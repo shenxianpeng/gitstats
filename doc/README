@@ -5,9 +5,9 @@ Currently it produces only HTML output with tables and graphs.
 
 Requirements
 ============
-- Python (>= 2.6.0)
-- Git (>= 1.5.2.4)
-- Gnuplot (>= 4.0.0)
+- Python (>= 3.9.0)
+- Git (>= 2.x)
+- Gnuplot (>= 5.4)  # sudo apt install gnuplot
 - a git repository (bare clone will work as well)
 
 The above versions are not absolute requirements; older versions may work also.

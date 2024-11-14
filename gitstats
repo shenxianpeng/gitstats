@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # Copyright (c) 2007-2014 Heikki Hokkanen <hoxu@users.sf.net> & others (see doc/AUTHOR)
 # GPLv2 / GPLv3
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
@@ -73,7 +73,7 @@ def getpipeoutput(cmds, quiet=False):
             print("\r", end=" ")
         print("[%.5f] >> %s" % (end - start, " | ".join(cmds)))
     exectime_external += end - start
-    return output.rstrip("\n")
+    return output.decode("utf-8").rstrip("\n")
 
 
 def getlogrange(defaultrange="HEAD", end_only=True):
