@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=62.6", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gitstats"
+description = "A statistics generator for git repositories"
+readme = "README.md"
+keywords = ["git", "gitstats", "statistics", "git history"]
+authors = [
+    { name = "Heikki Hokkanen", email = "hoxu@users.sf.net" },
+    { name = "Xianpeng Shen", email = "xianpeng.shen@gmail.com" },
+]
+
+requires-python = ">=3.9"
+dynamic = ["version"]
+
+classifiers = [
+    # https://pypi.org/pypi?%3Aaction=list_classifiers
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Build Tools",
+]
+
+[project.scripts]
+gitstats = "gitstats:main"
+
+[project.urls]
+source =  "https://github.com/shenxianpeng/gitstats"
+tracker = "https://github.com/shenxianpeng/gitstats/issues"
+
+[tool.setuptools]
+zip-safe = false
+packages = ["gitstats"]
+
+[tool.setuptools_scm]
+# It would be nice to include the commit hash in the version, but that
+# can't be done in a PEP 440-compatible way.
+version_scheme= "no-guess-dev"
+# Test PyPI does not support local versions.
+local_scheme = "no-local-version"
+fallback_version = "0.0.0"
+
+[tool.mypy]
+show_error_codes = true
+show_column_numbers = true

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 # Copyright (c) 2007-2014 Heikki Hokkanen <hoxu@users.sf.net> & others (see doc/AUTHOR)
 # GPLv2 / GPLv3
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
@@ -15,11 +14,6 @@ import subprocess
 import sys
 import time
 import zlib
-
-if sys.version_info < (3, 9):
-    print("Python 3.9 or higher is required for gitstats", file=sys.stderr)
-    sys.exit(1)
-
 from multiprocessing import Pool
 
 os.environ["LC_ALL"] = "C"
@@ -922,7 +916,7 @@ class HTMLReportCreator(ReportCreator):
             )
         )
         f.write(
-            '<dt>Generator</dt><dd><a href="http://gitstats.sourceforge.net/">GitStats</a> (version %s), %s, %s</dd>'
+            '<dt>Generator</dt><dd><a href="https://github.com/shenxianpeng/gitstats">GitStats</a> (version %s), %s, %s</dd>'
             % (getversion(), getgitversion(), getgnuplotversion())
         )
         f.write(
@@ -1861,6 +1855,10 @@ class GitStats:
             print()
 
 
-if __name__ == "__main__":
+def main():
     g = GitStats()
     g.run(sys.argv[1:])
+
+
+if __name__ == "__main__":
+    main()
