@@ -30,7 +30,9 @@ Requirements
 Usage
 =====
 
-    ./gitstats --help
+    pip install gitstats
+
+    gitstats --help
 
     Usage: gitstats [options] <gitpath..> <outputpath>
 
@@ -45,7 +47,7 @@ Usage
 Examples
 --------
 
-    ./gitstats ../gitstats ~/public_html
+    gitstats your-awesome-project ~/public_html
 
 The output will be generated in the given directory.
 
