@@ -1,7 +1,6 @@
 name: Run pre-commit
 
 on:
-  push:
   pull_request:
     types: opened
 
