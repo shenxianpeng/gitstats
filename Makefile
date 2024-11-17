@@ -14,6 +14,8 @@ help:
 	@echo "make install                   # install to ${PREFIX}"
 	@echo "make install PREFIX=~          # install to ~"
 	@echo "make release [VERSION=foo]     # make a release tarball"
+	@echo "make image                     # make a docker image"
+	@echo "make publishimage              # publish docker image to dockerhub"
 	@echo
 
 install:
@@ -28,7 +30,14 @@ release:
 	@tar --owner=0 --group=0 --transform 's!^!gitstats/!' --transform 's!gitstats.tmp!gitstats!' -zcf gitstats-$(VERSION).tar.gz gitstats.tmp $(RESOURCES) doc/ Makefile
 	@$(RM) gitstats.tmp
 
+image:
+	@docker build -t gitstats:$(VERSION) .
+
+publish-image: image
+	@docker tag gitstats:$(VERSION) xianpengshen/gitstats:$(VERSION)
+	@docker push xianpengshen/gitstats:$(VERSION)
+
 man:
 	pod2man --center "User Commands" -r $(VERSION) doc/gitstats.pod > doc/gitstats.1
 
-.PHONY: all help install release
+.PHONY: all help install release image

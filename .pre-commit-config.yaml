@@ -19,3 +19,14 @@ repos:
     rev: v2.3.0
     hooks:
     -   id: codespell
+-   repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+    -   id: hadolint
+        args:
+            [
+                --ignore,DL3008,
+                --ignore,DL3013,
+                --ignore,DL3042,
+                --ignore,SC1091,
+            ]
