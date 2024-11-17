@@ -27,10 +27,17 @@ Requirements
 - Python 3.9+
 - Gnuplot (http://www.gnuplot.info/)
 
+Installation
+============
+
+    # since I gitstats is used by other projects
+    # so right now I don't publish it on pypi and please install from source
+
+    pip install git+https://github.com/shenxianpeng/gitstats.git@main
+
+
 Usage
 =====
-
-    pip install gitstats
 
     gitstats --help
 
