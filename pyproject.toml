@@ -3,7 +3,7 @@ requires = ["setuptools>=62.6", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "git-stats"
+name = "gitstory"
 description = "A statistics generator for git repositories"
 readme = "README.md"
 keywords = ["git", "gitstats", "statistics", "git history"]
@@ -29,7 +29,7 @@ classifiers = [
 ]
 
 [project.scripts]
-git-stats = "gitstats.main:main"
+gitstory = "gitstats.main:main"
 
 [project.urls]
 source =  "https://github.com/shenxianpeng/gitstats"
