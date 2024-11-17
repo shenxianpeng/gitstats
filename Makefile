@@ -40,4 +40,4 @@ publish-image: image
 man:
 	pod2man --center "User Commands" -r $(VERSION) doc/gitstats.pod > doc/gitstats.1
 
-.PHONY: all help install release image
+.PHONY: all help install release image publish-image
