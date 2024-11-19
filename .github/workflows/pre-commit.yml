@@ -7,4 +7,7 @@ jobs:
   pre-commit:
     uses: shenxianpeng/.github/.github/workflows/pre-commit.yml@main
     with: 
-      commands: brew install hadolint
+      commands: |
+        wget -O hadolint https://github.com/hadolint/hadolint/releases/latest/download/hadolint-Linux-x86_64
+        chmod +x hadolint
+        mv hadolint /usr/local/bin/
