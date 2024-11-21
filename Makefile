@@ -5,6 +5,7 @@ RESOURCES=gitstats.css sortable.js *.gif
 BINARIES=gitstats
 VERSION=$(shell git describe 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || date +%Y-%m-%d)
 SEDVERSION=perl -pi -e 's/VERSION = 0/VERSION = "$(VERSION)"/' --
+TAG ?= latest
 
 all: help
 
@@ -15,7 +16,7 @@ help:
 	@echo "make install PREFIX=~          # install to ~"
 	@echo "make release [VERSION=foo]     # make a release tarball"
 	@echo "make image                     # make a docker image"
-	@echo "make publishimage              # publish docker image to dockerhub"
+	@echo "make publish-image             # publish docker image to dockerhub"
 	@echo
 
 install:
@@ -31,11 +32,11 @@ release:
 	@$(RM) gitstats.tmp
 
 image:
-	@docker build -t gitstats:$(VERSION) .
+	@docker build -t gitstats:$(TAG) .
 
 publish-image: image
-	@docker tag gitstats:$(VERSION) xianpengshen/gitstats:$(VERSION)
-	@docker push xianpengshen/gitstats:$(VERSION)
+	@docker tag gitstats:$(TAG) ghcr.io/shenxianpeng/gitstats:$(TAG)
+	@docker push ghcr.io/shenxianpeng/gitstats:$(TAG)
 
 man:
 	pod2man --center "User Commands" -r $(VERSION) doc/gitstats.pod > doc/gitstats.1
