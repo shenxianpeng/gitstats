@@ -18,7 +18,10 @@ jobs:
     - uses: actions/checkout@v4
     - name: Build to check Dockerfile
       if: github.event.inputs.tag == ''
-      run: make image
+      run:  |
+        make image
+        echo $CR_PAT | docker login ghcr.io -u shenxianpeng --password-stdin
+        make publish-image
     - name: Build and publish docker image
       if: github.event.inputs.tag != ''
       run: |
