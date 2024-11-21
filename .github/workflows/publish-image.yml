@@ -1,0 +1,30 @@
+name: Publish Image
+
+on:
+  push:
+    paths:
+      - 'Dockerfile'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Which tag want to build'
+        default: ''
+        required: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build to check Dockerfile
+      if: github.event.inputs.tag == ''
+      run: make image
+    - name: Build and publish docker image
+      if: github.event.inputs.tag != ''
+      run: |
+        echo "tag = ${{ github.event.inputs.tag }}"
+        make image TAG=${{ github.event.inputs.tag }}
+        echo $CR_PAT | docker login ghcr.io -u shenxianpeng --password-stdin
+        make publish-image TAG=${{ github.event.inputs.tag }}
+      env:
+        CR_PAT: ${{ secrets.CR_PAT }}
