@@ -16,7 +16,8 @@ help:
 	@echo "make install PREFIX=~          # install to ~"
 	@echo "make release [VERSION=foo]     # make a release tarball"
 	@echo "make image                     # make a docker image"
-	@echo "make publish-image             # publish docker image to dockerhub"
+	@echo "make publish-image             # publish docker image to ghcr"
+	@echo "make preview                   # preview gitstats report in local"
 	@echo
 
 install:
@@ -37,6 +38,11 @@ image:
 publish-image: image
 	@docker tag gitstats:$(TAG) ghcr.io/shenxianpeng/gitstats:$(TAG)
 	@docker push ghcr.io/shenxianpeng/gitstats:$(TAG)
+
+preview:
+	@mkdir -p gitstats-report
+	@gitstats . gitstats-report
+	@python3 -m http.server 8000 -d gitstats-report
 
 man:
 	pod2man --center "User Commands" -r $(VERSION) doc/gitstats.pod > doc/gitstats.1
