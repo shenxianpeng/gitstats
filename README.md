@@ -11,8 +11,7 @@ Currently it produces only HTML output with tables and graphs.
 >
 > I forked the project to update it for compatibility with Python 3.9+ and to introduce new features.
 
-Features
-========
+## Features
 
 Here is a list of some statistics generated currently:
 
@@ -22,43 +21,58 @@ Here is a list of some statistics generated currently:
 * Files: file count by date, extensions
 * Lines: Lines of Code by date
 
-Requirements
-============
+## Requirements
+
 - Python 3.9+
 - Gnuplot (http://www.gnuplot.info/)
 
-Installation
-============
+## Installation
 
-    # since I gitstats is used by other projects
-    # so right now I don't publish it on pypi and please install from source
+### Install from source
 
-    pip install git+https://github.com/shenxianpeng/gitstats.git@main
+Since I gitstats is used by other projects, so right now I don't publish it on pypi and please install from source.
+
+```
+# create python virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+pip install git+https://github.com/shenxianpeng/gitstats.git@main
+
+gitstats --help
+```
+
+### Install from Docker
+
+You can also get gitstats docker image.
+
+```
+docker run ghcr.io/shenxianpeng/gitstats:main --help
+```
 
 
-Usage
-=====
+## Usage
 
-    gitstats --help
+```
+Usage: gitstats [options] <gitpath..> <outputpath>
 
-    Usage: gitstats [options] <gitpath..> <outputpath>
+Options:
+-c key=value     Override configuration value
 
-    Options:
-    -c key=value     Override configuration value
+Default config values:
+{'max_domains': 10, 'max_ext_length': 10, 'style': 'gitstats.css', 'max_authors': 20, 'authors_top': 5, 'commit_begin': '', 'commit_end': 'HEAD', 'linear_linestats': 1, 'project_name': '', 'processes': 8, 'start_date': ''}
 
-    Default config values:
-    {'max_domains': 10, 'max_ext_length': 10, 'style': 'gitstats.css', 'max_authors': 20, 'authors_top': 5, 'commit_begin': '', 'commit_end': 'HEAD', 'linear_linestats': 1, 'project_name': '', 'processes': 8, 'start_date': ''}
+Please see the manual page for more details.
+```
 
-    Please see the manual page for more details.
+## Examples
 
-Examples
---------
-
-    gitstats your-awesome-project ~/public_html
+```
+gitstats your-awesome-project ~/public_html
+```
 
 The output will be generated in the given directory.
 
-License
-=======
+## License
 
 Both the code and the web site are licensed under GPLv2/GPLv3.
