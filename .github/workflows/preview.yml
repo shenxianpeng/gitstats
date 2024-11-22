@@ -1,0 +1,46 @@
+name: GitStats Preview
+
+on:
+  pull_request:
+    branches:
+      - main  # Trigger on pull requests targeting the `main` branch.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-tags: 0 # git all history.
+
+    - name: Install Dependencies and GitStats
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gnuplot
+
+        python3 -m venv venv
+        source venv/bin/activate
+
+        pip install .
+
+    - name: Generate GitStats Report
+      run: |
+        mkdir -p gitstats-report
+        gitstats . gitstats-report
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: gitstats-report
+        # Configure a unique preview link for each pull request
+        destination_dir: previews/${{ github.event.pull_request.number }}
+
+    - name: Add PR Comment with Preview Link
+      env:
+        PR_NUMBER: ${{ github.event.pull_request.number }}
+        REPO_NAME: ${{ github.repository }}
+      run: |
+        PREVIEW
