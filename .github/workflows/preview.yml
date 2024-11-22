@@ -13,7 +13,7 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0 # git all history.
+        fetch-depth: 0 # get all history.
 
     - name: Install Dependencies
       run: |
@@ -26,14 +26,14 @@ jobs:
         source venv/bin/activate
         pip install .
 
-        mkdir -p gitstats-report
-        gitstats . gitstats-report
+        mkdir -p ~/gitstats-report
+        gitstats . ~/gitstats-report
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: gitstats-report
+        publish_dir: ~/gitstats-report
         # Configure a unique preview link for each pull request
         destination_dir: previews/${{ github.event.pull_request.number }}
 
