@@ -14,6 +14,12 @@ Currently it produces only HTML output with tables and graphs.
 >
 > I forked the project to update it for compatibility with Python 3.9+ and to introduce new features.
 
+---
+
+Check what a _gitstats_ report looks like by going to: 
+
+📈 https://shenxianpeng.github.io/gitstats/previews/main/index.html
+
 ## Features
 
 Here is a list of some statistics generated currently:
