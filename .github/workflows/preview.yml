@@ -30,15 +30,15 @@ jobs:
         source venv/bin/activate
         pip install .
 
-        mkdir -p ~/gitstats-report
-        gitstats . ~/gitstats-report
+        mkdir -p gitstats-report
+        gitstats . gitstats-report
 
     - name: Deploy to GitHub Pages for PR
       if: ${{ github.event_name == 'pull_request' }}
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ~/gitstats-report
+        publish_dir: gitstats-report
         # Configure a unique preview link for each pull request
         destination_dir: previews/${{ github.event.pull_request.number }}
 
@@ -47,7 +47,7 @@ jobs:
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ~/gitstats-report
+        publish_dir: gitstats-report
         destination_dir: previews/main
 
     - name: Add PR Comment with Preview Link
