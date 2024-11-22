@@ -15,18 +15,17 @@ jobs:
       with:
         fetch-tags: 0 # git all history.
 
-    - name: Install Dependencies and GitStats
+    - name: Install Dependencies
       run: |
         sudo apt-get update
         sudo apt-get install -y gnuplot
 
-        python3 -m venv venv
-        source venv/bin/activate
-
-        pip install .
-
     - name: Generate GitStats Report
       run: |
+        python3 -m venv venv
+        source venv/bin/activate
+        pip install .
+
         mkdir -p gitstats-report
         gitstats . gitstats-report
 
