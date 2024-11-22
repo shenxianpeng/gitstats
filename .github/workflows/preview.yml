@@ -13,7 +13,7 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v4
       with:
-        fetch-tags: 0 # git all history.
+        fetch-depth: 0 # git all history.
 
     - name: Install Dependencies
       run: |
