@@ -43,6 +43,6 @@ jobs:
         REPO_NAME: ${{ github.repository }}
         GH_TOKEN: ${{ github.token }}
       run: |
-        PREVIEW_URL="https://${{ env.REPO_NAME }}.github.io/previews/${{ env.PR_NUMBER }}/"
+        PREVIEW_URL="https://${{ env.REPO_NAME }}.github.io/previews/${{ env.PR_NUMBER }}/index.html"
         COMMENT_BODY="🎉 Your GitStats preview is ready: [View Report](${PREVIEW_URL})"
         gh api repos/${{ env.REPO_NAME }}/issues/${{ env.PR_NUMBER }}/comments -f body="${COMMENT_BODY}"
