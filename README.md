@@ -1,5 +1,8 @@
 # GitStats - git history statistics generator
 
+[![GitStats Preview](https://github.com/shenxianpeng/gitstats/actions/workflows/preview.yml/badge.svg)](https://github.com/shenxianpeng/gitstats/actions/workflows/preview.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=shenxianpeng_gitstats&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=shenxianpeng_gitstats)
+
 **gitstats** is a statistics generator for git repositories. It examines the repository and produces some interesting statistics from the history of it.
 
 It is mostly intended for developers, as a way to check some development statistics for a project.
