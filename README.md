@@ -33,7 +33,7 @@ Here is a list of some statistics generated currently:
 Since I gitstats is used by other projects, so right now I don't publish it on pypi and please install from source.
 
 ```
-# create python virtual environment 
+# create python virtual environment
 python3 -m venv venv
 source venv/bin/activate
 
