@@ -42,4 +42,6 @@ jobs:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         REPO_NAME: ${{ github.repository }}
       run: |
-        PREVIEW
+        PREVIEW_URL="https://${{ env.REPO_NAME }}.github.io/previews/${{ env.PR_NUMBER }}/"
+        COMMENT_BODY="🎉 Your GitStats preview is ready: [View Report](${PREVIEW_URL})"
+        gh api repos/${{ env.REPO_NAME }}/issues/${{ env.PR_NUMBER }}/comments -f body="${COMMENT_BODY}"
