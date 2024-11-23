@@ -16,7 +16,7 @@ Currently it produces only HTML output with tables and graphs.
 
 ---
 
-Check what a _gitstats_ report looks like by going to: 
+Check what a _gitstats_ report looks like by going to:
 
 📈 https://shenxianpeng.github.io/gitstats/previews/main/index.html
 

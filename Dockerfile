@@ -19,10 +19,6 @@ USER nobody
 
 ENTRYPOINT [ "gitstats"]
 
-LABEL com.github.actions.name="Git Stats"
-LABEL com.github.actions.description="Check commit message formatting, branch naming, commit author, email, and more."
-LABEL com.github.actions.icon="code"
-LABEL com.github.actions.color="gray-dark"
-
-LABEL repository="https://github.com/shenxianpeng/git"
-LABEL maintainer="shenxianpeng <20297606+shenxianpeng@users.noreply.github.com>"
+LABEL org.opencontainers.image.source="https://github.com/shenxianpeng/gitstats"
+LABEL org.opencontainers.image.description="Git History Statistics Generator"
+LABEL org.opencontainers.image.licenses="GPLv3"

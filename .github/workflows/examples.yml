@@ -1,0 +1,40 @@
+name: GitStats Examples
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'The repo path to clone'
+        required: false
+        default: 'https://github.com/jenkinsci/jenkins.git'
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gnuplot
+
+    - name: Generate GitStats Report
+      run: |
+        python3 -m venv venv
+        source venv/bin/activate
+        pip install git+https://github.com/shenxianpeng/gitstats.git@main
+
+        mkdir -p gitstats-report
+        git clone ${{ inputs.name }}
+        repo_name=$(basename -s .git "${{ inputs.name }}")
+        echo "REPO_NAME=$repo_name" >> $GITHUB_ENV
+        gitstats ./$repo_name gitstats-report
+
+    - name: Deploy to GitHub Pages
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: gitstats-report
+        destination_dir: examples/${{ env.REPO_NAME }}
