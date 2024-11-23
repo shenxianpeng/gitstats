@@ -16,9 +16,12 @@ Currently it produces only HTML output with tables and graphs.
 
 ---
 
-Check what a _gitstats_ report looks like by going to:
+## Check out example gitstats reports
 
-📈 https://shenxianpeng.github.io/gitstats/previews/main/index.html
+Explore what a _gitstats_ report looks like with the following examples:
+
+* 📈 [Self preview of gitstats](https://shenxianpeng.github.io/gitstats/previews/main/index.html): A report generated for the GitStats project itself.
+* 📈 [Jenkins project example](https://shenxianpeng.github.io/gitstats/examples/jenkins/files.html): A report showcasing data from the Jenkins project.
 
 ## Features
 
