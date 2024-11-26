@@ -48,7 +48,7 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: gitstats-report
-        destination_dir: previews/main
+        destination_dir: main
 
     - name: Add PR Comment with Preview Link
       if: ${{ github.event_name == 'pull_request' }}

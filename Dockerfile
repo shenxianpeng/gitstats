@@ -10,9 +10,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN if [ -z "$VERSION" ]; then \
-        pip3 install git+https://github.com/shenxianpeng/gitstats.git@main; \
+        pip3 install gitstats; \
     else \
-        pip3 install git+https://github.com/shenxianpeng/gitstats.git@$VERSION; \
+        pip3 install gitstats==$VERSION; \
     fi
 
 USER nobody
