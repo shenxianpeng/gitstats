@@ -1,5 +1,6 @@
 # GitStats - git history statistics generator
 
+![PyPI - Version](https://img.shields.io/pypi/v/gitstats)
 [![GitStats Report](https://img.shields.io/badge/GitStats_Report-Available-green?style=flat)](https://shenxianpeng.github.io/gitstats/previews/main/index.html)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=shenxianpeng_gitstats&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=shenxianpeng_gitstats)
 
@@ -20,7 +21,7 @@ Currently it produces only HTML output with tables and graphs.
 
 Explore what a _gitstats_ report looks like with the following examples:
 
-* 📈 [Self preview of gitstats](https://shenxianpeng.github.io/gitstats/previews/main/index.html): A report generated for the GitStats project itself.
+* 📈 [Self preview of gitstats](https://shenxianpeng.github.io/gitstats/main/index.html): A report generated for the GitStats project itself.
 * 📈 [Jenkins project example](https://shenxianpeng.github.io/gitstats/examples/jenkins/files.html): A report showcasing data from the Jenkins project.
 
 ## Features
