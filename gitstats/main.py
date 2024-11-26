@@ -2,6 +2,7 @@
 # GPLv2 / GPLv3
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
 # GPLv2 / GPLv3
+import configparser
 import datetime
 import getopt
 import glob
@@ -32,19 +33,10 @@ gnuplot_cmd = "gnuplot"
 if "GNUPLOT" in os.environ:
     gnuplot_cmd = os.environ["GNUPLOT"]
 
-conf = {
-    "max_domains": 10,
-    "max_ext_length": 10,
-    "style": "gitstats.css",
-    "max_authors": 20,
-    "authors_top": 5,
-    "commit_begin": "",
-    "commit_end": "HEAD",
-    "linear_linestats": 1,
-    "project_name": "",
-    "processes": 8,
-    "start_date": "",
-}
+
+gitstats_conf = configparser.ConfigParser()
+gitstats_conf.read("gitstats.conf")
+conf = dict(gitstats_conf["gitstats"])
 
 
 def getpipeoutput(cmds, quiet=False):

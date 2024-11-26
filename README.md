@@ -31,8 +31,9 @@ Here is a list of some statistics generated currently:
 * General statistics: total files, lines, commits, authors.
 * Activity: commits by hour of day, day of week, hour of week, month of year, year and month, and year.
 * Authors: list of authors (name, commits (%), first commit date, last commit date, age), author of month, author of year.
-* Files: file count by date, extensions
-* Lines: Lines of Code by date
+* Files: file count by date, extensions.
+* Lines: Lines of Code by date.
+* Custom Configuration: config values can be customizable through `gitstats.conf`.
 
 ## Requirements
 
@@ -50,7 +51,7 @@ Since I gitstats is used by other projects, so right now I don't publish it on p
 python3 -m venv venv
 source venv/bin/activate
 
-pip install git+https://github.com/shenxianpeng/gitstats.git@main
+pip install gitstats
 
 gitstats --help
 ```
@@ -63,24 +64,23 @@ You can also get gitstats docker image.
 docker run ghcr.io/shenxianpeng/gitstats:main --help
 ```
 
-
 ## Usage
 
-```
+```bash
 Usage: gitstats [options] <gitpath..> <outputpath>
 
 Options:
 -c key=value     Override configuration value
 
 Default config values:
-{'max_domains': 10, 'max_ext_length': 10, 'style': 'gitstats.css', 'max_authors': 20, 'authors_top': 5, 'commit_begin': '', 'commit_end': 'HEAD', 'linear_linestats': 1, 'project_name': '', 'processes': 8, 'start_date': ''}
+{'max_domains': '10', 'max_ext_length': '10', 'style': 'gitstats.css', 'max_authors': '20', 'authors_top': '5', 'commit_begin': '', 'commit_end': 'HEAD', 'linear_linestats': '1', 'project_name': '', 'processes': '8', 'start_date': ''}
 
 Please see the manual page for more details.
 ```
 
 ## Examples
 
-```
+```bash
 gitstats your-awesome-project ~/public_html
 ```
 
