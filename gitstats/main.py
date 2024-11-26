@@ -36,7 +36,7 @@ if "GNUPLOT" in os.environ:
 
 gitstats_conf = configparser.ConfigParser()
 gitstats_conf.read("gitstats.conf")
-conf = dict(gitstats_conf["gitstats"])
+conf = {k: int(v) if v.isdigit() else v for k, v in gitstats_conf["gitstats"].items()}
 
 
 def getpipeoutput(cmds, quiet=False):
