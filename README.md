@@ -1,6 +1,6 @@
 # GitStats - git history statistics generator
 
-![PyPI - Version](https://img.shields.io/pypi/v/gitstats)
+![PyPI - Version](https://img.shields.io/pypi/v/gitstats?color=blue)
 [![GitStats Report](https://img.shields.io/badge/GitStats_Report-Available-green?style=flat)](https://shenxianpeng.github.io/gitstats/previews/main/index.html)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=shenxianpeng_gitstats&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=shenxianpeng_gitstats)
 
