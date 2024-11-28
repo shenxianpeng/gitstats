@@ -16,6 +16,7 @@ import sys
 import time
 import zlib
 from multiprocessing import Pool
+from gitstats import load_config
 
 os.environ["LC_ALL"] = "C"
 
@@ -34,9 +35,7 @@ if "GNUPLOT" in os.environ:
     gnuplot_cmd = os.environ["GNUPLOT"]
 
 
-gitstats_conf = configparser.ConfigParser()
-gitstats_conf.read("gitstats.conf")
-conf = {k: int(v) if v.isdigit() else v for k, v in gitstats_conf["gitstats"].items()}
+conf = load_config()
 
 
 def getpipeoutput(cmds, quiet=False):

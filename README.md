@@ -1,6 +1,6 @@
 # GitStats - git history statistics generator
 
-![PyPI - Version](https://img.shields.io/pypi/v/gitstats?color=blue)
+[![PyPI - Version](https://img.shields.io/pypi/v/gitstats?color=blue)](https://pypi.org/project/gitstats/)
 [![GitStats Report](https://img.shields.io/badge/GitStats_Report-Available-green?style=flat)](https://shenxianpeng.github.io/gitstats/previews/main/index.html)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=shenxianpeng_gitstats&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=shenxianpeng_gitstats)
 
@@ -44,8 +44,6 @@ Here is a list of some statistics generated currently:
 
 ### Install from source
 
-Since I gitstats is used by other projects, so right now I don't publish it on pypi and please install from source.
-
 ```
 # create python virtual environment
 python3 -m venv venv
@@ -61,7 +59,7 @@ gitstats --help
 You can also get gitstats docker image.
 
 ```
-docker run ghcr.io/shenxianpeng/gitstats:main --help
+docker run ghcr.io/shenxianpeng/gitstats:latest --help
 ```
 
 ## Usage
