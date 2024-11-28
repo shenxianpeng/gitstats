@@ -12,6 +12,7 @@ DEFAULT_CONFIG = {
     "start_date": "",
 }
 
+
 def load_config(file_path="gitstats.conf"):
     """Load configuration from a file, or fall back to defaults."""
     import configparser
@@ -22,5 +23,8 @@ def load_config(file_path="gitstats.conf"):
 
     if os.path.exists(file_path):
         config_parser.read(file_path)
-        config = {k: int(v) if v.isdigit() else v for k, v in config_parser["gitstats"].items()}
+        config = {
+            k: int(v) if v.isdigit() else v
+            for k, v in config_parser["gitstats"].items()
+        }
     return config
