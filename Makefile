@@ -1,9 +1,5 @@
-PREFIX=/usr/local
-BINDIR=$(PREFIX)/bin
-RESOURCEDIR=$(PREFIX)/share/gitstats
 RESOURCES=gitstats.css sortable.js *.gif
-BINARIES=gitstats
-VERSION=$(shell git describe 2>/dev/null || git rev-parse --short HEAD 2>/dev/null || date +%Y-%m-%d)
+VERSION := $(shell python3 -c "from setuptools_scm import get_version; print(get_version())")
 SEDVERSION=perl -pi -e 's/VERSION = 0/VERSION = "$(VERSION)"/' --
 TAG ?= latest
 
@@ -12,19 +8,11 @@ all: help
 help:
 	@echo "Usage:"
 	@echo
-	@echo "make install                   # install to ${PREFIX}"
-	@echo "make install PREFIX=~          # install to ~"
 	@echo "make release [VERSION=foo]     # make a release tarball"
 	@echo "make image                     # make a docker image"
 	@echo "make publish-image             # publish docker image to ghcr"
 	@echo "make preview                   # preview gitstats report in local"
 	@echo
-
-install:
-	install -d $(BINDIR) $(RESOURCEDIR)
-	install -v $(BINARIES) $(BINDIR)
-	install -v -m 644 $(RESOURCES) $(RESOURCEDIR)
-	$(SEDVERSION) $(BINDIR)/gitstats
 
 release:
 	@cp gitstats gitstats.tmp
@@ -43,8 +31,5 @@ preview:
 	@mkdir -p gitstats-report
 	@gitstats . gitstats-report
 	@python3 -m http.server 8000 -d gitstats-report
-
-man:
-	pod2man --center "User Commands" -r $(VERSION) doc/gitstats.pod > doc/gitstats.1
 
 .PHONY: all help install release image publish-image
