@@ -13,7 +13,7 @@ help:
 	@echo "make publish-image             # publish docker image to ghcr"
 	@echo "make preview                   # preview gitstats report in local"
 	@echo
-	
+
 release:
 	@cp gitstats gitstats.tmp
 	@$(SEDVERSION) gitstats.tmp
