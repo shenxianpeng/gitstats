@@ -42,7 +42,7 @@ Here is a list of some statistics generated currently:
 
 ## Installation
 
-### Install from pip
+### Install from PyPI
 
 ```
 # create python virtual environment
