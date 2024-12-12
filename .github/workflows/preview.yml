@@ -9,7 +9,7 @@ on:
       - '.github/workflows/preview.yml'
   push:
     branches:
-      - main  # Trigger on pushes to the `main` branch.
+      - "main"
   workflow_dispatch:
 
 jobs:
