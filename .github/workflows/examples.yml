@@ -21,11 +21,7 @@ jobs:
 
     - name: Generate GitStats Report
       run: |
-        python3 -m venv venv
-        source venv/bin/activate
-        pip install git+https://github.com/shenxianpeng/gitstats.git@main
-
-        mkdir -p gitstats-report
+        pipx install gitstats
         git clone ${{ inputs.name }}
         repo_name=$(basename -s .git "${{ inputs.name }}")
         echo "REPO_NAME=$repo_name" >> $GITHUB_ENV

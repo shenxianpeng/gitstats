@@ -1,6 +1,3 @@
-RESOURCES=gitstats.css sortable.js *.gif
-VERSION := $(shell python3 -c "from setuptools_scm import get_version; print(get_version())")
-SEDVERSION=perl -pi -e 's/VERSION = 0/VERSION = "$(VERSION)"/' --
 TAG ?= latest
 
 all: help
@@ -8,17 +5,10 @@ all: help
 help:
 	@echo "Usage:"
 	@echo
-	@echo "make release [VERSION=foo]     # make a release tarball"
 	@echo "make image                     # make a docker image"
 	@echo "make publish-image             # publish docker image to ghcr"
 	@echo "make preview                   # preview gitstats report in local"
 	@echo
-
-release:
-	@cp gitstats gitstats.tmp
-	@$(SEDVERSION) gitstats.tmp
-	@tar --owner=0 --group=0 --transform 's!^!gitstats/!' --transform 's!gitstats.tmp!gitstats!' -zcf gitstats-$(VERSION).tar.gz gitstats.tmp $(RESOURCES) doc/ Makefile
-	@$(RM) gitstats.tmp
 
 image:
 	@docker build -t gitstats:$(TAG) .

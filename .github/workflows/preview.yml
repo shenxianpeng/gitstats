@@ -2,22 +2,33 @@ name: GitStats Preview
 
 on:
   pull_request:
-    branches:
-      - main  # Trigger on pull requests targeting the `main` branch.
+    paths:
+      - '**/*.py'
+      - 'pyproject.toml'
+      - 'gitstats.conf'
+      - '.github/workflows/preview.yml'
   push:
     branches:
-      - main  # Trigger on pushes to the `main` branch.
+      - "main"
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
 
     steps:
-    - name: Checkout Repository
+    - name: Checkout Code
       uses: actions/checkout@v4
       with:
         fetch-depth: 0 # get all history.
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
 
     - name: Install Dependencies
       run: |
@@ -28,13 +39,12 @@ jobs:
       run: |
         python3 -m venv venv
         source venv/bin/activate
+        # for testing
         pip install .
-
-        mkdir -p gitstats-report
         gitstats . gitstats-report
 
     - name: Deploy to GitHub Pages for PR
-      if: ${{ github.event_name == 'pull_request' }}
+      if: ${{ github.event_name == 'pull_request' && matrix.python-version == '3.9' }}
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -43,7 +53,7 @@ jobs:
         destination_dir: previews/${{ github.event.pull_request.number }}
 
     - name: Deploy to GitHub Pages for main branch
-      if: ${{ (github.event_name == 'push' && github.ref_name == 'main') || github.event_name == 'workflow_dispatch' }}
+      if: ${{ (github.ref_name == 'main' || github.event_name == 'workflow_dispatch') && matrix.python-version == '3.9' }}
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -51,7 +61,7 @@ jobs:
         destination_dir: main
 
     - name: Add PR Comment with Preview Link
-      if: ${{ github.event_name == 'pull_request' }}
+      if: ${{ github.event_name == 'pull_request' && matrix.python-version == '3.9' }}
       env:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         REPO_NAME: ${{ github.repository }}
