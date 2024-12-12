@@ -45,7 +45,7 @@ Here is a list of some statistics generated currently:
 
 ### Install from PyPI
 
-```
+```bash
 # create python virtual environment
 python3 -m venv venv
 source venv/bin/activate
@@ -59,8 +59,46 @@ gitstats --help
 
 You can also get gitstats docker image.
 
-```
+```bash
 docker run ghcr.io/shenxianpeng/gitstats:latest --help
+```
+
+### Use gitstats in GitHub Actions
+
+```yaml
+name: GitStats Preview
+
+on:
+  cron:
+    - cron: '0 0 * * 0'  # Run at every sunday at 00:00
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # get all history.
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gnuplot
+
+    - name: Generate GitStats Report
+      run: |
+        pipx install gitstats
+        mkdir -p gitstats-report
+        gitstats . gitstats-report
+
+    - name: Deploy to GitHub Pages for view
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: gitstats-report
 ```
 
 ## Usage
