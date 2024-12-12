@@ -2,10 +2,8 @@ name: GitStats Preview
 
 on:
   pull_request:
-    branches:
-      - main  # Trigger on pull requests targeting the `main` branch.
     paths:
-      - '**.py'
+      - '**/*.py' 
       - 'pyproject.toml'
       - 'gitstats.conf'
       - '.github/workflows/preview.yml'
