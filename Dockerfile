@@ -9,16 +9,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN if [ -z "$VERSION" ]; then \
-        pip3 install gitstats; \
-    else \
-        pip3 install gitstats==$VERSION; \
-    fi
+# Install GitStats with optional version support
+RUN pip3 install gitstats${VERSION:+==$VERSION}
 
 USER nobody
 
 ENTRYPOINT [ "gitstats"]
 
-LABEL org.opencontainers.image.source="https://github.com/shenxianpeng/gitstats"
-LABEL org.opencontainers.image.description="Git History Statistics Generator"
-LABEL org.opencontainers.image.licenses="GPLv3"
+# Add metadata labels
+LABEL org.opencontainers.image.source="https://github.com/shenxianpeng/gitstats" \
+      org.opencontainers.image.description="Git History Statistics Generator" \
+      org.opencontainers.image.licenses="GPLv3"
