@@ -3,7 +3,7 @@ name: GitStats Preview
 on:
   pull_request:
     paths:
-      - '**/*.py' 
+      - '**/*.py'
       - 'pyproject.toml'
       - 'gitstats.conf'
       - '.github/workflows/preview.yml'
