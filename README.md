@@ -2,6 +2,7 @@
 
 [![PyPI - Version](https://img.shields.io/pypi/v/gitstats?color=blue)](https://pypi.org/project/gitstats/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/gitstats?color=blue)](https://pypistats.org/packages/gitstats)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gitstats)
 [![GitStats Report](https://img.shields.io/badge/GitStats_Report-Available-green?style=flat)](https://shenxianpeng.github.io/gitstats/previews/main/index.html)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=shenxianpeng_gitstats&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=shenxianpeng_gitstats)
 
@@ -40,6 +41,7 @@ Here is a list of some statistics generated currently:
 
 - Python 3.9+
 - Gnuplot (http://www.gnuplot.info/)
+- Git (http://git-scm.com/)
 
 ## Installation
 
@@ -64,6 +66,8 @@ docker run ghcr.io/shenxianpeng/gitstats:latest --help
 ```
 
 ### Use gitstats in GitHub Actions
+
+You can use gitstats in GitHub Actions to generate reports and deploy them to GitHub Pages.
 
 ```yaml
 name: GitStats Preview
@@ -91,7 +95,6 @@ jobs:
     - name: Generate GitStats Report
       run: |
         pipx install gitstats
-        mkdir -p gitstats-report
         gitstats . gitstats-report
 
     - name: Deploy to GitHub Pages for view
