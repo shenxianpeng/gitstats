@@ -6,16 +6,12 @@
 [![GitStats Report](https://img.shields.io/badge/GitStats_Report-Available-green?style=flat)](https://shenxianpeng.github.io/gitstats/previews/main/index.html)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=shenxianpeng_gitstats&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=shenxianpeng_gitstats)
 
-**gitstats** is a statistics generator for git repositories. It examines the repository and produces some interesting statistics from the history of it.
-
-It is mostly intended for developers, as a way to check some development statistics for a project.
-
-Currently it produces only HTML output with tables and graphs.
+**gitstats** is a tool that generates statistics for git repositories, providing HTML output with tables and graphs to help developers view project development history.
 
 > [!NOTE]
 > This project is a fork of [gitstats](https://github.com/hoxu/gitstats), which only supports Python 2.7 and is no longer maintained.
 >
-> I forked the project to update it for compatibility with Python 3.9+ and to introduce new features.
+> I forked the project to update it for compatibility with Python 3.9+ and to add new features.
 
 ---
 
@@ -28,14 +24,15 @@ Explore what a _gitstats_ report looks like with the following examples:
 
 ## Features
 
-Here is a list of some statistics generated currently:
+Here is a list of some features of _gitstats_:
 
-* General statistics: total files, lines, commits, authors.
-* Activity: commits by hour of day, day of week, hour of week, month of year, year and month, and year.
-* Authors: list of authors (name, commits (%), first commit date, last commit date, age), author of month, author of year.
-* Files: file count by date, extensions.
-* Lines: Lines of Code by date.
-* Custom Configuration: config values can be customizable through `gitstats.conf`.
+* **General**: total files, lines, commits, authors, age.
+* **Activity**: commits by hour of day, day of week, hour of week, month of year, year and month, and year.
+* **Authors**: list of authors (name, commits (%), first commit date, last commit date, age), author of month, author of year.
+* **Files**: file count by date, extensions.
+* **Lines**: line of code by date.
+* **Tags**: tags by date and author.
+* Customizable: config values through `gitstats.conf`.
 
 ## Requirements
 
