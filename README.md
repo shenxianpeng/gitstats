@@ -86,7 +86,7 @@ gitstats your-awesome-project ~/public_html
 
 The output will be generated in the given directory.
 
-If you want to use gitstats with CI to generate reports and deploy them, please see 
+If you want to use gitstats with CI to generate reports and deploy them, please see
 
 * [Use gitstats in GitHub Actions](#use-gitstats-in-github-actions)
 * [Use gitstats in Jenkins](#use-gitstats-in-jenkins)
