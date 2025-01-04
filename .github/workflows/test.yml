@@ -1,4 +1,4 @@
-name: GitStats Preview
+name: Test
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - '**/*.py'
       - 'pyproject.toml'
       - 'gitstats.conf'
-      - '.github/workflows/preview.yml'
+      - '.github/workflows/test.yml'
   push:
     branches:
       - "main"
