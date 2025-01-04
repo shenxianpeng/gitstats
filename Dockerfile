@@ -18,5 +18,5 @@ ENTRYPOINT [ "gitstats"]
 
 # Add metadata labels
 LABEL org.opencontainers.image.source="https://github.com/shenxianpeng/gitstats" \
-      org.opencontainers.image.description="Git History Statistics Generator" \
+      org.opencontainers.image.description="GitStats - Generate Visual Reports from Git History" \
       org.opencontainers.image.licenses="GPLv3"
