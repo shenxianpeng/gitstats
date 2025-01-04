@@ -1,12 +1,14 @@
-# GitStats - Generate Visual Reports from Git History
+# GitStats
+
+**gitstats** is a tool that generates visual reports for git repositories.
+
+It provides HTML output with tables and graphs to help teams view project development history.
 
 [![PyPI - Version](https://img.shields.io/pypi/v/gitstats?color=blue)](https://pypi.org/project/gitstats/)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gitstats)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/gitstats?color=blue)](https://pypistats.org/packages/gitstats)
 [![GitStats Report](https://img.shields.io/badge/GitStats_Report-Available-green?style=flat)](https://shenxianpeng.github.io/gitstats/index.html)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=shenxianpeng_gitstats&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=shenxianpeng_gitstats)
-
-**gitstats** is a tool that generates visual reports for git repositories, providing HTML output with tables and graphs to help teams view project development history.
 
 > [!NOTE]
 > This project is a fork of [gitstats](https://github.com/hoxu/gitstats), which only supports Python 2.7 and is no longer maintained.
