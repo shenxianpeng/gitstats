@@ -13,7 +13,45 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  test-windows:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: ["3.9"] # just test on one version to save time
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # get all history.
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install gnuplot
+      run: choco install gnuplot -y --no-progress
+
+    - name: Generate GitStats Report
+      run: |
+        $env:PATH += ";C:\Program Files\gnuplot\bin"
+        gnuplot --version
+
+        python -m venv venv
+        .\venv\Scripts\activate.bat
+        # for testing
+        pip install .
+        gitstats . gitstats-report-windows
+
+    - name: Save GitStats Report
+      if: ${{ matrix.python-version == '3.9' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: gitstats-report-windows
+        path: gitstats-report-windows
+
+  test-linux:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -42,6 +80,13 @@ jobs:
         # for testing
         pip install .
         gitstats . gitstats-report
+
+    - name: Save GitStats Report
+      if: ${{ matrix.python-version == '3.9' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: gitstats-report
+        path: gitstats-report
 
     - name: Deploy to GitHub Pages for PR
       if: ${{ github.event_name == 'pull_request' && matrix.python-version == '3.9' }}
