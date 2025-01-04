@@ -139,6 +139,7 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: gitstats-report
+        keep_files: true # do not remove example reports
 
     - name: Add PR Comment with Preview Link
       if: ${{ github.event_name == 'pull_request' && matrix.python-version == '3.9' }}

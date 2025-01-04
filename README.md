@@ -21,7 +21,7 @@ It provides HTML output with tables and graphs to help teams view project develo
 
 Explore what a _gitstats_ report looks like with the following examples:
 
-* 📈 [Self preview of gitstats](https://shenxianpeng.github.io/gitstats/main/index.html): A report generated for the GitStats project itself.
+* 📈 [Self preview of gitstats](https://shenxianpeng.github.io/gitstats/index.html): A report generated for the GitStats project itself.
 * 📈 [Jenkins project example](https://shenxianpeng.github.io/gitstats/examples/jenkins/files.html): A report showcasing data from the Jenkins project.
 
 ## Features
