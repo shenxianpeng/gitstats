@@ -1,4 +1,4 @@
-name: GitStats Preview
+name: Test
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - '**/*.py'
       - 'pyproject.toml'
       - 'gitstats.conf'
-      - '.github/workflows/preview.yml'
+      - '.github/workflows/test.yml'
   push:
     branches:
       - "main"
@@ -50,6 +50,42 @@ jobs:
       with:
         name: gitstats-report-windows
         path: gitstats-report-windows
+
+  test-macos:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: ["3.9"] # just test on one version to save time
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # get all history.
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install gnuplot
+      run: brew install gnuplot
+
+    - name: Generate GitStats Report
+      run: |
+        gnuplot --version
+        python3 -m venv venv
+        source venv/bin/activate
+        # for testing
+        pip install .
+        gitstats . gitstats-report-macos
+
+    - name: Save GitStats Report
+      if: ${{ matrix.python-version == '3.9' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: gitstats-report-macos
+        path: gitstats-report-macos
 
   test-linux:
     runs-on: ubuntu-latest
@@ -103,7 +139,6 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: gitstats-report
-        destination_dir: main
 
     - name: Add PR Comment with Preview Link
       if: ${{ github.event_name == 'pull_request' && matrix.python-version == '3.9' }}

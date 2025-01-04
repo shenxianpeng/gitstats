@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "gitstats"
-description = "A statistics generator for git repositories"
+description = "GitStats - generates visual reports for git repositories"
 readme = "README.md"
 keywords = ["git", "gitstats", "statistics", "git history"]
 authors = [
@@ -26,6 +26,9 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Topic :: Software Development :: Build Tools",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
 ]
 
 [project.scripts]
