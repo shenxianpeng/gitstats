@@ -1,4 +1,4 @@
-# GitStats
+# GitStats 📊
 
 **gitstats** is a tool that generates visual reports for git repositories.
 
