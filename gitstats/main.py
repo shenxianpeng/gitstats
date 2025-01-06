@@ -17,12 +17,15 @@ import time
 import zlib
 from multiprocessing import Pool
 from gitstats import load_config
+from gitstats.language import language_data
 
 os.environ["LC_ALL"] = "C"
 
 GNUPLOT_COMMON = "set terminal png transparent size 640,240\nset size 1.0,1.0\n"
 ON_LINUX = platform.system() == "Linux"
 WEEKDAYS = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+
+GIT_PATH = "."
 
 exectime_internal = 0.0
 exectime_external = 0.0
@@ -1493,6 +1496,32 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+        ###
+        # languages.html
+        language = language_data(GIT_PATH)
+        f = open(path + "/languages.html", "w")
+        self.printHeader(f)
+        f.write("<h1>Languages</h1>")
+        self.printNav(f)
+
+        f.write("<dl>")
+        f.write("<dt>Total languages</dt><dd>%d</dd>" % len(language))
+        f.write("</dl>")
+
+        f.write('<table class="tags">')
+        f.write("<tr><th>Language</th><th>Lines</th><th>Percentage</th>")
+        for lang, data in sorted(
+            language.items(), key=lambda x: x[1]["lines"], reverse=True
+        ):
+            f.write(
+                "<tr><td>%s</td><td>%d</td><td>%d%%</td></tr>"
+                % (lang, data["lines"], data["percentage"])
+            )
+        f.write("</table>")
+
+        f.write("</body></html>")
+        f.close()
+
         self.createGraphs(path)
 
     def createGraphs(self, path):
@@ -1741,6 +1770,7 @@ plot """
 <li><a href="files.html">Files</a></li>
 <li><a href="lines.html">Lines</a></li>
 <li><a href="tags.html">Tags</a></li>
+<li><a href="languages.html">Languages</a></li>
 </ul>
 </div>
 """
@@ -1807,6 +1837,10 @@ class GitStats:
 
         for gitpath in args[0:-1]:
             print("Git path: %s" % gitpath)
+
+            global GIT_PATH
+
+            GIT_PATH = gitpath
 
             prevdir = os.getcwd()
             os.chdir(gitpath)
