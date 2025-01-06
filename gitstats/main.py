@@ -574,7 +574,7 @@ class GitDataCollector(DataCollector):
 
             filename = fullpath.split("/")[-1]  # strip directories
             if filename.find(".") == -1 or filename.rfind(".") == 0:
-                ext = ""
+                continue  # skip files without extension
             else:
                 ext = filename[(filename.rfind(".") + 1) :]
             if len(ext) > conf["max_ext_length"]:
@@ -1404,6 +1404,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<table class="sortable" id="ext"><tr><th>Extension</th><th>Files (%)</th><th>Lines (%)</th><th>Lines/file</th></tr>'
         )
+
         for ext in sorted(data.extensions.keys()):
             files = data.extensions[ext]["files"]
             lines = data.extensions[ext]["lines"]
