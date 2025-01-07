@@ -7,6 +7,7 @@ help:
 	@echo
 	@echo "make image                     # make a docker image"
 	@echo "make publish-image             # publish docker image to ghcr"
+	@echo "make install-deps"             # install gnuplot on ubuntu
 	@echo "make preview                   # preview gitstats report in local"
 	@echo
 
@@ -17,9 +18,13 @@ publish-image: image
 	@docker tag gitstats:$(TAG) ghcr.io/shenxianpeng/gitstats:$(TAG)
 	@docker push ghcr.io/shenxianpeng/gitstats:$(TAG)
 
+install-deps:
+	@sudo apt update -y
+	@sudo apt install gnuplot -y
+	@pip install -e .
+
 preview:
-	@mkdir -p gitstats-report
 	@gitstats . gitstats-report
 	@python3 -m http.server 8000 -d gitstats-report
 
-.PHONY: all help install release image publish-image
+.PHONY: all help install-deps release image publish-image
