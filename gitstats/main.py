@@ -899,6 +899,7 @@ class HTMLReportCreator(ReportCreator):
 
         f.write("<dl>")
         f.write("<dt>Project name</dt><dd>%s</dd>" % (data.projectname))
+        f.write("<br>")
         f.write(
             "<dt>Generated</dt><dd>%s (in %d seconds)</dd>"
             % (
@@ -906,10 +907,12 @@ class HTMLReportCreator(ReportCreator):
                 time.time() - data.getStampCreated(),
             )
         )
+        f.write("<br>")
         f.write(
             '<dt>Generator</dt><dd><a href="https://github.com/shenxianpeng/gitstats">GitStats</a> (version %s), %s, %s</dd>'
             % (getversion(), getgitversion(), getgnuplotversion())
         )
+        f.write("<br>")
         f.write(
             "<dt>Report Period</dt><dd>%s to %s</dd>"
             % (
@@ -917,6 +920,7 @@ class HTMLReportCreator(ReportCreator):
                 data.getLastCommitDate().strftime(format),
             )
         )
+        f.write("<br>")
         f.write(
             "<dt>Age</dt><dd>%d days, %d active days (%3.2f%%)</dd>"
             % (
@@ -925,11 +929,14 @@ class HTMLReportCreator(ReportCreator):
                 (100.0 * len(data.getActiveDays()) / data.getCommitDeltaDays()),
             )
         )
+        f.write("<br>")
         f.write("<dt>Total Files</dt><dd>%s</dd>" % data.getTotalFiles())
+        f.write("<br>")
         f.write(
             "<dt>Total Lines of Code</dt><dd>%s (%d added, %d removed)</dd>"
             % (data.getTotalLOC(), data.total_lines_added, data.total_lines_removed)
         )
+        f.write("<br>")
         f.write(
             "<dt>Total Commits</dt><dd>%s (average %.1f commits per active day, %.1f per all days)</dd>"
             % (
@@ -938,6 +945,7 @@ class HTMLReportCreator(ReportCreator):
                 float(data.getTotalCommits()) / data.getCommitDeltaDays(),
             )
         )
+        f.write("<br>")
         f.write(
             "<dt>Authors</dt><dd>%s (average %.1f commits per author)</dd>"
             % (
@@ -945,6 +953,7 @@ class HTMLReportCreator(ReportCreator):
                 (1.0 * data.getTotalCommits()) / data.getTotalAuthors(),
             )
         )
+        f.write("<br>")
         f.write("</dl>")
 
         f.write("</body>\n</html>")
