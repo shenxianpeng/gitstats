@@ -873,6 +873,7 @@ class HTMLReportCreator(ReportCreator):
         basedirs = [binarypath, secondarypath, "/usr/share/gitstats"]
         for file in (
             conf["style"],
+            "script.js",
             "sortable.js",
             "arrow-up.gif",
             "arrow-down.gif",
@@ -1736,6 +1737,14 @@ plot """
 	<script type="text/javascript" src="sortable.js"></script>
 </head>
 <body>
+
+<label for="theme">Theme:</label>
+<select id="theme">
+  <option value="default">Default</option>
+  <option value="black">Black</option>
+  <option value="green">Green</option>
+</select>
+<script type="text/javascript" src="script.js"></script>
 """
             % (self.title, conf["style"], getversion())
         )
