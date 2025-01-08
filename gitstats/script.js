@@ -24,10 +24,8 @@ function getThemeColor(theme) {
   switch (theme) {
     case 'default':
       return 'black';
-    case 'black':
-      return 'white';
     case 'green':
-      return 'white';
+      return 'black';
     default:
       return 'black';
   }
@@ -37,10 +35,8 @@ function getThemeBackgroundColor(theme) {
   switch (theme) {
     case 'default':
       return '#ffffff';
-    case 'black':
-      return '#000000';
     case 'green':
-      return '#34c759';
+      return '#dfd';
     default:
       return '#ffffff';
   }

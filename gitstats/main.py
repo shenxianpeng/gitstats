@@ -1738,11 +1738,9 @@ plot """
 </head>
 <body>
 
-<label for="theme">Theme:</label>
 <select id="theme">
-  <option value="default">Default</option>
-  <option value="black">Black</option>
-  <option value="green">Green</option>
+  <option value="default">White</option>
+  <option value="green">Light Green</option>
 </select>
 <script type="text/javascript" src="script.js"></script>
 """

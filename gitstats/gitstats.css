@@ -6,19 +6,10 @@ body {
 	background-color: #ffffff;
 }
 
-.white-theme {
-	color: black;
-	background-color: #ffffff;
-}
-
-.black-theme {
-	color: white;
-	background-color: #000000;
-}
-
-.green-theme {
-	color: white;
-	background-color: #34c759;
+#theme {
+	position: absolute;
+	top: 10px;
+	right: 10px;
 }
 
 dt {
