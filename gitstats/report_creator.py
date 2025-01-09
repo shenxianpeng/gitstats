@@ -1,3 +1,31 @@
+import os
+import glob
+import shutil
+import datetime
+import time
+from gitstats import load_config, GNUPLOT_COMMON, WEEKDAYS
+from gitstats.utils import (
+    getversion,
+    getgitversion,
+    getgnuplotversion,
+    getpipeoutput,
+    gnuplot_cmd,
+)
+
+conf = load_config()
+
+
+class ReportCreator:
+    """Creates the actual report based on given data."""
+
+    def __init__(self):
+        pass
+
+    def create(self, data, path):
+        self.data = data
+        self.path = path
+
+
 class HTMLReportCreator(ReportCreator):
     def create(self, data, path):
         ReportCreator.create(self, data, path)
@@ -46,7 +74,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("<br>")
         f.write(
             '<dt>Generator</dt><dd><a href="https://github.com/shenxianpeng/gitstats">GitStats</a> (version %s), %s, %s</dd>'
-            % (getversion(), getgitversion(), getgnuplotversion())
+            % (getversion, getgitversion, getgnuplotversion)
         )
         f.write("<br>")
         f.write(
@@ -873,7 +901,7 @@ plot """
 </head>
 <body>
 """
-            % (self.title, conf["style"], getversion())
+            % (self.title, conf["style"], getversion)
         )
 
     def printNav(self, f):
@@ -891,3 +919,27 @@ plot """
 </div>
 """
         )
+
+
+def html_header(level, text):
+    name = html_linkify(text)
+    return '\n<h%d id="%s"><a href="#%s">%s</a></h%d>\n\n' % (
+        level,
+        name,
+        name,
+        text,
+        level,
+    )
+
+
+def html_linkify(text):
+    return text.lower().replace(" ", "_")
+
+
+def getkeyssortedbyvalues(dict):
+    return [el[1] for el in sorted([(el[1], el[0]) for el in list(dict.items())])]
+
+
+# dict['author'] = { 'commits': 512 } - ...key(dict, 'commits')
+def getkeyssortedbyvaluekey(d, key):
+    return [el[1] for el in sorted([(d[el][key], el) for el in list(d.keys())])]

@@ -16,46 +16,20 @@ import sys
 import time
 import zlib
 from multiprocessing import Pool
-from gitstats import load_config
+from gitstats import load_config, time_start, exectime_external, ON_LINUX
+from gitstats.report_creator import HTMLReportCreator, getkeyssortedbyvaluekey
+from gitstats.utils import (
+    getgitversion,
+    getgnuplotversion,
+    getversion,
+    getpipeoutput,
+    getcommitrange,
+)
 
 os.environ["LC_ALL"] = "C"
 
 
-exectime_internal = 0.0
-exectime_external = 0.0
-time_start = time.time()
-
-# By default, gnuplot is searched from path, but can be overridden with the
-# environment variable "GNUPLOT"
-gnuplot_cmd = "gnuplot"
-if "GNUPLOT" in os.environ:
-    gnuplot_cmd = os.environ["GNUPLOT"]
-
-
 conf = load_config()
-
-
-def getpipeoutput(cmds, quiet=False):
-    global exectime_external
-    start = time.time()
-    if not quiet and ON_LINUX and os.isatty(1):
-        print(">> " + " | ".join(cmds), end=" ")
-        sys.stdout.flush()
-    p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
-    processes = [p]
-    for x in cmds[1:]:
-        p = subprocess.Popen(x, stdin=p.stdout, stdout=subprocess.PIPE, shell=True)
-        processes.append(p)
-    output = p.communicate()[0]
-    for p in processes:
-        p.wait()
-    end = time.time()
-    if not quiet:
-        if ON_LINUX and os.isatty(1):
-            print("\r", end=" ")
-        print("[%.5f] >> %s" % (end - start, " | ".join(cmds)))
-    exectime_external += end - start
-    return output.decode("utf-8").rstrip("\n")
 
 
 def getlogrange(defaultrange="HEAD", end_only=True):
@@ -63,23 +37,6 @@ def getlogrange(defaultrange="HEAD", end_only=True):
     if len(conf["start_date"]) > 0:
         return '--since="%s" "%s"' % (conf["start_date"], commit_range)
     return commit_range
-
-
-def getcommitrange(defaultrange="HEAD", end_only=False):
-    if len(conf["commit_end"]) > 0:
-        if end_only or len(conf["commit_begin"]) == 0:
-            return conf["commit_end"]
-        return "%s..%s" % (conf["commit_begin"], conf["commit_end"])
-    return defaultrange
-
-
-def getkeyssortedbyvalues(dict):
-    return [el[1] for el in sorted([(el[1], el[0]) for el in list(dict.items())])]
-
-
-# dict['author'] = { 'commits': 512 } - ...key(dict, 'commits')
-def getkeyssortedbyvaluekey(d, key):
-    return [el[1] for el in sorted([(d[el][key], el) for el in list(d.keys())])]
 
 
 def getstatsummarycounts(line):
@@ -95,30 +52,6 @@ def getstatsummarycounts(line):
         numbers.insert(1, 0)
         # only deletions were printed on line
     return numbers
-
-
-VERSION = 0
-
-
-def getversion():
-    global VERSION
-    if VERSION == 0:
-        gitstats_repo = os.path.dirname(os.path.abspath(__file__))
-        VERSION = getpipeoutput(
-            [
-                "git --git-dir=%s/.git --work-tree=%s rev-parse --short %s"
-                % (gitstats_repo, gitstats_repo, getcommitrange("HEAD").split("\n")[0])
-            ]
-        )
-    return VERSION
-
-
-def getgitversion():
-    return getpipeoutput(["git --version"]).split("\n")[0]
-
-
-def getgnuplotversion():
-    return getpipeoutput(["%s --version" % gnuplot_cmd]).split("\n")[0]
 
 
 def getnumoffilesfromrev(time_rev):
@@ -833,32 +766,6 @@ class GitDataCollector(DataCollector):
         return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
 
 
-class ReportCreator:
-    """Creates the actual report based on given data."""
-
-    def __init__(self):
-        pass
-
-    def create(self, data, path):
-        self.data = data
-        self.path = path
-
-
-def html_linkify(text):
-    return text.lower().replace(" ", "_")
-
-
-def html_header(level, text):
-    name = html_linkify(text)
-    return '\n<h%d id="%s"><a href="#%s">%s</a></h%d>\n\n' % (
-        level,
-        name,
-        name,
-        text,
-        level,
-    )
-
-
 def usage() -> None:
     print(
         """
@@ -907,7 +814,7 @@ class GitStats:
             print("FATAL: Output path is not a directory or does not exist")
             sys.exit(1)
 
-        if not getgnuplotversion():
+        if getgnuplotversion is None:
             print("gnuplot not found")
             sys.exit(1)
 
