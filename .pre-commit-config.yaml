@@ -11,10 +11,15 @@ repos:
     rev: v1.13.0
     hooks:
     -   id: mypy
--   repo: https://github.com/psf/black
-    rev: 24.10.0
+-   repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.8.6
     hooks:
-    -   id: black
+    # Run the linter.
+    -   id: ruff
+        args: [ --fix ]
+    # Run the formatter.
+    -   id: ruff-format
 -   repo: https://github.com/codespell-project/codespell
     rev: v2.3.0
     hooks:

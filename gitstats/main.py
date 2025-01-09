@@ -2,26 +2,19 @@
 # GPLv2 / GPLv3
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
 # GPLv2 / GPLv3
-import configparser
 import datetime
 import getopt
-import glob
 import os
 import pickle
-import platform
 import re
-import shutil
-import subprocess
 import sys
 import time
 import zlib
 from multiprocessing import Pool
-from gitstats import load_config, time_start, exectime_external, ON_LINUX
+from gitstats import load_config, time_start, exectime_external
 from gitstats.report_creator import HTMLReportCreator, getkeyssortedbyvaluekey
 from gitstats.utils import (
-    getgitversion,
     getgnuplotversion,
-    getversion,
     getpipeoutput,
     getcommitrange,
 )
@@ -98,9 +91,7 @@ class DataCollector:
         self.activity_by_year_week = {}  # yy_wNN -> commits
         self.activity_by_year_week_peak = 0
 
-        self.authors = (
-            {}
-        )  # name -> {commits, first_commit_stamp, last_commit_stamp, last_active_day, active_days, lines_added, lines_removed}
+        self.authors = {}  # name -> {commits, first_commit_stamp, last_commit_stamp, last_active_day, active_days, lines_added, lines_removed}
 
         self.total_commits = 0
         self.total_files = 0
@@ -163,7 +154,7 @@ class DataCollector:
         f = open(cachefile, "rb")
         try:
             self.cache = pickle.loads(zlib.decompress(f.read()))
-        except:
+        except (zlib.error, pickle.UnpicklingError):  # Specific exceptions
             # temporary hack to upgrade non-compressed caches
             f.seek(0)
             self.cache = pickle.load(f)
@@ -280,7 +271,7 @@ class GitDataCollector(DataCollector):
         prev = None
         for tag in reversed(tags_sorted_by_date_desc):
             cmd = 'git shortlog -s "%s"' % tag
-            if prev != None:
+            if prev is None:
                 cmd += ' "^%s"' % prev
             output = getpipeoutput([cmd])
             if len(output) == 0:
@@ -562,7 +553,7 @@ class GitDataCollector(DataCollector):
                 continue
 
             # <stamp> <author>
-            if re.search("files? changed", line) == None:
+            if re.search("files? changed", line) is None:
                 pos = line.find(" ")
                 if pos != -1:
                     try:
@@ -637,7 +628,7 @@ class GitDataCollector(DataCollector):
                 continue
 
             # <stamp> <author>
-            if re.search("files? changed", line) == None:
+            if re.search("files? changed", line) is None:
                 pos = line.find(" ")
                 if pos != -1:
                     try:
