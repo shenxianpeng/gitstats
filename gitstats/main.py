@@ -847,12 +847,9 @@ class GitStats:
             )
         )
         if sys.stdin.isatty():
-            print("You may now run:")
+            print("To view the report, run:")
             print()
-            print(
-                "   sensible-browser '%s'"
-                % os.path.join(outputpath, "index.html").replace("'", "'\\''")
-            )
+            print(f"  python3 -m http.server 8000 -d {outputpath}")
             print()
 
 
