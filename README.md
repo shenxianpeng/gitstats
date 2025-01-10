@@ -1,8 +1,6 @@
 # GitStats 📊
 
-**gitstats** is a tool that generates visual reports for git repositories.
-
-It provides HTML output with tables and graphs to help teams view project development history.
+Visualize Your Git Repositories.
 
 <!--[![PyPI - Downloads](https://img.shields.io/pypi/dm/gitstats?color=blue)](https://pypistats.org/packages/gitstats)-->
 [![GitStats Report](https://img.shields.io/badge/GitStats_Report-yes-lightgreen?style=flat&&logo=git&&logoColor=white)](https://shenxianpeng.github.io/gitstats/index.html)
@@ -11,19 +9,9 @@ It provides HTML output with tables and graphs to help teams view project develo
 [![PyPI - Version](https://img.shields.io/pypi/v/gitstats?color=blue)](https://pypi.org/project/gitstats/)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gitstats)
 
-> [!NOTE]
-> This project is a fork of [gitstats](https://github.com/hoxu/gitstats), which only supports Python 2.7 and is no longer maintained.
->
-> I forked the project to update it for compatibility with Python 3.9+ and to add new features.
+## Example
 
----
-
-## Check out example gitstats reports
-
-Explore what a _gitstats_ report looks like with the following examples:
-
-* 📈 [Self preview of gitstats](https://shenxianpeng.github.io/gitstats/index.html): A report generated for the GitStats project itself.
-* 📈 [Jenkins project example](https://shenxianpeng.github.io/gitstats/examples/jenkins/files.html): A report showcasing data from the Jenkins project.
+`gitstats . report` generates this report: https://shenxianpeng.github.io/gitstats/index.html
 
 ## Features
 
@@ -38,6 +26,8 @@ Here is a list of some features of _gitstats_:
 * **Customizable**: config values through `gitstats.conf`.
 * **Cross-platform**: works on Linux, Windows, and macOS.
 
+📈 More examples: [Jenkins project example](https://shenxianpeng.github.io/gitstats/examples/jenkins/files.html): A report showcasing data from the Jenkins project.
+
 ## Requirements
 
 - Python 3.9+
@@ -49,13 +39,7 @@ Here is a list of some features of _gitstats_:
 ### Install from PyPI
 
 ```bash
-# create python virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
 pip install gitstats
-
-gitstats --help
 ```
 
 ### Install from Docker
@@ -80,14 +64,6 @@ Default config values:
 Please see the manual page for more details.
 
 ```
-
-## Examples
-
-```bash
-gitstats your-awesome-project ~/public_html
-```
-
-The output will be generated in the given directory.
 
 > [!TIP]
 > If you want to use gitstats with CI like GitHub Actions or Jenkins to generate reports and deploy them, please the following examples.
@@ -192,3 +168,7 @@ pipeline {
 ## License
 
 Both the code and the web site are licensed under GPLv2/GPLv3.
+
+---
+
+The gitstats project was originally created by [H​eikki H​okkanen](https://github.com/hoxu) but is no longer maintained since 2015. It is now maintained by [Xianpeng Shen](https://github.com/shenxianpeng).
