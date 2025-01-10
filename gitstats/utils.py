@@ -3,24 +3,24 @@ import sys
 import time
 import subprocess
 from gitstats import ON_LINUX, exectime_external, load_config
+from importlib.metadata import version
+
 
 conf = load_config()
 
 
-VERSION = 0
-
-
 def getversion():
-    global VERSION
-    if VERSION == 0:
-        gitstats_repo = os.path.dirname(os.path.abspath(__file__))
-        VERSION = getpipeoutput(
-            [
-                "git --git-dir=%s/.git --work-tree=%s rev-parse --short %s"
-                % (gitstats_repo, gitstats_repo, getcommitrange("HEAD").split("\n")[0])
-            ]
-        )
-    return VERSION
+    """
+    Returns the version number of GitStats as a string.
+    """
+    try:
+        version_str = version("gitstats")
+        if version_str is None:
+            raise ValueError("Failed to get version number")
+        return version_str
+    except Exception as e:
+        print("Error: Failed to get version number - %s" % e, file=sys.stderr)
+        return None
 
 
 def getgitversion():
