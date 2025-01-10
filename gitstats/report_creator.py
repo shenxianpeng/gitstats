@@ -461,7 +461,7 @@ class HTMLReportCreator(ReportCreator):
             authors = getkeyssortedbyvalues(authordict)
             authors.reverse()
             commits = data.author_of_month[yymm][authors[0]]
-            next = ", ".join(authors[1 : conf["authors_top"] + 1])
+            authors_str = ", ".join(authors[1 : conf["authors_top"] + 1])
             f.write(
                 "<tr><td>%s</td><td>%s</td><td>%d (%.2f%% of %d)</td><td>%s</td><td>%d</td></tr>"
                 % (
@@ -470,7 +470,7 @@ class HTMLReportCreator(ReportCreator):
                     commits,
                     (100.0 * commits) / data.commits_by_month[yymm],
                     data.commits_by_month[yymm],
-                    next,
+                    authors_str,
                     len(authors),
                 )
             )
@@ -487,7 +487,7 @@ class HTMLReportCreator(ReportCreator):
             authors = getkeyssortedbyvalues(authordict)
             authors.reverse()
             commits = data.author_of_year[yy][authors[0]]
-            next = ", ".join(authors[1 : conf["authors_top"] + 1])
+            authors_str = ", ".join(authors[1 : conf["authors_top"] + 1])
             f.write(
                 "<tr><td>%s</td><td>%s</td><td>%d (%.2f%% of %d)</td><td>%s</td><td>%d</td></tr>"
                 % (
@@ -496,7 +496,7 @@ class HTMLReportCreator(ReportCreator):
                     commits,
                     (100.0 * commits) / data.commits_by_year[yy],
                     data.commits_by_year[yy],
-                    next,
+                    authors_str,
                     len(authors),
                 )
             )
