@@ -28,7 +28,7 @@ build:
 	@gitstats . test-report
 
 preview:
-	@gitstats . gitstats-report
-	@python3 -m http.server 8000 -d gitstats-report
+	@gitstats . test-report
+	@python3 -m http.server 8000 -d test-report
 
 .PHONY: all help install-deps image publish-image build preview
