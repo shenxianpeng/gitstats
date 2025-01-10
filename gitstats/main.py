@@ -271,7 +271,7 @@ class GitDataCollector(DataCollector):
         prev = None
         for tag in reversed(tags_sorted_by_date_desc):
             cmd = 'git shortlog -s "%s"' % tag
-            if prev is None:
+            if prev is not None:
                 cmd += ' "^%s"' % prev
             output = getpipeoutput([cmd])
             if len(output) == 0:
