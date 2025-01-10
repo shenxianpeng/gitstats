@@ -10,17 +10,7 @@ conf = load_config()
 
 
 def getversion():
-    """
-    Returns the version number of GitStats as a string.
-    """
-    try:
-        version_str = version("gitstats")
-        if version_str is None:
-            raise ValueError("Failed to get version number")
-        return version_str
-    except Exception as e:
-        print("Error: Failed to get version number - %s" % e, file=sys.stderr)
-        return None
+    return version("gitstats")
 
 
 def getgitversion():

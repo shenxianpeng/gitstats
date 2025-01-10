@@ -73,7 +73,7 @@ class HTMLReportCreator(ReportCreator):
         )
         f.write("<br>")
         f.write(
-            '<dt>Generator</dt><dd><a href="https://github.com/shenxianpeng/gitstats">GitStats</a> (%s), %s, %s</dd>'
+            '<dt>Generator</dt><dd><a href="https://github.com/shenxianpeng/gitstats">GitStats</a> %s, %s, %s</dd>'
             % (getversion(), getgitversion(), getgnuplotversion())
         )
         f.write("<br>")
