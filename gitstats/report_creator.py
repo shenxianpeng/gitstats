@@ -888,7 +888,7 @@ plot """
             if len(out) > 0:
                 print(out)
 
-    def printHeader(self, f, title=""):
+    def printHeader(self, f):
         f.write(
             """<!DOCTYPE html>
 <html>
