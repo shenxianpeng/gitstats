@@ -26,7 +26,7 @@ Here is a list of some features of _gitstats_:
 * **Customizable**: config values through `gitstats.conf`.
 * **Cross-platform**: works on Linux, Windows, and macOS.
 
-📈 More examples: [Jenkins project example](https://shenxianpeng.github.io/gitstats/examples/jenkins/files.html): A report showcasing data from the Jenkins project.
+📈 More examples: [Jenkins project example](https://shenxianpeng.github.io/gitstats/examples/jenkins/index.html): A report showcasing data from the Jenkins project.
 
 ## Requirements
 
