@@ -40,6 +40,7 @@ class HTMLReportCreator(ReportCreator):
         basedir = os.path.dirname(os.path.abspath(__file__))
         for file in (
             conf["style"],
+            "script.js",
             "sortable.js",
             "arrow-up.gif",
             "arrow-down.gif",
@@ -930,6 +931,12 @@ plot """
 	<script type="text/javascript" src="sortable.js"></script>
 </head>
 <body>
+
+<select id="theme">
+  <option value="default">White</option>
+  <option value="green">Green</option>
+</select>
+<script type="text/javascript" src="script.js"></script>
 """
             % (self.title, conf["style"], get_version)
         )
