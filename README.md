@@ -6,12 +6,14 @@ Visualize Your Git Repositories.
 [![GitStats Report](https://img.shields.io/badge/GitStats_Report-yes-lightgreen?style=flat&&logo=git&&logoColor=white)](https://shenxianpeng.github.io/gitstats/index.html)
 [![Test](https://github.com/shenxianpeng/gitstats/actions/workflows/test.yml/badge.svg)](https://github.com/shenxianpeng/gitstats/actions/workflows/test.yml)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=shenxianpeng_gitstats&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=shenxianpeng_gitstats)
-[![PyPI - Version](https://img.shields.io/pypi/v/gitstats?color=blue)](https://pypi.org/project/gitstats/)
+[![PyPI - Version](https://img.shields.io/pypi/v/gitstpats?color=blue)](https://pypi.org/project/gitstats/)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/gitstats)
 
 ## Example
 
-`gitstats . report` generates this report: https://shenxianpeng.github.io/gitstats/index.html
+Run `gitstats . report`[^1] to generate this report: https://shenxianpeng.github.io/gitstats/index.html
+
+[^1]: Before running `gitstats`, ensure all required dependencies are installed on your system. See [requirements](#Requirements)
 
 ## Features
 
@@ -31,7 +33,10 @@ Here is a list of some features of _gitstats_:
 ## Requirements
 
 - Python 3.9+
-- Gnuplot (http://www.gnuplot.info/)
+- Gnuplot (http://www.gnuplot.info): You can install Gnuplot on
+  - Ubuntu with `sudo apt install gnuplot`
+  - macOS with `brew install gnuplot`
+  - Windows with `choco install gnuplot`
 - Git (http://git-scm.com/)
 
 ## Installation
