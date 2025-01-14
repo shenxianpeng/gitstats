@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GitStats - {{ data.projectname }}</title>
+</head>
+<body>
+    <h1>GitStats - {{ data.projectname }}</h1>
+    <dl>
+        <dt>Project name</dt><dd>{{ data.projectname }}</dd>
+        <br>
+        <dt>Generated</dt><dd>{{ data.generated }} (in {{ data.stamp_created }} seconds)</dd>
+        <br>
+        <dt>Generator</dt><dd><a href="https://github.com/shenxianpeng/gitstats">GitStats</a> {{ data.version }}, {{ data.git_version }}, {{ data.gnuplot_version }}</dd>
+        <br>
+        <dt>Report Period</dt><dd>{{ data.report_period.start }} to {{ data.report_period.end }}</dd>
+        <br>
+        <dt>Age</dt><dd>{{ data.age.days }} days, {{ data.age.active_days }} active days ({{ data.age.percentage|round(2) }}%)</dd>
+        <br>
+        <dt>Total Files</dt><dd>{{ data.total_files }}</dd>
+        <br>
+        <dt>Total Lines of Code</dt><dd>{{ data.total_loc.total }} ({{ data.total_loc.added }} added, {{ data.total_loc.removed }} removed)</dd>
+        <br>
+        <dt>Total Commits</dt><dd>{{ data.total_commits.total }} (average {{ data.total_commits.average_per_active_day|round(1) }} commits per active day, {{ data.total_commits.average_per_all_days|round(1) }} per all days)</dd>
+        <br>
+        <dt>Authors</dt><dd>{{ data.authors.total }} (average {{ data.authors.average_commits_per_author|round(1) }} commits per author)</dd>
+        <br>
+    </dl>
+</body>
+</html>

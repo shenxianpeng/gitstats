@@ -11,6 +11,9 @@ authors = [
     { name = "Xianpeng Shen", email = "xianpeng.shen@gmail.com" },
     { name = "Heikki Hokkanen", email = "hoxu@users.sf.net" },
 ]
+dependencies = [
+    "jinja2",
+]
 
 requires-python = ">=3.9"
 dynamic = ["version"]

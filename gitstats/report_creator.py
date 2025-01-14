@@ -1,8 +1,8 @@
 import os
 import glob
+import jinja2
 import shutil
 import datetime
-import time
 from gitstats import load_config, GNUPLOT_COMMON, WEEKDAYS
 from gitstats.utils import (
     getversion,
@@ -13,6 +13,11 @@ from gitstats.utils import (
 )
 
 conf = load_config()
+
+
+# Create a Jinja2 environment
+template_loader = jinja2.FileSystemLoader("templates")
+template_env = jinja2.Environment(loader=template_loader)
 
 
 class ReportCreator:
@@ -54,75 +59,125 @@ class HTMLReportCreator(ReportCreator):
                     % (file, basedirs)
                 )
 
-        f = open(path + "/index.html", "w")
-        format = "%Y-%m-%d %H:%M:%S"
-        self.printHeader(f)
+        # Load the index.html template
+        template = template_env.get_template("index.html")
 
-        f.write("<h1>GitStats - %s</h1>" % data.projectname)
+        # Define the data to be passed to the template
+        data = {
+            "projectname": data.projectname,
+            "generated": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "stamp_created": data.getStampCreated(),
+            "generator": "GitStats",
+            "version": getversion(),
+            "git_version": getgitversion(),
+            "gnuplot_version": getgnuplotversion(),
+            "report_period": {
+                "start": data.getFirstCommitDate().strftime("%Y-%m-%d %H:%M:%S"),
+                "end": data.getLastCommitDate().strftime("%Y-%m-%d %H:%M:%S"),
+            },
+            "age": {
+                "days": data.getCommitDeltaDays(),
+                "active_days": len(data.getActiveDays()),
+                "percentage": (
+                    100.0 * len(data.getActiveDays()) / data.getCommitDeltaDays()
+                ),
+            },
+            "total_files": data.getTotalFiles(),
+            "total_loc": {
+                "total": data.getTotalLOC(),
+                "added": data.total_lines_added,
+                "removed": data.total_lines_removed,
+            },
+            "total_commits": {
+                "total": data.getTotalCommits(),
+                "average_per_active_day": float(data.getTotalCommits())
+                / len(data.getActiveDays()),
+                "average_per_all_days": float(data.getTotalCommits())
+                / data.getCommitDeltaDays(),
+            },
+            "authors": {
+                "total": data.getTotalAuthors(),
+                "average_commits_per_author": (1.0 * data.getTotalCommits())
+                / data.getTotalAuthors(),
+            },
+        }
 
-        self.printNav(f)
+        # Render the template with the data
+        html = template.render(data=data)
 
-        f.write("<dl>")
-        f.write("<dt>Project name</dt><dd>%s</dd>" % (data.projectname))
-        f.write("<br>")
-        f.write(
-            "<dt>Generated</dt><dd>%s (in %d seconds)</dd>"
-            % (
-                datetime.datetime.now().strftime(format),
-                time.time() - data.getStampCreated(),
-            )
-        )
-        f.write("<br>")
-        f.write(
-            '<dt>Generator</dt><dd><a href="https://github.com/shenxianpeng/gitstats">GitStats</a> %s, %s, %s</dd>'
-            % (getversion(), getgitversion(), getgnuplotversion())
-        )
-        f.write("<br>")
-        f.write(
-            "<dt>Report Period</dt><dd>%s to %s</dd>"
-            % (
-                data.getFirstCommitDate().strftime(format),
-                data.getLastCommitDate().strftime(format),
-            )
-        )
-        f.write("<br>")
-        f.write(
-            "<dt>Age</dt><dd>%d days, %d active days (%3.2f%%)</dd>"
-            % (
-                data.getCommitDeltaDays(),
-                len(data.getActiveDays()),
-                (100.0 * len(data.getActiveDays()) / data.getCommitDeltaDays()),
-            )
-        )
-        f.write("<br>")
-        f.write("<dt>Total Files</dt><dd>%s</dd>" % data.getTotalFiles())
-        f.write("<br>")
-        f.write(
-            "<dt>Total Lines of Code</dt><dd>%s (%d added, %d removed)</dd>"
-            % (data.getTotalLOC(), data.total_lines_added, data.total_lines_removed)
-        )
-        f.write("<br>")
-        f.write(
-            "<dt>Total Commits</dt><dd>%s (average %.1f commits per active day, %.1f per all days)</dd>"
-            % (
-                data.getTotalCommits(),
-                float(data.getTotalCommits()) / len(data.getActiveDays()),
-                float(data.getTotalCommits()) / data.getCommitDeltaDays(),
-            )
-        )
-        f.write("<br>")
-        f.write(
-            "<dt>Authors</dt><dd>%s (average %.1f commits per author)</dd>"
-            % (
-                data.getTotalAuthors(),
-                (1.0 * data.getTotalCommits()) / data.getTotalAuthors(),
-            )
-        )
-        f.write("<br>")
-        f.write("</dl>")
+        # Write the rendered HTML to a file
+        with open("index.html", "w") as f:
+            f.write(html)
 
-        f.write("</body>\n</html>")
-        f.close()
+        # f = open(path + "/index.html", "w")
+        # format = "%Y-%m-%d %H:%M:%S"
+        # self.printHeader(f)
+
+        # f.write("<h1>GitStats - %s</h1>" % data.projectname)
+
+        # self.printNav(f)
+
+        # f.write("<dl>")
+        # f.write("<dt>Project name</dt><dd>%s</dd>" % (data.projectname))
+        # f.write("<br>")
+        # f.write(
+        #     "<dt>Generated</dt><dd>%s (in %d seconds)</dd>"
+        #     % (
+        #         datetime.datetime.now().strftime(format),
+        #         time.time() - data.getStampCreated(),
+        #     )
+        # )
+        # f.write("<br>")
+        # f.write(
+        #     '<dt>Generator</dt><dd><a href="https://github.com/shenxianpeng/gitstats">GitStats</a> %s, %s, %s</dd>'
+        #     % (getversion(), getgitversion(), getgnuplotversion())
+        # )
+        # f.write("<br>")
+        # f.write(
+        #     "<dt>Report Period</dt><dd>%s to %s</dd>"
+        #     % (
+        #         data.getFirstCommitDate().strftime(format),
+        #         data.getLastCommitDate().strftime(format),
+        #     )
+        # )
+        # f.write("<br>")
+        # f.write(
+        #     "<dt>Age</dt><dd>%d days, %d active days (%3.2f%%)</dd>"
+        #     % (
+        #         data.getCommitDeltaDays(),
+        #         len(data.getActiveDays()),
+        #         (100.0 * len(data.getActiveDays()) / data.getCommitDeltaDays()),
+        #     )
+        # )
+        # f.write("<br>")
+        # f.write("<dt>Total Files</dt><dd>%s</dd>" % data.getTotalFiles())
+        # f.write("<br>")
+        # f.write(
+        #     "<dt>Total Lines of Code</dt><dd>%s (%d added, %d removed)</dd>"
+        #     % (data.getTotalLOC(), data.total_lines_added, data.total_lines_removed)
+        # )
+        # f.write("<br>")
+        # f.write(
+        #     "<dt>Total Commits</dt><dd>%s (average %.1f commits per active day, %.1f per all days)</dd>"
+        #     % (
+        #         data.getTotalCommits(),
+        #         float(data.getTotalCommits()) / len(data.getActiveDays()),
+        #         float(data.getTotalCommits()) / data.getCommitDeltaDays(),
+        #     )
+        # )
+        # f.write("<br>")
+        # f.write(
+        #     "<dt>Authors</dt><dd>%s (average %.1f commits per author)</dd>"
+        #     % (
+        #         data.getTotalAuthors(),
+        #         (1.0 * data.getTotalCommits()) / data.getTotalAuthors(),
+        #     )
+        # )
+        # f.write("<br>")
+        # f.write("</dl>")
+
+        # f.write("</body>\n</html>")
+        # f.close()
 
         ###
         # Activity
