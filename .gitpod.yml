@@ -6,5 +6,5 @@
 
 tasks:
   - name: Install & Build
-    init: sudo apt-get install -y --no-install-recommends gnuplot
+    init: make install-deps && make build
     command: make preview
