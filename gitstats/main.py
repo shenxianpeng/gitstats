@@ -830,7 +830,8 @@ def get_parser() -> argparse.ArgumentParser:
         "--config",
         metavar="key=value",
         action="append",
-        help="Override configuration value. Can be specified multiple times.",
+        default=[],
+        help=f"Override configuration value. Can be specified multiple times. Default configuration: {conf}.",
     )
 
     # Positional arguments
@@ -851,6 +852,15 @@ def main():
     args = parser.parse_args()
     gitpath = args.gitpath
     outputpath = os.path.abspath(args.outputpath)
+
+    for item in args.config:
+        try:
+            key, value = item.split("=", 1)
+            if key not in conf:
+                parser.error(f'No such key "{key}" in config')
+            conf[key] = value
+        except ValueError:
+            parser.error("Config must be in the form key=value")
 
     g = GitStats()
     g.run(gitpath, outputpath)
