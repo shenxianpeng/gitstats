@@ -780,14 +780,14 @@ class GitStats:
         data = GitDataCollector()
         data.loadCache(cachefile)
 
-        for gp in gitpath:
-            print("Git path: %s" % gp)
+        for gitpath in gitpath:
+            print("Git path: %s" % gitpath)
 
             prevdir = os.getcwd()
-            os.chdir(gp)
+            os.chdir(gitpath)
 
             print("Collecting data...")
-            data.collect(gp)
+            data.collect(gitpath)
 
             os.chdir(prevdir)
 
@@ -850,11 +850,7 @@ def main():
     parser = get_parser()
     args = parser.parse_args()
     gitpath = args.gitpath
-    outputpath = args.outputpath
-
-    print("Configuration:", args.config or conf)
-    print("Git repository paths:", gitpath)
-    print("Output path:", outputpath)
+    outputpath = os.path.abspath(args.outputpath)
 
     g = GitStats()
     g.run(gitpath, outputpath)
