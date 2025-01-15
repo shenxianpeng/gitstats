@@ -2,8 +2,8 @@
 # GPLv2 / GPLv3
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
 # GPLv2 / GPLv3
+import argparse
 import datetime
-import getopt
 import os
 import pickle
 import re
@@ -757,50 +757,15 @@ class GitDataCollector(DataCollector):
         return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
 
 
-def usage() -> None:
-    print(
-        """
-Usage: gitstats [options] <gitpath..> <outputpath>
-
-Options:
--c key=value     Override configuration value
-
-Default config values:
-%s
-
-Please see the manual page for more details.
-"""
-        % conf
-    )
-
-
 class GitStats:
-    def run(self, args_orig):
-        optlist, args = getopt.getopt(args_orig, "hc:", ["help"])
-        for o, v in optlist:
-            if o == "-c":
-                key, value = v.split("=", 1)
-                if key not in conf:
-                    raise KeyError('no such key "%s" in config' % key)
-                if isinstance(conf[key], int):
-                    conf[key] = int(value)
-                else:
-                    conf[key] = value
-            elif o in ("-h", "--help"):
-                usage()
-                sys.exit()
-
-        if len(args) < 2:
-            usage()
-            sys.exit(0)
-
-        outputpath = os.path.abspath(args[-1])
+    def run(self, gitpath, outputpath):
         rundir = os.getcwd()
 
         try:
             os.makedirs(outputpath)
         except OSError:
             pass
+
         if not os.path.isdir(outputpath):
             print("FATAL: Output path is not a directory or does not exist")
             sys.exit(1)
@@ -815,14 +780,14 @@ class GitStats:
         data = GitDataCollector()
         data.loadCache(cachefile)
 
-        for gitpath in args[0:-1]:
-            print("Git path: %s" % gitpath)
+        for gp in gitpath:
+            print("Git path: %s" % gp)
 
             prevdir = os.getcwd()
-            os.chdir(gitpath)
+            os.chdir(gp)
 
             print("Collecting data...")
-            data.collect(gitpath)
+            data.collect(gp)
 
             os.chdir(prevdir)
 
@@ -853,9 +818,46 @@ class GitStats:
             print()
 
 
+def get_parser() -> argparse.ArgumentParser:
+    """Get the parser for the command line arguments."""
+    parser = argparse.ArgumentParser(
+        description="Generate statistics for a Git repository.",
+    )
+
+    # Optional arguments
+    parser.add_argument(
+        "-c",
+        "--config",
+        metavar="key=value",
+        action="append",
+        help="Override configuration value. Can be specified multiple times.",
+    )
+
+    # Positional arguments
+    parser.add_argument(
+        "gitpath", metavar="<gitpath>", nargs="+", help="Path(s) to the Git repository."
+    )
+    parser.add_argument(
+        "outputpath",
+        metavar="<outputpath>",
+        help="Path to the directory where the output will be stored.",
+    )
+
+    return parser
+
+
 def main():
+    parser = get_parser()
+    args = parser.parse_args()
+    gitpath = args.gitpath
+    outputpath = args.outputpath
+
+    print("Configuration:", args.config or conf)
+    print("Git repository paths:", gitpath)
+    print("Output path:", outputpath)
+
     g = GitStats()
-    g.run(sys.argv[1:])
+    g.run(gitpath, outputpath)
 
 
 if __name__ == "__main__":
