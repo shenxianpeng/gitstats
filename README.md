@@ -174,7 +174,7 @@ pipeline {
 
 [![GitStats Report](https://contrib.rocks/image?repo=shenxianpeng/gitstats)](https://github.com/shenxianpeng/gitstats/graphs/contributors)
 
-## License 
+## License
 
 Both the code and the web site are licensed under GPLv2/GPLv3.
 
