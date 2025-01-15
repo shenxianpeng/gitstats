@@ -170,7 +170,11 @@ pipeline {
 
     Use Git's `.mailmap` feature, as described in the **MAPPING AUTHORS** section of the [git-shortlog(1)](https://git-scm.com/docs/git-shortlog) documentation.
 
-## License
+## Contributors
+
+[![GitStats Report](https://contrib.rocks/image?repo=shenxianpeng/gitstats)](https://github.com/shenxianpeng/gitstats/graphs/contributors)
+
+## License 
 
 Both the code and the web site are licensed under GPLv2/GPLv3.
 
