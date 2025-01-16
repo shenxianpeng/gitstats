@@ -14,20 +14,20 @@ from importlib.metadata import version
 conf = load_config()
 
 
-def getversion():
+def get_version():
     return version("gitstats")
 
 
-def getgitversion():
-    return getpipeoutput(["git --version"]).split("\n")[0]
+def get_git_version():
+    return get_pipe_output(["git --version"]).split("\n")[0]
 
 
-def getgnuplotversion():
-    output = getpipeoutput(["%s --version" % gnuplot_cmd]).split("\n")[0]
+def get_gnuplot_version():
+    output = get_pipe_output(["%s --version" % gnuplot_cmd]).split("\n")[0]
     return output if output else None
 
 
-def getpipeoutput(cmds, quiet=False):
+def get_pipe_output(cmds, quiet=False):
     global exectime_external
     start = time.time()
     if not quiet and ON_LINUX and os.isatty(1):
@@ -50,7 +50,7 @@ def getpipeoutput(cmds, quiet=False):
     return output.decode("utf-8").rstrip("\n")
 
 
-def getcommitrange(defaultrange="HEAD", end_only=False):
+def get_commit_range(defaultrange="HEAD", end_only=False):
     if len(conf["commit_end"]) > 0:
         if end_only or len(conf["commit_begin"]) == 0:
             return conf["commit_end"]
@@ -58,7 +58,7 @@ def getcommitrange(defaultrange="HEAD", end_only=False):
     return defaultrange
 
 
-def getnumoflinesinblob(ext_blob):
+def get_num_of_lines_in_blob(ext_blob):
     """
     Get number of lines in blob
     """
@@ -66,11 +66,11 @@ def getnumoflinesinblob(ext_blob):
     return (
         ext,
         blob_id,
-        int(getpipeoutput(["git cat-file blob %s" % blob_id, "wc -l"]).split()[0]),
+        int(get_pipe_output(["git cat-file blob %s" % blob_id, "wc -l"]).split()[0]),
     )
 
 
-def getnumoffilesfromrev(time_rev):
+def get_num_of_files_from_rev(time_rev):
     """
     Get number of files changed in commit
     """
@@ -79,14 +79,14 @@ def getnumoffilesfromrev(time_rev):
         int(time),
         rev,
         int(
-            getpipeoutput(['git ls-tree -r --name-only "%s"' % rev, "wc -l"]).split(
+            get_pipe_output(['git ls-tree -r --name-only "%s"' % rev, "wc -l"]).split(
                 "\n"
             )[0]
         ),
     )
 
 
-def getstatsummarycounts(line):
+def get_stat_summary_counts(line):
     numbers = re.findall(r"\d+", line)
     if len(numbers) == 1:
         # neither insertions nor deletions: may probably only happen for "0 files changed"
@@ -101,8 +101,8 @@ def getstatsummarycounts(line):
     return numbers
 
 
-def getlogrange(defaultrange="HEAD", end_only=True):
-    commit_range = getcommitrange(defaultrange, end_only)
+def get_log_range(defaultrange="HEAD", end_only=True):
+    commit_range = get_commit_range(defaultrange, end_only)
     if len(conf["start_date"]) > 0:
         return '--since="%s" "%s"' % (conf["start_date"], commit_range)
     return commit_range
