@@ -474,8 +474,8 @@ class HTMLReportCreator(ReportCreator):
             % conf["authors_top"]
         )
         for yymm in reversed(sorted(data.author_of_month.keys())):
-            authordict = data.author_of_month[yymm]
-            authors = get_keys_sorted_by_values(authordict)
+            author_dict = data.author_of_month[yymm]
+            authors = get_keys_sorted_by_values(author_dict)
             authors.reverse()
             commits = data.author_of_month[yymm][authors[0]]
             authors_str = ", ".join(authors[1 : conf["authors_top"] + 1])
@@ -500,8 +500,8 @@ class HTMLReportCreator(ReportCreator):
             % conf["authors_top"]
         )
         for yy in reversed(sorted(data.author_of_year.keys())):
-            authordict = data.author_of_year[yy]
-            authors = get_keys_sorted_by_values(authordict)
+            author_dict = data.author_of_year[yy]
+            authors = get_keys_sorted_by_values(author_dict)
             authors.reverse()
             commits = data.author_of_year[yy][authors[0]]
             authors_str = ", ".join(authors[1 : conf["authors_top"] + 1])
