@@ -695,7 +695,19 @@ class HTMLReportCreator(ReportCreator):
 
     def create_graphs(self, path):
         print("Generating graphs...")
+        self.create_graph_hour_of_day(path)
+        self.create_graph_day_of_week(path)
+        self.create_graph_domains(path)
+        self.create_graph_month_of_year(path)
+        self.create_graph_commits_by_year_month(path)
+        self.create_graph_commits_by_year(path)
+        self.create_graph_files_by_date(path)
+        self.create_graph_lines_of_code(path)
+        self.create_graph_lines_of_code_by_author(path)
+        self.create_graph_commits_by_author(path)
+        self.create_graph_by_gnuplot(path)
 
+    def create_graph_hour_of_day(self, path):
         # hour of day
         f = open(path + "/hour_of_day.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -713,6 +725,7 @@ plot 'hour_of_day.dat' using 1:2:(0.5) w boxes fs solid
         )
         f.close()
 
+    def create_graph_day_of_week(self, path):
         # day of week
         f = open(path + "/day_of_week.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -730,6 +743,7 @@ plot 'day_of_week.dat' using 1:3:(0.5):xtic(2) w boxes fs solid
         )
         f.close()
 
+    def create_graph_domains(self, path):
         # Domains
         f = open(path + "/domains.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -746,6 +760,7 @@ plot 'domains.dat' using 2:3:(0.5) with boxes fs solid, '' using 2:3:1 with labe
         )
         f.close()
 
+    def create_graph_month_of_year(self, path):
         # Month of Year
         f = open(path + "/month_of_year.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -763,6 +778,7 @@ plot 'month_of_year.dat' using 1:2:(0.5) w boxes fs solid
         )
         f.close()
 
+    def create_graph_commits_by_year_month(self, path):
         # commits_by_year_month
         f = open(path + "/commits_by_year_month.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -783,6 +799,7 @@ plot 'commits_by_year_month.dat' using 1:2:(0.5) w boxes fs solid
         )
         f.close()
 
+    def create_graph_commits_by_year(self, path):
         # commits_by_year
         f = open(path + "/commits_by_year.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -800,6 +817,7 @@ plot 'commits_by_year.dat' using 1:2:(0.5) w boxes fs solid
         )
         f.close()
 
+    def create_graph_files_by_date(self, path):
         # Files by date
         f = open(path + "/files_by_date.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -821,6 +839,7 @@ plot 'files_by_date.dat' using 1:2 w steps
         )
         f.close()
 
+    def create_graph_lines_of_code(self, path):
         # Lines of Code
         f = open(path + "/lines_of_code.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -841,6 +860,7 @@ plot 'lines_of_code.dat' using 1:2 w lines
         )
         f.close()
 
+    def create_graph_lines_of_code_by_author(self, path):
         # Lines of Code Added per author
         f = open(path + "/lines_of_code_by_author.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -873,6 +893,7 @@ plot """
 
         f.close()
 
+    def create_graph_commits_by_author(self, path):
         # Commits per author
         f = open(path + "/commits_by_author.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -905,6 +926,7 @@ plot """
 
         f.close()
 
+    def create_graph_by_gnuplot(self, path):
         os.chdir(path)
         files = glob.glob(path + "/*.plot")
         for f in files:
@@ -912,8 +934,8 @@ plot """
             if len(out) > 0:
                 print(out)
 
-    def print_header(self, f):
-        f.write(
+    def print_header(self, file) -> None:
+        file.write(
             """<!DOCTYPE html>
 <html>
 <head>
@@ -928,20 +950,21 @@ plot """
             % (self.title, conf["style"], get_version)
         )
 
-    def print_nav(self, f):
-        f.write(
+    def print_nav(self, file) -> None:
+        """Print navigation menu to file."""
+        file.write(
             """
-<div class="nav">
-<ul>
-<li><a href="index.html">General</a></li>
-<li><a href="activity.html">Activity</a></li>
-<li><a href="authors.html">Authors</a></li>
-<li><a href="files.html">Files</a></li>
-<li><a href="lines.html">Lines</a></li>
-<li><a href="tags.html">Tags</a></li>
-</ul>
-</div>
-"""
+            <div class="nav">
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            </ul>
+            </div>
+            """
         )
 
 
