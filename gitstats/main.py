@@ -11,7 +11,7 @@ import sys
 import time
 import zlib
 from multiprocessing import Pool
-from gitstats import load_config, time_start, exectime_external
+from gitstats import load_config, time_start, exectime_external, __version__
 from gitstats.report_creator import HTMLReportCreator, getkeyssortedbyvaluekey
 from gitstats.utils import (
     getgnuplotversion,
@@ -822,6 +822,13 @@ def get_parser() -> argparse.ArgumentParser:
     """Get the parser for the command line arguments."""
     parser = argparse.ArgumentParser(
         description="Generate statistics for a Git repository.",
+    )
+
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
     )
 
     # Optional arguments
