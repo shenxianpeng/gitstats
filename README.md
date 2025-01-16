@@ -163,7 +163,7 @@ pipeline {
 
 1. How do I generate statistics of a non-master branch?
 
-    Use the `-c commit_end=web` parameter.
+    Use the `-c commit_end=devel` parameter.
 
 2. I have files in my git repository that I would like to exclude from the statistics. How do I do that?
 
@@ -171,7 +171,7 @@ pipeline {
 
 3. How do I merge author information when the same author has made commits using different names or emails?
 
-    Use Git's `.mailmap` feature, as described in the **MAPPING AUTHORS** section of the [git-shortlog(1)](https://git-scm.com/docs/git-shortlog) documentation.
+    Use Git's `.mailmap` feature, as described in the [gitmailmap](https://git-scm.com/docs/gitmailmap) documentation.
 
 ## Contributors
 
