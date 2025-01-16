@@ -1,3 +1,7 @@
+# Copyright (c) 2007-2014 Heikki Hokkanen <hoxu@users.sf.net> & others (see doc/AUTHOR)
+# GPLv2 / GPLv3
+# Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
+# GPLv2 / GPLv3
 import os
 import sys
 import time

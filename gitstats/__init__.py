@@ -1,5 +1,8 @@
+# Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
+# GPLv2 / GPLv3
 import platform
 import time
+from importlib.metadata import version
 
 exectime_internal = 0.0
 exectime_external = 0.0
@@ -39,3 +42,6 @@ def load_config(file_path="gitstats.conf") -> dict:
             for k, v in config_parser["gitstats"].items()
         }
     return config
+
+
+__version__ = version("gitstats")

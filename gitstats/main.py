@@ -2,8 +2,8 @@
 # GPLv2 / GPLv3
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
 # GPLv2 / GPLv3
+import argparse
 import datetime
-import getopt
 import os
 import pickle
 import re
@@ -11,7 +11,7 @@ import sys
 import time
 import zlib
 from multiprocessing import Pool
-from gitstats import load_config, time_start, exectime_external
+from gitstats import load_config, time_start, exectime_external, __version__
 from gitstats.report_creator import HTMLReportCreator, getkeyssortedbyvaluekey
 from gitstats.utils import (
     getgnuplotversion,
@@ -757,50 +757,15 @@ class GitDataCollector(DataCollector):
         return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
 
 
-def usage() -> None:
-    print(
-        """
-Usage: gitstats [options] <gitpath..> <outputpath>
-
-Options:
--c key=value     Override configuration value
-
-Default config values:
-%s
-
-Please see the manual page for more details.
-"""
-        % conf
-    )
-
-
 class GitStats:
-    def run(self, args_orig):
-        optlist, args = getopt.getopt(args_orig, "hc:", ["help"])
-        for o, v in optlist:
-            if o == "-c":
-                key, value = v.split("=", 1)
-                if key not in conf:
-                    raise KeyError('no such key "%s" in config' % key)
-                if isinstance(conf[key], int):
-                    conf[key] = int(value)
-                else:
-                    conf[key] = value
-            elif o in ("-h", "--help"):
-                usage()
-                sys.exit()
-
-        if len(args) < 2:
-            usage()
-            sys.exit(0)
-
-        outputpath = os.path.abspath(args[-1])
+    def run(self, gitpath, outputpath):
         rundir = os.getcwd()
 
         try:
             os.makedirs(outputpath)
         except OSError:
             pass
+
         if not os.path.isdir(outputpath):
             print("FATAL: Output path is not a directory or does not exist")
             sys.exit(1)
@@ -815,7 +780,7 @@ class GitStats:
         data = GitDataCollector()
         data.loadCache(cachefile)
 
-        for gitpath in args[0:-1]:
+        for gitpath in gitpath:
             print("Git path: %s" % gitpath)
 
             prevdir = os.getcwd()
@@ -853,9 +818,59 @@ class GitStats:
             print()
 
 
+def get_parser() -> argparse.ArgumentParser:
+    """Get the parser for the command line arguments."""
+    parser = argparse.ArgumentParser(
+        description="Generate statistics for a Git repository.",
+    )
+
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
+    )
+
+    # Optional arguments
+    parser.add_argument(
+        "-c",
+        "--config",
+        metavar="key=value",
+        action="append",
+        default=[],
+        help=f"Override configuration value. Can be specified multiple times. Default configuration: {conf}.",
+    )
+
+    # Positional arguments
+    parser.add_argument(
+        "gitpath", metavar="<gitpath>", nargs="+", help="Path(s) to the Git repository."
+    )
+    parser.add_argument(
+        "outputpath",
+        metavar="<outputpath>",
+        help="Path to the directory where the output will be stored.",
+    )
+
+    return parser
+
+
 def main():
+    parser = get_parser()
+    args = parser.parse_args()
+    gitpath = args.gitpath
+    outputpath = os.path.abspath(args.outputpath)
+
+    for item in args.config:
+        try:
+            key, value = item.split("=", 1)
+            if key not in conf:
+                parser.error(f'No such key "{key}" in config')
+            conf[key] = value
+        except ValueError:
+            parser.error("Config must be in the form key=value")
+
     g = GitStats()
-    g.run(sys.argv[1:])
+    g.run(gitpath, outputpath)
 
 
 if __name__ == "__main__":
