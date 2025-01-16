@@ -34,7 +34,7 @@ class ReportCreator:
 class HTMLReportCreator(ReportCreator):
     def create(self, data, path):
         ReportCreator.create(self, data, path)
-        self.title = data.projectname
+        self.title = data.project_name
 
         # copy static files. Looks in the binary directory, ../share/gitstats and /usr/share/gitstats
         binarypath = os.path.dirname(os.path.abspath(__file__))
@@ -71,12 +71,12 @@ class HTMLReportCreator(ReportCreator):
         format = "%Y-%m-%d %H:%M:%S"
         self.print_header(f)
 
-        f.write("<h1>GitStats - %s</h1>" % data.projectname)
+        f.write("<h1>GitStats - %s</h1>" % data.project_name)
 
         self.print_nav(f)
 
         f.write("<dl>")
-        f.write("<dt>Project name</dt><dd>%s</dd>" % (data.projectname))
+        f.write("<dt>Project name</dt><dd>%s</dd>" % (data.project_name))
         f.write("<br>")
         f.write(
             "<dt>Generated</dt><dd>%s (in %d seconds)</dd>"
