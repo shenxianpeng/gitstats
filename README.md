@@ -58,16 +58,19 @@ docker run ghcr.io/shenxianpeng/gitstats:latest --help
 ## Usage
 
 ```bash
-Usage: gitstats [options] <gitpath..> <outputpath>
+usage: gitstats [-h] [-v] [-c key=value] <gitpath> [<gitpath> ...] <outputpath>
 
-Options:
--c key=value     Override configuration value
+Generate statistics for a Git repository.
 
-Default config values:
-{'max_domains': 10, 'max_ext_length': 10, 'style': 'gitstats.css', 'max_authors': 20, 'authors_top': 5, 'commit_begin': '', 'commit_end': 'HEAD', 'linear_linestats': 1, 'project_name': '', 'processes': 8, 'start_date': ''}
+positional arguments:
+  <gitpath>             Path(s) to the Git repository.
+  <outputpath>          Path to the directory where the output will be stored.
 
-Please see the manual page for more details.
-
+options:
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+  -c key=value, --config key=value
+                        Override configuration value. Can be specified multiple times. Default configuration: {'max_domains': 10, 'max_ext_length': 10, 'style': 'gitstats.css', 'max_authors': 20, 'authors_top': 5, 'commit_begin': '', 'commit_end': 'HEAD', 'linear_linestats': 1, 'project_name': '', 'processes': 8, 'start_date': ''}.
 ```
 
 > [!TIP]
