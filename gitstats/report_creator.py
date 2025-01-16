@@ -60,11 +60,11 @@ class HTMLReportCreator(ReportCreator):
 
         f = open(path + "/index.html", "w")
         format = "%Y-%m-%d %H:%M:%S"
-        self.printHeader(f)
+        self.print_header(f)
 
         f.write("<h1>GitStats - %s</h1>" % data.projectname)
 
-        self.printNav(f)
+        self.print_nav(f)
 
         f.write("<dl>")
         f.write("<dt>Project name</dt><dd>%s</dd>" % (data.projectname))
@@ -131,9 +131,9 @@ class HTMLReportCreator(ReportCreator):
         ###
         # Activity
         f = open(path + "/activity.html", "w")
-        self.printHeader(f)
+        self.print_header(f)
         f.write("<h1>Activity</h1>")
-        self.printNav(f)
+        self.print_nav(f)
 
         # f.write('<h2>Last 30 days</h2>')
 
@@ -362,10 +362,10 @@ class HTMLReportCreator(ReportCreator):
         ###
         # Authors
         f = open(path + "/authors.html", "w")
-        self.printHeader(f)
+        self.print_header(f)
 
         f.write("<h1>Authors</h1>")
-        self.printNav(f)
+        self.print_nav(f)
 
         # Authors :: List of authors
         f.write(html_header(2, "List of Authors"))
@@ -464,7 +464,7 @@ class HTMLReportCreator(ReportCreator):
         )
         for yymm in reversed(sorted(data.author_of_month.keys())):
             authordict = data.author_of_month[yymm]
-            authors = getkeyssortedbyvalues(authordict)
+            authors = get_keys_sorted_by_values(authordict)
             authors.reverse()
             commits = data.author_of_month[yymm][authors[0]]
             authors_str = ", ".join(authors[1 : conf["authors_top"] + 1])
@@ -490,7 +490,7 @@ class HTMLReportCreator(ReportCreator):
         )
         for yy in reversed(sorted(data.author_of_year.keys())):
             authordict = data.author_of_year[yy]
-            authors = getkeyssortedbyvalues(authordict)
+            authors = get_keys_sorted_by_values(authordict)
             authors.reverse()
             commits = data.author_of_year[yy][authors[0]]
             authors_str = ", ".join(authors[1 : conf["authors_top"] + 1])
@@ -537,9 +537,9 @@ class HTMLReportCreator(ReportCreator):
         ###
         # Files
         f = open(path + "/files.html", "w")
-        self.printHeader(f)
+        self.print_header(f)
         f.write("<h1>Files</h1>")
-        self.printNav(f)
+        self.print_nav(f)
 
         f.write("<dl>\n")
         f.write("<dt>Total files</dt><dd>%d</dd>" % data.get_total_files())
@@ -610,9 +610,9 @@ class HTMLReportCreator(ReportCreator):
         ###
         # Lines
         f = open(path + "/lines.html", "w")
-        self.printHeader(f)
+        self.print_header(f)
         f.write("<h1>Lines</h1>")
-        self.printNav(f)
+        self.print_nav(f)
 
         f.write("<dl>\n")
         f.write("<dt>Total lines</dt><dd>%d</dd>" % data.get_total_loc())
@@ -632,9 +632,9 @@ class HTMLReportCreator(ReportCreator):
         ###
         # tags.html
         f = open(path + "/tags.html", "w")
-        self.printHeader(f)
+        self.print_header(f)
         f.write("<h1>Tags</h1>")
-        self.printNav(f)
+        self.print_nav(f)
 
         f.write("<dl>")
         f.write("<dt>Total tags</dt><dd>%d</dd>" % len(data.tags))
@@ -656,7 +656,9 @@ class HTMLReportCreator(ReportCreator):
         ]
         for tag in tags_sorted_by_date_desc:
             authorinfo = []
-            self.authors_by_commits = getkeyssortedbyvalues(data.tags[tag]["authors"])
+            self.authors_by_commits = get_keys_sorted_by_values(
+                data.tags[tag]["authors"]
+            )
             for i in reversed(self.authors_by_commits):
                 authorinfo.append("%s (%d)" % (i, data.tags[tag]["authors"][i]))
             f.write(
@@ -673,9 +675,9 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-        self.createGraphs(path)
+        self.create_graphs(path)
 
-    def createGraphs(self, path):
+    def create_graphs(self, path):
         print("Generating graphs...")
 
         # hour of day
@@ -894,7 +896,7 @@ plot """
             if len(out) > 0:
                 print(out)
 
-    def printHeader(self, f):
+    def print_header(self, f):
         f.write(
             """<!DOCTYPE html>
 <html>
@@ -910,7 +912,7 @@ plot """
             % (self.title, conf["style"], get_version)
         )
 
-    def printNav(self, f):
+    def print_nav(self, f):
         f.write(
             """
 <div class="nav">
@@ -942,7 +944,7 @@ def html_linkify(text):
     return text.lower().replace(" ", "_")
 
 
-def getkeyssortedbyvalues(dict):
+def get_keys_sorted_by_values(dict):
     return [el[1] for el in sorted([(el[1], el[0]) for el in list(dict.items())])]
 
 
