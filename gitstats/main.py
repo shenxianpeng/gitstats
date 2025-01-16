@@ -11,9 +11,10 @@ import sys
 import time
 import zlib
 from multiprocessing import Pool
-from gitstats import load_config, time_start, exectime_external, __version__
+from gitstats import load_config, time_start, exectime_external
 from gitstats.report_creator import HTMLReportCreator, getkeyssortedbyvaluekey
 from gitstats.utils import (
+    getversion,
     getgnuplotversion,
     getpipeoutput,
     getcommitrange,
@@ -828,7 +829,7 @@ def get_parser() -> argparse.ArgumentParser:
         "-v",
         "--version",
         action="version",
-        version=f"%(prog)s {__version__}",
+        version=f"%(prog)s {getversion()}",
     )
 
     # Optional arguments
