@@ -9,10 +9,10 @@ import datetime
 import time
 from gitstats import load_config, GNUPLOT_COMMON, WEEKDAYS
 from gitstats.utils import (
-    getversion,
-    getgitversion,
-    getgnuplotversion,
-    getpipeoutput,
+    get_version,
+    get_git_version,
+    get_gnuplot_version,
+    get_pipe_output,
     gnuplot_cmd,
 )
 
@@ -73,53 +73,53 @@ class HTMLReportCreator(ReportCreator):
             "<dt>Generated</dt><dd>%s (in %d seconds)</dd>"
             % (
                 datetime.datetime.now().strftime(format),
-                time.time() - data.getStampCreated(),
+                time.time() - data.get_stamp_created(),
             )
         )
         f.write("<br>")
         f.write(
             '<dt>Generator</dt><dd><a href="https://github.com/shenxianpeng/gitstats">GitStats</a> %s, %s, %s</dd>'
-            % (getversion(), getgitversion(), getgnuplotversion())
+            % (get_version(), get_git_version(), get_gnuplot_version())
         )
         f.write("<br>")
         f.write(
             "<dt>Report Period</dt><dd>%s to %s</dd>"
             % (
-                data.getFirstCommitDate().strftime(format),
-                data.getLastCommitDate().strftime(format),
+                data.get_first_commit_date().strftime(format),
+                data.get_last_commit_date().strftime(format),
             )
         )
         f.write("<br>")
         f.write(
             "<dt>Age</dt><dd>%d days, %d active days (%3.2f%%)</dd>"
             % (
-                data.getCommitDeltaDays(),
-                len(data.getActiveDays()),
-                (100.0 * len(data.getActiveDays()) / data.getCommitDeltaDays()),
+                data.get_commit_delta_days(),
+                len(data.get_active_days()),
+                (100.0 * len(data.get_active_days()) / data.get_commit_delta_days()),
             )
         )
         f.write("<br>")
-        f.write("<dt>Total Files</dt><dd>%s</dd>" % data.getTotalFiles())
+        f.write("<dt>Total Files</dt><dd>%s</dd>" % data.get_total_files())
         f.write("<br>")
         f.write(
             "<dt>Total Lines of Code</dt><dd>%s (%d added, %d removed)</dd>"
-            % (data.getTotalLOC(), data.total_lines_added, data.total_lines_removed)
+            % (data.get_total_loc(), data.total_lines_added, data.total_lines_removed)
         )
         f.write("<br>")
         f.write(
             "<dt>Total Commits</dt><dd>%s (average %.1f commits per active day, %.1f per all days)</dd>"
             % (
-                data.getTotalCommits(),
-                float(data.getTotalCommits()) / len(data.getActiveDays()),
-                float(data.getTotalCommits()) / data.getCommitDeltaDays(),
+                data.get_total_commits(),
+                float(data.get_total_commits()) / len(data.get_active_days()),
+                float(data.get_total_commits()) / data.get_commit_delta_days(),
             )
         )
         f.write("<br>")
         f.write(
             "<dt>Authors</dt><dd>%s (average %.1f commits per author)</dd>"
             % (
-                data.getTotalAuthors(),
-                (1.0 * data.getTotalCommits()) / data.getTotalAuthors(),
+                data.get_total_authors(),
+                (1.0 * data.get_total_commits()) / data.get_total_authors(),
             )
         )
         f.write("<br>")
@@ -180,7 +180,7 @@ class HTMLReportCreator(ReportCreator):
 
         # Hour of Day
         f.write(html_header(2, "Hour of Day"))
-        hour_of_day = data.getActivityByHourOfDay()
+        hour_of_day = data.get_activity_by_hour_of_day()
         f.write("<table><tr><th>Hour</th>")
         for i in range(0, 24):
             f.write("<th>%d</th>" % i)
@@ -201,7 +201,7 @@ class HTMLReportCreator(ReportCreator):
                 fp.write("%d 0\n" % i)
         fp.close()
         f.write("</tr>\n<tr><th>%</th>")
-        totalcommits = data.getTotalCommits()
+        totalcommits = data.get_total_commits()
         for i in range(0, 24):
             if i in hour_of_day:
                 r = 127 + int(
@@ -225,7 +225,7 @@ class HTMLReportCreator(ReportCreator):
 
         # Day of Week
         f.write(html_header(2, "Day of Week"))
-        day_of_week = data.getActivityByDayOfWeek()
+        day_of_week = data.get_activity_by_day_of_week()
         f.write('<div class="vtable"><table>')
         f.write("<tr><th>Day</th><th>Total (%)</th></tr>")
         fp = open(path + "/day_of_week.dat", "w")
@@ -288,7 +288,7 @@ class HTMLReportCreator(ReportCreator):
                 commits = data.activity_by_month_of_year[mm]
             f.write(
                 "<tr><td>%d</td><td>%d (%.2f %%)</td></tr>"
-                % (mm, commits, (100.0 * commits) / data.getTotalCommits())
+                % (mm, commits, (100.0 * commits) / data.get_total_commits())
             )
             fp.write("%d %d\n" % (mm, commits))
         fp.close()
@@ -328,7 +328,8 @@ class HTMLReportCreator(ReportCreator):
                 % (
                     yy,
                     data.commits_by_year.get(yy, 0),
-                    (100.0 * data.commits_by_year.get(yy, 0)) / data.getTotalCommits(),
+                    (100.0 * data.commits_by_year.get(yy, 0))
+                    / data.get_total_commits(),
                     data.lines_added_by_year.get(yy, 0),
                     data.lines_removed_by_year.get(yy, 0),
                 )
@@ -373,8 +374,8 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<tr><th>Author</th><th>Commits (%)</th><th>+ lines</th><th>- lines</th><th>First commit</th><th>Last commit</th><th class="unsortable">Age</th><th>Active days</th><th># by commits</th></tr>'
         )
-        for author in data.getAuthors(conf["max_authors"]):
-            info = data.getAuthorInfo(author)
+        for author in data.get_authors(conf["max_authors"]):
+            info = data.get_author_info(author)
             f.write(
                 "<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%d</td></tr>"
                 % (
@@ -392,7 +393,7 @@ class HTMLReportCreator(ReportCreator):
             )
         f.write("</table>")
 
-        allauthors = data.getAuthors()
+        allauthors = data.get_authors()
         if len(allauthors) > conf["max_authors"]:
             rest = allauthors[conf["max_authors"] :]
             f.write(
@@ -428,11 +429,11 @@ class HTMLReportCreator(ReportCreator):
         # lines_by_authors allows us to generate all the
         # points in the .dat file.
 
-        # Don't rely on getAuthors to give the same order each
+        # Don't rely on get_authors to give the same order each
         # time. Be robust and keep the list in a variable.
         commits_by_authors = {}  # cumulated added lines by
 
-        self.authors_to_plot = data.getAuthors(conf["max_authors"])
+        self.authors_to_plot = data.get_authors(conf["max_authors"])
         for author in self.authors_to_plot:
             lines_by_authors[author] = 0
             commits_by_authors[author] = 0
@@ -509,7 +510,7 @@ class HTMLReportCreator(ReportCreator):
 
         # Domains
         f.write(html_header(2, "Commits by Domains"))
-        domains_by_commits = getkeyssortedbyvaluekey(data.domains, "commits")
+        domains_by_commits = get_keys_sorted_by_value_key(data.domains, "commits")
         domains_by_commits.reverse()  # most first
         f.write('<div class="vtable"><table>')
         f.write("<tr><th>Domains</th><th>Total (%)</th></tr>")
@@ -520,7 +521,7 @@ class HTMLReportCreator(ReportCreator):
                 break
             commits = 0
             n += 1
-            info = data.getDomainInfo(domain)
+            info = data.get_domain_info(domain)
             fp.write("%s %d %d\n" % (domain, n, info["commits"]))
             f.write(
                 "<tr><th>%s</th><td>%d (%.2f%%)</td></tr>"
@@ -541,12 +542,12 @@ class HTMLReportCreator(ReportCreator):
         self.printNav(f)
 
         f.write("<dl>\n")
-        f.write("<dt>Total files</dt><dd>%d</dd>" % data.getTotalFiles())
-        f.write("<dt>Total lines</dt><dd>%d</dd>" % data.getTotalLOC())
+        f.write("<dt>Total files</dt><dd>%d</dd>" % data.get_total_files())
+        f.write("<dt>Total lines</dt><dd>%d</dd>" % data.get_total_loc())
         try:
             f.write(
                 "<dt>Average file size</dt><dd>%.2f bytes</dd>"
-                % (float(data.getTotalSize()) / data.getTotalFiles())
+                % (float(data.get_total_size()) / data.get_total_files())
             )
         except ZeroDivisionError:
             pass
@@ -587,7 +588,7 @@ class HTMLReportCreator(ReportCreator):
             files = data.extensions[ext]["files"]
             lines = data.extensions[ext]["lines"]
             try:
-                loc_percentage = (100.0 * lines) / data.getTotalLOC()
+                loc_percentage = (100.0 * lines) / data.get_total_loc()
             except ZeroDivisionError:
                 loc_percentage = 0
             f.write(
@@ -595,7 +596,7 @@ class HTMLReportCreator(ReportCreator):
                 % (
                     ext,
                     files,
-                    (100.0 * files) / data.getTotalFiles(),
+                    (100.0 * files) / data.get_total_files(),
                     lines,
                     loc_percentage,
                     lines / files,
@@ -614,7 +615,7 @@ class HTMLReportCreator(ReportCreator):
         self.printNav(f)
 
         f.write("<dl>\n")
-        f.write("<dt>Total lines</dt><dd>%d</dd>" % data.getTotalLOC())
+        f.write("<dt>Total lines</dt><dd>%d</dd>" % data.get_total_loc())
         f.write("</dl>\n")
 
         f.write(html_header(2, "Lines of Code"))
@@ -640,7 +641,7 @@ class HTMLReportCreator(ReportCreator):
         if len(data.tags) > 0:
             f.write(
                 "<dt>Average commits per tag</dt><dd>%.2f</dd>"
-                % (1.0 * data.getTotalCommits() / len(data.tags))
+                % (1.0 * data.get_total_commits() / len(data.tags))
             )
         f.write("</dl>")
 
@@ -889,7 +890,7 @@ plot """
         os.chdir(path)
         files = glob.glob(path + "/*.plot")
         for f in files:
-            out = getpipeoutput([gnuplot_cmd + ' "%s"' % f])
+            out = get_pipe_output([gnuplot_cmd + ' "%s"' % f])
             if len(out) > 0:
                 print(out)
 
@@ -906,7 +907,7 @@ plot """
 </head>
 <body>
 """
-            % (self.title, conf["style"], getversion)
+            % (self.title, conf["style"], get_version)
         )
 
     def printNav(self, f):
@@ -946,5 +947,5 @@ def getkeyssortedbyvalues(dict):
 
 
 # dict['author'] = { 'commits': 512 } - ...key(dict, 'commits')
-def getkeyssortedbyvaluekey(d, key):
+def get_keys_sorted_by_value_key(d, key):
     return [el[1] for el in sorted([(d[el][key], el) for el in list(d.keys())])]

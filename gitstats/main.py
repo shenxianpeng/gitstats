@@ -11,68 +11,23 @@ import sys
 import time
 import zlib
 from multiprocessing import Pool
-from gitstats import load_config, time_start, exectime_external, __version__
-from gitstats.report_creator import HTMLReportCreator, getkeyssortedbyvaluekey
+from gitstats import load_config, time_start, exectime_external
+from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.utils import (
-    getgnuplotversion,
-    getpipeoutput,
-    getcommitrange,
+    get_version,
+    get_gnuplot_version,
+    get_pipe_output,
+    get_commit_range,
+    get_log_range,
+    get_num_of_files_from_rev,
+    get_num_of_lines_in_blob,
+    get_stat_summary_counts,
 )
 
 os.environ["LC_ALL"] = "C"
 
 
 conf = load_config()
-
-
-def getlogrange(defaultrange="HEAD", end_only=True):
-    commit_range = getcommitrange(defaultrange, end_only)
-    if len(conf["start_date"]) > 0:
-        return '--since="%s" "%s"' % (conf["start_date"], commit_range)
-    return commit_range
-
-
-def getstatsummarycounts(line):
-    numbers = re.findall(r"\d+", line)
-    if len(numbers) == 1:
-        # neither insertions nor deletions: may probably only happen for "0 files changed"
-        numbers.append(0)
-        numbers.append(0)
-    elif len(numbers) == 2 and line.find("(+)") != -1:
-        numbers.append(0)
-        # only insertions were printed on line
-    elif len(numbers) == 2 and line.find("(-)") != -1:
-        numbers.insert(1, 0)
-        # only deletions were printed on line
-    return numbers
-
-
-def getnumoffilesfromrev(time_rev):
-    """
-    Get number of files changed in commit
-    """
-    time, rev = time_rev
-    return (
-        int(time),
-        rev,
-        int(
-            getpipeoutput(['git ls-tree -r --name-only "%s"' % rev, "wc -l"]).split(
-                "\n"
-            )[0]
-        ),
-    )
-
-
-def getnumoflinesinblob(ext_blob):
-    """
-    Get number of lines in blob
-    """
-    ext, blob_id = ext_blob
-    return (
-        ext,
-        blob_id,
-        int(getpipeoutput(["git cat-file blob %s" % blob_id, "wc -l"]).split()[0]),
-    )
 
 
 class DataCollector:
@@ -147,7 +102,7 @@ class DataCollector:
 
     ##
     # Load cacheable data
-    def loadCache(self, cachefile):
+    def load_cache(self, cachefile):
         if not os.path.exists(cachefile):
             return
         print("Loading cache...")
@@ -167,51 +122,51 @@ class DataCollector:
 
     ##
     # : get a dictionary of author
-    def getAuthorInfo(self, author):
+    def get_author_info(self, author):
         return None
 
-    def getActivityByDayOfWeek(self):
+    def get_activity_by_day_of_week(self):
         return {}
 
-    def getActivityByHourOfDay(self):
+    def get_activity_by_hour_of_day(self):
         return {}
 
     # : get a dictionary of domains
-    def getDomainInfo(self, domain):
+    def get_domain_info(self, domain):
         return None
 
     ##
     # Get a list of authors
-    def getAuthors(self):
+    def get_authors(self):
         return []
 
-    def getFirstCommitDate(self):
+    def get_first_commit_date(self):
         return datetime.datetime.now()
 
-    def getLastCommitDate(self):
+    def get_last_commit_date(self):
         return datetime.datetime.now()
 
-    def getStampCreated(self):
+    def get_stamp_created(self):
         return self.stamp_created
 
-    def getTags(self):
+    def get_tags(self):
         return []
 
-    def getTotalAuthors(self):
+    def get_total_authors(self):
         return -1
 
-    def getTotalCommits(self):
+    def get_total_commits(self):
         return -1
 
-    def getTotalFiles(self):
+    def get_total_files(self):
         return -1
 
-    def getTotalLOC(self):
+    def get_total_loc(self):
         return -1
 
     ##
     # Save cacheable data
-    def saveCache(self, cachefile):
+    def save_cache(self, cachefile):
         print("Saving cache...")
         tempfile = cachefile + ".tmp"
         f = open(tempfile, "wb")
@@ -231,19 +186,19 @@ class GitDataCollector(DataCollector):
         DataCollector.collect(self, dir)
 
         self.total_authors += int(
-            getpipeoutput(["git shortlog -s %s" % getlogrange(), "wc -l"])
+            get_pipe_output(["git shortlog -s %s" % get_log_range(), "wc -l"])
         )
         # self.total_lines = int(getoutput('git-ls-files -z |xargs -0 cat |wc -l'))
 
         # tags
-        lines = getpipeoutput(["git show-ref --tags"]).split("\n")
+        lines = get_pipe_output(["git show-ref --tags"]).split("\n")
         for line in lines:
             if len(line) == 0:
                 continue
             (hash, tag) = line.split(" ")
 
             tag = tag.replace("refs/tags/", "")
-            output = getpipeoutput(
+            output = get_pipe_output(
                 ['git log "%s" --pretty=format:"%%at %%aN" -n 1' % hash]
             )
             if len(output) > 0:
@@ -273,7 +228,7 @@ class GitDataCollector(DataCollector):
             cmd = 'git shortlog -s "%s"' % tag
             if prev is not None:
                 cmd += ' "^%s"' % prev
-            output = getpipeoutput([cmd])
+            output = get_pipe_output([cmd])
             if len(output) == 0:
                 continue
             prev = tag
@@ -286,10 +241,10 @@ class GitDataCollector(DataCollector):
 
         # Collect revision statistics
         # Outputs "<stamp> <date> <time> <timezone> <author> '<' <mail> '>'"
-        lines = getpipeoutput(
+        lines = get_pipe_output(
             [
                 'git rev-list --pretty=format:"%%at %%ai %%aN <%%aE>" %s'
-                % getlogrange("HEAD"),
+                % get_log_range("HEAD"),
                 "grep -v ^commit",
             ]
         ).split("\n")
@@ -424,9 +379,10 @@ class GitDataCollector(DataCollector):
 
         # outputs "<stamp> <files>" for each revision
         revlines = (
-            getpipeoutput(
+            get_pipe_output(
                 [
-                    'git rev-list --pretty=format:"%%at %%T" %s' % getlogrange("HEAD"),
+                    'git rev-list --pretty=format:"%%at %%T" %s'
+                    % get_log_range("HEAD"),
                     "grep -v ^commit",
                 ]
             )
@@ -452,7 +408,7 @@ class GitDataCollector(DataCollector):
 
         # Read revisions from repo
         pool = Pool(processes=conf["processes"])
-        time_rev_count = pool.map(getnumoffilesfromrev, revs_to_read)
+        time_rev_count = pool.map(get_num_of_files_from_rev, revs_to_read)
         pool.terminate()
         pool.join()
 
@@ -475,8 +431,8 @@ class GitDataCollector(DataCollector):
                 print('Warning: failed to parse line "%s"' % line)
 
         # extensions and size of files
-        lines = getpipeoutput(
-            ["git ls-tree -r -l -z %s" % getcommitrange("HEAD", end_only=True)]
+        lines = get_pipe_output(
+            ["git ls-tree -r -l -z %s" % get_commit_range("HEAD", end_only=True)]
         ).split("\000")
         blobs_to_read = []
         for line in lines:
@@ -515,7 +471,7 @@ class GitDataCollector(DataCollector):
 
         # Get info about line count for new blob's that wasn't found in cache
         pool = Pool(processes=conf["processes"])
-        ext_blob_linecount = pool.map(getnumoflinesinblob, blobs_to_read)
+        ext_blob_linecount = pool.map(get_num_of_lines_in_blob, blobs_to_read)
         pool.terminate()
         pool.join()
 
@@ -536,10 +492,10 @@ class GitDataCollector(DataCollector):
         extra = ""
         if conf["linear_linestats"]:
             extra = "--first-parent -m"
-        lines = getpipeoutput(
+        lines = get_pipe_output(
             [
                 'git log --shortstat %s --pretty=format:"%%at %%aN" %s'
-                % (extra, getlogrange("HEAD"))
+                % (extra, get_log_range("HEAD"))
             ]
         ).split("\n")
         lines.reverse()
@@ -588,7 +544,7 @@ class GitDataCollector(DataCollector):
                 else:
                     print('Warning: unexpected line "%s"' % line)
             else:
-                numbers = getstatsummarycounts(line)
+                numbers = get_stat_summary_counts(line)
 
                 if len(numbers) == 3:
                     (files, inserted, deleted) = [int(el) for el in numbers]
@@ -611,10 +567,10 @@ class GitDataCollector(DataCollector):
         # Similar to the above, but never use --first-parent
         # (we need to walk through every commit to know who
         # committed what, not just through mainline)
-        lines = getpipeoutput(
+        lines = get_pipe_output(
             [
                 'git log --shortstat --date-order --pretty=format:"%%at %%aN" %s'
-                % (getlogrange("HEAD"))
+                % (get_log_range("HEAD"))
             ]
         ).split("\n")
         lines.reverse()
@@ -668,7 +624,7 @@ class GitDataCollector(DataCollector):
                 else:
                     print('Warning: unexpected line "%s"' % line)
             else:
-                numbers = getstatsummarycounts(line)
+                numbers = get_stat_summary_counts(line)
 
                 if len(numbers) == 3:
                     (files, inserted, deleted) = [int(el) for el in numbers]
@@ -679,14 +635,14 @@ class GitDataCollector(DataCollector):
     def refine(self):
         # authors
         # name -> {place_by_commits, commits_frac, date_first, date_last, timedelta}
-        self.authors_by_commits = getkeyssortedbyvaluekey(self.authors, "commits")
+        self.authors_by_commits = get_keys_sorted_by_value_key(self.authors, "commits")
         self.authors_by_commits.reverse()  # most first
         for i, name in enumerate(self.authors_by_commits):
             self.authors[name]["place_by_commits"] = i + 1
 
         for name in list(self.authors.keys()):
             a = self.authors[name]
-            a["commits_frac"] = (100 * float(a["commits"])) / self.getTotalCommits()
+            a["commits_frac"] = (100 * float(a["commits"])) / self.get_total_commits()
             date_first = datetime.datetime.fromtimestamp(a["first_commit_stamp"])
             date_last = datetime.datetime.fromtimestamp(a["last_commit_stamp"])
             delta = date_last - date_first
@@ -698,62 +654,62 @@ class GitDataCollector(DataCollector):
             if "lines_removed" not in a:
                 a["lines_removed"] = 0
 
-    def getActiveDays(self):
+    def get_active_days(self):
         return self.active_days
 
-    def getActivityByDayOfWeek(self):
+    def get_activity_by_day_of_week(self):
         return self.activity_by_day_of_week
 
-    def getActivityByHourOfDay(self):
+    def get_activity_by_hour_of_day(self):
         return self.activity_by_hour_of_day
 
-    def getAuthorInfo(self, author):
+    def get_author_info(self, author):
         return self.authors[author]
 
-    def getAuthors(self, limit=None):
-        res = getkeyssortedbyvaluekey(self.authors, "commits")
+    def get_authors(self, limit=None):
+        res = get_keys_sorted_by_value_key(self.authors, "commits")
         res.reverse()
         return res[:limit]
 
-    def getCommitDeltaDays(self):
+    def get_commit_delta_days(self):
         return (self.last_commit_stamp / 86400 - self.first_commit_stamp / 86400) + 1
 
-    def getDomainInfo(self, domain):
+    def get_domain_info(self, domain):
         return self.domains[domain]
 
-    def getDomains(self):
+    def get_domains(self):
         return list(self.domains.keys())
 
-    def getFirstCommitDate(self):
+    def get_first_commit_date(self):
         return datetime.datetime.fromtimestamp(self.first_commit_stamp)
 
-    def getLastCommitDate(self):
+    def get_last_commit_date(self):
         return datetime.datetime.fromtimestamp(self.last_commit_stamp)
 
-    def getTags(self):
-        lines = getpipeoutput(["git show-ref --tags", "cut -d/ -f3"])
+    def get_tags(self):
+        lines = get_pipe_output(["git show-ref --tags", "cut -d/ -f3"])
         return lines.split("\n")
 
-    def getTagDate(self, tag):
-        return self.revToDate("tags/" + tag)
+    def get_tag_date(self, tag):
+        return self.rev_to_date("tags/" + tag)
 
-    def getTotalAuthors(self):
+    def get_total_authors(self):
         return self.total_authors
 
-    def getTotalCommits(self):
+    def get_total_commits(self):
         return self.total_commits
 
-    def getTotalFiles(self):
+    def get_total_files(self):
         return self.total_files
 
-    def getTotalLOC(self):
+    def get_total_loc(self):
         return self.total_lines
 
-    def getTotalSize(self):
+    def get_total_size(self):
         return self.total_size
 
-    def revToDate(self, rev):
-        stamp = int(getpipeoutput(['git log --pretty=format:%%at "%s" -n 1' % rev]))
+    def rev_to_date(self, rev):
+        stamp = int(get_pipe_output(['git log --pretty=format:%%at "%s" -n 1' % rev]))
         return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
 
 
@@ -770,7 +726,7 @@ class GitStats:
             print("FATAL: Output path is not a directory or does not exist")
             sys.exit(1)
 
-        if getgnuplotversion is None:
+        if get_gnuplot_version is None:
             print("gnuplot not found")
             sys.exit(1)
 
@@ -778,7 +734,7 @@ class GitStats:
         cachefile = os.path.join(outputpath, "gitstats.cache")
 
         data = GitDataCollector()
-        data.loadCache(cachefile)
+        data.load_cache(cachefile)
 
         for gitpath in gitpath:
             print("Git path: %s" % gitpath)
@@ -792,7 +748,7 @@ class GitStats:
             os.chdir(prevdir)
 
         print("Refining data...")
-        data.saveCache(cachefile)
+        data.save_cache(cachefile)
         data.refine()
 
         os.chdir(rundir)
@@ -828,7 +784,7 @@ def get_parser() -> argparse.ArgumentParser:
         "-v",
         "--version",
         action="version",
-        version=f"%(prog)s {__version__}",
+        version=f"%(prog)s {get_version()}",
     )
 
     # Optional arguments
