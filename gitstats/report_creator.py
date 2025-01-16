@@ -58,6 +58,15 @@ class HTMLReportCreator(ReportCreator):
                     % (file, basedirs)
                 )
 
+        self.create_index_html(data, path)
+        self.create_activity_html(data, path)
+        self.create_authors_html(data, path)
+        self.create_files_html(data, path)
+        self.create_lines_html(data, path)
+        self.create_tags_html(data, path)
+        self.create_graphs(path)
+
+    def create_index_html(self, data, path):
         f = open(path + "/index.html", "w")
         format = "%Y-%m-%d %H:%M:%S"
         self.print_header(f)
@@ -128,6 +137,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body>\n</html>")
         f.close()
 
+    def create_activity_html(self, data, path):
         ###
         # Activity
         f = open(path + "/activity.html", "w")
@@ -359,6 +369,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def create_authors_html(self, data, path):
         ###
         # Authors
         f = open(path + "/authors.html", "w")
@@ -525,7 +536,11 @@ class HTMLReportCreator(ReportCreator):
             fp.write("%s %d %d\n" % (domain, n, info["commits"]))
             f.write(
                 "<tr><th>%s</th><td>%d (%.2f%%)</td></tr>"
-                % (domain, info["commits"], (100.0 * info["commits"] / totalcommits))
+                % (
+                    domain,
+                    info["commits"],
+                    (100.0 * info["commits"] / data.get_total_commits()),
+                )
             )
         f.write("</table></div>")
         f.write('<img src="domains.png" alt="Commits by Domains">')
@@ -534,6 +549,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def create_files_html(self, data, path):
         ###
         # Files
         f = open(path + "/files.html", "w")
@@ -607,6 +623,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def create_lines_html(self, data, path):
         ###
         # Lines
         f = open(path + "/lines.html", "w")
@@ -629,6 +646,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def create_tags_html(self, data, path):
         ###
         # tags.html
         f = open(path + "/tags.html", "w")
@@ -674,8 +692,6 @@ class HTMLReportCreator(ReportCreator):
 
         f.write("</body></html>")
         f.close()
-
-        self.create_graphs(path)
 
     def create_graphs(self, path):
         print("Generating graphs...")
