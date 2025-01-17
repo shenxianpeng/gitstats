@@ -34,7 +34,7 @@ class ReportCreator:
 class HTMLReportCreator(ReportCreator):
     def create(self, data, path):
         ReportCreator.create(self, data, path)
-        self.title = data.projectname
+        self.title = data.project_name
 
         # copy static files. Looks in the binary directory, ../share/gitstats and /usr/share/gitstats
         binarypath = os.path.dirname(os.path.abspath(__file__))
@@ -58,16 +58,25 @@ class HTMLReportCreator(ReportCreator):
                     % (file, basedirs)
                 )
 
+        self.create_index_html(data, path)
+        self.create_activity_html(data, path)
+        self.create_authors_html(data, path)
+        self.create_files_html(data, path)
+        self.create_lines_html(data, path)
+        self.create_tags_html(data, path)
+        self.create_graphs(path)
+
+    def create_index_html(self, data, path):
         f = open(path + "/index.html", "w")
         format = "%Y-%m-%d %H:%M:%S"
-        self.printHeader(f)
+        self.print_header(f)
 
-        f.write("<h1>GitStats - %s</h1>" % data.projectname)
+        f.write("<h1>GitStats - %s</h1>" % data.project_name)
 
-        self.printNav(f)
+        self.print_nav(f)
 
         f.write("<dl>")
-        f.write("<dt>Project name</dt><dd>%s</dd>" % (data.projectname))
+        f.write("<dt>Project name</dt><dd>%s</dd>" % (data.project_name))
         f.write("<br>")
         f.write(
             "<dt>Generated</dt><dd>%s (in %d seconds)</dd>"
@@ -128,12 +137,13 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body>\n</html>")
         f.close()
 
+    def create_activity_html(self, data, path):
         ###
         # Activity
         f = open(path + "/activity.html", "w")
-        self.printHeader(f)
+        self.print_header(f)
         f.write("<h1>Activity</h1>")
-        self.printNav(f)
+        self.print_nav(f)
 
         # f.write('<h2>Last 30 days</h2>')
 
@@ -359,13 +369,14 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def create_authors_html(self, data, path):
         ###
         # Authors
         f = open(path + "/authors.html", "w")
-        self.printHeader(f)
+        self.print_header(f)
 
         f.write("<h1>Authors</h1>")
-        self.printNav(f)
+        self.print_nav(f)
 
         # Authors :: List of authors
         f.write(html_header(2, "List of Authors"))
@@ -463,8 +474,8 @@ class HTMLReportCreator(ReportCreator):
             % conf["authors_top"]
         )
         for yymm in reversed(sorted(data.author_of_month.keys())):
-            authordict = data.author_of_month[yymm]
-            authors = getkeyssortedbyvalues(authordict)
+            author_dict = data.author_of_month[yymm]
+            authors = get_keys_sorted_by_values(author_dict)
             authors.reverse()
             commits = data.author_of_month[yymm][authors[0]]
             authors_str = ", ".join(authors[1 : conf["authors_top"] + 1])
@@ -489,8 +500,8 @@ class HTMLReportCreator(ReportCreator):
             % conf["authors_top"]
         )
         for yy in reversed(sorted(data.author_of_year.keys())):
-            authordict = data.author_of_year[yy]
-            authors = getkeyssortedbyvalues(authordict)
+            author_dict = data.author_of_year[yy]
+            authors = get_keys_sorted_by_values(author_dict)
             authors.reverse()
             commits = data.author_of_year[yy][authors[0]]
             authors_str = ", ".join(authors[1 : conf["authors_top"] + 1])
@@ -525,7 +536,11 @@ class HTMLReportCreator(ReportCreator):
             fp.write("%s %d %d\n" % (domain, n, info["commits"]))
             f.write(
                 "<tr><th>%s</th><td>%d (%.2f%%)</td></tr>"
-                % (domain, info["commits"], (100.0 * info["commits"] / totalcommits))
+                % (
+                    domain,
+                    info["commits"],
+                    (100.0 * info["commits"] / data.get_total_commits()),
+                )
             )
         f.write("</table></div>")
         f.write('<img src="domains.png" alt="Commits by Domains">')
@@ -534,12 +549,13 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def create_files_html(self, data, path):
         ###
         # Files
         f = open(path + "/files.html", "w")
-        self.printHeader(f)
+        self.print_header(f)
         f.write("<h1>Files</h1>")
-        self.printNav(f)
+        self.print_nav(f)
 
         f.write("<dl>\n")
         f.write("<dt>Total files</dt><dd>%d</dd>" % data.get_total_files())
@@ -607,12 +623,13 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def create_lines_html(self, data, path):
         ###
         # Lines
         f = open(path + "/lines.html", "w")
-        self.printHeader(f)
+        self.print_header(f)
         f.write("<h1>Lines</h1>")
-        self.printNav(f)
+        self.print_nav(f)
 
         f.write("<dl>\n")
         f.write("<dt>Total lines</dt><dd>%d</dd>" % data.get_total_loc())
@@ -629,12 +646,13 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def create_tags_html(self, data, path):
         ###
         # tags.html
         f = open(path + "/tags.html", "w")
-        self.printHeader(f)
+        self.print_header(f)
         f.write("<h1>Tags</h1>")
-        self.printNav(f)
+        self.print_nav(f)
 
         f.write("<dl>")
         f.write("<dt>Total tags</dt><dd>%d</dd>" % len(data.tags))
@@ -656,7 +674,9 @@ class HTMLReportCreator(ReportCreator):
         ]
         for tag in tags_sorted_by_date_desc:
             authorinfo = []
-            self.authors_by_commits = getkeyssortedbyvalues(data.tags[tag]["authors"])
+            self.authors_by_commits = get_keys_sorted_by_values(
+                data.tags[tag]["authors"]
+            )
             for i in reversed(self.authors_by_commits):
                 authorinfo.append("%s (%d)" % (i, data.tags[tag]["authors"][i]))
             f.write(
@@ -673,11 +693,21 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-        self.createGraphs(path)
-
-    def createGraphs(self, path):
+    def create_graphs(self, path):
         print("Generating graphs...")
+        self.create_graph_hour_of_day(path)
+        self.create_graph_day_of_week(path)
+        self.create_graph_domains(path)
+        self.create_graph_month_of_year(path)
+        self.create_graph_commits_by_year_month(path)
+        self.create_graph_commits_by_year(path)
+        self.create_graph_files_by_date(path)
+        self.create_graph_lines_of_code(path)
+        self.create_graph_lines_of_code_by_author(path)
+        self.create_graph_commits_by_author(path)
+        self.create_graph_by_gnuplot(path)
 
+    def create_graph_hour_of_day(self, path):
         # hour of day
         f = open(path + "/hour_of_day.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -695,6 +725,7 @@ plot 'hour_of_day.dat' using 1:2:(0.5) w boxes fs solid
         )
         f.close()
 
+    def create_graph_day_of_week(self, path):
         # day of week
         f = open(path + "/day_of_week.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -712,6 +743,7 @@ plot 'day_of_week.dat' using 1:3:(0.5):xtic(2) w boxes fs solid
         )
         f.close()
 
+    def create_graph_domains(self, path):
         # Domains
         f = open(path + "/domains.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -728,6 +760,7 @@ plot 'domains.dat' using 2:3:(0.5) with boxes fs solid, '' using 2:3:1 with labe
         )
         f.close()
 
+    def create_graph_month_of_year(self, path):
         # Month of Year
         f = open(path + "/month_of_year.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -745,6 +778,7 @@ plot 'month_of_year.dat' using 1:2:(0.5) w boxes fs solid
         )
         f.close()
 
+    def create_graph_commits_by_year_month(self, path):
         # commits_by_year_month
         f = open(path + "/commits_by_year_month.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -765,6 +799,7 @@ plot 'commits_by_year_month.dat' using 1:2:(0.5) w boxes fs solid
         )
         f.close()
 
+    def create_graph_commits_by_year(self, path):
         # commits_by_year
         f = open(path + "/commits_by_year.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -782,6 +817,7 @@ plot 'commits_by_year.dat' using 1:2:(0.5) w boxes fs solid
         )
         f.close()
 
+    def create_graph_files_by_date(self, path):
         # Files by date
         f = open(path + "/files_by_date.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -803,6 +839,7 @@ plot 'files_by_date.dat' using 1:2 w steps
         )
         f.close()
 
+    def create_graph_lines_of_code(self, path):
         # Lines of Code
         f = open(path + "/lines_of_code.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -823,6 +860,7 @@ plot 'lines_of_code.dat' using 1:2 w lines
         )
         f.close()
 
+    def create_graph_lines_of_code_by_author(self, path):
         # Lines of Code Added per author
         f = open(path + "/lines_of_code_by_author.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -855,6 +893,7 @@ plot """
 
         f.close()
 
+    def create_graph_commits_by_author(self, path):
         # Commits per author
         f = open(path + "/commits_by_author.plot", "w")
         f.write(GNUPLOT_COMMON)
@@ -887,6 +926,7 @@ plot """
 
         f.close()
 
+    def create_graph_by_gnuplot(self, path):
         os.chdir(path)
         files = glob.glob(path + "/*.plot")
         for f in files:
@@ -894,8 +934,8 @@ plot """
             if len(out) > 0:
                 print(out)
 
-    def printHeader(self, f):
-        f.write(
+    def print_header(self, file) -> None:
+        file.write(
             """<!DOCTYPE html>
 <html>
 <head>
@@ -910,20 +950,21 @@ plot """
             % (self.title, conf["style"], get_version)
         )
 
-    def printNav(self, f):
-        f.write(
+    def print_nav(self, file) -> None:
+        """Print navigation menu to file."""
+        file.write(
             """
-<div class="nav">
-<ul>
-<li><a href="index.html">General</a></li>
-<li><a href="activity.html">Activity</a></li>
-<li><a href="authors.html">Authors</a></li>
-<li><a href="files.html">Files</a></li>
-<li><a href="lines.html">Lines</a></li>
-<li><a href="tags.html">Tags</a></li>
-</ul>
-</div>
-"""
+            <div class="nav">
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            </ul>
+            </div>
+            """
         )
 
 
@@ -942,7 +983,7 @@ def html_linkify(text):
     return text.lower().replace(" ", "_")
 
 
-def getkeyssortedbyvalues(dict):
+def get_keys_sorted_by_values(dict):
     return [el[1] for el in sorted([(el[1], el[0]) for el in list(dict.items())])]
 
 
