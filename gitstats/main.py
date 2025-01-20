@@ -115,56 +115,9 @@ class DataCollector:
             self.cache = pickle.load(f)
         f.close()
 
-    ##
-    # Produce any additional statistics from the extracted data.
-    def refine(self):
-        pass
-
-    ##
-    # : get a dictionary of author
-    def get_author_info(self, author):
-        return None
-
-    def get_activity_by_day_of_week(self):
-        return {}
-
-    def get_activity_by_hour_of_day(self):
-        return {}
-
-    # : get a dictionary of domains
-    def get_domain_info(self, domain):
-        return None
-
-    ##
-    # Get a list of authors
-    def get_authors(self):
-        return []
-
-    def get_first_commit_date(self):
-        return datetime.datetime.now()
-
-    def get_last_commit_date(self):
-        return datetime.datetime.now()
-
     def get_stamp_created(self):
         return self.stamp_created
 
-    def get_tags(self):
-        return []
-
-    def get_total_authors(self):
-        return -1
-
-    def get_total_commits(self):
-        return -1
-
-    def get_total_files(self):
-        return -1
-
-    def get_total_loc(self):
-        return -1
-
-    ##
     # Save cacheable data
     def save_cache(self, cachefile):
         print("Saving cache...")
@@ -713,65 +666,66 @@ class GitDataCollector(DataCollector):
         return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
 
 
-class GitStats:
-    def run(self, gitpath, outputpath):
-        rundir = os.getcwd()
+def run(gitpath, outputpath) -> int:
+    rundir = os.getcwd()
 
-        try:
-            os.makedirs(outputpath)
-        except OSError:
-            pass
+    try:
+        os.makedirs(outputpath)
+    except OSError:
+        pass
 
-        if not os.path.isdir(outputpath):
-            print("FATAL: Output path is not a directory or does not exist")
-            sys.exit(1)
+    if not os.path.isdir(outputpath):
+        print("FATAL: Output path is not a directory or does not exist")
+        return 1
 
-        if get_gnuplot_version is None:
-            print("gnuplot not found")
-            sys.exit(1)
+    if get_gnuplot_version is None:
+        print("gnuplot not found")
+        return 1
 
-        print("Output path: %s" % outputpath)
-        cachefile = os.path.join(outputpath, "gitstats.cache")
+    print("Output path: %s" % outputpath)
+    cachefile = os.path.join(outputpath, "gitstats.cache")
 
-        data = GitDataCollector()
-        data.load_cache(cachefile)
+    data = GitDataCollector()
+    data.load_cache(cachefile)
 
-        for gitpath in gitpath:
-            print("Git path: %s" % gitpath)
+    for gitpath in gitpath:
+        print("Git path: %s" % gitpath)
 
-            prevdir = os.getcwd()
-            os.chdir(gitpath)
+        prevdir = os.getcwd()
+        os.chdir(gitpath)
 
-            print("Collecting data...")
-            data.collect(gitpath)
+        print("Collecting data...")
+        data.collect(gitpath)
 
-            os.chdir(prevdir)
+        os.chdir(prevdir)
 
-        print("Refining data...")
-        data.save_cache(cachefile)
-        data.refine()
+    print("Refining data...")
+    data.save_cache(cachefile)
+    data.refine()
 
-        os.chdir(rundir)
+    os.chdir(rundir)
 
-        print("Generating report...")
-        report = HTMLReportCreator()
-        report.create(data, outputpath)
+    print("Generating report...")
+    html_report = HTMLReportCreator()
+    html_report.create(data, outputpath)
 
-        time_end = time.time()
-        exectime_internal = time_end - time_start
-        print(
-            "Execution time %.5f secs, %.5f secs (%.2f %%) in external commands)"
-            % (
-                exectime_internal,
-                exectime_external,
-                (100.0 * exectime_external) / exectime_internal,
-            )
+    time_end = time.time()
+    exectime_internal = time_end - time_start
+    print(
+        "Execution time %.5f secs, %.5f secs (%.2f %%) in external commands)"
+        % (
+            exectime_internal,
+            exectime_external,
+            (100.0 * exectime_external) / exectime_internal,
         )
-        if sys.stdin.isatty():
-            print("To view the report, run:")
-            print()
-            print(f"  python3 -m http.server 8000 -d {outputpath}")
-            print()
+    )
+    if sys.stdin.isatty():
+        print("To view the report, run:")
+        print()
+        print(f"  python3 -m http.server 8000 -d {outputpath}")
+        print()
+
+    return 0
 
 
 def get_parser() -> argparse.ArgumentParser:
@@ -810,7 +764,7 @@ def get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main():
+def main() -> int:
     parser = get_parser()
     args = parser.parse_args()
     gitpath = args.gitpath
@@ -825,9 +779,10 @@ def main():
         except ValueError:
             parser.error("Config must be in the form key=value")
 
-    g = GitStats()
-    g.run(gitpath, outputpath)
+    run(gitpath, outputpath)
+
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
