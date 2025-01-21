@@ -666,7 +666,15 @@ class GitDataCollector(DataCollector):
         return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
 
 
-def run(gitpath, outputpath) -> int:
+def run(gitpath, outputpath, extra_fmt=None) -> int:
+    """Run the gitstats program.
+    Args:
+        gitpath: path to the git repository
+        outputpath: path to the output directory
+        extra_fmt: extra format
+    Returns:
+        0 on success, 1 on failure
+    """
     rundir = os.getcwd()
 
     try:
@@ -708,6 +716,18 @@ def run(gitpath, outputpath) -> int:
     print("Generating report...")
     html_report = HTMLReportCreator()
     html_report.create(data, outputpath)
+
+    if extra_fmt:
+        output_file = os.path.join(gitpath, f"{outputpath}.{extra_fmt}")
+        if extra_fmt == "json":
+            import json
+
+            print(f'Generating JSON file: "{output_file}"')
+            with open(output_file, "w") as file:
+                json.dump(data.__dict__, file, default=str)
+        else:
+            print(f"Error: Unsupported format '{extra_fmt}'")
+            return 1
 
     time_end = time.time()
     exectime_internal = time_end - time_start
@@ -761,6 +781,14 @@ def get_parser() -> argparse.ArgumentParser:
         help="Path to the directory where the output will be stored.",
     )
 
+    parser.add_argument(
+        "-f",
+        "--format",
+        choices=["json"],
+        required=False,
+        help="The extra format of the output file.",
+    )
+
     return parser
 
 
@@ -769,6 +797,7 @@ def main() -> int:
     args = parser.parse_args()
     gitpath = args.gitpath
     outputpath = os.path.abspath(args.outputpath)
+    extra_fmt = args.format
 
     for item in args.config:
         try:
@@ -779,7 +808,7 @@ def main() -> int:
         except ValueError:
             parser.error("Config must be in the form key=value")
 
-    run(gitpath, outputpath)
+    run(gitpath, outputpath, extra_fmt=extra_fmt)
 
     return 0
 
