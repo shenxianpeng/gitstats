@@ -58,7 +58,8 @@ docker run ghcr.io/shenxianpeng/gitstats:latest --help
 ## Usage
 
 ```bash
-usage: gitstats [-h] [-v] [-c key=value] <gitpath> [<gitpath> ...] <outputpath>
+gitstats --help
+usage: gitstats [-h] [-v] [-c key=value] [-f {json}] <gitpath> [<gitpath> ...] <outputpath>
 
 Generate statistics for a Git repository.
 
@@ -70,7 +71,11 @@ options:
   -h, --help            show this help message and exit
   -v, --version         show program's version number and exit
   -c key=value, --config key=value
-                        Override configuration value. Can be specified multiple times. Default configuration: {'max_domains': 10, 'max_ext_length': 10, 'style': 'gitstats.css', 'max_authors': 20, 'authors_top': 5, 'commit_begin': '', 'commit_end': 'HEAD', 'linear_linestats': 1, 'project_name': '', 'processes': 8, 'start_date': ''}.
+                        Override configuration value. Can be specified multiple times. Default configuration: {'max_domains':
+                        10, 'max_ext_length': 10, 'style': 'gitstats.css', 'max_authors': 20, 'authors_top': 5, 'commit_begin':
+                        '', 'commit_end': 'HEAD', 'linear_linestats': 1, 'project_name': '', 'processes': 8, 'start_date': ''}.
+  -f {json}, --format {json}
+                        The extra format of the output file.
 ```
 
 > [!TIP]
