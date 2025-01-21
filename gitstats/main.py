@@ -797,7 +797,7 @@ def main() -> int:
     args = parser.parse_args()
     gitpath = args.gitpath
     outputpath = os.path.abspath(args.outputpath)
-    format = args.format
+    user_format = args.format
 
     for item in args.config:
         try:
@@ -808,7 +808,7 @@ def main() -> int:
         except ValueError:
             parser.error("Config must be in the form key=value")
 
-    run(gitpath, outputpath, extra_fmt=format)
+    run(gitpath, outputpath, extra_fmt=user_format)
 
     return 0
 
