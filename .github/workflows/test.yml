@@ -42,7 +42,7 @@ jobs:
         .\venv\Scripts\activate.bat
         # for testing
         pip install .
-        gitstats . gitstats-report-windows
+        gitstats . gitstats-report-windows -f json
 
     - name: Save GitStats Report
       if: ${{ matrix.python-version == '3.9' }}
@@ -78,7 +78,7 @@ jobs:
         source venv/bin/activate
         # for testing
         pip install .
-        gitstats . gitstats-report-macos
+        gitstats . gitstats-report-macos -f json
 
     - name: Save GitStats Report
       if: ${{ matrix.python-version == '3.9' }}
@@ -115,7 +115,7 @@ jobs:
         source venv/bin/activate
         # for testing
         pip install .
-        gitstats . gitstats-report
+        gitstats . gitstats-report -f json
 
     - name: Save GitStats Report
       if: ${{ matrix.python-version == '3.9' }}
