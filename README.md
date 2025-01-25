@@ -79,6 +79,9 @@ options:
 ```
 
 > [!TIP]
+> Run `gitstats . report --format json` to generate above report and a JSON file[^2] as well.
+> [^2]: You can use [jq](https://jqlang.github.io/jq/) to parse the JSON file: `cat report.json | jq .`
+>
 > If you want to use gitstats with CI like GitHub Actions or Jenkins to generate reports and deploy them, please the following examples.
 
 ### Use gitstats in GitHub Actions
