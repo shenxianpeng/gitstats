@@ -11,7 +11,9 @@ Visualize Your Git Repositories.
 
 ## Example
 
-Run `gitstats . report`[^1] to generate this report: https://shenxianpeng.github.io/gitstats/index.html. passing `--format json` can generate a JSON file[^2].
+Run `gitstats . report`[^1] to generate this report: https://shenxianpeng.github.io/gitstats/index.html.
+
+Run `gitstats . report --format json`[^1] to generate report and also a JSON file[^2].
 
 [^1]: Before running `gitstats`, ensure all required dependencies are installed on your system. See [requirements](#Requirements)
 
