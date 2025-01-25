@@ -13,7 +13,7 @@ Visualize Your Git Repositories.
 
 Run `gitstats . report`[^1] to generate this report: https://shenxianpeng.github.io/gitstats/index.html.
 
-Run `gitstats . report --format json` to generate report and also a JSON file[^2].
+Run `gitstats . report --format json` to generate above report along with a JSON file[^2].
 
 [^1]: Before running `gitstats`, ensure all required dependencies are installed on your system. See [requirements](#Requirements)
 
