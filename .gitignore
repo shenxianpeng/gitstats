@@ -1,5 +1,8 @@
 venv/
 .venv/
+.tox/
+.coverage
+tests/__pycache__/
 gitstats/__pycache__/
 gitstats.egg-info
 gitstory.egg-info
