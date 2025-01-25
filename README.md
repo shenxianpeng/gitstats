@@ -17,7 +17,7 @@ Run `gitstats . report --format json` to generate above report along with a JSON
 
 [^1]: Before running `gitstats`, ensure all required dependencies are installed on your system. See [requirements](#Requirements)
 
-[^2]: You can use [jq](https://jqlang.github.io/jq/) to parse the JSON file: `cat report.json | jq .`
+[^2]: You can use [jq](https://jqlang.github.io/jq/) to parse the JSON file: `cat report.json | jq .` and extract any data you need.
 
 ## Features
 
