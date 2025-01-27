@@ -152,7 +152,7 @@ jobs:
         COMMENT_BODY="🎉 Your GitStats preview is ready: [View Report](${PREVIEW_URL})"
         gh api repos/${{ env.REPO_NAME }}/issues/${{ env.PR_NUMBER }}/comments -f body="${COMMENT_BODY}"
 
-  code-coverage:
+  coverage:
     runs-on: ubuntu-24.04
     steps:
     - name: Checkout Code
