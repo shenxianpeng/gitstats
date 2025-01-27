@@ -27,7 +27,7 @@ def get_gnuplot_version():
     return output if output else None
 
 
-def get_pipe_output(cmds, quiet=False):
+def get_pipe_output(cmds: list, quiet=False):
     global exectime_external
     start = time.time()
     if not quiet and ON_LINUX and os.isatty(1):
