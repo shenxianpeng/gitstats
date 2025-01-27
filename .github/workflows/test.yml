@@ -152,6 +152,16 @@ jobs:
         COMMENT_BODY="🎉 Your GitStats preview is ready: [View Report](${PREVIEW_URL})"
         gh api repos/${{ env.REPO_NAME }}/issues/${{ env.PR_NUMBER }}/comments -f body="${COMMENT_BODY}"
 
+coverage:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
     - name: Run Tests
       run: pip install tox && tox
 
