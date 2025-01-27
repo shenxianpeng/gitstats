@@ -88,7 +88,7 @@ jobs:
         path: gitstats-report-macos
 
   test-linux:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
@@ -151,3 +151,25 @@ jobs:
         PREVIEW_URL="https://shenxianpeng.github.io/gitstats/previews/${{ env.PR_NUMBER }}/index.html"
         COMMENT_BODY="🎉 Your GitStats preview is ready: [View Report](${PREVIEW_URL})"
         gh api repos/${{ env.REPO_NAME }}/issues/${{ env.PR_NUMBER }}/comments -f body="${COMMENT_BODY}"
+
+  code-coverage:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # get all history.
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Run Tests
+      run: pip install tox && tox
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: shenxianpeng/gitstats
