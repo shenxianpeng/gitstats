@@ -385,7 +385,7 @@ class GitDataCollector(DataCollector):
 
         # extensions and size of files
         lines = get_pipe_output(
-            ["git ls-tree -r -l -z %s" % get_commit_range("HEAD", end_only=True)]
+            ["git ls-tree -r -l -z %s" % get_commit_range("HEAD", end_only=False)]
         ).split("\000")
         blobs_to_read = []
         for line in lines:

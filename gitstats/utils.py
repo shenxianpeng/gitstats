@@ -54,7 +54,7 @@ def get_commit_range(defaultrange="HEAD", end_only=False):
     if len(conf["commit_end"]) > 0:
         if end_only or len(conf["commit_begin"]) == 0:
             return conf["commit_end"]
-        return "%s..%s" % (conf["commit_begin"], conf["commit_end"])
+        return "%s~%s" % (conf["commit_end"], conf["commit_begin"])
     return defaultrange
 
 
