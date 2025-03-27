@@ -26,18 +26,26 @@ DEFAULT_CONFIG = {
 }
 
 
+_config = None
+
+
 def load_config(file_path="gitstats.conf") -> dict:
     """Load configuration from a file, or fall back to defaults."""
     import configparser
     import os
 
-    config = DEFAULT_CONFIG.copy()  # Start with defaults
+    global _config
+
+    if _config is not None:
+        return _config
+
+    _config = DEFAULT_CONFIG.copy()  # Start with defaults
     config_parser = configparser.ConfigParser()
 
     if os.path.exists(file_path):
         config_parser.read(file_path)
-        config = {
+        _config = {
             k: int(v) if v.isdigit() else v
             for k, v in config_parser["gitstats"].items()
         }
-    return config
+    return _config
