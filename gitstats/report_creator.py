@@ -36,10 +36,8 @@ class HTMLReportCreator(ReportCreator):
         ReportCreator.create(self, data, path)
         self.title = data.project_name
 
-        # copy static files. Looks in the binary directory, ../share/gitstats and /usr/share/gitstats
-        binarypath = os.path.dirname(os.path.abspath(__file__))
-        secondarypath = os.path.join(binarypath, "..", "share", "gitstats")
-        basedirs = [binarypath, secondarypath, "/usr/share/gitstats"]
+        # copy static files to the report directory
+        basedir = os.path.dirname(os.path.abspath(__file__))
         for file in (
             conf["style"],
             "sortable.js",
@@ -47,16 +45,10 @@ class HTMLReportCreator(ReportCreator):
             "arrow-down.gif",
             "arrow-none.gif",
         ):
-            for base in basedirs:
-                src = base + "/" + file
-                if os.path.exists(src):
-                    shutil.copyfile(src, path + "/" + file)
-                    break
-            else:
-                print(
-                    'Warning: "%s" not found, so not copied (searched: %s)'
-                    % (file, basedirs)
-                )
+            src = basedir + "/" + file
+            if os.path.exists(src):
+                shutil.copyfile(src, path + "/" + file)
+                break
 
         self.create_index_html(data, path)
         self.create_activity_html(data, path)
