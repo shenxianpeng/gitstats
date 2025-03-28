@@ -105,17 +105,10 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install Dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y gnuplot
+      run: nox -s install-deps
 
     - name: Generate GitStats Report
-      run: |
-        python3 -m venv venv
-        source venv/bin/activate
-        # for testing
-        pip install .
-        gitstats . gitstats-report -f json
+      run: nox -s build
 
     - name: Save GitStats Report
       if: ${{ matrix.python-version == '3.9' }}
