@@ -11,13 +11,13 @@ Visualize Your Git Repositories.
 
 ## Example
 
-Run `gitstats . report`[^1] to generate this report: https://shenxianpeng.github.io/gitstats/index.html.
+Run `gitstats . report`[^1] to generate a report like this: https://shenxianpeng.github.io/gitstats/index.html.
 
-Run `gitstats . report --format json` to generate above report along with a JSON file[^2].
+Run `gitstats . report --format json` to generate the same report along with a JSON file[^2].
 
-[^1]: Before running `gitstats`, ensure all required dependencies are installed on your system. See [requirements](#Requirements)
+[^1]: Before running `gitstats`, ensure all required dependencies are installed. See [Installation](#Installation) and [Requirements](#Requirements). The `.` refers the current directory, or you can specify any other `gitpath` as needed. See [Usage](#Usage).
 
-[^2]: You can use [jq](https://jqlang.github.io/jq/) to parse the JSON file: `cat report.json | jq .` and extract any data you need.
+[^2]: You can use [jq](https://jqlang.github.io/jq/) to parse the JSON file. For example: `cat report.json | jq .`, this allows you to extract any data you need.
 
 ## Features
 
