@@ -6,5 +6,8 @@
 
 tasks:
   - name: Install & Build
-    init: nox -s install-deps && nox -s build
+    init: |
+      pip install nox
+      nox -s install-deps
+      nox -s build
     command: nox -s preview

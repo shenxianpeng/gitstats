@@ -105,10 +105,14 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Install Dependencies
-      run: nox -s install-deps
+      run: |
+        pip install nox
+        nox -s install-deps
 
     - name: Generate GitStats Report
-      run: nox -s build
+      run: |
+        pip install nox
+        nox -s build
 
     - name: Save GitStats Report
       if: ${{ matrix.python-version == '3.9' }}
