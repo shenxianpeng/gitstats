@@ -106,16 +106,13 @@ jobs:
 
     - name: Install Dependencies
       run: |
-        sudo apt-get update
-        sudo apt-get install -y gnuplot
+        pip install nox
+        nox -s install-deps
 
     - name: Generate GitStats Report
       run: |
-        python3 -m venv venv
-        source venv/bin/activate
-        # for testing
-        pip install .
-        gitstats . gitstats-report -f json
+        pip install nox
+        nox -s build
 
     - name: Save GitStats Report
       if: ${{ matrix.python-version == '3.9' }}
