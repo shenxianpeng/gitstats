@@ -59,7 +59,7 @@ class HTMLReportCreator(ReportCreator):
         self.create_graphs(path)
 
     def create_index_html(self, data, path):
-        f = open(path + "/index.html", "w")
+        f = open(path + "/index.html", "w", encoding='UTF8')
         format = "%Y-%m-%d %H:%M:%S"
         self.print_header(f)
 
@@ -132,7 +132,7 @@ class HTMLReportCreator(ReportCreator):
     def create_activity_html(self, data, path):
         ###
         # Activity
-        f = open(path + "/activity.html", "w")
+        f = open(path + "/activity.html", "w", encoding='UTF8')
         self.print_header(f)
         f.write("<h1>Activity</h1>")
         self.print_nav(f)
@@ -364,7 +364,7 @@ class HTMLReportCreator(ReportCreator):
     def create_authors_html(self, data, path):
         ###
         # Authors
-        f = open(path + "/authors.html", "w")
+        f = open(path + "/authors.html", "w", encoding='UTF8')
         self.print_header(f)
 
         f.write("<h1>Authors</h1>")
@@ -544,7 +544,7 @@ class HTMLReportCreator(ReportCreator):
     def create_files_html(self, data, path):
         ###
         # Files
-        f = open(path + "/files.html", "w")
+        f = open(path + "/files.html", "w", encoding='UTF8')
         self.print_header(f)
         f.write("<h1>Files</h1>")
         self.print_nav(f)
@@ -618,7 +618,7 @@ class HTMLReportCreator(ReportCreator):
     def create_lines_html(self, data, path):
         ###
         # Lines
-        f = open(path + "/lines.html", "w")
+        f = open(path + "/lines.html", "w", encoding='UTF8')
         self.print_header(f)
         f.write("<h1>Lines</h1>")
         self.print_nav(f)
@@ -641,7 +641,7 @@ class HTMLReportCreator(ReportCreator):
     def create_tags_html(self, data, path):
         ###
         # tags.html
-        f = open(path + "/tags.html", "w")
+        f = open(path + "/tags.html", "w", encoding='UTF8')
         self.print_header(f)
         f.write("<h1>Tags</h1>")
         self.print_nav(f)
@@ -701,7 +701,7 @@ class HTMLReportCreator(ReportCreator):
 
     def create_graph_hour_of_day(self, path):
         # hour of day
-        f = open(path + "/hour_of_day.plot", "w")
+        f = open(path + "/hour_of_day.plot", "w", encoding='UTF8')
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -719,7 +719,7 @@ plot 'hour_of_day.dat' using 1:2:(0.5) w boxes fs solid
 
     def create_graph_day_of_week(self, path):
         # day of week
-        f = open(path + "/day_of_week.plot", "w")
+        f = open(path + "/day_of_week.plot", "w", encoding='UTF8')
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -737,7 +737,7 @@ plot 'day_of_week.dat' using 1:3:(0.5):xtic(2) w boxes fs solid
 
     def create_graph_domains(self, path):
         # Domains
-        f = open(path + "/domains.plot", "w")
+        f = open(path + "/domains.plot", "w", encoding='UTF8')
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -754,7 +754,7 @@ plot 'domains.dat' using 2:3:(0.5) with boxes fs solid, '' using 2:3:1 with labe
 
     def create_graph_month_of_year(self, path):
         # Month of Year
-        f = open(path + "/month_of_year.plot", "w")
+        f = open(path + "/month_of_year.plot", "w", encoding='UTF8')
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -772,7 +772,7 @@ plot 'month_of_year.dat' using 1:2:(0.5) w boxes fs solid
 
     def create_graph_commits_by_year_month(self, path):
         # commits_by_year_month
-        f = open(path + "/commits_by_year_month.plot", "w")
+        f = open(path + "/commits_by_year_month.plot", "w", encoding='UTF8')
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -793,7 +793,7 @@ plot 'commits_by_year_month.dat' using 1:2:(0.5) w boxes fs solid
 
     def create_graph_commits_by_year(self, path):
         # commits_by_year
-        f = open(path + "/commits_by_year.plot", "w")
+        f = open(path + "/commits_by_year.plot", "w", encoding='UTF8')
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -811,7 +811,7 @@ plot 'commits_by_year.dat' using 1:2:(0.5) w boxes fs solid
 
     def create_graph_files_by_date(self, path):
         # Files by date
-        f = open(path + "/files_by_date.plot", "w")
+        f = open(path + "/files_by_date.plot", "w", encoding='UTF8')
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -833,7 +833,7 @@ plot 'files_by_date.dat' using 1:2 w steps
 
     def create_graph_lines_of_code(self, path):
         # Lines of Code
-        f = open(path + "/lines_of_code.plot", "w")
+        f = open(path + "/lines_of_code.plot", "w", encoding='UTF8')
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -854,7 +854,7 @@ plot 'lines_of_code.dat' using 1:2 w lines
 
     def create_graph_lines_of_code_by_author(self, path):
         # Lines of Code Added per author
-        f = open(path + "/lines_of_code_by_author.plot", "w")
+        f = open(path + "/lines_of_code_by_author.plot", "w", encoding='UTF8')
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -887,7 +887,7 @@ plot """
 
     def create_graph_commits_by_author(self, path):
         # Commits per author
-        f = open(path + "/commits_by_author.plot", "w")
+        f = open(path + "/commits_by_author.plot", "w", encoding='UTF8')
         f.write(GNUPLOT_COMMON)
         f.write(
             """
