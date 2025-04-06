@@ -1,6 +1,6 @@
-# GitStats 📊
+# `$ gitstats`
 
-Visualize Your Git Repositories.
+📊 Visualize Your Git Repositories.
 
 <!--[![PyPI - Downloads](https://img.shields.io/pypi/dm/gitstats?color=blue)](https://pypistats.org/packages/gitstats)-->
 [![GitStats Report](https://img.shields.io/badge/GitStats_Report-passing-lightgreen?style=flat&&logo=git&&logoColor=white)](https://shenxianpeng.github.io/gitstats/index.html)
