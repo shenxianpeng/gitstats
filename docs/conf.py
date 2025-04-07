@@ -7,8 +7,12 @@ project = "GitStats"
 author = "Xianpeng Shen"
 copyright = "2024, Xianpeng Shen"
 extensions = [
-    "sphinx.ext.autodoc",
-    "sphinx.ext.napoleon",
-    "sphinx.ext.viewcode",
+    "myst_parser",
 ]
+
+source_suffix = {
+    ".rst": "restructuredtext",
+    ".md": "markdown",
+}
+
 html_theme = "sphinx_rtd_theme"
