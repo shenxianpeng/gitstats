@@ -149,3 +149,17 @@ jobs:
         PREVIEW_URL="https://shenxianpeng.github.io/gitstats/previews/${{ env.PR_NUMBER }}/index.html"
         COMMENT_BODY="🎉 Your GitStats preview is ready: [View Report](${PREVIEW_URL})"
         gh api repos/${{ env.REPO_NAME }}/issues/${{ env.PR_NUMBER }}/comments -f body="${COMMENT_BODY}"
+
+  test-docs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12
+    - name: Build Docs
+      run: |
+        pip install nox
+        nox -s docs
