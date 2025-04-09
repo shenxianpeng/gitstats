@@ -7,13 +7,26 @@ on:
       - 'pyproject.toml'
       - 'gitstats.conf'
       - '.github/workflows/test.yml'
-      - '!docs/**'
   push:
     branches:
       - "main"
   workflow_dispatch:
 
 jobs:
+  test-docs:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12
+    - name: Build Docs
+      run: |
+        pip install nox
+        nox -s docs
+
   test-windows:
     runs-on: windows-latest
     strategy:
@@ -43,14 +56,14 @@ jobs:
         .\venv\Scripts\activate.bat
         # for testing
         pip install .
-        gitstats . gitstats-report-windows -f json
+        gitstats . test-report-windows -f json
 
     - name: Save GitStats Report
       if: ${{ matrix.python-version == '3.9' }}
       uses: actions/upload-artifact@v4
       with:
-        name: gitstats-report-windows
-        path: gitstats-report-windows
+        name: test-report-windows
+        path: test-report-windows
 
   test-macos:
     runs-on: macos-latest
@@ -79,14 +92,14 @@ jobs:
         source venv/bin/activate
         # for testing
         pip install .
-        gitstats . gitstats-report-macos -f json
+        gitstats . test-report-macos -f json
 
     - name: Save GitStats Report
       if: ${{ matrix.python-version == '3.9' }}
       uses: actions/upload-artifact@v4
       with:
-        name: gitstats-report-macos
-        path: gitstats-report-macos
+        name: test-report-macos
+        path: test-report-macos
 
   test-linux:
     runs-on: ubuntu-latest
@@ -119,15 +132,15 @@ jobs:
       if: ${{ matrix.python-version == '3.9' }}
       uses: actions/upload-artifact@v4
       with:
-        name: gitstats-report
-        path: gitstats-report
+        name: test-report
+        path: test-report
 
     - name: Deploy to GitHub Pages for PR
       if: ${{ github.event_name == 'pull_request' && matrix.python-version == '3.9' }}
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: gitstats-report
+        publish_dir: test-report
         # Configure a unique preview link for each pull request
         destination_dir: previews/${{ github.event.pull_request.number }}
 
@@ -136,7 +149,7 @@ jobs:
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: gitstats-report
+        publish_dir: test-report
         keep_files: true # do not remove example reports
 
     - name: Add PR Comment with Preview Link
