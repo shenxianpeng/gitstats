@@ -24,12 +24,9 @@ html_title = "gitstats"
 
 
 def setup(app: Sphinx) -> None:
-    URL = f"https://api.github.com/repos/shenxianpeng/gitstats/releases"
+    URL = "https://api.github.com/repos/shenxianpeng/gitstats/releases"
 
     response = requests.get(URL)
-    print("===============")
-    print(response)
-    print("===============")
     releases = response.json()
 
     news_doc = Path(app.srcdir, "CHANGELOG.md")
@@ -37,7 +34,7 @@ def setup(app: Sphinx) -> None:
     with open(news_doc, "w") as f:
         f.write("# Changelog\n\n")
         for release in releases:
-            print(release)  
+            print(release)
             f.write(f"## [{release['tag_name']}] - {release['published_at'][:10]}\n")
             f.write(f"{release['body']}\n\n")
             f.write(f"[{release['tag_name']}]: {release['html_url']}\n\n")

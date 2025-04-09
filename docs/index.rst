@@ -1,5 +1,5 @@
-gitstats
-========
+Welcome to gitstats documentation!
+==================================
 
 
 .. include:: ../README.md
