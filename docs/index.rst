@@ -1,12 +1,14 @@
-Welcome to GitStats documentation!
-==================================
+gitstats
+========
 
 
 .. include:: ../README.md
    :parser: myst_parser.sphinx_
 
 .. toctree::
-   :hidden:
+   :maxdepth: 1
 
+   getting-started.md
    AUTHOR.md
    TODO.md
+   CHANGELOG.md
