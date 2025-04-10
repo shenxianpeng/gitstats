@@ -1,8 +1,4 @@
-# Author
-
-Author can be reached by sending e-mail to <xianpeng.shen@gmail.com>.
-
-Include "gitstats" in the subject or prepare to battle the spam filters.
+# Contributors
 
 See the following command for list of authors who have contributed:
 
