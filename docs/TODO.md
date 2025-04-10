@@ -1,6 +1,5 @@
 # TODO
 
-[]
 - cleanup: use defaultdict(int) for counting dicts instead of foo[x] = foo.get(x, 0) + 1
 	- not supported in python 2.4 - do any users use python 2.4?
 	- debian lenny (oldstable) has python 2.5
