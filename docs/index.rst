@@ -6,6 +6,7 @@ Welcome to GitStats documentation!
 
 .. toctree::
    :maxdepth: 1
+   :hidden:
 
    getting-started.md
    example.md
