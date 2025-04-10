@@ -7,6 +7,7 @@ Welcome to GitStats documentation!
 .. toctree::
    :maxdepth: 1
 
+   getting-started.md
    example.md
    FAQ.md
    contributors.md
