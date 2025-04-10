@@ -1,5 +1,3 @@
-# Get Started
-
 ## Features
 
 Here is a list of some features of _gitstats_:
