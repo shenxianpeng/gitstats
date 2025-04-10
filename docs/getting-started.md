@@ -1,5 +1,18 @@
 # Get Started
 
+## Features
+
+Here is a list of some features of _gitstats_:
+
+* **General**: total files, lines, commits, authors, age.
+* **Activity**: commits by hour of day, day of week, hour of week, month of year, year and month, and year.
+* **Authors**: list of authors (name, commits (%), first commit date, last commit date, age), author of month, author of year.
+* **Files**: file count by date, extensions.
+* **Lines**: line of code by date.
+* **Tags**: tags by date and author.
+* **Customizable**: config values through `gitstats.conf`.
+* **Cross-platform**: works on Linux, Windows, and macOS.
+
 ## Requirements
 
 - Python 3.9+ (https://www.python.org/downloads/)
@@ -66,7 +79,7 @@ Run `gitstats . report --format json` to generate the same report along with a J
 
 If you want to use gitstats with CI like GitHub Actions or Jenkins to generate reports and deploy them, please the following examples.
 
-## Use gitstats in GitHub Actions
+### Use gitstats in GitHub Actions
 
 Use gitstats in GitHub Actions to generate reports and deploy them to GitHub Pages.
 
@@ -105,7 +118,7 @@ jobs:
         publish_dir: gitstats-report
 ```
 
-## Use gitstats in Jenkins
+### Use gitstats in Jenkins
 
 Use gitstats in Jenkins to generate reports and publish them to Jenkins server.
 
