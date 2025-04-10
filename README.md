@@ -83,7 +83,3 @@ options:
   -f {json}, --format {json}
                         The extra format of the output file.
 ```
-
----
-
-The gitstats project was originally created by [H​eikki H​okkanen](https://github.com/hoxu) but is no longer maintained since 2015. It is now maintained by [Xianpeng Shen](https://github.com/shenxianpeng).

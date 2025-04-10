@@ -1,11 +1,7 @@
 # Contributors
 
-See the following command for list of authors who have contributed:
+The **gitstats** project was originally created by [Heikki Hokkainen](https://github.com/hoxu), but has not been maintained since 2015. It is now maintained by [Xianpeng Shen](https://github.com/shenxianpeng).
 
-```bash
-$ git shortlog HEAD
-```
+We would like to thank the following individuals for their contributions:
 
-Also thanks to the following people:
-
-[![GitStats Report](https://contrib.rocks/image?repo=shenxianpeng/gitstats)](https://github.com/shenxianpeng/gitstats/graphs/contributors)
+[![GitStats Contributors](https://contrib.rocks/image?repo=shenxianpeng/gitstats)](https://github.com/shenxianpeng/gitstats/graphs/contributors)
