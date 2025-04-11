@@ -6,7 +6,7 @@ Welcome to GitStats documentation!
 Features
 --------
 
-Here is a list of some features of _gitstats_:
+Here is a list of some features of `gitstats`:
 
 * **General**: total files, lines, commits, authors, age.
 * **Activity**: commits by hour of day, day of week, hour of week, month of year, year and month, and year.
@@ -14,7 +14,7 @@ Here is a list of some features of _gitstats_:
 * **Files**: file count by date, extensions.
 * **Lines**: line of code by date.
 * **Tags**: tags by date and author.
-* **Customizable**: config values through `gitstats.conf`.
+* **Customizable**: config values through ``gitstats.conf``.
 * **Cross-platform**: works on Linux, Windows, and macOS.
 
 .. toctree::
