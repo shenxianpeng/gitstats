@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "gitstats"
 description = "GitStats - Visualize Your Git Repositories"
-readme = "README.md"
+readme = "README.rst"
 keywords = ["git", "gitstats", "statistics", "git history"]
 authors = [
     { name = "Xianpeng Shen", email = "xianpeng.shen@gmail.com" },
@@ -38,6 +38,7 @@ gitstats = "gitstats.main:main"
 source =  "https://github.com/shenxianpeng/gitstats"
 tracker = "https://github.com/shenxianpeng/gitstats/issues"
 homepage = "https://shenxianpeng.github.io/gitstats/main/index.html"
+documentation = "https://gitstats.readthedocs.io/"
 
 [tool.setuptools]
 zip-safe = false
