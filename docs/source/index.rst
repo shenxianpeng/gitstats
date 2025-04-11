@@ -20,7 +20,7 @@ Here is a list of some features of _gitstats_:
 .. toctree::
    :maxdepth: 1
    :caption: Getting Started
-   
+
    installation
    example
    faq

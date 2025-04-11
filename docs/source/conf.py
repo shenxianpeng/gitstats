@@ -16,4 +16,4 @@ html_theme = "sphinx_rtd_theme"
 html_title = "gitstats"
 html_short_title = "gitstats"
 
-exclude_patterns = ['soruce/TODO.md']
+exclude_patterns = ["source/TODO.md"]
