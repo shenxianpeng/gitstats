@@ -1,5 +1,5 @@
 Contributors
-=================
+============
 
 The **gitstats** project was originally created by `Heikki Hokkainen <https://github.com/hoxu>`_, but has not been maintained since 2015. It is now maintained by `Xianpeng Shen <https://github.com/shenxianpeng>`_.
 
