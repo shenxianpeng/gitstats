@@ -2,6 +2,8 @@ Welcome to GitStats documentation!
 ==================================
 
 .. include:: ../../README.rst
+   :start-after: .. start-of-about
+   :end-before: .. end-of-about
 
 Features
 --------

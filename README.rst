@@ -1,3 +1,5 @@
+.. start-of-about
+
 GitStats
 ========
 
@@ -27,9 +29,12 @@ A tool for generating insightful visual reports from your Git repositories. 📊
 * 📘 Documentation: `gitstats.readthedocs.io <https://gitstats.readthedocs.io/>`_
 * 🌐 Live Report Example: `GitStats Report <https://shenxianpeng.github.io/gitstats/index.html>`_
 
+.. end-of-about
 
 Contributors
 ============
+
+.. start-of-contrib
 
 **gitstats** was originally created by `Heikki Hokkainen <https://github.com/hoxu>`_ and is now maintained by `Xianpeng Shen <https://github.com/shenxianpeng>`_.
 
@@ -38,3 +43,5 @@ Thanks to all contributors:
 .. image:: https://contrib.rocks/image?repo=shenxianpeng/gitstats
    :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
    :alt: GitStats Contributors
+
+.. end-of-contrib
