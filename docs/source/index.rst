@@ -2,6 +2,8 @@ Welcome to GitStats documentation!
 ==================================
 
 .. include:: ../../README.rst
+   :start-after: .. start-of-about
+   :end-before: .. end-of-about
 
 Features
 --------
@@ -18,7 +20,7 @@ Here is a list of some features of `gitstats`:
 * **Cross-platform**: works on Linux, Windows, and macOS.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Getting Started
 
    installation
@@ -26,7 +28,7 @@ Here is a list of some features of `gitstats`:
    faq
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: About
 
    license

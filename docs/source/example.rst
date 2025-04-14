@@ -33,7 +33,7 @@ Run ``gitstats . report`` to generate a report like this: https://shenxianpeng.g
 
 .. tip::
    Before running ``gitstats``, ensure all required dependencies are installed.
-   See `Installation <#installation>`_ and `Requirements <#requirements>`_.
+   See :doc:`installation`.
    The ``.`` refers to the current directory, or you can specify any other ``gitpath`` as needed.
    See `Usage <#usage>`_.
 
