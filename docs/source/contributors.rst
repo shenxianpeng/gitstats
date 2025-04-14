@@ -1,9 +1,9 @@
 Contributors
 ============
 
-The **gitstats** project was originally created by `Heikki Hokkainen <https://github.com/hoxu>`_, but has not been maintained since 2015. It is now maintained by `Xianpeng Shen <https://github.com/shenxianpeng>`_.
+**gitstats** was originally created by `Heikki Hokkainen <https://github.com/hoxu>`_ and is now maintained by `Xianpeng Shen <https://github.com/shenxianpeng>`_.
 
-We would like to thank the following individuals for their contributions:
+Thanks to all contributors:
 
 .. image:: https://contrib.rocks/image?repo=shenxianpeng/gitstats
    :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
