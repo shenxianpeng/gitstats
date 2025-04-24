@@ -25,6 +25,30 @@ DEFAULT_CONFIG = {
     "start_date": "",  # Starting date for commits, passed as --since to Git (optional).
 }
 
+# Define a mapping of file extensions to programming languages
+# TODO: Add more languages as needed
+LANGUAGE_EXTENSIONS = {
+    ".py": "Python",
+    ".js": "JavaScript",
+    ".java": "Java",
+    ".cpp": "C++",
+    ".c": "C",
+    ".html": "HTML",
+    ".css": "CSS",
+    ".rb": "Ruby",
+    ".go": "Go",
+    ".php": "PHP",
+    ".ts": "TypeScript",
+    ".sh": "Shell",
+    ".json": "JSON",
+    ".yml": "YAML",
+    ".xml": "XML",
+    ".md": "Markdown",
+    ".swift": "Swift",
+    ".dockerfile": "Dockerfile",  # added Dockerfile extension
+    ".docker": "Dockerfile",  # added Dockerfile extension
+    "Dockerfile": "Dockerfile",  # added Dockerfile extension
+}
 
 _config = None
 

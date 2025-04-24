@@ -11,7 +11,7 @@ import sys
 import time
 import zlib
 from multiprocessing import Pool
-from gitstats import load_config, time_start, exectime_external
+from gitstats import load_config, time_start, exectime_external, LANGUAGE_EXTENSIONS
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.utils import (
     get_version,
@@ -87,6 +87,9 @@ class DataCollector:
 
         # extensions
         self.extensions = {}  # extension -> files, lines
+
+        # languages
+        self.languages = {}
 
         # line statistics
         self.changes_by_date = {}  # stamp -> { files, ins, del }
@@ -421,6 +424,27 @@ class GitDataCollector(DataCollector):
                 self.extensions[ext]["lines"] += self.cache["lines_in_blob"][blob_id]
             else:
                 blobs_to_read.append((ext, blob_id))
+
+        # Language statistics of lines
+        total_lines = 0
+
+        for ext, data in self.extensions.items():
+            if ext in LANGUAGE_EXTENSIONS.keys():
+                language = LANGUAGE_EXTENSIONS[ext]
+                lines = data["lines"]
+                self.languages[language] = self.languages.get(language, 0) + lines
+                total_lines += lines
+
+        # Calculate percentage for each language
+        for language in self.languages:
+            self.languages[language] = {
+                "lines": self.languages[language],
+                "percentage": (self.languages[language] / total_lines) * 100
+                if total_lines > 0
+                else 0,
+            }
+
+        print("Languages and their percentages:", self.languages)
 
         # Get info about line count for new blob's that wasn't found in cache
         pool = Pool(processes=conf["processes"])

@@ -613,6 +613,19 @@ class HTMLReportCreator(ReportCreator):
         f.write("</table>")
 
         f.write("</body></html>")
+
+        # Files :: Languages
+        f.write(html_header(2, "Languages"))
+        f.write('<img src="languages.png" alt="Languages">')
+
+        fg = open(path + "/languages.dat", "w")
+        print(data.languages)
+        for lang in sorted(data.languages.keys()):
+            lines = data.languages[lang]["lines"]
+            fg.write("%s %d\n" % (lang, lines))
+        fg.close()
+
+        f.write("</body></html>")
         f.close()
 
     def create_lines_html(self, data, path):
