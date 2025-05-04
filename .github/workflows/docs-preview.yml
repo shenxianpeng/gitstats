@@ -19,5 +19,5 @@ jobs:
     steps:
       - uses: readthedocs/actions/preview@v1
         with:
-          project-slug: "gitstats-previews"
+          project-slug: "gitstats"
           single-version: "true"
