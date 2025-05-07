@@ -616,14 +616,13 @@ class HTMLReportCreator(ReportCreator):
 
         # Files :: Languages
         f.write(html_header(2, "Languages"))
-        f.write('<img src="languages.png" alt="Languages">')
-
-        fg = open(path + "/languages.dat", "w")
-        print(data.languages)
-        for lang in sorted(data.languages.keys()):
-            lines = data.languages[lang]["lines"]
-            fg.write("%s %d\n" % (lang, lines))
-        fg.close()
+        f.write(
+            '<table class="sortable" id="ext"><tr><th>Languages</th><th> % </th></tr>'
+        )
+        print(data.languages_percent)
+        for lang, percent in sorted(data.languages_percent.items()):
+            print(lang, percent)
+            f.write("<tr><td>%s</td><td>%.2f%%</td></tr>" % (lang, percent))
 
         f.write("</body></html>")
         f.close()

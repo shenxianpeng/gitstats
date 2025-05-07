@@ -89,7 +89,7 @@ class DataCollector:
         self.extensions = {}  # extension -> files, lines
 
         # languages
-        self.languages = {}
+        self.languages_percent = {}  # extension -> { language, percent }
 
         # line statistics
         self.changes_by_date = {}  # stamp -> { files, ins, del }
@@ -425,19 +425,21 @@ class GitDataCollector(DataCollector):
             else:
                 blobs_to_read.append((ext, blob_id))
 
+        languages = {}
         for ext_name, ext_data in self.extensions.items():
             for lang_ext, lang_name in LANGUAGE_EXTENSIONS.items():
                 if lang_ext.endswith(ext_name):
-                    self.languages[lang_name] = {ext_data["files"], ext_data["lines"]}
+                    languages[lang_name] = {ext_data["files"], ext_data["lines"]}
 
-        total_lines = sum(lines for _, lines in self.languages.values())
+        total_lines = sum(lines for _, lines in languages.values())
 
         percentages = {
             lang: round((lines / total_lines) * 100, 2)
-            for lang, (_, lines) in self.languages.items()
+            for lang, (_, lines) in languages.items()
         }
 
         for lang, percent in sorted(percentages.items(), key=lambda x: -x[1]):
+            self.languages_percent = {lang: percent}
             print(f"{lang}: {percent}%")
 
         # Get info about line count for new blob's that wasn't found in cache
