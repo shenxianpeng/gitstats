@@ -425,26 +425,20 @@ class GitDataCollector(DataCollector):
             else:
                 blobs_to_read.append((ext, blob_id))
 
-        # Language statistics of lines
-        total_lines = 0
+        for ext_name, ext_data in self.extensions.items():
+            for lang_ext, lang_name in LANGUAGE_EXTENSIONS.items():
+                if lang_ext.endswith(ext_name):
+                    self.languages[lang_name] = {ext_data["files"], ext_data["lines"]}
 
-        for ext, data in self.extensions.items():
-            if ext in LANGUAGE_EXTENSIONS.keys():
-                language = LANGUAGE_EXTENSIONS[ext]
-                lines = data["lines"]
-                self.languages[language] = self.languages.get(language, 0) + lines
-                total_lines += lines
+        total_lines = sum(lines for _, lines in self.languages.values())
 
-        # Calculate percentage for each language
-        for language in self.languages:
-            self.languages[language] = {
-                "lines": self.languages[language],
-                "percentage": (self.languages[language] / total_lines) * 100
-                if total_lines > 0
-                else 0,
-            }
+        percentages = {
+            lang: round((lines / total_lines) * 100, 2)
+            for lang, (_, lines) in self.languages.items()
+        }
 
-        print("Languages and their percentages:", self.languages)
+        for lang, percent in sorted(percentages.items(), key=lambda x: -x[1]):
+            print(f"{lang}: {percent}%")
 
         # Get info about line count for new blob's that wasn't found in cache
         pool = Pool(processes=conf["processes"])
