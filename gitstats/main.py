@@ -439,7 +439,7 @@ class GitDataCollector(DataCollector):
         }
 
         for lang, percent in sorted(percentages.items(), key=lambda x: -x[1]):
-            self.languages_percent = {lang: percent}
+            self.languages_percent[lang] = percent
             print(f"{lang}: {percent}%")
 
         # Get info about line count for new blob's that wasn't found in cache

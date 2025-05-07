@@ -619,8 +619,8 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<table class="sortable" id="ext"><tr><th>Languages</th><th> % </th></tr>'
         )
-        print(data.languages_percent)
-        for lang, percent in sorted(data.languages_percent.items()):
+
+        for lang, percent in sorted(data.languages_percent.items(), reverse=True):
             print(lang, percent)
             f.write("<tr><td>%s</td><td>%.2f%%</td></tr>" % (lang, percent))
 
