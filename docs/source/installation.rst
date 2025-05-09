@@ -19,7 +19,11 @@ You can install gitstats with pip:
 
     pip install gitstats
 
-Or you can also get gitstats docker image.
+Or you can also get gitstats Docker image.
+
+.. tip::
+
+    The Docker image has all the dependencies (Python, Git, Gnuplot and gitstats) already installed.
 
 .. code-block::
 
