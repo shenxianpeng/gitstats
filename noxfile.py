@@ -7,6 +7,13 @@ TAG = "latest"
 
 
 @nox.session
+def lint(session: nox.Session) -> None:
+    """Run linter"""
+    session.install("pre-commit")
+    session.run("pre-commit", "run", "--all-files", external=True)
+
+
+@nox.session
 def image(session: nox.Session) -> None:
     """Build docker image"""
     session.run("docker", "build", "-t", f"gitstats:{TAG}", ".", external=True)
