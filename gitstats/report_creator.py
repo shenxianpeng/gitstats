@@ -67,64 +67,59 @@ class HTMLReportCreator(ReportCreator):
 
         self.print_nav(f)
 
-        f.write("<dl>")
-        f.write("<dt>Project name</dt><dd>%s</dd>" % (data.project_name))
-        f.write("<br>")
+        f.write(html_header(2, "Git Overview"))
+
+        f.write("<table border='1' cellspacing='0' cellpadding='4'>")
+        f.write("<tr><td><b>Project name</b></td><td>%s</td></tr>" % data.project_name)
         f.write(
-            "<dt>Generated</dt><dd>%s (in %d seconds)</dd>"
+            "<tr><td><b>Generated</b></td><td>%s (in %d seconds)</td></tr>"
             % (
                 datetime.datetime.now().strftime(format),
                 time.time() - data.get_stamp_created(),
             )
         )
-        f.write("<br>")
         f.write(
-            '<dt>Generator</dt><dd><a href="https://github.com/shenxianpeng/gitstats">GitStats</a> %s, %s, %s</dd>'
+            '<tr><td><b>Generator</b></td><td><a href="https://github.com/shenxianpeng/gitstats">gitstats</a> %s, %s, %s</td></tr>'
             % (get_version(), get_git_version(), get_gnuplot_version())
         )
-        f.write("<br>")
         f.write(
-            "<dt>Report Period</dt><dd>%s to %s</dd>"
+            "<tr><td><b>Report Period</b></td><td>%s to %s</td></tr>"
             % (
                 data.get_first_commit_date().strftime(format),
                 data.get_last_commit_date().strftime(format),
             )
         )
-        f.write("<br>")
         f.write(
-            "<dt>Age</dt><dd>%d days, %d active days (%3.2f%%)</dd>"
+            "<tr><td><b>Age</b></td><td>%d days, %d active days (%3.2f%%)</td></tr>"
             % (
                 data.get_commit_delta_days(),
                 len(data.get_active_days()),
                 (100.0 * len(data.get_active_days()) / data.get_commit_delta_days()),
             )
         )
-        f.write("<br>")
-        f.write("<dt>Total Files</dt><dd>%s</dd>" % data.get_total_files())
-        f.write("<br>")
         f.write(
-            "<dt>Total Lines of Code</dt><dd>%s (%d added, %d removed)</dd>"
+            "<tr><td><b>Total Files</b></td><td>%s</td></tr>" % data.get_total_files()
+        )
+        f.write(
+            "<tr><td><b>Total Lines of Code</b></td><td>%s (%d added, %d removed)</td></tr>"
             % (data.get_total_loc(), data.total_lines_added, data.total_lines_removed)
         )
-        f.write("<br>")
         f.write(
-            "<dt>Total Commits</dt><dd>%s (average %.1f commits per active day, %.1f per all days)</dd>"
+            "<tr><td><b>Total Commits</b></td><td>%s (average %.1f commits per active day, %.1f per all days)</td></tr>"
             % (
                 data.get_total_commits(),
                 float(data.get_total_commits()) / len(data.get_active_days()),
                 float(data.get_total_commits()) / data.get_commit_delta_days(),
             )
         )
-        f.write("<br>")
         f.write(
-            "<dt>Authors</dt><dd>%s (average %.1f commits per author)</dd>"
+            "<tr><td><b>Authors</b></td><td>%s (average %.1f commits per author)</td></tr>"
             % (
                 data.get_total_authors(),
                 (1.0 * data.get_total_commits()) / data.get_total_authors(),
             )
         )
-        f.write("<br>")
-        f.write("</dl>")
+        f.write("</table>")
 
         f.write("</body>\n</html>")
         f.close()
