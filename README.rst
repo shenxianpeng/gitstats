@@ -26,22 +26,51 @@ GitStats
 
 A tool for generating insightful visual reports from your Git repositories. 📊
 
-* 📘 Documentation: `gitstats.readthedocs.io <https://gitstats.readthedocs.io/>`_
-* 🌐 Live Report Example: `GitStats Report <https://shenxianpeng.github.io/gitstats/index.html>`_
+📘 Documentation: `gitstats.readthedocs.io <https://gitstats.readthedocs.io/>`_
+
+Example
+-------
+
+``gitstats . report`` generates this `gitstats report <https://shenxianpeng.github.io/gitstats/index.html>`_
+
+Installation
+------------
+
+.. code-block:: bash
+
+   pip install gitstats
+
+
+gitstats is compatible with Python 3.9 and newer.
+
+
+Usage
+-----
+
+.. code-block:: bash
+
+   gitstats <gitpath> <outputpath>
+
+
+Run ``gitstats --help`` for more options, or check the `documentation <https://gitstats.readthedocs.io/en/latest/usage.html>`_.
+
+
+Features
+--------
+
+Here is a list of some features of ``gitstats``:
+
+* **General**: total files, lines, commits, authors, age.
+* **Activity**: commits by hour of day, day of week, hour of week, month of year, year and month, and year.
+* **Authors**: list of authors (name, commits (%), first commit date, last commit date, age), author of month, author of year.
+* **Files**: file count by date, extensions.
+* **Lines**: line of code by date.
+* **Tags**: tags by date and author.
+* **Customizable**: config values through ``gitstats.conf``.
+* **Cross-platform**: works on Linux, Windows, and macOS.
 
 .. end-of-about
 
-Contributors
-============
-
-.. start-of-contrib
+---
 
 **gitstats** was originally created by `Heikki Hokkainen <https://github.com/hoxu>`_ and is now maintained by `Xianpeng Shen <https://github.com/shenxianpeng>`_.
-
-Thanks to all contributors:
-
-.. image:: https://contrib.rocks/image?repo=shenxianpeng/gitstats
-   :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
-   :alt: GitStats Contributors
-
-.. end-of-contrib

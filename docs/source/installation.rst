@@ -1,21 +1,21 @@
 Installation
 ============
 
-The following requirements need to be installed before run ``gitstats``
+.. important::
 
-- Python 3.9+ (https://www.python.org/downloads/)
-- Git (http://git-scm.com/)
-- Gnuplot (http://www.gnuplot.info): You can install Gnuplot on
+    The following requirements need to be installed before using ``gitstats``
 
-  - Ubuntu with ``sudo apt install gnuplot``
+    - Python 3.9+ (https://www.python.org/downloads/)
+    - Git (http://git-scm.com/)
+    - Gnuplot (http://www.gnuplot.info): You can install Gnuplot on
 
-  - macOS with ``brew install gnuplot``
-
-  - Windows with ``choco install gnuplot``
+        - Ubuntu with ``sudo apt install gnuplot``
+        - macOS with ``brew install gnuplot``
+        - Windows with ``choco install gnuplot``
 
 You can install gitstats with pip:
 
-.. code-block::
+.. code-block:: bash
 
     pip install gitstats
 
@@ -25,6 +25,6 @@ Or you can also get gitstats Docker image.
 
     The Docker image has all the dependencies (Python, Git, Gnuplot and gitstats) already installed.
 
-.. code-block::
+.. code-block:: bash
 
     docker run ghcr.io/shenxianpeng/gitstats:latest
