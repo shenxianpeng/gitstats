@@ -31,7 +31,7 @@ A tool for generating insightful visual reports from your Git repositories. 📊
 Example
 -------
 
-``gitstats . report`` generates this `gitstats report <https://shenxianpeng.github.io/gitstats/index.html>`_
+``gitstats . report`` generates this `gitstats report <https://shenxianpeng.github.io/gitstats/index.html>`_.
 
 Installation
 ------------
@@ -71,6 +71,21 @@ Here is a list of some features of ``gitstats``:
 
 .. end-of-about
 
+Contributing
+------------
+
+.. start-of-contributing
+
+As an open source project, gitstats welcomes contributions of all forms.
+
+Thanks to all contributors:
+
+.. image:: https://contrib.rocks/image?repo=shenxianpeng/gitstats
+   :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
+   :alt: GitStats Contributors
+
 ----
 
 The gitstats project was originally created by `Heikki Hokkainen <https://github.com/hoxu>`_ and is now maintained by `Xianpeng Shen <https://github.com/shenxianpeng>`_.
+
+.. end-of-contributing
