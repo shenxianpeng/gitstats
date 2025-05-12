@@ -5,7 +5,7 @@ on:
     paths:
       - '**/*.py'
       - 'pyproject.toml'
-      - 'gitstats.conf'
+      - 'gitstats/*'
       - '.github/workflows/test.yml'
   push:
     branches:
