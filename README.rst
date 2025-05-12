@@ -1,6 +1,6 @@
 .. start-of-about
 
-.. image:: docs/source/logo.png
+.. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/logo.png
    :alt: Project Logo
    :align: center
    :width: 200px
