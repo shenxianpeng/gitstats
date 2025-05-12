@@ -1,7 +1,9 @@
 .. start-of-about
 
-GitStats
-========
+.. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/logo.png
+   :alt: Project Logo
+   :align: center
+   :width: 200px
 
 .. |pypi-version| image:: https://img.shields.io/pypi/v/gitstats?color=blue
    :target: https://pypi.org/project/gitstats/
@@ -28,7 +30,7 @@ GitStats
 
 |pypi-version| |python-versions| |test-badge| |docs-badge| |contributors|
 
-A tool for generating insightful visual reports from your Git repositories. 📊
+📊 Generate insightful visual reports from Git.
 
 📘 Documentation: `gitstats.readthedocs.io <https://gitstats.readthedocs.io/>`_
 
