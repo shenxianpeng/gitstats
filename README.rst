@@ -82,4 +82,4 @@ As an open source project, gitstats welcomes contributions of all forms.
 
 ----
 
-The gitstats project was originally created by `Heikki Hokkainen <https://github.com/hoxu>`_ and is now maintained by `Xianpeng Shen <https://github.com/shenxianpeng>`_.
+The gitstats project was originally created by `Heikki Hokkainen <https://github.com/hoxu>`_ and is currently maintained by `Xianpeng Shen <https://github.com/shenxianpeng>`_.
