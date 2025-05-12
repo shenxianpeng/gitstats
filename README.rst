@@ -22,7 +22,11 @@ GitStats
    :target: https://gitstats.readthedocs.io/
    :alt: Documentation
 
-|pypi-version| |python-versions| |test-badge| |sonarcloud| |docs-badge|
+.. |contributors| image:: https://img.shields.io/github/contributors/shenxianpeng/gitstats
+   :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
+   :alt: GitHub contributors
+
+|pypi-version| |python-versions| |test-badge| |docs-badge| |contributors|
 
 A tool for generating insightful visual reports from your Git repositories. 📊
 
@@ -74,16 +78,8 @@ Here is a list of some features of ``gitstats``:
 Contributing
 ------------
 
-.. start-of-contributing
-
-As an open source project, gitstats welcomes contributions of all forms. Thanks to all contributors:
-
-.. image:: https://contrib.rocks/image?repo=shenxianpeng/gitstats
-   :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
-   :alt: GitStats Contributors
+As an open source project, gitstats welcomes contributions of all forms.
 
 ----
 
-The gitstats project was originally created by `Heikki Hokkainen <https://github.com/hoxu>`_ and is now maintained by `Xianpeng Shen <https://github.com/shenxianpeng>`_.
-
-.. end-of-contributing
+The gitstats project was originally created by `Heikki Hokkainen <https://github.com/hoxu>`_ and is currently maintained by `Xianpeng Shen <https://github.com/shenxianpeng>`_.
