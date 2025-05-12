@@ -26,7 +26,7 @@ GitStats
    :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
    :alt: GitHub contributors
 
-|pypi-version| |python-versions| |test-badge| |sonarcloud| |docs-badge| |contributors|
+|pypi-version| |python-versions| |test-badge| |docs-badge| |contributors|
 
 A tool for generating insightful visual reports from your Git repositories. 📊
 
