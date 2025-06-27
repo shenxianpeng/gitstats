@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fshenxianpeng%2Fgitstats.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fshenxianpeng%2Fgitstats?ref=badge_shield)
+
 .. start-of-about
 
 .. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/logo.png
@@ -85,3 +87,7 @@ As an open source project, gitstats welcomes contributions of all forms.
 ----
 
 The gitstats project was originally created by `Heikki Hokkainen <https://github.com/hoxu>`_ and is currently maintained by `Xianpeng Shen <https://github.com/shenxianpeng>`_.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fshenxianpeng%2Fgitstats.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fshenxianpeng%2Fgitstats?ref=badge_large)
