@@ -12,6 +12,10 @@
 .. |python-versions| image:: https://img.shields.io/pypi/pyversions/gitstats
    :alt: PyPI - Python Version
 
+.. |python-download| image:: https://static.pepy.tech/badge/gitstats/week
+   :target: https://pepy.tech/projects/gitstats
+   :alt: PyPI Downloads
+
 .. |test-badge| image:: https://github.com/shenxianpeng/gitstats/actions/workflows/test.yml/badge.svg
    :target: https://github.com/shenxianpeng/gitstats/actions/workflows/test.yml
    :alt: Test
@@ -28,7 +32,7 @@
    :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
    :alt: GitHub contributors
 
-|pypi-version| |python-versions| |test-badge| |docs-badge| |contributors|
+|pypi-version| |python-versions| |python-download| |test-badge| |docs-badge| |contributors|
 
 📊 Generate insightful visual reports from Git.
 
