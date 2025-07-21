@@ -18,7 +18,7 @@ jobs:
 
       - name: Remove preview folder
         run: |
-          rm -rf previews/${{ github.event.pull_request.number }}
+          rm -rf previews/${{ github.event.pull_request.number }} || true
 
       - name: Commit and push changes
         run: |
