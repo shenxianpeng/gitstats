@@ -97,9 +97,7 @@ class HTMLReportCreator(ReportCreator):
                 (100.0 * len(data.get_active_days()) / data.get_commit_delta_days()),
             )
         )
-        f.write(
-            "<tr><td>Total Files</td><td>%s</td></tr>" % data.get_total_files()
-        )
+        f.write("<tr><td>Total Files</td><td>%s</td></tr>" % data.get_total_files())
         f.write(
             "<tr><td>Total Lines of Code</td><td>%s (%d added, %d removed)</td></tr>"
             % (data.get_total_loc(), data.total_lines_added, data.total_lines_removed)
