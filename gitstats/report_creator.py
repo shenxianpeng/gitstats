@@ -70,7 +70,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Git Overview"))
 
         f.write("<table border='1' cellspacing='0' cellpadding='4'>")
-        f.write("<tr><td><b>Project name</b></td><td>%s</td></tr>" % data.project_name)
+        f.write("<tr><td><b>Project Name</b></td><td>%s</td></tr>" % data.project_name)
         f.write(
             "<tr><td><b>Generated</b></td><td>%s (in %d seconds)</td></tr>"
             % (
