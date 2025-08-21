@@ -48,7 +48,6 @@ class HTMLReportCreator(ReportCreator):
             src = basedir + "/" + file
             if os.path.exists(src):
                 shutil.copyfile(src, path + "/" + file)
-                break
 
         self.create_index_html(data, path)
         self.create_activity_html(data, path)
