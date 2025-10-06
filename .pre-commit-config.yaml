@@ -3,7 +3,7 @@ ci:
 
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
     -   id: check-yaml
     -   id: check-toml
@@ -19,13 +19,13 @@ repos:
     - id: rst-inline-touching-normal
 
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.13.0
+    rev: v1.18.2
     hooks:
     -   id: mypy
         additional_dependencies: [types-requests]
 -   repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.8.6
+    rev: v0.13.3
     hooks:
     # Run the linter.
     -   id: ruff
@@ -33,11 +33,11 @@ repos:
     # Run the formatter.
     -   id: ruff-format
 -   repo: https://github.com/codespell-project/codespell
-    rev: v2.3.0
+    rev: v2.4.1
     hooks:
     -   id: codespell
 -   repo: https://github.com/hadolint/hadolint
-    rev: v2.12.0
+    rev: v2.14.0
     hooks:
     -   id: hadolint
         args:
