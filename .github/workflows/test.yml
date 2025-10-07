@@ -28,7 +28,7 @@ jobs:
         nox -s docs
 
   test-windows:
-    runs-on: windows-latest
+    runs-on: windows-2022
     strategy:
       matrix:
         python-version: ["3.9"] # just test on one version to save time
