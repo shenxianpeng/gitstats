@@ -723,7 +723,7 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
             import json
 
             print(f'Generating JSON file: "{output_file}"')
-            with open(output_file, "w") as file:
+            with open(output_file, "w", encoding="utf-8") as file:
                 json.dump(data.__dict__, file, default=str)
         else:
             print(f"Error: Unsupported format '{extra_fmt}'")
