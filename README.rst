@@ -51,7 +51,7 @@ Installation
    pip install gitstats
 
 
-gitstats is compatible with Python 3.9 and newer.
+gitstats is compatible with Python 3.10 and newer.
 
 
 Usage

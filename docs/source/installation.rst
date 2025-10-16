@@ -5,7 +5,7 @@ Installation
 
     The following requirements need to be installed before using ``gitstats``
 
-    - Python 3.9+ (https://www.python.org/downloads/)
+    - Python 3.10+ (https://www.python.org/downloads/)
     - Git (http://git-scm.com/)
     - Gnuplot (http://www.gnuplot.info): You can install Gnuplot on
 

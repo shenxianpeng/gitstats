@@ -31,7 +31,7 @@ jobs:
     runs-on: windows-latest
     strategy:
       matrix:
-        python-version: ["3.9"] # just test on one version to save time
+        python-version: ["3.10"] # just test on one version to save time
 
     steps:
     - name: Checkout Code
@@ -59,7 +59,7 @@ jobs:
         gitstats . test-report-windows -f json
 
     - name: Save GitStats Report
-      if: ${{ matrix.python-version == '3.9' }}
+      if: ${{ matrix.python-version == '3.10' }}
       uses: actions/upload-artifact@v4
       with:
         name: test-report-windows
@@ -69,7 +69,7 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        python-version: ["3.9"] # just test on one version to save time
+        python-version: ["3.10"] # just test on one version to save time
 
     steps:
     - name: Checkout Code
@@ -95,7 +95,7 @@ jobs:
         gitstats . test-report-macos -f json
 
     - name: Save GitStats Report
-      if: ${{ matrix.python-version == '3.9' }}
+      if: ${{ matrix.python-version == '3.10' }}
       uses: actions/upload-artifact@v4
       with:
         name: test-report-macos
@@ -108,7 +108,7 @@ jobs:
       pull-requests: write
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14.0-beta.1"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
     steps:
     - name: Checkout Code
@@ -132,14 +132,14 @@ jobs:
         nox -s build
 
     - name: Save GitStats Report
-      if: ${{ matrix.python-version == '3.9' }}
+      if: ${{ matrix.python-version == '3.10' }}
       uses: actions/upload-artifact@v4
       with:
         name: test-report
         path: test-report
 
     - name: Deploy to GitHub Pages for PR
-      if: ${{ github.event_name == 'pull_request' && matrix.python-version == '3.9' }}
+      if: ${{ github.event_name == 'pull_request' && matrix.python-version == '3.10' }}
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -148,7 +148,7 @@ jobs:
         destination_dir: previews/${{ github.event.pull_request.number }}
 
     - name: Deploy to GitHub Pages for main branch
-      if: ${{ (github.ref_name == 'main' || github.event_name == 'workflow_dispatch') && matrix.python-version == '3.9' }}
+      if: ${{ (github.ref_name == 'main' || github.event_name == 'workflow_dispatch') && matrix.python-version == '3.10' }}
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -156,7 +156,7 @@ jobs:
         keep_files: true # do not remove example reports
 
     - name: Add PR Comment with Preview Link
-      if: ${{ github.event_name == 'pull_request' && matrix.python-version == '3.9' }}
+      if: ${{ github.event_name == 'pull_request' && matrix.python-version == '3.10' }}
       env:
         PR_NUMBER: ${{ github.event.pull_request.number }}
         REPO_NAME: ${{ github.repository }}
