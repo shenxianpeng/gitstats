@@ -139,16 +139,29 @@ class GitDataCollector(DataCollector):
         DataCollector.collect(self, dir)
 
         self.total_authors += int(
-            get_pipe_output(["git shortlog -s %s" % get_log_range(), "wc -l"])
+            get_pipe_output(
+                ["git shortlog -s %s" % get_log_range("HEAD", False), "wc -l"]
+            )
         )
         # self.total_lines = int(getoutput('git-ls-files -z |xargs -0 cat |wc -l'))
 
         # tags
+        # Only include tags that are reachable within the commit range
+        commit_range = get_commit_range("HEAD", False)
+        tag_commits = (
+            get_pipe_output([f"git rev-list {commit_range}"]).strip().split("\n")
+        )
+        tag_commits_set = set(tag_commits) if tag_commits[0] else set()
+
         lines = get_pipe_output(["git show-ref --tags"]).split("\n")
         for line in lines:
             if len(line) == 0:
                 continue
             (hash, tag) = line.split(" ")
+
+            # Only include tags whose commit is in our range
+            if hash not in tag_commits_set:
+                continue
 
             tag = tag.replace("refs/tags/", "")
             output = get_pipe_output(
@@ -170,6 +183,8 @@ class GitDataCollector(DataCollector):
                 }
 
         # collect info on tags, starting from latest
+        # Only collect statistics for commits within our range
+        commit_range = get_commit_range("HEAD", False)
         tags_sorted_by_date_desc = [
             el[1]
             for el in reversed(
@@ -178,15 +193,22 @@ class GitDataCollector(DataCollector):
         ]
         prev = None
         for tag in reversed(tags_sorted_by_date_desc):
-            cmd = 'git shortlog -s "%s"' % tag
+            # Modify command to only include commits within our range
+            cmd = f'git shortlog -s "{tag}"'
             if prev is not None:
-                cmd += ' "^%s"' % prev
+                cmd += f' "^{prev}"'
+            # Intersect with our commit range
+            cmd += f" {commit_range}"
             output = get_pipe_output([cmd])
             if len(output) == 0:
                 continue
             prev = tag
             for line in output.split("\n"):
+                if len(line.strip()) == 0:
+                    continue
                 parts = re.split(r"\s+", line, 2)
+                if len(parts) < 3:
+                    continue
                 commits = int(parts[1])
                 author = parts[2]
                 self.tags[tag]["commits"] += commits
@@ -197,7 +219,7 @@ class GitDataCollector(DataCollector):
         lines = get_pipe_output(
             [
                 'git rev-list --pretty=format:"%%at %%ai %%aN <%%aE>" %s'
-                % get_log_range("HEAD"),
+                % get_log_range("HEAD", False),
                 "grep -v ^commit",
             ]
         ).split("\n")
@@ -335,7 +357,7 @@ class GitDataCollector(DataCollector):
             get_pipe_output(
                 [
                     'git rev-list --pretty=format:"%%at %%T" %s'
-                    % get_log_range("HEAD"),
+                    % get_log_range("HEAD", False),
                     "grep -v ^commit",
                 ]
             )
@@ -448,7 +470,7 @@ class GitDataCollector(DataCollector):
         lines = get_pipe_output(
             [
                 'git log --shortstat %s --pretty=format:"%%at %%aN" %s'
-                % (extra, get_log_range("HEAD"))
+                % (extra, get_log_range("HEAD", False))
             ]
         ).split("\n")
         lines.reverse()
@@ -523,7 +545,7 @@ class GitDataCollector(DataCollector):
         lines = get_pipe_output(
             [
                 'git log --shortstat --date-order --pretty=format:"%%at %%aN" %s'
-                % (get_log_range("HEAD"))
+                % (get_log_range("HEAD", False))
             ]
         ).split("\n")
         lines.reverse()
@@ -804,7 +826,11 @@ def main() -> int:
             key, value = item.split("=", 1)
             if key not in conf:
                 parser.error(f'No such key "{key}" in config')
-            conf[key] = value
+            # Convert numeric strings to integers to match config file behavior
+            if value.isdigit():
+                conf[key] = int(value)
+            else:
+                conf[key] = value
         except ValueError:
             parser.error("Config must be in the form key=value")
 

@@ -11,6 +11,7 @@ Welcome to GitStats documentation!
 
    installation
    usage
+   configuration
    integration
    faq
 

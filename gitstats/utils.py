@@ -100,9 +100,20 @@ def get_pipe_output(cmds, quiet=False):
 
 def get_commit_range(defaultrange="HEAD", end_only=False):
     if len(conf["commit_end"]) > 0:
-        if end_only or len(conf["commit_begin"]) == 0:
+        commit_begin = conf["commit_begin"]
+
+        # Convert commit_begin to string for consistent handling
+        commit_begin_str = str(commit_begin)
+
+        # If end_only or no commit_begin specified, return just the end
+        if end_only or len(commit_begin_str) == 0:
             return conf["commit_end"]
-        return "%s..%s" % (conf["commit_begin"], conf["commit_end"])
+
+        # Handle numeric commit_begin as "N commits ago"
+        if commit_begin_str.isdigit():
+            commit_begin_str = f"{conf['commit_end']}~{commit_begin_str}"
+
+        return "%s..%s" % (commit_begin_str, conf["commit_end"])
     return defaultrange
 
 
