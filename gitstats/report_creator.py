@@ -58,7 +58,7 @@ class HTMLReportCreator(ReportCreator):
         self.create_graphs(path)
 
     def create_index_html(self, data, path):
-        f = open(path + "/index.html", "w")
+        f = open(path + "/index.html", "w", encoding="utf-8")
         format = "%Y-%m-%d %H:%M:%S"
         self.print_header(f)
 
@@ -124,7 +124,7 @@ class HTMLReportCreator(ReportCreator):
     def create_activity_html(self, data, path):
         ###
         # Activity
-        f = open(path + "/activity.html", "w")
+        f = open(path + "/activity.html", "w", encoding="utf-8")
         self.print_header(f)
         f.write("<h1>Activity</h1>")
         self.print_nav(f)
@@ -179,7 +179,7 @@ class HTMLReportCreator(ReportCreator):
         for i in range(0, 24):
             f.write("<th>%d</th>" % i)
         f.write("</tr>\n<tr><th>Commits</th>")
-        fp = open(path + "/hour_of_day.dat", "w")
+        fp = open(path + "/hour_of_day.dat", "w", encoding="utf-8")
         for i in range(0, 24):
             if i in hour_of_day:
                 r = 127 + int(
@@ -209,7 +209,7 @@ class HTMLReportCreator(ReportCreator):
                 f.write("<td>0.00</td>")
         f.write("</tr></table>")
         f.write('<img src="hour_of_day.png" alt="Hour of Day">')
-        fg = open(path + "/hour_of_day.dat", "w")
+        fg = open(path + "/hour_of_day.dat", "w", encoding="utf-8")
         for i in range(0, 24):
             if i in hour_of_day:
                 fg.write("%d %d\n" % (i + 1, hour_of_day[i]))
@@ -222,7 +222,7 @@ class HTMLReportCreator(ReportCreator):
         day_of_week = data.get_activity_by_day_of_week()
         f.write('<div class="vtable"><table>')
         f.write("<tr><th>Day</th><th>Total (%)</th></tr>")
-        fp = open(path + "/day_of_week.dat", "w")
+        fp = open(path + "/day_of_week.dat", "w", encoding="utf-8")
         for d in range(0, 7):
             commits = 0
             if d in day_of_week:
@@ -275,7 +275,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Month of Year"))
         f.write('<div class="vtable"><table>')
         f.write("<tr><th>Month</th><th>Commits (%)</th></tr>")
-        fp = open(path + "/month_of_year.dat", "w")
+        fp = open(path + "/month_of_year.dat", "w", encoding="utf-8")
         for mm in range(1, 13):
             commits = 0
             if mm in data.activity_by_month_of_year:
@@ -306,7 +306,7 @@ class HTMLReportCreator(ReportCreator):
             )
         f.write("</table></div>")
         f.write('<img src="commits_by_year_month.png" alt="Commits by year/month">')
-        fg = open(path + "/commits_by_year_month.dat", "w")
+        fg = open(path + "/commits_by_year_month.dat", "w", encoding="utf-8")
         for yymm in sorted(data.commits_by_month.keys()):
             fg.write("%s %s\n" % (yymm, data.commits_by_month[yymm]))
         fg.close()
@@ -330,7 +330,7 @@ class HTMLReportCreator(ReportCreator):
             )
         f.write("</table></div>")
         f.write('<img src="commits_by_year.png" alt="Commits by Year">')
-        fg = open(path + "/commits_by_year.dat", "w")
+        fg = open(path + "/commits_by_year.dat", "w", encoding="utf-8")
         for yy in sorted(data.commits_by_year.keys()):
             fg.write("%d %d\n" % (yy, data.commits_by_year[yy]))
         fg.close()
@@ -356,7 +356,7 @@ class HTMLReportCreator(ReportCreator):
     def create_authors_html(self, data, path):
         ###
         # Authors
-        f = open(path + "/authors.html", "w")
+        f = open(path + "/authors.html", "w", encoding="utf-8")
         self.print_header(f)
 
         f.write("<h1>Authors</h1>")
@@ -414,8 +414,8 @@ class HTMLReportCreator(ReportCreator):
                 % conf["max_authors"]
             )
 
-        fgl = open(path + "/lines_of_code_by_author.dat", "w")
-        fgc = open(path + "/commits_by_author.dat", "w")
+        fgl = open(path + "/lines_of_code_by_author.dat", "w", encoding="utf-8")
+        fgc = open(path + "/commits_by_author.dat", "w", encoding="utf-8")
 
         lines_by_authors = {}  # cumulated added lines by
         # author. to save memory,
@@ -509,7 +509,7 @@ class HTMLReportCreator(ReportCreator):
         domains_by_commits.reverse()  # most first
         f.write('<div class="vtable"><table>')
         f.write("<tr><th>Domains</th><th>Total (%)</th></tr>")
-        fp = open(path + "/domains.dat", "w")
+        fp = open(path + "/domains.dat", "w", encoding="utf-8")
         n = 0
         for domain in domains_by_commits:
             if n == conf["max_domains"]:
@@ -536,7 +536,7 @@ class HTMLReportCreator(ReportCreator):
     def create_files_html(self, data, path):
         ###
         # Files
-        f = open(path + "/files.html", "w")
+        f = open(path + "/files.html", "w", encoding="utf-8")
         self.print_header(f)
         f.write("<h1>Files</h1>")
         self.print_nav(f)
@@ -567,7 +567,7 @@ class HTMLReportCreator(ReportCreator):
                 )
             )
 
-        fg = open(path + "/files_by_date.dat", "w")
+        fg = open(path + "/files_by_date.dat", "w", encoding="utf-8")
         for line in sorted(list(files_by_date)):
             fg.write("%s\n" % line)
         # for stamp in sorted(data.files_by_stamp.keys()):
@@ -610,7 +610,7 @@ class HTMLReportCreator(ReportCreator):
     def create_lines_html(self, data, path):
         ###
         # Lines
-        f = open(path + "/lines.html", "w")
+        f = open(path + "/lines.html", "w", encoding="utf-8")
         self.print_header(f)
         f.write("<h1>Lines</h1>")
         self.print_nav(f)
@@ -622,7 +622,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Lines of Code"))
         f.write('<img src="lines_of_code.png" alt="Lines of Code">')
 
-        fg = open(path + "/lines_of_code.dat", "w")
+        fg = open(path + "/lines_of_code.dat", "w", encoding="utf-8")
         for stamp in sorted(data.changes_by_date.keys()):
             fg.write("%d %d\n" % (stamp, data.changes_by_date[stamp]["lines"]))
         fg.close()
@@ -633,7 +633,7 @@ class HTMLReportCreator(ReportCreator):
     def create_tags_html(self, data, path):
         ###
         # tags.html
-        f = open(path + "/tags.html", "w")
+        f = open(path + "/tags.html", "w", encoding="utf-8")
         self.print_header(f)
         f.write("<h1>Tags</h1>")
         self.print_nav(f)
@@ -693,7 +693,7 @@ class HTMLReportCreator(ReportCreator):
 
     def create_graph_hour_of_day(self, path):
         # hour of day
-        f = open(path + "/hour_of_day.plot", "w")
+        f = open(path + "/hour_of_day.plot", "w", encoding="utf-8")
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -711,7 +711,7 @@ plot 'hour_of_day.dat' using 1:2:(0.5) w boxes fs solid
 
     def create_graph_day_of_week(self, path):
         # day of week
-        f = open(path + "/day_of_week.plot", "w")
+        f = open(path + "/day_of_week.plot", "w", encoding="utf-8")
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -729,7 +729,7 @@ plot 'day_of_week.dat' using 1:3:(0.5):xtic(2) w boxes fs solid
 
     def create_graph_domains(self, path):
         # Domains
-        f = open(path + "/domains.plot", "w")
+        f = open(path + "/domains.plot", "w", encoding="utf-8")
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -746,7 +746,7 @@ plot 'domains.dat' using 2:3:(0.5) with boxes fs solid, '' using 2:3:1 with labe
 
     def create_graph_month_of_year(self, path):
         # Month of Year
-        f = open(path + "/month_of_year.plot", "w")
+        f = open(path + "/month_of_year.plot", "w", encoding="utf-8")
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -764,7 +764,7 @@ plot 'month_of_year.dat' using 1:2:(0.5) w boxes fs solid
 
     def create_graph_commits_by_year_month(self, path):
         # commits_by_year_month
-        f = open(path + "/commits_by_year_month.plot", "w")
+        f = open(path + "/commits_by_year_month.plot", "w", encoding="utf-8")
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -785,7 +785,7 @@ plot 'commits_by_year_month.dat' using 1:2:(0.5) w boxes fs solid
 
     def create_graph_commits_by_year(self, path):
         # commits_by_year
-        f = open(path + "/commits_by_year.plot", "w")
+        f = open(path + "/commits_by_year.plot", "w", encoding="utf-8")
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -803,7 +803,7 @@ plot 'commits_by_year.dat' using 1:2:(0.5) w boxes fs solid
 
     def create_graph_files_by_date(self, path):
         # Files by date
-        f = open(path + "/files_by_date.plot", "w")
+        f = open(path + "/files_by_date.plot", "w", encoding="utf-8")
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -825,7 +825,7 @@ plot 'files_by_date.dat' using 1:2 w steps
 
     def create_graph_lines_of_code(self, path):
         # Lines of Code
-        f = open(path + "/lines_of_code.plot", "w")
+        f = open(path + "/lines_of_code.plot", "w", encoding="utf-8")
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -846,7 +846,7 @@ plot 'lines_of_code.dat' using 1:2 w lines
 
     def create_graph_lines_of_code_by_author(self, path):
         # Lines of Code Added per author
-        f = open(path + "/lines_of_code_by_author.plot", "w")
+        f = open(path + "/lines_of_code_by_author.plot", "w", encoding="utf-8")
         f.write(GNUPLOT_COMMON)
         f.write(
             """
@@ -879,7 +879,7 @@ plot """
 
     def create_graph_commits_by_author(self, path):
         # Commits per author
-        f = open(path + "/commits_by_author.plot", "w")
+        f = open(path + "/commits_by_author.plot", "w", encoding="utf-8")
         f.write(GNUPLOT_COMMON)
         f.write(
             """

@@ -14,6 +14,22 @@ from importlib.metadata import version
 conf = load_config()
 
 
+def count_lines_in_text(text):
+    """Cross-platform function to count lines in text"""
+    if not text or not text.strip():
+        return 0
+    return len(text.strip().split("\n"))
+
+
+def filter_lines_by_pattern(text, pattern):
+    """Filter out lines matching a pattern (cross-platform grep -v replacement)"""
+    if not text or not text.strip():
+        return ""
+    lines = text.split("\n")
+    filtered_lines = [line for line in lines if not re.match(pattern, line)]
+    return "\n".join(filtered_lines)
+
+
 def get_version():
     return version("gitstats")
 
@@ -33,21 +49,53 @@ def get_pipe_output(cmds, quiet=False):
     if not quiet and ON_LINUX and os.isatty(1):
         print(">> " + " | ".join(cmds), end=" ")
         sys.stdout.flush()
-    p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
-    processes = [p]
-    for x in cmds[1:]:
-        p = subprocess.Popen(x, stdin=p.stdout, stdout=subprocess.PIPE, shell=True)
-        processes.append(p)
-    output = p.communicate()[0]
-    for p in processes:
+
+    # Handle cross-platform cases
+    if len(cmds) == 2 and cmds[1] == "wc -l":
+        # Handle line counting cross-platform
+        p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
+        output = p.communicate()[0]
         p.wait()
+        try:
+            text = output.decode("utf-8", errors="replace").rstrip("\n")
+        except UnicodeDecodeError:
+            # Fallback for binary files
+            text = output.decode("latin-1", errors="replace").rstrip("\n")
+        line_count = count_lines_in_text(text)
+        result = str(line_count)
+    elif len(cmds) == 2 and cmds[1].startswith("grep -v"):
+        # Handle grep -v cross-platform
+        pattern = cmds[1].split("grep -v ")[1]
+        p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
+        output = p.communicate()[0]
+        p.wait()
+        try:
+            text = output.decode("utf-8", errors="replace").rstrip("\n")
+        except UnicodeDecodeError:
+            text = output.decode("latin-1", errors="replace").rstrip("\n")
+        result = filter_lines_by_pattern(text, pattern)
+    else:
+        # Standard pipe behavior for other cases
+        p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
+        processes = [p]
+        for x in cmds[1:]:
+            p = subprocess.Popen(x, stdin=p.stdout, stdout=subprocess.PIPE, shell=True)
+            processes.append(p)
+        output = p.communicate()[0]
+        for p in processes:
+            p.wait()
+        try:
+            result = output.decode("utf-8", errors="replace").rstrip("\n")
+        except UnicodeDecodeError:
+            result = output.decode("latin-1", errors="replace").rstrip("\n")
+
     end = time.time()
     if not quiet:
         if ON_LINUX and os.isatty(1):
             print("\r", end=" ")
         print("[%.5f] >> %s" % (end - start, " | ".join(cmds)))
     exectime_external += end - start
-    return output.decode("utf-8").rstrip("\n")
+    return result
 
 
 def get_commit_range(defaultrange="HEAD", end_only=False):
