@@ -1,6 +1,6 @@
 .. start-of-about
 
-.. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/logo.png
+.. |project-logo| image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/logo.png
    :alt: Project Logo
    :align: center
    :width: 200px
@@ -31,6 +31,8 @@
 .. |contributors| image:: https://img.shields.io/github/contributors/shenxianpeng/gitstats
    :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
    :alt: GitHub contributors
+
+|project-logo|
 
 |pypi-version| |python-versions| |python-download| |test-badge| |docs-badge| |contributors|
 

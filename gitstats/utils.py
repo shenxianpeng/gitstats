@@ -14,19 +14,19 @@ from importlib.metadata import version
 conf = load_config()
 
 
-def count_lines(text):
-    """Cross-platform line counting function"""
-    if not text.strip():
+def count_lines_in_text(text):
+    """Cross-platform function to count lines in text"""
+    if not text or not text.strip():
         return 0
     return len(text.strip().split("\n"))
 
 
-def filter_lines(text, pattern_to_exclude):
-    """Filter out lines matching a pattern (replaces grep -v)"""
-    if not text.strip():
+def filter_lines_by_pattern(text, pattern):
+    """Filter out lines matching a pattern (cross-platform grep -v replacement)"""
+    if not text or not text.strip():
         return ""
     lines = text.split("\n")
-    filtered_lines = [line for line in lines if not re.match(pattern_to_exclude, line)]
+    filtered_lines = [line for line in lines if not re.match(pattern, line)]
     return "\n".join(filtered_lines)
 
 
@@ -52,35 +52,28 @@ def get_pipe_output(cmds, quiet=False):
 
     # Handle cross-platform cases
     if len(cmds) == 2 and cmds[1] == "wc -l":
-        # Handle wc -l case cross-platform
+        # Handle line counting cross-platform
         p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
         output = p.communicate()[0]
         p.wait()
         try:
-            text = output.decode("utf-8").rstrip("\n")
+            text = output.decode("utf-8", errors="replace").rstrip("\n")
         except UnicodeDecodeError:
-            # Handle binary files by trying different encodings or counting bytes
-            try:
-                text = output.decode("latin-1").rstrip("\n")
-            except UnicodeDecodeError:
-                # For binary files, count newline bytes
-                text = "\n" * output.count(b"\n")
-        line_count = count_lines(text)
+            # Fallback for binary files
+            text = output.decode("latin-1", errors="replace").rstrip("\n")
+        line_count = count_lines_in_text(text)
         result = str(line_count)
     elif len(cmds) == 2 and cmds[1].startswith("grep -v"):
-        # Handle grep -v case cross-platform
+        # Handle grep -v cross-platform
         pattern = cmds[1].split("grep -v ")[1]
         p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
         output = p.communicate()[0]
         p.wait()
         try:
-            text = output.decode("utf-8").rstrip("\n")
+            text = output.decode("utf-8", errors="replace").rstrip("\n")
         except UnicodeDecodeError:
-            try:
-                text = output.decode("latin-1").rstrip("\n")
-            except UnicodeDecodeError:
-                text = ""  # Skip binary content for grep
-        result = filter_lines(text, pattern)
+            text = output.decode("latin-1", errors="replace").rstrip("\n")
+        result = filter_lines_by_pattern(text, pattern)
     else:
         # Standard pipe behavior for other cases
         p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
@@ -92,12 +85,9 @@ def get_pipe_output(cmds, quiet=False):
         for p in processes:
             p.wait()
         try:
-            result = output.decode("utf-8").rstrip("\n")
+            result = output.decode("utf-8", errors="replace").rstrip("\n")
         except UnicodeDecodeError:
-            try:
-                result = output.decode("latin-1").rstrip("\n")
-            except UnicodeDecodeError:
-                result = ""  # Return empty string for binary content
+            result = output.decode("latin-1", errors="replace").rstrip("\n")
 
     end = time.time()
     if not quiet:
