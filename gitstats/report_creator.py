@@ -157,7 +157,9 @@ class HTMLReportCreator(ReportCreator):
 
             percentage = 0
             if year_key in data.commits_by_year:
-                max_commits = max(data.commits_by_year.values()) if data.commits_by_year else 1
+                max_commits = (
+                    max(data.commits_by_year.values()) if data.commits_by_year else 1
+                )
                 percentage = float(data.commits_by_year[year_key]) / max_commits
             height = max(1, int(200 * percentage))
             f.write(
