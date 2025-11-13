@@ -73,6 +73,8 @@ class DataCollector:
         self.activity_by_year_week_peak = 0
 
         self.authors = {}  # name -> {commits, first_commit_stamp, last_commit_stamp, last_active_day, active_days, lines_added, lines_removed}
+        self.author_emails = {}  # email -> canonical_author_name
+        self.author_name_counts = {}  # email -> {name -> count}
 
         self.total_commits = 0
         self.total_files = 0
@@ -161,6 +163,28 @@ class DataCollector:
 
 
 class GitDataCollector(DataCollector):
+    def get_canonical_author(self, author, email):
+        """
+        Get the canonical author name for a given email.
+        If multiple names are used with the same email, uses the most frequently used name.
+        """
+        if email not in self.author_emails:
+            # First time seeing this email
+            self.author_emails[email] = author
+            self.author_name_counts[email] = {author: 1}
+            return author
+        
+        # Track name usage for this email
+        if author not in self.author_name_counts[email]:
+            self.author_name_counts[email][author] = 0
+        self.author_name_counts[email][author] += 1
+        
+        # Update canonical name to the most frequently used one
+        most_used_name = max(self.author_name_counts[email].items(), key=lambda x: x[1])[0]
+        self.author_emails[email] = most_used_name
+        
+        return self.author_emails[email]
+
     def collect(self, dir):
         DataCollector.collect(self, dir)
 
@@ -217,8 +241,8 @@ class GitDataCollector(DataCollector):
         ]
         prev = None
         for tag in reversed(tags_sorted_by_date_desc):
-            # Modify command to only include commits within our range
-            cmd = f'git shortlog -s "{tag}"'
+            # Modify command to only include commits within our range and include email
+            cmd = f'git shortlog -s -e "{tag}"'
             if prev is not None:
                 cmd += f' "^{prev}"'
             # Intersect with our commit range and apply filters
@@ -234,7 +258,17 @@ class GitDataCollector(DataCollector):
                 if len(parts) < 3:
                     continue
                 commits = int(parts[1])
-                author = parts[2]
+                author_and_email = parts[2]
+                # Parse "Name <email>" format
+                if "<" in author_and_email and ">" in author_and_email:
+                    author, mail = author_and_email.split("<", 1)
+                    author = author.rstrip()
+                    mail = mail.rstrip(">")
+                    # Get canonical author name based on email
+                    author = self.get_canonical_author(author, mail)
+                else:
+                    # Fallback if no email found
+                    author = author_and_email
                 self.tags[tag]["commits"] += commits
                 self.tags[tag]["authors"][author] = commits
 
@@ -264,6 +298,10 @@ class GitDataCollector(DataCollector):
             author, mail = parts[4].split("<", 1)
             author = author.rstrip()
             mail = mail.rstrip(">")
+            
+            # Get canonical author name based on email
+            author = self.get_canonical_author(author, mail)
+            
             domain = "?"
             if mail.find("@") != -1:
                 domain = mail.rsplit("@", 1)[1]
@@ -331,7 +369,11 @@ class GitDataCollector(DataCollector):
 
             # author stats
             if author not in self.authors:
-                self.authors[author] = {}
+                self.authors[author] = {
+                    "lines_added": 0,
+                    "lines_removed": 0,
+                    "commits": 0,
+                }
             # commits, note again that commits may be in any date order because of cherry-picking and patches
             if "last_commit_stamp" not in self.authors[author]:
                 self.authors[author]["last_commit_stamp"] = stamp
@@ -577,7 +619,7 @@ class GitDataCollector(DataCollector):
         # committed what, not just through mainline)
         lines = get_pipe_output(
             [
-                'git log --shortstat --date-order --pretty=format:"%%at %%aN" %s'
+                'git log --shortstat --date-order --pretty=format:"%%at %%aN <%%aE>" %s'
                 % (get_log_range("HEAD", False))
             ]
         ).split("\n")
@@ -591,13 +633,26 @@ class GitDataCollector(DataCollector):
             if len(line) == 0:
                 continue
 
-            # <stamp> <author>
+            # <stamp> <author> <email>
             if re.search("files? changed", line) is None:
                 pos = line.find(" ")
                 if pos != -1:
                     try:
                         oldstamp = stamp
-                        (stamp, author) = (int(line[:pos]), line[pos + 1 :])
+                        stamp_str, author_and_email = line[:pos], line[pos + 1:]
+                        stamp = int(stamp_str)
+                        
+                        # Parse "Name <email>" format
+                        if "<" in author_and_email and ">" in author_and_email:
+                            author, mail = author_and_email.split("<", 1)
+                            author = author.rstrip()
+                            mail = mail.rstrip(">")
+                            # Get canonical author name based on email
+                            author = self.get_canonical_author(author, mail)
+                        else:
+                            # Fallback if no email found (shouldn't happen with new format)
+                            author = author_and_email
+                        
                         if oldstamp > stamp:
                             # clock skew, keep old timestamp to avoid having ugly graph
                             stamp = oldstamp
