@@ -173,16 +173,18 @@ class GitDataCollector(DataCollector):
             self.author_emails[email] = author
             self.author_name_counts[email] = {author: 1}
             return author
-        
+
         # Track name usage for this email
         if author not in self.author_name_counts[email]:
             self.author_name_counts[email][author] = 0
         self.author_name_counts[email][author] += 1
-        
+
         # Update canonical name to the most frequently used one
-        most_used_name = max(self.author_name_counts[email].items(), key=lambda x: x[1])[0]
+        most_used_name = max(
+            self.author_name_counts[email].items(), key=lambda x: x[1]
+        )[0]
         self.author_emails[email] = most_used_name
-        
+
         return self.author_emails[email]
 
     def collect(self, dir):
@@ -298,10 +300,10 @@ class GitDataCollector(DataCollector):
             author, mail = parts[4].split("<", 1)
             author = author.rstrip()
             mail = mail.rstrip(">")
-            
+
             # Get canonical author name based on email
             author = self.get_canonical_author(author, mail)
-            
+
             domain = "?"
             if mail.find("@") != -1:
                 domain = mail.rsplit("@", 1)[1]
@@ -639,9 +641,9 @@ class GitDataCollector(DataCollector):
                 if pos != -1:
                     try:
                         oldstamp = stamp
-                        stamp_str, author_and_email = line[:pos], line[pos + 1:]
+                        stamp_str, author_and_email = line[:pos], line[pos + 1 :]
                         stamp = int(stamp_str)
-                        
+
                         # Parse "Name <email>" format
                         if "<" in author_and_email and ">" in author_and_email:
                             author, mail = author_and_email.split("<", 1)
@@ -652,7 +654,7 @@ class GitDataCollector(DataCollector):
                         else:
                             # Fallback if no email found (shouldn't happen with new format)
                             author = author_and_email
-                        
+
                         if oldstamp > stamp:
                             # clock skew, keep old timestamp to avoid having ugly graph
                             stamp = oldstamp
