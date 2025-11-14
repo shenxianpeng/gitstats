@@ -20,7 +20,7 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y gnuplot
-          pipx nox -s build
+          pipx run nox -s build
 
       - name: Install Netlify CLI
         run: npm install -g netlify-cli
