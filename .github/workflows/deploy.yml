@@ -34,4 +34,4 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
-          netlify deploy --dir=./test-report --prod --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
+          netlify deploy --dir=./test-report --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
