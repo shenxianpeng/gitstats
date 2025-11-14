@@ -22,16 +22,16 @@ jobs:
           sudo apt-get install -y gnuplot
           pipx run nox -s build
 
-      - name: Install Netlify CLI
-        run: npm install -g netlify-cli
-
       - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v3.0
+        with:
+          publish-dir: 'test-report'
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+          enable-pull-request-comment: true
+          overwrites-pull-request-comment: true
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-        run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            netlify deploy --dir=test-report --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN --alias=pr-${{ github.event.number }}
-          else
-            netlify deploy --dir=test-report --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN --prod
-          fi
+        timeout-minutes: 1
