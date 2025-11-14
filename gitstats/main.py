@@ -15,7 +15,6 @@ from gitstats import load_config, time_start, exectime_external
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.utils import (
     get_version,
-    get_gnuplot_version,
     get_pipe_output,
     get_commit_range,
     get_log_range,
@@ -706,10 +705,6 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
 
     if not os.path.isdir(outputpath):
         print("FATAL: Output path is not a directory or does not exist")
-        return 1
-
-    if get_gnuplot_version is None:
-        print("gnuplot not found")
         return 1
 
     print("Output path: %s" % outputpath)

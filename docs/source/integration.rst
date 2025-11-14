@@ -37,7 +37,6 @@ Use gitstats in GitHub Actions to generate reports and deploy them to GitHub Pag
         - name: Install Dependencies
           run: |
             sudo apt-get update
-            sudo apt-get install -y gnuplot
 
         - name: Generate GitStats Report
           run: |

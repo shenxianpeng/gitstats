@@ -7,9 +7,8 @@ exectime_internal = 0.0
 exectime_external = 0.0
 time_start = time.time()
 
-GNUPLOT_COMMON = "set terminal png transparent size 640,240\nset size 1.0,1.0\n"
 ON_LINUX = platform.system() == "Linux"
-WEEKDAYS = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
+WEEKDAYS = ("Mon", "Tue", "Thu", "Fri", "Sat", "Sun")
 
 DEFAULT_CONFIG = {
     "max_domains": 10,  # Maximum number of domains to display in "Domains by Commits".

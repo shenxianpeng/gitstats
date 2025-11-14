@@ -44,14 +44,8 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install gnuplot
-      run: choco install gnuplot -y --no-progress
-
     - name: Generate GitStats Report
       run: |
-        $env:PATH += ";C:\Program Files\gnuplot\bin"
-        gnuplot --version
-
         python -m venv venv
         .\venv\Scripts\activate.bat
         # for testing
@@ -82,12 +76,8 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install gnuplot
-      run: brew install gnuplot
-
     - name: Generate GitStats Report
       run: |
-        gnuplot --version
         python3 -m venv venv
         source venv/bin/activate
         # for testing
@@ -138,15 +128,6 @@ jobs:
         name: test-report
         path: test-report
 
-    - name: Deploy to GitHub Pages for PR
-      if: ${{ github.event_name == 'pull_request' && matrix.python-version == '3.9' }}
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: test-report
-        # Configure a unique preview link for each pull request
-        destination_dir: previews/${{ github.event.pull_request.number }}
-
     - name: Deploy to GitHub Pages for main branch
       if: ${{ (github.ref_name == 'main' || github.event_name == 'workflow_dispatch') && matrix.python-version == '3.9' }}
       uses: peaceiris/actions-gh-pages@v4
@@ -154,14 +135,3 @@ jobs:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: test-report
         keep_files: true # do not remove example reports
-
-    - name: Add PR Comment with Preview Link
-      if: ${{ github.event_name == 'pull_request' && matrix.python-version == '3.9' }}
-      env:
-        PR_NUMBER: ${{ github.event.pull_request.number }}
-        REPO_NAME: ${{ github.repository }}
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        PREVIEW_URL="https://shenxianpeng.github.io/gitstats/previews/${{ env.PR_NUMBER }}/index.html"
-        COMMENT_BODY="🎉 Your GitStats preview is ready: [View Report](${PREVIEW_URL})"
-        gh api repos/${{ env.REPO_NAME }}/issues/${{ env.PR_NUMBER }}/comments -f body="${COMMENT_BODY}"
