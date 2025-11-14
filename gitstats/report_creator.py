@@ -133,6 +133,46 @@ class HTMLReportCreator(ReportCreator):
 
         # f.write('<h2>Last 12 months</h2>')
 
+        # Yearly activity
+        YEARS = 5
+        f.write(html_header(2, "Yearly activity"))
+        f.write("<p>Last %d years</p>" % YEARS)
+
+        # generate years to show (previous N years from now)
+        now = datetime.datetime.now()
+        deltayear = datetime.timedelta(365)
+        years = []
+        stampcur = now
+        for i in range(0, YEARS):
+            years.insert(0, stampcur.strftime("%Y"))
+            stampcur -= deltayear
+
+        # top row: commits & bar
+        f.write('<table class="noborders"><tr>')
+        for i in range(0, YEARS):
+            commits = 0
+            year_key = int(years[i])
+            if year_key in data.commits_by_year:
+                commits = data.commits_by_year[year_key]
+
+            percentage = 0
+            if year_key in data.commits_by_year:
+                max_commits = (
+                    max(data.commits_by_year.values()) if data.commits_by_year else 1
+                )
+                percentage = float(data.commits_by_year[year_key]) / max_commits
+            height = max(1, int(200 * percentage))
+            f.write(
+                '<td style="text-align: center; vertical-align: bottom">%d<div style="display: block; background-color: red; width: 20px; height: %dpx"></div></td>'
+                % (commits, height)
+            )
+
+        # bottom row: year
+        f.write("</tr><tr>")
+        for i in range(0, YEARS):
+            f.write("<td>%s</td>" % years[i])
+        f.write("</tr></table>")
+
         # Weekly activity
         WEEKS = 32
         f.write(html_header(2, "Weekly activity"))
