@@ -7,6 +7,7 @@ import glob
 import shutil
 import datetime
 import time
+import math
 from gitstats import load_config, GNUPLOT_COMMON, WEEKDAYS
 from gitstats.utils import (
     get_version,
@@ -134,7 +135,16 @@ class HTMLReportCreator(ReportCreator):
         # f.write('<h2>Last 12 months</h2>')
 
         # Yearly activity
-        YEARS = 5
+        first_commit_timestamp = get_pipe_output(
+            ["git log --reverse --pretty=format:%ct | head -n 1"], quiet=True
+        )
+        if first_commit_timestamp:
+            repo_age_years = (
+                time.time() - int(first_commit_timestamp)
+            ) / 31536000  # 365 days
+            YEARS = max(5, int(math.ceil(repo_age_years / 5.0)) * 5)
+        else:
+            YEARS = 5
         f.write(html_header(2, "Yearly activity"))
         f.write("<p>Last %d years</p>" % YEARS)
 
