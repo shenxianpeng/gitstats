@@ -30,4 +30,8 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
         run: |
-          netlify deploy --dir=./test-report --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            netlify deploy --dir=test-report --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN --alias=pr-${{ github.event.number }}
+          else
+            netlify deploy --dir=test-report --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN --prod
+          fi
