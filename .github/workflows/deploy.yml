@@ -18,9 +18,10 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Install dependencies and build
+      - name: Install gnuplot and build
         run: |
           sudo apt-get update -y
+          sudo apt-get install -y gnuplot
           pipx run nox -s build
 
       - name: Deploy to Netlify
