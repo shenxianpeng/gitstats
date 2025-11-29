@@ -41,6 +41,10 @@ tracker = "https://github.com/shenxianpeng/gitstats/issues"
 homepage = "https://shenxianpeng.github.io/gitstats/main/index.html"
 documentation = "https://gitstats.readthedocs.io/"
 
+[project.optional-dependencies]
+dev = ["nox"]
+docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autobuild"]
+
 [tool.setuptools]
 zip-safe = false
 packages = ["gitstats"]
