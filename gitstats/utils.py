@@ -167,8 +167,6 @@ def get_log_range(defaultrange="HEAD", end_only=True):
     return commit_range
 
 
-# By default, gnuplot is searched from path, but can be overridden with the
+# By default, gnuplot from gnuplot-wheel package is used, but can be overridden with the
 # environment variable "GNUPLOT"
-gnuplot_cmd = "gnuplot"
-if "GNUPLOT" in os.environ:
-    gnuplot_cmd = os.environ["GNUPLOT"]
+gnuplot_cmd = os.environ.get("GNUPLOT", "gnuplot")
