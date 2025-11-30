@@ -1,6 +1,6 @@
 .. start-of-about
 
-.. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/logo.png
+.. figure:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/logo.png
    :alt: Project Logo
    :align: center
    :width: 200px
@@ -33,6 +33,9 @@
    :alt: GitHub contributors
 
 |pypi-version| |python-versions| |python-download| |test-badge| |docs-badge| |contributors|
+
+``$ gitstats``
+===============
 
 📊 Generate insightful visual reports from Git.
 
