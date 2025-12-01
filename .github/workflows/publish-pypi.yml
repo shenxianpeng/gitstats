@@ -23,7 +23,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
       # use fetch --all for setuptools_scm to work
       with:
         fetch-depth: 0
