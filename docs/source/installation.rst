@@ -7,11 +7,6 @@ Installation
 
     - Python 3.9+ (https://www.python.org/downloads/)
     - Git (http://git-scm.com/)
-    - Gnuplot (http://www.gnuplot.info): You can install Gnuplot on
-
-        - Ubuntu with ``sudo apt install gnuplot``
-        - macOS with ``brew install gnuplot``
-        - Windows with ``choco install gnuplot``
 
 You can install gitstats with pip:
 
@@ -19,11 +14,15 @@ You can install gitstats with pip:
 
     pip install gitstats
 
+.. note::
+
+    Starting from version 0.9.0, gitstats uses `gnuplot-wheel <https://pypi.org/project/gnuplot-wheel/>`_ package which bundles gnuplot as a Python dependency. You no longer need to install gnuplot separately!
+
 Or you can also get gitstats Docker image.
 
 .. tip::
 
-    The Docker image has all the dependencies (Python, Git, Gnuplot and gitstats) already installed.
+    The Docker image has all the dependencies (Python, Git, and gitstats) already installed.
 
 .. code-block:: bash
 

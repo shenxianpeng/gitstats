@@ -44,14 +44,8 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install gnuplot
-      run: choco install gnuplot -y --no-progress
-
     - name: Generate GitStats Report
       run: |
-        $env:PATH += ";C:\Program Files\gnuplot\bin"
-        gnuplot --version
-
         python -m venv venv
         .\venv\Scripts\activate.bat
         # for testing
@@ -82,12 +76,8 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Install gnuplot
-      run: brew install gnuplot
-
     - name: Generate GitStats Report
       run: |
-        gnuplot --version
         python3 -m venv venv
         source venv/bin/activate
         # for testing
@@ -120,11 +110,6 @@ jobs:
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
-
-    - name: Install Dependencies
-      run: |
-        pip install nox
-        nox -s install-deps
 
     - name: Generate GitStats Report
       run: |

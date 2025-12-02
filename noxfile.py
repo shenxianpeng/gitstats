@@ -33,13 +33,6 @@ def publish_image(session: nox.Session) -> None:
     session.run("docker", "push", f"ghcr.io/shenxianpeng/gitstats:{TAG}", external=True)
 
 
-@nox.session(name="install-deps")
-def install_deps(session: nox.Session) -> None:
-    """Install gnuplot"""
-    session.run("sudo", "apt", "update", "-y", external=True)
-    session.run("sudo", "apt", "install", "gnuplot", "-y", external=True)
-
-
 @nox.session
 def build(session: nox.Session) -> None:
     """Generate gitstats report and json file"""
