@@ -30,6 +30,14 @@ def filter_lines_by_pattern(text, pattern):
     return "\n".join(filtered_lines)
 
 
+def get_first_n_lines(text, n):
+    """Get first N lines from text (cross-platform head -n N replacement)"""
+    if not text or not text.strip():
+        return ""
+    lines = text.split("\n")
+    return "\n".join(lines[:n])
+
+
 def get_version():
     return version("gitstats")
 
@@ -74,6 +82,17 @@ def get_pipe_output(cmds, quiet=False):
         except UnicodeDecodeError:
             text = output.decode("latin-1", errors="replace").rstrip("\n")
         result = filter_lines_by_pattern(text, pattern)
+    elif len(cmds) == 2 and cmds[1].startswith("head -n"):
+        # Handle head -n N cross-platform
+        n = int(cmds[1].split("head -n ")[1])
+        p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
+        output = p.communicate()[0]
+        p.wait()
+        try:
+            text = output.decode("utf-8", errors="replace").rstrip("\n")
+        except UnicodeDecodeError:
+            text = output.decode("latin-1", errors="replace").rstrip("\n")
+        result = get_first_n_lines(text, n)
     else:
         # Standard pipe behavior for other cases
         p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
