@@ -969,6 +969,14 @@ plot """
                 print(out)
 
     def print_header(self, file) -> None:
+        """
+        Write the HTML document header and opening body tag into the provided writable file.
+
+        This writes the DOCTYPE, head section (title from self.title), a link to the configured stylesheet, a generator meta tag, an inclusion of sortable.js, an embedded client-side theme toggle script (init, toggle, and icon update handlers using localStorage), and the opening <body> tag.
+
+        Parameters:
+                file: A writable file-like object opened for text output where the HTML header will be written.
+        """
         file.write(
             """<!DOCTYPE html>
 <html>
@@ -1012,7 +1020,12 @@ plot """
         )
 
     def print_nav(self, file) -> None:
-        """Print navigation menu to file."""
+        """
+        Write the navigation bar HTML (page links and a client-side theme-toggle button) to the given writable file-like object.
+
+        Parameters:
+            file: A writable file-like object opened in text mode where the navigation HTML will be written.
+        """
         file.write(
             """
             <div class="nav">
