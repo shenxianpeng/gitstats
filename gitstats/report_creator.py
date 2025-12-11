@@ -978,6 +978,33 @@ plot """
 	<link rel="stylesheet" href="%s" type="text/css">
 	<meta name="generator" content="GitStats %s">
 	<script type="text/javascript" src="sortable.js"></script>
+	<script>
+		// Theme toggle functionality
+		function initTheme() {
+			const savedTheme = localStorage.getItem('theme') || 'light';
+			document.documentElement.setAttribute('data-theme', savedTheme);
+			updateThemeIcon(savedTheme);
+		}
+
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			updateThemeIcon(newTheme);
+		}
+
+		function updateThemeIcon(theme) {
+			const button = document.getElementById('theme-toggle');
+			if (button) {
+				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+			}
+		}
+
+		// Initialize theme on page load
+		document.addEventListener('DOMContentLoaded', initTheme);
+	</script>
 </head>
 <body>
 """
@@ -997,6 +1024,7 @@ plot """
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
             </ul>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
             </div>
             """
         )
