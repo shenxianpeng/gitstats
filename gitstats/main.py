@@ -790,17 +790,17 @@ def get_parser() -> argparse.ArgumentParser:
         metavar="key=value",
         action="append",
         default=[],
-        help=f"Override configuration value. Can be specified multiple times. Default configuration: {conf}.",
+        help=f"Override configuration value. Can be specified multiple times. Default configuration: {conf}",
     )
 
     # Positional arguments
     parser.add_argument(
-        "gitpath", metavar="<gitpath>", nargs="+", help="Path(s) to the Git repository."
+        "gitpath", metavar="<gitpath>", nargs="+", help="Path(s) to the Git repository"
     )
     parser.add_argument(
         "outputpath",
         metavar="<outputpath>",
-        help="Path to the directory where the output will be stored.",
+        help="Path to the directory where the output will be stored",
     )
 
     parser.add_argument(
@@ -808,7 +808,7 @@ def get_parser() -> argparse.ArgumentParser:
         "--format",
         choices=["json"],
         required=False,
-        help="The extra format of the output file.",
+        help="Generate additional output format",
     )
 
     return parser

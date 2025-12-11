@@ -9,8 +9,7 @@ Welcome to GitStats documentation!
    :maxdepth: 2
    :caption: Getting Started
 
-   installation
-   usage
+   getting-started
    configuration
    integration
    faq
