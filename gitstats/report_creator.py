@@ -1024,7 +1024,7 @@ plot """
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
             </ul>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
             </div>
             """
         )
