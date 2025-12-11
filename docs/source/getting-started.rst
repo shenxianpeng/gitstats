@@ -16,17 +16,11 @@ Before using gitstats, ensure you have the following installed:
 Installation
 ------------
 
-Install gitstats using `pip <https://pip.pypa.io/en/stable/>`_:
+Install `gitstats <https://pypi.org/project/gitstats/>`_ using `pip <https://pip.pypa.io/en/stable/>`_:
 
 .. code-block:: bash
 
     pip install gitstats
-
-Alternatively, use `uv <https://docs.astral.sh/uv/>`_ to run gitstats without installation:
-
-.. code-block:: bash
-
-    uvx gitstats . report
 
 Quick Start
 -----------
@@ -37,15 +31,21 @@ Generate a basic report by running:
 
     gitstats . report
 
+.. tip::
+
+    Alternatively, use `uv <https://docs.astral.sh/uv/>`_ to download and run gitstats in one command:
+
+    .. code-block:: bash
+
+        uvx gitstats . report
+
 Where:
 
-- ``.`` is the current directory (your Git repository)
+- ``.`` is the current directory (your Git repository), you can specify any Git repository path.
 - ``report`` is the output directory where HTML files will be generated
 
 View a live example: https://shenxianpeng.github.io/gitstats/index.html
 
-.. tip::
-   You can specify any Git repository path instead of ``.`` (current directory).
 
 Generate Report with JSON Output
 ---------------------------------

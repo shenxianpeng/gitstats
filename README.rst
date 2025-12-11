@@ -65,7 +65,7 @@ Usage
    gitstats <gitpath> <outputpath>
 
 
-Run ``gitstats --help`` for more options, or check the `documentation <https://gitstats.readthedocs.io/en/latest/usage.html>`_.
+Run ``gitstats --help`` for more options, or check the `documentation <https://gitstats.readthedocs.io/en/latest/getting-started.html>`_.
 
 
 Features
