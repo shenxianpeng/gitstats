@@ -4,8 +4,35 @@
 	<meta charset="UTF-8">
 	<title>GitStats - gitstats</title>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats <function get_version at 0x7f7df604c280>">
+	<meta name="generator" content="GitStats <function get_version at 0x7fc5aeb01280>">
 	<script type="text/javascript" src="sortable.js"></script>
+	<script>
+		// Theme toggle functionality
+		function initTheme() {
+			const savedTheme = localStorage.getItem('theme') || 'light';
+			document.documentElement.setAttribute('data-theme', savedTheme);
+			updateThemeIcon(savedTheme);
+		}
+
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			updateThemeIcon(newTheme);
+		}
+
+		function updateThemeIcon(theme) {
+			const button = document.getElementById('theme-toggle');
+			if (button) {
+				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+			}
+		}
+
+		// Initialize theme on page load
+		document.addEventListener('DOMContentLoaded', initTheme);
+	</script>
 </head>
 <body>
 <h1>Lines</h1>
@@ -18,9 +45,10 @@
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
             </ul>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
             </div>
             <dl>
-<dt>Total lines</dt><dd>4683</dd></dl>
+<dt>Total lines</dt><dd>4785</dd></dl>
 
 <h2 id="lines_of_code"><a href="#lines_of_code">Lines of Code</a></h2>
 

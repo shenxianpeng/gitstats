@@ -4,8 +4,35 @@
 	<meta charset="UTF-8">
 	<title>GitStats - gitstats</title>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats <function get_version at 0x7f7df604c280>">
+	<meta name="generator" content="GitStats <function get_version at 0x7fc5aeb01280>">
 	<script type="text/javascript" src="sortable.js"></script>
+	<script>
+		// Theme toggle functionality
+		function initTheme() {
+			const savedTheme = localStorage.getItem('theme') || 'light';
+			document.documentElement.setAttribute('data-theme', savedTheme);
+			updateThemeIcon(savedTheme);
+		}
+
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			updateThemeIcon(newTheme);
+		}
+
+		function updateThemeIcon(theme) {
+			const button = document.getElementById('theme-toggle');
+			if (button) {
+				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+			}
+		}
+
+		// Initialize theme on page load
+		document.addEventListener('DOMContentLoaded', initTheme);
+	</script>
 </head>
 <body>
 <h1>Files</h1>
@@ -18,13 +45,14 @@
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
             </ul>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
             </div>
             <dl>
-<dt>Total files</dt><dd>45</dd><dt>Total lines</dt><dd>4683</dd><dt>Average file size</dt><dd>23319.67 bytes</dd></dl>
+<dt>Total files</dt><dd>45</dd><dt>Total lines</dt><dd>4785</dd><dt>Average file size</dt><dd>23392.40 bytes</dd></dl>
 
 <h2 id="file_count_by_date"><a href="#file_count_by_date">File count by date</a></h2>
 
 <img src="files_by_date.png" alt="Files by Date">
 <h2 id="extensions"><a href="#extensions">Extensions</a></h2>
 
-<table class="sortable" id="ext"><tr><th>Extension</th><th>Files (%)</th><th>Lines (%)</th><th>Lines/file</th></tr><tr><td>conf</td><td>1 (2.22%)</td><td>12 (0.26%)</td><td>12</td></tr><tr><td>css</td><td>1 (2.22%)</td><td>145 (3.10%)</td><td>145</td></tr><tr><td>gif</td><td>3 (6.67%)</td><td>9 (0.19%)</td><td>3</td></tr><tr><td>js</td><td>1 (2.22%)</td><td>324 (6.92%)</td><td>324</td></tr><tr><td>json</td><td>1 (2.22%)</td><td>19 (0.41%)</td><td>19</td></tr><tr><td>md</td><td>1 (2.22%)</td><td>77 (1.64%)</td><td>77</td></tr><tr><td>png</td><td>1 (2.22%)</td><td>3168 (67.65%)</td><td>3168</td></tr><tr><td>py</td><td>6 (13.33%)</td><td>2180 (46.55%)</td><td>363</td></tr><tr><td>rst</td><td>11 (24.44%)</td><td>373 (7.96%)</td><td>33</td></tr><tr><td>toml</td><td>1 (2.22%)</td><td>65 (1.39%)</td><td>65</td></tr><tr><td>yaml</td><td>2 (4.44%)</td><td>76 (1.62%)</td><td>38</td></tr><tr><td>yml</td><td>10 (22.22%)</td><td>360 (7.69%)</td><td>36</td></tr></table></body></html>
+<table class="sortable" id="ext"><tr><th>Extension</th><th>Files (%)</th><th>Lines (%)</th><th>Lines/file</th></tr><tr><td>conf</td><td>1 (2.22%)</td><td>12 (0.25%)</td><td>12</td></tr><tr><td>css</td><td>1 (2.22%)</td><td>206 (4.31%)</td><td>206</td></tr><tr><td>gif</td><td>3 (6.67%)</td><td>9 (0.19%)</td><td>3</td></tr><tr><td>js</td><td>1 (2.22%)</td><td>324 (6.77%)</td><td>324</td></tr><tr><td>json</td><td>1 (2.22%)</td><td>19 (0.40%)</td><td>19</td></tr><tr><td>md</td><td>1 (2.22%)</td><td>77 (1.61%)</td><td>77</td></tr><tr><td>png</td><td>1 (2.22%)</td><td>3168 (66.21%)</td><td>3168</td></tr><tr><td>py</td><td>6 (13.33%)</td><td>2221 (46.42%)</td><td>370</td></tr><tr><td>rst</td><td>11 (24.44%)</td><td>373 (7.80%)</td><td>33</td></tr><tr><td>toml</td><td>1 (2.22%)</td><td>65 (1.36%)</td><td>65</td></tr><tr><td>yaml</td><td>2 (4.44%)</td><td>76 (1.59%)</td><td>38</td></tr><tr><td>yml</td><td>10 (22.22%)</td><td>360 (7.52%)</td><td>36</td></tr></table></body></html>
