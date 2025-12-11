@@ -969,6 +969,14 @@ plot """
                 print(out)
 
     def print_header(self, file) -> None:
+        """
+        Write the HTML document header and opening body tag into the provided writable file.
+
+        This writes the DOCTYPE, head section (title from self.title), a link to the configured stylesheet, a generator meta tag, an inclusion of sortable.js, an embedded client-side theme toggle script (init, toggle, and icon update handlers using localStorage), and the opening <body> tag.
+
+        Parameters:
+                file: A writable file-like object opened for text output where the HTML header will be written.
+        """
         file.write(
             """<!DOCTYPE html>
 <html>
@@ -978,6 +986,33 @@ plot """
 	<link rel="stylesheet" href="%s" type="text/css">
 	<meta name="generator" content="GitStats %s">
 	<script type="text/javascript" src="sortable.js"></script>
+	<script>
+		// Theme toggle functionality
+		function initTheme() {
+			const savedTheme = localStorage.getItem('theme') || 'light';
+			document.documentElement.setAttribute('data-theme', savedTheme);
+			updateThemeIcon(savedTheme);
+		}
+
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			updateThemeIcon(newTheme);
+		}
+
+		function updateThemeIcon(theme) {
+			const button = document.getElementById('theme-toggle');
+			if (button) {
+				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+			}
+		}
+
+		// Initialize theme on page load
+		document.addEventListener('DOMContentLoaded', initTheme);
+	</script>
 </head>
 <body>
 """
@@ -985,7 +1020,12 @@ plot """
         )
 
     def print_nav(self, file) -> None:
-        """Print navigation menu to file."""
+        """
+        Write the navigation bar HTML (page links and a client-side theme-toggle button) to the given writable file-like object.
+
+        Parameters:
+            file: A writable file-like object opened in text mode where the navigation HTML will be written.
+        """
         file.write(
             """
             <div class="nav">
@@ -997,6 +1037,7 @@ plot """
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
             </ul>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
             </div>
             """
         )
