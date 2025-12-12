@@ -128,7 +128,7 @@ def get_excluded_extensions():
     return {ext.strip().lower() for ext in exclude_ext_str.split(",") if ext.strip()}
 
 
-def should_exclude_file(ext, blob_id):
+def should_exclude_file(ext):
     """
     Check if a file should be excluded from line counting based on extension.
     Returns True if the file extension is in the exclude_exts configuration.
@@ -153,7 +153,7 @@ def get_num_of_lines_in_blob(ext_blob):
     ext, blob_id = ext_blob
 
     # Skip excluded files
-    if should_exclude_file(ext, blob_id):
+    if should_exclude_file(ext):
         return (ext, blob_id, 0)
 
     # Check if file is binary by reading first 8192 bytes and looking for null bytes

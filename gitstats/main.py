@@ -434,7 +434,7 @@ class GitDataCollector(DataCollector):
                 ext = ""
 
             # Skip excluded files completely
-            if should_exclude_file(ext, blob_id):
+            if should_exclude_file(ext):
                 continue
 
             if ext not in self.extensions:
