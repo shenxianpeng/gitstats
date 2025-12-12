@@ -631,6 +631,10 @@ class HTMLReportCreator(ReportCreator):
         # Files :: Extensions
         f.write(html_header(2, "Extensions"))
         f.write(
+            "<p><em>Note: Percentages may not total 100% as some file extensions are excluded from statistics. "
+            "See <code>exclude_exts</code> in gitstats.conf to configure which extensions are excluded.</em></p>"
+        )
+        f.write(
             '<table class="sortable" id="ext"><tr><th>Extension</th><th>Files (%)</th><th>Lines (%)</th><th>Lines/file</th></tr>'
         )
 

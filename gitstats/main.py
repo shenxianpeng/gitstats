@@ -22,7 +22,7 @@ from gitstats.utils import (
     get_num_of_files_from_rev,
     get_num_of_lines_in_blob,
     get_stat_summary_counts,
-    is_binary_file,
+    should_exclude_file,
 )
 
 os.environ["LC_ALL"] = "C"
@@ -433,8 +433,8 @@ class GitDataCollector(DataCollector):
             if len(ext) > conf["max_ext_length"]:
                 ext = ""
 
-            # Skip binary files completely
-            if is_binary_file(ext, blob_id):
+            # Skip excluded files completely
+            if should_exclude_file(ext, blob_id):
                 continue
 
             if ext not in self.extensions:

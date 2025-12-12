@@ -117,50 +117,54 @@ def get_commit_range(defaultrange="HEAD", end_only=False):
     return defaultrange
 
 
-def get_binary_extensions():
+def get_excluded_extensions():
     """
-    Get the set of binary file extensions from config.
+    Get the set of excluded file extensions from config.
     Returns a set of lowercase extensions.
     """
-    binary_ext_str = conf.get("binary_exts", "")
-    if not binary_ext_str:
+    exclude_ext_str = conf.get("exclude_exts", "")
+    if not exclude_ext_str:
         return set()
-    return {ext.strip().lower() for ext in binary_ext_str.split(",") if ext.strip()}
+    return {ext.strip().lower() for ext in exclude_ext_str.split(",") if ext.strip()}
 
 
-def is_binary_file(ext, blob_id):
+def should_exclude_file(ext, blob_id):
     """
-    Check if a file is binary based on extension or content.
-    Returns True if the file is binary and should be excluded from line counting.
+    Check if a file should be excluded from line counting based on extension.
+    Returns True if the file extension is in the exclude_exts configuration.
+    If exclude_exts is empty, no files are excluded (returns False for all).
     """
-    # Check extension first (fast)
-    binary_extensions = get_binary_extensions()
-    if ext.lower() in binary_extensions:
-        return True
+    # Get excluded extensions from config
+    excluded_extensions = get_excluded_extensions()
 
-    # For unknown extensions, check if content contains null bytes (binary indicator)
-    try:
-        content = get_pipe_output(["git cat-file blob %s" % blob_id], quiet=True)
-        # Check first 8KB for null bytes (standard binary detection)
-        sample = content[:8192] if len(content) > 8192 else content
-        if "\0" in sample:
-            return True
-    except Exception:
-        # If we can't read the file, assume it's binary
-        return True
+    # If exclude_exts is empty, don't exclude any files
+    if not excluded_extensions:
+        return False
 
-    return False
+    # Check if extension is in the excluded list
+    return ext.lower() in excluded_extensions
 
 
 def get_num_of_lines_in_blob(ext_blob):
     """
     Get number of lines in blob.
-    Returns 0 for binary files.
+    Returns 0 for binary files (detected by null bytes).
     """
     ext, blob_id = ext_blob
 
-    # Skip binary files
-    if is_binary_file(ext, blob_id):
+    # Skip excluded files
+    if should_exclude_file(ext, blob_id):
+        return (ext, blob_id, 0)
+
+    # Check if file is binary by reading first 8192 bytes and looking for null bytes
+    try:
+        blob_content = subprocess.check_output(
+            ["git", "cat-file", "blob", blob_id], stderr=subprocess.DEVNULL
+        )
+        # Check first 8KB for null bytes (binary indicator)
+        if b"\x00" in blob_content[:8192]:
+            return (ext, blob_id, 0)
+    except subprocess.CalledProcessError:
         return (ext, blob_id, 0)
 
     return (
