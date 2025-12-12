@@ -117,11 +117,52 @@ def get_commit_range(defaultrange="HEAD", end_only=False):
     return defaultrange
 
 
+def get_binary_extensions():
+    """
+    Get the set of binary file extensions from config.
+    Returns a set of lowercase extensions.
+    """
+    binary_ext_str = conf.get("binary_exts", "")
+    if not binary_ext_str:
+        return set()
+    return {ext.strip().lower() for ext in binary_ext_str.split(",") if ext.strip()}
+
+
+def is_binary_file(ext, blob_id):
+    """
+    Check if a file is binary based on extension or content.
+    Returns True if the file is binary and should be excluded from line counting.
+    """
+    # Check extension first (fast)
+    binary_extensions = get_binary_extensions()
+    if ext.lower() in binary_extensions:
+        return True
+
+    # For unknown extensions, check if content contains null bytes (binary indicator)
+    try:
+        content = get_pipe_output(["git cat-file blob %s" % blob_id], quiet=True)
+        # Check first 8KB for null bytes (standard binary detection)
+        sample = content[:8192] if len(content) > 8192 else content
+        if "\0" in sample:
+            return True
+    except Exception:
+        # If we can't read the file, assume it's binary
+        return True
+
+    return False
+
+
 def get_num_of_lines_in_blob(ext_blob):
     """
-    Get number of lines in blob
+    Get number of lines in blob.
+    Returns 0 for binary files.
     """
     ext, blob_id = ext_blob
+
+    # Skip binary files
+    if is_binary_file(ext, blob_id):
+        return (ext, blob_id, 0)
+
     return (
         ext,
         blob_id,

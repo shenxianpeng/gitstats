@@ -23,6 +23,7 @@ DEFAULT_CONFIG = {
     "project_name": "",  # Project name to display (default: repository directory name).
     "processes": 8,  # Number of parallel processes to use when gathering data.
     "start_date": "",  # Starting date for commits, passed as --since to Git (optional).
+    "binary_exts": "png,jpg,jpeg,gif,bmp,ico,svg,zip,tar,gz,exe,dll,so,bin,pdf,mp3,mp4,pyc",  # Common binary file extensions (others detected via null bytes).
 }
 
 
