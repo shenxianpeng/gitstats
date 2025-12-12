@@ -158,13 +158,11 @@ def get_num_of_lines_in_blob(ext_blob):
 
     # Check if file is binary by reading first 8192 bytes and looking for null bytes
     try:
-        blob_content = subprocess.check_output(
-            ["git", "cat-file", "blob", blob_id], stderr=subprocess.DEVNULL
-        )
+        blob_content = get_pipe_output(["git cat-file blob %s" % blob_id], return_bytes=True)
         # Check first 8KB for null bytes (binary indicator)
         if b"\x00" in blob_content[:8192]:
             return (ext, blob_id, 0)
-    except subprocess.CalledProcessError:
+    except Exception:
         return (ext, blob_id, 0)
 
     return (
