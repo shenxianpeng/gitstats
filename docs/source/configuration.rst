@@ -33,7 +33,7 @@ Here is an example ``gitstats.conf`` file:
    project_name =
    processes = 8
    start_date =
-   exclude_exts =
+   exclude_exts = png,jpg,bin,exe,dll,class,jar,zip,tar
 
 You can also override configuration values using the ``-c key=value`` option when running the ``gitstats`` command.
 
