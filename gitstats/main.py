@@ -22,6 +22,7 @@ from gitstats.utils import (
     get_num_of_files_from_rev,
     get_num_of_lines_in_blob,
     get_stat_summary_counts,
+    should_exclude_file,
 )
 
 os.environ["LC_ALL"] = "C"
@@ -431,6 +432,11 @@ class GitDataCollector(DataCollector):
                 ext = filename[(filename.rfind(".") + 1) :]
             if len(ext) > conf["max_ext_length"]:
                 ext = ""
+
+            # Skip excluded files completely
+            if should_exclude_file(ext):
+                continue
+
             if ext not in self.extensions:
                 self.extensions[ext] = {"files": 0, "lines": 0}
             self.extensions[ext]["files"] += 1

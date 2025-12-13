@@ -15,6 +15,7 @@ You can create a ``gitstats.conf`` file in the current directory to customize th
 * ``project_name`` - Project name to display (default: repository directory name). Default: ``""`` (empty).
 * ``processes`` - Number of parallel processes to use when gathering data. Default: ``8``.
 * ``start_date`` - Starting date for commits, passed as --since to Git (optional). Format: ``YYYY-MM-DD``. Default: ``""`` (empty).
+* ``exclude_exts`` - Comma-separated list of file extensions to exclude from line counting. If empty, no files are excluded. Files with null bytes in their content are automatically detected as binary and excluded from line counting. This detection occurs in addition to any extensions specified in exclude_exts. Default: ``""`` (empty).
 
 Here is an example ``gitstats.conf`` file:
 
@@ -32,6 +33,7 @@ Here is an example ``gitstats.conf`` file:
    project_name =
    processes = 8
    start_date =
+   exclude_exts =
 
 You can also override configuration values using the ``-c key=value`` option when running the ``gitstats`` command.
 
