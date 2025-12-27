@@ -16,6 +16,14 @@
 	--h2-color: #ffffff;
 	--img-bg: #ffffff;
 	--link-color: #000000;
+	--heat1-bg: #ffcccc;
+	--heat1-color: inherit;
+	--heat2-bg: #ff8080;
+	--heat2-color: inherit;
+	--heat3-bg: #ff0000;
+	--heat3-color: #ffffff;
+	--heat4-bg: #b30000;
+	--heat4-color: #ffffff;
 }
 
 /* Dark mode - Soft dark theme */
@@ -32,6 +40,14 @@
 	--h2-color: #e8e8e8;
 	--img-bg: #34373a;
 	--link-color: #7eb7d8;
+	--heat1-bg: #4a3030;
+	--heat1-color: #d4d4d4;
+	--heat2-bg: #6b3030;
+	--heat2-color: #d4d4d4;
+	--heat3-bg: #8b3030;
+	--heat3-color: #ffffff;
+	--heat4-bg: #b34040;
+	--heat4-color: #ffffff;
 }
 
 body {
@@ -203,4 +219,33 @@ h2 a {
 
 .moreauthors {
 	font-size: 80%;
+}
+
+/* GitHub-like heatmap colors (higher value => darker) */
+.heat {
+	text-align: center;
+}
+
+.heat0 {
+	background-color: var(--table-bg);
+}
+
+.heat1 {
+	background-color: var(--heat1-bg);
+	color: var(--heat1-color);
+}
+
+.heat2 {
+	background-color: var(--heat2-bg);
+	color: var(--heat2-color);
+}
+
+.heat3 {
+	background-color: var(--heat3-bg);
+	color: var(--heat3-color);
+}
+
+.heat4 {
+	background-color: var(--heat4-bg);
+	color: var(--heat4-color);
 }
