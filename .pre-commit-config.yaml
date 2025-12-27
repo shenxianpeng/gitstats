@@ -1,6 +1,5 @@
 ci:
   autoupdate_schedule: quarterly
-  skip: [hadolint]
 
 repos:
 -   repo: https://github.com/pre-commit/pre-commit-hooks
@@ -10,7 +9,6 @@ repos:
     -   id: check-toml
     -   id: end-of-file-fixer
     -   id: trailing-whitespace
-    -   id: requirements-txt-fixer
 
 -   repo: https://github.com/pre-commit/pygrep-hooks
     rev: "v1.10.0"
@@ -37,14 +35,3 @@ repos:
     rev: v2.4.1
     hooks:
     -   id: codespell
--   repo: https://github.com/hadolint/hadolint
-    rev: v2.14.0
-    hooks:
-    -   id: hadolint
-        args:
-            [
-                --ignore,DL3008,
-                --ignore,DL3013,
-                --ignore,DL3042,
-                --ignore,SC1091,
-            ]
