@@ -1,3 +1,4 @@
+import os
 import nox
 import shutil
 from pathlib import Path
@@ -48,8 +49,9 @@ def build(session: nox.Session) -> None:
 def preview(session: nox.Session) -> None:
     """Preview gitstats report in local"""
     build(session)  # Generate report first
+    python_cmd = "python" if os.name == "nt" else "python3"
     session.run(
-        "python3", "-m", "http.server", "8000", "-d", "test-report", external=True
+        python_cmd, "-m", "http.server", "8000", "-d", "test-report", external=True
     )
 
 
