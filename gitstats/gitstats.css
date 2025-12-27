@@ -204,3 +204,30 @@ h2 a {
 .moreauthors {
 	font-size: 80%;
 }
+
+/* GitHub-like heatmap colors (higher value => darker) */
+.heat {
+	text-align: center;
+}
+
+.heat0 {
+	background-color: var(--table-bg);
+}
+
+.heat1 {
+	background-color: #ffcccc; /* very light red (uniform lightness ramp) */
+}
+
+.heat2 {
+	background-color: #ff8080; /* light red */
+}
+
+.heat3 {
+	background-color: #ff0000; /* red */
+	color: #ffffff;
+}
+
+.heat4 {
+	background-color: #b30000; /* dark red */
+	color: #ffffff;
+}

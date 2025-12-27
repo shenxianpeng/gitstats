@@ -33,6 +33,23 @@ class ReportCreator:
 
 
 class HTMLReportCreator(ReportCreator):
+    @staticmethod
+    def _heat_level(value, max_value):
+        if max_value <= 0 or value <= 0:
+            return 0
+        ratio = float(value) / float(max_value)
+        if ratio <= 0.25:
+            return 1
+        if ratio <= 0.50:
+            return 2
+        if ratio <= 0.75:
+            return 3
+        return 4
+
+    @classmethod
+    def _heat_td_class(cls, value, max_value):
+        return f"heat heat{cls._heat_level(value, max_value)}"
+
     def create(self, data, path):
         ReportCreator.create(self, data, path)
         self.title = data.project_name
@@ -232,31 +249,35 @@ class HTMLReportCreator(ReportCreator):
         fp = open(path + "/hour_of_day.dat", "w", encoding="utf-8")
         for i in range(0, 24):
             if i in hour_of_day:
-                r = 127 + int(
-                    (float(hour_of_day[i]) / data.activity_by_hour_of_day_busiest) * 128
-                )
                 f.write(
-                    '<td style="background-color: rgb(%d, 0, 0)">%d</td>'
-                    % (r, hour_of_day[i])
+                    '<td class="%s">%d</td>'
+                    % (
+                        self._heat_td_class(
+                            hour_of_day[i], data.activity_by_hour_of_day_busiest
+                        ),
+                        hour_of_day[i],
+                    )
                 )
                 fp.write("%d %d\n" % (i, hour_of_day[i]))
             else:
-                f.write("<td>0</td>")
+                f.write('<td class="%s">0</td>' % self._heat_td_class(0, 0))
                 fp.write("%d 0\n" % i)
         fp.close()
         f.write("</tr>\n<tr><th>%</th>")
         totalcommits = data.get_total_commits()
         for i in range(0, 24):
             if i in hour_of_day:
-                r = 127 + int(
-                    (float(hour_of_day[i]) / data.activity_by_hour_of_day_busiest) * 128
-                )
                 f.write(
-                    '<td style="background-color: rgb(%d, 0, 0)">%.2f</td>'
-                    % (r, (100.0 * hour_of_day[i]) / totalcommits)
+                    '<td class="%s">%.2f</td>'
+                    % (
+                        self._heat_td_class(
+                            hour_of_day[i], data.activity_by_hour_of_day_busiest
+                        ),
+                        (100.0 * hour_of_day[i]) / totalcommits,
+                    )
                 )
             else:
-                f.write("<td>0.00</td>")
+                f.write('<td class="%s">0.00</td>' % self._heat_td_class(0, 0))
         f.write("</tr></table>")
         f.write('<img src="hour_of_day.png" alt="Hour of Day">')
         fg = open(path + "/hour_of_day.dat", "w", encoding="utf-8")
@@ -308,15 +329,15 @@ class HTMLReportCreator(ReportCreator):
                     commits = data.activity_by_hour_of_week[weekday][hour]
                 except KeyError:
                     commits = 0
-                if commits != 0:
-                    f.write("<td")
-                    r = 127 + int(
-                        (float(commits) / data.activity_by_hour_of_week_busiest) * 128
+                f.write(
+                    '<td class="%s">%s</td>'
+                    % (
+                        self._heat_td_class(
+                            commits, data.activity_by_hour_of_week_busiest
+                        ),
+                        ("%d" % commits) if commits != 0 else "",
                     )
-                    f.write(' style="background-color: rgb(%d, 0, 0)"' % r)
-                    f.write(">%d</td>" % commits)
-                else:
-                    f.write("<td></td>")
+                )
             f.write("</tr>")
 
         f.write("</table>")
@@ -393,10 +414,9 @@ class HTMLReportCreator(ReportCreator):
         max_commits_on_tz = max(data.commits_by_timezone.values())
         for i in sorted(list(data.commits_by_timezone.keys()), key=lambda n: int(n)):
             commits = data.commits_by_timezone[i]
-            r = 127 + int((float(commits) / max_commits_on_tz) * 128)
             f.write(
-                '<tr><th>%s</th><td style="background-color: rgb(%d, 0, 0)">%d</td></tr>'
-                % (i, r, commits)
+                '<tr><th>%s</th><td class="%s">%d</td></tr>'
+                % (i, self._heat_td_class(commits, max_commits_on_tz), commits)
             )
         f.write("</table>")
 
