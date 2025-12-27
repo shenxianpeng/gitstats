@@ -768,9 +768,10 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
         )
     )
     if sys.stdin.isatty():
+        python_cmd = "python" if os.name == "nt" else "python3"
         print("To view the report, run:")
         print()
-        print(f"  python3 -m http.server 8000 -d {outputpath}")
+        print(f"  {python_cmd} -m http.server 8000 -d {outputpath}")
         print()
 
     return 0
