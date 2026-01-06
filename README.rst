@@ -54,7 +54,11 @@ Installation
    pip install gitstats
 
 
-gitstats is compatible with Python 3.9 and newer.
+gitstats is compatible with Python 3.6.6, Python 3.7, and newer.
+
+.. note::
+
+   We added compatibility changes for Python 3.6/3.7 (importlib-metadata backport and CI tests). If you need strict testing against Python 3.6.6 specifically, add a request and we'll adjust CI to pin that minor version.
 
 
 Usage

@@ -8,7 +8,14 @@ import sys
 import time
 import subprocess
 from gitstats import ON_LINUX, exectime_external, load_config
-from importlib.metadata import version
+
+# importlib.metadata is in the stdlib since Python 3.8. For older
+# Python versions (3.7) use the importlib-metadata backport package if
+# available.
+try:
+    from importlib.metadata import version
+except ImportError:
+    from importlib_metadata import version  # type: ignore
 
 
 conf = load_config()
