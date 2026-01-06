@@ -1,6 +1,3 @@
-import importlib
-
-import gitstats
 from gitstats import load_config
 from gitstats.utils import get_version
 
