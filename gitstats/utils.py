@@ -219,7 +219,9 @@ def get_log_range(defaultrange="HEAD", end_only=True):
 
     # Author filtering
     if len(conf["authors"]) > 0:
-        authors_list = [author.strip() for author in conf["authors"].split(",") if author.strip()]
+        authors_list = [
+            author.strip() for author in conf["authors"].split(",") if author.strip()
+        ]
         for author in authors_list:
             options.append('--author="%s"' % author)
 
@@ -262,7 +264,7 @@ def get_log_range(defaultrange="HEAD", end_only=True):
 
     # Combine options with commit range
     if options:
-        return "%s \"%s\"" % (" ".join(options), commit_range)
+        return '%s "%s"' % (" ".join(options), commit_range)
     return commit_range
 
 

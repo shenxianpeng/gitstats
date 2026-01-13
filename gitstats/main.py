@@ -174,9 +174,7 @@ class GitDataCollector(DataCollector):
         # tags
         # Only include tags that are reachable within the commit range
         log_range = get_log_range("HEAD", False)
-        tag_commits = (
-            get_pipe_output([f"git rev-list {log_range}"]).strip().split("\n")
-        )
+        tag_commits = get_pipe_output([f"git rev-list {log_range}"]).strip().split("\n")
         tag_commits_set = set(tag_commits) if tag_commits[0] else set()
 
         lines = get_pipe_output(["git show-ref --tags"]).split("\n")
