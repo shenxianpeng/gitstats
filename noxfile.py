@@ -87,6 +87,7 @@ def coverage(session: nox.Session) -> None:
         "--cov=gitstats",
         "--cov-report=term-missing",
         "--cov-report=html",
+        "--cov-report=xml",
         "-v",
         external=True,
     )
