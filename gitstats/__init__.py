@@ -23,6 +23,9 @@ DEFAULT_CONFIG = {
     "project_name": "",  # Project name to display (default: repository directory name).
     "processes": 8,  # Number of parallel processes to use when gathering data.
     "start_date": "",  # Starting date for commits, passed as --since to Git (optional).
+    "end_date": "",  # Ending date for commits, passed as --until to Git (optional). Format: YYYY-MM-DD.
+    "authors": "",  # Comma-separated list of authors to filter commits (empty = include all authors).
+    "commit_message_grep": "",  # Search expression to filter commits by message (empty = include all commits).
     "exclude_exts": "",  # File extensions to exclude from line counting (others detected via null bytes).
 }
 
