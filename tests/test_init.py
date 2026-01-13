@@ -1,7 +1,6 @@
 """Tests for gitstats.__init__ module."""
+
 import os
-import pytest
-import tempfile
 import gitstats
 
 
@@ -56,7 +55,7 @@ def test_load_config_from_file(temp_dir, reset_config):
         f.write("max_authors = 25\n")
         f.write("processes = 4\n")
         f.write("project_name = TestProject\n")
-    
+
     config = gitstats.load_config(config_path)
     assert config["max_domains"] == 15
     assert config["max_authors"] == 25
@@ -70,7 +69,7 @@ def test_load_config_partial_file(temp_dir, reset_config):
     with open(config_path, "w") as f:
         f.write("[gitstats]\n")
         f.write("max_domains = 7\n")
-    
+
     config = gitstats.load_config(config_path)
     # Should have overridden value
     assert config["max_domains"] == 7
@@ -87,7 +86,7 @@ def test_load_config_string_values(temp_dir, reset_config):
         f.write("style = custom.css\n")
         f.write("commit_end = main\n")
         f.write("exclude_exts = .md,.txt\n")
-    
+
     config = gitstats.load_config(config_path)
     assert config["style"] == "custom.css"
     assert config["commit_end"] == "main"

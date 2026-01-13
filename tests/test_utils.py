@@ -1,8 +1,8 @@
 """Tests for gitstats.utils module."""
+
 import os
-import pytest
 import subprocess
-from unittest.mock import patch, MagicMock, Mock
+from unittest.mock import patch, MagicMock
 import gitstats.utils as utils
 import gitstats
 
@@ -79,7 +79,7 @@ def test_get_pipe_output_simple(mock_popen):
     mock_process.communicate.return_value = (b"output\n", None)
     mock_process.wait.return_value = 0
     mock_popen.return_value = mock_process
-    
+
     result = utils.get_pipe_output(["echo hello"], quiet=True)
     assert result == "output"
 
@@ -91,7 +91,7 @@ def test_get_pipe_output_wc_line_count(mock_popen):
     mock_process.communicate.return_value = (b"line1\nline2\nline3", None)
     mock_process.wait.return_value = 0
     mock_popen.return_value = mock_process
-    
+
     result = utils.get_pipe_output(["git log", "wc -l"], quiet=True)
     assert result == "3"
 
@@ -103,7 +103,7 @@ def test_get_pipe_output_grep_v(mock_popen):
     mock_process.communicate.return_value = (b"commit abc\nline1\ncommit def", None)
     mock_process.wait.return_value = 0
     mock_popen.return_value = mock_process
-    
+
     result = utils.get_pipe_output(["git log", "grep -v ^commit"], quiet=True)
     assert "line1" in result
     assert "commit" not in result
@@ -118,7 +118,7 @@ def test_get_pipe_output_unicode_decode_error(mock_popen):
     mock_process.communicate.return_value = (bad_bytes, None)
     mock_process.wait.return_value = 0
     mock_popen.return_value = mock_process
-    
+
     # Should use latin-1 fallback
     result = utils.get_pipe_output(["cat binary"], quiet=True)
     assert isinstance(result, str)
@@ -133,28 +133,34 @@ def test_get_commit_range_default(reset_config):
 
 def test_get_commit_range_with_end(reset_config):
     """Test get_commit_range with commit_end set."""
-    with patch.dict('gitstats.utils.conf', {"commit_end": "main", "commit_begin": ""}):
+    with patch.dict("gitstats.utils.conf", {"commit_end": "main", "commit_begin": ""}):
         result = utils.get_commit_range("HEAD", end_only=True)
         assert result == "main"
 
 
 def test_get_commit_range_with_begin_and_end(reset_config):
     """Test get_commit_range with both begin and end."""
-    with patch.dict('gitstats.utils.conf', {"commit_end": "HEAD", "commit_begin": "abc123"}):
+    with patch.dict(
+        "gitstats.utils.conf", {"commit_end": "HEAD", "commit_begin": "abc123"}
+    ):
         result = utils.get_commit_range()
         assert result == "abc123..HEAD"
 
 
 def test_get_commit_range_numeric_begin(reset_config):
     """Test get_commit_range with numeric commit_begin."""
-    with patch.dict('gitstats.utils.conf', {"commit_end": "main", "commit_begin": "10"}):
+    with patch.dict(
+        "gitstats.utils.conf", {"commit_end": "main", "commit_begin": "10"}
+    ):
         result = utils.get_commit_range()
         assert result == "main~10..main"
 
 
 def test_get_commit_range_numeric_string_begin(reset_config):
     """Test get_commit_range with numeric string commit_begin."""
-    with patch.dict('gitstats.utils.conf', {"commit_end": "develop", "commit_begin": 5}):
+    with patch.dict(
+        "gitstats.utils.conf", {"commit_end": "develop", "commit_begin": 5}
+    ):
         result = utils.get_commit_range()
         assert result == "develop~5..develop"
 
@@ -169,21 +175,21 @@ def test_get_excluded_extensions_empty(reset_config):
 
 def test_get_excluded_extensions_single(reset_config):
     """Test getting single excluded extension."""
-    with patch.dict('gitstats.utils.conf', {"exclude_exts": "md"}):
+    with patch.dict("gitstats.utils.conf", {"exclude_exts": "md"}):
         result = utils.get_excluded_extensions()
         assert result == {"md"}
 
 
 def test_get_excluded_extensions_multiple(reset_config):
     """Test getting multiple excluded extensions."""
-    with patch.dict('gitstats.utils.conf', {"exclude_exts": "md, txt, log"}):
+    with patch.dict("gitstats.utils.conf", {"exclude_exts": "md, txt, log"}):
         result = utils.get_excluded_extensions()
         assert result == {"md", "txt", "log"}
 
 
 def test_get_excluded_extensions_with_dots(reset_config):
     """Test getting excluded extensions with dots."""
-    with patch.dict('gitstats.utils.conf', {"exclude_exts": ".md,.txt"}):
+    with patch.dict("gitstats.utils.conf", {"exclude_exts": ".md,.txt"}):
         result = utils.get_excluded_extensions()
         assert result == {".md", ".txt"}
 
@@ -198,7 +204,7 @@ def test_should_exclude_file_no_exclusions(reset_config):
 
 def test_should_exclude_file_with_exclusions(reset_config):
     """Test should_exclude_file with exclusions."""
-    with patch.dict('gitstats.utils.conf', {"exclude_exts": "md,txt,log"}):
+    with patch.dict("gitstats.utils.conf", {"exclude_exts": "md,txt,log"}):
         assert utils.should_exclude_file("md") is True
         assert utils.should_exclude_file("txt") is True
         assert utils.should_exclude_file("py") is False
@@ -206,7 +212,7 @@ def test_should_exclude_file_with_exclusions(reset_config):
 
 def test_should_exclude_file_case_insensitive(reset_config):
     """Test should_exclude_file is case insensitive."""
-    with patch.dict('gitstats.utils.conf', {"exclude_exts": "MD,TXT"}):
+    with patch.dict("gitstats.utils.conf", {"exclude_exts": "MD,TXT"}):
         assert utils.should_exclude_file("md") is True
         assert utils.should_exclude_file("MD") is True
         assert utils.should_exclude_file("Md") is True
@@ -216,7 +222,7 @@ def test_should_exclude_file_case_insensitive(reset_config):
 @patch("gitstats.utils.get_pipe_output")
 def test_get_num_of_lines_in_blob_excluded(mock_pipe, mock_check):
     """Test get_num_of_lines_in_blob for excluded file."""
-    with patch.dict('gitstats.utils.conf', {"exclude_exts": "md"}):
+    with patch.dict("gitstats.utils.conf", {"exclude_exts": "md"}):
         result = utils.get_num_of_lines_in_blob(("md", "abc123"))
         assert result == ("md", "abc123", 0)
         mock_check.assert_not_called()
@@ -228,10 +234,10 @@ def test_get_num_of_lines_in_blob_binary(mock_pipe, mock_check):
     """Test get_num_of_lines_in_blob for binary file."""
     gitstats._config = gitstats.DEFAULT_CONFIG.copy()
     gitstats._config["exclude_exts"] = ""
-    
+
     # Return binary content with null byte
     mock_check.return_value = b"binary\x00content"
-    
+
     result = utils.get_num_of_lines_in_blob(("exe", "abc123"))
     assert result == ("exe", "abc123", 0)
 
@@ -242,9 +248,9 @@ def test_get_num_of_lines_in_blob_error(mock_pipe, mock_check):
     """Test get_num_of_lines_in_blob when git command fails."""
     gitstats._config = gitstats.DEFAULT_CONFIG.copy()
     gitstats._config["exclude_exts"] = ""
-    
+
     mock_check.side_effect = subprocess.CalledProcessError(1, "git")
-    
+
     result = utils.get_num_of_lines_in_blob(("py", "abc123"))
     assert result == ("py", "abc123", 0)
 
@@ -255,11 +261,11 @@ def test_get_num_of_lines_in_blob_text(mock_pipe, mock_check):
     """Test get_num_of_lines_in_blob for text file."""
     gitstats._config = gitstats.DEFAULT_CONFIG.copy()
     gitstats._config["exclude_exts"] = ""
-    
+
     # Return text content without null bytes
     mock_check.return_value = b"line1\nline2\nline3"
     mock_pipe.return_value = "3"
-    
+
     result = utils.get_num_of_lines_in_blob(("py", "abc123"))
     assert result == ("py", "abc123", 3)
 
@@ -268,7 +274,7 @@ def test_get_num_of_lines_in_blob_text(mock_pipe, mock_check):
 def test_get_num_of_files_from_rev(mock_pipe):
     """Test get_num_of_files_from_rev."""
     mock_pipe.return_value = "42\n"
-    
+
     result = utils.get_num_of_files_from_rev((1234567890, "abc123"))
     assert result == (1234567890, "abc123", 42)
 
@@ -316,7 +322,9 @@ def test_get_log_range_default(reset_config):
 
 def test_get_log_range_with_start_date(reset_config):
     """Test get_log_range with start_date."""
-    with patch.dict('gitstats.utils.conf', {"start_date": "2024-01-01", "commit_end": "main"}):
+    with patch.dict(
+        "gitstats.utils.conf", {"start_date": "2024-01-01", "commit_end": "main"}
+    ):
         result = utils.get_log_range("HEAD", end_only=True)
         assert '--since="2024-01-01"' in result
         assert '"main"' in result
@@ -324,7 +332,10 @@ def test_get_log_range_with_start_date(reset_config):
 
 def test_get_log_range_end_only_false(reset_config):
     """Test get_log_range with end_only=False."""
-    with patch.dict('gitstats.utils.conf', {"start_date": "", "commit_end": "main", "commit_begin": "dev"}):
+    with patch.dict(
+        "gitstats.utils.conf",
+        {"start_date": "", "commit_end": "main", "commit_begin": "dev"},
+    ):
         result = utils.get_log_range("HEAD", end_only=False)
         assert "dev..main" in result
 
@@ -338,6 +349,7 @@ def test_gnuplot_cmd_default():
 def test_gnuplot_cmd_custom():
     """Test gnuplot command can be overridden."""
     import importlib
+
     importlib.reload(utils)
     assert utils.gnuplot_cmd == "/custom/gnuplot"
 
@@ -367,7 +379,7 @@ def test_get_pipe_output_quiet_tty_linux(mock_popen, mock_stdout):
     mock_process.wait.return_value = 0
     mock_process.stdout = MagicMock()
     mock_popen.return_value = mock_process
-    
+
     with patch("os.isatty", return_value=True):
         result = utils.get_pipe_output(["git log"], quiet=False)
         assert result == "output"
@@ -382,7 +394,7 @@ def test_get_pipe_output_wc_unicode_decode_error(mock_popen):
     mock_process.wait.return_value = 0
     mock_process.stdout = MagicMock()
     mock_popen.return_value = mock_process
-    
+
     result = utils.get_pipe_output(["git show", "wc -l"], quiet=True)
     # Should handle binary data and count lines
     assert isinstance(result, str)
@@ -393,11 +405,14 @@ def test_get_pipe_output_grep_v_unicode_decode_error(mock_popen):
     """Test get_pipe_output grep -v with UnicodeDecodeError fallback."""
     mock_process = MagicMock()
     # Return binary data that will trigger UnicodeDecodeError
-    mock_process.communicate.return_value = (b"\xff\xfeline1\ncommit abc\nline2\n", None)
+    mock_process.communicate.return_value = (
+        b"\xff\xfeline1\ncommit abc\nline2\n",
+        None,
+    )
     mock_process.wait.return_value = 0
     mock_process.stdout = MagicMock()
     mock_popen.return_value = mock_process
-    
+
     result = utils.get_pipe_output(["git log", "grep -v ^commit"], quiet=True)
     # Should fallback to latin-1 and filter
     assert isinstance(result, str)
@@ -409,17 +424,17 @@ def test_get_pipe_output_multi_command_pipe(mock_popen):
     mock_process1 = MagicMock()
     mock_process1.stdout = MagicMock()
     mock_process1.wait.return_value = 0
-    
+
     mock_process2 = MagicMock()
     mock_process2.stdout = MagicMock()
     mock_process2.wait.return_value = 0
-    
+
     mock_process3 = MagicMock()
     mock_process3.communicate.return_value = (b"final output\n", None)
     mock_process3.wait.return_value = 0
-    
+
     mock_popen.side_effect = [mock_process1, mock_process2, mock_process3]
-    
+
     result = utils.get_pipe_output(["git log", "grep author", "wc -l"], quiet=True)
     assert result == "final output"
     assert mock_popen.call_count == 3
@@ -434,14 +449,14 @@ def test_get_pipe_output_normal_pipe_unicode_decode_error(mock_popen):
     mock_process.wait.return_value = 0
     mock_process.stdout = MagicMock()
     mock_popen.return_value = mock_process
-    
+
     result = utils.get_pipe_output(["git show HEAD:file.bin"], quiet=True)
     # Should fallback to latin-1
     assert isinstance(result, str)
 
 
 @patch("gitstats.ON_LINUX", True)
-@patch("os.isatty", return_value=True)  
+@patch("os.isatty", return_value=True)
 @patch("subprocess.Popen")
 def test_get_pipe_output_not_quiet_tty_print(mock_popen, mock_isatty):
     """Test get_pipe_output with quiet=False shows progress on tty."""
@@ -450,7 +465,7 @@ def test_get_pipe_output_not_quiet_tty_print(mock_popen, mock_isatty):
     mock_process.wait.return_value = 0
     mock_process.stdout = MagicMock()
     mock_popen.return_value = mock_process
-    
+
     with patch("builtins.print") as mock_print:
         result = utils.get_pipe_output(["git log"], quiet=False)
         assert result == "output"
@@ -460,7 +475,10 @@ def test_get_pipe_output_not_quiet_tty_print(mock_popen, mock_isatty):
 
 def test_get_log_range_no_start_date(reset_config):
     """Test get_log_range without start_date."""
-    with patch.dict("gitstats.utils.conf", {"commit_end": "main", "start_date": "", "commit_begin": ""}):
+    with patch.dict(
+        "gitstats.utils.conf",
+        {"commit_end": "main", "start_date": "", "commit_begin": ""},
+    ):
         result = utils.get_log_range()
         assert result == "main"
         assert "--since" not in result
@@ -468,6 +486,9 @@ def test_get_log_range_no_start_date(reset_config):
 
 def test_get_log_range_with_start_date(reset_config):
     """Test get_log_range with start_date."""
-    with patch.dict("gitstats.utils.conf", {"commit_end": "main", "start_date": "2024-01-01", "commit_begin": ""}):
+    with patch.dict(
+        "gitstats.utils.conf",
+        {"commit_end": "main", "start_date": "2024-01-01", "commit_begin": ""},
+    ):
         result = utils.get_log_range()
         assert '--since="2024-01-01" "main"' == result
