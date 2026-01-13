@@ -1,10 +1,9 @@
 """Pytest configuration and fixtures for gitstats tests."""
+
 import os
-import sys
 import tempfile
 import shutil
 import pytest
-from pathlib import Path
 
 
 @pytest.fixture
@@ -20,19 +19,19 @@ def mock_git_repo(temp_dir):
     """Create a mock git repository for testing."""
     repo_path = os.path.join(temp_dir, "test_repo")
     os.makedirs(repo_path)
-    
+
     # Initialize a git repo
     os.chdir(repo_path)
     os.system("git init")
     os.system('git config user.email "test@example.com"')
     os.system('git config user.name "Test User"')
-    
+
     # Create initial commit
     with open(os.path.join(repo_path, "README.md"), "w") as f:
         f.write("# Test Repository\n")
     os.system("git add .")
     os.system('git commit -m "Initial commit"')
-    
+
     yield repo_path
 
 
@@ -54,6 +53,7 @@ def config_file(temp_dir):
 def reset_config():
     """Reset global config between tests."""
     import gitstats
+
     gitstats._config = None
     yield
     gitstats._config = None
