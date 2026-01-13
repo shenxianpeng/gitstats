@@ -67,3 +67,26 @@ def docs(session: nox.Session) -> None:
 def docs_live(session: nox.Session) -> None:
     session.install("-e", ".[docs]")
     session.run("sphinx-autobuild", "docs/source", "docs/build/html", external=True)
+
+
+@nox.session
+def test(session: nox.Session) -> None:
+    """Run tests with pytest"""
+    session.install("--upgrade", "pip")
+    session.install("-e", ".[test]")
+    session.run("pytest", "-v", external=True)
+
+
+@nox.session
+def coverage(session: nox.Session) -> None:
+    """Run tests with coverage"""
+    session.install("--upgrade", "pip")
+    session.install("-e", ".[test]")
+    session.run(
+        "pytest",
+        "--cov=gitstats",
+        "--cov-report=term-missing",
+        "--cov-report=html",
+        "-v",
+        external=True,
+    )

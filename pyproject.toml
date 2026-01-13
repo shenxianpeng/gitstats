@@ -47,6 +47,7 @@ documentation = "https://gitstats.readthedocs.io/"
 [project.optional-dependencies]
 dev = ["nox"]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autobuild"]
+test = ["pytest>=7.0", "pytest-cov>=4.0", "pytest-mock>=3.10"]
 
 [tool.setuptools]
 zip-safe = false
@@ -59,6 +60,9 @@ version_scheme= "no-guess-dev"
 # Test PyPI does not support local versions.
 local_scheme = "no-local-version"
 fallback_version = "0.0.0"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
 
 [tool.mypy]
 show_error_codes = true
