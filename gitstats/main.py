@@ -248,7 +248,13 @@ class GitDataCollector(DataCollector):
             ]
         ).split("\n")
         for line in lines:
+            # Skip empty lines (happens when there are no commits in the date range)
+            if not line.strip():
+                continue
             parts = line.split(" ", 4)
+            # Skip lines that don't have enough parts
+            if len(parts) < 5:
+                continue
             author = ""
             try:
                 stamp = int(parts[0])
