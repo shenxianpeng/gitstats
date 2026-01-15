@@ -45,7 +45,7 @@ homepage = "https://shenxianpeng.github.io/gitstats/index.html"
 documentation = "https://gitstats.readthedocs.io/"
 
 [project.optional-dependencies]
-dev = ["nox"]
+dev = ["nox==2025.10.16"]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autobuild"]
 
 [tool.setuptools]
