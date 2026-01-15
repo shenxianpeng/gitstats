@@ -31,6 +31,31 @@ os.environ["LC_ALL"] = "C"
 conf = load_config()
 
 
+def parallel_map_with_fallback(func, items):
+    """Apply a function to items using multiprocessing, with sequential fallback.
+
+    Args:
+        func: Function to apply to each item
+        items: Iterable of items to process
+
+    Returns:
+        List of results from applying func to each item
+    """
+    try:
+        pool = Pool(processes=conf["processes"])
+        results = pool.map(func, items)
+        pool.terminate()
+        pool.join()
+        return results
+    except OSError as e:
+        # Fallback to sequential processing if multiprocessing fails
+        # (common in restricted environments like Netlify)
+        print(
+            f"Warning: Multiprocessing not available ({e}), falling back to sequential processing"
+        )
+        return [func(item) for item in items]
+
+
 class DataCollector:
     """Manages data collection from a revision control repository."""
 
@@ -383,10 +408,9 @@ class GitDataCollector(DataCollector):
                 revs_to_read.append((time, rev))
 
         # Read revisions from repo
-        pool = Pool(processes=conf["processes"])
-        time_rev_count = pool.map(get_num_of_files_from_rev, revs_to_read)
-        pool.terminate()
-        pool.join()
+        time_rev_count = parallel_map_with_fallback(
+            get_num_of_files_from_rev, revs_to_read
+        )
 
         # Update cache with new revisions and append then to general list
         for time, rev, count in time_rev_count:
@@ -451,10 +475,9 @@ class GitDataCollector(DataCollector):
                 blobs_to_read.append((ext, blob_id))
 
         # Get info about line count for new blob's that wasn't found in cache
-        pool = Pool(processes=conf["processes"])
-        ext_blob_linecount = pool.map(get_num_of_lines_in_blob, blobs_to_read)
-        pool.terminate()
-        pool.join()
+        ext_blob_linecount = parallel_map_with_fallback(
+            get_num_of_lines_in_blob, blobs_to_read
+        )
 
         # Update cache and write down info about number of number of lines
         for ext, blob_id, linecount in ext_blob_linecount:
