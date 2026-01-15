@@ -383,10 +383,16 @@ class GitDataCollector(DataCollector):
                 revs_to_read.append((time, rev))
 
         # Read revisions from repo
-        pool = Pool(processes=conf["processes"])
-        time_rev_count = pool.map(get_num_of_files_from_rev, revs_to_read)
-        pool.terminate()
-        pool.join()
+        try:
+            pool = Pool(processes=conf["processes"])
+            time_rev_count = pool.map(get_num_of_files_from_rev, revs_to_read)
+            pool.terminate()
+            pool.join()
+        except (OSError, FileNotFoundError) as e:
+            # Fallback to sequential processing if multiprocessing fails
+            # (common in restricted environments like Netlify)
+            print(f"Warning: Multiprocessing not available ({e}), falling back to sequential processing")
+            time_rev_count = [get_num_of_files_from_rev(rev) for rev in revs_to_read]
 
         # Update cache with new revisions and append then to general list
         for time, rev, count in time_rev_count:
@@ -451,10 +457,16 @@ class GitDataCollector(DataCollector):
                 blobs_to_read.append((ext, blob_id))
 
         # Get info about line count for new blob's that wasn't found in cache
-        pool = Pool(processes=conf["processes"])
-        ext_blob_linecount = pool.map(get_num_of_lines_in_blob, blobs_to_read)
-        pool.terminate()
-        pool.join()
+        try:
+            pool = Pool(processes=conf["processes"])
+            ext_blob_linecount = pool.map(get_num_of_lines_in_blob, blobs_to_read)
+            pool.terminate()
+            pool.join()
+        except (OSError, FileNotFoundError) as e:
+            # Fallback to sequential processing if multiprocessing fails
+            # (common in restricted environments like Netlify)
+            print(f"Warning: Multiprocessing not available ({e}), falling back to sequential processing")
+            ext_blob_linecount = [get_num_of_lines_in_blob(blob) for blob in blobs_to_read]
 
         # Update cache and write down info about number of number of lines
         for ext, blob_id, linecount in ext_blob_linecount:
