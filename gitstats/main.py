@@ -391,7 +391,9 @@ class GitDataCollector(DataCollector):
         except (OSError, FileNotFoundError) as e:
             # Fallback to sequential processing if multiprocessing fails
             # (common in restricted environments like Netlify)
-            print(f"Warning: Multiprocessing not available ({e}), falling back to sequential processing")
+            print(
+                f"Warning: Multiprocessing not available ({e}), falling back to sequential processing"
+            )
             time_rev_count = [get_num_of_files_from_rev(rev) for rev in revs_to_read]
 
         # Update cache with new revisions and append then to general list
@@ -465,8 +467,12 @@ class GitDataCollector(DataCollector):
         except (OSError, FileNotFoundError) as e:
             # Fallback to sequential processing if multiprocessing fails
             # (common in restricted environments like Netlify)
-            print(f"Warning: Multiprocessing not available ({e}), falling back to sequential processing")
-            ext_blob_linecount = [get_num_of_lines_in_blob(blob) for blob in blobs_to_read]
+            print(
+                f"Warning: Multiprocessing not available ({e}), falling back to sequential processing"
+            )
+            ext_blob_linecount = [
+                get_num_of_lines_in_blob(blob) for blob in blobs_to_read
+            ]
 
         # Update cache and write down info about number of number of lines
         for ext, blob_id, linecount in ext_blob_linecount:
