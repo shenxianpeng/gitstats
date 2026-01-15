@@ -47,7 +47,7 @@ def parallel_map_with_fallback(func, items):
         pool.terminate()
         pool.join()
         return results
-    except (OSError, FileNotFoundError) as e:
+    except OSError as e:
         # Fallback to sequential processing if multiprocessing fails
         # (common in restricted environments like Netlify)
         print(
