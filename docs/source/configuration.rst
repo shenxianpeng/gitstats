@@ -64,10 +64,10 @@ Filtering examples:
    # Filter commits by commit message pattern
    gitstats . report -c commit_message_grep="bug fix"
 
-   # Filter commits by commit message pattern
+   # Filter commits matching any pattern (OR logic)
    gitstats . report -c commit_message_grep="sec|SQL|SQLi"
 
-   # Filter commits by commit message pattern
+   # Filter commits matching ALL patterns (AND logic)
    gitstats . report -c commit_message_grep="sec&SQLi"
 
    # Combine multiple filters
