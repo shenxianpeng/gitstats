@@ -25,7 +25,6 @@ DEFAULT_CONFIG = {
     "start_date": "",  # Starting date for commits, passed as --since to Git (optional).
     "end_date": "",  # Ending date for commits, passed as --until to Git (optional). Format: YYYY-MM-DD.
     "authors": "",  # Comma-separated list of authors to filter commits (empty = include all authors).
-    "commit_message_grep": "",  # Search expression to filter commits by message (empty = include all commits).
     "exclude_exts": "",  # File extensions to exclude from line counting (others detected via null bytes).
 }
 

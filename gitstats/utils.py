@@ -225,43 +225,6 @@ def get_log_range(defaultrange="HEAD", end_only=True):
         for author in authors_list:
             options.append('--author="%s"' % author)
 
-    # Commit message filtering
-    if len(conf["commit_message_grep"]) > 0:
-        grep_pattern = conf["commit_message_grep"]
-        # Check if pattern uses AND (&) or OR (|) operator
-        if "&" in grep_pattern and "|" in grep_pattern:
-            # Mixed operators: AND takes precedence, split by & first, then | within each AND group
-            # This means: (A|B)&(C|D) -> must match (A or B) AND (C or D)
-            and_groups = [g.strip() for g in grep_pattern.split("&") if g.strip()]
-            if len(and_groups) > 1:
-                # Multiple AND groups: use --all-match
-                for group in and_groups:
-                    # Within each AND group, split by | for OR
-                    or_patterns = [p.strip() for p in group.split("|") if p.strip()]
-                    for pattern in or_patterns:
-                        options.append('--grep="%s"' % pattern)
-                options.append("--all-match")
-            else:
-                # Only OR patterns within single group
-                or_patterns = [p.strip() for p in and_groups[0].split("|") if p.strip()]
-                for pattern in or_patterns:
-                    options.append('--grep="%s"' % pattern)
-        elif "&" in grep_pattern:
-            # AND operation: split on & and use --all-match
-            grep_patterns = [p.strip() for p in grep_pattern.split("&") if p.strip()]
-            for pattern in grep_patterns:
-                options.append('--grep="%s"' % pattern)
-            if len(grep_patterns) > 1:
-                options.append("--all-match")
-        elif "|" in grep_pattern:
-            # OR operation: split on | (Git treats multiple --grep as OR)
-            grep_patterns = [p.strip() for p in grep_pattern.split("|") if p.strip()]
-            for pattern in grep_patterns:
-                options.append('--grep="%s"' % pattern)
-        else:
-            # Single pattern, no operators
-            options.append('--grep="%s"' % grep_pattern)
-
     # Combine options with commit range
     if options:
         return '%s "%s"' % (" ".join(options), commit_range)
