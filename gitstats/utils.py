@@ -223,7 +223,9 @@ def get_log_range(defaultrange="HEAD", end_only=True):
             author.strip() for author in conf["authors"].split(",") if author.strip()
         ]
         for author in authors_list:
-            options.append('--author="%s"' % author)
+            # Escape possible double quotes or special characters in author
+            safe_author = author.replace('"', r'\"')
+            options.append(f'--author="{safe_author}"')
 
     # Combine options with commit range
     if options:
