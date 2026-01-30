@@ -208,8 +208,28 @@ def get_stat_summary_counts(line):
 
 def get_log_range(defaultrange="HEAD", end_only=True):
     commit_range = get_commit_range(defaultrange, end_only)
+    # Build git log options
+    options = []
+
+    # Date range filtering
     if len(conf["start_date"]) > 0:
-        return '--since="%s" "%s"' % (conf["start_date"], commit_range)
+        options.append('--since="%s"' % conf["start_date"])
+    if len(conf["end_date"]) > 0:
+        options.append('--until="%s"' % conf["end_date"])
+
+    # Author filtering
+    if len(conf["authors"]) > 0:
+        authors_list = [
+            author.strip() for author in conf["authors"].split(",") if author.strip()
+        ]
+        for author in authors_list:
+            # Escape possible double quotes or special characters in author
+            safe_author = author.replace('"', r"\"")
+            options.append(f'--author="{safe_author}"')
+
+    # Combine options with commit range
+    if options:
+        return '%s "%s"' % (" ".join(options), commit_range)
     return commit_range
 
 

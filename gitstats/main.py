@@ -173,10 +173,8 @@ class GitDataCollector(DataCollector):
 
         # tags
         # Only include tags that are reachable within the commit range
-        commit_range = get_commit_range("HEAD", False)
-        tag_commits = (
-            get_pipe_output([f"git rev-list {commit_range}"]).strip().split("\n")
-        )
+        log_range = get_log_range("HEAD", False)
+        tag_commits = get_pipe_output([f"git rev-list {log_range}"]).strip().split("\n")
         tag_commits_set = set(tag_commits) if tag_commits[0] else set()
 
         lines = get_pipe_output(["git show-ref --tags"]).split("\n")
@@ -210,7 +208,7 @@ class GitDataCollector(DataCollector):
 
         # collect info on tags, starting from latest
         # Only collect statistics for commits within our range
-        commit_range = get_commit_range("HEAD", False)
+        log_range = get_log_range("HEAD", False)
         tags_sorted_by_date_desc = [
             el[1]
             for el in reversed(
@@ -223,8 +221,8 @@ class GitDataCollector(DataCollector):
             cmd = f'git shortlog -s "{tag}"'
             if prev is not None:
                 cmd += f' "^{prev}"'
-            # Intersect with our commit range
-            cmd += f" {commit_range}"
+            # Intersect with our commit range and apply filters
+            cmd += f" {log_range}"
             output = get_pipe_output([cmd])
             if len(output) == 0:
                 continue
@@ -250,7 +248,13 @@ class GitDataCollector(DataCollector):
             ]
         ).split("\n")
         for line in lines:
+            # Skip empty lines (happens when there are no commits in the date range)
+            if not line.strip():
+                continue
             parts = line.split(" ", 4)
+            # Skip lines that don't have enough parts
+            if len(parts) < 5:
+                continue
             author = ""
             try:
                 stamp = int(parts[0])
