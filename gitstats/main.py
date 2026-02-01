@@ -798,7 +798,7 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
         python_cmd = "python" if os.name == "nt" else "python3"
         print("To view the report, run:")
         print()
-        print(f"  {python_cmd} -m http.server 8000 -d {outputpath}")
+        print(f"  {python_cmd} -m http.server 8000 --bind 127.0.0.1 -d {outputpath}")
         print()
 
     return 0

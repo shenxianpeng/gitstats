@@ -51,7 +51,7 @@ def preview(session: nox.Session) -> None:
     build(session)  # Generate report first
     python_cmd = "python" if os.name == "nt" else "python3"
     session.run(
-        python_cmd, "-m", "http.server", "8000", "-d", "test-report", external=True
+        python_cmd, "-m", "http.server", "8000", "--bind", "127.0.0.1", "-d", "test-report", external=True
     )
 
 
