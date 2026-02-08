@@ -302,8 +302,8 @@ Best Practices
 
 1. **API Costs**: Enable caching to avoid regenerating summaries
 2. **Privacy**: Use Ollama for sensitive repositories
-3. **Model Selection**: 
-   
+3. **Model Selection**:
+
    * GPT-4: Best quality, higher cost
    * GPT-3.5-turbo: Good balance
    * Llama2: Free, local, good for testing

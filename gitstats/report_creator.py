@@ -73,11 +73,11 @@ class HTMLReportCreator(ReportCreator):
         self.create_files_html(data, path)
         self.create_lines_html(data, path)
         self.create_tags_html(data, path)
-        
+
         # Create AI Insights page if AI is enabled
-        if hasattr(data, 'ai_summaries') and data.ai_summaries:
+        if hasattr(data, "ai_summaries") and data.ai_summaries:
             self.create_ai_insights_html(data, path)
-        
+
         self.create_graphs(path)
 
     def create_index_html(self, data, path):
@@ -763,89 +763,91 @@ class HTMLReportCreator(ReportCreator):
         self.print_header(f)
         f.write("<h1>🤖 AI-Powered Insights</h1>")
         self.print_nav(f)
-        
+
         f.write("""
         <div class="ai-insights-intro">
-            <p>This page contains AI-generated analysis and insights based on your repository statistics. 
+            <p>This page contains AI-generated analysis and insights based on your repository statistics.
             The analysis focuses on human contributions and excludes automated bot accounts.</p>
         </div>
         """)
-        
+
         # Get all AI summaries
         summaries = data.ai_summaries
-        
+
         # Define sections with titles and descriptions
         sections = [
             {
-                'key': 'index',
-                'title': 'Project Overview',
-                'icon': '📊',
-                'description': 'Comprehensive analysis of the repository\'s development history and overall health'
+                "key": "index",
+                "title": "Project Overview",
+                "icon": "📊",
+                "description": "Comprehensive analysis of the repository's development history and overall health",
             },
             {
-                'key': 'activity',
-                'title': 'Activity Patterns',
-                'icon': '📈',
-                'description': 'Insights into commit frequency, development rhythm, and temporal patterns'
+                "key": "activity",
+                "title": "Activity Patterns",
+                "icon": "📈",
+                "description": "Insights into commit frequency, development rhythm, and temporal patterns",
             },
             {
-                'key': 'authors',
-                'title': 'Team Collaboration',
-                'icon': '👥',
-                'description': 'Analysis of contributor dynamics, team diversity, and collaboration patterns'
+                "key": "authors",
+                "title": "Team Collaboration",
+                "icon": "👥",
+                "description": "Analysis of contributor dynamics, team diversity, and collaboration patterns",
             },
             {
-                'key': 'lines',
-                'title': 'Code Evolution',
-                'icon': '💻',
-                'description': 'Understanding of codebase growth, code churn, and maintenance patterns'
-            }
+                "key": "lines",
+                "title": "Code Evolution",
+                "icon": "💻",
+                "description": "Understanding of codebase growth, code churn, and maintenance patterns",
+            },
         ]
-        
+
         # Generate sections
         for section in sections:
-            key = section['key']
+            key = section["key"]
             if key not in summaries:
                 continue
-                
+
             summary_data = summaries[key]
-            summary_text = summary_data.get('summary', '')
-            error = summary_data.get('error')
-            
-            f.write(f'<div class="ai-insight-section">')
+            summary_text = summary_data.get("summary", "")
+            error = summary_data.get("error")
+
+            f.write('<div class="ai-insight-section">')
             f.write(f'<h2 id="{key}">{section["icon"]} {section["title"]}</h2>')
-            f.write(f'<p class="section-description"><em>{section["description"]}</em></p>')
-            
+            f.write(
+                f'<p class="section-description"><em>{section["description"]}</em></p>'
+            )
+
             if error:
-                f.write(f'''
+                f.write(f"""
                 <div class="ai-summary-error">
                     <p><strong>⚠️ Analysis Unavailable</strong></p>
                     <p><em>{error}</em></p>
                 </div>
-                ''')
+                """)
             elif summary_text:
-                f.write(f'''
+                f.write(f"""
                 <div class="ai-summary-content">
                     {summary_text}
                 </div>
-                ''')
+                """)
             else:
-                f.write('<p><em>No analysis available for this section.</em></p>')
-            
-            f.write('</div>')
-        
+                f.write("<p><em>No analysis available for this section.</em></p>")
+
+            f.write("</div>")
+
         # Add disclaimer
         f.write("""
         <div class="ai-disclaimer">
             <h3>About AI Insights</h3>
-            <p>These insights are generated using artificial intelligence based on repository statistics. 
-            While AI analysis can identify patterns and trends, it should be considered as supplementary 
+            <p>These insights are generated using artificial intelligence based on repository statistics.
+            While AI analysis can identify patterns and trends, it should be considered as supplementary
             information alongside your own understanding of the project.</p>
-            <p><strong>Note:</strong> Bot accounts (such as dependabot[bot], pre-commit-ci[bot], and other 
+            <p><strong>Note:</strong> Bot accounts (such as dependabot[bot], pre-commit-ci[bot], and other
             automated contributors) are automatically excluded from the analysis to focus on human team dynamics.</p>
         </div>
         """)
-        
+
         f.write("</body></html>")
         f.close()
 
@@ -1149,10 +1151,12 @@ plot """
             file: A writable file-like object opened in text mode where the navigation HTML will be written.
         """
         # Check if AI insights are available
-        has_ai = hasattr(self.data, 'ai_summaries') and self.data.ai_summaries
-        
-        ai_link = '<li><a href="ai-insights.html">🤖 AI Insights</a></li>' if has_ai else ''
-        
+        has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
+
+        ai_link = (
+            '<li><a href="ai-insights.html">🤖 AI Insights</a></li>' if has_ai else ""
+        )
+
         file.write(
             f"""
             <div class="nav">
@@ -1173,41 +1177,40 @@ plot """
     def get_ai_summary_html(self, page_type):
         """
         Generate HTML for AI-powered summary section.
-        
+
         Args:
             page_type: The type of page (index, activity, authors, lines)
-            
+
         Returns:
             HTML string for the AI summary section
         """
-        if not hasattr(self.data, 'ai_summaries') or not self.data.ai_summaries:
+        if not hasattr(self.data, "ai_summaries") or not self.data.ai_summaries:
             return ""
-        
+
         summary_data = self.data.ai_summaries.get(page_type, {})
-        summary_text = summary_data.get('summary', '')
-        error = summary_data.get('error')
-        
+        summary_text = summary_data.get("summary", "")
+        error = summary_data.get("error")
+
         if error:
             # Show error message with graceful degradation
-            return f'''
+            return f"""
             <div class="ai-summary ai-summary-error">
                 <h3>🤖 AI Insights</h3>
                 <p><em>AI analysis is currently unavailable: {error}</em></p>
             </div>
-            '''
-        
+            """
+
         if not summary_text:
             return ""
-        
-        return f'''
+
+        return f"""
         <div class="ai-summary">
             <h3>🤖 AI-Powered Insights</h3>
             <div class="ai-summary-content">
                 {summary_text}
             </div>
         </div>
-        '''
-
+        """
 
 
 def html_header(level, text):
