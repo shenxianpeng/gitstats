@@ -47,6 +47,12 @@ documentation = "https://gitstats.readthedocs.io/"
 [project.optional-dependencies]
 dev = ["nox"]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autobuild"]
+ai = [
+    "openai>=1.0",
+    "anthropic>=0.8",
+    "google-generativeai>=0.3",
+    "requests>=2.31"
+]
 
 [tool.setuptools]
 zip-safe = false
