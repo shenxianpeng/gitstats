@@ -148,13 +148,17 @@ class AISummarizer:
         Sanitize AI-generated HTML content to prevent XSS.
         Only allows safe tags: p, ul, ol, li, strong, em, br, h1-h6.
         Strips all attributes to prevent event handlers and other malicious code.
+        
+        Note: This provides basic protection but for production use,
+        consider using a dedicated HTML sanitization library like bleach.
         """
         # Allowed tags (without attributes)
         allowed_tags = ['p', 'ul', 'ol', 'li', 'strong', 'em', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
         
-        # Remove any script or dangerous tags
-        content = re.sub(r'<script[^>]*>.*?</script>', '', content, flags=re.DOTALL | re.IGNORECASE)
-        content = re.sub(r'<style[^>]*>.*?</style>', '', content, flags=re.DOTALL | re.IGNORECASE)
+        # Remove any script or style tags with all possible whitespace variations
+        # Use [\s\S] to match any character including newlines
+        content = re.sub(r'<\s*script[^>]*>[\s\S]*?<\s*/\s*script[^>]*>', '', content, flags=re.IGNORECASE)
+        content = re.sub(r'<\s*style[^>]*>[\s\S]*?<\s*/\s*style[^>]*>', '', content, flags=re.IGNORECASE)
         
         # Function to strip attributes from allowed tags and escape disallowed tags
         def sanitize_tag(match):
