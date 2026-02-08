@@ -61,8 +61,8 @@ def load_config(file_path="gitstats.conf") -> dict:
             # Convert to appropriate type
             if v.isdigit():
                 _config[k] = int(v)
-            elif v.lower() in ('true', 'false'):
-                _config[k] = v.lower() == 'true'
+            elif v.lower() in ("true", "false"):
+                _config[k] = v.lower() == "true"
             else:
                 _config[k] = v
     return _config
