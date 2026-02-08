@@ -5,10 +5,11 @@ Generates intelligent summaries for different report pages using configured AI p
 """
 
 import hashlib
-import pickle
+import json
 import logging
 from typing import Dict, Any, Optional
 from pathlib import Path
+import html
 
 from gitstats.ai_providers import AIProviderFactory, AIProviderError
 
@@ -92,13 +93,17 @@ class AISummarizer:
         if not self.cache_enabled or not self.cache_dir:
             return None
 
-        cache_file = self.cache_dir / f"{cache_key}.pkl"
+        cache_file = self.cache_dir / f"{cache_key}.json"
         if cache_file.exists():
             try:
-                with open(cache_file, "rb") as f:
-                    cached_data = pickle.load(f)
-                    logger.info(f"Using cached AI summary for {cache_key}")
-                    return cached_data["summary"]
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    cached_data = json.load(f)
+                    # Validate expected schema
+                    if isinstance(cached_data, dict) and "summary" in cached_data:
+                        logger.info(f"Using cached AI summary for {cache_key}")
+                        return cached_data["summary"]
+                    else:
+                        logger.warning(f"Invalid cache format for {cache_key}")
             except Exception as e:
                 logger.warning(f"Failed to load cached summary: {str(e)}")
         return None
@@ -108,10 +113,10 @@ class AISummarizer:
         if not self.cache_enabled or not self.cache_dir:
             return
 
-        cache_file = self.cache_dir / f"{cache_key}.pkl"
+        cache_file = self.cache_dir / f"{cache_key}.json"
         try:
-            with open(cache_file, "wb") as f:
-                pickle.dump({"summary": summary}, f)
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump({"summary": summary}, f, ensure_ascii=False, indent=2)
             logger.info(f"Cached AI summary for {cache_key}")
         except Exception as e:
             logger.warning(f"Failed to cache summary: {str(e)}")
@@ -136,18 +141,64 @@ class AISummarizer:
             if not self._is_bot_account(name)
         }
 
-    def prepare_index_data(self, data: Dict[str, Any]) -> str:
-        """Prepare data context for index page summary."""
-        commits_count = data.get("total_commits", 0)
-        files_count = data.get("total_files", 0)
-        lines_of_code = data.get("total_lines_of_code", 0)
+    def _sanitize_html(self, content: str) -> str:
+        """
+        Sanitize AI-generated HTML content to prevent XSS.
+        Only allows safe tags: p, ul, ol, li, strong, em, br, h1-h6.
+        """
+        import re
+        
+        # Allowed tags
+        allowed_tags = ['p', 'ul', 'ol', 'li', 'strong', 'em', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
+        
+        # Remove any script or dangerous tags
+        content = re.sub(r'<script[^>]*>.*?</script>', '', content, flags=re.DOTALL | re.IGNORECASE)
+        content = re.sub(r'<style[^>]*>.*?</style>', '', content, flags=re.DOTALL | re.IGNORECASE)
+        content = re.sub(r'on\w+="[^"]*"', '', content, flags=re.IGNORECASE)  # Remove event handlers
+        content = re.sub(r'on\w+=\'[^\']*\'', '', content, flags=re.IGNORECASE)
+        
+        # Escape any tag that's not in the allowed list
+        def replace_tag(match):
+            tag_name = match.group(1).lower().rstrip('/')
+            tag_name_clean = tag_name.split()[0]  # Get just the tag name without attributes
+            if tag_name_clean in allowed_tags:
+                return match.group(0)
+            else:
+                return html.escape(match.group(0))
+        
+        content = re.sub(r'<(/?)(\w+)[^>]*>', replace_tag, content)
+        
+        return content
 
-        first_commit = data.get("first_commit_date", "Unknown")
-        last_commit = data.get("last_commit_date", "Unknown")
-        active_days = data.get("active_days", 0)
+    def prepare_index_data(self, data) -> str:
+        """Prepare data context for index page summary."""
+        # Access data object attributes directly
+        commits_count = getattr(data, "total_commits", 0)
+        files_count = getattr(data, "total_files", 0)
+        lines_of_code = getattr(data, "total_lines", 0)
+
+        # Convert timestamps to readable dates
+        first_commit_stamp = getattr(data, "first_commit_stamp", 0)
+        last_commit_stamp = getattr(data, "last_commit_stamp", 0)
+        
+        import datetime
+        first_commit = (
+            datetime.datetime.fromtimestamp(first_commit_stamp).strftime("%Y-%m-%d")
+            if first_commit_stamp
+            else "Unknown"
+        )
+        last_commit = (
+            datetime.datetime.fromtimestamp(last_commit_stamp).strftime("%Y-%m-%d")
+            if last_commit_stamp
+            else "Unknown"
+        )
+        
+        # active_days is a set, get its length
+        active_days_set = getattr(data, "active_days", set())
+        active_days = len(active_days_set) if isinstance(active_days_set, set) else 0
 
         # Get top human authors (filter out bots)
-        authors = data.get("authors", {})
+        authors = getattr(data, "authors", {})
         human_authors = self._filter_human_authors(authors)
         authors_count = len(human_authors)
         bot_count = len(authors) - len(human_authors)
@@ -179,13 +230,12 @@ Note: Bot accounts (like dependabot[bot], pre-commit-ci[bot]) are excluded from 
 """
         return context
 
-    def prepare_activity_data(self, data: Dict[str, Any]) -> str:
+    def prepare_activity_data(self, data) -> str:
         """Prepare data context for activity page summary."""
-        commits_by_year = data.get("commits_by_year", {})
-        commits_by_month = data.get("commits_by_month", {})
-        commits_by_hour = data.get("commits_by_hour_of_day", {})
-        commits_by_day = data.get("commits_by_day_of_week", {})
-        commits_by_timezone = data.get("commits_by_timezone", {})
+        commits_by_year = getattr(data, "commits_by_year", {})
+        commits_by_hour = getattr(data, "activity_by_hour_of_day", {})
+        commits_by_day = getattr(data, "activity_by_day_of_week", {})
+        commits_by_timezone = getattr(data, "commits_by_timezone", {})
 
         # Find peak activity periods
         if commits_by_hour:
@@ -230,9 +280,9 @@ Timezone Distribution: {len(commits_by_timezone)} different timezones
 """
         return context
 
-    def prepare_authors_data(self, data: Dict[str, Any]) -> str:
+    def prepare_authors_data(self, data) -> str:
         """Prepare data context for authors page summary."""
-        authors = data.get("authors", {})
+        authors = getattr(data, "authors", {})
 
         # Filter human authors (exclude bots)
         human_authors = self._filter_human_authors(authors)
@@ -290,20 +340,21 @@ Note: Bot accounts (dependabot[bot], pre-commit-ci[bot], etc.) are excluded from
 """
         return context
 
-    def prepare_lines_data(self, data: Dict[str, Any]) -> str:
+    def prepare_lines_data(self, data) -> str:
         """Prepare data context for lines page summary."""
-        total_lines = data.get("total_lines_of_code", 0)
-        total_added = data.get("total_lines_added", 0)
-        total_removed = data.get("total_lines_removed", 0)
+        total_lines = getattr(data, "total_lines", 0)
+        total_added = getattr(data, "total_lines_added", 0)
+        total_removed = getattr(data, "total_lines_removed", 0)
 
-        lines_by_date = data.get("lines_by_date", {})
+        # Use changes_by_date which contains cumulative line counts
+        changes_by_date = getattr(data, "changes_by_date", {})
 
         # Calculate growth trend
-        if lines_by_date:
-            dates = sorted(lines_by_date.keys())
+        if changes_by_date:
+            dates = sorted(changes_by_date.keys())
             if len(dates) >= 2:
-                start_lines = lines_by_date[dates[0]]
-                end_lines = lines_by_date[dates[-1]]
+                start_lines = changes_by_date[dates[0]].get("lines", 0)
+                end_lines = changes_by_date[dates[-1]].get("lines", 0)
                 growth = end_lines - start_lines
                 growth_rate = (growth / start_lines * 100) if start_lines > 0 else 0
                 trend_str = f"Growth from {start_lines:,} to {end_lines:,} lines ({growth_rate:+.1f}%)"
@@ -313,7 +364,7 @@ Note: Bot accounts (dependabot[bot], pre-commit-ci[bot], etc.) are excluded from
             trend_str = f"Current: {total_lines:,} lines"
 
         # Lines by human authors (exclude bots)
-        authors = data.get("authors", {})
+        authors = getattr(data, "authors", {})
         human_authors = self._filter_human_authors(authors)
         authors_by_lines = sorted(
             human_authors.items(),
@@ -344,14 +395,14 @@ Top 5 Contributors by Lines:
         return context
 
     def generate_summary(
-        self, page_type: str, data: Dict[str, Any], force_refresh: bool = False
+        self, page_type: str, data: Any, force_refresh: bool = False
     ) -> Dict[str, Any]:
         """
         Generate AI summary for a specific page type.
 
         Args:
             page_type: Type of page (index, activity, authors, lines)
-            data: Repository statistics data
+            data: Repository data object (GitDataCollector instance)
             force_refresh: Force regenerate even if cached
 
         Returns:
@@ -412,6 +463,9 @@ Generate your analysis:"""
             logger.info(f"Generating AI summary for {page_type} page...")
             summary = self.provider.generate_summary(data, prompt)
 
+            # Sanitize HTML output to prevent XSS
+            summary = self._sanitize_html(summary)
+
             # Cache the result
             self._save_cached_summary(cache_key, summary)
 
@@ -427,13 +481,13 @@ Generate your analysis:"""
         return result
 
     def generate_all_summaries(
-        self, data: Dict[str, Any], force_refresh: bool = False
+        self, data: Any, force_refresh: bool = False
     ) -> Dict[str, Dict[str, Any]]:
         """
         Generate summaries for all report pages.
 
         Args:
-            data: Repository statistics data
+            data: Repository data object (GitDataCollector instance)
             force_refresh: Force regenerate even if cached
 
         Returns:

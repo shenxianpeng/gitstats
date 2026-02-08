@@ -88,7 +88,7 @@ class OpenAIProvider(AIProvider):
                 "OpenAI API key not found. Set OPENAI_API_KEY environment variable or configure it."
             )
 
-        self.model = config.get("model", "gpt-4")
+        self.model = config.get("model") or "gpt-4"
         self.client = openai.OpenAI(api_key=self.api_key)
 
     def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
@@ -132,7 +132,7 @@ class ClaudeProvider(AIProvider):
                 "Claude API key not found. Set ANTHROPIC_API_KEY environment variable or configure it."
             )
 
-        self.model = config.get("model", "claude-3-5-sonnet-20241022")
+        self.model = config.get("model") or "claude-3-5-sonnet-20241022"
         self.client = self.anthropic.Anthropic(api_key=self.api_key)
 
     def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
@@ -170,7 +170,7 @@ class GeminiProvider(AIProvider):
                 "Gemini API key not found. Set GOOGLE_API_KEY environment variable or configure it."
             )
 
-        self.model_name = config.get("model", "gemini-pro")
+        self.model_name = config.get("model") or "gemini-pro"
         self.genai.configure(api_key=self.api_key)
         self.model = self.genai.GenerativeModel(self.model_name)
 
@@ -199,7 +199,7 @@ class OllamaProvider(AIProvider):
             )
 
         self.base_url = config.get("base_url", "http://localhost:11434")
-        self.model = config.get("model", "llama2")
+        self.model = config.get("model") or "llama2"
 
     def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
         """Generate summary using Ollama API."""
@@ -217,10 +217,21 @@ class OllamaProvider(AIProvider):
 
 
 class CopilotProvider(AIProvider):
-    """GitHub Copilot provider (using OpenAI-compatible endpoint)."""
+    """
+    GitHub Copilot provider (EXPERIMENTAL - Limited Support).
+    
+    Note: This provider is currently a placeholder and may not work without
+    proper Copilot-specific endpoint configuration. GitHub Copilot's API
+    endpoints differ from standard OpenAI endpoints.
+    """
 
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
+        logger.warning(
+            "GitHub Copilot provider is experimental and may not work without "
+            "proper endpoint configuration. Consider using OpenAI, Claude, or Gemini instead."
+        )
+        
         try:
             import openai
 
@@ -238,11 +249,21 @@ class CopilotProvider(AIProvider):
             )
 
         # Use gpt-4 for Copilot
-        self.model = config.get("model", "gpt-4")
+        self.model = config.get("model") or "gpt-4"
 
-        # Note: This is a placeholder. GitHub Copilot's API might have different endpoints
-        # For now, we'll use OpenAI's API structure, but this may need adjustment
-        self.client = openai.OpenAI(api_key=self.api_key)
+        # Note: This is a placeholder implementation
+        # GitHub Copilot requires a specific base_url which is not publicly documented
+        # Without the correct endpoint, authentication will fail
+        base_url = config.get("base_url")
+        if base_url:
+            self.client = openai.OpenAI(api_key=self.api_key, base_url=base_url)
+        else:
+            # This will likely fail - Copilot needs a custom endpoint
+            logger.warning(
+                "No base_url configured for Copilot provider. "
+                "API calls will likely fail without a Copilot-specific endpoint."
+            )
+            self.client = openai.OpenAI(api_key=self.api_key)
 
     def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
         """Generate summary using GitHub Copilot."""

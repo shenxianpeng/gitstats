@@ -775,7 +775,7 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
             summarizer.set_cache_dir(os.path.join(outputpath, ".ai_cache"))
             force_refresh = conf.get("refresh_ai", False)
             data.ai_summaries = summarizer.generate_all_summaries(
-                data.__dict__, force_refresh
+                data, force_refresh
             )
             print("AI summaries generated successfully")
         except Exception as e:
