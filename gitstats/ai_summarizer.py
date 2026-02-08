@@ -7,6 +7,8 @@ Generates intelligent summaries for different report pages using configured AI p
 import hashlib
 import json
 import logging
+import re
+import datetime
 from typing import Dict, Any, Optional
 from pathlib import Path
 import html
@@ -145,28 +147,36 @@ class AISummarizer:
         """
         Sanitize AI-generated HTML content to prevent XSS.
         Only allows safe tags: p, ul, ol, li, strong, em, br, h1-h6.
+        Strips all attributes to prevent event handlers and other malicious code.
         """
-        import re
-        
-        # Allowed tags
+        # Allowed tags (without attributes)
         allowed_tags = ['p', 'ul', 'ol', 'li', 'strong', 'em', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6']
         
         # Remove any script or dangerous tags
         content = re.sub(r'<script[^>]*>.*?</script>', '', content, flags=re.DOTALL | re.IGNORECASE)
         content = re.sub(r'<style[^>]*>.*?</style>', '', content, flags=re.DOTALL | re.IGNORECASE)
-        content = re.sub(r'on\w+="[^"]*"', '', content, flags=re.IGNORECASE)  # Remove event handlers
-        content = re.sub(r'on\w+=\'[^\']*\'', '', content, flags=re.IGNORECASE)
         
-        # Escape any tag that's not in the allowed list
-        def replace_tag(match):
-            tag_name = match.group(1).lower().rstrip('/')
-            tag_name_clean = tag_name.split()[0]  # Get just the tag name without attributes
-            if tag_name_clean in allowed_tags:
-                return match.group(0)
+        # Function to strip attributes from allowed tags and escape disallowed tags
+        def sanitize_tag(match):
+            full_tag = match.group(0)
+            closing_slash = match.group(1) or ''
+            tag_name = match.group(2).lower().split()[0]  # Get just the tag name
+            
+            if tag_name in allowed_tags:
+                # Return tag without attributes (just tag name)
+                if closing_slash:
+                    return f'</{tag_name}>'
+                else:
+                    # For self-closing tags like br
+                    if tag_name == 'br':
+                        return '<br>'
+                    return f'<{tag_name}>'
             else:
-                return html.escape(match.group(0))
+                # Escape disallowed tags
+                return html.escape(full_tag)
         
-        content = re.sub(r'<(/?)(\w+)[^>]*>', replace_tag, content)
+        # Match all tags and sanitize them
+        content = re.sub(r'<(/?)([a-zA-Z][a-zA-Z0-9]*)[^>]*/?>', sanitize_tag, content)
         
         return content
 
@@ -181,7 +191,6 @@ class AISummarizer:
         first_commit_stamp = getattr(data, "first_commit_stamp", 0)
         last_commit_stamp = getattr(data, "last_commit_stamp", 0)
         
-        import datetime
         first_commit = (
             datetime.datetime.fromtimestamp(first_commit_stamp).strftime("%Y-%m-%d")
             if first_commit_stamp
