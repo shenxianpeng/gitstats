@@ -82,6 +82,59 @@ Here is a list of some features of ``gitstats``:
 * **Customizable**: config values through ``gitstats.conf``.
 * **Cross-platform**: works on Linux, Windows, and macOS.
 
+AI-Powered Features 🤖
+-----------------------
+
+GitStats now supports AI-powered insights to enhance your repository analysis. Get detailed, natural language summaries and actionable recommendations on:
+
+* **Project Overview**: Comprehensive analysis of development history and project health
+* **Activity Patterns**: Insights into commit frequency, peak periods, and development rhythm
+* **Team Collaboration**: Analysis of contribution distribution and potential knowledge silos
+* **Code Evolution**: Understanding of codebase growth patterns and maintenance burden
+
+**Supported AI Providers:**
+
+* OpenAI (GPT-4, GPT-3.5)
+* Anthropic Claude
+* Google Gemini
+* Ollama (local LLMs)
+* GitHub Copilot
+
+**Installation with AI Support:**
+
+.. code-block:: bash
+
+   pip install gitstats[ai]
+
+**Basic Usage:**
+
+.. code-block:: bash
+
+   # Enable AI with OpenAI
+   export OPENAI_API_KEY=your-api-key
+   gitstats --ai --ai-provider openai <gitpath> <outputpath>
+
+   # Use local LLM with Ollama
+   gitstats --ai --ai-provider ollama --ai-model llama2 <gitpath> <outputpath>
+
+   # Generate Chinese summaries
+   gitstats --ai --ai-language zh <gitpath> <outputpath>
+
+**Configuration:**
+
+Add these options to ``gitstats.conf``:
+
+.. code-block:: ini
+
+   [gitstats]
+   ai_enabled = true
+   ai_provider = openai
+   ai_model = gpt-4
+   ai_language = en
+   ai_cache_enabled = true
+
+See the `AI Integration Documentation <https://gitstats.readthedocs.io/>`_ for detailed setup instructions for each AI provider.
+
 .. end-of-about
 
 Contributing
