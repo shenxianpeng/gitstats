@@ -80,7 +80,7 @@ class HTMLReportCreator(ReportCreator):
         format = "%Y-%m-%d %H:%M:%S"
         self.print_header(f)
 
-        f.write("<h1>GitStats - %s</h1>" % data.project_name)
+        f.write("<h1>General</h1>")
 
         self.print_nav(f)
 
