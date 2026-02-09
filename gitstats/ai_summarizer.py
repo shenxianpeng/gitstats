@@ -422,16 +422,16 @@ Top 5 Contributors by Lines:
             # Prepare page-specific data
             if page_type == "index":
                 data_context = self.prepare_index_data(data)
-                prompt_focus = "Provide a comprehensive overview of this repository's development history, highlighting key statistics, contribution patterns, and overall project health. Identify any notable trends or insights."
+                prompt_focus = "provide a high-level overview focusing on the most interesting aspects of this repository's development."
             elif page_type == "activity":
                 data_context = self.prepare_activity_data(data)
-                prompt_focus = "Analyze the activity patterns over time. Identify trends in commit frequency, peak activity periods, and any notable changes in development pace. Provide insights into the project's development rhythm."
+                prompt_focus = "identify the most notable patterns in commit activity and development rhythm."
             elif page_type == "authors":
                 data_context = self.prepare_authors_data(data)
-                prompt_focus = "Analyze the contributor dynamics and team collaboration patterns. Discuss contribution distribution, potential knowledge silos, team diversity, and recommendations for healthy collaboration."
+                prompt_focus = "highlight key observations about the contributor community and collaboration patterns."
             elif page_type == "lines":
                 data_context = self.prepare_lines_data(data)
-                prompt_focus = "Analyze the codebase evolution in terms of code volume. Discuss growth patterns, code churn, and what these metrics might indicate about the project's maturity and maintenance burden."
+                prompt_focus = "summarize the codebase growth trajectory and what it indicates about the project."
             else:
                 result["error"] = f"Unknown page type: {page_type}"
                 return result
@@ -454,10 +454,12 @@ Top 5 Contributors by Lines:
 {data_context}
 
 Requirements:
-- Provide detailed analysis with 3-5 paragraphs
-- Include specific numbers and percentages from the data
-- Identify trends, patterns, and anomalies
-- Offer actionable insights or recommendations where relevant
+- Keep analysis concise: 2-3 short paragraphs maximum
+- Start with 2-3 key findings as bullet points using <ul><li><strong>Key finding</strong>: explanation</li></ul>
+- Use specific numbers and percentages to support your points
+- Avoid over-interpretation - if it's a small or open-source project, having 1-2 main contributors is normal
+- Focus on actionable insights rather than generic recommendations
+- Use clear, conversational language rather than academic tone
 - Format your response in HTML (use <p>, <ul>, <li>, <strong>, <em> tags)
 - {language_instruction}
 
