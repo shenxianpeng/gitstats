@@ -12,6 +12,7 @@ Welcome to GitStats documentation!
    getting-started
    configuration
    integration
+   ai-integration
    faq
 
 .. toctree::
