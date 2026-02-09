@@ -58,11 +58,11 @@ class AIProvider(ABC):
             except Exception as e:
                 if attempt == self.max_retries - 1:
                     raise AIProviderError(
-                        f"Failed after {self.max_retries} attempts: {str(e)}"
-                    )
+                        f"Failed after {self.max_retries} attempts: {e}"
+                    ) from e
                 delay = self.retry_delay * (2**attempt)
                 logger.warning(
-                    f"Attempt {attempt + 1} failed, retrying in {delay}s: {str(e)}"
+                    f"Attempt {attempt + 1} failed, retrying in {delay}s: {e}"
                 )
                 time.sleep(delay)
 
@@ -79,7 +79,7 @@ class OpenAIProvider(AIProvider):
         except ImportError:
             raise AIProviderError(
                 "openai package not installed. Install with: pip install openai"
-            )
+            ) from None
 
         # Get API key from config or environment
         self.api_key = config.get("api_key") or os.environ.get("OPENAI_API_KEY")
@@ -124,7 +124,7 @@ class ClaudeProvider(AIProvider):
         except ImportError:
             raise AIProviderError(
                 "anthropic package not installed. Install with: pip install anthropic"
-            )
+            ) from None
 
         self.api_key = config.get("api_key") or os.environ.get("ANTHROPIC_API_KEY")
         if not self.api_key:
@@ -162,7 +162,7 @@ class GeminiProvider(AIProvider):
         except ImportError:
             raise AIProviderError(
                 "google-generativeai package not installed. Install with: pip install google-generativeai"
-            )
+            ) from None
 
         self.api_key = config.get("api_key") or os.environ.get("GOOGLE_API_KEY")
         if not self.api_key:
@@ -196,7 +196,7 @@ class OllamaProvider(AIProvider):
         except ImportError:
             raise AIProviderError(
                 "requests package not installed. Install with: pip install requests"
-            )
+            ) from None
 
         self.base_url = config.get("base_url", "http://localhost:11434")
         self.model = config.get("model", "llama2")
@@ -228,7 +228,7 @@ class CopilotProvider(AIProvider):
         except ImportError:
             raise AIProviderError(
                 "openai package not installed. Install with: pip install openai"
-            )
+            ) from None
 
         # GitHub Copilot uses a different endpoint
         self.api_key = config.get("api_key") or os.environ.get("GITHUB_TOKEN")

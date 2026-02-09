@@ -83,7 +83,7 @@ Google's advanced AI model for analysis and insights.
 
 **Setup:**
 
-1. Get your API key from `Google AI Studio <https://makersuite.google.com/app/apikey>`_
+1. Get your API key from `Google AI Studio <https://aistudio.google.com/app/api-keys>`_
 
 2. Set environment variable:
 
@@ -372,10 +372,10 @@ Examples
 .. code-block:: bash
 
    export ANTHROPIC_API_KEY=sk-ant-...
-   gitstats --ai \\
-            --ai-provider claude \\
-            --ai-model claude-3-5-sonnet-20241022 \\
-            --ai-language zh \\
+   gitstats --ai \
+            --ai-provider claude \
+            --ai-model claude-3-5-sonnet-20241022 \
+            --ai-language zh \
             /path/to/repo output/
 
 **Configuration-based Approach:**
