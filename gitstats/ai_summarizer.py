@@ -82,7 +82,7 @@ class AISummarizer:
 
     def _get_cache_key(self, page_type: str, data_hash: str) -> str:
         """Generate cache key for a specific page and data."""
-        config_hash = hashlib.md5(
+        config_hash = hashlib.sha256(
             f"{self.config.get('ai_provider')}-{self.config.get('ai_model')}-{self.config.get('ai_language', 'en')}".encode()
         ).hexdigest()[:8]
         return f"{page_type}_{data_hash}_{config_hash}"
@@ -381,7 +381,7 @@ Top 5 Contributors by Lines:
                 return result
 
             # Generate cache key
-            data_hash = hashlib.md5(data_context.encode()).hexdigest()[:8]
+            data_hash = hashlib.sha256(data_context.encode()).hexdigest()[:8]
             cache_key = self._get_cache_key(page_type, data_hash)
 
             # Check cache unless force refresh
