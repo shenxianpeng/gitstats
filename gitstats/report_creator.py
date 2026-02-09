@@ -8,7 +8,7 @@ import shutil
 import datetime
 import time
 import math
-from gitstats import load_config, GNUPLOT_COMMON, WEEKDAYS
+from gitstats import load_config, GNUPLOT_COMMON, WEEKDAYS, get_i18n_text
 from gitstats.utils import (
     get_version,
     get_git_version,
@@ -759,15 +759,17 @@ class HTMLReportCreator(ReportCreator):
         """
         Create a dedicated AI Insights page with all AI-generated summaries.
         """
+        # Get language from config
+        language = conf.get("ai_language", "en")
+
         f = open(path + "/ai-insights.html", "w", encoding="utf-8")
         self.print_header(f)
-        f.write("<h1>🤖 AI-Powered Insights</h1>")
+        f.write(f"<h1>{get_i18n_text('ai_insights_title', language)}</h1>")
         self.print_nav(f)
 
-        f.write("""
+        f.write(f"""
         <div class="ai-insights-intro">
-            <p>This page contains AI-generated analysis and insights based on your repository statistics.
-            The analysis focuses on human contributions and excludes automated bot accounts.</p>
+            <p>{get_i18n_text("ai_insights_intro", language)}</p>
         </div>
         """)
 
@@ -778,27 +780,23 @@ class HTMLReportCreator(ReportCreator):
         sections = [
             {
                 "key": "index",
-                "title": "Project Overview",
-                "icon": "📊",
-                "description": "Comprehensive analysis of the repository's development history and overall health",
+                "title": get_i18n_text("project_overview", language),
+                "description": get_i18n_text("project_overview_desc", language),
             },
             {
                 "key": "activity",
-                "title": "Activity Patterns",
-                "icon": "📈",
-                "description": "Insights into commit frequency, development rhythm, and temporal patterns",
+                "title": get_i18n_text("activity_patterns", language),
+                "description": get_i18n_text("activity_patterns_desc", language),
             },
             {
                 "key": "authors",
-                "title": "Team Collaboration",
-                "icon": "👥",
-                "description": "Analysis of contributor dynamics, team diversity, and collaboration patterns",
+                "title": get_i18n_text("team_collaboration", language),
+                "description": get_i18n_text("team_collaboration_desc", language),
             },
             {
                 "key": "lines",
-                "title": "Code Evolution",
-                "icon": "💻",
-                "description": "Understanding of codebase growth, code churn, and maintenance patterns",
+                "title": get_i18n_text("code_evolution", language),
+                "description": get_i18n_text("code_evolution_desc", language),
             },
         ]
 
@@ -813,7 +811,7 @@ class HTMLReportCreator(ReportCreator):
             error = summary_data.get("error")
 
             f.write('<div class="ai-insight-section">')
-            f.write(f'<h2 id="{key}">{section["icon"]} {section["title"]}</h2>')
+            f.write(f'<h2 id="{key}">{section["title"]}</h2>')
             f.write(
                 f'<p class="section-description"><em>{section["description"]}</em></p>'
             )
@@ -821,7 +819,7 @@ class HTMLReportCreator(ReportCreator):
             if error:
                 f.write(f"""
                 <div class="ai-summary-error">
-                    <p><strong>⚠️ Analysis Unavailable</strong></p>
+                    <p><strong>{get_i18n_text("analysis_unavailable", language)}</strong></p>
                     <p><em>{error}</em></p>
                 </div>
                 """)
@@ -832,19 +830,16 @@ class HTMLReportCreator(ReportCreator):
                 </div>
                 """)
             else:
-                f.write("<p><em>No analysis available for this section.</em></p>")
+                f.write(f"<p><em>{get_i18n_text('no_analysis', language)}</em></p>")
 
             f.write("</div>")
 
         # Add disclaimer
-        f.write("""
+        f.write(f"""
         <div class="ai-disclaimer">
-            <h3>About AI Insights</h3>
-            <p>These insights are generated using artificial intelligence based on repository statistics.
-            While AI analysis can identify patterns and trends, it should be considered as supplementary
-            information alongside your own understanding of the project.</p>
-            <p><strong>Note:</strong> Bot accounts (such as dependabot[bot], pre-commit-ci[bot], and other
-            automated contributors) are automatically excluded from the analysis to focus on human team dynamics.</p>
+            <h3>{get_i18n_text("about_ai_insights", language)}</h3>
+            <p>{get_i18n_text("ai_disclaimer", language)}</p>
+            <p>{get_i18n_text("bot_note", language)}</p>
         </div>
         """)
 
@@ -1154,7 +1149,7 @@ plot """
         has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
 
         ai_link = (
-            '<li><a href="ai-insights.html">🤖 AI Insights</a></li>' if has_ai else ""
+            '<li><a href="ai-insights.html">AI Insights</a></li>' if has_ai else ""
         )
 
         file.write(
@@ -1195,7 +1190,7 @@ plot """
             # Show error message with graceful degradation
             return f"""
             <div class="ai-summary ai-summary-error">
-                <h3>🤖 AI Insights</h3>
+                <h3>AI Insights</h3>
                 <p><em>AI analysis is currently unavailable: {error}</em></p>
             </div>
             """
@@ -1205,7 +1200,7 @@ plot """
 
         return f"""
         <div class="ai-summary">
-            <h3>🤖 AI-Powered Insights</h3>
+            <h3>AI-Powered Insights</h3>
             <div class="ai-summary-content">
                 {summary_text}
             </div>

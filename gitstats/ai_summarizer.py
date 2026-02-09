@@ -138,6 +138,7 @@ class AISummarizer:
 
     def prepare_index_data(self, data: Dict[str, Any]) -> str:
         """Prepare data context for index page summary."""
+
         # Support both dict inputs and collector-like objects.
         def _get_field(obj: Any, key: str, default: Any = None) -> Any:
             """Try to get a value from a dict key or object attribute."""
