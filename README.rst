@@ -98,7 +98,7 @@ GitStats now supports AI-powered insights to enhance your repository analysis. G
 * Anthropic Claude
 * Google Gemini
 * Ollama (local LLMs)
-* GitHub Copilot
+* GitHub Copilot (experimental / limited support)
 
 **Installation with AI Support:**
 

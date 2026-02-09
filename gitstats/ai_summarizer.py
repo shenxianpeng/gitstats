@@ -5,14 +5,53 @@ Generates intelligent summaries for different report pages using configured AI p
 """
 
 import hashlib
-import pickle
+import json
 import logging
+import html
+import re
 from typing import Dict, Any, Optional
 from pathlib import Path
 
 from gitstats.ai_providers import AIProviderFactory, AIProviderError
 
 logger = logging.getLogger("gitstats")
+
+
+def sanitize_html(text: str) -> str:
+    """
+    Sanitize HTML content to prevent XSS attacks.
+    
+    Only allows a safe subset of HTML tags commonly used in AI summaries:
+    p, ul, ol, li, strong, em, br, h1, h2, h3, h4.
+    
+    Args:
+        text: Raw HTML text from AI provider
+        
+    Returns:
+        Sanitized HTML safe for embedding in reports
+    """
+    # Allowed tags - use a whitelist approach
+    allowed_tags = {'p', 'ul', 'ol', 'li', 'strong', 'em', 'br', 'h1', 'h2', 'h3', 'h4'}
+    
+    # Pattern to find all HTML tags
+    tag_pattern = re.compile(r'<(/?)(\w+)([^>]*)>')
+    
+    def replace_tag(match):
+        closing = match.group(1)
+        tag_name = match.group(2).lower()
+        attributes = match.group(3)
+        
+        # If tag is allowed, return it (but without attributes for safety)
+        if tag_name in allowed_tags:
+            return f'<{closing}{tag_name}>'
+        else:
+            # Escape disallowed tags
+            return html.escape(match.group(0))
+    
+    # Replace tags
+    sanitized = tag_pattern.sub(replace_tag, text)
+    
+    return sanitized
 
 
 class AISummarizer:
@@ -92,13 +131,17 @@ class AISummarizer:
         if not self.cache_enabled or not self.cache_dir:
             return None
 
-        cache_file = self.cache_dir / f"{cache_key}.pkl"
+        cache_file = self.cache_dir / f"{cache_key}.json"
         if cache_file.exists():
             try:
-                with open(cache_file, "rb") as f:
-                    cached_data = pickle.load(f)
-                    logger.info(f"Using cached AI summary for {cache_key}")
-                    return cached_data["summary"]
+                with open(cache_file, "r", encoding="utf-8") as f:
+                    cached_data = json.load(f)
+                    # Validate schema
+                    if isinstance(cached_data, dict) and "summary" in cached_data:
+                        logger.info(f"Using cached AI summary for {cache_key}")
+                        return cached_data["summary"]
+                    else:
+                        logger.warning(f"Invalid cache format for {cache_key}")
             except Exception as e:
                 logger.warning(f"Failed to load cached summary: {str(e)}")
         return None
@@ -108,10 +151,10 @@ class AISummarizer:
         if not self.cache_enabled or not self.cache_dir:
             return
 
-        cache_file = self.cache_dir / f"{cache_key}.pkl"
+        cache_file = self.cache_dir / f"{cache_key}.json"
         try:
-            with open(cache_file, "wb") as f:
-                pickle.dump({"summary": summary}, f)
+            with open(cache_file, "w", encoding="utf-8") as f:
+                json.dump({"summary": summary}, f, indent=2)
             logger.info(f"Cached AI summary for {cache_key}")
         except Exception as e:
             logger.warning(f"Failed to cache summary: {str(e)}")
@@ -140,11 +183,12 @@ class AISummarizer:
         """Prepare data context for index page summary."""
         commits_count = data.get("total_commits", 0)
         files_count = data.get("total_files", 0)
-        lines_of_code = data.get("total_lines_of_code", 0)
+        lines_of_code = data.get("total_lines", 0)
 
-        first_commit = data.get("first_commit_date", "Unknown")
-        last_commit = data.get("last_commit_date", "Unknown")
-        active_days = data.get("active_days", 0)
+        first_commit = data.get("first_commit_stamp", "Unknown")
+        last_commit = data.get("last_commit_stamp", "Unknown")
+        active_days_collection = data.get("active_days") or set()
+        active_days = len(active_days_collection) if isinstance(active_days_collection, set) else 0
 
         # Get top human authors (filter out bots)
         authors = data.get("authors", {})
@@ -182,9 +226,8 @@ Note: Bot accounts (like dependabot[bot], pre-commit-ci[bot]) are excluded from 
     def prepare_activity_data(self, data: Dict[str, Any]) -> str:
         """Prepare data context for activity page summary."""
         commits_by_year = data.get("commits_by_year", {})
-        commits_by_month = data.get("commits_by_month", {})
-        commits_by_hour = data.get("commits_by_hour_of_day", {})
-        commits_by_day = data.get("commits_by_day_of_week", {})
+        commits_by_hour = data.get("activity_by_hour_of_day", {})
+        commits_by_day = data.get("activity_by_day_of_week", {})
         commits_by_timezone = data.get("commits_by_timezone", {})
 
         # Find peak activity periods
@@ -292,18 +335,29 @@ Note: Bot accounts (dependabot[bot], pre-commit-ci[bot], etc.) are excluded from
 
     def prepare_lines_data(self, data: Dict[str, Any]) -> str:
         """Prepare data context for lines page summary."""
-        total_lines = data.get("total_lines_of_code", 0)
+        total_lines = data.get("total_lines", 0)
         total_added = data.get("total_lines_added", 0)
         total_removed = data.get("total_lines_removed", 0)
 
-        lines_by_date = data.get("lines_by_date", {})
+        changes_by_date = data.get("changes_by_date", {})
 
-        # Calculate growth trend
-        if lines_by_date:
-            dates = sorted(lines_by_date.keys())
+        # Calculate growth trend from changes_by_date
+        if changes_by_date:
+            dates = sorted(changes_by_date.keys())
             if len(dates) >= 2:
-                start_lines = lines_by_date[dates[0]]
-                end_lines = lines_by_date[dates[-1]]
+                # Calculate cumulative lines over time
+                cumulative_lines = 0
+                start_lines = 0
+                end_lines = 0
+                
+                for i, date in enumerate(dates):
+                    change = changes_by_date[date]
+                    cumulative_lines += change.get("ins", 0) - change.get("del", 0)
+                    if i == 0:
+                        start_lines = cumulative_lines
+                    if i == len(dates) - 1:
+                        end_lines = cumulative_lines
+                
                 growth = end_lines - start_lines
                 growth_rate = (growth / start_lines * 100) if start_lines > 0 else 0
                 trend_str = f"Growth from {start_lines:,} to {end_lines:,} lines ({growth_rate:+.1f}%)"
@@ -411,6 +465,9 @@ Generate your analysis:"""
             # Call AI provider
             logger.info(f"Generating AI summary for {page_type} page...")
             summary = self.provider.generate_summary(data, prompt)
+            
+            # Sanitize AI-generated HTML to prevent XSS
+            summary = sanitize_html(summary)
 
             # Cache the result
             self._save_cached_summary(cache_key, summary)

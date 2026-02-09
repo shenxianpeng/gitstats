@@ -146,8 +146,19 @@ Run AI models locally without sending data to external services.
 * No API costs
 * Works offline
 
-GitHub Copilot
-~~~~~~~~~~~~~~
+GitHub Copilot (Experimental / Limited Support)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. warning::
+   **EXPERIMENTAL**: GitHub Copilot support is currently a placeholder implementation
+   and may not work correctly. GitHub Copilot does not provide a public API endpoint
+   compatible with this implementation. Consider using OpenAI, Claude, Gemini, or
+   Ollama instead.
+
+**Status:** Limited support - requires proper Copilot-specific endpoint configuration
+which is not yet fully implemented.
+
+If you still want to try the experimental Copilot provider:
 
 Use GitHub's AI service for repository analysis.
 

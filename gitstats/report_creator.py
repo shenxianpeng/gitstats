@@ -8,6 +8,8 @@ import shutil
 import datetime
 import time
 import math
+import html as html_module
+import re
 from gitstats import load_config, GNUPLOT_COMMON, WEEKDAYS
 from gitstats.utils import (
     get_version,
@@ -759,7 +761,7 @@ class HTMLReportCreator(ReportCreator):
         """
         Create a dedicated AI Insights page with all AI-generated summaries.
         """
-        f = open(path + "/ai-insights.html", "w", encoding="utf-8")
+        with open(path + "/ai-insights.html", "w", encoding="utf-8") as f:
         self.print_header(f)
         f.write("<h1>🤖 AI-Powered Insights</h1>")
         self.print_nav(f)
@@ -819,16 +821,20 @@ class HTMLReportCreator(ReportCreator):
             )
 
             if error:
+                # Escape error message for safety
+                error_escaped = html_module.escape(str(error))
                 f.write(f"""
                 <div class="ai-summary-error">
                     <p><strong>⚠️ Analysis Unavailable</strong></p>
-                    <p><em>{error}</em></p>
+                    <p><em>{error_escaped}</em></p>
                 </div>
                 """)
             elif summary_text:
+                # Sanitize AI content before embedding
+                summary_text_safe = self._sanitize_ai_html(summary_text)
                 f.write(f"""
                 <div class="ai-summary-content">
-                    {summary_text}
+                    {summary_text_safe}
                 </div>
                 """)
             else:
@@ -848,8 +854,7 @@ class HTMLReportCreator(ReportCreator):
         </div>
         """)
 
-        f.write("</body></html>")
-        f.close()
+            f.write("</body></html>")
 
     def create_graphs(self, path):
         print("Generating graphs...")
@@ -1192,25 +1197,65 @@ plot """
         error = summary_data.get("error")
 
         if error:
-            # Show error message with graceful degradation
+            # Show error message with graceful degradation - escape for safety
+            error_escaped = html_module.escape(str(error))
             return f"""
             <div class="ai-summary ai-summary-error">
                 <h3>🤖 AI Insights</h3>
-                <p><em>AI analysis is currently unavailable: {error}</em></p>
+                <p><em>AI analysis is currently unavailable: {error_escaped}</em></p>
             </div>
             """
 
         if not summary_text:
             return ""
 
+        # Sanitize summary text for defense in depth (should already be sanitized by AISummarizer)
+        # This provides an extra layer of protection
+        summary_text_safe = self._sanitize_ai_html(summary_text)
+
         return f"""
         <div class="ai-summary">
             <h3>🤖 AI-Powered Insights</h3>
             <div class="ai-summary-content">
-                {summary_text}
+                {summary_text_safe}
             </div>
         </div>
         """
+
+    def _sanitize_ai_html(self, text: str) -> str:
+        """
+        Sanitize AI-generated HTML content.
+        
+        This is a defense-in-depth measure. Content should already be
+        sanitized by AISummarizer, but we apply it again for safety.
+        
+        Args:
+            text: HTML text to sanitize
+            
+        Returns:
+            Sanitized HTML
+        """
+        # Allowed tags - use a whitelist approach
+        allowed_tags = {'p', 'ul', 'ol', 'li', 'strong', 'em', 'br', 'h1', 'h2', 'h3', 'h4'}
+        
+        # Pattern to find all HTML tags
+        tag_pattern = re.compile(r'<(/?)(\w+)([^>]*)>')
+        
+        def replace_tag(match):
+            closing = match.group(1)
+            tag_name = match.group(2).lower()
+            
+            # If tag is allowed, return it (but without attributes for safety)
+            if tag_name in allowed_tags:
+                return f'<{closing}{tag_name}>'
+            else:
+                # Escape disallowed tags
+                return html_module.escape(match.group(0))
+        
+        # Replace tags
+        sanitized = tag_pattern.sub(replace_tag, text)
+        
+        return sanitized
 
 
 def html_header(level, text):
