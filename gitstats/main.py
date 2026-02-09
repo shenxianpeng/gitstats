@@ -11,6 +11,7 @@ import sys
 import time
 import zlib
 from multiprocessing import Pool
+from typing import Dict, Any
 from gitstats import load_config, time_start, exectime_external
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.ai_summarizer import AISummarizer
@@ -117,6 +118,11 @@ class DataCollector:
 
         # line statistics
         self.changes_by_date = {}  # stamp -> { files, ins, del }
+
+        # AI summaries
+        self.ai_summaries: Dict[
+            str, Dict[str, Any]
+        ] = {}  # page_type -> {summary, error}
 
     ##
     # This should be the main function to extract data from the repository.

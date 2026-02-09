@@ -55,7 +55,7 @@ class AISummarizer:
         """
         self.config = config
         self.provider = None
-        self.cache_dir = None
+        self.cache_dir: Optional[Path] = None
         self.cache_enabled = config.get("ai_cache_enabled", True)
 
         # Initialize AI provider if enabled
@@ -182,7 +182,6 @@ Note: Bot accounts (like dependabot[bot], pre-commit-ci[bot]) are excluded from 
     def prepare_activity_data(self, data: Dict[str, Any]) -> str:
         """Prepare data context for activity page summary."""
         commits_by_year = data.get("commits_by_year", {})
-        commits_by_month = data.get("commits_by_month", {})
         commits_by_hour = data.get("commits_by_hour_of_day", {})
         commits_by_day = data.get("commits_by_day_of_week", {})
         commits_by_timezone = data.get("commits_by_timezone", {})

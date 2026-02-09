@@ -149,7 +149,7 @@ Run AI models locally without sending data to external services.
 GitHub Copilot
 ~~~~~~~~~~~~~~
 
-Use GitHub's AI service for repository analysis.
+Use GitHub's AI infrastructure for repository analysis.
 
 **Setup:**
 

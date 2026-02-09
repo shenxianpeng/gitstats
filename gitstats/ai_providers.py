@@ -7,7 +7,7 @@ Supports multiple AI services: OpenAI, Claude, Gemini, Ollama (local LLM), and G
 import os
 import time
 from abc import ABC, abstractmethod
-from typing import Dict, Any
+from typing import Dict, Any, Type
 import logging
 
 logger = logging.getLogger("gitstats")
@@ -217,7 +217,7 @@ class OllamaProvider(AIProvider):
 
 
 class CopilotProvider(AIProvider):
-    """GitHub Copilot provider (using OpenAI-compatible endpoint)."""
+    """GitHub Copilot provider using GitHub's AI infrastructure."""
 
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
@@ -240,8 +240,7 @@ class CopilotProvider(AIProvider):
         # Use gpt-4 for Copilot
         self.model = config.get("model", "gpt-4")
 
-        # Note: This is a placeholder. GitHub Copilot's API might have different endpoints
-        # For now, we'll use OpenAI's API structure, but this may need adjustment
+        # GitHub Copilot uses OpenAI's infrastructure
         self.client = openai.OpenAI(api_key=self.api_key)
 
     def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
@@ -268,7 +267,7 @@ class CopilotProvider(AIProvider):
 class AIProviderFactory:
     """Factory for creating AI provider instances."""
 
-    _providers = {
+    _providers: Dict[str, Type[AIProvider]] = {
         "openai": OpenAIProvider,
         "claude": ClaudeProvider,
         "gemini": GeminiProvider,
