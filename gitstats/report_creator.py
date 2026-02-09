@@ -762,97 +762,97 @@ class HTMLReportCreator(ReportCreator):
         Create a dedicated AI Insights page with all AI-generated summaries.
         """
         with open(path + "/ai-insights.html", "w", encoding="utf-8") as f:
-        self.print_header(f)
-        f.write("<h1>🤖 AI-Powered Insights</h1>")
-        self.print_nav(f)
+            self.print_header(f)
+            f.write("<h1>🤖 AI-Powered Insights</h1>")
+            self.print_nav(f)
 
-        f.write("""
-        <div class="ai-insights-intro">
-            <p>This page contains AI-generated analysis and insights based on your repository statistics.
-            The analysis focuses on human contributions and excludes automated bot accounts.</p>
-        </div>
-        """)
+            f.write("""
+            <div class="ai-insights-intro">
+                <p>This page contains AI-generated analysis and insights based on your repository statistics.
+                The analysis focuses on human contributions and excludes automated bot accounts.</p>
+            </div>
+            """)
 
-        # Get all AI summaries
-        summaries = data.ai_summaries
+            # Get all AI summaries
+            summaries = data.ai_summaries
 
-        # Define sections with titles and descriptions
-        sections = [
-            {
-                "key": "index",
-                "title": "Project Overview",
-                "icon": "📊",
-                "description": "Comprehensive analysis of the repository's development history and overall health",
-            },
-            {
-                "key": "activity",
-                "title": "Activity Patterns",
-                "icon": "📈",
-                "description": "Insights into commit frequency, development rhythm, and temporal patterns",
-            },
-            {
-                "key": "authors",
-                "title": "Team Collaboration",
-                "icon": "👥",
-                "description": "Analysis of contributor dynamics, team diversity, and collaboration patterns",
-            },
-            {
-                "key": "lines",
-                "title": "Code Evolution",
-                "icon": "💻",
-                "description": "Understanding of codebase growth, code churn, and maintenance patterns",
-            },
-        ]
+            # Define sections with titles and descriptions
+            sections = [
+                {
+                    "key": "index",
+                    "title": "Project Overview",
+                    "icon": "📊",
+                    "description": "Comprehensive analysis of the repository's development history and overall health",
+                },
+                {
+                    "key": "activity",
+                    "title": "Activity Patterns",
+                    "icon": "📈",
+                    "description": "Insights into commit frequency, development rhythm, and temporal patterns",
+                },
+                {
+                    "key": "authors",
+                    "title": "Team Collaboration",
+                    "icon": "👥",
+                    "description": "Analysis of contributor dynamics, team diversity, and collaboration patterns",
+                },
+                {
+                    "key": "lines",
+                    "title": "Code Evolution",
+                    "icon": "💻",
+                    "description": "Understanding of codebase growth, code churn, and maintenance patterns",
+                },
+            ]
 
-        # Generate sections
-        for section in sections:
-            key = section["key"]
-            if key not in summaries:
-                continue
+            # Generate sections
+            for section in sections:
+                key = section["key"]
+                if key not in summaries:
+                    continue
 
-            summary_data = summaries[key]
-            summary_text = summary_data.get("summary", "")
-            error = summary_data.get("error")
+                summary_data = summaries[key]
+                summary_text = summary_data.get("summary", "")
+                error = summary_data.get("error")
 
-            f.write('<div class="ai-insight-section">')
-            f.write(f'<h2 id="{key}">{section["icon"]} {section["title"]}</h2>')
-            f.write(
-                f'<p class="section-description"><em>{section["description"]}</em></p>'
-            )
+                f.write('<div class="ai-insight-section">')
+                f.write(f'<h2 id="{key}">{section["icon"]} {section["title"]}</h2>')
+                f.write(
+                    f'<p class="section-description"><em>{section["description"]}</em></p>'
+                )
 
-            if error:
-                # Escape error message for safety
-                error_escaped = html_module.escape(str(error))
-                f.write(f"""
-                <div class="ai-summary-error">
-                    <p><strong>⚠️ Analysis Unavailable</strong></p>
-                    <p><em>{error_escaped}</em></p>
-                </div>
-                """)
-            elif summary_text:
-                # Sanitize AI content before embedding
-                summary_text_safe = self._sanitize_ai_html(summary_text)
-                f.write(f"""
-                <div class="ai-summary-content">
-                    {summary_text_safe}
-                </div>
-                """)
-            else:
-                f.write("<p><em>No analysis available for this section.</em></p>")
+                if error:
+                    # Escape error message for safety
+                    error_escaped = html_module.escape(str(error))
+                    f.write(f"""
+                    <div class="ai-summary-error">
+                        <p><strong>⚠️ Analysis Unavailable</strong></p>
+                        <p><em>{error_escaped}</em></p>
+                    </div>
+                    """)
+                elif summary_text:
+                    # Sanitize AI content before embedding
+                    summary_text_safe = self._sanitize_ai_html(summary_text)
+                    f.write(f"""
+                    <div class="ai-summary-content">
+                        {summary_text_safe}
+                    </div>
+                    """)
+                else:
+                    f.write("<p><em>No analysis available for this section.</em></p>")
 
-            f.write("</div>")
+                f.write("</div>")
 
-        # Add disclaimer
-        f.write("""
-        <div class="ai-disclaimer">
-            <h3>About AI Insights</h3>
-            <p>These insights are generated using artificial intelligence based on repository statistics.
-            While AI analysis can identify patterns and trends, it should be considered as supplementary
-            information alongside your own understanding of the project.</p>
-            <p><strong>Note:</strong> Bot accounts (such as dependabot[bot], pre-commit-ci[bot], and other
-            automated contributors) are automatically excluded from the analysis to focus on human team dynamics.</p>
-        </div>
-        """)
+            # Add disclaimer
+            f.write("""
+            <div class="ai-disclaimer">
+                <h3>About AI Insights</h3>
+                <p>These insights are generated using artificial intelligence based on repository statistics.
+                While AI analysis can identify patterns and trends, it should be considered as supplementary
+                information alongside your own understanding of the project.</p>
+                <p><strong>Note:</strong> Bot accounts (such as dependabot[bot], pre-commit-ci[bot], and other
+                automated contributors) are automatically excluded from the analysis to focus on human team dynamics.</p>
+            </div>
+            """)
 
             f.write("</body></html>")
 
