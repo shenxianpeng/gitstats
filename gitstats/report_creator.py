@@ -19,6 +19,15 @@ from gitstats.utils import (
     gnuplot_cmd,
 )
 
+# Import sanitization function for AI-generated content
+try:
+    from gitstats.ai_summarizer import sanitize_html
+except ImportError:
+    # Fallback if ai_summarizer is not available
+    def sanitize_html(text: str) -> str:
+        """Fallback sanitization - just escape everything."""
+        return html_module.escape(text)
+
 conf = load_config()
 
 
@@ -831,7 +840,7 @@ class HTMLReportCreator(ReportCreator):
                     """)
                 elif summary_text:
                     # Sanitize AI content before embedding
-                    summary_text_safe = self._sanitize_ai_html(summary_text)
+                    summary_text_safe = sanitize_html(summary_text)
                     f.write(f"""
                     <div class="ai-summary-content">
                         {summary_text_safe}
@@ -1211,7 +1220,7 @@ plot """
 
         # Sanitize summary text for defense in depth (should already be sanitized by AISummarizer)
         # This provides an extra layer of protection
-        summary_text_safe = self._sanitize_ai_html(summary_text)
+        summary_text_safe = sanitize_html(summary_text)
 
         return f"""
         <div class="ai-summary">
@@ -1221,41 +1230,6 @@ plot """
             </div>
         </div>
         """
-
-    def _sanitize_ai_html(self, text: str) -> str:
-        """
-        Sanitize AI-generated HTML content.
-        
-        This is a defense-in-depth measure. Content should already be
-        sanitized by AISummarizer, but we apply it again for safety.
-        
-        Args:
-            text: HTML text to sanitize
-            
-        Returns:
-            Sanitized HTML
-        """
-        # Allowed tags - use a whitelist approach
-        allowed_tags = {'p', 'ul', 'ol', 'li', 'strong', 'em', 'br', 'h1', 'h2', 'h3', 'h4'}
-        
-        # Pattern to find all HTML tags
-        tag_pattern = re.compile(r'<(/?)(\w+)([^>]*)>')
-        
-        def replace_tag(match):
-            closing = match.group(1)
-            tag_name = match.group(2).lower()
-            
-            # If tag is allowed, return it (but without attributes for safety)
-            if tag_name in allowed_tags:
-                return f'<{closing}{tag_name}>'
-            else:
-                # Escape disallowed tags
-                return html_module.escape(match.group(0))
-        
-        # Replace tags
-        sanitized = tag_pattern.sub(replace_tag, text)
-        
-        return sanitized
 
 
 def html_header(level, text):

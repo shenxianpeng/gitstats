@@ -39,7 +39,7 @@ def sanitize_html(text: str) -> str:
     def replace_tag(match):
         closing = match.group(1)
         tag_name = match.group(2).lower()
-        attributes = match.group(3)
+        # Attributes are intentionally stripped for security
         
         # If tag is allowed, return it (but without attributes for safety)
         if tag_name in allowed_tags:
@@ -185,8 +185,23 @@ class AISummarizer:
         files_count = data.get("total_files", 0)
         lines_of_code = data.get("total_lines", 0)
 
-        first_commit = data.get("first_commit_stamp", "Unknown")
-        last_commit = data.get("last_commit_stamp", "Unknown")
+        # Get timestamps and format them appropriately
+        first_commit_stamp = data.get("first_commit_stamp", 0)
+        last_commit_stamp = data.get("last_commit_stamp", 0)
+        
+        # Format timestamps as readable dates if available
+        if first_commit_stamp:
+            from datetime import datetime
+            first_commit = datetime.fromtimestamp(first_commit_stamp).strftime('%Y-%m-%d')
+        else:
+            first_commit = "Unknown"
+            
+        if last_commit_stamp:
+            from datetime import datetime
+            last_commit = datetime.fromtimestamp(last_commit_stamp).strftime('%Y-%m-%d')
+        else:
+            last_commit = "Unknown"
+        
         active_days_collection = data.get("active_days") or set()
         active_days = len(active_days_collection) if isinstance(active_days_collection, set) else 0
 
