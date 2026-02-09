@@ -789,11 +789,6 @@ class HTMLReportCreator(ReportCreator):
                 "description": get_i18n_text("activity_patterns_desc", language),
             },
             {
-                "key": "authors",
-                "title": get_i18n_text("team_collaboration", language),
-                "description": get_i18n_text("team_collaboration_desc", language),
-            },
-            {
                 "key": "lines",
                 "title": get_i18n_text("code_evolution", language),
                 "description": get_i18n_text("code_evolution_desc", language),

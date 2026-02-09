@@ -426,9 +426,6 @@ Top 5 Contributors by Lines:
             elif page_type == "activity":
                 data_context = self.prepare_activity_data(data)
                 prompt_focus = "identify the most notable patterns in commit activity and development rhythm."
-            elif page_type == "authors":
-                data_context = self.prepare_authors_data(data)
-                prompt_focus = "highlight key observations about the contributor community and collaboration patterns."
             elif page_type == "lines":
                 data_context = self.prepare_lines_data(data)
                 prompt_focus = "summarize the codebase growth trajectory and what it indicates about the project."
@@ -497,7 +494,7 @@ Generate your analysis:"""
             Dictionary mapping page types to summary results
         """
         summaries = {}
-        page_types = ["index", "activity", "authors", "lines"]
+        page_types = ["index", "activity", "lines"]
 
         for page_type in page_types:
             summaries[page_type] = self.generate_summary(page_type, data, force_refresh)
