@@ -88,17 +88,21 @@ AI-Powered Features 🤖
 GitStats now supports AI-powered insights to enhance your repository analysis. Get detailed, natural language summaries and actionable recommendations on:
 
 * **Project Overview**: Comprehensive analysis of development history and project health
-* **Activity Patterns**: Insights into commit frequency, peak periods, and development rhythm
-* **Team Collaboration**: Analysis of contribution distribution and potential knowledge silos
-* **Code Evolution**: Understanding of codebase growth patterns and maintenance burden
+* **Activity Patterns**: Insights into commit frequency, development rhythm, and temporal patterns
+* **Code Evolution**: Understanding of codebase growth, code churn, and maintenance patterns
 
 **Supported AI Providers:**
 
-* OpenAI (GPT-4, GPT-3.5)
-* Anthropic Claude
-* Google Gemini
-* Ollama (local LLMs)
+* OpenAI (GPT-4, GPT-4 Turbo, GPT-3.5 Turbo)
+* Anthropic Claude (Claude 3.5 Sonnet, Claude 3 Opus)
+* Google Gemini (Gemini Pro, Gemini 1.5 Pro)
+* Ollama (local LLMs: Llama 2/3, Mistral, CodeLlama, etc.)
 * GitHub Copilot
+
+**Supported Languages:**
+
+* English (en), Chinese (zh), Japanese (ja), Korean (ko)
+* Spanish (es), French (fr), German (de)
 
 **Installation with AI Support:**
 
@@ -120,6 +124,9 @@ GitStats now supports AI-powered insights to enhance your repository analysis. G
    # Generate Chinese summaries
    gitstats --ai --ai-language zh <gitpath> <outputpath>
 
+   # Force refresh AI summaries (ignore cache)
+   gitstats --ai --refresh-ai <gitpath> <outputpath>
+
 **Configuration:**
 
 Add these options to ``gitstats.conf``:
@@ -129,9 +136,30 @@ Add these options to ``gitstats.conf``:
    [gitstats]
    ai_enabled = true
    ai_provider = openai
+   ai_api_key =
    ai_model = gpt-4
    ai_language = en
    ai_cache_enabled = true
+   ai_max_retries = 3
+   ai_retry_delay = 1
+
+For Ollama (local LLM):
+
+.. code-block:: ini
+
+   [gitstats]
+   ai_enabled = true
+   ai_provider = ollama
+   ai_model = llama2
+   ollama_base_url = http://localhost:11434
+
+**Supported Models:**
+
+* **OpenAI**: gpt-4, gpt-4-turbo, gpt-3.5-turbo
+* **Claude**: claude-3-5-sonnet-20241022, claude-3-opus-20240229
+* **Gemini**: gemini-pro, gemini-1.5-pro
+* **Ollama**: llama2, llama3, mistral, codellama
+* **Copilot**: gpt-4
 
 See the `AI Integration Documentation <https://gitstats.readthedocs.io/>`_ for detailed setup instructions for each AI provider.
 
