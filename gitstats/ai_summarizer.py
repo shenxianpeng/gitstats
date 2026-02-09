@@ -138,17 +138,71 @@ class AISummarizer:
 
     def prepare_index_data(self, data: Dict[str, Any]) -> str:
         """Prepare data context for index page summary."""
-        commits_count = data.get("total_commits", 0)
-        files_count = data.get("total_files", 0)
-        lines_of_code = data.get("total_lines", 0)
+        # Support both dict inputs and collector-like objects.
+        def _get_field(obj: Any, key: str, default: Any = None) -> Any:
+            """Try to get a value from a dict key or object attribute."""
+            if isinstance(obj, dict):
+                return obj.get(key, default)
+            return getattr(obj, key, default)
 
-        first_commit = data.get("first_commit_stamp", "Unknown")
-        last_commit = data.get("last_commit_stamp", "Unknown")
-        active_days_collection = data.get("active_days") or set()
-        active_days = len(active_days_collection)
+        # Basic counts
+        commits_count = _get_field(data, "total_commits", 0)
+        files_count = _get_field(data, "total_files", 0)
+
+        # Lines of code: prefer normalized dict key, then real attribute name.
+        if isinstance(data, dict):
+            lines_of_code = data.get("total_lines_of_code")
+            if lines_of_code is None:
+                lines_of_code = data.get("total_lines", 0)
+        else:
+            lines_of_code = getattr(data, "total_lines", 0)
+
+        # Commit dates: prefer formatted methods if available, then dict keys, then stamps.
+        first_commit = "Unknown"
+        last_commit = "Unknown"
+
+        # Try methods on object first
+        if not isinstance(data, dict):
+            if hasattr(data, "get_first_commit_date"):
+                try:
+                    first_commit = data.get_first_commit_date()
+                except Exception:
+                    first_commit = "Unknown"
+            if hasattr(data, "get_last_commit_date"):
+                try:
+                    last_commit = data.get_last_commit_date()
+                except Exception:
+                    last_commit = "Unknown"
+
+        # If still unknown, try dict-style fields
+        if first_commit == "Unknown":
+            first_commit = _get_field(data, "first_commit_date", "Unknown")
+        if last_commit == "Unknown":
+            last_commit = _get_field(data, "last_commit_date", "Unknown")
+
+        # As a final fallback, try stamp attributes if present.
+        if first_commit == "Unknown" and not isinstance(data, dict):
+            stamp = getattr(data, "first_commit_stamp", None)
+            if stamp is not None:
+                first_commit = stamp
+        if last_commit == "Unknown" and not isinstance(data, dict):
+            stamp = getattr(data, "last_commit_stamp", None)
+            if stamp is not None:
+                last_commit = stamp
+
+        # Active days: normalize to a numeric count.
+        raw_active_days = _get_field(data, "active_days", 0)
+        if isinstance(raw_active_days, (set, list, tuple)):
+            active_days = len(raw_active_days)
+        else:
+            # If it's already a number or something else, best-effort convert to int.
+            try:
+                active_days = int(raw_active_days)
+            except (TypeError, ValueError):
+                active_days = 0
 
         # Get top human authors (filter out bots)
-        authors = data.get("authors", {})
+        authors = _get_field(data, "authors", {}) or {}
         human_authors = self._filter_human_authors(authors)
         authors_count = len(human_authors)
         bot_count = len(authors) - len(human_authors)

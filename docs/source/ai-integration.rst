@@ -351,10 +351,10 @@ Examples
 .. code-block:: bash
 
    export OPENAI_API_KEY=sk-...
-   gitstats --ai \\
-            --ai-provider openai \\
-            --ai-model gpt-4 \\
-            --ai-language en \\
+   gitstats --ai \
+            --ai-provider openai \
+            --ai-model gpt-4 \
+            --ai-language en \
             /path/to/repo output/
 
 **Privacy-focused Local Analysis:**
@@ -362,9 +362,9 @@ Examples
 .. code-block:: bash
 
    ollama pull llama2
-   gitstats --ai \\
-            --ai-provider ollama \\
-            --ai-model llama2 \\
+   gitstats --ai \
+            --ai-provider ollama \
+            --ai-model llama2 \
             /path/to/repo output/
 
 **Chinese Analysis with Claude:**
