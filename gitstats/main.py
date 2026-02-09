@@ -898,7 +898,7 @@ def get_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "--ai-language",
-        help="Language for AI-generated summaries (en, zh, zh-CN, ja, ko, es, fr, de, etc.)",
+        help="Language for AI-generated summaries (en, zh, ja, ko, es, fr, de, etc.)",
     )
 
     parser.add_argument(

@@ -222,7 +222,7 @@ Edit ``gitstats.conf`` to set default AI options:
    # Model to use
    ai_model = gpt-4
 
-   # Language for summaries (en, zh, zh-CN, ja, ko, es, fr, de)
+   # Language for summaries (en, zh, ja, ko, es, fr, de)
    ai_language = en
 
    # Cache AI summaries to save costs
@@ -241,8 +241,7 @@ Language Support
 AI summaries can be generated in multiple languages:
 
 * **en**: English
-* **zh** or **zh-CN**: Simplified Chinese
-* **zh-TW**: Traditional Chinese
+* **zh**: Chinese
 * **ja**: Japanese
 * **ko**: Korean
 * **es**: Spanish

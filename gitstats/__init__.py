@@ -31,7 +31,7 @@ DEFAULT_CONFIG = {
     "ai_provider": "openai",  # AI provider: openai, claude, gemini, ollama, copilot.
     "ai_api_key": "",  # API key for AI provider (can also use environment variables).
     "ai_model": "",  # AI model to use (e.g., gpt-4, claude-3-5-sonnet-20241022, gemini-pro, llama2).
-    "ai_language": "en",  # Language for AI-generated summaries (en, zh, zh-CN, ja, ko, es, fr, de, etc.).
+    "ai_language": "en",  # Language for AI-generated summaries (en, zh, ja, ko, es, fr, de, etc.).
     "ai_cache_enabled": True,  # Cache AI-generated summaries to save API costs.
     "ai_max_retries": 3,  # Maximum retry attempts for AI API calls.
     "ai_retry_delay": 1,  # Delay in seconds between retries.

@@ -37,8 +37,6 @@ class AISummarizer:
     LANGUAGE_INSTRUCTIONS = {
         "en": "Provide your analysis in English.",
         "zh": "请用中文提供分析。",
-        "zh-CN": "请用简体中文提供分析。",
-        "zh-TW": "請用繁體中文提供分析。",
         "ja": "日本語で分析を提供してください。",
         "ko": "한국어로 분석을 제공해 주세요.",
         "es": "Proporcione su análisis en español.",
