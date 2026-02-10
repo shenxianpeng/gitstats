@@ -134,87 +134,83 @@ class AISummarizer:
             if not self._is_bot_account(name)
         }
 
+    def _get_field_value(self, obj: Any, key: str, default: Any = None) -> Any:
+        """Get value from dict key or object attribute."""
+        if isinstance(obj, dict):
+            return obj.get(key, default)
+        return getattr(obj, key, default)
+
+    def _get_lines_of_code(self, data: Dict[str, Any]) -> int:
+        """Extract total lines of code with fallback logic."""
+        if isinstance(data, dict):
+            lines = data.get("total_lines_of_code")
+            return lines if lines is not None else data.get("total_lines", 0)
+        return getattr(data, "total_lines", 0)
+
+    def _get_commit_date(self, data: Dict[str, Any], date_type: str) -> str:
+        """Extract commit date (first or last) with multiple fallback strategies."""
+        method_name = f"get_{date_type}_commit_date"
+        dict_key = f"{date_type}_commit_date"
+        stamp_key = f"{date_type}_commit_stamp"
+
+        # Try method call on object
+        if not isinstance(data, dict) and hasattr(data, method_name):
+            try:
+                return getattr(data, method_name)()
+            except Exception:
+                pass
+
+        # Try dict-style field
+        date = self._get_field_value(data, dict_key, "Unknown")
+        if date != "Unknown":
+            return date
+
+        # Try stamp attribute as final fallback
+        if not isinstance(data, dict):
+            stamp = getattr(data, stamp_key, None)
+            if stamp is not None:
+                return stamp
+
+        return "Unknown"
+
+    def _normalize_active_days(self, raw_value: Any) -> int:
+        """Convert active days to numeric count."""
+        if isinstance(raw_value, (set, list, tuple)):
+            return len(raw_value)
+        try:
+            return int(raw_value)
+        except (TypeError, ValueError):
+            return 0
+
+    def _format_top_authors(self, human_authors: Dict[str, Any], limit: int = 5) -> str:
+        """Format top contributors as a string."""
+        top_authors = sorted(
+            human_authors.items(), key=lambda x: x[1].get("commits", 0), reverse=True
+        )[:limit]
+        return "\n".join(
+            f"  - {name}: {info.get('commits', 0)} commits"
+            for name, info in top_authors
+        )
+
     def prepare_index_data(self, data: Dict[str, Any]) -> str:
         """Prepare data context for index page summary."""
+        # Extract basic statistics
+        commits_count = self._get_field_value(data, "total_commits", 0)
+        files_count = self._get_field_value(data, "total_files", 0)
+        lines_of_code = self._get_lines_of_code(data)
+        first_commit = self._get_commit_date(data, "first")
+        last_commit = self._get_commit_date(data, "last")
 
-        # Support both dict inputs and collector-like objects.
-        def _get_field(obj: Any, key: str, default: Any = None) -> Any:
-            """Try to get a value from a dict key or object attribute."""
-            if isinstance(obj, dict):
-                return obj.get(key, default)
-            return getattr(obj, key, default)
+        # Process active days
+        raw_active_days = self._get_field_value(data, "active_days", 0)
+        active_days = self._normalize_active_days(raw_active_days)
 
-        # Basic counts
-        commits_count = _get_field(data, "total_commits", 0)
-        files_count = _get_field(data, "total_files", 0)
-
-        # Lines of code: prefer normalized dict key, then real attribute name.
-        if isinstance(data, dict):
-            lines_of_code = data.get("total_lines_of_code")
-            if lines_of_code is None:
-                lines_of_code = data.get("total_lines", 0)
-        else:
-            lines_of_code = getattr(data, "total_lines", 0)
-
-        # Commit dates: prefer formatted methods if available, then dict keys, then stamps.
-        first_commit = "Unknown"
-        last_commit = "Unknown"
-
-        # Try methods on object first
-        if not isinstance(data, dict):
-            if hasattr(data, "get_first_commit_date"):
-                try:
-                    first_commit = data.get_first_commit_date()
-                except Exception:
-                    first_commit = "Unknown"
-            if hasattr(data, "get_last_commit_date"):
-                try:
-                    last_commit = data.get_last_commit_date()
-                except Exception:
-                    last_commit = "Unknown"
-
-        # If still unknown, try dict-style fields
-        if first_commit == "Unknown":
-            first_commit = _get_field(data, "first_commit_date", "Unknown")
-        if last_commit == "Unknown":
-            last_commit = _get_field(data, "last_commit_date", "Unknown")
-
-        # As a final fallback, try stamp attributes if present.
-        if first_commit == "Unknown" and not isinstance(data, dict):
-            stamp = getattr(data, "first_commit_stamp", None)
-            if stamp is not None:
-                first_commit = stamp
-        if last_commit == "Unknown" and not isinstance(data, dict):
-            stamp = getattr(data, "last_commit_stamp", None)
-            if stamp is not None:
-                last_commit = stamp
-
-        # Active days: normalize to a numeric count.
-        raw_active_days = _get_field(data, "active_days", 0)
-        if isinstance(raw_active_days, (set, list, tuple)):
-            active_days = len(raw_active_days)
-        else:
-            # If it's already a number or something else, best-effort convert to int.
-            try:
-                active_days = int(raw_active_days)
-            except (TypeError, ValueError):
-                active_days = 0
-
-        # Get top human authors (filter out bots)
-        authors = _get_field(data, "authors", {}) or {}
+        # Process authors (filter out bots)
+        authors = self._get_field_value(data, "authors", {}) or {}
         human_authors = self._filter_human_authors(authors)
         authors_count = len(human_authors)
         bot_count = len(authors) - len(human_authors)
-
-        top_authors = sorted(
-            human_authors.items(), key=lambda x: x[1].get("commits", 0), reverse=True
-        )[:5]
-        top_authors_str = "\n".join(
-            [
-                f"  - {name}: {info.get('commits', 0)} commits"
-                for name, info in top_authors
-            ]
-        )
+        top_authors_str = self._format_top_authors(human_authors)
 
         context = f"""Repository Statistics Overview:
 - Total Human Authors: {authors_count}
