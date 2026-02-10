@@ -146,36 +146,6 @@ Run AI models locally without sending data to external services.
 * No API costs
 * Works offline
 
-GitHub Copilot
-~~~~~~~~~~~~~~
-
-Use GitHub's AI infrastructure for repository analysis.
-
-**Setup:**
-
-1. Ensure you have a GitHub Copilot subscription
-
-2. Set your GitHub token:
-
-.. code-block:: bash
-
-   export GITHUB_TOKEN=ghp_...
-
-3. Configure in ``gitstats.conf``:
-
-.. code-block:: ini
-
-   [gitstats]
-   ai_enabled = true
-   ai_provider = copilot
-   ai_model = gpt-4
-
-**Usage:**
-
-.. code-block:: bash
-
-   gitstats --ai --ai-provider copilot /path/to/repo output/
-
 Configuration
 -------------
 
@@ -213,7 +183,7 @@ Edit ``gitstats.conf`` to set default AI options:
    # Enable AI features
    ai_enabled = true
 
-   # AI provider: openai, claude, gemini, ollama, copilot
+   # AI provider: openai, claude, gemini, ollama
    ai_provider = openai
 
    # API key (or use environment variable)

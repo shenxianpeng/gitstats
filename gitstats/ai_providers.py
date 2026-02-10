@@ -1,7 +1,7 @@
 """
 AI Provider abstraction layer for GitStats.
 
-Supports multiple AI services: OpenAI, Claude, Gemini, Ollama (local LLM), and GitHub Copilot.
+Supports multiple AI services: OpenAI, Claude, Gemini, and Ollama (local LLM).
 """
 
 import os
@@ -11,6 +11,22 @@ from typing import Dict, Any, Type
 import logging
 
 logger = logging.getLogger("gitstats")
+
+
+def _get_model_with_fallback(config: Dict[str, Any], default: str) -> str:
+    """
+    Get model from config, treating empty/whitespace-only values as unset.
+
+    Args:
+        config: Configuration dictionary
+        default: Default model name to use if config value is empty/whitespace
+
+    Returns:
+        Model name from config or default if config value is empty/whitespace
+    """
+    model = config.get("model", default)
+    # Treat empty or whitespace-only strings as unset
+    return model.strip() if model and model.strip() else default
 
 
 class AIProviderError(Exception):
@@ -88,7 +104,7 @@ class OpenAIProvider(AIProvider):
                 "OpenAI API key not found. Set OPENAI_API_KEY environment variable or configure it."
             )
 
-        self.model = config.get("model", "gpt-4")
+        self.model = _get_model_with_fallback(config, "gpt-4")
         self.client = openai.OpenAI(api_key=self.api_key)
 
     def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
@@ -132,7 +148,7 @@ class ClaudeProvider(AIProvider):
                 "Claude API key not found. Set ANTHROPIC_API_KEY environment variable or configure it."
             )
 
-        self.model = config.get("model", "claude-3-5-sonnet-20241022")
+        self.model = _get_model_with_fallback(config, "claude-3-5-sonnet-20241022")
         self.client = self.anthropic.Anthropic(api_key=self.api_key)
 
     def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
@@ -170,7 +186,7 @@ class GeminiProvider(AIProvider):
                 "Gemini API key not found. Set GOOGLE_API_KEY environment variable or configure it."
             )
 
-        self.model_name = config.get("model", "gemini-pro")
+        self.model_name = _get_model_with_fallback(config, "gemini-2.5-flash")
         self.genai.configure(api_key=self.api_key)
         self.model = self.genai.GenerativeModel(self.model_name)
 
@@ -199,7 +215,7 @@ class OllamaProvider(AIProvider):
             ) from None
 
         self.base_url = config.get("base_url", "http://localhost:11434")
-        self.model = config.get("model", "llama2")
+        self.model = _get_model_with_fallback(config, "llama2")
 
     def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
         """Generate summary using Ollama API."""
@@ -216,54 +232,6 @@ class OllamaProvider(AIProvider):
         return self._retry_with_backoff(_call_api)
 
 
-class CopilotProvider(AIProvider):
-    """GitHub Copilot provider using GitHub's AI infrastructure."""
-
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        try:
-            import openai
-
-            self.openai = openai
-        except ImportError:
-            raise AIProviderError(
-                "openai package not installed. Install with: pip install openai"
-            ) from None
-
-        # GitHub Copilot uses a different endpoint
-        self.api_key = config.get("api_key") or os.environ.get("GITHUB_TOKEN")
-        if not self.api_key:
-            raise AIProviderError(
-                "GitHub token not found. Set GITHUB_TOKEN environment variable or configure it."
-            )
-
-        # Use gpt-4 for Copilot
-        self.model = config.get("model", "gpt-4")
-
-        # GitHub Copilot uses OpenAI's infrastructure
-        self.client = openai.OpenAI(api_key=self.api_key)
-
-    def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
-        """Generate summary using GitHub Copilot."""
-
-        def _call_api():
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are an expert software development analyst who provides insightful analysis of git repository statistics.",
-                    },
-                    {"role": "user", "content": prompt},
-                ],
-                temperature=0.7,
-                max_tokens=2000,
-            )
-            return response.choices[0].message.content
-
-        return self._retry_with_backoff(_call_api)
-
-
 class AIProviderFactory:
     """Factory for creating AI provider instances."""
 
@@ -272,7 +240,6 @@ class AIProviderFactory:
         "claude": ClaudeProvider,
         "gemini": GeminiProvider,
         "ollama": OllamaProvider,
-        "copilot": CopilotProvider,
     }
 
     @classmethod
@@ -281,7 +248,7 @@ class AIProviderFactory:
         Create an AI provider instance.
 
         Args:
-            provider_name: Name of the provider (openai, claude, gemini, ollama, copilot)
+            provider_name: Name of the provider (openai, claude, gemini, ollama)
             config: Configuration dictionary
 
         Returns:

@@ -97,7 +97,6 @@ GitStats now supports AI-powered insights to enhance your repository analysis. G
 * Anthropic Claude (Claude 3.5 Sonnet, Claude 3 Opus)
 * Google Gemini (Gemini Pro, Gemini 1.5 Pro)
 * Ollama (local LLMs: Llama 2/3, Mistral, CodeLlama, etc.)
-* GitHub Copilot
 
 **Supported Languages:**
 
@@ -159,7 +158,6 @@ For Ollama (local LLM):
 * **Claude**: claude-3-5-sonnet-20241022, claude-3-opus-20240229
 * **Gemini**: gemini-pro, gemini-1.5-pro
 * **Ollama**: llama2, llama3, mistral, codellama
-* **Copilot**: gpt-4
 
 See the `AI Integration Documentation <https://gitstats.readthedocs.io/>`_ for detailed setup instructions for each AI provider.
 

@@ -887,8 +887,8 @@ def get_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "--ai-provider",
-        choices=["openai", "claude", "gemini", "ollama", "copilot"],
-        help="AI provider to use (openai, claude, gemini, ollama, copilot)",
+        choices=["openai", "claude", "gemini", "ollama"],
+        help="AI provider to use (openai, claude, gemini, ollama)",
     )
 
     parser.add_argument(
