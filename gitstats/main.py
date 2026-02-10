@@ -873,16 +873,9 @@ def get_parser() -> argparse.ArgumentParser:
     # AI-powered features
     parser.add_argument(
         "--ai",
-        action="store_true",
+        action=argparse.BooleanOptionalAction,
         default=None,
-        help="Enable AI-powered summaries in reports",
-    )
-
-    parser.add_argument(
-        "--no-ai",
-        action="store_true",
-        default=None,
-        help="Disable AI-powered summaries (overrides config file)",
+        help="Enable/disable AI-powered summaries in reports (use --ai or --no-ai)",
     )
 
     parser.add_argument(
@@ -933,10 +926,8 @@ def main() -> int:
             parser.error("Config must be in the form key=value")
 
     # Handle AI CLI arguments (CLI takes precedence over config)
-    if args.no_ai:
-        conf["ai_enabled"] = False
-    elif args.ai:
-        conf["ai_enabled"] = True
+    if args.ai is not None:
+        conf["ai_enabled"] = args.ai
 
     if args.ai_provider:
         conf["ai_provider"] = args.ai_provider
