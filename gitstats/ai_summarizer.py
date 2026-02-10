@@ -4,6 +4,7 @@ AI Summarizer for GitStats reports.
 Generates intelligent summaries for different report pages using configured AI providers.
 """
 
+import datetime
 import hashlib
 import json
 import logging
@@ -165,11 +166,16 @@ class AISummarizer:
         if date != "Unknown":
             return date
 
-        # Try stamp attribute as final fallback
-        if not isinstance(data, dict):
-            stamp = getattr(data, stamp_key, None)
-            if stamp is not None:
-                return stamp
+        # Try stamp attribute as final fallback (works for both dicts and objects)
+        stamp = self._get_field_value(data, stamp_key, None)
+        if stamp is not None and stamp > 0:
+            try:
+                # Format Unix timestamp to readable date
+                dt = datetime.datetime.fromtimestamp(stamp)
+                return dt.strftime("%Y-%m-%d")
+            except (ValueError, OSError):
+                # Handle invalid timestamps
+                pass
 
         return "Unknown"
 

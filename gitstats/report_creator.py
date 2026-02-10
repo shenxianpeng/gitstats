@@ -141,9 +141,6 @@ class HTMLReportCreator(ReportCreator):
         )
         f.write("</table>")
 
-        # Add AI-powered summary
-        f.write(self.get_ai_summary_html("index"))
-
         f.write("</body>\n</html>")
         f.close()
 
@@ -428,9 +425,6 @@ class HTMLReportCreator(ReportCreator):
             )
         f.write("</table>")
 
-        # Add AI-powered summary
-        f.write(self.get_ai_summary_html("activity"))
-
         f.write("</body></html>")
         f.close()
 
@@ -710,9 +704,6 @@ class HTMLReportCreator(ReportCreator):
         for stamp in sorted(data.changes_by_date.keys()):
             fg.write("%d %d\n" % (stamp, data.changes_by_date[stamp]["lines"]))
         fg.close()
-
-        # Add AI-powered summary
-        f.write(self.get_ai_summary_html("lines"))
 
         f.write("</body></html>")
         f.close()
