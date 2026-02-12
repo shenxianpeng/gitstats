@@ -8,7 +8,7 @@ import shutil
 import datetime
 import time
 import math
-from gitstats import load_config, GNUPLOT_COMMON, WEEKDAYS
+from gitstats import load_config, GNUPLOT_COMMON, WEEKDAYS, get_i18n_text
 from gitstats.utils import (
     get_version,
     get_git_version,
@@ -73,6 +73,11 @@ class HTMLReportCreator(ReportCreator):
         self.create_files_html(data, path)
         self.create_lines_html(data, path)
         self.create_tags_html(data, path)
+
+        # Create AI Insights page if AI is enabled
+        if hasattr(data, "ai_summaries") and data.ai_summaries:
+            self.create_ai_insights_html(data, path)
+
         self.create_graphs(path)
 
     def create_index_html(self, data, path):
@@ -750,6 +755,92 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def create_ai_insights_html(self, data, path):
+        """
+        Create a dedicated AI Insights page with all AI-generated summaries.
+        """
+        # Get language from config
+        language = conf.get("ai_language", "en")
+
+        f = open(path + "/ai-insights.html", "w", encoding="utf-8")
+        self.print_header(f)
+        f.write(f"<h1>{get_i18n_text('ai_insights_title', language)}</h1>")
+        self.print_nav(f)
+
+        f.write(f"""
+        <div class="ai-insights-intro">
+            <p>{get_i18n_text("ai_insights_intro", language)}</p>
+        </div>
+        """)
+
+        # Get all AI summaries
+        summaries = data.ai_summaries
+
+        # Define sections with titles and descriptions
+        sections = [
+            {
+                "key": "index",
+                "title": get_i18n_text("project_overview", language),
+                "description": get_i18n_text("project_overview_desc", language),
+            },
+            {
+                "key": "activity",
+                "title": get_i18n_text("activity_patterns", language),
+                "description": get_i18n_text("activity_patterns_desc", language),
+            },
+            {
+                "key": "lines",
+                "title": get_i18n_text("code_evolution", language),
+                "description": get_i18n_text("code_evolution_desc", language),
+            },
+        ]
+
+        # Generate sections
+        for section in sections:
+            key = section["key"]
+            if key not in summaries:
+                continue
+
+            summary_data = summaries[key]
+            summary_text = summary_data.get("summary", "")
+            error = summary_data.get("error")
+
+            f.write('<div class="ai-insight-section">')
+            f.write(f'<h2 id="{key}">{section["title"]}</h2>')
+            f.write(
+                f'<p class="section-description"><em>{section["description"]}</em></p>'
+            )
+
+            if error:
+                f.write(f"""
+                <div class="ai-summary-error">
+                    <p><strong>{get_i18n_text("analysis_unavailable", language)}</strong></p>
+                    <p><em>{error}</em></p>
+                </div>
+                """)
+            elif summary_text:
+                f.write(f"""
+                <div class="ai-summary-content">
+                    {summary_text}
+                </div>
+                """)
+            else:
+                f.write(f"<p><em>{get_i18n_text('no_analysis', language)}</em></p>")
+
+            f.write("</div>")
+
+        # Add disclaimer
+        f.write(f"""
+        <div class="ai-disclaimer">
+            <h3>{get_i18n_text("about_ai_insights", language)}</h3>
+            <p>{get_i18n_text("ai_disclaimer", language)}</p>
+            <p>{get_i18n_text("bot_note", language)}</p>
+        </div>
+        """)
+
+        f.write("</body></html>")
+        f.close()
+
     def create_graphs(self, path):
         print("Generating graphs...")
         self.create_graph_hour_of_day(path)
@@ -1049,8 +1140,15 @@ plot """
         Parameters:
             file: A writable file-like object opened in text mode where the navigation HTML will be written.
         """
+        # Check if AI insights are available
+        has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
+
+        ai_link = (
+            '<li><a href="ai-insights.html">AI Insights</a></li>' if has_ai else ""
+        )
+
         file.write(
-            """
+            f"""
             <div class="nav">
             <ul>
             <li><a href="index.html">General</a></li>
@@ -1059,11 +1157,50 @@ plot """
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
+            {ai_link}
             </ul>
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
             </div>
             """
         )
+
+    def get_ai_summary_html(self, page_type):
+        """
+        Generate HTML for AI-powered summary section.
+
+        Args:
+            page_type: The type of page (index, activity, authors, lines)
+
+        Returns:
+            HTML string for the AI summary section
+        """
+        if not hasattr(self.data, "ai_summaries") or not self.data.ai_summaries:
+            return ""
+
+        summary_data = self.data.ai_summaries.get(page_type, {})
+        summary_text = summary_data.get("summary", "")
+        error = summary_data.get("error")
+
+        if error:
+            # Show error message with graceful degradation
+            return f"""
+            <div class="ai-summary ai-summary-error">
+                <h3>AI Insights</h3>
+                <p><em>AI analysis is currently unavailable: {error}</em></p>
+            </div>
+            """
+
+        if not summary_text:
+            return ""
+
+        return f"""
+        <div class="ai-summary">
+            <h3>AI-Powered Insights</h3>
+            <div class="ai-summary-content">
+                {summary_text}
+            </div>
+        </div>
+        """
 
 
 def html_header(level, text):

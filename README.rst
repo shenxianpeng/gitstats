@@ -82,6 +82,24 @@ Here is a list of some features of ``gitstats``:
 * **Customizable**: config values through ``gitstats.conf``.
 * **Cross-platform**: works on Linux, Windows, and macOS.
 
+AI-Powered Features 🤖
+-----------------------
+
+GitStats supports AI-powered insights to enhance your repository analysis with natural language summaries and actionable recommendations.
+
+**Quick Start:**
+
+.. code-block:: bash
+
+   # Install with AI support
+   pip install gitstats[ai]
+
+   # Enable AI with OpenAI
+   export OPENAI_API_KEY=your-api-key
+   gitstats --ai --ai-provider openai <gitpath> <outputpath>
+
+For detailed setup instructions, configuration options, and examples, see the `AI Integration Documentation <https://gitstats.readthedocs.io/en/latest/ai-integration.html>`_.
+
 .. end-of-about
 
 Contributing

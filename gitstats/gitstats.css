@@ -249,3 +249,101 @@ h2 a {
 	background-color: var(--heat4-bg);
 	color: var(--heat4-color);
 }
+
+/* AI Summary Styles */
+.ai-summary {
+	margin: 1em 0;
+	padding: 1em;
+	background-color: var(--table-header-bg);
+	border: 1px solid var(--border-color);
+}
+
+.ai-summary h3 {
+	margin-top: 0;
+	color: var(--text-color);
+	font-size: 1.1em;
+	font-weight: 600;
+}
+
+.ai-summary-content {
+	margin-top: 1em;
+	line-height: 1.6;
+	color: var(--text-color);
+}
+
+.ai-summary-content p {
+	margin: 0.8em 0;
+}
+
+.ai-summary-content ul {
+	margin: 0.5em 0;
+	padding-left: 2em;
+}
+
+.ai-summary-content li {
+	margin: 0.3em 0;
+}
+
+.ai-summary-content strong {
+	font-weight: 600;
+}
+
+.ai-summary-content em {
+	font-style: italic;
+}
+
+/* AI Error State */
+.ai-summary-error {
+	padding: 1em;
+	background-color: var(--table-bg);
+	border: 1px solid var(--border-color);
+	border-left: 3px solid #fc8181;
+}
+
+/* AI Insights Page Styles */
+.ai-insights-intro {
+	padding: 1em;
+	margin: 1em 0;
+	background-color: var(--table-header-bg);
+	border: 1px solid var(--border-color);
+}
+
+.ai-insights-intro p {
+	margin: 0;
+	line-height: 1.6;
+}
+
+.ai-insight-section {
+	margin: 2em 0;
+	padding: 0;
+}
+
+.ai-insight-section h2 {
+	/* Use standard h2 styles - don't override color or background */
+	margin-top: 0;
+	margin-bottom: 1em;
+}
+
+.ai-insight-section .section-description {
+	font-size: 0.9em;
+	margin: 0.5em 0 1em 0;
+	font-style: italic;
+}
+
+.ai-disclaimer {
+	margin: 2em 0;
+	padding: 1em;
+	background-color: var(--table-header-bg);
+	border: 1px solid var(--border-color);
+}
+
+.ai-disclaimer h3 {
+	margin-top: 0;
+	font-size: 1em;
+}
+
+.ai-disclaimer p {
+	margin: 0.6em 0;
+	line-height: 1.6;
+	font-size: 0.9em;
+}

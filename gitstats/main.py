@@ -11,8 +11,10 @@ import sys
 import time
 import zlib
 from multiprocessing import Pool
+from typing import Dict, Any
 from gitstats import load_config, time_start, exectime_external
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
+from gitstats.ai_summarizer import AISummarizer
 from gitstats.utils import (
     get_version,
     get_gnuplot_version,
@@ -116,6 +118,11 @@ class DataCollector:
 
         # line statistics
         self.changes_by_date = {}  # stamp -> { files, ins, del }
+
+        # AI summaries
+        self.ai_summaries: Dict[
+            str, Dict[str, Any]
+        ] = {}  # page_type -> {summary, error}
 
     ##
     # This should be the main function to extract data from the repository.
@@ -766,6 +773,24 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
     data.save_cache(cachefile)
     data.refine()
 
+    # Generate AI summaries if enabled
+    if conf.get("ai_enabled", False):
+        try:
+            print("Generating AI summaries...")
+            summarizer = AISummarizer(conf)
+            summarizer.set_cache_dir(os.path.join(outputpath, ".ai_cache"))
+            force_refresh = conf.get("refresh_ai", False)
+            data.ai_summaries = summarizer.generate_all_summaries(
+                data.__dict__, force_refresh
+            )
+            print("AI summaries generated successfully")
+        except Exception as e:
+            print(f"Warning: Failed to generate AI summaries: {str(e)}")
+            print("Report will be generated without AI insights")
+            data.ai_summaries = {}
+    else:
+        data.ai_summaries = {}
+
     os.chdir(rundir)
 
     print("Generating report...")
@@ -845,6 +870,36 @@ def get_parser() -> argparse.ArgumentParser:
         help="Generate additional output format",
     )
 
+    # AI-powered features
+    parser.add_argument(
+        "--ai",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Enable/disable AI-powered summaries in reports (use --ai or --no-ai)",
+    )
+
+    parser.add_argument(
+        "--ai-provider",
+        choices=["openai", "claude", "gemini", "ollama"],
+        help="AI provider to use (openai, claude, gemini, ollama)",
+    )
+
+    parser.add_argument(
+        "--ai-model",
+        help="AI model to use (e.g., gpt-4, claude-3-5-sonnet-20241022, gemini-pro, llama2)",
+    )
+
+    parser.add_argument(
+        "--ai-language",
+        help="Language for AI-generated summaries (en, zh, ja, ko, es, fr, de, etc.)",
+    )
+
+    parser.add_argument(
+        "--refresh-ai",
+        action="store_true",
+        help="Force refresh AI-generated summaries (ignore cache)",
+    )
+
     return parser
 
 
@@ -863,10 +918,28 @@ def main() -> int:
             # Convert numeric strings to integers to match config file behavior
             if value.isdigit():
                 conf[key] = int(value)
+            elif value.lower() in ("true", "false"):
+                conf[key] = value.lower() == "true"
             else:
                 conf[key] = value
         except ValueError:
             parser.error("Config must be in the form key=value")
+
+    # Handle AI CLI arguments (CLI takes precedence over config)
+    if args.ai is not None:
+        conf["ai_enabled"] = args.ai
+
+    if args.ai_provider:
+        conf["ai_provider"] = args.ai_provider
+
+    if args.ai_model:
+        conf["ai_model"] = args.ai_model
+
+    if args.ai_language:
+        conf["ai_language"] = args.ai_language
+
+    # Store refresh_ai flag for later use
+    conf["refresh_ai"] = args.refresh_ai if hasattr(args, "refresh_ai") else False
 
     run(gitpath, outputpath, extra_fmt=extra_fmt)
 
