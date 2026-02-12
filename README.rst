@@ -85,81 +85,24 @@ Here is a list of some features of ``gitstats``:
 AI-Powered Features 🤖
 -----------------------
 
-GitStats now supports AI-powered insights to enhance your repository analysis. Get detailed, natural language summaries and actionable recommendations on:
+GitStats supports AI-powered insights to enhance your repository analysis with natural language summaries and actionable recommendations.
 
-* **Project Overview**: Comprehensive analysis of development history and project health
-* **Activity Patterns**: Insights into commit frequency, development rhythm, and temporal patterns
-* **Code Evolution**: Understanding of codebase growth, code churn, and maintenance patterns
-
-**Supported AI Providers:**
-
-* OpenAI (GPT-4, GPT-4 Turbo, GPT-3.5 Turbo)
-* Anthropic Claude (Claude 3.5 Sonnet, Claude 3 Opus)
-* Google Gemini (Gemini Pro, Gemini 1.5 Pro)
-* Ollama (local LLMs: Llama 2/3, Mistral, CodeLlama, etc.)
-
-**Supported Languages:**
-
-* English (en), Chinese (zh), Japanese (ja), Korean (ko)
-* Spanish (es), French (fr), German (de)
-
-**Installation with AI Support:**
+**Quick Start:**
 
 .. code-block:: bash
 
+   # Install with AI support
    pip install gitstats[ai]
-
-**Basic Usage:**
-
-.. code-block:: bash
 
    # Enable AI with OpenAI
    export OPENAI_API_KEY=your-api-key
    gitstats --ai --ai-provider openai <gitpath> <outputpath>
 
-   # Use local LLM with Ollama
-   gitstats --ai --ai-provider ollama --ai-model llama2 <gitpath> <outputpath>
+**Supported AI Providers:** OpenAI, Anthropic Claude, Google Gemini, Ollama (local LLMs)
 
-   # Generate Chinese summaries
-   gitstats --ai --ai-language zh <gitpath> <outputpath>
+**Supported Languages:** English, Chinese, Japanese, Korean, Spanish, French, German
 
-   # Force refresh AI summaries (ignore cache)
-   gitstats --ai --refresh-ai <gitpath> <outputpath>
-
-**Configuration:**
-
-Add these options to ``gitstats.conf``:
-
-.. code-block:: ini
-
-   [gitstats]
-   ai_enabled = true
-   ai_provider = openai
-   ai_api_key =
-   ai_model = gpt-4
-   ai_language = en
-   ai_cache_enabled = true
-   ai_max_retries = 3
-   ai_retry_delay = 1
-
-For Ollama (local LLM):
-
-.. code-block:: ini
-
-   [gitstats]
-   ai_enabled = true
-   ai_provider = ollama
-   ai_model = llama2
-   ollama_base_url = http://localhost:11434
-
-**Supported Models:**
-
-* **OpenAI**: gpt-4, gpt-4-turbo, gpt-3.5-turbo
-* **Claude**: claude-3-5-sonnet-20241022, claude-3-opus-20240229
-* **Gemini**: gemini-pro, gemini-1.5-pro
-* **Ollama**: llama2, llama3, mistral, codellama
-
-See the `AI Integration Documentation <https://gitstats.readthedocs.io/>`_ for detailed setup instructions for each AI provider.
+For detailed setup instructions, configuration options, and examples, see the `AI Integration Documentation <https://gitstats.readthedocs.io/en/latest/ai-integration.html>`_.
 
 .. end-of-about
 

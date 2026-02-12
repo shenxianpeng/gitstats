@@ -6,15 +6,34 @@ GitStats supports AI-powered analysis to provide intelligent insights and natura
 Overview
 --------
 
-AI-powered features enhance GitStats reports by:
+AI-powered features enhance GitStats reports by providing detailed, natural language summaries and actionable recommendations on:
+
+* **Project Overview**: Comprehensive analysis of development history and project health
+* **Activity Patterns**: Insights into commit frequency, development rhythm, and temporal patterns
+* **Code Evolution**: Understanding of codebase growth, code churn, and maintenance patterns
+
+Additional capabilities:
 
 * **Analyzing patterns**: Identifying trends in commit activity, team collaboration, and code growth
 * **Providing insights**: Offering actionable recommendations based on repository statistics
 * **Generating summaries**: Creating natural language explanations of complex metrics
 * **Supporting multiple languages**: Available in English, Chinese, Japanese, Korean, Spanish, French, German, and more
 
+Installation
+------------
+
+To use AI features, install GitStats with AI dependencies:
+
+.. code-block:: bash
+
+   pip install gitstats[ai]
+
+This installs the required packages for all supported AI providers.
+
 Supported AI Providers
 ----------------------
+
+GitStats supports multiple AI providers, each offering different models and capabilities. Refer to each provider's documentation for available models and pricing.
 
 OpenAI
 ~~~~~~
