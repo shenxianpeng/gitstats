@@ -98,7 +98,7 @@ GitStats supports AI-powered insights to enhance your repository analysis with n
    export OPENAI_API_KEY=your-api-key
    gitstats --ai --ai-provider openai <gitpath> <outputpath>
 
-For detailed setup instructions, configuration options, and examples, see the `AI Integration Documentation <https://gitstats.readthedocs.io/en/latest/ai-integration.html>`_.
+For detailed setup instructions, configuration options, and examples, see the `AI Integration Documentation <https://gitstats.readthedocs.io/en/stable/ai-integration.html>`_.
 
 .. end-of-about
 
