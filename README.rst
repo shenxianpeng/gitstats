@@ -98,10 +98,6 @@ GitStats supports AI-powered insights to enhance your repository analysis with n
    export OPENAI_API_KEY=your-api-key
    gitstats --ai --ai-provider openai <gitpath> <outputpath>
 
-**Supported AI Providers:** OpenAI, Anthropic Claude, Google Gemini, Ollama (local LLMs)
-
-**Supported Languages:** English, Chinese, Japanese, Korean, Spanish, French, German
-
 For detailed setup instructions, configuration options, and examples, see the `AI Integration Documentation <https://gitstats.readthedocs.io/en/latest/ai-integration.html>`_.
 
 .. end-of-about
