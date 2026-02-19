@@ -103,8 +103,6 @@ pre-commit install
 - `nox -s preview` - Build and preview report locally on port 8000
 - `nox -s docs` - Build Sphinx documentation
 - `nox -s docs-live` - Live documentation preview with auto-reload
-- `nox -s image` - Build Docker image
-- `nox -s publish_image` - Publish Docker image to GHCR
 
 ### Pre-commit Hooks
 
