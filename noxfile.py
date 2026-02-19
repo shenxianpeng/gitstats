@@ -3,35 +3,12 @@ import nox
 import shutil
 from pathlib import Path
 
-# Default tag for docker images
-TAG = "latest"
-
 
 @nox.session
 def lint(session: nox.Session) -> None:
     """Run linter"""
     session.install("pre-commit")
     session.run("pre-commit", "run", "--all-files", external=True)
-
-
-@nox.session
-def image(session: nox.Session) -> None:
-    """Build docker image"""
-    session.run("docker", "build", "-t", f"gitstats:{TAG}", ".", external=True)
-
-
-@nox.session
-def publish_image(session: nox.Session) -> None:
-    """Publish docker image to ghcr"""
-    image(session)  # Build the image first
-    session.run(
-        "docker",
-        "tag",
-        f"gitstats:{TAG}",
-        f"ghcr.io/shenxianpeng/gitstats:{TAG}",
-        external=True,
-    )
-    session.run("docker", "push", f"ghcr.io/shenxianpeng/gitstats:{TAG}", external=True)
 
 
 @nox.session
