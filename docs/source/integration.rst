@@ -34,11 +34,6 @@ Use gitstats in GitHub Actions to generate reports and deploy them to GitHub Pag
           with:
             fetch-depth: 0 # get all history.
 
-        - name: Install Dependencies
-          run: |
-            sudo apt-get update
-            sudo apt-get install -y gnuplot
-
         - name: Generate GitStats Report
           run: |
             pipx install gitstats
