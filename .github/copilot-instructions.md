@@ -78,7 +78,7 @@ gitstats/
 #### HTMLReportCreator (report_creator.py)
 - Generates HTML reports from collected data
 - Creates charts using gnuplot
-- Handles template rendering and output file generation
+- Handles HTML generation and output file writing
 
 #### Utility Functions (utils.py)
 - `get_pipe_output()`: Execute Git commands and capture output
@@ -103,8 +103,6 @@ pre-commit install
 - `nox -s preview` - Build and preview report locally on port 8000
 - `nox -s docs` - Build Sphinx documentation
 - `nox -s docs-live` - Live documentation preview with auto-reload
-- `nox -s image` - Build Docker image
-- `nox -s publish_image` - Publish Docker image to GHCR
 
 ### Pre-commit Hooks
 
@@ -169,11 +167,11 @@ gitstats . report -f json  # Also generate JSON output
 
 ### Adding New Statistics
 
-1. Add data structure to `DataCollector.__init__()` in `main.py`
-2. Collect data in appropriate method (e.g., `collect_data()`)
-3. Add rendering logic in `HTMLReportCreator` in `report_creator.py`
-4. Update templates or create new HTML sections
-5. Consider adding configuration options to `gitstats.conf`
+1. Add or extend data structures in `GitDataCollector` (for example, in its `__init__` or related setup code) so they can hold the new statistic.
+2. Collect and aggregate the data in `GitDataCollector.collect()` and, if needed, in `GitDataCollector.refine()`, ensuring the new statistic is exposed in the data passed to report generation.
+3. Wire the new statistic into `HTMLReportCreator` in `report_creator.py` by passing the collected data where other statistics are handled.
+4. Add or update HTML generation logic in `HTMLReportCreator` (for example, by extending existing sections or adding new ones) so the new statistic appears in the report.
+5. Consider adding configuration options to `gitstats.conf` and documenting how they affect the new statistic.
 
 ### Working with Git Data
 
