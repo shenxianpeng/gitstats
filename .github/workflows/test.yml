@@ -54,7 +54,7 @@ jobs:
 
     - name: Save GitStats Report
       if: ${{ matrix.python-version == '3.9' }}
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: test-report-windows
         path: test-report-windows
@@ -86,7 +86,7 @@ jobs:
 
     - name: Save GitStats Report
       if: ${{ matrix.python-version == '3.9' }}
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: test-report-macos
         path: test-report-macos
@@ -118,7 +118,7 @@ jobs:
 
     - name: Save GitStats Report
       if: ${{ matrix.python-version == '3.9' }}
-      uses: actions/upload-artifact@v6
+      uses: actions/upload-artifact@v7
       with:
         name: test-report
         path: test-report
