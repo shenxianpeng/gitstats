@@ -16,7 +16,7 @@
 	added?
 
 [Unsorted]
-- clean up after running gnuplot (option to keep .dat files around?)
+- show raw data in some way (in addition to the tables used currently)
 - show raw data in some way (the tables used currently aren't very nice)
 - allow multiple stylesheets
 	- parameter --style

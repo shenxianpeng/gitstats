@@ -16,7 +16,7 @@ Xianpeng Shen (shenxianpeng), DevOps engineer. Maintains the gitstats open sourc
 | **gitstats** | Python tool that generates HTML/JSON reports with statistics from Git repos (commits, authors, activity, files, LOC, tags) |
 
 ## Tech Stack
-- Python 3.9+ | gnuplot-wheel (charts) | Sphinx (docs) | Nox (task runner)
+- Python 3.9+ | Chart.js (bundled, browser-side charts) | Sphinx (docs) | Nox (task runner)
 - Linting: ruff, mypy, pre-commit
 - Config: `gitstats.conf`
 
