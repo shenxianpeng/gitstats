@@ -85,9 +85,9 @@ class HTMLReportCreator(ReportCreator):
         format = "%Y-%m-%d %H:%M:%S"
         self.print_header(f)
 
-        f.write("<h1>General</h1>")
-
         self.print_nav(f)
+
+        f.write("<h1>General</h1>")
 
         f.write(html_header(2, "Git Overview"))
 
@@ -149,8 +149,8 @@ class HTMLReportCreator(ReportCreator):
         # Activity
         f = open(path + "/activity.html", "w", encoding="utf-8")
         self.print_header(f)
-        f.write("<h1>Activity</h1>")
         self.print_nav(f)
+        f.write("<h1>Activity</h1>")
 
         # f.write('<h2>Last 30 days</h2>')
 
@@ -195,7 +195,7 @@ class HTMLReportCreator(ReportCreator):
                 percentage = float(data.commits_by_year[year_key]) / max_commits
             height = max(1, int(200 * percentage))
             f.write(
-                '<td style="text-align: center; vertical-align: bottom">%d<div style="display: block; background-color: red; width: 20px; height: %dpx"></div></td>'
+                '<td style="text-align: center; vertical-align: bottom">%d<div class="bar" style="display: block; width: 20px; height: %dpx"></div></td>'
                 % (commits, height)
             )
 
@@ -234,7 +234,7 @@ class HTMLReportCreator(ReportCreator):
                 )
             height = max(1, int(200 * percentage))
             f.write(
-                '<td style="text-align: center; vertical-align: bottom">%d<div style="display: block; background-color: red; width: 20px; height: %dpx"></div></td>'
+                '<td style="text-align: center; vertical-align: bottom">%d<div class="bar" style="display: block; width: 20px; height: %dpx"></div></td>'
                 % (commits, height)
             )
 
@@ -434,8 +434,8 @@ class HTMLReportCreator(ReportCreator):
         f = open(path + "/authors.html", "w", encoding="utf-8")
         self.print_header(f)
 
-        f.write("<h1>Authors</h1>")
         self.print_nav(f)
+        f.write("<h1>Authors</h1>")
 
         # Authors :: List of authors
         f.write(html_header(2, "List of Authors"))
@@ -613,8 +613,8 @@ class HTMLReportCreator(ReportCreator):
         # Files
         f = open(path + "/files.html", "w", encoding="utf-8")
         self.print_header(f)
-        f.write("<h1>Files</h1>")
         self.print_nav(f)
+        f.write("<h1>Files</h1>")
 
         f.write("<dl>\n")
         f.write("<dt>Total files</dt><dd>%d</dd>" % data.get_total_files())
@@ -690,8 +690,8 @@ class HTMLReportCreator(ReportCreator):
         # Lines
         f = open(path + "/lines.html", "w", encoding="utf-8")
         self.print_header(f)
-        f.write("<h1>Lines</h1>")
         self.print_nav(f)
+        f.write("<h1>Lines</h1>")
 
         f.write("<dl>\n")
         f.write("<dt>Total lines</dt><dd>%d</dd>" % data.get_total_loc())
@@ -713,8 +713,8 @@ class HTMLReportCreator(ReportCreator):
         # tags.html
         f = open(path + "/tags.html", "w", encoding="utf-8")
         self.print_header(f)
-        f.write("<h1>Tags</h1>")
         self.print_nav(f)
+        f.write("<h1>Tags</h1>")
 
         f.write("<dl>")
         f.write("<dt>Total tags</dt><dd>%d</dd>" % len(data.tags))
@@ -764,8 +764,8 @@ class HTMLReportCreator(ReportCreator):
 
         f = open(path + "/ai-insights.html", "w", encoding="utf-8")
         self.print_header(f)
-        f.write(f"<h1>{get_i18n_text('ai_insights_title', language)}</h1>")
         self.print_nav(f)
+        f.write(f"<h1>{get_i18n_text('ai_insights_title', language)}</h1>")
 
         f.write(f"""
         <div class="ai-insights-intro">
@@ -1093,9 +1093,10 @@ plot """
         """
         file.write(
             """<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - %s</title>
 	<link rel="stylesheet" href="%s" type="text/css">
 	<meta name="generator" content="GitStats %s">
