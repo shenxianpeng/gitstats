@@ -417,13 +417,18 @@ class HTMLReportCreator(ReportCreator):
                 )
             )
         f.write("</table></div>")
-        cby_keys = sorted(data.commits_by_year.keys())
-        cby_values = [data.commits_by_year[k] for k in cby_keys]
+        if data.commits_by_year:
+            cby_all_years = list(
+                range(min(data.commits_by_year.keys()), max(data.commits_by_year.keys()) + 1)
+            )
+        else:
+            cby_all_years = []
+        cby_values = [data.commits_by_year.get(y, 0) for y in cby_all_years]
         f.write(
             self._render_chartjs(
                 "chart-commits-by-year",
                 "bar",
-                cby_keys,
+                cby_all_years,
                 [{"label": "Commits", "data": cby_values}],
                 y_label="Commits",
             )
@@ -912,10 +917,14 @@ class HTMLReportCreator(ReportCreator):
                 entry.setdefault("fill", False)
                 entry.setdefault("tension", 0.1)
                 entry.setdefault("pointRadius", 2)
+                entry.setdefault("borderWidth", 1)
             else:
                 # single dataset: use CSS var for theme-aware color
                 entry["backgroundColor"] = "__CSS_BAR_COLOR__"
                 entry["borderColor"] = "__CSS_BAR_COLOR__"
+                if chart_type == "line":
+                    entry.setdefault("borderWidth", 1)
+                    entry.setdefault("pointRadius", 2)
             js_datasets.append(entry)
 
         labels_json = json.dumps(labels)
