@@ -10,7 +10,7 @@ time_start = time.time()
 GNUPLOT_COMMON = (
     "set terminal png transparent size 640,240\n"
     "set size 1.0,1.0\n"
-    "set linetype 1 lc rgb '#0969da'\n"
+    "set linetype 1 lc rgb '#5b8dee'\n"
     "set linetype 2 lc rgb '#1a7f37'\n"
     "set linetype 3 lc rgb '#cf222e'\n"
     "set linetype 4 lc rgb '#8250df'\n"
