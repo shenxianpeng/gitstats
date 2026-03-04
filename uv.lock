@@ -542,9 +542,6 @@ wheels = [
 [[package]]
 name = "gitstats"
 source = { editable = "." }
-dependencies = [
-    { name = "gnuplot-wheel" },
-]
 
 [package.optional-dependencies]
 ai = [
@@ -569,7 +566,6 @@ docs = [
 [package.metadata]
 requires-dist = [
     { name = "anthropic", marker = "extra == 'ai'", specifier = ">=0.8" },
-    { name = "gnuplot-wheel" },
     { name = "google-generativeai", marker = "extra == 'ai'", specifier = ">=0.3" },
     { name = "nox", marker = "extra == 'dev'" },
     { name = "openai", marker = "extra == 'ai'", specifier = ">=1.0" },
@@ -579,43 +575,6 @@ requires-dist = [
     { name = "sphinx-rtd-theme", marker = "extra == 'docs'" },
 ]
 provides-extras = ["dev", "docs", "ai"]
-
-[[package]]
-name = "gnuplot-wheel"
-version = "6.0.1"
-source = { registry = "https://pypi.org/simple" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/8f/59/b377a0df56a87d4be3895c5e64c65c0cc0ec9fea5fd171ed878e0f5657cc/gnuplot_wheel-6.0.1-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:f11286b39eac5201eacd9da8bded261a77accddced35b46c29fbdc2ae167abfd", size = 714851, upload-time = "2025-12-09T23:45:38.067Z" },
-    { url = "https://files.pythonhosted.org/packages/de/40/6f5ca48150bdabfa97730c9a9e05e0506ba9b76b8d7ee60a2afe848de604/gnuplot_wheel-6.0.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:5b608b93e3f7b779c50e061ff3a548cafbb6564c75d92b627d3887564a21ef25", size = 714716, upload-time = "2025-12-09T23:45:39.694Z" },
-    { url = "https://files.pythonhosted.org/packages/23/59/1293ef5ff1ac3e86ed229ef94cfa5e205945cabf80ec62eff588c7bd2b3c/gnuplot_wheel-6.0.1-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:4b32f0edd48e2eadb75030098f30cb3cc68ffdcfa7e60ba6d62350434e5f9c35", size = 3748527, upload-time = "2025-12-09T23:45:40.71Z" },
-    { url = "https://files.pythonhosted.org/packages/0b/31/7e7c4cf9f435b349f32d7a2e4ed8d87432e085218cdb5f76a6c6a2054045/gnuplot_wheel-6.0.1-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:fc3cb3b8567ed8417949c96d4e763cc0b4088087386a6216f9244b0ede2c12d0", size = 3811404, upload-time = "2025-12-09T23:45:41.952Z" },
-    { url = "https://files.pythonhosted.org/packages/4d/42/1bc9e0da09bbbbc499fa913031eea3d7e5d2b3ac60955667f9076d5bed8e/gnuplot_wheel-6.0.1-cp310-cp310-win_amd64.whl", hash = "sha256:4c5ae10ea13353be4d1040556180d1947bb673f042931dc25d7bb1292cb215b5", size = 55543256, upload-time = "2025-12-09T23:45:44.011Z" },
-    { url = "https://files.pythonhosted.org/packages/c1/cc/96b173435e72e4efa42372f75b107c5c322e2fa3715877347ccdd87a4c26/gnuplot_wheel-6.0.1-cp311-cp311-macosx_10_9_x86_64.whl", hash = "sha256:7584bdfffd353113bc2210ad647df874279c51ed260b925017b7862103a471aa", size = 714856, upload-time = "2025-12-09T23:45:46.531Z" },
-    { url = "https://files.pythonhosted.org/packages/cd/06/254b6be16e64ac7be6554ad62a224ba9c3e1c71f6582b06a8b73618c6f0b/gnuplot_wheel-6.0.1-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:7e31abec99f39984d265a360077bd7a0cae9d2c09a5259fc060865f4f3214b2a", size = 714709, upload-time = "2025-12-09T23:45:47.653Z" },
-    { url = "https://files.pythonhosted.org/packages/f1/82/e2c4d46b3b2ec4c9f6143fbadfcf2864d196cfaba54810a1fac746de03b8/gnuplot_wheel-6.0.1-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:c333a19981a31408b79ca3285a6155fcf25f55bf3ec7c8ecc64d4227e07ee89a", size = 3748473, upload-time = "2025-12-09T23:45:48.764Z" },
-    { url = "https://files.pythonhosted.org/packages/9a/6d/46ff2a073fe3d15fde9cbd44cc5577f15b7fef969e532380ff8e5965e777/gnuplot_wheel-6.0.1-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:9b338927d959d7e1aaf066f0eba5d7e25d8925f35b265418a80d896f35084fe5", size = 3811365, upload-time = "2025-12-09T23:45:50.058Z" },
-    { url = "https://files.pythonhosted.org/packages/1a/a8/b6cb5f54404f9e329cb7fd882471f6714d14e487cbd405c386b9bd19b025/gnuplot_wheel-6.0.1-cp311-cp311-win_amd64.whl", hash = "sha256:540c0e93a46ebb5c093a1927ee852f6d07c42a4cb115aa90494f9399ea72e4b7", size = 55543254, upload-time = "2025-12-09T23:45:51.826Z" },
-    { url = "https://files.pythonhosted.org/packages/07/0f/b3f405b5a4aaa74e185cea92294129cec31eac4f463abea1945cf8160cb3/gnuplot_wheel-6.0.1-cp312-cp312-macosx_10_13_x86_64.whl", hash = "sha256:fb1d0e07beba1be3e38f0fdaf30defff61258ef5d8da200b3da321c80e3bccb9", size = 714720, upload-time = "2025-12-09T23:45:54.307Z" },
-    { url = "https://files.pythonhosted.org/packages/2e/09/3994f79d2bea8d11be6908cb679fc7504b08473847f36e6e66d2f520c611/gnuplot_wheel-6.0.1-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:9c9f1ff6fc009d6925609453b9bbc7dc5009be86bb71ef31bbaccdc1bfec3b48", size = 714708, upload-time = "2025-12-09T23:45:55.231Z" },
-    { url = "https://files.pythonhosted.org/packages/75/ef/0a67c871f03762d8f8bcdc4bc02b415401f64d737236ee10c7100111e114/gnuplot_wheel-6.0.1-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:a76cf67392fd5301b7d16b7c00fe6e273549d876beff2f6ad57160a8c903ac11", size = 3748518, upload-time = "2025-12-09T23:45:56.322Z" },
-    { url = "https://files.pythonhosted.org/packages/33/83/47c53b6c6d4deb10b338748786620e53ed308ef0d5418a6fdd07a1ef155c/gnuplot_wheel-6.0.1-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:89a786038b18659a85592d16b6cf7f3c992798f48fa2e12262e226100028fcb3", size = 3811369, upload-time = "2025-12-09T23:45:57.762Z" },
-    { url = "https://files.pythonhosted.org/packages/60/f7/81f32df418f766f60f3371754f64d21cff7fb810acb9e7782971735023a8/gnuplot_wheel-6.0.1-cp312-cp312-win_amd64.whl", hash = "sha256:a458dae640c674b0fbf7c5615d8b1099ea944c9b546d4b188b5a7bac044b165b", size = 55543256, upload-time = "2025-12-09T23:45:59.846Z" },
-    { url = "https://files.pythonhosted.org/packages/6d/33/0d8c44262d2b7ea597d3a9da728290a274e4464126297546a156618d8652/gnuplot_wheel-6.0.1-cp313-cp313-macosx_10_13_x86_64.whl", hash = "sha256:163da6d30a92e44110841bc57ffc11880c308ccad26299fd5bb72336a7fe8fe1", size = 714710, upload-time = "2025-12-09T23:46:02.242Z" },
-    { url = "https://files.pythonhosted.org/packages/80/8a/5c1739f5e8b0fea3bd17ac3f7bc9169ee5253d358add8a8333ea81b848f6/gnuplot_wheel-6.0.1-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:5a8a087f3e87b7d0dc23eec5eba0cfe426f3ab34adc49d381f07ff74af40cd17", size = 714705, upload-time = "2025-12-09T23:46:03.118Z" },
-    { url = "https://files.pythonhosted.org/packages/cf/43/9ad112451a1873249c00f102eac7eb32ae3a9b7743091a1d71d13c4f5c0e/gnuplot_wheel-6.0.1-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:100b17ac32e563b55791995e20331231a6dce842a7977c56bc7d9a7e84f2dd6f", size = 3748522, upload-time = "2025-12-09T23:46:04.481Z" },
-    { url = "https://files.pythonhosted.org/packages/c0/89/f6f5642021611ecb0118f24c45ef55b0f075eb17533e490a992c789acc41/gnuplot_wheel-6.0.1-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:3296eefb147d34ead1910b5968458a30410330e0f4f9f21822b2751121a77e2c", size = 3811398, upload-time = "2025-12-09T23:46:05.622Z" },
-    { url = "https://files.pythonhosted.org/packages/36/92/9e9c440d6e38c0d9ba15771b82ed1576f222ab60c40eb4c6720d43d9ccc4/gnuplot_wheel-6.0.1-cp313-cp313-win_amd64.whl", hash = "sha256:70e6f4943041b16665ad6a934ce7603b020d6715a3c09082ec8325763ef97547", size = 55543256, upload-time = "2025-12-09T23:46:07.695Z" },
-    { url = "https://files.pythonhosted.org/packages/2d/78/9d9c808158ec2946ababc267715831017c948125db08b80aa38fe6cfd11e/gnuplot_wheel-6.0.1-cp314-cp314-macosx_10_15_x86_64.whl", hash = "sha256:41c38f311d5ce5027535243a22e1ee6a5dd3e40e5e82f967fd405821cc13cb9b", size = 714710, upload-time = "2025-12-09T23:46:10.352Z" },
-    { url = "https://files.pythonhosted.org/packages/31/61/76a2bfd1c0f526de3c910451bc883965790c2862602fe93f4c61fbbd884b/gnuplot_wheel-6.0.1-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:5402747eec97ad9d9f845176ba7648b2b15b4004892f2c4771625d32b69f2bbb", size = 714704, upload-time = "2025-12-09T23:46:11.357Z" },
-    { url = "https://files.pythonhosted.org/packages/7f/66/09bda7e1431d95fe2a364894b7534a43b7de16150bc74e767cc1180c4afd/gnuplot_wheel-6.0.1-cp314-cp314-manylinux_2_28_aarch64.whl", hash = "sha256:555088e96655bffabd281e556d6f047a3ad7f338c4bafb2e9b13785e442189c7", size = 3748537, upload-time = "2025-12-09T23:46:12.343Z" },
-    { url = "https://files.pythonhosted.org/packages/a9/4a/aa694a2eea0aaa2f727e05d104619694d679d377af2c2d1d93e89afb2f10/gnuplot_wheel-6.0.1-cp314-cp314-manylinux_2_28_x86_64.whl", hash = "sha256:21174a37007f221f7d92a43d9d55bcc8155b0f69592fc0fb333f1a13003ba5f2", size = 3811377, upload-time = "2025-12-09T23:46:13.468Z" },
-    { url = "https://files.pythonhosted.org/packages/c1/09/851b344241a193e458c384703c0b9bdfab6d9e4eb67331807fa0e98af2c8/gnuplot_wheel-6.0.1-cp314-cp314-win_amd64.whl", hash = "sha256:e5212d9933217b562b0426e09f5b7a6552bdfa7303cee48c7c0ef1b9d22d4274", size = 57440390, upload-time = "2025-12-09T23:46:15.231Z" },
-    { url = "https://files.pythonhosted.org/packages/79/28/7cd61989850b26af27aa2986ae72b7d98e6ecbd4aad1b4e2dda6482337f4/gnuplot_wheel-6.0.1-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:ed334ea7cc7602f5f8c173882e94fd2fea5a075ea5365e7427308e9fb2807c7f", size = 714852, upload-time = "2025-12-09T23:46:19.581Z" },
-    { url = "https://files.pythonhosted.org/packages/9b/6f/108263ce73f8966eeaa079924efbc354e33a23e3c2e292ef08aecd5945ac/gnuplot_wheel-6.0.1-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:5c89240c4135797ca0575aef5942ccb8ddad227a34081ed1d2a9548f05a642b9", size = 714707, upload-time = "2025-12-09T23:46:20.608Z" },
-    { url = "https://files.pythonhosted.org/packages/41/88/daf2f3e27625e31d16ce5c81f636137dc393ecfcea56a555abb5fe3bc248/gnuplot_wheel-6.0.1-cp39-cp39-manylinux_2_28_aarch64.whl", hash = "sha256:93d2196d6719eec720cebeacd6b300b35304756668c9b6c40a8423c6daffcd76", size = 3748538, upload-time = "2025-12-09T23:46:21.75Z" },
-    { url = "https://files.pythonhosted.org/packages/79/5d/3be70e33233f2318902ccd010d386ca60cc707aca49c6f0ce5336e3da11d/gnuplot_wheel-6.0.1-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:354a1e0ea7cb32ded0e4ee8dc59f7d84daa1e4319298f4c1550ffded1296ee87", size = 3811389, upload-time = "2025-12-09T23:46:22.822Z" },
-    { url = "https://files.pythonhosted.org/packages/c9/f2/9d19c891c1cf4b72872263f54891ddf801d4b6ac9ce6247cacd4118ea344/gnuplot_wheel-6.0.1-cp39-cp39-win_amd64.whl", hash = "sha256:67fb486cc7cc339bff6e93d2680035d9a06ce3f5f4e748111fb46bc63c99bfd3", size = 55543253, upload-time = "2025-12-09T23:46:24.622Z" },
-]
 
 [[package]]
 name = "google-ai-generativelanguage"
