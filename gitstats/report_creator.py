@@ -419,7 +419,10 @@ class HTMLReportCreator(ReportCreator):
         f.write("</table></div>")
         if data.commits_by_year:
             cby_all_years = list(
-                range(min(data.commits_by_year.keys()), max(data.commits_by_year.keys()) + 1)
+                range(
+                    min(data.commits_by_year.keys()),
+                    max(data.commits_by_year.keys()) + 1,
+                )
             )
         else:
             cby_all_years = []
