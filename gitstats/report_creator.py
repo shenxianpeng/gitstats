@@ -184,6 +184,7 @@ class HTMLReportCreator(ReportCreator):
                 years,
                 [{"label": "Commits", "data": yearly_values}],
                 y_label="Commits",
+                aspect_ratio=4,
             )
         )
 
