@@ -290,6 +290,8 @@ class HTMLReportCreator(ReportCreator):
                 dow_labels,
                 [{"label": "Commits", "data": dow_values}],
                 y_label="Commits",
+                max_bar_thickness=40,
+                aspect_ratio=4,
             )
         )
         f.write("</div></div>")
@@ -338,6 +340,8 @@ class HTMLReportCreator(ReportCreator):
                 moy_labels,
                 [{"label": "Commits", "data": moy_values}],
                 y_label="Commits",
+                max_bar_thickness=40,
+                aspect_ratio=4,
             )
         )
         f.write("</div></div>")
@@ -890,6 +894,7 @@ class HTMLReportCreator(ReportCreator):
         y_label="Commits",
         x_ticks_rotate=False,
         aspect_ratio=3,
+        max_bar_thickness=None,
     ):
         """Render a Chart.js chart as inline HTML."""
         is_multi = len(datasets) > 1
@@ -924,6 +929,9 @@ class HTMLReportCreator(ReportCreator):
         x_ticks_opts = (
             "maxRotation: 45, minRotation: 45" if x_ticks_rotate else "maxRotation: 0"
         )
+        max_bar_thickness_opt = (
+            f", maxBarThickness: {max_bar_thickness}" if max_bar_thickness else ""
+        )
 
         legend_display = "true" if is_multi else "false"
 
@@ -947,7 +955,7 @@ class HTMLReportCreator(ReportCreator):
       scales: {{
         x: {{ ticks: {{ {x_ticks_opts} }} }},
         y: {{ beginAtZero: true, title: {{ display: true, text: '{y_label}' }} }}
-      }}
+      }}{f", datasets: {{ bar: {{ maxBarThickness: {max_bar_thickness} }} }}" if max_bar_thickness else ""}
     }}
   }});
   document.addEventListener('themechange', function() {{ chart.update(); }});
