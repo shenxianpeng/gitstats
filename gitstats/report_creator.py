@@ -217,6 +217,7 @@ class HTMLReportCreator(ReportCreator):
 
         # Hour of Day
         f.write(html_header(2, "Hour of Day"))
+        totalcommits = data.get_total_commits()
         hour_of_day = data.get_activity_by_hour_of_day()
         f.write("<table><tr><th>Hour</th>")
         for i in range(0, 24):
@@ -226,27 +227,16 @@ class HTMLReportCreator(ReportCreator):
             if i in hour_of_day:
                 f.write(
                     '<td class="%s">%d</td>'
-                    % (
-                        self._heat_td_class(
-                            hour_of_day[i], data.activity_by_hour_of_day_busiest
-                        ),
-                        hour_of_day[i],
-                    )
+                    % (self._heat_td_class(hour_of_day[i], data.activity_by_hour_of_day_busiest), hour_of_day[i])
                 )
             else:
                 f.write('<td class="%s">0</td>' % self._heat_td_class(0, 0))
         f.write("</tr>\n<tr><th>%</th>")
-        totalcommits = data.get_total_commits()
         for i in range(0, 24):
             if i in hour_of_day:
                 f.write(
                     '<td class="%s">%.2f</td>'
-                    % (
-                        self._heat_td_class(
-                            hour_of_day[i], data.activity_by_hour_of_day_busiest
-                        ),
-                        (100.0 * hour_of_day[i]) / totalcommits,
-                    )
+                    % (self._heat_td_class(hour_of_day[i], data.activity_by_hour_of_day_busiest), (100.0 * hour_of_day[i]) / totalcommits)
                 )
             else:
                 f.write('<td class="%s">0.00</td>' % self._heat_td_class(0, 0))
@@ -266,8 +256,8 @@ class HTMLReportCreator(ReportCreator):
         # Day of Week
         f.write(html_header(2, "Day of Week"))
         day_of_week = data.get_activity_by_day_of_week()
-        f.write('<div class="vtable"><table>')
-        f.write("<tr><th>Day</th><th>Total (%)</th></tr>")
+        f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
+        f.write("<table><tr><th>Day</th><th>Total (%)</th></tr>")
         for d in range(0, 7):
             f.write("<tr>")
             f.write("<th>%s</th>" % (WEEKDAYS[d]))
@@ -279,9 +269,10 @@ class HTMLReportCreator(ReportCreator):
             else:
                 f.write("<td>0</td>")
             f.write("</tr>")
-        f.write("</table></div>")
+        f.write("</table>")
         dow_labels = list(WEEKDAYS)
         dow_values = [day_of_week.get(d, 0) for d in range(0, 7)]
+        f.write('<div style="flex:1;min-width:0">')
         f.write(
             self._render_chartjs(
                 "chart-day-of-week",
@@ -291,49 +282,43 @@ class HTMLReportCreator(ReportCreator):
                 y_label="Commits",
             )
         )
+        f.write("</div></div>")
 
         # Hour of Week
         f.write(html_header(2, "Hour of Week"))
         f.write("<table>")
-
         f.write("<tr><th>Weekday</th>")
         for hour in range(0, 24):
-            f.write("<th>%d</th>" % (hour))
+            f.write("<th>%d</th>" % hour)
         f.write("</tr>")
-
         for weekday in range(0, 7):
-            f.write("<tr><th>%s</th>" % (WEEKDAYS[weekday]))
+            f.write("<tr><th>%s</th>" % WEEKDAYS[weekday])
             for hour in range(0, 24):
-                try:
-                    commits = data.activity_by_hour_of_week[weekday][hour]
-                except KeyError:
-                    commits = 0
+                commits = data.activity_by_hour_of_week.get(weekday, {}).get(hour, 0)
                 f.write(
                     '<td class="%s">%s</td>'
                     % (
-                        self._heat_td_class(
-                            commits, data.activity_by_hour_of_week_busiest
-                        ),
-                        ("%d" % commits) if commits != 0 else "",
+                        self._heat_td_class(commits, data.activity_by_hour_of_week_busiest),
+                        ("%d" % commits) if commits else "",
                     )
                 )
             f.write("</tr>")
-
         f.write("</table>")
 
         # Month of Year
         f.write(html_header(2, "Month of Year"))
-        f.write('<div class="vtable"><table>')
-        f.write("<tr><th>Month</th><th>Commits (%)</th></tr>")
+        f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
+        f.write("<table><tr><th>Month</th><th>Commits (%)</th></tr>")
         for mm in range(1, 13):
             commits = data.activity_by_month_of_year.get(mm, 0)
             f.write(
                 "<tr><td>%d</td><td>%d (%.2f %%)</td></tr>"
                 % (mm, commits, (100.0 * commits) / data.get_total_commits())
             )
-        f.write("</table></div>")
+        f.write("</table>")
         moy_labels = list(range(1, 13))
         moy_values = [data.activity_by_month_of_year.get(mm, 0) for mm in moy_labels]
+        f.write('<div style="flex:1;min-width:0">')
         f.write(
             self._render_chartjs(
                 "chart-month-of-year",
@@ -343,11 +328,13 @@ class HTMLReportCreator(ReportCreator):
                 y_label="Commits",
             )
         )
+        f.write("</div></div>")
 
         # Commits by year/month
         f.write(html_header(2, "Commits by year/month"))
+        f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
         f.write(
-            '<div class="vtable"><table><tr><th>Month</th><th>Commits</th><th>Lines added</th><th>Lines removed</th></tr>'
+            '<table><tr><th>Month</th><th>Commits</th><th>Lines added</th><th>Lines removed</th></tr>'
         )
         for yymm in reversed(sorted(data.commits_by_month.keys())):
             f.write(
@@ -359,9 +346,10 @@ class HTMLReportCreator(ReportCreator):
                     data.lines_removed_by_month.get(yymm, 0),
                 )
             )
-        f.write("</table></div>")
+        f.write("</table>")
         cbym_keys = sorted(data.commits_by_month.keys())
         cbym_values = [data.commits_by_month[k] for k in cbym_keys]
+        f.write('<div style="flex:1;min-width:0">')
         f.write(
             self._render_chartjs(
                 "chart-commits-by-year-month",
@@ -372,11 +360,13 @@ class HTMLReportCreator(ReportCreator):
                 x_ticks_rotate=True,
             )
         )
+        f.write("</div></div>")
 
         # Commits by year
         f.write(html_header(2, "Commits by Year"))
+        f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
         f.write(
-            '<div class="vtable"><table><tr><th>Year</th><th>Commits (% of all)</th><th>Lines added</th><th>Lines removed</th></tr>'
+            '<table><tr><th>Year</th><th>Commits (% of all)</th><th>Lines added</th><th>Lines removed</th></tr>'
         )
         for yy in reversed(sorted(data.commits_by_year.keys())):
             f.write(
@@ -390,7 +380,7 @@ class HTMLReportCreator(ReportCreator):
                     data.lines_removed_by_year.get(yy, 0),
                 )
             )
-        f.write("</table></div>")
+        f.write("</table>")
         if data.commits_by_year:
             cby_all_years = list(
                 range(
@@ -401,6 +391,7 @@ class HTMLReportCreator(ReportCreator):
         else:
             cby_all_years = []
         cby_values = [data.commits_by_year.get(y, 0) for y in cby_all_years]
+        f.write('<div style="flex:1;min-width:0">')
         f.write(
             self._render_chartjs(
                 "chart-commits-by-year",
@@ -410,20 +401,23 @@ class HTMLReportCreator(ReportCreator):
                 y_label="Commits",
             )
         )
+        f.write("</div></div>")
 
         # Commits by timezone
         f.write(html_header(2, "Commits by Timezone"))
-        f.write("<table><tr>")
-        f.write("<th>Timezone</th><th>Commits</th>")
-        f.write("</tr>")
         max_commits_on_tz = max(data.commits_by_timezone.values())
-        for i in sorted(list(data.commits_by_timezone.keys()), key=lambda n: int(n)):
+        tz_sorted = sorted(list(data.commits_by_timezone.keys()), key=lambda n: int(n))
+        f.write('<table class="heat"><tr>')
+        for i in tz_sorted:
+            f.write("<th>%s</th>" % i)
+        f.write("</tr>\n<tr>")
+        for i in tz_sorted:
             commits = data.commits_by_timezone[i]
             f.write(
-                '<tr><th>%s</th><td class="%s">%d</td></tr>'
-                % (i, self._heat_td_class(commits, max_commits_on_tz), commits)
+                '<td class="heat %s">%d</td>'
+                % (self._heat_td_class(commits, max_commits_on_tz), commits)
             )
-        f.write("</table>")
+        f.write("</tr></table>")
 
         f.write("</body></html>")
         f.close()
@@ -594,7 +588,8 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Commits by Domains"))
         domains_by_commits = get_keys_sorted_by_value_key(data.domains, "commits")
         domains_by_commits.reverse()  # most first
-        f.write('<div class="vtable"><table>')
+        f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
+        f.write('<table>')
         f.write("<tr><th>Domains</th><th>Total (%)</th></tr>")
         dom_labels = []
         dom_values = []
@@ -614,7 +609,8 @@ class HTMLReportCreator(ReportCreator):
                     (100.0 * info["commits"] / data.get_total_commits()),
                 )
             )
-        f.write("</table></div>")
+        f.write("</table>")
+        f.write('<div style="flex:1;min-width:0">')
         f.write(
             self._render_chartjs(
                 "chart-domains",
@@ -625,6 +621,7 @@ class HTMLReportCreator(ReportCreator):
                 x_ticks_rotate=True,
             )
         )
+        f.write("</div></div>")
 
         f.write("</body></html>")
         f.close()
