@@ -176,31 +176,16 @@ class HTMLReportCreator(ReportCreator):
             years.insert(0, stampcur.strftime("%Y"))
             stampcur -= deltayear
 
-        # top row: commits & bar
-        f.write('<table class="noborders"><tr>')
-        for i in range(0, YEARS):
-            commits = 0
-            year_key = int(years[i])
-            if year_key in data.commits_by_year:
-                commits = data.commits_by_year[year_key]
-
-            percentage = 0
-            if year_key in data.commits_by_year:
-                max_commits = (
-                    max(data.commits_by_year.values()) if data.commits_by_year else 1
-                )
-                percentage = float(data.commits_by_year[year_key]) / max_commits
-            height = max(1, int(200 * percentage))
-            f.write(
-                '<td style="text-align: center; vertical-align: bottom">%d<div class="bar" style="display: block; width: 20px; height: %dpx"></div></td>'
-                % (commits, height)
+        yearly_values = [data.commits_by_year.get(int(y), 0) for y in years]
+        f.write(
+            self._render_chartjs(
+                "chart-yearly-activity",
+                "bar",
+                years,
+                [{"label": "Commits", "data": yearly_values}],
+                y_label="Commits",
             )
-
-        # bottom row: year
-        f.write("</tr><tr>")
-        for i in range(0, YEARS):
-            f.write("<td>%s</td>" % years[i])
-        f.write("</tr></table>")
+        )
 
         # Weekly activity
         WEEKS = 32
@@ -216,30 +201,18 @@ class HTMLReportCreator(ReportCreator):
             weeks.insert(0, stampcur.strftime("%Y-%W"))
             stampcur -= deltaweek
 
-        # top row: commits & bar
-        f.write('<table class="noborders"><tr>')
-        for i in range(0, WEEKS):
-            commits = 0
-            if weeks[i] in data.activity_by_year_week:
-                commits = data.activity_by_year_week[weeks[i]]
-
-            percentage = 0
-            if weeks[i] in data.activity_by_year_week:
-                percentage = (
-                    float(data.activity_by_year_week[weeks[i]])
-                    / data.activity_by_year_week_peak
-                )
-            height = max(1, int(200 * percentage))
-            f.write(
-                '<td style="text-align: center; vertical-align: bottom">%d<div class="bar" style="display: block; width: 20px; height: %dpx"></div></td>'
-                % (commits, height)
+        weekly_values = [data.activity_by_year_week.get(w, 0) for w in weeks]
+        f.write(
+            self._render_chartjs(
+                "chart-weekly-activity",
+                "bar",
+                weeks,
+                [{"label": "Commits", "data": weekly_values}],
+                y_label="Commits",
+                x_ticks_rotate=True,
+                aspect_ratio=5,
             )
-
-        # bottom row: year/week
-        f.write("</tr><tr>")
-        for i in range(0, WEEKS):
-            f.write("<td>%s</td>" % (WEEKS - i))
-        f.write("</tr></table>")
+        )
 
         # Hour of Day
         f.write(html_header(2, "Hour of Day"))
@@ -906,6 +879,7 @@ class HTMLReportCreator(ReportCreator):
         datasets,
         y_label="Commits",
         x_ticks_rotate=False,
+        aspect_ratio=3,
     ):
         """Render a Chart.js chart as inline HTML."""
         is_multi = len(datasets) > 1
@@ -943,7 +917,7 @@ class HTMLReportCreator(ReportCreator):
 
         legend_display = "true" if is_multi else "false"
 
-        return f"""<div style="max-width:640px"><canvas id="{chart_id}"></canvas></div>
+        return f"""<div style="max-width:100%;margin-bottom:8px"><canvas id="{chart_id}"></canvas></div>
 <script>
 (function() {{
   var ctx = document.getElementById('{chart_id}').getContext('2d');
@@ -955,6 +929,8 @@ class HTMLReportCreator(ReportCreator):
     }},
     options: {{
       responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: {aspect_ratio},
       plugins: {{
         legend: {{ display: {legend_display} }}
       }},
