@@ -1,13 +1,14 @@
 /**
- * GitStats - Modern stylesheet with light/dark mode support
- * Inspired by contemporary developer tooling (GitHub, Linear, Vercel)
+ * GitStats — Terminal / OpenCode-inspired stylesheet
+ * Design: angular (0 border-radius), monospace accents, line-heavy borders
+ * Palette: OpenCode warm grayscale (#211E1E / #F1ECEC)
  */
 
 /* ===== CSS Custom Properties ===== */
 :root {
-	/* Typography */
+	/* Typography — OpenCode uses IBM Plex Mono / Inter */
 	--font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
-	--font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+	--font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 	--font-size-xs: 11px;
 	--font-size-sm: 12px;
 	--font-size-base: 14px;
@@ -23,39 +24,41 @@
 	--space-5: 24px;
 	--space-6: 32px;
 
-	/* Border radius */
-	--radius-sm: 4px;
-	--radius-md: 6px;
-	--radius-lg: 8px;
+	/* Border radius — ZERO everywhere: terminal/angular aesthetic */
+	--radius-sm: 0;
+	--radius-md: 0;
+	--radius-lg: 0;
 
-	/* Light mode colors */
+	/* ── Light mode — OpenCode warm palette ── */
 	--bg-color: #ffffff;
-	--surface-color: #f6f8fa;
-	--text-color: #1f2328;
-	--text-secondary: #656d76;
-	--text-muted: #9198a1;
-	--border-color: #d0d7de;
-	--accent-color: #0969da;
-	--success-color: #1a7f37;
-	--danger-color: #cf222e;
+	--surface-color: #f5f5f4;
+	--text-color: #211e1e;
+	--text-secondary: #656363;
+	--text-muted: #b7b1b1;
+	--border-color: #cfcecd;
+	--border-strong: #9e9a9a;
+	--accent-color: #211e1e;
+	--success-color: #2d6a3f;
+	--danger-color: #8b2323;
 
 	--table-bg: #ffffff;
-	--table-header-bg: #f6f8fa;
-	--table-hover-bg: #f3f6fa;
-	--table-border: #d0d7de;
+	--table-header-bg: #f5f5f4;
+	--table-header-color: #211e1e;
+	--table-hover-bg: #f0efef;
+	--table-border: #cfcecd;
 
 	--nav-bg: #ffffff;
-	--nav-text: #1f2328;
-	--nav-hover-bg: #f3f6fa;
+	--nav-text: #4b4646;
+	--nav-hover-color: #211e1e;
 
-	--img-bg: #f6f8fa;
-	--img-border: #d0d7de;
+	--img-bg: #f5f5f4;
+	--img-border: #cfcecd;
 
-	--link-color: #0969da;
+	--link-color: #4a7ab5;
 
-	--bar-color: #0969da;
+	--bar-color: #4a7ab5;
 
-	/* Heatmap - GitHub green scale */
+	/* Heatmap — GitHub green scale (user preference) */
 	--heat0-bg: #ebedf0;
 	--heat0-color: #1f2328;
 	--heat1-bg: #9be9a8;
@@ -68,35 +71,37 @@
 	--heat4-color: #ffffff;
 }
 
-/* Dark mode */
+/* ── Dark mode — OpenCode near-black ── */
 [data-theme="dark"] {
-	--bg-color: #0d1117;
-	--surface-color: #161b22;
-	--text-color: #e6edf3;
-	--text-secondary: #8b949e;
-	--text-muted: #6e7681;
-	--border-color: #30363d;
-	--accent-color: #58a6ff;
-	--success-color: #3fb950;
-	--danger-color: #f85149;
+	--bg-color: #211e1e;
+	--surface-color: #2d2929;
+	--text-color: #f1ecec;
+	--text-secondary: #b7b1b1;
+	--text-muted: #656363;
+	--border-color: #3d3838;
+	--border-strong: #656363;
+	--accent-color: #f1ecec;
+	--success-color: #4ade80;
+	--danger-color: #f87171;
 
-	--table-bg: #161b22;
-	--table-header-bg: #1c2128;
-	--table-hover-bg: #1c2837;
-	--table-border: #30363d;
+	--table-bg: #2d2929;
+	--table-header-bg: #211e1e;
+	--table-header-color: #cfcecd;
+	--table-hover-bg: #352f2f;
+	--table-border: #3d3838;
 
-	--nav-bg: #0d1117;
-	--nav-text: #e6edf3;
-	--nav-hover-bg: #21262d;
+	--nav-bg: #211e1e;
+	--nav-text: #b7b1b1;
+	--nav-hover-color: #f1ecec;
 
-	--img-bg: #1c2128;
-	--img-border: #30363d;
+	--img-bg: #2d2929;
+	--img-border: #3d3838;
 
-	--link-color: #58a6ff;
+	--link-color: #6b95c8;
 
-	--bar-color: #388bfd;
+	--bar-color: #6b95c8;
 
-	/* Heatmap dark mode - GitHub dark green scale */
+	/* Heatmap dark — GitHub dark green */
 	--heat0-bg: #1c2128;
 	--heat0-color: #e6edf3;
 	--heat1-bg: #0e4429;
@@ -109,7 +114,7 @@
 	--heat4-color: #0d1117;
 }
 
-/* ===== Base Styles ===== */
+/* ===== Base ===== */
 *, *::before, *::after {
 	box-sizing: border-box;
 }
@@ -132,6 +137,8 @@ dt {
 	float: left;
 	margin-right: var(--space-2);
 	color: var(--text-secondary);
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
 }
 
 dt::after {
@@ -149,15 +156,12 @@ table {
 	border-collapse: collapse;
 	font-size: var(--font-size-sm);
 	margin-bottom: var(--space-4);
-	border: 1px solid var(--table-border);
-	border-radius: var(--radius-md);
-	overflow: hidden;
+	border: 1px solid var(--border-strong);
 }
 
 table.noborders {
 	border: none;
 	background: transparent;
-	overflow: visible;
 }
 
 table.noborders td {
@@ -184,23 +188,25 @@ td {
 
 th {
 	background-color: var(--table-header-bg);
+	font-family: var(--font-mono);
 	font-weight: 600;
-	color: var(--text-secondary);
+	color: var(--table-header-color);
 	padding: var(--space-2) var(--space-3);
 	text-align: left;
 	font-size: var(--font-size-xs);
 	text-transform: uppercase;
-	letter-spacing: 0.04em;
-	border: 1px solid var(--table-border);
+	letter-spacing: 0.08em;
+	border: 1px solid var(--border-strong);
+	white-space: nowrap;
 }
 
 th a {
 	text-decoration: none;
-	color: var(--text-secondary);
+	color: var(--table-header-color);
 }
 
 th a:hover {
-	color: var(--accent-color);
+	color: var(--text-secondary);
 }
 
 tr:hover td {
@@ -212,9 +218,9 @@ tr:hover td {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: var(--space-2) 0;
+	padding: var(--space-4) 0;
 	margin-bottom: var(--space-5);
-	border-bottom: 1px solid var(--border-color);
+	border-bottom: 1px solid var(--border-strong);
 	position: sticky;
 	top: 0;
 	background-color: var(--nav-bg);
@@ -225,7 +231,7 @@ tr:hover td {
 	list-style: none;
 	display: flex;
 	flex-wrap: wrap;
-	gap: var(--space-1);
+	gap: 0;
 	margin: 0;
 	padding: 0;
 }
@@ -234,56 +240,106 @@ tr:hover td {
 	display: inline-flex;
 }
 
+/* Vertical separator between nav items */
+.nav li + li {
+	border-left: 1px solid var(--border-color);
+}
+
 .nav li a {
 	display: inline-flex;
 	align-items: center;
-	padding: var(--space-1) var(--space-3);
+	padding: var(--space-2) var(--space-3);
 	text-decoration: none;
 	color: var(--nav-text);
-	border: 1px solid transparent;
-	border-radius: var(--radius-md);
+	font-family: var(--font-mono);
 	font-size: var(--font-size-sm);
 	font-weight: 500;
-	transition: background-color 0.15s ease, border-color 0.15s ease;
+	letter-spacing: 0.02em;
+	transition: color 0.12s ease, background-color 0.12s ease;
 	white-space: nowrap;
 }
 
 .nav li a:hover {
-	background-color: var(--nav-hover-bg);
-	border-color: var(--border-color);
+	color: var(--nav-hover-color);
+	background-color: var(--surface-color);
 	text-decoration: none;
+}
+
+/* ===== Nav Brand ===== */
+.nav-brand {
+	font-family: var(--font-mono);
+	font-size: var(--font-size-md);
+	font-weight: 700;
+	color: var(--text-color);
+	text-decoration: none;
+	letter-spacing: -0.01em;
+	flex-shrink: 0;
+	margin-right: var(--space-4);
+}
+
+.nav-brand:hover {
+	text-decoration: none;
+	opacity: 0.75;
+}
+
+/* ===== Nav Right (GitHub icon + theme toggle) ===== */
+.nav-right {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	flex-shrink: 0;
+	margin-left: var(--space-4);
+	border-left: 1px solid var(--border-color);
+	padding-left: var(--space-3);
+}
+
+.nav-github {
+	display: inline-flex;
+	align-items: center;
+	color: var(--text-secondary);
+	padding: var(--space-1);
+	transition: color 0.12s ease;
+	text-decoration: none;
+}
+
+.nav-github:hover {
+	color: var(--nav-hover-color);
+	text-decoration: none;
+}
+
+.nav-github svg {
+	display: block;
 }
 
 /* ===== Theme Toggle ===== */
 .theme-toggle {
-	background: var(--surface-color);
+	background: transparent;
 	border: 1px solid var(--border-color);
-	border-radius: var(--radius-md);
 	cursor: pointer;
 	padding: var(--space-1) var(--space-2);
 	font-size: var(--font-size-base);
 	color: var(--text-secondary);
 	line-height: 1.4;
-	transition: background-color 0.15s ease, border-color 0.15s ease;
+	transition: border-color 0.12s ease, color 0.12s ease;
 	flex-shrink: 0;
-	margin-left: var(--space-3);
 }
 
 .theme-toggle:hover {
-	background-color: var(--nav-hover-bg);
-	border-color: var(--accent-color);
+	border-color: var(--border-strong);
 	color: var(--text-color);
 }
 
 /* ===== Headings ===== */
 h1 {
+	font-family: var(--font-mono);
 	font-size: var(--font-size-xl);
-	font-weight: 600;
+	font-weight: 700;
 	color: var(--text-color);
 	margin: var(--space-5) 0 var(--space-4);
 	padding-bottom: var(--space-3);
-	border-bottom: 1px solid var(--border-color);
+	border-bottom: 1px solid var(--border-strong);
 	line-height: 1.3;
+	letter-spacing: -0.02em;
 }
 
 h1 a {
@@ -292,16 +348,23 @@ h1 a {
 }
 
 h2 {
+	font-family: var(--font-mono);
 	font-size: var(--font-size-md);
 	font-weight: 600;
 	color: var(--text-color);
 	margin: var(--space-6) 0 var(--space-3);
-	padding: var(--space-2) var(--space-4);
+	padding: var(--space-2) var(--space-3);
+	border-left: 2px solid var(--text-color);
 	background-color: var(--surface-color);
-	border: 1px solid var(--border-color);
-	border-left: 3px solid var(--accent-color);
-	border-radius: 0 var(--radius-md) var(--radius-md) 0;
 	clear: both;
+	letter-spacing: -0.01em;
+}
+
+h2::before {
+	content: '// ';
+	color: var(--text-muted);
+	font-weight: 400;
+	letter-spacing: 0;
 }
 
 h2 a {
@@ -311,15 +374,14 @@ h2 a {
 
 h1:hover a::after,
 h2:hover a::after {
-	content: ' ¶';
+	content: ' #';
 	color: var(--text-muted);
 	font-weight: 400;
 }
 
 /* ===== Images ===== */
 img {
-	border: 1px solid var(--img-border);
-	border-radius: var(--radius-md);
+	border: 1px solid var(--border-strong);
 	padding: var(--space-3);
 	background-color: var(--img-bg);
 	max-width: 100%;
@@ -332,7 +394,6 @@ th img {
 	border: none;
 	padding: 0;
 	background-color: transparent;
-	border-radius: 0;
 	margin: 0;
 	display: inline;
 }
@@ -350,9 +411,8 @@ a:hover {
 /* ===== Bar Charts ===== */
 .bar {
 	background-color: var(--bar-color);
-	border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-	opacity: 0.8;
-	transition: opacity 0.15s ease;
+	opacity: 0.85;
+	transition: opacity 0.12s ease;
 }
 
 table.noborders td:hover .bar {
@@ -363,6 +423,7 @@ table.noborders td {
 	font-size: var(--font-size-xs);
 	color: var(--text-secondary);
 	font-variant-numeric: tabular-nums;
+	font-family: var(--font-mono);
 }
 
 /* ===== Misc ===== */
@@ -379,44 +440,25 @@ table.noborders td {
 	font-variant-numeric: tabular-nums;
 }
 
-.heat0 {
-	background-color: var(--heat0-bg) !important;
-	color: var(--heat0-color);
-}
-
-.heat1 {
-	background-color: var(--heat1-bg) !important;
-	color: var(--heat1-color);
-}
-
-.heat2 {
-	background-color: var(--heat2-bg) !important;
-	color: var(--heat2-color);
-}
-
-.heat3 {
-	background-color: var(--heat3-bg) !important;
-	color: var(--heat3-color);
-}
-
-.heat4 {
-	background-color: var(--heat4-bg) !important;
-	color: var(--heat4-color);
-}
+.heat0 { background-color: var(--heat0-bg) !important; color: var(--heat0-color); }
+.heat1 { background-color: var(--heat1-bg) !important; color: var(--heat1-color); }
+.heat2 { background-color: var(--heat2-bg) !important; color: var(--heat2-color); }
+.heat3 { background-color: var(--heat3-bg) !important; color: var(--heat3-color); }
+.heat4 { background-color: var(--heat4-bg) !important; color: var(--heat4-color); }
 
 /* ===== AI Summary ===== */
 .ai-summary {
 	margin: var(--space-4) 0;
 	padding: var(--space-4);
 	background-color: var(--surface-color);
-	border: 1px solid var(--border-color);
-	border-left: 3px solid var(--accent-color);
-	border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+	border: 1px solid var(--border-strong);
+	border-left: 3px solid var(--text-color);
 }
 
 .ai-summary h3 {
 	margin-top: 0;
 	color: var(--text-color);
+	font-family: var(--font-mono);
 	font-size: var(--font-size-base);
 	font-weight: 600;
 }
@@ -427,34 +469,18 @@ table.noborders td {
 	color: var(--text-color);
 }
 
-.ai-summary-content p {
-	margin: var(--space-3) 0;
-}
-
-.ai-summary-content ul {
-	margin: var(--space-2) 0;
-	padding-left: var(--space-5);
-}
-
-.ai-summary-content li {
-	margin: var(--space-1) 0;
-}
-
-.ai-summary-content strong {
-	font-weight: 600;
-}
-
-.ai-summary-content em {
-	font-style: italic;
-}
+.ai-summary-content p { margin: var(--space-3) 0; }
+.ai-summary-content ul { margin: var(--space-2) 0; padding-left: var(--space-5); }
+.ai-summary-content li { margin: var(--space-1) 0; }
+.ai-summary-content strong { font-weight: 600; }
+.ai-summary-content em { font-style: italic; }
 
 /* ===== AI Error State ===== */
 .ai-summary-error {
 	padding: var(--space-3);
 	background-color: var(--surface-color);
-	border: 1px solid var(--border-color);
+	border: 1px solid var(--border-strong);
 	border-left: 3px solid var(--danger-color);
-	border-radius: 0 var(--radius-md) var(--radius-md) 0;
 }
 
 /* ===== AI Insights Page ===== */
@@ -462,8 +488,7 @@ table.noborders td {
 	padding: var(--space-4);
 	margin: var(--space-4) 0;
 	background-color: var(--surface-color);
-	border: 1px solid var(--border-color);
-	border-radius: var(--radius-lg);
+	border: 1px solid var(--border-strong);
 }
 
 .ai-insights-intro p {
@@ -492,12 +517,12 @@ table.noborders td {
 	margin: var(--space-6) 0;
 	padding: var(--space-4);
 	background-color: var(--surface-color);
-	border: 1px solid var(--border-color);
-	border-radius: var(--radius-lg);
+	border: 1px solid var(--border-strong);
 }
 
 .ai-disclaimer h3 {
 	margin-top: 0;
+	font-family: var(--font-mono);
 	font-size: var(--font-size-base);
 	font-weight: 600;
 }
