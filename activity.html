@@ -4,18 +4,14 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - gitstats</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats <function get_version at 0x7f3ff7cd0310>">
+	<meta name="generator" content="GitStats <function get_version at 0x7fa3991cd310>">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
 		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
-		// Theme toggle functionality
-		function initTheme() {
-			const savedTheme = localStorage.getItem('theme') || 'light';
-			document.documentElement.setAttribute('data-theme', savedTheme);
-			updateThemeIcon(savedTheme);
-		}
 
 		function toggleTheme() {
 			const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -33,13 +29,15 @@
 			}
 		}
 
-		// Initialize theme on page load
-		document.addEventListener('DOMContentLoaded', initTheme);
+		document.addEventListener('DOMContentLoaded', function() {
+			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		});
 	</script>
 </head>
 <body>
 
             <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
             <ul>
             <li><a href="index.html">General</a></li>
             <li><a href="activity.html">Activity</a></li>
@@ -49,20 +47,75 @@
             <li><a href="tags.html">Tags</a></li>
             
             </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            </div>
             </div>
             <h1>Activity</h1>
 <h2 id="yearly_activity"><a href="#yearly_activity">Yearly activity</a></h2>
 
-<p>Last 20 years</p><table class="noborders"><tr><td style="text-align: center; vertical-align: bottom">107<div class="bar" style="display: block; width: 20px; height: 200px"></div></td><td style="text-align: center; vertical-align: bottom">29<div class="bar" style="display: block; width: 20px; height: 54px"></div></td><td style="text-align: center; vertical-align: bottom">45<div class="bar" style="display: block; width: 20px; height: 84px"></div></td><td style="text-align: center; vertical-align: bottom">36<div class="bar" style="display: block; width: 20px; height: 67px"></div></td><td style="text-align: center; vertical-align: bottom">28<div class="bar" style="display: block; width: 20px; height: 52px"></div></td><td style="text-align: center; vertical-align: bottom">17<div class="bar" style="display: block; width: 20px; height: 31px"></div></td><td style="text-align: center; vertical-align: bottom">11<div class="bar" style="display: block; width: 20px; height: 20px"></div></td><td style="text-align: center; vertical-align: bottom">19<div class="bar" style="display: block; width: 20px; height: 35px"></div></td><td style="text-align: center; vertical-align: bottom">2<div class="bar" style="display: block; width: 20px; height: 3px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">68<div class="bar" style="display: block; width: 20px; height: 127px"></div></td><td style="text-align: center; vertical-align: bottom">90<div class="bar" style="display: block; width: 20px; height: 168px"></div></td><td style="text-align: center; vertical-align: bottom">17<div class="bar" style="display: block; width: 20px; height: 31px"></div></td></tr><tr><td>2007</td><td>2008</td><td>2009</td><td>2010</td><td>2011</td><td>2012</td><td>2013</td><td>2014</td><td>2015</td><td>2016</td><td>2017</td><td>2018</td><td>2019</td><td>2020</td><td>2021</td><td>2022</td><td>2023</td><td>2024</td><td>2025</td><td>2026</td></tr></table>
+<p>Last 20 years</p><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-yearly-activity"></canvas></div>
+<script>
+(function() {
+  var ctx = document.getElementById('chart-yearly-activity').getContext('2d');
+  var chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ["2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026"],
+      datasets: [{"label": "Commits", "data": [107, 29, 45, 36, 28, 17, 11, 19, 2, 0, 0, 0, 0, 0, 0, 0, 0, 68, 90, 18], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 4,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: { ticks: { maxRotation: 0 } },
+        y: { beginAtZero: true, title: { display: true, text: 'Commits' } }
+      }
+    }
+  });
+  document.addEventListener('themechange', function() { chart.update(); });
+})();
+</script>
+
 <h2 id="weekly_activity"><a href="#weekly_activity">Weekly activity</a></h2>
 
-<p>Last 32 weeks</p><table class="noborders"><tr><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">3<div class="bar" style="display: block; width: 20px; height: 15px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">1<div class="bar" style="display: block; width: 20px; height: 5px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">2<div class="bar" style="display: block; width: 20px; height: 10px"></div></td><td style="text-align: center; vertical-align: bottom">1<div class="bar" style="display: block; width: 20px; height: 5px"></div></td><td style="text-align: center; vertical-align: bottom">2<div class="bar" style="display: block; width: 20px; height: 10px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">1<div class="bar" style="display: block; width: 20px; height: 5px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">4<div class="bar" style="display: block; width: 20px; height: 21px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">3<div class="bar" style="display: block; width: 20px; height: 15px"></div></td><td style="text-align: center; vertical-align: bottom">2<div class="bar" style="display: block; width: 20px; height: 10px"></div></td><td style="text-align: center; vertical-align: bottom">5<div class="bar" style="display: block; width: 20px; height: 26px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">3<div class="bar" style="display: block; width: 20px; height: 15px"></div></td><td style="text-align: center; vertical-align: bottom">1<div class="bar" style="display: block; width: 20px; height: 5px"></div></td><td style="text-align: center; vertical-align: bottom">1<div class="bar" style="display: block; width: 20px; height: 5px"></div></td><td style="text-align: center; vertical-align: bottom">1<div class="bar" style="display: block; width: 20px; height: 5px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">4<div class="bar" style="display: block; width: 20px; height: 21px"></div></td><td style="text-align: center; vertical-align: bottom">0<div class="bar" style="display: block; width: 20px; height: 1px"></div></td><td style="text-align: center; vertical-align: bottom">4<div class="bar" style="display: block; width: 20px; height: 21px"></div></td><td style="text-align: center; vertical-align: bottom">3<div class="bar" style="display: block; width: 20px; height: 15px"></div></td><td style="text-align: center; vertical-align: bottom">1<div class="bar" style="display: block; width: 20px; height: 5px"></div></td><td style="text-align: center; vertical-align: bottom">2<div class="bar" style="display: block; width: 20px; height: 10px"></div></td></tr><tr><td>32</td><td>31</td><td>30</td><td>29</td><td>28</td><td>27</td><td>26</td><td>25</td><td>24</td><td>23</td><td>22</td><td>21</td><td>20</td><td>19</td><td>18</td><td>17</td><td>16</td><td>15</td><td>14</td><td>13</td><td>12</td><td>11</td><td>10</td><td>9</td><td>8</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td><td>1</td></tr></table>
+<p>Last 32 weeks</p><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-weekly-activity"></canvas></div>
+<script>
+(function() {
+  var ctx = document.getElementById('chart-weekly-activity').getContext('2d');
+  var chart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ["2025-30", "2025-31", "2025-32", "2025-33", "2025-34", "2025-35", "2025-36", "2025-37", "2025-38", "2025-39", "2025-40", "2025-41", "2025-42", "2025-43", "2025-44", "2025-45", "2025-46", "2025-47", "2025-48", "2025-49", "2025-50", "2025-51", "2026-00", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08", "2026-09"],
+      datasets: [{"label": "Commits", "data": [0, 0, 0, 3, 0, 1, 0, 0, 0, 2, 1, 2, 0, 1, 0, 4, 0, 3, 2, 5, 0, 3, 1, 1, 1, 0, 4, 0, 4, 3, 1, 3], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 5,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: { ticks: { maxRotation: 45, minRotation: 45 } },
+        y: { beginAtZero: true, title: { display: true, text: 'Commits' } }
+      }
+    }
+  });
+  document.addEventListener('themechange', function() { chart.update(); });
+})();
+</script>
+
 <h2 id="hour_of_day"><a href="#hour_of_day">Hour of Day</a></h2>
 
 <table><tr><th>Hour</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th></tr>
-<tr><th>Commits</th><td class="heat heat1">5</td><td class="heat heat1">5</td><td class="heat heat1">3</td><td class="heat heat1">3</td><td class="heat heat1">4</td><td class="heat heat1">3</td><td class="heat heat1">8</td><td class="heat heat3">30</td><td class="heat heat3">29</td><td class="heat heat4">33</td><td class="heat heat2">17</td><td class="heat heat2">19</td><td class="heat heat3">29</td><td class="heat heat4">35</td><td class="heat heat3">23</td><td class="heat heat3">28</td><td class="heat heat4">43</td><td class="heat heat4">40</td><td class="heat heat3">32</td><td class="heat heat3">30</td><td class="heat heat3">26</td><td class="heat heat1">7</td><td class="heat heat1">9</td><td class="heat heat1">8</td></tr>
-<tr><th>%</th><td class="heat heat1">1.07</td><td class="heat heat1">1.07</td><td class="heat heat1">0.64</td><td class="heat heat1">0.64</td><td class="heat heat1">0.85</td><td class="heat heat1">0.64</td><td class="heat heat1">1.71</td><td class="heat heat3">6.40</td><td class="heat heat3">6.18</td><td class="heat heat4">7.04</td><td class="heat heat2">3.62</td><td class="heat heat2">4.05</td><td class="heat heat3">6.18</td><td class="heat heat4">7.46</td><td class="heat heat3">4.90</td><td class="heat heat3">5.97</td><td class="heat heat4">9.17</td><td class="heat heat4">8.53</td><td class="heat heat3">6.82</td><td class="heat heat3">6.40</td><td class="heat heat3">5.54</td><td class="heat heat1">1.49</td><td class="heat heat1">1.92</td><td class="heat heat1">1.71</td></tr></table><div style="max-width:640px"><canvas id="chart-hour-of-day"></canvas></div>
+<tr><th>Commits</th><td class="heat heat1">5</td><td class="heat heat1">5</td><td class="heat heat1">3</td><td class="heat heat1">3</td><td class="heat heat1">4</td><td class="heat heat1">3</td><td class="heat heat1">8</td><td class="heat heat3">30</td><td class="heat heat3">29</td><td class="heat heat4">33</td><td class="heat heat2">17</td><td class="heat heat2">19</td><td class="heat heat3">29</td><td class="heat heat4">35</td><td class="heat heat3">23</td><td class="heat heat3">28</td><td class="heat heat4">43</td><td class="heat heat4">40</td><td class="heat heat4">33</td><td class="heat heat3">30</td><td class="heat heat3">26</td><td class="heat heat1">7</td><td class="heat heat1">9</td><td class="heat heat1">8</td></tr>
+<tr><th>%</th><td class="heat heat1">1.06</td><td class="heat heat1">1.06</td><td class="heat heat1">0.64</td><td class="heat heat1">0.64</td><td class="heat heat1">0.85</td><td class="heat heat1">0.64</td><td class="heat heat1">1.70</td><td class="heat heat3">6.38</td><td class="heat heat3">6.17</td><td class="heat heat4">7.02</td><td class="heat heat2">3.62</td><td class="heat heat2">4.04</td><td class="heat heat3">6.17</td><td class="heat heat4">7.45</td><td class="heat heat3">4.89</td><td class="heat heat3">5.96</td><td class="heat heat4">9.15</td><td class="heat heat4">8.51</td><td class="heat heat4">7.02</td><td class="heat heat3">6.38</td><td class="heat heat3">5.53</td><td class="heat heat1">1.49</td><td class="heat heat1">1.91</td><td class="heat heat1">1.70</td></tr></table><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-hour-of-day"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-hour-of-day').getContext('2d');
@@ -70,10 +123,12 @@
     type: 'bar',
     data: {
       labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-      datasets: [{"label": "Commits", "data": [5, 5, 3, 3, 4, 3, 8, 30, 29, 33, 17, 19, 29, 35, 23, 28, 43, 40, 32, 30, 26, 7, 9, 8], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
+      datasets: [{"label": "Commits", "data": [5, 5, 3, 3, 4, 3, 8, 30, 29, 33, 17, 19, 29, 35, 23, 28, 43, 40, 33, 30, 26, 7, 9, 8], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 3,
       plugins: {
         legend: { display: false }
       },
@@ -89,7 +144,7 @@
 
 <h2 id="day_of_week"><a href="#day_of_week">Day of Week</a></h2>
 
-<div class="vtable"><table><tr><th>Day</th><th>Total (%)</th></tr><tr><th>Mon</th><td>46 (9.81%)</td></tr><tr><th>Tue</th><td>74 (15.78%)</td></tr><tr><th>Wed</th><td>41 (8.74%)</td></tr><tr><th>Thu</th><td>77 (16.42%)</td></tr><tr><th>Fri</th><td>88 (18.76%)</td></tr><tr><th>Sat</th><td>72 (15.35%)</td></tr><tr><th>Sun</th><td>71 (15.14%)</td></tr></table></div><div style="max-width:640px"><canvas id="chart-day-of-week"></canvas></div>
+<div style="display:flex;gap:24px;align-items:flex-start"><table><tr><th>Day</th><th>Total (%)</th></tr><tr><th>Mon</th><td>46 (9.79%)</td></tr><tr><th>Tue</th><td>74 (15.74%)</td></tr><tr><th>Wed</th><td>41 (8.72%)</td></tr><tr><th>Thu</th><td>78 (16.60%)</td></tr><tr><th>Fri</th><td>88 (18.72%)</td></tr><tr><th>Sat</th><td>72 (15.32%)</td></tr><tr><th>Sun</th><td>71 (15.11%)</td></tr></table><div style="flex:1;min-width:0"><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-day-of-week"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-day-of-week').getContext('2d');
@@ -97,29 +152,31 @@
     type: 'bar',
     data: {
       labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-      datasets: [{"label": "Commits", "data": [46, 74, 41, 77, 88, 72, 71], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
+      datasets: [{"label": "Commits", "data": [46, 74, 41, 78, 88, 72, 71], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 4,
       plugins: {
         legend: { display: false }
       },
       scales: {
         x: { ticks: { maxRotation: 0 } },
         y: { beginAtZero: true, title: { display: true, text: 'Commits' } }
-      }
+      }, datasets: { bar: { maxBarThickness: 40 } }
     }
   });
   document.addEventListener('themechange', function() { chart.update(); });
 })();
 </script>
-
+</div></div>
 <h2 id="hour_of_week"><a href="#hour_of_week">Hour of Week</a></h2>
 
-<table><tr><th>Weekday</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th></tr><tr><th>Mon</th><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat0"></td><td class="heat heat2">5</td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat1">3</td><td class="heat heat1">2</td><td class="heat heat2">6</td><td class="heat heat2">5</td><td class="heat heat2">8</td><td class="heat heat2">5</td><td class="heat heat1">3</td><td class="heat heat1">2</td><td class="heat heat1">1</td><td class="heat heat1">1</td></tr><tr><th>Tue</th><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat1">4</td><td class="heat heat1">2</td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat1">3</td><td class="heat heat2">9</td><td class="heat heat2">9</td><td class="heat heat2">8</td><td class="heat heat2">9</td><td class="heat heat2">9</td><td class="heat heat1">4</td><td class="heat heat2">5</td><td class="heat heat1">2</td><td class="heat heat1">3</td><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat1">1</td></tr><tr><th>Wed</th><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">4</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat2">5</td><td class="heat heat1">1</td><td class="heat heat1">1</td><td class="heat heat1">1</td><td class="heat heat2">8</td><td class="heat heat2">6</td><td class="heat heat1">4</td><td class="heat heat1">3</td><td class="heat heat1">2</td><td class="heat heat1">3</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">1</td></tr><tr><th>Thu</th><td class="heat heat1">1</td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat2">5</td><td class="heat heat2">6</td><td class="heat heat1">3</td><td class="heat heat1">1</td><td class="heat heat1">4</td><td class="heat heat2">7</td><td class="heat heat2">6</td><td class="heat heat1">2</td><td class="heat heat1">1</td><td class="heat heat1">3</td><td class="heat heat3">13</td><td class="heat heat2">8</td><td class="heat heat2">7</td><td class="heat heat2">6</td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat0"></td></tr><tr><th>Fri</th><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat3">11</td><td class="heat heat4">18</td><td class="heat heat3">12</td><td class="heat heat1">1</td><td class="heat heat1">3</td><td class="heat heat2">6</td><td class="heat heat1">3</td><td class="heat heat2">5</td><td class="heat heat2">6</td><td class="heat heat1">2</td><td class="heat heat1">3</td><td class="heat heat2">6</td><td class="heat heat1">2</td><td class="heat heat0"></td><td class="heat heat1">4</td><td class="heat heat1">4</td></tr><tr><th>Sat</th><td class="heat heat1">2</td><td class="heat heat1">3</td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat1">4</td><td class="heat heat2">5</td><td class="heat heat3">10</td><td class="heat heat1">3</td><td class="heat heat1">1</td><td class="heat heat1">1</td><td class="heat heat2">5</td><td class="heat heat2">5</td><td class="heat heat1">1</td><td class="heat heat1">3</td><td class="heat heat1">1</td><td class="heat heat2">8</td><td class="heat heat1">3</td><td class="heat heat1">2</td><td class="heat heat2">6</td><td class="heat heat1">4</td><td class="heat heat1">1</td><td class="heat heat1">1</td></tr><tr><th>Sun</th><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat1">2</td><td class="heat heat1">2</td><td class="heat heat2">8</td><td class="heat heat0"></td><td class="heat heat1">3</td><td class="heat heat1">2</td><td class="heat heat2">5</td><td class="heat heat1">3</td><td class="heat heat2">8</td><td class="heat heat2">5</td><td class="heat heat0"></td><td class="heat heat3">12</td><td class="heat heat1">4</td><td class="heat heat1">2</td><td class="heat heat2">6</td><td class="heat heat1">3</td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat0"></td></tr></table>
+<table><tr><th>Weekday</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th></tr><tr><th>Mon</th><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat0"></td><td class="heat heat2">5</td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat1">3</td><td class="heat heat1">2</td><td class="heat heat2">6</td><td class="heat heat2">5</td><td class="heat heat2">8</td><td class="heat heat2">5</td><td class="heat heat1">3</td><td class="heat heat1">2</td><td class="heat heat1">1</td><td class="heat heat1">1</td></tr><tr><th>Tue</th><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat1">4</td><td class="heat heat1">2</td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat1">3</td><td class="heat heat2">9</td><td class="heat heat2">9</td><td class="heat heat2">8</td><td class="heat heat2">9</td><td class="heat heat2">9</td><td class="heat heat1">4</td><td class="heat heat2">5</td><td class="heat heat1">2</td><td class="heat heat1">3</td><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat1">1</td></tr><tr><th>Wed</th><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">4</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat2">5</td><td class="heat heat1">1</td><td class="heat heat1">1</td><td class="heat heat1">1</td><td class="heat heat2">8</td><td class="heat heat2">6</td><td class="heat heat1">4</td><td class="heat heat1">3</td><td class="heat heat1">2</td><td class="heat heat1">3</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">1</td></tr><tr><th>Thu</th><td class="heat heat1">1</td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat2">5</td><td class="heat heat2">6</td><td class="heat heat1">3</td><td class="heat heat1">1</td><td class="heat heat1">4</td><td class="heat heat2">7</td><td class="heat heat2">6</td><td class="heat heat1">2</td><td class="heat heat1">1</td><td class="heat heat1">3</td><td class="heat heat3">13</td><td class="heat heat2">9</td><td class="heat heat2">7</td><td class="heat heat2">6</td><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat0"></td></tr><tr><th>Fri</th><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat3">11</td><td class="heat heat4">18</td><td class="heat heat3">12</td><td class="heat heat1">1</td><td class="heat heat1">3</td><td class="heat heat2">6</td><td class="heat heat1">3</td><td class="heat heat2">5</td><td class="heat heat2">6</td><td class="heat heat1">2</td><td class="heat heat1">3</td><td class="heat heat2">6</td><td class="heat heat1">2</td><td class="heat heat0"></td><td class="heat heat1">4</td><td class="heat heat1">4</td></tr><tr><th>Sat</th><td class="heat heat1">2</td><td class="heat heat1">3</td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat1">4</td><td class="heat heat2">5</td><td class="heat heat3">10</td><td class="heat heat1">3</td><td class="heat heat1">1</td><td class="heat heat1">1</td><td class="heat heat2">5</td><td class="heat heat2">5</td><td class="heat heat1">1</td><td class="heat heat1">3</td><td class="heat heat1">1</td><td class="heat heat2">8</td><td class="heat heat1">3</td><td class="heat heat1">2</td><td class="heat heat2">6</td><td class="heat heat1">4</td><td class="heat heat1">1</td><td class="heat heat1">1</td></tr><tr><th>Sun</th><td class="heat heat1">1</td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat0"></td><td class="heat heat1">1</td><td class="heat heat1">2</td><td class="heat heat1">2</td><td class="heat heat2">8</td><td class="heat heat0"></td><td class="heat heat1">3</td><td class="heat heat1">2</td><td class="heat heat2">5</td><td class="heat heat1">3</td><td class="heat heat2">8</td><td class="heat heat2">5</td><td class="heat heat0"></td><td class="heat heat3">12</td><td class="heat heat1">4</td><td class="heat heat1">2</td><td class="heat heat2">6</td><td class="heat heat1">3</td><td class="heat heat0"></td><td class="heat heat1">2</td><td class="heat heat0"></td></tr></table>
 <h2 id="month_of_year"><a href="#month_of_year">Month of Year</a></h2>
 
-<div class="vtable"><table><tr><th>Month</th><th>Commits (%)</th></tr><tr><td>1</td><td>67 (14.29 %)</td></tr><tr><td>2</td><td>17 (3.62 %)</td></tr><tr><td>3</td><td>16 (3.41 %)</td></tr><tr><td>4</td><td>18 (3.84 %)</td></tr><tr><td>5</td><td>18 (3.84 %)</td></tr><tr><td>6</td><td>29 (6.18 %)</td></tr><tr><td>7</td><td>31 (6.61 %)</td></tr><tr><td>8</td><td>92 (19.62 %)</td></tr><tr><td>9</td><td>24 (5.12 %)</td></tr><tr><td>10</td><td>19 (4.05 %)</td></tr><tr><td>11</td><td>86 (18.34 %)</td></tr><tr><td>12</td><td>52 (11.09 %)</td></tr></table></div><div style="max-width:640px"><canvas id="chart-month-of-year"></canvas></div>
+<div style="display:flex;gap:24px;align-items:flex-start"><table><tr><th>Month</th><th>Commits (%)</th></tr><tr><td>1</td><td>67 (14.26 %)</td></tr><tr><td>2</td><td>17 (3.62 %)</td></tr><tr><td>3</td><td>17 (3.62 %)</td></tr><tr><td>4</td><td>18 (3.83 %)</td></tr><tr><td>5</td><td>18 (3.83 %)</td></tr><tr><td>6</td><td>29 (6.17 %)</td></tr><tr><td>7</td><td>31 (6.60 %)</td></tr><tr><td>8</td><td>92 (19.57 %)</td></tr><tr><td>9</td><td>24 (5.11 %)</td></tr><tr><td>10</td><td>19 (4.04 %)</td></tr><tr><td>11</td><td>86 (18.30 %)</td></tr><tr><td>12</td><td>52 (11.06 %)</td></tr></table><div style="flex:1;min-width:0"><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-month-of-year"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-month-of-year').getContext('2d');
@@ -127,26 +184,28 @@
     type: 'bar',
     data: {
       labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-      datasets: [{"label": "Commits", "data": [67, 17, 16, 18, 18, 29, 31, 92, 24, 19, 86, 52], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
+      datasets: [{"label": "Commits", "data": [67, 17, 17, 18, 18, 29, 31, 92, 24, 19, 86, 52], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 4,
       plugins: {
         legend: { display: false }
       },
       scales: {
         x: { ticks: { maxRotation: 0 } },
         y: { beginAtZero: true, title: { display: true, text: 'Commits' } }
-      }
+      }, datasets: { bar: { maxBarThickness: 40 } }
     }
   });
   document.addEventListener('themechange', function() { chart.update(); });
 })();
 </script>
-
+</div></div>
 <h2 id="commits_by_year/month"><a href="#commits_by_year/month">Commits by year/month</a></h2>
 
-<div class="vtable"><table><tr><th>Month</th><th>Commits</th><th>Lines added</th><th>Lines removed</th></tr><tr><td>2026-03</td><td>3</td><td>634</td><td>654</td></tr><tr><td>2026-02</td><td>10</td><td>4215</td><td>127</td></tr><tr><td>2026-01</td><td>4</td><td>90</td><td>22</td></tr><tr><td>2025-12</td><td>10</td><td>446</td><td>187</td></tr><tr><td>2025-11</td><td>8</td><td>108</td><td>116</td></tr><tr><td>2025-10</td><td>5</td><td>199</td><td>68</td></tr><tr><td>2025-09</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2025-08</td><td>3</td><td>21</td><td>15</td></tr><tr><td>2025-07</td><td>5</td><td>48</td><td>17</td></tr><tr><td>2025-06</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2025-05</td><td>11</td><td>192</td><td>138</td></tr><tr><td>2025-04</td><td>13</td><td>711</td><td>524</td></tr><tr><td>2025-03</td><td>7</td><td>87</td><td>57</td></tr><tr><td>2025-02</td><td>3</td><td>12</td><td>22</td></tr><tr><td>2025-01</td><td>23</td><td>1746</td><td>1479</td></tr><tr><td>2024-12</td><td>4</td><td>83</td><td>49</td></tr><tr><td>2024-11</td><td>64</td><td>2428</td><td>1683</td></tr><tr><td>2015-12</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2015-07</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2014-12</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2014-11</td><td>7</td><td>23</td><td>23</td></tr><tr><td>2014-10</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2014-09</td><td>3</td><td>5</td><td>12</td></tr><tr><td>2014-06</td><td>3</td><td>9</td><td>2</td></tr><tr><td>2014-05</td><td>2</td><td>26</td><td>11</td></tr><tr><td>2014-03</td><td>2</td><td>10</td><td>1</td></tr><tr><td>2013-12</td><td>2</td><td>5</td><td>3</td></tr><tr><td>2013-11</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2013-09</td><td>1</td><td>2</td><td>2</td></tr><tr><td>2013-07</td><td>4</td><td>26</td><td>13</td></tr><tr><td>2013-02</td><td>2</td><td>4</td><td>1</td></tr><tr><td>2013-01</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2012-12</td><td>2</td><td>71</td><td>32</td></tr><tr><td>2012-08</td><td>1</td><td>14</td><td>0</td></tr><tr><td>2012-07</td><td>9</td><td>45</td><td>8</td></tr><tr><td>2012-05</td><td>4</td><td>22</td><td>6</td></tr><tr><td>2012-03</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2011-11</td><td>1</td><td>3</td><td>0</td></tr><tr><td>2011-10</td><td>4</td><td>21</td><td>7</td></tr><tr><td>2011-09</td><td>2</td><td>21</td><td>6</td></tr><tr><td>2011-04</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2011-03</td><td>1</td><td>2</td><td>1</td></tr><tr><td>2011-02</td><td>1</td><td>5</td><td>2</td></tr><tr><td>2011-01</td><td>18</td><td>278</td><td>103</td></tr><tr><td>2010-10</td><td>2</td><td>8</td><td>2</td></tr><tr><td>2010-09</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2010-08</td><td>2</td><td>78</td><td>1</td></tr><tr><td>2010-07</td><td>1</td><td>1</td><td>0</td></tr><tr><td>2010-06</td><td>5</td><td>20</td><td>11</td></tr><tr><td>2010-04</td><td>4</td><td>14</td><td>9</td></tr><tr><td>2010-03</td><td>2</td><td>3</td><td>2</td></tr><tr><td>2010-02</td><td>1</td><td>5</td><td>4</td></tr><tr><td>2010-01</td><td>18</td><td>199</td><td>86</td></tr><tr><td>2009-12</td><td>28</td><td>218</td><td>81</td></tr><tr><td>2009-11</td><td>1</td><td>1</td><td>0</td></tr><tr><td>2009-10</td><td>3</td><td>10</td><td>6</td></tr><tr><td>2009-09</td><td>1</td><td>8</td><td>2</td></tr><tr><td>2009-06</td><td>8</td><td>50</td><td>27</td></tr><tr><td>2009-05</td><td>1</td><td>2</td><td>2</td></tr><tr><td>2009-01</td><td>3</td><td>16</td><td>5</td></tr><tr><td>2008-12</td><td>4</td><td>24</td><td>10</td></tr><tr><td>2008-11</td><td>4</td><td>23</td><td>18</td></tr><tr><td>2008-10</td><td>4</td><td>354</td><td>20</td></tr><tr><td>2008-09</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2008-07</td><td>4</td><td>50</td><td>14</td></tr><tr><td>2008-06</td><td>12</td><td>779</td><td>102</td></tr><tr><td>2007-09</td><td>14</td><td>75</td><td>42</td></tr><tr><td>2007-08</td><td>86</td><td>1531</td><td>412</td></tr><tr><td>2007-07</td><td>7</td><td>297</td><td>25</td></tr></table></div><div style="max-width:640px"><canvas id="chart-commits-by-year-month"></canvas></div>
+<div style="display:flex;gap:24px;align-items:flex-start"><table><tr><th>Month</th><th>Commits</th><th>Lines added</th><th>Lines removed</th></tr><tr><td>2026-03</td><td>4</td><td>898</td><td>889</td></tr><tr><td>2026-02</td><td>10</td><td>4215</td><td>127</td></tr><tr><td>2026-01</td><td>4</td><td>90</td><td>22</td></tr><tr><td>2025-12</td><td>10</td><td>446</td><td>187</td></tr><tr><td>2025-11</td><td>8</td><td>108</td><td>116</td></tr><tr><td>2025-10</td><td>5</td><td>199</td><td>68</td></tr><tr><td>2025-09</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2025-08</td><td>3</td><td>21</td><td>15</td></tr><tr><td>2025-07</td><td>5</td><td>48</td><td>17</td></tr><tr><td>2025-06</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2025-05</td><td>11</td><td>192</td><td>138</td></tr><tr><td>2025-04</td><td>13</td><td>711</td><td>524</td></tr><tr><td>2025-03</td><td>7</td><td>87</td><td>57</td></tr><tr><td>2025-02</td><td>3</td><td>12</td><td>22</td></tr><tr><td>2025-01</td><td>23</td><td>1746</td><td>1479</td></tr><tr><td>2024-12</td><td>4</td><td>83</td><td>49</td></tr><tr><td>2024-11</td><td>64</td><td>2428</td><td>1683</td></tr><tr><td>2015-12</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2015-07</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2014-12</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2014-11</td><td>7</td><td>23</td><td>23</td></tr><tr><td>2014-10</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2014-09</td><td>3</td><td>5</td><td>12</td></tr><tr><td>2014-06</td><td>3</td><td>9</td><td>2</td></tr><tr><td>2014-05</td><td>2</td><td>26</td><td>11</td></tr><tr><td>2014-03</td><td>2</td><td>10</td><td>1</td></tr><tr><td>2013-12</td><td>2</td><td>5</td><td>3</td></tr><tr><td>2013-11</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2013-09</td><td>1</td><td>2</td><td>2</td></tr><tr><td>2013-07</td><td>4</td><td>26</td><td>13</td></tr><tr><td>2013-02</td><td>2</td><td>4</td><td>1</td></tr><tr><td>2013-01</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2012-12</td><td>2</td><td>71</td><td>32</td></tr><tr><td>2012-08</td><td>1</td><td>14</td><td>0</td></tr><tr><td>2012-07</td><td>9</td><td>45</td><td>8</td></tr><tr><td>2012-05</td><td>4</td><td>22</td><td>6</td></tr><tr><td>2012-03</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2011-11</td><td>1</td><td>3</td><td>0</td></tr><tr><td>2011-10</td><td>4</td><td>21</td><td>7</td></tr><tr><td>2011-09</td><td>2</td><td>21</td><td>6</td></tr><tr><td>2011-04</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2011-03</td><td>1</td><td>2</td><td>1</td></tr><tr><td>2011-02</td><td>1</td><td>5</td><td>2</td></tr><tr><td>2011-01</td><td>18</td><td>278</td><td>103</td></tr><tr><td>2010-10</td><td>2</td><td>8</td><td>2</td></tr><tr><td>2010-09</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2010-08</td><td>2</td><td>78</td><td>1</td></tr><tr><td>2010-07</td><td>1</td><td>1</td><td>0</td></tr><tr><td>2010-06</td><td>5</td><td>20</td><td>11</td></tr><tr><td>2010-04</td><td>4</td><td>14</td><td>9</td></tr><tr><td>2010-03</td><td>2</td><td>3</td><td>2</td></tr><tr><td>2010-02</td><td>1</td><td>5</td><td>4</td></tr><tr><td>2010-01</td><td>18</td><td>199</td><td>86</td></tr><tr><td>2009-12</td><td>28</td><td>218</td><td>81</td></tr><tr><td>2009-11</td><td>1</td><td>1</td><td>0</td></tr><tr><td>2009-10</td><td>3</td><td>10</td><td>6</td></tr><tr><td>2009-09</td><td>1</td><td>8</td><td>2</td></tr><tr><td>2009-06</td><td>8</td><td>50</td><td>27</td></tr><tr><td>2009-05</td><td>1</td><td>2</td><td>2</td></tr><tr><td>2009-01</td><td>3</td><td>16</td><td>5</td></tr><tr><td>2008-12</td><td>4</td><td>24</td><td>10</td></tr><tr><td>2008-11</td><td>4</td><td>23</td><td>18</td></tr><tr><td>2008-10</td><td>4</td><td>354</td><td>20</td></tr><tr><td>2008-09</td><td>1</td><td>1</td><td>1</td></tr><tr><td>2008-07</td><td>4</td><td>50</td><td>14</td></tr><tr><td>2008-06</td><td>12</td><td>779</td><td>102</td></tr><tr><td>2007-09</td><td>14</td><td>75</td><td>42</td></tr><tr><td>2007-08</td><td>86</td><td>1531</td><td>412</td></tr><tr><td>2007-07</td><td>7</td><td>297</td><td>25</td></tr></table><div style="flex:1;min-width:0"><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-commits-by-year-month"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-commits-by-year-month').getContext('2d');
@@ -154,10 +213,12 @@
     type: 'bar',
     data: {
       labels: ["2007-07", "2007-08", "2007-09", "2008-06", "2008-07", "2008-09", "2008-10", "2008-11", "2008-12", "2009-01", "2009-05", "2009-06", "2009-09", "2009-10", "2009-11", "2009-12", "2010-01", "2010-02", "2010-03", "2010-04", "2010-06", "2010-07", "2010-08", "2010-09", "2010-10", "2011-01", "2011-02", "2011-03", "2011-04", "2011-09", "2011-10", "2011-11", "2012-03", "2012-05", "2012-07", "2012-08", "2012-12", "2013-01", "2013-02", "2013-07", "2013-09", "2013-11", "2013-12", "2014-03", "2014-05", "2014-06", "2014-09", "2014-10", "2014-11", "2014-12", "2015-07", "2015-12", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03"],
-      datasets: [{"label": "Commits", "data": [7, 86, 14, 12, 4, 1, 4, 4, 4, 3, 1, 8, 1, 3, 1, 28, 18, 1, 2, 4, 5, 1, 2, 1, 2, 18, 1, 1, 1, 2, 4, 1, 1, 4, 9, 1, 2, 1, 2, 4, 1, 1, 2, 2, 2, 3, 3, 1, 7, 1, 1, 1, 64, 4, 23, 3, 7, 13, 11, 1, 5, 3, 1, 5, 8, 10, 4, 10, 3], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
+      datasets: [{"label": "Commits", "data": [7, 86, 14, 12, 4, 1, 4, 4, 4, 3, 1, 8, 1, 3, 1, 28, 18, 1, 2, 4, 5, 1, 2, 1, 2, 18, 1, 1, 1, 2, 4, 1, 1, 4, 9, 1, 2, 1, 2, 4, 1, 1, 2, 2, 2, 3, 3, 1, 7, 1, 1, 1, 64, 4, 23, 3, 7, 13, 11, 1, 5, 3, 1, 5, 8, 10, 4, 10, 4], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 3,
       plugins: {
         legend: { display: false }
       },
@@ -170,10 +231,10 @@
   document.addEventListener('themechange', function() { chart.update(); });
 })();
 </script>
-
+</div></div>
 <h2 id="commits_by_year"><a href="#commits_by_year">Commits by Year</a></h2>
 
-<div class="vtable"><table><tr><th>Year</th><th>Commits (% of all)</th><th>Lines added</th><th>Lines removed</th></tr><tr><td>2026</td><td>17 (3.62%)</td><td>4939</td><td>803</td></tr><tr><td>2025</td><td>90 (19.19%)</td><td>3572</td><td>2625</td></tr><tr><td>2024</td><td>68 (14.50%)</td><td>2511</td><td>1732</td></tr><tr><td>2015</td><td>2 (0.43%)</td><td>2</td><td>2</td></tr><tr><td>2014</td><td>19 (4.05%)</td><td>75</td><td>51</td></tr><tr><td>2013</td><td>11 (2.35%)</td><td>39</td><td>21</td></tr><tr><td>2012</td><td>17 (3.62%)</td><td>153</td><td>47</td></tr><tr><td>2011</td><td>28 (5.97%)</td><td>331</td><td>120</td></tr><tr><td>2010</td><td>36 (7.68%)</td><td>329</td><td>116</td></tr><tr><td>2009</td><td>45 (9.59%)</td><td>305</td><td>123</td></tr><tr><td>2008</td><td>29 (6.18%)</td><td>1231</td><td>165</td></tr><tr><td>2007</td><td>107 (22.81%)</td><td>1903</td><td>479</td></tr></table></div><div style="max-width:640px"><canvas id="chart-commits-by-year"></canvas></div>
+<div style="display:flex;gap:24px;align-items:flex-start"><table><tr><th>Year</th><th>Commits (% of all)</th><th>Lines added</th><th>Lines removed</th></tr><tr><td>2026</td><td>18 (3.83%)</td><td>5203</td><td>1038</td></tr><tr><td>2025</td><td>90 (19.15%)</td><td>3572</td><td>2625</td></tr><tr><td>2024</td><td>68 (14.47%)</td><td>2511</td><td>1732</td></tr><tr><td>2015</td><td>2 (0.43%)</td><td>2</td><td>2</td></tr><tr><td>2014</td><td>19 (4.04%)</td><td>75</td><td>51</td></tr><tr><td>2013</td><td>11 (2.34%)</td><td>39</td><td>21</td></tr><tr><td>2012</td><td>17 (3.62%)</td><td>153</td><td>47</td></tr><tr><td>2011</td><td>28 (5.96%)</td><td>331</td><td>120</td></tr><tr><td>2010</td><td>36 (7.66%)</td><td>329</td><td>116</td></tr><tr><td>2009</td><td>45 (9.57%)</td><td>305</td><td>123</td></tr><tr><td>2008</td><td>29 (6.17%)</td><td>1231</td><td>165</td></tr><tr><td>2007</td><td>107 (22.77%)</td><td>1903</td><td>479</td></tr></table><div style="flex:1;min-width:0"><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-commits-by-year"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-commits-by-year').getContext('2d');
@@ -181,10 +242,12 @@
     type: 'bar',
     data: {
       labels: [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
-      datasets: [{"label": "Commits", "data": [107, 29, 45, 36, 28, 17, 11, 19, 2, 0, 0, 0, 0, 0, 0, 0, 0, 68, 90, 17], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
+      datasets: [{"label": "Commits", "data": [107, 29, 45, 36, 28, 17, 11, 19, 2, 0, 0, 0, 0, 0, 0, 0, 0, 68, 90, 18], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 3,
       plugins: {
         legend: { display: false }
       },
@@ -197,7 +260,8 @@
   document.addEventListener('themechange', function() { chart.update(); });
 })();
 </script>
-
+</div></div>
 <h2 id="commits_by_timezone"><a href="#commits_by_timezone">Commits by Timezone</a></h2>
 
-<table><tr><th>Timezone</th><th>Commits</th></tr><tr><th>-0800</th><td class="heat heat1">2</td></tr><tr><th>-0600</th><td class="heat heat1">3</td></tr><tr><th>-0500</th><td class="heat heat1">22</td></tr><tr><th>-0400</th><td class="heat heat1">1</td></tr><tr><th>+0000</th><td class="heat heat1">20</td></tr><tr><th>+0100</th><td class="heat heat1">16</td></tr><tr><th>+0200</th><td class="heat heat4">187</td></tr><tr><th>+0300</th><td class="heat heat4">201</td></tr><tr><th>+0400</th><td class="heat heat1">2</td></tr><tr><th>+0800</th><td class="heat heat1">13</td></tr><tr><th>+1200</th><td class="heat heat1">1</td></tr><tr><th>+1300</th><td class="heat heat1">1</td></tr></table></body></html>
+<table class="heat"><tr><th>-0800</th><th>-0600</th><th>-0500</th><th>-0400</th><th>+0000</th><th>+0100</th><th>+0200</th><th>+0300</th><th>+0400</th><th>+0800</th><th>+1200</th><th>+1300</th></tr>
+<tr><td class="heat heat heat1">2</td><td class="heat heat heat1">3</td><td class="heat heat heat1">22</td><td class="heat heat heat1">1</td><td class="heat heat heat1">20</td><td class="heat heat heat1">16</td><td class="heat heat heat4">188</td><td class="heat heat heat4">201</td><td class="heat heat heat1">2</td><td class="heat heat heat1">13</td><td class="heat heat heat1">1</td><td class="heat heat heat1">1</td></tr></table></body></html>
