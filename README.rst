@@ -67,6 +67,20 @@ Usage
 
 Run ``gitstats --help`` for more options, or check the `documentation <https://gitstats.readthedocs.io/en/latest/getting-started.html>`_.
 
+What's New in v2.0.0
+--------------------
+
+v2.0.0 is a major release focused on modernizing the report UI and removing the Gnuplot dependency.
+
+**Terminal-inspired UI redesign**
+   The entire report interface has been redesigned with a terminal / OpenCode-inspired aesthetic:
+   zero border-radius (sharp, angular corners), monospace fonts in headings and navigation,
+   border-heavy layout, and a GitHub-style green heatmap. Both light and dark modes are supported
+   with a one-click toggle — no flash of unstyled content when switching pages.
+
+**Chart.js replaces Gnuplot**
+   All charts are now rendered interactively in the browser using `Chart.js <https://www.chartjs.org/>`_.
+   Gnuplot is no longer required. Reports are fully self-contained HTML files.
 
 Features
 --------
