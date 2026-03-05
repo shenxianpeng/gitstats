@@ -12,6 +12,7 @@ Before using gitstats, ensure you have the following installed:
 .. note::
 
     Starting from version ``2.0.0``, gitstats uses `Chart.js <https://www.chartjs.org/>`_ (bundled with the report) for rendering charts to modernize the visualizations and improve performance.
+
     Starting from version ``1.0.0``, gitstats uses `gnuplot-wheel <https://pypi.org/project/gnuplot-wheel/>`_ package which bundles gnuplot as a Python dependency. You no longer need to install gnuplot separately!
 
 
