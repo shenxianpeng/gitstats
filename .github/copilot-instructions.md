@@ -33,7 +33,7 @@ gitstats/
 ## Technology Stack
 
 - **Language**: Python 3.9+
-- **Dependencies**: gnuplot-wheel for chart generation
+- **Dependencies**: no runtime dependencies (charts rendered via bundled Chart.js in the browser)
 - **Build System**: setuptools with setuptools-scm for versioning
 - **Documentation**: Sphinx with Read the Docs theme
 - **Task Runner**: Nox for development tasks
@@ -77,7 +77,7 @@ gitstats/
 
 #### HTMLReportCreator (report_creator.py)
 - Generates HTML reports from collected data
-- Creates charts using gnuplot
+- Creates interactive charts using Chart.js (bundled as `chart.umd.min.js`)
 - Handles HTML generation and output file writing
 
 #### Utility Functions (utils.py)
@@ -190,7 +190,7 @@ gitstats . report -f json  # Also generate JSON output
 ## Troubleshooting
 
 - **Multiprocessing fails**: Automatically falls back to sequential processing
-- **gnuplot errors**: Ensure gnuplot-wheel is installed correctly
+- **Charts not rendering**: Ensure `chart.umd.min.js` is present in the output directory
 - **Git command failures**: Check repository path and Git installation
 - **Memory issues with large repos**: Adjust `processes` in config or use date filtering
 

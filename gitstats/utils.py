@@ -38,11 +38,6 @@ def get_git_version():
     return get_pipe_output(["git --version"]).split("\n")[0]
 
 
-def get_gnuplot_version():
-    output = get_pipe_output(["%s --version" % gnuplot_cmd]).split("\n")[0]
-    return output if output else None
-
-
 def get_pipe_output(cmds, quiet=False):
     global exectime_external
     start = time.time()
@@ -231,8 +226,3 @@ def get_log_range(defaultrange="HEAD", end_only=True):
     if options:
         return '%s "%s"' % (" ".join(options), commit_range)
     return commit_range
-
-
-# By default, gnuplot from gnuplot-wheel package is used, but can be overridden with the
-# environment variable "GNUPLOT"
-gnuplot_cmd = os.environ.get("GNUPLOT", "gnuplot")
