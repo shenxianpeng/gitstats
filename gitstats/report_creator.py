@@ -227,7 +227,12 @@ class HTMLReportCreator(ReportCreator):
             if i in hour_of_day:
                 f.write(
                     '<td class="%s">%d</td>'
-                    % (self._heat_td_class(hour_of_day[i], data.activity_by_hour_of_day_busiest), hour_of_day[i])
+                    % (
+                        self._heat_td_class(
+                            hour_of_day[i], data.activity_by_hour_of_day_busiest
+                        ),
+                        hour_of_day[i],
+                    )
                 )
             else:
                 f.write('<td class="%s">0</td>' % self._heat_td_class(0, 0))
@@ -236,7 +241,12 @@ class HTMLReportCreator(ReportCreator):
             if i in hour_of_day:
                 f.write(
                     '<td class="%s">%.2f</td>'
-                    % (self._heat_td_class(hour_of_day[i], data.activity_by_hour_of_day_busiest), (100.0 * hour_of_day[i]) / totalcommits)
+                    % (
+                        self._heat_td_class(
+                            hour_of_day[i], data.activity_by_hour_of_day_busiest
+                        ),
+                        (100.0 * hour_of_day[i]) / totalcommits,
+                    )
                 )
             else:
                 f.write('<td class="%s">0.00</td>' % self._heat_td_class(0, 0))
@@ -298,7 +308,9 @@ class HTMLReportCreator(ReportCreator):
                 f.write(
                     '<td class="%s">%s</td>'
                     % (
-                        self._heat_td_class(commits, data.activity_by_hour_of_week_busiest),
+                        self._heat_td_class(
+                            commits, data.activity_by_hour_of_week_busiest
+                        ),
                         ("%d" % commits) if commits else "",
                     )
                 )
@@ -334,7 +346,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Commits by year/month"))
         f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
         f.write(
-            '<table><tr><th>Month</th><th>Commits</th><th>Lines added</th><th>Lines removed</th></tr>'
+            "<table><tr><th>Month</th><th>Commits</th><th>Lines added</th><th>Lines removed</th></tr>"
         )
         for yymm in reversed(sorted(data.commits_by_month.keys())):
             f.write(
@@ -366,7 +378,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Commits by Year"))
         f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
         f.write(
-            '<table><tr><th>Year</th><th>Commits (% of all)</th><th>Lines added</th><th>Lines removed</th></tr>'
+            "<table><tr><th>Year</th><th>Commits (% of all)</th><th>Lines added</th><th>Lines removed</th></tr>"
         )
         for yy in reversed(sorted(data.commits_by_year.keys())):
             f.write(
@@ -589,7 +601,7 @@ class HTMLReportCreator(ReportCreator):
         domains_by_commits = get_keys_sorted_by_value_key(data.domains, "commits")
         domains_by_commits.reverse()  # most first
         f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
-        f.write('<table>')
+        f.write("<table>")
         f.write("<tr><th>Domains</th><th>Total (%)</th></tr>")
         dom_labels = []
         dom_values = []
