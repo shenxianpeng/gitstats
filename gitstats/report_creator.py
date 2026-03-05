@@ -929,10 +929,6 @@ class HTMLReportCreator(ReportCreator):
         x_ticks_opts = (
             "maxRotation: 45, minRotation: 45" if x_ticks_rotate else "maxRotation: 0"
         )
-        max_bar_thickness_opt = (
-            f", maxBarThickness: {max_bar_thickness}" if max_bar_thickness else ""
-        )
-
         legend_display = "true" if is_multi else "false"
 
         return f"""<div style="max-width:100%;margin-bottom:8px"><canvas id="{chart_id}"></canvas></div>
