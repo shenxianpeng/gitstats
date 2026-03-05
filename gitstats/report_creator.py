@@ -985,18 +985,14 @@ class HTMLReportCreator(ReportCreator):
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - %s</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="%s" type="text/css">
 	<meta name="generator" content="GitStats %s">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
 		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
-		// Theme toggle functionality
-		function initTheme() {
-			const savedTheme = localStorage.getItem('theme') || 'dark';
-			document.documentElement.setAttribute('data-theme', savedTheme);
-			updateThemeIcon(savedTheme);
-		}
 
 		function toggleTheme() {
 			const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -1014,8 +1010,9 @@ class HTMLReportCreator(ReportCreator):
 			}
 		}
 
-		// Initialize theme on page load
-		document.addEventListener('DOMContentLoaded', initTheme);
+		document.addEventListener('DOMContentLoaded', function() {
+			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		});
 	</script>
 </head>
 <body>
