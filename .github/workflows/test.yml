@@ -93,9 +93,6 @@ jobs:
 
   test-linux:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     strategy:
       matrix:
         python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
@@ -115,18 +112,3 @@ jobs:
       run: |
         pip install nox
         nox -s build
-
-    - name: Save GitStats Report
-      if: ${{ matrix.python-version == '3.9' }}
-      uses: actions/upload-artifact@v7
-      with:
-        name: test-report
-        path: test-report
-
-    - name: Deploy to GitHub Pages for main branch
-      if: ${{ (github.ref_name == 'main' || github.event_name == 'workflow_dispatch') && matrix.python-version == '3.9' }}
-      uses: peaceiris/actions-gh-pages@v4
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: test-report
-        keep_files: true # do not remove example reports

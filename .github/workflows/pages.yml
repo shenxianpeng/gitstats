@@ -1,0 +1,42 @@
+name: Generate and Deploy Report
+
+on:
+  push:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+jobs:
+  deploy-report:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0 # get all history.
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v6
+      with:
+        python-version: "3.9"
+
+    - name: Generate GitStats Report
+      run: |
+        pip install nox
+        nox -s build
+
+    - name: Save GitStats Report
+      uses: actions/upload-artifact@v7
+      with:
+        name: test-report
+        path: test-report
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: test-report
+        keep_files: true # do not remove example reports
