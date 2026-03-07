@@ -38,3 +38,4 @@ Xianpeng Shen (shenxianpeng), DevOps engineer. Maintains the gitstats open sourc
 ## Preferences
 - Branch for PRs: `main`
 - Always run `nox -s lint` before committing
+- **Language**: Always reply in the same language the user writes in. If the user writes in Chinese, respond in Chinese.
