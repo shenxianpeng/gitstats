@@ -74,6 +74,7 @@ class DataCollector:
         self.activity_by_year_week_peak = 0
 
         self.authors = {}  # name -> {commits, first_commit_stamp, last_commit_stamp, last_active_day, active_days, lines_added, lines_removed}
+        self.email_by_author = {}  # name -> email (for merging aliases with same email)
 
         self.total_commits = 0
         self.total_files = 0
@@ -336,6 +337,7 @@ class GitDataCollector(DataCollector):
                 self.activity_by_year_week_peak = self.activity_by_year_week[yyw]
 
             # author stats
+            self.email_by_author[author] = mail
             if author not in self.authors:
                 self.authors[author] = {}
             # commits, note again that commits may be in any date order because of cherry-picking and patches
@@ -646,7 +648,105 @@ class GitDataCollector(DataCollector):
                     print('Warning: failed to handle line "%s"' % line)
                     (files, inserted, deleted) = (0, 0, 0)
 
+    def _merge_authors_by_email(self):
+        """Automatically merge authors that share the same email address.
+
+        When the same person has committed under different display names but the
+        same email, all their stats are consolidated under the name that has the
+        most commits.  The mapping is logged so users can audit it.
+        """
+        # Build email -> [names] mapping
+        email_to_names: Dict[str, list] = {}
+        for name, email in self.email_by_author.items():
+            if not email:
+                continue
+            email_to_names.setdefault(email, []).append(name)
+
+        # Build alias -> canonical map for emails with multiple names
+        alias_to_canonical: Dict[str, str] = {}
+        for email, names in email_to_names.items():
+            if len(names) < 2:
+                continue
+            canonical = max(
+                names, key=lambda n: self.authors.get(n, {}).get("commits", 0)
+            )
+            for name in names:
+                if name != canonical:
+                    alias_to_canonical[name] = canonical
+                    print(
+                        f"Info: merging author '{name}' into '{canonical}' (same email: {email})"
+                    )
+
+        if not alias_to_canonical:
+            return
+
+        # Merge self.authors
+        for alias, canonical in alias_to_canonical.items():
+            if alias not in self.authors:
+                continue
+            a = self.authors[alias]
+            c = self.authors.setdefault(canonical, {})
+
+            c["commits"] = c.get("commits", 0) + a.get("commits", 0)
+            c["lines_added"] = c.get("lines_added", 0) + a.get("lines_added", 0)
+            c["lines_removed"] = c.get("lines_removed", 0) + a.get("lines_removed", 0)
+
+            if "first_commit_stamp" in a:
+                if (
+                    "first_commit_stamp" not in c
+                    or a["first_commit_stamp"] < c["first_commit_stamp"]
+                ):
+                    c["first_commit_stamp"] = a["first_commit_stamp"]
+            if "last_commit_stamp" in a:
+                if (
+                    "last_commit_stamp" not in c
+                    or a["last_commit_stamp"] > c["last_commit_stamp"]
+                ):
+                    c["last_commit_stamp"] = a["last_commit_stamp"]
+
+            if "active_days" in a:
+                c.setdefault("active_days", set()).update(a["active_days"])
+            if "active_days" in c and c["active_days"]:
+                c["last_active_day"] = max(c["active_days"])
+
+            del self.authors[alias]
+
+        # Re-key author_of_month
+        for yymm in self.author_of_month:
+            d = self.author_of_month[yymm]
+            for alias, canonical in alias_to_canonical.items():
+                if alias in d:
+                    d[canonical] = d.get(canonical, 0) + d.pop(alias)
+
+        # Re-key author_of_year
+        for yy in self.author_of_year:
+            d = self.author_of_year[yy]
+            for alias, canonical in alias_to_canonical.items():
+                if alias in d:
+                    d[canonical] = d.get(canonical, 0) + d.pop(alias)
+
+        # Re-key changes_by_date_by_author (cumulative series; re-key only)
+        for stamp in self.changes_by_date_by_author:
+            d = self.changes_by_date_by_author[stamp]
+            for alias, canonical in alias_to_canonical.items():
+                if alias in d:
+                    if canonical not in d:
+                        d[canonical] = d.pop(alias)
+                    else:
+                        d[canonical]["lines_added"] = d[canonical].get(
+                            "lines_added", 0
+                        ) + d[alias].get("lines_added", 0)
+                        d[canonical]["commits"] = d[canonical].get("commits", 0) + d[
+                            alias
+                        ].get("commits", 0)
+                        del d[alias]
+
+        # Adjust total_authors to reflect de-duplicated count
+        self.total_authors = len(self.authors)
+
     def refine(self):
+        self._merge_authors_by_email()
+
         # authors
         # name -> {place_by_commits, commits_frac, date_first, date_last, timedelta}
         self.authors_by_commits = get_keys_sorted_by_value_key(self.authors, "commits")
