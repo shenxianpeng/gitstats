@@ -39,4 +39,5 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: test-report
-        keep_files: true # do not remove example reports
+        destination_dir: report
+        keep_files: true # do not remove example reports and docs

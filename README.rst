@@ -34,6 +34,8 @@
 
 |pypi-version| |python-versions| |python-download| |test-badge| |docs-badge| |contributors|
 
+**English** | `中文 <README.zh.rst>`_
+
 ``$ gitstats``
 ===============
 

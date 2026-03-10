@@ -1,0 +1,104 @@
+site_name: gitstats
+site_url: https://shenxianpeng.github.io/gitstats/docs/
+site_description: Generate insightful visual reports from Git
+site_author: Xianpeng Shen
+repo_name: shenxianpeng/gitstats
+repo_url: https://github.com/shenxianpeng/gitstats
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: green
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: green
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.sections
+    - search.highlight
+    - search.share
+    - search.suggest
+    - content.code.copy
+    - content.action.edit
+  font:
+    text: JetBrains Mono
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - i18n:
+      docs_structure: suffix
+      fallback_to_default: true
+      reconfigure_material: true
+      reconfigure_search: true
+      languages:
+        - locale: en
+          default: true
+          name: English
+          build: true
+        - locale: zh
+          name: 中文
+          build: true
+          nav_translations:
+            Home: 首页
+            Getting Started: 入门指南
+            Configuration: 配置
+            Integration: CI/CD 集成
+            AI Integration: AI 集成
+            FAQ: 常见问题
+            About: 关于
+            License: 许可证
+            Contributors: 贡献者
+            Changelog: 更新日志
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Configuration: configuration.md
+  - Integration: integration.md
+  - AI Integration: ai-integration.md
+  - FAQ: faq.md
+  - About:
+      - License: license.md
+      - Contributors: contributors.md
+      - Changelog: changelog.md
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+  - tables
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/shenxianpeng/gitstats
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/gitstats/
+
+copyright: Copyright &copy; 2008 - 2026 Xianpeng Shen, Heikki Hokkanen, and contributors

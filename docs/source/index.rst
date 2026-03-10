@@ -1,6 +1,10 @@
 Welcome to GitStats documentation!
 ==================================
 
+.. tip::
+
+   📖 `中文文档 <zh/index.html>`_
+
 .. include:: ../../README.rst
    :start-after: .. start-of-about
    :end-before: .. end-of-about
@@ -22,3 +26,8 @@ Welcome to GitStats documentation!
    license
    contributors
    changelog
+
+.. toctree::
+   :hidden:
+
+   zh/index

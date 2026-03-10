@@ -1,0 +1,129 @@
+# Getting Started
+
+## Prerequisites
+
+Before using gitstats, ensure you have the following installed:
+
+- **Python 3.9+** - Download from <https://www.python.org/downloads/>
+- **Git** - Download from <https://git-scm.com/>
+
+!!! note
+    Starting from version `2.0.0`, gitstats uses [Chart.js](https://www.chartjs.org/) (bundled with the report) for rendering charts to modernize the visualizations and improve performance.
+
+## Installation
+
+Install [gitstats](https://pypi.org/project/gitstats/) using [pip](https://pip.pypa.io/en/stable/):
+
+```bash
+pip install gitstats
+```
+
+## Quick Start
+
+Generate a basic report by running:
+
+```bash
+gitstats . report
+```
+
+!!! tip
+    Alternatively, use [uv](https://docs.astral.sh/uv/) to download and run gitstats in one command:
+
+    ```bash
+    uvx gitstats . report
+    ```
+
+Where:
+
+- `.` is the current directory (your Git repository), you can specify any Git repository path.
+- `report` is the output directory where HTML files will be generated.
+
+View a live example: <https://shenxianpeng.github.io/gitstats/report/index.html>
+
+## Generate Report with JSON Output
+
+To generate both HTML and JSON formats:
+
+```bash
+gitstats . report --format json
+```
+
+This creates a `report.json` file alongside the HTML report.
+
+!!! tip
+    Use [jq](https://jqlang.github.io/jq/) to parse the JSON file:
+
+    ```bash
+    cat report.json | jq .
+    ```
+
+    This allows you to extract specific data or integrate with other tools.
+
+## Command Line Usage
+
+### Basic Syntax
+
+```bash
+gitstats [options] <gitpath> <outputpath>
+```
+
+**Arguments:**
+
+- `<gitpath>` - Path to your Git repository (e.g., `.` for current directory)
+- `<outputpath>` - Directory where the report will be generated
+
+**Options:**
+
+- `-h, --help` - Show help message and exit
+- `-v, --version` - Show program version number
+- `-c key=value, --config key=value` - Override configuration values (can be used multiple times)
+- `-f {json}, --format {json}` - Generate additional output format
+
+### Full Help Output
+
+```text
+usage: gitstats [-h] [-v] [-c key=value] [-f {json}] <gitpath> <outputpath>
+
+Generate statistics for a Git repository.
+
+positional arguments:
+  <gitpath>             Path(s) to the Git repository.
+  <outputpath>          Path to the directory where the output will be stored.
+
+options:
+  -h, --help            show this help message and exit
+  -v, --version         show program's version number and exit
+  -c key=value, --config key=value
+                        Override configuration value. Can be specified multiple
+                        times. See configuration documentation for available options.
+  -f {json}, --format {json}
+                        Generate additional output format.
+```
+
+## Examples
+
+Generate report for current directory:
+
+```bash
+gitstats . my-report
+```
+
+Generate report for specific repository:
+
+```bash
+gitstats /path/to/repo output-folder
+```
+
+Generate report with JSON output:
+
+```bash
+gitstats . report --format json
+```
+
+Override configuration values:
+
+```bash
+gitstats . report -c max_authors=10 -c authors_top=3
+```
+
+For more configuration options, see the [Configuration](configuration.md) page.
