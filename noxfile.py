@@ -48,7 +48,23 @@ def docs(session: nox.Session) -> None:
     session.run("sphinx-build", "-b", "html", "docs/source", "docs/build/html")
 
 
+@nox.session(name="docs-zh")
+def docs_zh(session: nox.Session) -> None:
+    """Build Chinese docs"""
+    session.install("--upgrade", "pip")
+    session.install("-e", ".[docs]")
+    session.run("sphinx-build", "-b", "html", "docs/zh", "docs/build/zh")
+
+
 @nox.session(name="docs-live")
 def docs_live(session: nox.Session) -> None:
+    """Live preview English docs"""
     session.install("-e", ".[docs]")
     session.run("sphinx-autobuild", "docs/source", "docs/build/html", external=True)
+
+
+@nox.session(name="docs-zh-live")
+def docs_zh_live(session: nox.Session) -> None:
+    """Live preview Chinese docs"""
+    session.install("-e", ".[docs]")
+    session.run("sphinx-autobuild", "docs/zh", "docs/build/zh", external=True)

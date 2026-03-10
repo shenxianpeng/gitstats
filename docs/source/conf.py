@@ -19,3 +19,5 @@ html_title = "gitstats"
 html_short_title = "gitstats"
 
 exclude_patterns = ["source/TODO.md"]
+
+language = "en"
