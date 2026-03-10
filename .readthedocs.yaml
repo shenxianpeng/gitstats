@@ -13,7 +13,7 @@ build:
     - pip install .[docs]
     # Build English or Chinese docs based on RTD language setting
     - >
-      if [ "$READTHEDOCS_LANGUAGE" = "zh" ]; then
+      if [ "$READTHEDOCS_LANGUAGE" = "zh-cn" ]; then
         sphinx-build -b html docs/zh $READTHEDOCS_OUTPUT/html;
       else
         sphinx-build -b html docs/source $READTHEDOCS_OUTPUT/html;
