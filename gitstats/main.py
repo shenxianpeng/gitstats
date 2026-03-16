@@ -282,7 +282,7 @@ class GitDataCollector(DataCollector):
 
             # Track email<->author mapping to later resolve identity aliases
             if mail and (
-                mail not in email_to_latest or stamp > email_to_latest[mail][0]
+                mail not in email_to_latest or int(stamp) > email_to_latest[mail][0]
             ):
                 email_to_latest[mail] = (stamp, author)
             if mail and author not in author_to_email:
