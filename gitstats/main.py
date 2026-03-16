@@ -254,7 +254,9 @@ class GitDataCollector(DataCollector):
             ]
         ).split("\n")
         # Track email<->author mappings to automatically merge identities that share an email
-        email_to_latest: Dict[str, Tuple[int, str]] = {}  # email -> (stamp, author_name)
+        email_to_latest: Dict[
+            str, Tuple[int, str]
+        ] = {}  # email -> (stamp, author_name)
         author_to_email: Dict[str, str] = {}  # author_name -> primary email
         for line in lines:
             # Skip empty lines (happens when there are no commits in the date range)
@@ -279,7 +281,9 @@ class GitDataCollector(DataCollector):
             date = datetime.datetime.fromtimestamp(float(stamp))
 
             # Track email<->author mapping to later resolve identity aliases
-            if mail and (mail not in email_to_latest or stamp > email_to_latest[mail][0]):
+            if mail and (
+                mail not in email_to_latest or stamp > email_to_latest[mail][0]
+            ):
                 email_to_latest[mail] = (stamp, author)
             if mail and author not in author_to_email:
                 author_to_email[author] = mail
@@ -421,8 +425,8 @@ class GitDataCollector(DataCollector):
             aa = self.authors.pop(alias)
             ca["commits"] = ca.get("commits", 0) + aa.get("commits", 0)
             ca["lines_added"] = ca.get("lines_added", 0) + aa.get("lines_added", 0)
-            ca["lines_removed"] = (
-                ca.get("lines_removed", 0) + aa.get("lines_removed", 0)
+            ca["lines_removed"] = ca.get("lines_removed", 0) + aa.get(
+                "lines_removed", 0
             )
             if "first_commit_stamp" in aa and (
                 "first_commit_stamp" not in ca
@@ -445,10 +449,9 @@ class GitDataCollector(DataCollector):
             for period in period_dict:
                 for alias, canonical in name_to_canonical.items():
                     if alias in period_dict[period]:
-                        period_dict[period][canonical] = (
-                            period_dict[period].get(canonical, 0)
-                            + period_dict[period].pop(alias)
-                        )
+                        period_dict[period][canonical] = period_dict[period].get(
+                            canonical, 0
+                        ) + period_dict[period].pop(alias)
 
         # Merge aliases in tag author dicts
         for tag in self.tags:
