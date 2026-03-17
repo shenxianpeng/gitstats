@@ -407,7 +407,7 @@ class GitDataCollector(DataCollector):
             email: name for email, (_, name) in email_to_latest.items()
         }
         name_to_canonical: Dict[str, str] = {}
-        for name in list(self.authors.keys()):
+        for name in self.authors.keys():
             email = author_to_email.get(name)
             if email:
                 canonical = email_to_canonical.get(email, name)
