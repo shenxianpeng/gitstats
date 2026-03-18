@@ -46,6 +46,12 @@ Example
 
 ``gitstats . report`` generates this `gitstats report <https://shenxianpeng.github.io/gitstats/index.html>`_.
 
+.. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/demo.gif
+   :alt: gitstats terminal demo
+   :align: center
+
+
+
 Installation
 ------------
 
