@@ -11,7 +11,7 @@ import sys
 import time
 import zlib
 from multiprocessing import Pool
-from typing import Dict, Any
+from typing import Dict, Any, Tuple
 from gitstats import load_config, time_start, exectime_external
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.ai_summarizer import AISummarizer
@@ -253,6 +253,11 @@ class GitDataCollector(DataCollector):
                 "grep -v ^commit",
             ]
         ).split("\n")
+        # Track email<->author mappings to automatically merge identities that share an email
+        email_to_latest: Dict[
+            str, Tuple[int, str]
+        ] = {}  # email -> (stamp, author_name)
+        author_to_email: Dict[str, str] = {}  # author_name -> primary email
         for line in lines:
             # Skip empty lines (happens when there are no commits in the date range)
             if not line.strip():
@@ -274,6 +279,14 @@ class GitDataCollector(DataCollector):
             if mail.find("@") != -1:
                 domain = mail.rsplit("@", 1)[1]
             date = datetime.datetime.fromtimestamp(float(stamp))
+
+            # Track email<->author mapping to later resolve identity aliases
+            if mail and (
+                mail not in email_to_latest or int(stamp) > email_to_latest[mail][0]
+            ):
+                email_to_latest[mail] = (stamp, author)
+            if mail and author not in author_to_email:
+                author_to_email[author] = mail
 
             # First and last commit stamp (may be in any order because of cherry-picking and patches)
             if stamp > self.last_commit_stamp:
@@ -387,6 +400,69 @@ class GitDataCollector(DataCollector):
             self.commits_by_timezone[timezone] = (
                 self.commits_by_timezone.get(timezone, 0) + 1
             )
+
+        # Build canonical name mapping: merge authors that share the same email
+        # (same person who committed with different name/email configurations)
+        email_to_canonical = {
+            email: name for email, (_, name) in email_to_latest.items()
+        }
+        name_to_canonical: Dict[str, str] = {}
+        for name in self.authors.keys():
+            email = author_to_email.get(name)
+            if email:
+                canonical = email_to_canonical.get(email, name)
+                if canonical != name:
+                    name_to_canonical[name] = canonical
+
+        # Merge aliased author entries into their canonical entries
+        for alias, canonical in name_to_canonical.items():
+            if alias not in self.authors:
+                continue
+            if canonical not in self.authors:
+                self.authors[canonical] = self.authors.pop(alias)
+                continue
+            ca = self.authors[canonical]
+            aa = self.authors.pop(alias)
+            ca["commits"] = ca.get("commits", 0) + aa.get("commits", 0)
+            ca["lines_added"] = ca.get("lines_added", 0) + aa.get("lines_added", 0)
+            ca["lines_removed"] = ca.get("lines_removed", 0) + aa.get(
+                "lines_removed", 0
+            )
+            if "first_commit_stamp" in aa and (
+                "first_commit_stamp" not in ca
+                or aa["first_commit_stamp"] < ca["first_commit_stamp"]
+            ):
+                ca["first_commit_stamp"] = aa["first_commit_stamp"]
+            if "last_commit_stamp" in aa and aa.get("last_commit_stamp", 0) > ca.get(
+                "last_commit_stamp", 0
+            ):
+                ca["last_commit_stamp"] = aa["last_commit_stamp"]
+            if "active_days" in aa:
+                ca.setdefault("active_days", set()).update(aa["active_days"])
+            if "last_active_day" in aa:
+                ca["last_active_day"] = max(
+                    ca.get("last_active_day", ""), aa["last_active_day"]
+                )
+
+        # Merge aliases in time-based author dicts
+        for period_dict in (self.author_of_month, self.author_of_year):
+            for period in period_dict:
+                for alias, canonical in name_to_canonical.items():
+                    if alias in period_dict[period]:
+                        period_dict[period][canonical] = period_dict[period].get(
+                            canonical, 0
+                        ) + period_dict[period].pop(alias)
+
+        # Merge aliases in tag author dicts
+        for tag in self.tags:
+            merged_authors: Dict[str, int] = {}
+            for author, commits in self.tags[tag]["authors"].items():
+                resolved = name_to_canonical.get(author, author)
+                merged_authors[resolved] = merged_authors.get(resolved, 0) + commits
+            self.tags[tag]["authors"] = merged_authors
+
+        # Update total_authors to reflect merged identities
+        self.total_authors = len(self.authors)
 
         # outputs "<stamp> <files>" for each revision
         revlines = (
@@ -604,6 +680,7 @@ class GitDataCollector(DataCollector):
                     try:
                         oldstamp = stamp
                         (stamp, author) = (int(line[:pos]), line[pos + 1 :])
+                        author = name_to_canonical.get(author, author)
                         if oldstamp > stamp:
                             # clock skew, keep old timestamp to avoid having ugly graph
                             stamp = oldstamp
