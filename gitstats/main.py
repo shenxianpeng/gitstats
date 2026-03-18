@@ -1013,6 +1013,27 @@ def main() -> int:
     # Store refresh_ai flag for later use
     conf["refresh_ai"] = args.refresh_ai if hasattr(args, "refresh_ai") else False
 
+    # Warn early if --ai is enabled but no API key is available for the provider
+    if conf.get("ai_enabled", False):
+        provider = conf.get("ai_provider", "openai")
+        api_key = conf.get("ai_api_key", "")
+        provider_env_vars: dict[str, str | None] = {
+            "openai": "OPENAI_API_KEY",
+            "claude": "ANTHROPIC_API_KEY",
+            "gemini": "GOOGLE_API_KEY",
+            "ollama": None,  # Ollama runs locally and does not require an API key
+        }
+        env_var = provider_env_vars.get(provider)
+        if env_var and not api_key and not os.environ.get(env_var):
+            print(
+                f"Warning: --ai is enabled but no API key was found for provider '{provider}'.\n"
+                f"Please provide one via:\n"
+                f"  - Environment variable: {env_var}\n"
+                f"  - Command-line option:  -c ai_api_key=YOUR_KEY\n"
+                "AI summaries will be disabled."
+            )
+            conf["ai_enabled"] = False
+
     run(gitpath, outputpath, extra_fmt=extra_fmt)
 
     return 0
