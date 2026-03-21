@@ -73,6 +73,10 @@ class HTMLReportCreator(ReportCreator):
         self.create_lines_html(data, path)
         self.create_tags_html(data, path)
 
+        # Create Health Dashboard page if health data is available
+        if getattr(data, "health_data_available", False):
+            self.create_health_html(data, path)
+
         # Create AI Insights page if AI is enabled
         if hasattr(data, "ai_summaries") and data.ai_summaries:
             self.create_ai_insights_html(data, path)
@@ -137,6 +141,27 @@ class HTMLReportCreator(ReportCreator):
             )
         )
         f.write("</table>")
+
+        # Health summary card
+        if getattr(data, "health_data_available", False):
+            score = data.health_score
+            if score >= 75:
+                color = "var(--health-green)"
+                label = "Healthy"
+            elif score >= 50:
+                color = "var(--health-yellow)"
+                label = "Needs Attention"
+            else:
+                color = "var(--health-red)"
+                label = "At Risk"
+            f.write(
+                f'<div class="ai-summary" style="margin-top:16px">'
+                f'<h3>Repository Health — <a href="health.html">View Dashboard</a></h3>'
+                f'<p>Overall health score: '
+                f'<strong style="color:{color};font-size:1.4em">{score}</strong>/100 '
+                f'<span style="color:{color}">({label})</span></p>'
+                f"</div>"
+            )
 
         f.write("</body>\n</html>")
         f.close()
@@ -450,14 +475,21 @@ class HTMLReportCreator(ReportCreator):
         # Authors :: List of authors
         f.write(html_header(2, "List of Authors"))
 
+        has_health = getattr(data, "health_data_available", False)
+        fix_rate_header = "<th>Fix Rate</th>" if has_health else ""
         f.write('<table class="authors sortable" id="authors">')
         f.write(
-            '<tr><th>Author</th><th>Commits (%)</th><th>+ lines</th><th>- lines</th><th>First commit</th><th>Last commit</th><th class="unsortable">Age</th><th>Active days</th><th># by commits</th></tr>'
+            '<tr><th>Author</th><th>Commits (%%)</th><th>+ lines</th><th>- lines</th><th>First commit</th><th>Last commit</th><th class="unsortable">Age</th><th>Active days</th><th># by commits</th>%s</tr>'
+            % fix_rate_header
         )
         for author in data.get_authors(conf["max_authors"]):
             info = data.get_author_info(author)
+            fix_rate_cell = ""
+            if has_health:
+                fix_rate = info.get("fix_rate", 0.0)
+                fix_rate_cell = "<td>%.1f%%</td>" % (fix_rate * 100)
             f.write(
-                "<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%d</td></tr>"
+                "<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%d</td>%s</tr>"
                 % (
                     author,
                     info["commits"],
@@ -469,6 +501,7 @@ class HTMLReportCreator(ReportCreator):
                     info["timedelta"],
                     len(info["active_days"]),
                     info["place_by_commits"],
+                    fix_rate_cell,
                 )
             )
         f.write("</table>")
@@ -715,6 +748,36 @@ class HTMLReportCreator(ReportCreator):
             )
         f.write("</table>")
 
+        # Hot Files section (requires health data)
+        if getattr(data, "health_data_available", False) and data.file_commit_count:
+            from gitstats.main import _get_hot_file_threshold
+            total_files = len(data.file_commit_count)
+            threshold = _get_hot_file_threshold(total_files)
+            sorted_files = sorted(
+                data.file_commit_count.items(), key=lambda x: x[1], reverse=True
+            )
+            hot_files = set(f for f, _ in sorted_files[:threshold])
+
+            f.write(html_header(2, "Hot Files"))
+            f.write(
+                "<p>Files with the most commits — frequently changed files may indicate "
+                "complexity hotspots or areas of active development.</p>"
+            )
+            f.write(
+                '<table class="sortable" id="hot-files">'
+                "<tr><th>File</th><th>Commits</th><th>Lines Added</th><th>Lines Deleted</th><th>Authors</th></tr>"
+            )
+            for filename, commit_count in sorted_files[:50]:
+                is_hot = filename in hot_files
+                hot_marker = " 🔥" if is_hot else ""
+                added, deleted = data.file_churn.get(filename, (0, 0))
+                authors = len(data.file_authors.get(filename, set()))
+                f.write(
+                    "<tr><td>%s%s</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td></tr>"
+                    % (filename, hot_marker, commit_count, added, deleted, authors)
+                )
+            f.write("</table>")
+
         f.write("</body></html>")
         f.close()
 
@@ -793,6 +856,162 @@ class HTMLReportCreator(ReportCreator):
                 )
             )
         f.write("</table>")
+
+        f.write("</body></html>")
+        f.close()
+
+    def create_health_html(self, data, path):
+        """Create the Code Health Dashboard page (health.html)."""
+        from gitstats.main import _get_hot_file_threshold
+
+        f = open(path + "/health.html", "w", encoding="utf-8")
+        self.print_header(f)
+        self.print_nav(f)
+        f.write("<h1>Code Health Dashboard</h1>")
+
+        if not getattr(data, "health_data_available", False):
+            f.write("<p>Not enough data to generate health metrics.</p>")
+            f.write("</body></html>")
+            f.close()
+            return
+
+        # ── Health Score Card ──────────────────────────────────────────────
+        score = data.health_score
+        if score >= 75:
+            color = "var(--health-green)"
+            label = "Healthy"
+        elif score >= 50:
+            color = "var(--health-yellow)"
+            label = "Needs Attention"
+        else:
+            color = "var(--health-red)"
+            label = "At Risk"
+
+        f.write(html_header(2, "Overall Health Score"))
+        f.write(
+            f'<div class="ai-summary">'
+            f'<p class="health-score" style="font-size:3em;font-weight:700;color:{color};margin:8px 0">'
+            f"{score}"
+            f'</p><p style="color:{color};font-size:1.2em">{label}</p>'
+            f"<p>Score based on bug rate, code churn, hot-spot concentration, bus factor, and docs ratio.</p>"
+            f"</div>"
+        )
+
+        # ── Commit Type Breakdown ──────────────────────────────────────────
+        f.write(html_header(2, "Commit Type Breakdown"))
+        type_order = ["fix", "revert", "feat", "refactor", "test", "docs", "chore", "other"]
+        type_labels = []
+        type_values = []
+        for t in type_order:
+            count = data.commit_type_counts.get(t, 0)
+            if count > 0:
+                type_labels.append(t)
+                type_values.append(count)
+        if type_labels:
+            f.write(
+                self._render_chartjs(
+                    "chart-commit-types",
+                    "doughnut",
+                    type_labels,
+                    [{"label": "Commits", "data": type_values}],
+                    aspect_ratio=2,
+                )
+            )
+
+        # ── Bug Rate Trend ─────────────────────────────────────────────────
+        f.write(html_header(2, "Bug Rate Trend"))
+        f.write("<p>Ratio of fix/revert commits to total commits per month.</p>")
+        months_sorted = sorted(data.bug_commits_by_month.keys())[-24:]
+        bug_rate_labels = months_sorted
+        bug_rate_values = []
+        for m in months_sorted:
+            entry = data.bug_commits_by_month[m]
+            total = entry["total"]
+            bug = entry["bug"]
+            bug_rate_values.append(round(100.0 * bug / total, 1) if total > 0 else 0)
+        if bug_rate_labels:
+            f.write(
+                self._render_chartjs(
+                    "chart-bug-rate-trend",
+                    "line",
+                    bug_rate_labels,
+                    [{"label": "Bug Rate (%)", "data": bug_rate_values}],
+                    y_label="Bug Rate (%)",
+                    x_ticks_rotate=True,
+                    aspect_ratio=3,
+                )
+            )
+
+        # ── Code Churn Trend (reuse existing data) ─────────────────────────
+        f.write(html_header(2, "Code Churn Trend"))
+        f.write("<p>Lines deleted as a percentage of total changed lines, per month.</p>")
+        churn_months = sorted(
+            set(data.lines_added_by_month.keys()) | set(data.lines_removed_by_month.keys())
+        )[-24:]
+        churn_labels = churn_months
+        churn_values = []
+        for m in churn_months:
+            added = data.lines_added_by_month.get(m, 0)
+            deleted = data.lines_removed_by_month.get(m, 0)
+            total = added + deleted
+            churn_values.append(round(100.0 * deleted / total, 1) if total > 0 else 0)
+        if churn_labels:
+            f.write(
+                self._render_chartjs(
+                    "chart-churn-trend",
+                    "line",
+                    churn_labels,
+                    [{"label": "Churn (%)", "data": churn_values}],
+                    y_label="Churn (%)",
+                    x_ticks_rotate=True,
+                    aspect_ratio=3,
+                )
+            )
+
+        # ── Hot Files Table ────────────────────────────────────────────────
+        f.write(html_header(2, "Hot Files"))
+        f.write("<p>Files with the most commits. 🔥 marks the hottest files.</p>")
+        if data.file_commit_count:
+            total_fc = len(data.file_commit_count)
+            threshold = _get_hot_file_threshold(total_fc)
+            sorted_files = sorted(
+                data.file_commit_count.items(), key=lambda x: x[1], reverse=True
+            )
+            hot_set = {fn for fn, _ in sorted_files[:threshold]}
+            f.write(
+                '<table class="sortable" id="health-hot-files">'
+                "<tr><th>File</th><th>Commits</th><th>Lines Added</th><th>Lines Deleted</th><th>Authors</th></tr>"
+            )
+            for filename, count in sorted_files[:50]:
+                marker = " 🔥" if filename in hot_set else ""
+                added, deleted = data.file_churn.get(filename, (0, 0))
+                authors = len(data.file_authors.get(filename, set()))
+                f.write(
+                    "<tr><td>%s%s</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td></tr>"
+                    % (filename, marker, count, added, deleted, authors)
+                )
+            f.write("</table>")
+
+        # ── Bus Factor Table ───────────────────────────────────────────────
+        f.write(html_header(2, "Bus Factor by File"))
+        f.write(
+            "<p>Number of distinct contributors per file. Files with only 1 author are high-risk.</p>"
+        )
+        if data.file_authors:
+            bus_sorted = sorted(
+                data.file_authors.items(), key=lambda x: len(x[1])
+            )[:50]
+            f.write(
+                '<table class="sortable" id="health-bus-factor">'
+                "<tr><th>File</th><th>Authors</th></tr>"
+            )
+            for filename, authors in bus_sorted:
+                risk = " ⚠️" if len(authors) == 1 else ""
+                f.write(
+                    "<tr><td>%s%s</td><td>%d</td></tr>"
+                    % (filename, risk, len(authors))
+                )
+            f.write("</table>")
 
         f.write("</body></html>")
         f.close()
@@ -1017,6 +1236,12 @@ class HTMLReportCreator(ReportCreator):
         Parameters:
             file: A writable file-like object opened in text mode where the navigation HTML will be written.
         """
+        # Check if Health dashboard is available
+        has_health = getattr(self.data, "health_data_available", False)
+        health_link = (
+            '<li><a href="health.html">Health</a></li>' if has_health else ""
+        )
+
         # Check if AI insights are available
         has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
 
@@ -1048,6 +1273,7 @@ class HTMLReportCreator(ReportCreator):
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
+            {health_link}
             {ai_link}
             </ul>
             <div class="nav-right">

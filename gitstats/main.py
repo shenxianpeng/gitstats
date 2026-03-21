@@ -32,6 +32,60 @@ os.environ["LC_ALL"] = "C"
 conf = load_config()
 
 
+# ---------------------------------------------------------------------------
+# Health dashboard helpers (module-level, pure functions — easy to unit test)
+# ---------------------------------------------------------------------------
+
+# Commit-type patterns: first match wins (priority order)
+_COMMIT_TYPE_PATTERNS = [
+    ("revert",   re.compile(r"revert|rollback|回滚", re.IGNORECASE)),
+    ("fix",      re.compile(r"fix|bug|hotfix|patch|修复|问题|BUG", re.IGNORECASE)),
+    ("feat",     re.compile(r"\bfeat\b|feature|\badd\b|新增|添加|实现", re.IGNORECASE)),
+    ("refactor", re.compile(r"refactor|重构", re.IGNORECASE)),
+    ("test",     re.compile(r"\btest\b", re.IGNORECASE)),
+    ("docs",     re.compile(r"\bdocs?\b|\bdoc\b|文档|说明", re.IGNORECASE)),
+    ("chore",    re.compile(r"chore|\bci\b|build|deps|bump", re.IGNORECASE)),
+]
+
+# Extensions considered auto-generated (excluded from bus-factor computation)
+_GENERATED_SUFFIXES = (".min.js", "-lock.json", ".lock", ".pb.go", ".pb.py")
+
+
+def _classify_commit_type(subject: str) -> str:
+    """Return the commit type category for a subject line."""
+    for ctype, pattern in _COMMIT_TYPE_PATTERNS:
+        if pattern.search(subject):
+            return ctype
+    return "other"
+
+
+def _resolve_rename(filename: str) -> str:
+    """Resolve git numstat rename notation to the new filename.
+
+    Handles two formats produced by git:
+      - "{old_dir => new_dir}/file.py"  →  "new_dir/file.py"
+      - "old/path => new/path"          →  "new/path"
+    """
+    m = re.search(r"\{([^}]*) => ([^}]*)\}", filename)
+    if m:
+        return filename[: m.start()] + m.group(2) + filename[m.end():]
+    if " => " in filename:
+        return filename.split(" => ", 1)[1]
+    return filename
+
+
+def _get_hot_file_threshold(total_files: int) -> int:
+    """Return how many files to mark as 'hot' given the total file count."""
+    if total_files == 0:
+        return 0
+    if total_files < 50:
+        return min(total_files, max(5, int(total_files * 0.20)))
+    elif total_files < 500:
+        return max(5, int(total_files * 0.10))
+    else:
+        return max(5, int(total_files * 0.05))
+
+
 def parallel_map_with_fallback(func, items):
     """Apply a function to items using multiprocessing, with sequential fallback.
 
@@ -122,6 +176,16 @@ class DataCollector:
         self.ai_summaries: Dict[
             str, Dict[str, Any]
         ] = {}  # page_type -> {summary, error}
+
+        # Health dashboard data
+        self.file_commit_count: Dict[str, int] = {}      # filename -> commit count
+        self.file_churn: Dict[str, tuple] = {}           # filename -> (lines_added, lines_deleted)
+        self.file_authors: Dict[str, set] = {}           # filename -> set of author names
+        self.commit_type_counts: Dict[str, int] = {}     # type -> count
+        self.commit_type_by_author: Dict[str, Dict[str, int]] = {}  # author -> type -> count
+        self.bug_commits_by_month: Dict[str, Dict[str, int]] = {}   # "YYYY-MM" -> {total, bug}
+        self.health_score: int = 0
+        self.health_data_available: bool = False
 
     ##
     # This should be the main function to extract data from the repository.
@@ -723,6 +787,106 @@ class GitDataCollector(DataCollector):
                     print('Warning: failed to handle line "%s"' % line)
                     (files, inserted, deleted) = (0, 0, 0)
 
+        self._collect_health_data(name_to_canonical)
+
+    def _collect_health_data(self, name_to_canonical: Dict[str, str]) -> None:
+        """Collect health metrics via a single git log --numstat pass.
+
+        Data flow:
+          git log --numstat
+            ↓
+          per-commit header  →  commit_type_counts, commit_type_by_author,
+                                 bug_commits_by_month
+          per-file numstat   →  file_commit_count, file_churn, file_authors
+
+        Uses name_to_canonical to keep author identities consistent with the
+        rest of the DataCollector (which keys self.authors by display name).
+        Sets health_data_available = True on success, False on any error.
+        """
+        try:
+            since_arg = ""
+            max_years = conf.get("health_max_years", 5)
+            if max_years and max_years > 0:
+                since_dt = datetime.datetime.now() - datetime.timedelta(
+                    days=int(max_years) * 365
+                )
+                since_arg = f' --since="{since_dt.strftime("%Y-%m-%d")}"'
+
+            log_range = get_log_range("HEAD", False)
+            # Sentinel prefix makes header lines unambiguous among numstat lines.
+            output = get_pipe_output(
+                [
+                    'git log --numstat'
+                    ' --format="GITSTATS_COMMIT\t%aN\t%s\t%ad"'
+                    ' --date=format:"%%Y-%%m"'
+                    ' --no-merges'
+                    f"{since_arg} {log_range}"
+                ]
+            )
+
+            current_author: str = ""
+            current_month: str = ""
+
+            for line in output.split("\n"):
+                if line.startswith("GITSTATS_COMMIT\t"):
+                    parts = line.split("\t", 3)
+                    if len(parts) != 4:
+                        continue
+                    _, raw_author, subject, current_month = parts
+                    current_author = name_to_canonical.get(raw_author, raw_author)
+
+                    ctype = _classify_commit_type(subject)
+                    self.commit_type_counts[ctype] = (
+                        self.commit_type_counts.get(ctype, 0) + 1
+                    )
+
+                    if current_author not in self.commit_type_by_author:
+                        self.commit_type_by_author[current_author] = {}
+                    self.commit_type_by_author[current_author][ctype] = (
+                        self.commit_type_by_author[current_author].get(ctype, 0) + 1
+                    )
+
+                    if current_month:
+                        entry = self.bug_commits_by_month.setdefault(
+                            current_month, {"total": 0, "bug": 0}
+                        )
+                        entry["total"] += 1
+                        if ctype in ("fix", "revert"):
+                            entry["bug"] += 1
+
+                elif line and current_author:
+                    # Numstat line: "added\tdeleted\tfilename"
+                    parts = line.split("\t", 2)
+                    if len(parts) != 3:
+                        continue
+                    added_str, deleted_str, filename = parts
+                    if added_str == "-" or deleted_str == "-":
+                        continue  # binary file
+                    if " => " in filename or "{" in filename:
+                        filename = _resolve_rename(filename)
+                    try:
+                        added = int(added_str)
+                        deleted = int(deleted_str)
+                    except ValueError:
+                        continue
+
+                    self.file_commit_count[filename] = (
+                        self.file_commit_count.get(filename, 0) + 1
+                    )
+                    prev_a, prev_d = self.file_churn.get(filename, (0, 0))
+                    self.file_churn[filename] = (prev_a + added, prev_d + deleted)
+
+                    is_generated = filename.endswith(_GENERATED_SUFFIXES)
+                    if not is_generated:
+                        self.file_authors.setdefault(filename, set()).add(
+                            current_author
+                        )
+
+            self.health_data_available = True
+        except Exception as e:
+            print(f"Warning: Failed to collect health data: {e}")
+            self.health_data_available = False
+
     def refine(self):
         # authors
         # name -> {place_by_commits, commits_frac, date_first, date_last, timedelta}
@@ -744,6 +908,73 @@ class GitDataCollector(DataCollector):
                 a["lines_added"] = 0
             if "lines_removed" not in a:
                 a["lines_removed"] = 0
+
+        # Per-author fix rate (fix/revert commits / total commits)
+        for name in self.authors:
+            author_types = self.commit_type_by_author.get(name, {})
+            total = sum(author_types.values())
+            fix = author_types.get("fix", 0) + author_types.get("revert", 0)
+            self.authors[name]["fix_rate"] = (fix / total) if total > 0 else 0.0
+
+        if self.health_data_available:
+            self._calculate_health_score()
+
+    def _calculate_health_score(self) -> None:
+        """Compute the 0–100 health score from collected health data.
+
+        Score = bug_score*0.30 + churn_score*0.20 + concentration_score*0.20
+              + bus_score*0.15 + docs_score*0.15
+
+        Each sub-score is 0–100 (higher = healthier).
+        """
+        total = self.get_total_commits()
+        if total == 0:
+            self.health_score = 50
+            return
+
+        # 1. Bug commit ratio (fix + revert)
+        fix_count = self.commit_type_counts.get("fix", 0) + self.commit_type_counts.get("revert", 0)
+        bug_ratio = fix_count / total
+        bug_score = max(0, 100 - int(bug_ratio * 200))  # 50% bug → score=0
+
+        # 2. Code churn ratio (deleted / total changed lines)
+        total_added = sum(a for a, _ in self.file_churn.values())
+        total_deleted = sum(d for _, d in self.file_churn.values())
+        total_changed = total_added + total_deleted
+        churn_ratio = (total_deleted / total_changed) if total_changed > 0 else 0.0
+        churn_score = max(0, 100 - int(churn_ratio * 200))  # 50% churn → score=0
+
+        # 3. Hot-spot concentration
+        file_count = len(self.file_commit_count)
+        if file_count > 0:
+            threshold = _get_hot_file_threshold(file_count)
+            sorted_files = sorted(self.file_commit_count.values(), reverse=True)
+            hot_commits = sum(sorted_files[:threshold])
+            concentration = hot_commits / max(sum(sorted_files), 1)
+            concentration_score = max(0, 100 - int(concentration * 100))
+        else:
+            concentration_score = 100
+
+        # 4. Bus factor (avg unique authors per file, capped at 5+)
+        if self.file_authors:
+            avg_bus = sum(len(v) for v in self.file_authors.values()) / len(self.file_authors)
+            bus_score = min(100, int(avg_bus / 5 * 100))
+        else:
+            bus_score = 50
+
+        # 5. Docs commit ratio
+        docs_count = self.commit_type_counts.get("docs", 0)
+        docs_ratio = docs_count / total
+        docs_score = min(100, int(docs_ratio * 500))  # 20% docs → score=100
+
+        raw = (
+            bug_score * 0.30
+            + churn_score * 0.20
+            + concentration_score * 0.20
+            + bus_score * 0.15
+            + docs_score * 0.15
+        )
+        self.health_score = max(0, min(100, int(raw)))
 
     def get_active_days(self):
         return self.active_days

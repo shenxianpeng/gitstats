@@ -67,3 +67,8 @@ fallback_version = "0.0.0"
 [tool.mypy]
 show_error_codes = true
 show_column_numbers = true
+
+[dependency-groups]
+dev = [
+    "pytest>=8.4.2",
+]

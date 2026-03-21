@@ -25,6 +25,8 @@ DEFAULT_CONFIG = {
     "end_date": "",  # Ending date for commits, passed as --until to Git (optional). Format: YYYY-MM-DD.
     "authors": "",  # Comma-separated list of authors to filter commits (empty = include all authors).
     "exclude_exts": "",  # File extensions to exclude from line counting (others detected via null bytes).
+    # Health dashboard
+    "health_max_years": 5,  # Years of history to analyze for health metrics (0 = all history).
     # AI-powered features
     "ai_enabled": False,  # Enable AI-powered summaries (requires AI provider configuration).
     "ai_provider": "openai",  # AI provider: openai, claude, gemini, ollama.
