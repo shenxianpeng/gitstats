@@ -286,6 +286,9 @@ tr:hover td {
 	letter-spacing: -0.01em;
 	flex-shrink: 0;
 	margin-right: var(--space-4);
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
 }
 
 .nav-brand:hover {
