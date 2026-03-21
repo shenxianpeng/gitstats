@@ -155,11 +155,12 @@ class HTMLReportCreator(ReportCreator):
                 color = "var(--health-red)"
                 label = "At Risk"
             f.write(
-                f'<div class="ai-summary" style="margin-top:16px">'
-                f'<h3>Repository Health — <a href="health.html">View Dashboard</a></h3>'
-                f'<p>Overall health score: '
-                f'<strong style="color:{color};font-size:1.4em">{score}</strong>/100 '
-                f'<span style="color:{color}">({label})</span></p>'
+                f'<div class="health-score-card" style="margin-top:var(--space-4);border-left:4px solid {color}">'
+                f'<div class="health-score-number" style="color:{color}">{score}<span style="font-size:0.4em;color:var(--text-muted)">/100</span></div>'
+                f"<div>"
+                f'<div class="health-score-label" style="color:{color}">{label}</div>'
+                f'<p class="health-score-desc"><a href="health.html">View Health Dashboard →</a></p>'
+                f"</div>"
                 f"</div>"
             )
 
@@ -894,13 +895,13 @@ class HTMLReportCreator(ReportCreator):
             color = "var(--health-red)"
             label = "At Risk"
 
-        f.write(html_header(2, "Overall Health Score"))
         f.write(
-            f'<div class="ai-summary">'
-            f'<p class="health-score" style="font-size:3em;font-weight:700;color:{color};margin:8px 0">'
-            f"{score}"
-            f'</p><p style="color:{color};font-size:1.2em">{label}</p>'
-            f"<p>Score based on bug rate, code churn, hot-spot concentration, bus factor, and docs ratio.</p>"
+            f'<div class="health-score-card" style="border-left: 4px solid {color}">'
+            f'<div class="health-score-number" style="color:{color}">{score}<span style="font-size:0.4em;color:var(--text-muted)">/100</span></div>'
+            f"<div>"
+            f'<div class="health-score-label" style="color:{color}">{label}</div>'
+            f'<p class="health-score-desc">Score based on bug rate, code churn, hot-spot concentration, bus factor, and docs ratio.</p>'
+            f"</div>"
             f"</div>"
         )
 
