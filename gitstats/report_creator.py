@@ -1012,13 +1012,17 @@ class HTMLReportCreator(ReportCreator):
 
         # ── Bus Factor Table ───────────────────────────────────────────────
         f.write(html_header(2, "Bus Factor by File"))
-        f.write(
-            "<p>Number of distinct contributors per file. Files with only 1 author are high-risk.</p>"
-        )
         if data.file_authors:
+            single_author_count = sum(1 for v in data.file_authors.values() if len(v) == 1)
             bus_sorted = sorted(
                 data.file_authors.items(), key=lambda x: len(x[1])
             )[:50]
+            f.write(
+                "<p>Number of distinct contributors per file. "
+                "⚠️ marks files with only 1 author — if that person leaves, no one else knows this code. "
+                "<strong>%d of %d tracked files</strong> are single-author.</p>"
+                % (single_author_count, len(data.file_authors))
+            )
             f.write(
                 '<table class="sortable" id="health-bus-factor">'
                 "<tr><th>File</th><th>Authors</th></tr>"
