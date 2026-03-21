@@ -760,8 +760,14 @@ class HTMLReportCreator(ReportCreator):
 
             f.write(html_header(2, "Hot Files"))
             f.write(
-                "<p>Files with the most commits — frequently changed files may indicate "
-                "complexity hotspots or areas of active development.</p>"
+                "<p>🔥 marks the %d hottest files (top %d%% of %d total) — "
+                "frequently changed files may indicate complexity hotspots. "
+                '<a href="health.html">View full health dashboard →</a></p>'
+                % (
+                    threshold,
+                    max(5, int(threshold / total_files * 100)),
+                    total_files,
+                )
             )
             f.write(
                 '<table class="sortable" id="hot-files">'
@@ -771,10 +777,11 @@ class HTMLReportCreator(ReportCreator):
                 is_hot = filename in hot_files
                 hot_marker = " 🔥" if is_hot else ""
                 added, deleted = data.file_churn.get(filename, (0, 0))
-                authors = len(data.file_authors.get(filename, set()))
+                author_set = data.file_authors.get(filename, set())
+                author_display = str(len(author_set)) if author_set else "—"
                 f.write(
-                    "<tr><td>%s%s</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td></tr>"
-                    % (filename, hot_marker, commit_count, added, deleted, authors)
+                    "<tr><td>%s%s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td></tr>"
+                    % (filename, hot_marker, commit_count, added, deleted, author_display)
                 )
             f.write("</table>")
 
@@ -970,7 +977,6 @@ class HTMLReportCreator(ReportCreator):
 
         # ── Hot Files Table ────────────────────────────────────────────────
         f.write(html_header(2, "Hot Files"))
-        f.write("<p>Files with the most commits. 🔥 marks the hottest files.</p>")
         if data.file_commit_count:
             total_fc = len(data.file_commit_count)
             threshold = _get_hot_file_threshold(total_fc)
@@ -978,17 +984,28 @@ class HTMLReportCreator(ReportCreator):
                 data.file_commit_count.items(), key=lambda x: x[1], reverse=True
             )
             hot_set = {fn for fn, _ in sorted_files[:threshold]}
+            display_count = min(50, total_fc)
+            f.write(
+                "<p>Files with the most commits — 🔥 marks the %d hottest files "
+                "(top %d%% of %d total). Files with 1 author are high bus-factor risk.</p>"
+                % (
+                    threshold,
+                    max(5, int(threshold / total_fc * 100)),
+                    total_fc,
+                )
+            )
             f.write(
                 '<table class="sortable" id="health-hot-files">'
                 "<tr><th>File</th><th>Commits</th><th>Lines Added</th><th>Lines Deleted</th><th>Authors</th></tr>"
             )
-            for filename, count in sorted_files[:50]:
+            for filename, count in sorted_files[:display_count]:
                 marker = " 🔥" if filename in hot_set else ""
                 added, deleted = data.file_churn.get(filename, (0, 0))
-                authors = len(data.file_authors.get(filename, set()))
+                author_set = data.file_authors.get(filename, set())
+                author_display = str(len(author_set)) if author_set else "—"
                 f.write(
-                    "<tr><td>%s%s</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td></tr>"
-                    % (filename, marker, count, added, deleted, authors)
+                    "<tr><td>%s%s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td></tr>"
+                    % (filename, marker, count, added, deleted, author_display)
                 )
             f.write("</table>")
 
