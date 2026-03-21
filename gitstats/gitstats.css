@@ -258,7 +258,8 @@ tr:hover td {
 .nav li a {
 	display: inline-flex;
 	align-items: center;
-	padding: var(--space-2) var(--space-3);
+	min-height: 44px;
+	padding: 0 var(--space-3);
 	text-decoration: none;
 	color: var(--nav-text);
 	font-family: var(--font-mono);
@@ -306,8 +307,10 @@ tr:hover td {
 .nav-github {
 	display: inline-flex;
 	align-items: center;
+	min-height: 44px;
+	min-width: 44px;
+	justify-content: center;
 	color: var(--text-secondary);
-	padding: var(--space-1);
 	transition: color 0.12s ease;
 	text-decoration: none;
 }
@@ -326,10 +329,11 @@ tr:hover td {
 	background: transparent;
 	border: 1px solid var(--border-color);
 	cursor: pointer;
-	padding: var(--space-1) var(--space-2);
+	min-height: 44px;
+	min-width: 44px;
 	font-size: var(--font-size-base);
 	color: var(--text-secondary);
-	line-height: 1.4;
+	line-height: 1;
 	transition: border-color 0.12s ease, color 0.12s ease;
 	flex-shrink: 0;
 }
