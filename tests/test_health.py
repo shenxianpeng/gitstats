@@ -1,5 +1,5 @@
 """Unit tests for health dashboard metrics."""
-import pytest
+
 from gitstats.main import _classify_commit_type, _get_hot_file_threshold
 
 
@@ -68,17 +68,27 @@ class TestHealthScoreCalculation:
             "commit_type_counts",
             {"fix": 5, "feat": 30, "chore": 10, "docs": 5, "other": 50},
         )
-        data.file_churn = overrides.get("file_churn", {
-            "a.py": (1000, 100),
-            "b.py": (500, 50),
-        })
-        data.file_authors = overrides.get("file_authors", {
-            "a.py": {"alice", "bob", "carol", "dave", "eve"},
-            "b.py": {"alice", "bob"},
-        })
-        data.file_commit_count = overrides.get("file_commit_count", {
-            "a.py": 40, "b.py": 20,
-        })
+        data.file_churn = overrides.get(
+            "file_churn",
+            {
+                "a.py": (1000, 100),
+                "b.py": (500, 50),
+            },
+        )
+        data.file_authors = overrides.get(
+            "file_authors",
+            {
+                "a.py": {"alice", "bob", "carol", "dave", "eve"},
+                "b.py": {"alice", "bob"},
+            },
+        )
+        data.file_commit_count = overrides.get(
+            "file_commit_count",
+            {
+                "a.py": 40,
+                "b.py": 20,
+            },
+        )
         data.health_score = 0
         return data
 

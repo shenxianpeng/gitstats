@@ -38,13 +38,13 @@ conf = load_config()
 
 # Commit-type patterns: first match wins (priority order)
 _COMMIT_TYPE_PATTERNS = [
-    ("revert",   re.compile(r"revert|rollback|回滚", re.IGNORECASE)),
-    ("fix",      re.compile(r"fix|bug|hotfix|patch|修复|问题|BUG", re.IGNORECASE)),
-    ("feat",     re.compile(r"\bfeat\b|feature|\badd\b|新增|添加|实现", re.IGNORECASE)),
+    ("revert", re.compile(r"revert|rollback|回滚", re.IGNORECASE)),
+    ("fix", re.compile(r"fix|bug|hotfix|patch|修复|问题|BUG", re.IGNORECASE)),
+    ("feat", re.compile(r"\bfeat\b|feature|\badd\b|新增|添加|实现", re.IGNORECASE)),
     ("refactor", re.compile(r"refactor|重构", re.IGNORECASE)),
-    ("test",     re.compile(r"\btest\b", re.IGNORECASE)),
-    ("docs",     re.compile(r"\bdocs?\b|\bdoc\b|文档|说明", re.IGNORECASE)),
-    ("chore",    re.compile(r"chore|\bci\b|build|deps|bump", re.IGNORECASE)),
+    ("test", re.compile(r"\btest\b", re.IGNORECASE)),
+    ("docs", re.compile(r"\bdocs?\b|\bdoc\b|文档|说明", re.IGNORECASE)),
+    ("chore", re.compile(r"chore|\bci\b|build|deps|bump", re.IGNORECASE)),
 ]
 
 # Extensions considered auto-generated (excluded from bus-factor computation)
@@ -68,7 +68,7 @@ def _resolve_rename(filename: str) -> str:
     """
     m = re.search(r"\{([^}]*) => ([^}]*)\}", filename)
     if m:
-        return filename[: m.start()] + m.group(2) + filename[m.end():]
+        return filename[: m.start()] + m.group(2) + filename[m.end() :]
     if " => " in filename:
         return filename.split(" => ", 1)[1]
     return filename
@@ -178,12 +178,18 @@ class DataCollector:
         ] = {}  # page_type -> {summary, error}
 
         # Health dashboard data
-        self.file_commit_count: Dict[str, int] = {}      # filename -> commit count
-        self.file_churn: Dict[str, tuple] = {}           # filename -> (lines_added, lines_deleted)
-        self.file_authors: Dict[str, set] = {}           # filename -> set of author names
-        self.commit_type_counts: Dict[str, int] = {}     # type -> count
-        self.commit_type_by_author: Dict[str, Dict[str, int]] = {}  # author -> type -> count
-        self.bug_commits_by_month: Dict[str, Dict[str, int]] = {}   # "YYYY-MM" -> {total, bug}
+        self.file_commit_count: Dict[str, int] = {}  # filename -> commit count
+        self.file_churn: Dict[
+            str, tuple
+        ] = {}  # filename -> (lines_added, lines_deleted)
+        self.file_authors: Dict[str, set] = {}  # filename -> set of author names
+        self.commit_type_counts: Dict[str, int] = {}  # type -> count
+        self.commit_type_by_author: Dict[
+            str, Dict[str, int]
+        ] = {}  # author -> type -> count
+        self.bug_commits_by_month: Dict[
+            str, Dict[str, int]
+        ] = {}  # "YYYY-MM" -> {total, bug}
         self.health_score: int = 0
         self.health_data_available: bool = False
 
@@ -816,10 +822,10 @@ class GitDataCollector(DataCollector):
             # Sentinel prefix makes header lines unambiguous among numstat lines.
             output = get_pipe_output(
                 [
-                    'git log --numstat'
+                    "git log --numstat"
                     ' --format="GITSTATS_COMMIT\t%aN\t%s\t%ad"'
                     ' --date=format:"%%Y-%%m"'
-                    ' --no-merges'
+                    " --no-merges"
                     f"{since_arg} {log_range}"
                 ]
             )
@@ -933,7 +939,9 @@ class GitDataCollector(DataCollector):
             return
 
         # 1. Bug commit ratio (fix + revert)
-        fix_count = self.commit_type_counts.get("fix", 0) + self.commit_type_counts.get("revert", 0)
+        fix_count = self.commit_type_counts.get("fix", 0) + self.commit_type_counts.get(
+            "revert", 0
+        )
         bug_ratio = fix_count / total
         bug_score = max(0, 100 - int(bug_ratio * 200))  # 50% bug → score=0
 
@@ -957,7 +965,9 @@ class GitDataCollector(DataCollector):
 
         # 4. Bus factor (avg unique authors per file, capped at 5+)
         if self.file_authors:
-            avg_bus = sum(len(v) for v in self.file_authors.values()) / len(self.file_authors)
+            avg_bus = sum(len(v) for v in self.file_authors.values()) / len(
+                self.file_authors
+            )
             bus_score = min(100, int(avg_bus / 5 * 100))
         else:
             bus_score = 50

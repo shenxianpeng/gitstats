@@ -752,6 +752,7 @@ class HTMLReportCreator(ReportCreator):
         # Hot Files section (requires health data)
         if getattr(data, "health_data_available", False) and data.file_commit_count:
             from gitstats.main import _get_hot_file_threshold
+
             total_files = len(data.file_commit_count)
             threshold = _get_hot_file_threshold(total_files)
             sorted_files = sorted(
@@ -782,7 +783,14 @@ class HTMLReportCreator(ReportCreator):
                 author_display = str(len(author_set)) if author_set else "—"
                 f.write(
                     "<tr><td>%s%s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td></tr>"
-                    % (filename, hot_marker, commit_count, added, deleted, author_display)
+                    % (
+                        filename,
+                        hot_marker,
+                        commit_count,
+                        added,
+                        deleted,
+                        author_display,
+                    )
                 )
             f.write("</table>")
 
@@ -907,7 +915,16 @@ class HTMLReportCreator(ReportCreator):
 
         # ── Commit Type Breakdown ──────────────────────────────────────────
         f.write(html_header(2, "Commit Type Breakdown"))
-        type_order = ["fix", "revert", "feat", "refactor", "test", "docs", "chore", "other"]
+        type_order = [
+            "fix",
+            "revert",
+            "feat",
+            "refactor",
+            "test",
+            "docs",
+            "chore",
+            "other",
+        ]
         type_labels = []
         type_values = []
         for t in type_order:
@@ -952,9 +969,12 @@ class HTMLReportCreator(ReportCreator):
 
         # ── Code Churn Trend (reuse existing data) ─────────────────────────
         f.write(html_header(2, "Code Churn Trend"))
-        f.write("<p>Lines deleted as a percentage of total changed lines, per month.</p>")
+        f.write(
+            "<p>Lines deleted as a percentage of total changed lines, per month.</p>"
+        )
         churn_months = sorted(
-            set(data.lines_added_by_month.keys()) | set(data.lines_removed_by_month.keys())
+            set(data.lines_added_by_month.keys())
+            | set(data.lines_removed_by_month.keys())
         )[-24:]
         churn_labels = churn_months
         churn_values = []
@@ -1013,10 +1033,10 @@ class HTMLReportCreator(ReportCreator):
         # ── Bus Factor Table ───────────────────────────────────────────────
         f.write(html_header(2, "Bus Factor by File"))
         if data.file_authors:
-            single_author_count = sum(1 for v in data.file_authors.values() if len(v) == 1)
-            bus_sorted = sorted(
-                data.file_authors.items(), key=lambda x: len(x[1])
-            )[:50]
+            single_author_count = sum(
+                1 for v in data.file_authors.values() if len(v) == 1
+            )
+            bus_sorted = sorted(data.file_authors.items(), key=lambda x: len(x[1]))[:50]
             f.write(
                 "<p>Number of distinct contributors per file. "
                 "⚠️ marks files with only 1 author — if that person leaves, no one else knows this code. "
@@ -1030,8 +1050,7 @@ class HTMLReportCreator(ReportCreator):
             for filename, authors in bus_sorted:
                 risk = " ⚠️" if len(authors) == 1 else ""
                 f.write(
-                    "<tr><td>%s%s</td><td>%d</td></tr>"
-                    % (filename, risk, len(authors))
+                    "<tr><td>%s%s</td><td>%d</td></tr>" % (filename, risk, len(authors))
                 )
             f.write("</table>")
 
@@ -1260,9 +1279,7 @@ class HTMLReportCreator(ReportCreator):
         """
         # Check if Health dashboard is available
         has_health = getattr(self.data, "health_data_available", False)
-        health_link = (
-            '<li><a href="health.html">Health</a></li>' if has_health else ""
-        )
+        health_link = '<li><a href="health.html">Health</a></li>' if has_health else ""
 
         # Check if AI insights are available
         has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
