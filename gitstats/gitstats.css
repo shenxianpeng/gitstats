@@ -29,17 +29,24 @@
 	--radius-md: 0;
 	--radius-lg: 0;
 
-	/* ── Light mode — OpenCode warm palette ── */
+	/* ── Light mode — warm palette ── */
 	--bg-color: #ffffff;
 	--surface-color: #f5f5f4;
+	--surface-2: #ebeaea;
 	--text-color: #211e1e;
-	--text-secondary: #656363;
-	--text-muted: #b7b1b1;
+	--text-secondary: #4b4646;
+	--text-muted: #9e9a9a;
 	--border-color: #cfcecd;
 	--border-strong: #9e9a9a;
 	--accent-color: #211e1e;
 	--success-color: #2d6a3f;
 	--danger-color: #8b2323;
+	--warning-color: #d4a017;
+
+	/* Amber — the accent: links, bars, h2 prefix, hover */
+	--amber: #D97706;
+	--amber-hover: #b45309;
+	--amber-light: #fef3c7;
 
 	--table-bg: #ffffff;
 	--table-header-bg: #f5f5f4;
@@ -49,14 +56,14 @@
 
 	--nav-bg: #ffffff;
 	--nav-text: #4b4646;
-	--nav-hover-color: #211e1e;
+	--nav-hover-color: var(--amber);
 
 	--img-bg: #f5f5f4;
 	--img-border: #cfcecd;
 
-	--link-color: #4a7ab5;
+	--link-color: var(--amber);
 
-	--bar-color: #4a7ab5;
+	--bar-color: var(--amber);
 
 	/* Heatmap — GitHub green scale (user preference) */
 	--heat0-bg: #ebedf0;
@@ -71,10 +78,11 @@
 	--heat4-color: #ffffff;
 }
 
-/* ── Dark mode — OpenCode near-black ── */
+/* ── Dark mode — warm near-black ── */
 [data-theme="dark"] {
 	--bg-color: #211e1e;
 	--surface-color: #2d2929;
+	--surface-2: #352f2f;
 	--text-color: #f1ecec;
 	--text-secondary: #b7b1b1;
 	--text-muted: #656363;
@@ -83,6 +91,11 @@
 	--accent-color: #f1ecec;
 	--success-color: #4ade80;
 	--danger-color: #f87171;
+	--warning-color: #e3b341;
+
+	/* Amber — one stop brighter for dark contrast */
+	--amber: #F59E0B;
+	--amber-hover: #fbbf24;
 
 	--table-bg: #2d2929;
 	--table-header-bg: #211e1e;
@@ -92,14 +105,14 @@
 
 	--nav-bg: #211e1e;
 	--nav-text: #b7b1b1;
-	--nav-hover-color: #f1ecec;
+	--nav-hover-color: var(--amber);
 
 	--img-bg: #2d2929;
 	--img-border: #3d3838;
 
-	--link-color: #6b95c8;
+	--link-color: var(--amber);
 
-	--bar-color: #6b95c8;
+	--bar-color: var(--amber);
 
 	/* Heatmap dark — GitHub dark green */
 	--heat0-bg: #1c2128;
@@ -120,15 +133,44 @@
 }
 
 body {
-	font-family: var(--font-sans);
-	font-size: var(--font-size-base);
-	line-height: 1.6;
+	font-family: var(--font-mono);
+	font-size: 13px;
+	line-height: 1.7;
 	color: var(--text-color);
 	background-color: var(--bg-color);
 	margin: 0 auto;
 	padding: 0 var(--space-5);
 	max-width: 1280px;
 	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ===== Generation Command Block ===== */
+.cmd-block {
+	display: inline-block;
+	margin: var(--space-3) 0 var(--space-5);
+	padding: var(--space-2) var(--space-4);
+	background-color: var(--surface-color);
+	border: 1px solid var(--border-color);
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+}
+
+.cmd-prompt {
+	color: var(--amber);
+	margin-right: var(--space-2);
+	font-weight: 600;
+}
+
+.cmd-cursor {
+	color: var(--amber);
+	animation: blink 1.2s step-end infinite;
+	margin-left: 2px;
+}
+
+@keyframes blink {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0; }
 }
 
 /* ===== Definition Lists ===== */
@@ -218,6 +260,7 @@ tr:hover td {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	min-height: 44px;
 	padding: var(--space-4) 0;
 	margin-bottom: var(--space-5);
 	border-bottom: 1px solid var(--border-strong);
@@ -248,6 +291,7 @@ tr:hover td {
 .nav li a {
 	display: inline-flex;
 	align-items: center;
+	min-height: 44px;
 	padding: var(--space-2) var(--space-3);
 	text-decoration: none;
 	color: var(--nav-text);
@@ -260,13 +304,16 @@ tr:hover td {
 }
 
 .nav li a:hover {
-	color: var(--nav-hover-color);
+	color: var(--amber);
 	background-color: var(--surface-color);
 	text-decoration: none;
 }
 
 /* ===== Nav Brand ===== */
 .nav-brand {
+	display: inline-flex;
+	align-items: center;
+	min-height: 44px;
 	font-family: var(--font-mono);
 	font-size: var(--font-size-md);
 	font-weight: 700;
@@ -296,6 +343,9 @@ tr:hover td {
 .nav-github {
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
+	min-width: 44px;
+	min-height: 44px;
 	color: var(--text-secondary);
 	padding: var(--space-1);
 	transition: color 0.12s ease;
@@ -316,6 +366,8 @@ tr:hover td {
 	background: transparent;
 	border: 1px solid var(--border-color);
 	cursor: pointer;
+	min-width: 44px;
+	min-height: 44px;
 	padding: var(--space-1) var(--space-2);
 	font-size: var(--font-size-base);
 	color: var(--text-secondary);
@@ -349,12 +401,12 @@ h1 a {
 
 h2 {
 	font-family: var(--font-mono);
-	font-size: var(--font-size-md);
-	font-weight: 600;
+	font-size: 18px;
+	font-weight: 500;
 	color: var(--text-color);
 	margin: var(--space-6) 0 var(--space-3);
 	padding: var(--space-2) var(--space-3);
-	border-left: 2px solid var(--text-color);
+	border-left: 2px solid var(--amber);
 	background-color: var(--surface-color);
 	clear: both;
 	letter-spacing: -0.01em;
@@ -362,7 +414,7 @@ h2 {
 
 h2::before {
 	content: '// ';
-	color: var(--text-muted);
+	color: var(--amber);
 	font-weight: 400;
 	letter-spacing: 0;
 }
