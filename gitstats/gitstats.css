@@ -400,6 +400,7 @@ h1 {
 	border-bottom: 1px solid var(--border-strong);
 	line-height: 1.3;
 	letter-spacing: -0.02em;
+	text-wrap: balance;
 }
 
 h1 a {
@@ -418,6 +419,7 @@ h2 {
 	background-color: var(--surface-color);
 	clear: both;
 	letter-spacing: -0.01em;
+	text-wrap: balance;
 }
 
 h2::before {
