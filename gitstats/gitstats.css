@@ -6,6 +6,7 @@
 
 /* ===== CSS Custom Properties ===== */
 :root {
+	color-scheme: light;
 	/* Typography — OpenCode uses IBM Plex Mono / Inter */
 	--font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
 	--font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -80,6 +81,7 @@
 
 /* ── Dark mode — warm near-black ── */
 [data-theme="dark"] {
+	color-scheme: dark;
 	--bg-color: #211e1e;
 	--surface-color: #2d2929;
 	--surface-2: #352f2f;
