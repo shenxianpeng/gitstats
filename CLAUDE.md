@@ -39,3 +39,15 @@ Xianpeng Shen (shenxianpeng), DevOps engineer. Maintains the gitstats open sourc
 - Branch for PRs: `main`
 - Always run `nox -s lint` before committing
 - **Language**: Always reply in the same language the user writes in. If the user writes in Chinese, respond in Chinese.
+
+## Design System
+Always read `DESIGN.md` before making any visual or UI decisions.
+All font choices, colors, spacing, and aesthetic direction are defined there.
+Do not deviate without explicit user approval.
+In QA mode, flag any code that doesn't match `DESIGN.md`.
+
+Key rules (never violate without checking DESIGN.md first):
+- `font-family` must be `var(--font-mono)` on body — no fallback to sans-serif
+- Accent color is warm amber (`#D97706` light / `#F59E0B` dark) — not steel blue
+- Border-radius: zero everywhere
+- No cards, no box-shadow elevation, no grain textures

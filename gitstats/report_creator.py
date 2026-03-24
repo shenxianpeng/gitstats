@@ -86,6 +86,10 @@ class HTMLReportCreator(ReportCreator):
 
         f.write("<h1>General</h1>")
 
+        f.write(
+            f"""<div class="cmd-block"><span class="cmd-prompt">$</span> gitstats {data.dir} {path}<span class="cmd-cursor">▊</span></div>"""
+        )
+
         f.write(html_header(2, "Git Overview"))
 
         f.write("<table border='1' cellspacing='0' cellpadding='4'>")
@@ -977,6 +981,9 @@ class HTMLReportCreator(ReportCreator):
 	<title>GitStats - %s</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap">
 	<link rel="stylesheet" href="%s" type="text/css">
 	<meta name="generator" content="GitStats %s">
 	<script type="text/javascript" src="sortable.js"></script>
