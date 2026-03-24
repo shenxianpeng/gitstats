@@ -199,9 +199,15 @@ table {
 	font-size: var(--font-size-sm);
 	margin-bottom: var(--space-4);
 	border: 1px solid var(--border-strong);
+	display: block;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+	max-width: 100%;
 }
 
 table.noborders {
+	display: table;
+	overflow-x: visible;
 	border: none;
 	background: transparent;
 }
