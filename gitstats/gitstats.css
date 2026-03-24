@@ -458,6 +458,12 @@ th img {
 	display: inline;
 }
 
+/* ===== Focus Visible ===== */
+:focus-visible {
+	outline: 2px solid var(--amber);
+	outline-offset: 2px;
+}
+
 /* ===== Links ===== */
 a {
 	color: var(--link-color);
