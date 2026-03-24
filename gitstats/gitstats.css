@@ -175,6 +175,12 @@ body {
 	50% { opacity: 0; }
 }
 
+@media (prefers-reduced-motion: reduce) {
+	.cmd-cursor {
+		animation: none;
+	}
+}
+
 /* ===== Definition Lists ===== */
 dt {
 	font-weight: 600;
