@@ -121,11 +121,8 @@ class DataCollector:
         # file churn: number of commits that touched each file path
         self.file_churn = {}  # filepath -> commit count
 
-        # commit type breakdown (conventional commits)
-        self.commit_types = {}  # type -> count  (feat, fix, docs, …, other)
-
         # new contributors per month
-        self.new_contributors_by_month = {}  # yymm -> count
+        self.new_contributors_by_month = {}  # YYYY-MM -> count
 
         # AI summaries
         self.ai_summaries: Dict[
@@ -740,41 +737,6 @@ class GitDataCollector(DataCollector):
             line = line.strip()
             if line:
                 self.file_churn[line] = self.file_churn.get(line, 0) + 1
-
-        # Commit-type breakdown (Conventional Commits)
-        KNOWN_TYPES = [
-            "feat",
-            "fix",
-            "refactor",
-            "docs",
-            "test",
-            "chore",
-            "style",
-            "perf",
-            "ci",
-            "build",
-            "revert",
-        ]
-        # Pre-compile patterns for performance with large histories
-        type_patterns = [
-            (ctype, re.compile(r"^%s[\(:!]" % ctype)) for ctype in KNOWN_TYPES
-        ]
-        subject_lines = get_pipe_output(
-            ["git log --format=%%s %s" % get_log_range("HEAD", False)]
-        ).split("\n")
-        for subject in subject_lines:
-            subject = subject.strip()
-            if not subject:
-                continue
-            matched = False
-            lower_subject = subject.lower()
-            for ctype, pattern in type_patterns:
-                if pattern.match(lower_subject):
-                    self.commit_types[ctype] = self.commit_types.get(ctype, 0) + 1
-                    matched = True
-                    break
-            if not matched:
-                self.commit_types["other"] = self.commit_types.get("other", 0) + 1
 
     def refine(self):
         # authors
