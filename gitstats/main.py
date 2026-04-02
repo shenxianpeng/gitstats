@@ -761,7 +761,7 @@ class GitDataCollector(DataCollector):
                 a["lines_removed"] = 0
 
         # Compute new contributors per month from author first-commit stamps
-        for name in list(self.authors.keys()):
+        for name in self.authors:
             a = self.authors[name]
             if "first_commit_stamp" in a:
                 first_month = datetime.datetime.fromtimestamp(

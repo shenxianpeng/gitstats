@@ -439,6 +439,38 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def _build_author_time_series(self, data):
+        """Build per-author cumulative lines and commits time series for Chart.js."""
+        authors_to_plot = data.get_authors(conf["max_authors"])
+        lines_by_authors = {a: 0 for a in authors_to_plot}
+        commits_by_authors = {a: 0 for a in authors_to_plot}
+        time_labels = []
+        per_author_lines = {a: [] for a in authors_to_plot}
+        per_author_commits = {a: [] for a in authors_to_plot}
+
+        for stamp in sorted(data.changes_by_date_by_author.keys()):
+            time_labels.append(
+                datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
+            )
+            for author in authors_to_plot:
+                if author in data.changes_by_date_by_author[stamp]:
+                    lines_by_authors[author] = data.changes_by_date_by_author[stamp][
+                        author
+                    ]["lines_added"]
+                    commits_by_authors[author] = data.changes_by_date_by_author[stamp][
+                        author
+                    ]["commits"]
+                per_author_lines[author].append(lines_by_authors[author])
+                per_author_commits[author].append(commits_by_authors[author])
+
+        loc_datasets = [
+            {"label": a, "data": per_author_lines[a]} for a in authors_to_plot
+        ]
+        cba_datasets = [
+            {"label": a, "data": per_author_commits[a]} for a in authors_to_plot
+        ]
+        return time_labels, loc_datasets, cba_datasets
+
     def create_authors_html(self, data, path):
         ###
         # Authors
@@ -483,36 +515,7 @@ class HTMLReportCreator(ReportCreator):
             )
 
         # Build per-author time series data for Chart.js
-        self.authors_to_plot = data.get_authors(conf["max_authors"])
-        lines_by_authors = {a: 0 for a in self.authors_to_plot}
-        commits_by_authors = {a: 0 for a in self.authors_to_plot}
-
-        # time_labels: formatted date strings; per_author_lines/commits: list per author
-        time_labels = []
-        per_author_lines = {a: [] for a in self.authors_to_plot}
-        per_author_commits = {a: [] for a in self.authors_to_plot}
-
-        for stamp in sorted(data.changes_by_date_by_author.keys()):
-            time_labels.append(
-                datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
-            )
-            for author in self.authors_to_plot:
-                if author in data.changes_by_date_by_author[stamp]:
-                    lines_by_authors[author] = data.changes_by_date_by_author[stamp][
-                        author
-                    ]["lines_added"]
-                    commits_by_authors[author] = data.changes_by_date_by_author[stamp][
-                        author
-                    ]["commits"]
-                per_author_lines[author].append(lines_by_authors[author])
-                per_author_commits[author].append(commits_by_authors[author])
-
-        loc_datasets = [
-            {"label": a, "data": per_author_lines[a]} for a in self.authors_to_plot
-        ]
-        cba_datasets = [
-            {"label": a, "data": per_author_commits[a]} for a in self.authors_to_plot
-        ]
+        time_labels, loc_datasets, cba_datasets = self._build_author_time_series(data)
 
         f.write(html_header(2, "Cumulated Added Lines of Code per Author"))
         f.write(
