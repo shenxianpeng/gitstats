@@ -3,6 +3,7 @@
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
 # GPLv2 / GPLv3
 import os
+import html
 import shutil
 import datetime
 import time
@@ -435,45 +436,6 @@ class HTMLReportCreator(ReportCreator):
             )
         f.write("</tr></table>")
 
-        # Commit type breakdown (Conventional Commits)
-        if data.commit_types:
-            f.write(html_header(2, "Commit Types"))
-            f.write(
-                "<p><em>Distribution of commit message types "
-                "(based on <a href='https://www.conventionalcommits.org/' target='_blank' rel='noopener'>Conventional Commits</a> prefixes).</em></p>"
-            )
-            total_typed = sum(data.commit_types.values())
-            # Sort by count descending; put "other" last
-            ct_sorted = sorted(
-                data.commit_types.items(),
-                key=lambda x: (x[0] == "other", -x[1]),
-            )
-            f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
-            f.write("<table><tr><th>Type</th><th>Commits (%)</th></tr>")
-            ct_labels = []
-            ct_values = []
-            for ctype, count in ct_sorted:
-                ct_labels.append(ctype)
-                ct_values.append(count)
-                f.write(
-                    "<tr><td>%s</td><td>%d (%.1f%%)</td></tr>"
-                    % (ctype, count, 100.0 * count / total_typed)
-                )
-            f.write("</table>")
-            f.write('<div style="flex:1;min-width:0">')
-            f.write(
-                self._render_chartjs(
-                    "chart-commit-types",
-                    "bar",
-                    ct_labels,
-                    [{"label": "Commits", "data": ct_values}],
-                    y_label="Commits",
-                    max_bar_thickness=40,
-                    aspect_ratio=3,
-                )
-            )
-            f.write("</div></div>")
-
         f.write("</body></html>")
         f.close()
 
@@ -796,7 +758,11 @@ class HTMLReportCreator(ReportCreator):
             for filepath, count in top_churn:
                 f.write(
                     '<tr><td class="%s">%s</td><td>%d</td></tr>'
-                    % (self._heat_td_class(count, max_churn), filepath, count)
+                    % (
+                        self._heat_td_class(count, max_churn),
+                        html.escape(filepath),
+                        count,
+                    )
                 )
             f.write("</table>")
             f.write(
@@ -1015,8 +981,8 @@ class HTMLReportCreator(ReportCreator):
                     entry.setdefault("pointRadius", 2)
             js_datasets.append(entry)
 
-        labels_json = json.dumps(labels)
-        datasets_json = json.dumps(js_datasets)
+        labels_json = json.dumps(labels).replace("</", "<\\/")
+        datasets_json = json.dumps(js_datasets).replace("</", "<\\/")
         # Replace quoted placeholder with JS expression
         datasets_json = datasets_json.replace(
             '"__CSS_BAR_COLOR__"', "getCSSVar('--bar-color')"
