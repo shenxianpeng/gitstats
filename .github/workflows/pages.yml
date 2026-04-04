@@ -24,6 +24,8 @@ jobs:
         python-version: "3.9"
 
     - name: Generate GitStats Report
+      env:
+        FONTCONFIG_FILE: /dev/null
       run: |
         pip install nox
         nox -s build
