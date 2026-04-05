@@ -3,6 +3,7 @@
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
 # GPLv2 / GPLv3
 import os
+import html
 import shutil
 import datetime
 import time
@@ -438,6 +439,38 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def _build_author_time_series(self, data):
+        """Build per-author cumulative lines and commits time series for Chart.js."""
+        authors_to_plot = data.get_authors(conf["max_authors"])
+        lines_by_authors = {a: 0 for a in authors_to_plot}
+        commits_by_authors = {a: 0 for a in authors_to_plot}
+        time_labels = []
+        per_author_lines = {a: [] for a in authors_to_plot}
+        per_author_commits = {a: [] for a in authors_to_plot}
+
+        for stamp in sorted(data.changes_by_date_by_author.keys()):
+            time_labels.append(
+                datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
+            )
+            for author in authors_to_plot:
+                if author in data.changes_by_date_by_author[stamp]:
+                    lines_by_authors[author] = data.changes_by_date_by_author[stamp][
+                        author
+                    ]["lines_added"]
+                    commits_by_authors[author] = data.changes_by_date_by_author[stamp][
+                        author
+                    ]["commits"]
+                per_author_lines[author].append(lines_by_authors[author])
+                per_author_commits[author].append(commits_by_authors[author])
+
+        loc_datasets = [
+            {"label": a, "data": per_author_lines[a]} for a in authors_to_plot
+        ]
+        cba_datasets = [
+            {"label": a, "data": per_author_commits[a]} for a in authors_to_plot
+        ]
+        return time_labels, loc_datasets, cba_datasets
+
     def create_authors_html(self, data, path):
         ###
         # Authors
@@ -482,36 +515,7 @@ class HTMLReportCreator(ReportCreator):
             )
 
         # Build per-author time series data for Chart.js
-        self.authors_to_plot = data.get_authors(conf["max_authors"])
-        lines_by_authors = {a: 0 for a in self.authors_to_plot}
-        commits_by_authors = {a: 0 for a in self.authors_to_plot}
-
-        # time_labels: formatted date strings; per_author_lines/commits: list per author
-        time_labels = []
-        per_author_lines = {a: [] for a in self.authors_to_plot}
-        per_author_commits = {a: [] for a in self.authors_to_plot}
-
-        for stamp in sorted(data.changes_by_date_by_author.keys()):
-            time_labels.append(
-                datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
-            )
-            for author in self.authors_to_plot:
-                if author in data.changes_by_date_by_author[stamp]:
-                    lines_by_authors[author] = data.changes_by_date_by_author[stamp][
-                        author
-                    ]["lines_added"]
-                    commits_by_authors[author] = data.changes_by_date_by_author[stamp][
-                        author
-                    ]["commits"]
-                per_author_lines[author].append(lines_by_authors[author])
-                per_author_commits[author].append(commits_by_authors[author])
-
-        loc_datasets = [
-            {"label": a, "data": per_author_lines[a]} for a in self.authors_to_plot
-        ]
-        cba_datasets = [
-            {"label": a, "data": per_author_commits[a]} for a in self.authors_to_plot
-        ]
+        time_labels, loc_datasets, cba_datasets = self._build_author_time_series(data)
 
         f.write(html_header(2, "Cumulated Added Lines of Code per Author"))
         f.write(
@@ -639,6 +643,27 @@ class HTMLReportCreator(ReportCreator):
         )
         f.write("</div></div>")
 
+        # Contributor Growth Over Time
+        if data.new_contributors_by_month:
+            f.write(html_header(2, "Contributor Growth"))
+            f.write(
+                "<p><em>Number of first-time contributors per month. "
+                "A growing trend indicates a healthy, welcoming project.</em></p>"
+            )
+            nc_keys = sorted(data.new_contributors_by_month.keys())
+            nc_values = [data.new_contributors_by_month[k] for k in nc_keys]
+            f.write(
+                self._render_chartjs(
+                    "chart-contributor-growth",
+                    "bar",
+                    nc_keys,
+                    [{"label": "New contributors", "data": nc_values}],
+                    y_label="New contributors",
+                    x_ticks_rotate=True,
+                    aspect_ratio=4,
+                )
+            )
+
         f.write("</body></html>")
         f.close()
 
@@ -714,6 +739,46 @@ class HTMLReportCreator(ReportCreator):
                 )
             )
         f.write("</table>")
+
+        # Files :: Code Churn (most frequently changed files)
+        if data.file_churn:
+            f.write(html_header(2, "Most Changed Files (Code Churn)"))
+            f.write(
+                "<p><em>Files touched most often across all commits. "
+                "High-churn files are hotspots that may benefit from extra review or refactoring.</em></p>"
+            )
+            churn_sorted = sorted(
+                data.file_churn.items(), key=lambda x: x[1], reverse=True
+            )
+            top_churn = churn_sorted[:25]
+            max_churn = max(1, top_churn[0][1]) if top_churn else 1
+            churn_labels = [item[0] for item in top_churn]
+            churn_values = [item[1] for item in top_churn]
+            f.write(
+                '<table class="sortable" id="churn">'
+                "<tr><th>File</th><th>Times Changed</th></tr>"
+            )
+            for filepath, count in top_churn:
+                f.write(
+                    '<tr><td class="%s">%s</td><td>%d</td></tr>'
+                    % (
+                        self._heat_td_class(count, max_churn),
+                        html.escape(filepath),
+                        count,
+                    )
+                )
+            f.write("</table>")
+            f.write(
+                self._render_chartjs(
+                    "chart-file-churn",
+                    "bar",
+                    churn_labels,
+                    [{"label": "Commits", "data": churn_values}],
+                    y_label="Times Changed",
+                    x_ticks_rotate=True,
+                    aspect_ratio=3,
+                )
+            )
 
         f.write("</body></html>")
         f.close()
@@ -919,8 +984,8 @@ class HTMLReportCreator(ReportCreator):
                     entry.setdefault("pointRadius", 2)
             js_datasets.append(entry)
 
-        labels_json = json.dumps(labels)
-        datasets_json = json.dumps(js_datasets)
+        labels_json = json.dumps(labels).replace("</", "<\\/")
+        datasets_json = json.dumps(js_datasets).replace("</", "<\\/")
         # Replace quoted placeholder with JS expression
         datasets_json = datasets_json.replace(
             '"__CSS_BAR_COLOR__"', "getCSSVar('--bar-color')"

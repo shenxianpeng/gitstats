@@ -118,6 +118,12 @@ class DataCollector:
         # line statistics
         self.changes_by_date = {}  # stamp -> { files, ins, del }
 
+        # file churn: number of commits that touched each file path
+        self.file_churn = {}  # filepath -> commit count
+
+        # new contributors per month
+        self.new_contributors_by_month = {}  # YYYY-MM -> count
+
         # AI summaries
         self.ai_summaries: Dict[
             str, Dict[str, Any]
@@ -723,6 +729,15 @@ class GitDataCollector(DataCollector):
                     print('Warning: failed to handle line "%s"' % line)
                     (files, inserted, deleted) = (0, 0, 0)
 
+        # File churn: count how many commits touched each file
+        churn_output = get_pipe_output(
+            ['git log --format="" --name-only %s' % get_log_range("HEAD", False)]
+        )
+        for line in churn_output.split("\n"):
+            line = line.strip()
+            if line:
+                self.file_churn[line] = self.file_churn.get(line, 0) + 1
+
     def refine(self):
         # authors
         # name -> {place_by_commits, commits_frac, date_first, date_last, timedelta}
@@ -744,6 +759,17 @@ class GitDataCollector(DataCollector):
                 a["lines_added"] = 0
             if "lines_removed" not in a:
                 a["lines_removed"] = 0
+
+        # Compute new contributors per month from author first-commit stamps
+        for name in self.authors:
+            a = self.authors[name]
+            if "first_commit_stamp" in a:
+                first_month = datetime.datetime.fromtimestamp(
+                    a["first_commit_stamp"]
+                ).strftime("%Y-%m")
+                self.new_contributors_by_month[first_month] = (
+                    self.new_contributors_by_month.get(first_month, 0) + 1
+                )
 
     def get_active_days(self):
         return self.active_days
