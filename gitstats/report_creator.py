@@ -155,9 +155,10 @@ class HTMLReportCreator(ReportCreator):
         # f.write('<h2>Last 12 months</h2>')
 
         # Yearly activity
-        first_commit_timestamp = get_pipe_output(
-            ["git log --reverse --pretty=format:%ct | head -n 1"], quiet=True
+        log_output = get_pipe_output(
+            ["git log --reverse --pretty=format:%ct"], quiet=True
         )
+        first_commit_timestamp = log_output.split("\n")[0] if log_output else ""
         if first_commit_timestamp:
             repo_age_years = (
                 time.time() - int(first_commit_timestamp)
