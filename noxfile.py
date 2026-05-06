@@ -12,6 +12,14 @@ def lint(session: nox.Session) -> None:
 
 
 @nox.session
+def test(session: nox.Session) -> None:
+    """Run tests"""
+    session.install("--upgrade", "pip")
+    session.install("-e", ".[test]")
+    session.run("pytest", *session.posargs, external=True)
+
+
+@nox.session
 def build(session: nox.Session) -> None:
     """Generate gitstats report and json file"""
     report_dir = Path("test-report")
