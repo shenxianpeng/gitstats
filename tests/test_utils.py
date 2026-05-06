@@ -1,22 +1,20 @@
 """Tests for gitstats.utils – pure logic and git helper functions."""
 
-import os
-
 import pytest
 
 from gitstats.utils import (
-    get_stat_summary_counts,
     count_lines_in_text,
     filter_lines_by_pattern,
-    should_exclude_file,
-    get_excluded_extensions,
-    get_version,
     get_commit_range,
+    get_excluded_extensions,
     get_log_range,
+    get_stat_summary_counts,
+    get_version,
+    should_exclude_file,
 )
 
-
 # ── get_stat_summary_counts ──────────────────────────────────────────────
+
 
 @pytest.mark.parametrize(
     "line,expected",
@@ -59,6 +57,7 @@ def test_get_stat_summary_counts_unexpected_format():
 
 # ── count_lines_in_text ──────────────────────────────────────────────────
 
+
 def test_count_lines_in_text_basic():
     assert count_lines_in_text("a\nb\nc\n") == 3
     assert count_lines_in_text("single line") == 1
@@ -75,6 +74,7 @@ def test_count_lines_in_text_trailing_newline():
 
 
 # ── filter_lines_by_pattern ──────────────────────────────────────────────
+
 
 def test_filter_lines_by_pattern_basic():
     text = "line1\ncomment: foo\nline2\ncomment: bar\n"
@@ -96,10 +96,12 @@ def test_filter_lines_by_pattern_empty():
 
 # ── should_exclude_file / get_excluded_extensions ────────────────────────
 
+
 def _set_config(**kwargs):
     """Helper: set the gitstats config across all modules."""
     import gitstats
     import gitstats.utils
+
     cfg = dict(gitstats.DEFAULT_CONFIG, **kwargs)
     gitstats._config = cfg
     # Also update module-level conf variables
@@ -146,6 +148,7 @@ def test_get_excluded_extensions_values():
 
 # ── get_version ──────────────────────────────────────────────────────────
 
+
 def test_get_version():
     v = get_version()
     assert v  # not empty
@@ -153,6 +156,7 @@ def test_get_version():
 
 
 # ── get_commit_range ─────────────────────────────────────────────────────
+
 
 def test_get_commit_range_default():
     _set_config(commit_begin="", commit_end="HEAD")
@@ -177,13 +181,20 @@ def test_get_commit_range_numeric_begin():
 
 # ── get_log_range ────────────────────────────────────────────────────────
 
+
 def test_get_log_range_default():
     _set_config(start_date="", end_date="", authors="", commit_begin="", commit_end="HEAD")
     assert get_log_range() == "HEAD"
 
 
 def test_get_log_range_with_dates():
-    _set_config(start_date="2023-01-01", end_date="2023-12-31", authors="", commit_begin="", commit_end="HEAD")
+    _set_config(
+        start_date="2023-01-01",
+        end_date="2023-12-31",
+        authors="",
+        commit_begin="",
+        commit_end="HEAD",
+    )
     result = get_log_range()
     assert '--since="2023-01-01"' in result
     assert '--until="2023-12-31"' in result

@@ -6,15 +6,15 @@ import tempfile
 import pytest
 
 from gitstats import (
+    DEFAULT_CONFIG,
+    ON_LINUX,
     WEEKDAYS,
     get_i18n_text,
     load_config,
-    DEFAULT_CONFIG,
-    ON_LINUX,
 )
 
-
 # ── Constants ────────────────────────────────────────────────────────────
+
 
 def test_weekdays():
     assert list(WEEKDAYS) == ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
@@ -26,14 +26,33 @@ def test_on_linux_is_bool():
 
 # ── DEFAULT_CONFIG ───────────────────────────────────────────────────────
 
+
 def test_default_config_keys():
     """Verify all expected keys exist in DEFAULT_CONFIG."""
     expected_keys = {
-        "max_domains", "max_ext_length", "style", "max_authors", "authors_top",
-        "commit_begin", "commit_end", "linear_linestats", "project_name",
-        "processes", "start_date", "end_date", "authors", "exclude_exts",
-        "ai_enabled", "ai_provider", "ai_api_key", "ai_model", "ai_language",
-        "ai_cache_enabled", "ai_max_retries", "ai_retry_delay", "ollama_base_url",
+        "max_domains",
+        "max_ext_length",
+        "style",
+        "max_authors",
+        "authors_top",
+        "commit_begin",
+        "commit_end",
+        "linear_linestats",
+        "project_name",
+        "processes",
+        "start_date",
+        "end_date",
+        "authors",
+        "exclude_exts",
+        "ai_enabled",
+        "ai_provider",
+        "ai_api_key",
+        "ai_model",
+        "ai_language",
+        "ai_cache_enabled",
+        "ai_max_retries",
+        "ai_retry_delay",
+        "ollama_base_url",
     }
     assert set(DEFAULT_CONFIG.keys()) == expected_keys
 
@@ -48,6 +67,7 @@ def test_default_config_types():
 
 
 # ── load_config ──────────────────────────────────────────────────────────
+
 
 def test_load_config_defaults():
     """Without a config file, load_config should return defaults."""
@@ -70,6 +90,7 @@ project_name = test-project
     try:
         # Reset config cache
         import gitstats
+
         gitstats._config = None
 
         cfg = load_config(path)
@@ -98,6 +119,7 @@ ai_cache_enabled = false
 
     try:
         import gitstats
+
         gitstats._config = None
 
         cfg = load_config(path)
@@ -114,15 +136,19 @@ ai_cache_enabled = false
 
 # ── get_i18n_text ────────────────────────────────────────────────────────
 
-@pytest.mark.parametrize("lang,key", [
-    ("en", "ai_insights_title"),
-    ("zh", "ai_insights_title"),
-    ("ja", "ai_insights_title"),
-    ("ko", "ai_insights_title"),
-    ("es", "ai_insights_title"),
-    ("fr", "ai_insights_title"),
-    ("de", "ai_insights_title"),
-])
+
+@pytest.mark.parametrize(
+    "lang,key",
+    [
+        ("en", "ai_insights_title"),
+        ("zh", "ai_insights_title"),
+        ("ja", "ai_insights_title"),
+        ("ko", "ai_insights_title"),
+        ("es", "ai_insights_title"),
+        ("fr", "ai_insights_title"),
+        ("de", "ai_insights_title"),
+    ],
+)
 def test_get_i18n_text_all_languages(lang, key):
     """Every supported language should return a non-empty string."""
     result = get_i18n_text(key, lang)

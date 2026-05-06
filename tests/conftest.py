@@ -1,15 +1,13 @@
 """Shared fixtures for gitstats tests."""
 
+import datetime
 import os
 import shutil
 import subprocess
 import tempfile
-import datetime
 from unittest.mock import Mock
 
 import pytest
-
-from gitstats import WEEKDAYS, load_config
 
 
 @pytest.fixture
@@ -64,11 +62,15 @@ def git_repo(temp_dir):
     subprocess.run(["git", "init"], cwd=repo_path, check=True, capture_output=True)
     subprocess.run(
         ["git", "config", "user.name", "Test User"],
-        cwd=repo_path, check=True, capture_output=True,
+        cwd=repo_path,
+        check=True,
+        capture_output=True,
     )
     subprocess.run(
         ["git", "config", "user.email", "test@example.com"],
-        cwd=repo_path, check=True, capture_output=True,
+        cwd=repo_path,
+        check=True,
+        capture_output=True,
     )
 
     # Commit 1: alice creates initial files
@@ -78,8 +80,12 @@ def git_repo(temp_dir):
         f.write("print('hello')\nprint('world')\n")
     _run_git("add", "README.md", "main.py")
     _run_git_author(
-        "Alice Smith", "alice@example.com", "2023-01-15T10:00:00",
-        "commit", "-m", "Initial commit",
+        "Alice Smith",
+        "alice@example.com",
+        "2023-01-15T10:00:00",
+        "commit",
+        "-m",
+        "Initial commit",
     )
 
     # Commit 2: bob adds a file
@@ -87,8 +93,12 @@ def git_repo(temp_dir):
         f.write("def add(a, b):\n    return a + b\n\ndef sub(a, b):\n    return a - b\n")
     _run_git("add", "utils.py")
     _run_git_author(
-        "Bob Jones", "bob@example.com", "2023-02-20T14:00:00",
-        "commit", "-m", "Add utils module",
+        "Bob Jones",
+        "bob@example.com",
+        "2023-02-20T14:00:00",
+        "commit",
+        "-m",
+        "Add utils module",
     )
 
     # Tag the first release
@@ -99,8 +109,12 @@ def git_repo(temp_dir):
         f.write("print('hello, world!')\nprint('foo')\nprint('bar')\n")
     _run_git("add", "main.py")
     _run_git_author(
-        "Alice Smith", "alice@example.com", "2023-03-10T08:30:00",
-        "commit", "-m", "Improve greeting",
+        "Alice Smith",
+        "alice@example.com",
+        "2023-03-10T08:30:00",
+        "commit",
+        "-m",
+        "Improve greeting",
     )
 
     # Commit 4: alice adds a binary file (image)
@@ -108,8 +122,12 @@ def git_repo(temp_dir):
         f.write(b"\x89PNG\r\n\x1a\n" + b"\x00" * 100)
     _run_git("add", "logo.png")
     _run_git_author(
-        "Alice Smith", "alice@example.com", "2023-04-05T16:00:00",
-        "commit", "-m", "Add logo",
+        "Alice Smith",
+        "alice@example.com",
+        "2023-04-05T16:00:00",
+        "commit",
+        "-m",
+        "Add logo",
     )
 
     # Tag the second release
@@ -120,8 +138,12 @@ def git_repo(temp_dir):
         f.write("*.pyc\n__pycache__/\n")
     _run_git("add", ".gitignore")
     _run_git_author(
-        "Alice Smith", "alice@example.com", "2023-05-01T09:00:00",
-        "commit", "-m", "Add gitignore",
+        "Alice Smith",
+        "alice@example.com",
+        "2023-05-01T09:00:00",
+        "commit",
+        "-m",
+        "Add gitignore",
     )
 
     return repo_path
@@ -138,20 +160,33 @@ def git_repo_minimal(temp_dir):
     subprocess.run(["git", "init"], cwd=repo_path, check=True, capture_output=True, env=env)
     subprocess.run(
         ["git", "config", "user.name", "Test"],
-        cwd=repo_path, check=True, capture_output=True, env=env,
+        cwd=repo_path,
+        check=True,
+        capture_output=True,
+        env=env,
     )
     subprocess.run(
         ["git", "config", "user.email", "test@test.com"],
-        cwd=repo_path, check=True, capture_output=True, env=env,
+        cwd=repo_path,
+        check=True,
+        capture_output=True,
+        env=env,
     )
 
     with open(os.path.join(repo_path, "file.txt"), "w") as f:
         f.write("line 1\n")
-    subprocess.run(["git", "add", "file.txt"], cwd=repo_path, check=True, capture_output=True, env=env)
-    env.update({"GIT_AUTHOR_DATE": "2023-06-01T12:00:00", "GIT_COMMITTER_DATE": "2023-06-01T12:00:00"})
+    subprocess.run(
+        ["git", "add", "file.txt"], cwd=repo_path, check=True, capture_output=True, env=env
+    )
+    env.update(
+        {"GIT_AUTHOR_DATE": "2023-06-01T12:00:00", "GIT_COMMITTER_DATE": "2023-06-01T12:00:00"}
+    )
     subprocess.run(
         ["git", "commit", "-m", "first"],
-        cwd=repo_path, check=True, capture_output=True, env=env,
+        cwd=repo_path,
+        check=True,
+        capture_output=True,
+        env=env,
     )
 
     return repo_path
@@ -189,7 +224,9 @@ def mock_data_collector():
     data.get_last_commit_date.return_value = datetime.datetime(2023, 4, 1, 0, 0)
 
     # Active days
-    data.get_active_days.return_value = set(["2023-01-01", "2023-01-15", "2023-02-01", "2023-03-10"])
+    data.get_active_days.return_value = set(
+        ["2023-01-01", "2023-01-15", "2023-02-01", "2023-03-10"]
+    )
     data.get_commit_delta_days.return_value = 120
 
     # Activity
@@ -200,22 +237,29 @@ def mock_data_collector():
     data.activity_by_day_of_week = {0: 8, 1: 10, 2: 12, 3: 7, 4: 9, 5: 2, 6: 2}
     data.get_activity_by_day_of_week.return_value = data.activity_by_day_of_week
 
-    data.activity_by_hour_of_week = {
-        d: {h: 1 for h in range(9, 17)} for d in range(5)
-    }
+    data.activity_by_hour_of_week = {d: {h: 1 for h in range(9, 17)} for d in range(5)}
     data.activity_by_hour_of_week_busiest = 2
 
     data.activity_by_month_of_year = {1: 5, 2: 10, 3: 15, 4: 8, 5: 7, 6: 5}
     data.commits_by_month = {
-        "2023-01": 5, "2023-02": 10, "2023-03": 15, "2023-04": 8, "2023-05": 7, "2023-06": 5,
+        "2023-01": 5,
+        "2023-02": 10,
+        "2023-03": 15,
+        "2023-04": 8,
+        "2023-05": 7,
+        "2023-06": 5,
     }
     data.commits_by_year = {2023: 50}
 
     data.lines_added_by_month = {
-        "2023-01": 300, "2023-02": 600, "2023-03": 900,
+        "2023-01": 300,
+        "2023-02": 600,
+        "2023-03": 900,
     }
     data.lines_removed_by_month = {
-        "2023-01": 100, "2023-02": 200, "2023-03": 300,
+        "2023-01": 100,
+        "2023-02": 200,
+        "2023-03": 300,
     }
     data.lines_added_by_year = {2023: 3000}
     data.lines_removed_by_year = {2023: 1000}
@@ -225,25 +269,37 @@ def mock_data_collector():
     # Authors
     data.authors = {
         "Alice Smith": {
-            "commits": 30, "lines_added": 2000, "lines_removed": 500,
-            "date_first": "2023-01-15", "date_last": "2023-06-15",
+            "commits": 30,
+            "lines_added": 2000,
+            "lines_removed": 500,
+            "date_first": "2023-01-15",
+            "date_last": "2023-06-15",
             "timedelta": datetime.timedelta(days=150),
             "active_days": {f"2023-{m:02d}-{d:02d}" for m in range(1, 7) for d in (1, 15)},
-            "place_by_commits": 1, "commits_frac": 60.0,
+            "place_by_commits": 1,
+            "commits_frac": 60.0,
         },
         "Bob Jones": {
-            "commits": 15, "lines_added": 800, "lines_removed": 300,
-            "date_first": "2023-02-01", "date_last": "2023-05-30",
+            "commits": 15,
+            "lines_added": 800,
+            "lines_removed": 300,
+            "date_first": "2023-02-01",
+            "date_last": "2023-05-30",
             "timedelta": datetime.timedelta(days=118),
             "active_days": {f"2023-{m:02d}-01" for m in range(2, 6)},
-            "place_by_commits": 2, "commits_frac": 30.0,
+            "place_by_commits": 2,
+            "commits_frac": 30.0,
         },
         "Charlie Brown": {
-            "commits": 5, "lines_added": 200, "lines_removed": 200,
-            "date_first": "2023-03-10", "date_last": "2023-04-20",
+            "commits": 5,
+            "lines_added": 200,
+            "lines_removed": 200,
+            "date_first": "2023-03-10",
+            "date_last": "2023-04-20",
             "timedelta": datetime.timedelta(days=41),
             "active_days": {f"2023-03-{d:02d}" for d in (10, 20)},
-            "place_by_commits": 3, "commits_frac": 10.0,
+            "place_by_commits": 3,
+            "commits_frac": 10.0,
         },
     }
     data.get_authors.side_effect = lambda limit=None: (
@@ -317,7 +373,9 @@ def mock_data_collector():
 
     # New contributors
     data.new_contributors_by_month = {
-        "2023-01": 1, "2023-02": 1, "2023-03": 1,
+        "2023-01": 1,
+        "2023-02": 1,
+        "2023-03": 1,
     }
 
     # AI summaries (disabled by default)
@@ -353,9 +411,10 @@ def mock_data_collector_with_ai_error(mock_data_collector):
 def reset_config():
     """Reset the cached config before each test to avoid cross-test pollution."""
     import gitstats
-    import gitstats.utils
     import gitstats.main
     import gitstats.report_creator
+    import gitstats.utils
+
     cfg = gitstats.DEFAULT_CONFIG.copy()
     gitstats._config = cfg
     gitstats.utils.conf = cfg

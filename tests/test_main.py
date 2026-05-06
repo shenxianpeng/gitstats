@@ -2,23 +2,21 @@
 
 import os
 import pickle
-import zlib
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 
 from gitstats.main import (
     DataCollector,
     GitDataCollector,
-    run,
     get_parser,
     main,
     parallel_map_with_fallback,
+    run,
 )
-from gitstats import load_config
-
 
 # ── DataCollector base class ─────────────────────────────────────────────
+
 
 class TestDataCollector:
     def test_init(self):
@@ -39,6 +37,7 @@ class TestDataCollector:
     def test_collect_with_config_project_name(self, temp_dir):
         import gitstats
         import gitstats.main
+
         cfg = dict(gitstats.DEFAULT_CONFIG, project_name="my-custom-project")
         gitstats._config = cfg
         gitstats.main.conf = cfg
@@ -107,6 +106,7 @@ class TestDataCollector:
 
 # ── parallel_map_with_fallback ───────────────────────────────────────────
 
+
 def _square(x):
     """Test helper function defined at module level for pickling."""
     return x * x
@@ -124,6 +124,7 @@ def test_parallel_map_with_fallback_empty():
 
 
 # ── GitDataCollector integration tests ───────────────────────────────────
+
 
 class TestGitDataCollectorIntegration:
     """Tests that require a real git repository (fixture: git_repo)."""
@@ -355,6 +356,7 @@ class TestGitDataCollectorIntegration:
         import gitstats
         import gitstats.main
         import gitstats.utils
+
         cfg = dict(gitstats.DEFAULT_CONFIG, exclude_exts="py")
         gitstats._config = cfg
         gitstats.main.conf = cfg
@@ -388,6 +390,7 @@ class TestGitDataCollectorIntegration:
 
 # ── run() integration ────────────────────────────────────────────────────
 
+
 class TestRunIntegration:
     """End-to-end tests for the run() function."""
 
@@ -395,6 +398,7 @@ class TestRunIntegration:
         """run() should produce HTML report files."""
         import gitstats
         import gitstats.main
+
         cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
         gitstats._config = cfg
         gitstats.main.conf = cfg
@@ -413,6 +417,7 @@ class TestRunIntegration:
         """run() with extra_fmt='json' should produce a JSON file."""
         import gitstats
         import gitstats.main
+
         cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
         gitstats._config = cfg
         gitstats.main.conf = cfg
@@ -430,6 +435,7 @@ class TestRunIntegration:
 
 
 # ── get_parser / CLI ─────────────────────────────────────────────────────
+
 
 class TestCLI:
     def test_parser_defaults(self):
@@ -459,23 +465,34 @@ class TestCLI:
 
     def test_parser_ai_provider_model(self):
         parser = get_parser()
-        args = parser.parse_args([
-            "--ai-provider", "ollama",
-            "--ai-model", "llama3",
-            "--ai-language", "zh",
-            "repo", "out",
-        ])
+        args = parser.parse_args(
+            [
+                "--ai-provider",
+                "ollama",
+                "--ai-model",
+                "llama3",
+                "--ai-language",
+                "zh",
+                "repo",
+                "out",
+            ]
+        )
         assert args.ai_provider == "ollama"
         assert args.ai_model == "llama3"
         assert args.ai_language == "zh"
 
     def test_parser_config_override(self):
         parser = get_parser()
-        args = parser.parse_args([
-            "-c", "max_authors=5",
-            "-c", "processes=2",
-            "repo", "out",
-        ])
+        args = parser.parse_args(
+            [
+                "-c",
+                "max_authors=5",
+                "-c",
+                "processes=2",
+                "repo",
+                "out",
+            ]
+        )
         assert args.config == ["max_authors=5", "processes=2"]
 
     def test_parser_version(self, capsys):
@@ -486,15 +503,18 @@ class TestCLI:
 
 # ── main() ───────────────────────────────────────────────────────────────
 
+
 def test_main_basic(git_repo_minimal, temp_dir):
     """Test main() with minimal args."""
     import gitstats
     import gitstats.main
+
     cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
     gitstats._config = cfg
     gitstats.main.conf = cfg
 
     import sys
+
     output = os.path.join(temp_dir, "report")
 
     with patch.object(sys, "argv", ["gitstats", git_repo_minimal, output]):
@@ -506,11 +526,13 @@ def test_main_with_config_override(git_repo_minimal, temp_dir):
     """Test main() with -c overrides."""
     import gitstats
     import gitstats.main
+
     cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
     gitstats._config = cfg
     gitstats.main.conf = cfg
 
     import sys
+
     output = os.path.join(temp_dir, "report")
 
     with patch.object(sys, "argv", ["gitstats", "-c", "max_authors=10", git_repo_minimal, output]):

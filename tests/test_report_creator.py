@@ -1,44 +1,45 @@
 """Tests for gitstats.report_creator – HTML generation, helpers, chart rendering."""
 
-import datetime
-import json
 import os
-import re
 from io import StringIO
 
 import pytest
 
 from gitstats.report_creator import (
-    html_header,
-    html_linkify,
-    get_keys_sorted_by_values,
-    get_keys_sorted_by_value_key,
     HTMLReportCreator,
     ReportCreator,
+    get_keys_sorted_by_value_key,
+    get_keys_sorted_by_values,
+    html_header,
+    html_linkify,
 )
-
 
 # ── html_linkify ─────────────────────────────────────────────────────────
 
-@pytest.mark.parametrize("text,expected", [
-    ("Hello World", "hello_world"),
-    ("Hello  World", "hello__world"),
-    ("AB C", "ab_c"),
-    ("single", "single"),
-    ("", ""),
-    ("Project Overview", "project_overview"),
-])
+
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        ("Hello World", "hello_world"),
+        ("Hello  World", "hello__world"),
+        ("AB C", "ab_c"),
+        ("single", "single"),
+        ("", ""),
+        ("Project Overview", "project_overview"),
+    ],
+)
 def test_html_linkify(text, expected):
     assert html_linkify(text) == expected
 
 
 # ── html_header ──────────────────────────────────────────────────────────
 
+
 def test_html_header_basic():
     result = html_header(2, "Hello World")
     assert '<h2 id="hello_world">' in result
     assert 'href="#hello_world"' in result
-    assert '>Hello World</a></h2>' in result
+    assert ">Hello World</a></h2>" in result
     assert result.startswith("\n")
     assert result.endswith("\n\n")
 
@@ -49,6 +50,7 @@ def test_html_header_level_3():
 
 
 # ── get_keys_sorted_by_values ────────────────────────────────────────────
+
 
 def test_get_keys_sorted_by_values_basic():
     d = {"a": 3, "b": 1, "c": 2}
@@ -73,6 +75,7 @@ def test_get_keys_sorted_by_values_same_value():
 
 # ── get_keys_sorted_by_value_key ─────────────────────────────────────────
 
+
 def test_get_keys_sorted_by_value_key_basic():
     d = {
         "alice": {"commits": 10, "lines": 100},
@@ -89,16 +92,20 @@ def test_get_keys_sorted_by_value_key_empty():
 
 # ── HTMLReportCreator._heat_level ────────────────────────────────────────
 
-@pytest.mark.parametrize("value,max_value,expected", [
-    (0, 100, 0),
-    (10, 100, 1),
-    (30, 100, 2),
-    (60, 100, 3),
-    (80, 100, 4),
-    (100, 100, 4),
-    (0, 0, 0),
-    (-1, 100, 0),
-])
+
+@pytest.mark.parametrize(
+    "value,max_value,expected",
+    [
+        (0, 100, 0),
+        (10, 100, 1),
+        (30, 100, 2),
+        (60, 100, 3),
+        (80, 100, 4),
+        (100, 100, 4),
+        (0, 0, 0),
+        (-1, 100, 0),
+    ],
+)
 def test_heat_level(value, max_value, expected):
     assert HTMLReportCreator._heat_level(value, max_value) == expected
 
@@ -115,12 +122,14 @@ def test_heat_level_boundary():
 
 # ── HTMLReportCreator._heat_td_class ─────────────────────────────────────
 
+
 def test_heat_td_class():
     assert HTMLReportCreator._heat_td_class(30, 100) == "heat heat2"
     assert HTMLReportCreator._heat_td_class(0, 0) == "heat heat0"
 
 
 # ── HTMLReportCreator._render_chartjs ────────────────────────────────────
+
 
 def test_render_chartjs_single_dataset():
     creator = HTMLReportCreator()
@@ -239,6 +248,7 @@ def test_render_chartjs_y_label():
 
 # ── HTMLReportCreator.print_header ───────────────────────────────────────
 
+
 def test_print_header():
     creator = HTMLReportCreator()
     creator.title = "my-project"
@@ -257,8 +267,10 @@ def test_print_header():
 
 # ── HTMLReportCreator.print_nav ──────────────────────────────────────────
 
+
 def test_print_nav_without_ai():
     from unittest.mock import Mock
+
     creator = HTMLReportCreator()
     creator.data = Mock()
     creator.data.ai_summaries = {}
@@ -278,6 +290,7 @@ def test_print_nav_without_ai():
 
 def test_print_nav_with_ai():
     from unittest.mock import Mock
+
     creator = HTMLReportCreator()
     creator.data = Mock()
     creator.data.ai_summaries = {"index": {"summary": "test"}}
@@ -292,6 +305,7 @@ def test_print_nav_with_ai():
 
 def test_print_nav_has_github_link():
     from unittest.mock import Mock
+
     creator = HTMLReportCreator()
     creator.data = Mock()
     creator.data.ai_summaries = {}
@@ -305,6 +319,7 @@ def test_print_nav_has_github_link():
 
 
 # ── HTMLReportCreator.create_index_html ──────────────────────────────────
+
 
 def test_create_index_html(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
@@ -324,6 +339,7 @@ def test_create_index_html(mock_data_collector, temp_dir):
 
 
 # ── HTMLReportCreator.create_activity_html ───────────────────────────────
+
 
 def test_create_activity_html(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
@@ -347,6 +363,7 @@ def test_create_activity_html(mock_data_collector, temp_dir):
 
 # ── HTMLReportCreator.create_authors_html ────────────────────────────────
 
+
 def test_create_authors_html(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
     creator.title = mock_data_collector.project_name
@@ -367,6 +384,7 @@ def test_create_authors_html(mock_data_collector, temp_dir):
 
 
 # ── HTMLReportCreator.create_files_html ──────────────────────────────────
+
 
 def test_create_files_html(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
@@ -389,6 +407,7 @@ def test_create_files_html(mock_data_collector, temp_dir):
 
 # ── HTMLReportCreator.create_lines_html ──────────────────────────────────
 
+
 def test_create_lines_html(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
     creator.title = mock_data_collector.project_name
@@ -403,6 +422,7 @@ def test_create_lines_html(mock_data_collector, temp_dir):
 
 
 # ── HTMLReportCreator.create_tags_html ───────────────────────────────────
+
 
 def test_create_tags_html(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
@@ -420,6 +440,7 @@ def test_create_tags_html(mock_data_collector, temp_dir):
 
 
 # ── HTMLReportCreator.create_ai_insights_html ────────────────────────────
+
 
 def test_create_ai_insights(mock_data_collector_with_ai, temp_dir):
     creator = HTMLReportCreator()
@@ -464,6 +485,7 @@ def test_create_ai_insights_no_ai_data(mock_data_collector, temp_dir):
 
 # ── HTMLReportCreator.get_ai_summary_html ────────────────────────────────
 
+
 def test_get_ai_summary_html_with_data(mock_data_collector_with_ai):
     creator = HTMLReportCreator()
     creator.data = mock_data_collector_with_ai
@@ -495,6 +517,7 @@ def test_get_ai_summary_html_missing_key(mock_data_collector_with_ai):
 
 
 # ── HTMLReportCreator._build_author_time_series ──────────────────────────
+
 
 def test_build_author_time_series_empty(mock_data_collector):
     creator = HTMLReportCreator()
@@ -535,6 +558,7 @@ def test_build_author_time_series_basic(mock_data_collector):
 
 # ── ReportCreator base class ─────────────────────────────────────────────
 
+
 def test_report_creator_base():
     rc = ReportCreator()
     assert rc.data is None
@@ -549,6 +573,7 @@ def test_report_creator_base():
 
 
 # ── HTMLReportCreator.create (integration of all pages) ──────────────────
+
 
 def test_create_all_pages(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()

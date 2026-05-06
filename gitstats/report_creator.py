@@ -2,18 +2,19 @@
 # GPLv2 / GPLv3
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
 # GPLv2 / GPLv3
-import os
-import html
-import shutil
 import datetime
-import time
-import math
+import html
 import json
-from gitstats import load_config, WEEKDAYS, get_i18n_text
+import math
+import os
+import shutil
+import time
+
+from gitstats import WEEKDAYS, get_i18n_text, load_config
 from gitstats.utils import (
-    get_version,
     get_git_version,
     get_pipe_output,
+    get_version,
 )
 
 conf = load_config()
@@ -155,14 +156,10 @@ class HTMLReportCreator(ReportCreator):
         # f.write('<h2>Last 12 months</h2>')
 
         # Yearly activity
-        log_output = get_pipe_output(
-            ["git log --reverse --pretty=format:%ct"], quiet=True
-        )
+        log_output = get_pipe_output(["git log --reverse --pretty=format:%ct"], quiet=True)
         first_commit_timestamp = log_output.split("\n")[0] if log_output else ""
         if first_commit_timestamp:
-            repo_age_years = (
-                time.time() - int(first_commit_timestamp)
-            ) / 31536000  # 365 days
+            repo_age_years = (time.time() - int(first_commit_timestamp)) / 31536000  # 365 days
             YEARS = max(5, int(math.ceil(repo_age_years / 5.0)) * 5)
         else:
             YEARS = 5
@@ -230,9 +227,7 @@ class HTMLReportCreator(ReportCreator):
                 f.write(
                     '<td class="%s">%d</td>'
                     % (
-                        self._heat_td_class(
-                            hour_of_day[i], data.activity_by_hour_of_day_busiest
-                        ),
+                        self._heat_td_class(hour_of_day[i], data.activity_by_hour_of_day_busiest),
                         hour_of_day[i],
                     )
                 )
@@ -244,9 +239,7 @@ class HTMLReportCreator(ReportCreator):
                 f.write(
                     '<td class="%s">%.2f</td>'
                     % (
-                        self._heat_td_class(
-                            hour_of_day[i], data.activity_by_hour_of_day_busiest
-                        ),
+                        self._heat_td_class(hour_of_day[i], data.activity_by_hour_of_day_busiest),
                         (100.0 * hour_of_day[i]) / totalcommits,
                     )
                 )
@@ -312,9 +305,7 @@ class HTMLReportCreator(ReportCreator):
                 f.write(
                     '<td class="%s">%s</td>'
                     % (
-                        self._heat_td_class(
-                            commits, data.activity_by_hour_of_week_busiest
-                        ),
+                        self._heat_td_class(commits, data.activity_by_hour_of_week_busiest),
                         ("%d" % commits) if commits else "",
                     )
                 )
@@ -392,8 +383,7 @@ class HTMLReportCreator(ReportCreator):
                 % (
                     yy,
                     data.commits_by_year.get(yy, 0),
-                    (100.0 * data.commits_by_year.get(yy, 0))
-                    / data.get_total_commits(),
+                    (100.0 * data.commits_by_year.get(yy, 0)) / data.get_total_commits(),
                     data.lines_added_by_year.get(yy, 0),
                     data.lines_removed_by_year.get(yy, 0),
                 )
@@ -450,26 +440,20 @@ class HTMLReportCreator(ReportCreator):
         per_author_commits = {a: [] for a in authors_to_plot}
 
         for stamp in sorted(data.changes_by_date_by_author.keys()):
-            time_labels.append(
-                datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
-            )
+            time_labels.append(datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d"))
             for author in authors_to_plot:
                 if author in data.changes_by_date_by_author[stamp]:
-                    lines_by_authors[author] = data.changes_by_date_by_author[stamp][
-                        author
-                    ]["lines_added"]
-                    commits_by_authors[author] = data.changes_by_date_by_author[stamp][
-                        author
-                    ]["commits"]
+                    lines_by_authors[author] = data.changes_by_date_by_author[stamp][author][
+                        "lines_added"
+                    ]
+                    commits_by_authors[author] = data.changes_by_date_by_author[stamp][author][
+                        "commits"
+                    ]
                 per_author_lines[author].append(lines_by_authors[author])
                 per_author_commits[author].append(commits_by_authors[author])
 
-        loc_datasets = [
-            {"label": a, "data": per_author_lines[a]} for a in authors_to_plot
-        ]
-        cba_datasets = [
-            {"label": a, "data": per_author_commits[a]} for a in authors_to_plot
-        ]
+        loc_datasets = [{"label": a, "data": per_author_lines[a]} for a in authors_to_plot]
+        cba_datasets = [{"label": a, "data": per_author_commits[a]} for a in authors_to_plot]
         return time_labels, loc_datasets, cba_datasets
 
     def create_authors_html(self, data, path):
@@ -511,8 +495,7 @@ class HTMLReportCreator(ReportCreator):
         if len(allauthors) > conf["max_authors"]:
             rest = allauthors[conf["max_authors"] :]
             f.write(
-                '<p class="moreauthors">These didn\'t make it to the top: %s</p>'
-                % ", ".join(rest)
+                '<p class="moreauthors">These didn\'t make it to the top: %s</p>' % ", ".join(rest)
             )
 
         # Build per-author time series data for Chart.js
@@ -530,10 +513,7 @@ class HTMLReportCreator(ReportCreator):
             )
         )
         if len(allauthors) > conf["max_authors"]:
-            f.write(
-                '<p class="moreauthors">Only top %d authors shown</p>'
-                % conf["max_authors"]
-            )
+            f.write('<p class="moreauthors">Only top %d authors shown</p>' % conf["max_authors"])
 
         f.write(html_header(2, "Commits per Author"))
         f.write(
@@ -547,10 +527,7 @@ class HTMLReportCreator(ReportCreator):
             )
         )
         if len(allauthors) > conf["max_authors"]:
-            f.write(
-                '<p class="moreauthors">Only top %d authors shown</p>'
-                % conf["max_authors"]
-            )
+            f.write('<p class="moreauthors">Only top %d authors shown</p>' % conf["max_authors"])
 
         # Authors :: Author of Month
         f.write(html_header(2, "Author of Month"))
@@ -748,16 +725,13 @@ class HTMLReportCreator(ReportCreator):
                 "<p><em>Files touched most often across all commits. "
                 "High-churn files are hotspots that may benefit from extra review or refactoring.</em></p>"
             )
-            churn_sorted = sorted(
-                data.file_churn.items(), key=lambda x: x[1], reverse=True
-            )
+            churn_sorted = sorted(data.file_churn.items(), key=lambda x: x[1], reverse=True)
             top_churn = churn_sorted[:25]
             max_churn = max(1, top_churn[0][1]) if top_churn else 1
             churn_labels = [item[0] for item in top_churn]
             churn_values = [item[1] for item in top_churn]
             f.write(
-                '<table class="sortable" id="churn">'
-                "<tr><th>File</th><th>Times Changed</th></tr>"
+                '<table class="sortable" id="churn"><tr><th>File</th><th>Times Changed</th></tr>'
             )
             for filepath, count in top_churn:
                 f.write(
@@ -798,9 +772,7 @@ class HTMLReportCreator(ReportCreator):
 
         f.write(html_header(2, "Lines of Code"))
         loc_stamps = sorted(data.changes_by_date.keys())
-        loc_labels = [
-            datetime.datetime.fromtimestamp(s).strftime("%Y-%m-%d") for s in loc_stamps
-        ]
+        loc_labels = [datetime.datetime.fromtimestamp(s).strftime("%Y-%m-%d") for s in loc_stamps]
         loc_values = [data.changes_by_date[s]["lines"] for s in loc_stamps]
         f.write(
             self._render_chartjs(
@@ -838,15 +810,11 @@ class HTMLReportCreator(ReportCreator):
         # sort the tags by date desc
         tags_sorted_by_date_desc = [
             el[1]
-            for el in reversed(
-                sorted([(el[1]["date"], el[0]) for el in list(data.tags.items())])
-            )
+            for el in reversed(sorted([(el[1]["date"], el[0]) for el in list(data.tags.items())]))
         ]
         for tag in tags_sorted_by_date_desc:
             authorinfo = []
-            self.authors_by_commits = get_keys_sorted_by_values(
-                data.tags[tag]["authors"]
-            )
+            self.authors_by_commits = get_keys_sorted_by_values(data.tags[tag]["authors"])
             for i in reversed(self.authors_by_commits):
                 authorinfo.append("%s (%d)" % (i, data.tags[tag]["authors"][i]))
             f.write(
@@ -915,9 +883,7 @@ class HTMLReportCreator(ReportCreator):
 
             f.write('<div class="ai-insight-section">')
             f.write(f'<h2 id="{key}">{section["title"]}</h2>')
-            f.write(
-                f'<p class="section-description"><em>{section["description"]}</em></p>'
-            )
+            f.write(f'<p class="section-description"><em>{section["description"]}</em></p>')
 
             if error:
                 f.write(f"""
@@ -988,13 +954,9 @@ class HTMLReportCreator(ReportCreator):
         labels_json = json.dumps(labels).replace("</", "<\\/")
         datasets_json = json.dumps(js_datasets).replace("</", "<\\/")
         # Replace quoted placeholder with JS expression
-        datasets_json = datasets_json.replace(
-            '"__CSS_BAR_COLOR__"', "getCSSVar('--bar-color')"
-        )
+        datasets_json = datasets_json.replace('"__CSS_BAR_COLOR__"', "getCSSVar('--bar-color')")
 
-        x_ticks_opts = (
-            "maxRotation: 45, minRotation: 45" if x_ticks_rotate else "maxRotation: 0"
-        )
+        x_ticks_opts = "maxRotation: 45, minRotation: 45" if x_ticks_rotate else "maxRotation: 0"
         legend_display = "true" if is_multi else "false"
 
         return f"""<div style="max-width:100%;margin-bottom:8px"><canvas id="{chart_id}"></canvas></div>
@@ -1086,9 +1048,7 @@ class HTMLReportCreator(ReportCreator):
         # Check if AI insights are available
         has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
 
-        ai_link = (
-            '<li><a href="ai-insights.html">AI Insights</a></li>' if has_ai else ""
-        )
+        ai_link = '<li><a href="ai-insights.html">AI Insights</a></li>' if has_ai else ""
 
         github_icon = (
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" '

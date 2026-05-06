@@ -1,7 +1,8 @@
 import os
-import nox
 import shutil
 from pathlib import Path
+
+import nox
 
 
 @nox.session

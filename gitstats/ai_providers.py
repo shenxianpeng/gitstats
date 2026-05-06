@@ -4,16 +4,16 @@ AI Provider abstraction layer for GitStats.
 Supports multiple AI services: OpenAI, Claude, Gemini, and Ollama (local LLM).
 """
 
+import logging
 import os
 import time
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Type
-import logging
+from typing import Any
 
 logger = logging.getLogger("gitstats")
 
 
-def _get_model_with_fallback(config: Dict[str, Any], default: str) -> str:
+def _get_model_with_fallback(config: dict[str, Any], default: str) -> str:
     """
     Get model from config, treating empty/whitespace-only values as unset.
 
@@ -38,7 +38,7 @@ class AIProviderError(Exception):
 class AIProvider(ABC):
     """Abstract base class for AI providers."""
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         """
         Initialize the AI provider.
 
@@ -50,7 +50,7 @@ class AIProvider(ABC):
         self.retry_delay = config.get("retry_delay", 1)
 
     @abstractmethod
-    def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
+    def generate_summary(self, data: dict[str, Any], prompt: str) -> str:
         """
         Generate a summary using the AI service.
 
@@ -73,20 +73,16 @@ class AIProvider(ABC):
                 return func(*args, **kwargs)
             except Exception as e:
                 if attempt == self.max_retries - 1:
-                    raise AIProviderError(
-                        f"Failed after {self.max_retries} attempts: {e}"
-                    ) from e
+                    raise AIProviderError(f"Failed after {self.max_retries} attempts: {e}") from e
                 delay = self.retry_delay * (2**attempt)
-                logger.warning(
-                    f"Attempt {attempt + 1} failed, retrying in {delay}s: {e}"
-                )
+                logger.warning(f"Attempt {attempt + 1} failed, retrying in {delay}s: {e}")
                 time.sleep(delay)
 
 
 class OpenAIProvider(AIProvider):
     """OpenAI GPT provider."""
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         super().__init__(config)
         try:
             import openai
@@ -107,7 +103,7 @@ class OpenAIProvider(AIProvider):
         self.model = _get_model_with_fallback(config, "gpt-4")
         self.client = openai.OpenAI(api_key=self.api_key)
 
-    def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
+    def generate_summary(self, data: dict[str, Any], prompt: str) -> str:
         """Generate summary using OpenAI API."""
 
         def _call_api():
@@ -131,7 +127,7 @@ class OpenAIProvider(AIProvider):
 class ClaudeProvider(AIProvider):
     """Anthropic Claude provider."""
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         super().__init__(config)
         try:
             import anthropic
@@ -151,7 +147,7 @@ class ClaudeProvider(AIProvider):
         self.model = _get_model_with_fallback(config, "claude-3-5-sonnet-20241022")
         self.client = self.anthropic.Anthropic(api_key=self.api_key)
 
-    def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
+    def generate_summary(self, data: dict[str, Any], prompt: str) -> str:
         """Generate summary using Claude API."""
 
         def _call_api():
@@ -169,7 +165,7 @@ class ClaudeProvider(AIProvider):
 class GeminiProvider(AIProvider):
     """Google Gemini provider."""
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         super().__init__(config)
         try:
             import google.generativeai as genai
@@ -190,7 +186,7 @@ class GeminiProvider(AIProvider):
         self.genai.configure(api_key=self.api_key)
         self.model = self.genai.GenerativeModel(self.model_name)
 
-    def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
+    def generate_summary(self, data: dict[str, Any], prompt: str) -> str:
         """Generate summary using Gemini API."""
 
         def _call_api():
@@ -203,7 +199,7 @@ class GeminiProvider(AIProvider):
 class OllamaProvider(AIProvider):
     """Ollama local LLM provider."""
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         super().__init__(config)
         try:
             import requests
@@ -217,7 +213,7 @@ class OllamaProvider(AIProvider):
         self.base_url = config.get("base_url", "http://localhost:11434")
         self.model = _get_model_with_fallback(config, "llama2")
 
-    def generate_summary(self, data: Dict[str, Any], prompt: str) -> str:
+    def generate_summary(self, data: dict[str, Any], prompt: str) -> str:
         """Generate summary using Ollama API."""
 
         def _call_api():
@@ -235,7 +231,7 @@ class OllamaProvider(AIProvider):
 class AIProviderFactory:
     """Factory for creating AI provider instances."""
 
-    _providers: Dict[str, Type[AIProvider]] = {
+    _providers: dict[str, type[AIProvider]] = {
         "openai": OpenAIProvider,
         "claude": ClaudeProvider,
         "gemini": GeminiProvider,
@@ -243,7 +239,7 @@ class AIProviderFactory:
     }
 
     @classmethod
-    def create(cls, provider_name: str, config: Dict[str, Any]) -> AIProvider:
+    def create(cls, provider_name: str, config: dict[str, Any]) -> AIProvider:
         """
         Create an AI provider instance.
 

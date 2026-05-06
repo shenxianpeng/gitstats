@@ -4,12 +4,12 @@
 # GPLv2 / GPLv3
 import os
 import re
+import subprocess
 import sys
 import time
-import subprocess
-from gitstats import ON_LINUX, exectime_external, load_config
 from importlib.metadata import version
 
+from gitstats import ON_LINUX, exectime_external, load_config
 
 conf = load_config()
 
@@ -178,11 +178,7 @@ def get_num_of_files_from_rev(time_rev):
     return (
         int(time),
         rev,
-        int(
-            get_pipe_output(['git ls-tree -r --name-only "%s"' % rev, "wc -l"]).split(
-                "\n"
-            )[0]
-        ),
+        int(get_pipe_output(['git ls-tree -r --name-only "%s"' % rev, "wc -l"]).split("\n")[0]),
     )
 
 
@@ -214,9 +210,7 @@ def get_log_range(defaultrange="HEAD", end_only=True):
 
     # Author filtering
     if len(conf["authors"]) > 0:
-        authors_list = [
-            author.strip() for author in conf["authors"].split(",") if author.strip()
-        ]
+        authors_list = [author.strip() for author in conf["authors"].split(",") if author.strip()]
         for author in authors_list:
             # Escape possible double quotes or special characters in author
             safe_author = author.replace('"', r"\"")
