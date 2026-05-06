@@ -327,7 +327,7 @@ def test_create_index_html(mock_data_collector, temp_dir):
     creator.data = mock_data_collector
     creator.create_index_html(mock_data_collector, temp_dir)
 
-    with open(f"{temp_dir}/index.html") as f:
+    with open(f"{temp_dir}/index.html", encoding="utf-8") as f:
         html = f.read()
 
     assert "<h1>General</h1>" in html
@@ -347,7 +347,7 @@ def test_create_activity_html(mock_data_collector, temp_dir):
     creator.data = mock_data_collector
     creator.create_activity_html(mock_data_collector, temp_dir)
 
-    with open(f"{temp_dir}/activity.html") as f:
+    with open(f"{temp_dir}/activity.html", encoding="utf-8") as f:
         html = f.read()
 
     assert "<h1>Activity</h1>" in html
@@ -370,7 +370,7 @@ def test_create_authors_html(mock_data_collector, temp_dir):
     creator.data = mock_data_collector
     creator.create_authors_html(mock_data_collector, temp_dir)
 
-    with open(f"{temp_dir}/authors.html") as f:
+    with open(f"{temp_dir}/authors.html", encoding="utf-8") as f:
         html = f.read()
 
     assert "<h1>Authors</h1>" in html
@@ -392,7 +392,7 @@ def test_create_files_html(mock_data_collector, temp_dir):
     creator.data = mock_data_collector
     creator.create_files_html(mock_data_collector, temp_dir)
 
-    with open(f"{temp_dir}/files.html") as f:
+    with open(f"{temp_dir}/files.html", encoding="utf-8") as f:
         html = f.read()
 
     assert "<h1>Files</h1>" in html
@@ -414,7 +414,7 @@ def test_create_lines_html(mock_data_collector, temp_dir):
     creator.data = mock_data_collector
     creator.create_lines_html(mock_data_collector, temp_dir)
 
-    with open(f"{temp_dir}/lines.html") as f:
+    with open(f"{temp_dir}/lines.html", encoding="utf-8") as f:
         html = f.read()
 
     assert "<h1>Lines</h1>" in html
@@ -430,7 +430,7 @@ def test_create_tags_html(mock_data_collector, temp_dir):
     creator.data = mock_data_collector
     creator.create_tags_html(mock_data_collector, temp_dir)
 
-    with open(f"{temp_dir}/tags.html") as f:
+    with open(f"{temp_dir}/tags.html", encoding="utf-8") as f:
         html = f.read()
 
     assert "<h1>Tags</h1>" in html
@@ -448,7 +448,7 @@ def test_create_ai_insights(mock_data_collector_with_ai, temp_dir):
     creator.data = mock_data_collector_with_ai
     creator.create_ai_insights_html(mock_data_collector_with_ai, temp_dir)
 
-    with open(f"{temp_dir}/ai-insights.html") as f:
+    with open(f"{temp_dir}/ai-insights.html", encoding="utf-8") as f:
         html = f.read()
 
     assert "AI-Powered Insights" in html
@@ -463,7 +463,7 @@ def test_create_ai_insights_with_error(mock_data_collector_with_ai_error, temp_d
     creator.data = mock_data_collector_with_ai_error
     creator.create_ai_insights_html(mock_data_collector_with_ai_error, temp_dir)
 
-    with open(f"{temp_dir}/ai-insights.html") as f:
+    with open(f"{temp_dir}/ai-insights.html", encoding="utf-8") as f:
         html = f.read()
 
     assert "Analysis Unavailable" in html
@@ -478,7 +478,7 @@ def test_create_ai_insights_no_ai_data(mock_data_collector, temp_dir):
     # Should not crash even with empty ai_summaries
     creator.create_ai_insights_html(mock_data_collector, temp_dir)
     # File should exist but have limited content
-    with open(f"{temp_dir}/ai-insights.html") as f:
+    with open(f"{temp_dir}/ai-insights.html", encoding="utf-8") as f:
         html = f.read()
     assert "No analysis" in html or "AI-Powered Insights" in html
 
@@ -590,7 +590,7 @@ def test_create_all_pages(mock_data_collector, temp_dir):
     for fname in expected_files:
         path = f"{temp_dir}/{fname}"
         assert os.path.exists(path), f"Missing: {fname}"
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             content = f.read()
             assert "</html>" in content
 
