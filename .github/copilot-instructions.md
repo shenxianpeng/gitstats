@@ -32,7 +32,7 @@ gitstats/
 
 ## Technology Stack
 
-- **Language**: Python 3.9+
+- **Language**: Python 3.10+
 - **Dependencies**: no runtime dependencies (charts rendered via bundled Chart.js in the browser)
 - **Build System**: setuptools with setuptools-scm for versioning
 - **Documentation**: Sphinx with Read the Docs theme
@@ -44,7 +44,7 @@ gitstats/
 
 ### Code Style
 
-1. **Python Version**: Compatible with Python 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
+1. **Python Version**: Compatible with Python 3.10, 3.11, 3.12, 3.13, 3.14
 2. **Formatting**: Uses ruff for linting and formatting
 3. **Type Hints**: MyPy is enabled; use type hints where appropriate
 4. **Import Order**: Follow standard Python import conventions
