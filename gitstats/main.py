@@ -176,7 +176,7 @@ class GitDataCollector(DataCollector):
         DataCollector.collect(self, dir)
 
         self.total_authors += int(
-            get_pipe_output(["git shortlog -s %s" % get_log_range("HEAD", False), "wc -l"])
+            get_pipe_output(["git shortlog -s {}".format(get_log_range("HEAD", False)), "wc -l"])
         )
         # self.total_lines = int(getoutput('git-ls-files -z |xargs -0 cat |wc -l'))
 
@@ -197,7 +197,7 @@ class GitDataCollector(DataCollector):
                 continue
 
             tag = tag.replace("refs/tags/", "")
-            output = get_pipe_output(['git log "%s" --pretty=format:"%%at %%aN" -n 1' % hash])
+            output = get_pipe_output([f'git log "{hash}" --pretty=format:"%at %aN" -n 1'])
             if len(output) > 0:
                 parts = output.split(" ")
                 stamp = 0
@@ -247,8 +247,9 @@ class GitDataCollector(DataCollector):
         # Outputs "<stamp> <date> <time> <timezone> <author> '<' <mail> '>'"
         lines = get_pipe_output(
             [
-                'git rev-list --pretty=format:"%%at %%ai %%aN <%%aE>" %s'
-                % get_log_range("HEAD", False),
+                'git rev-list --pretty=format:"%at %ai %aN <%aE>" {}'.format(
+                    get_log_range("HEAD", False)
+                ),
                 "grep -v ^commit",
             ]
         ).split("\n")
@@ -435,7 +436,7 @@ class GitDataCollector(DataCollector):
         revlines = (
             get_pipe_output(
                 [
-                    'git rev-list --pretty=format:"%%at %%T" %s' % get_log_range("HEAD", False),
+                    'git rev-list --pretty=format:"%at %T" {}'.format(get_log_range("HEAD", False)),
                     "grep -v ^commit",
                 ]
             )
@@ -478,11 +479,11 @@ class GitDataCollector(DataCollector):
             try:
                 self.files_by_stamp[int(stamp)] = int(files)
             except ValueError:
-                print('Warning: failed to parse line "%s"' % line)
+                print(f'Warning: failed to parse line "{line}"')
 
         # extensions and size of files
         lines = get_pipe_output(
-            ["git ls-tree -r -l -z %s" % get_commit_range("HEAD", end_only=True)]
+            ["git ls-tree -r -l -z {}".format(get_commit_range("HEAD", end_only=True))]
         ).split("\000")
         blobs_to_read = []
         for line in lines:
@@ -546,8 +547,9 @@ class GitDataCollector(DataCollector):
             extra = "--first-parent -m"
         lines = get_pipe_output(
             [
-                'git log --shortstat %s --pretty=format:"%%at %%aN" %s'
-                % (extra, get_log_range("HEAD", False))
+                'git log --shortstat {} --pretty=format:"%at %aN" {}'.format(
+                    extra, get_log_range("HEAD", False)
+                )
             ]
         ).split("\n")
         lines.reverse()
@@ -592,9 +594,9 @@ class GitDataCollector(DataCollector):
 
                         files, inserted, deleted = 0, 0, 0
                     except ValueError:
-                        print('Warning: unexpected line "%s"' % line)
+                        print(f'Warning: unexpected line "{line}"')
                 else:
-                    print('Warning: unexpected line "%s"' % line)
+                    print(f'Warning: unexpected line "{line}"')
             else:
                 numbers = get_stat_summary_counts(line)
 
@@ -606,7 +608,7 @@ class GitDataCollector(DataCollector):
                     self.total_lines_removed += deleted
 
                 else:
-                    print('Warning: failed to handle line "%s"' % line)
+                    print(f'Warning: failed to handle line "{line}"')
                     (files, inserted, deleted) = (0, 0, 0)
                 # self.changes_by_date[stamp] = { 'files': files, 'ins': inserted, 'del': deleted }
         self.total_lines += total_lines
@@ -621,8 +623,9 @@ class GitDataCollector(DataCollector):
         # committed what, not just through mainline)
         lines = get_pipe_output(
             [
-                'git log --shortstat --date-order --pretty=format:"%%at %%aN" %s'
-                % (get_log_range("HEAD", False))
+                'git log --shortstat --date-order --pretty=format:"%at %aN" {}'.format(
+                    get_log_range("HEAD", False)
+                )
             ]
         ).split("\n")
         lines.reverse()
@@ -671,21 +674,21 @@ class GitDataCollector(DataCollector):
                         ]["commits"]
                         files, inserted, deleted = 0, 0, 0
                     except ValueError:
-                        print('Warning: unexpected line "%s"' % line)
+                        print(f'Warning: unexpected line "{line}"')
                 else:
-                    print('Warning: unexpected line "%s"' % line)
+                    print(f'Warning: unexpected line "{line}"')
             else:
                 numbers = get_stat_summary_counts(line)
 
                 if len(numbers) == 3:
                     (files, inserted, deleted) = [int(el) for el in numbers]
                 else:
-                    print('Warning: failed to handle line "%s"' % line)
+                    print(f'Warning: failed to handle line "{line}"')
                     (files, inserted, deleted) = (0, 0, 0)
 
         # File churn: count how many commits touched each file
         churn_output = get_pipe_output(
-            ['git log --format="" --name-only %s' % get_log_range("HEAD", False)]
+            ['git log --format="" --name-only {}'.format(get_log_range("HEAD", False))]
         )
         for line in churn_output.split("\n"):
             line = line.strip()
@@ -780,7 +783,7 @@ class GitDataCollector(DataCollector):
         return self.total_size
 
     def rev_to_date(self, rev):
-        stamp = int(get_pipe_output(['git log --pretty=format:%%at "%s" -n 1' % rev]))
+        stamp = int(get_pipe_output([f'git log --pretty=format:%at "{rev}" -n 1']))
         return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
 
 
@@ -804,14 +807,14 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
         print("FATAL: Output path is not a directory or does not exist")
         return 1
 
-    print("Output path: %s" % outputpath)
+    print(f"Output path: {outputpath}")
     cachefile = os.path.join(outputpath, "gitstats.cache")
 
     data = GitDataCollector()
     data.load_cache(cachefile)
 
     for gitpath in gitpath:
-        print("Git path: %s" % gitpath)
+        print(f"Git path: {gitpath}")
 
         prevdir = os.getcwd()
         os.chdir(gitpath)
@@ -862,12 +865,7 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
     time_end = time.time()
     exectime_internal = time_end - time_start
     print(
-        "Execution time %.5f secs, %.5f secs (%.2f %%) in external commands)"
-        % (
-            exectime_internal,
-            exectime_external,
-            (100.0 * exectime_external) / exectime_internal,
-        )
+        f"Execution time {exectime_internal:.5f} secs, {exectime_external:.5f} secs ({(100.0 * exectime_external) / exectime_internal:.2f} %) in external commands)"
     )
     if sys.stdin.isatty():
         python_cmd = "python" if os.name == "nt" else "python3"
