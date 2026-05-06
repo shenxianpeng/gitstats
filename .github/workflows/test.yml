@@ -6,6 +6,7 @@ on:
       - '**/*.py'
       - 'pyproject.toml'
       - 'gitstats/*'
+      - 'tests/*'
       - '.github/workflows/test.yml'
   push:
     branches:
@@ -13,6 +14,29 @@ on:
   workflow_dispatch:
 
 jobs:
+  unit-tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-2022]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v6
+      with:
+        fetch-depth: 0
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Run pytest
+      run: |
+        pip install -e ".[test]"
+        pytest tests/ -v
+
   test-docs:
     runs-on: ubuntu-latest
     steps:
