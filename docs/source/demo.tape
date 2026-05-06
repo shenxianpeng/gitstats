@@ -3,7 +3,7 @@
 
 Output demo.gif
 
-Set Shell "bash"
+Set Shell "fish"
 Set FontSize 16
 Set Width 1200
 Set Height 700
@@ -17,20 +17,14 @@ Sleep 500ms
 Enter
 Sleep 8s
 
-# Step 2: Show help
-Type "gitstats --help"
-Sleep 300ms
-Enter
-Sleep 3s
-
-# Step 3: Generate a report for the cloned repo
-Type "gitstats . report"
+# Step 2: Generate a report for the cloned repo
+Type "gitstats . /tmp/demo/report"
 Sleep 300ms
 Enter
 Sleep 15s
 
-# Step 4: Show the generated output files
-Type "python3 -m http.server 8000 --bind 127.0.0.1 -d /workspaces/gitstats/report"
+# Step 3: Show the generated output files
+Type "python3 -m http.server 8000 --bind 127.0.0.1 -d /tmp/demo/report"
 Sleep 300ms
 Enter
 Sleep 2s
