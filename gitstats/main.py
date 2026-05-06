@@ -11,18 +11,19 @@ import sys
 import time
 import zlib
 from multiprocessing import Pool
-from typing import Dict, Any, Tuple
-from gitstats import load_config, time_start, exectime_external
-from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
+from typing import Any
+
+from gitstats import exectime_external, load_config, time_start
 from gitstats.ai_summarizer import AISummarizer
+from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.utils import (
-    get_version,
-    get_pipe_output,
     get_commit_range,
     get_log_range,
     get_num_of_files_from_rev,
     get_num_of_lines_in_blob,
+    get_pipe_output,
     get_stat_summary_counts,
+    get_version,
     should_exclude_file,
 )
 
@@ -125,9 +126,7 @@ class DataCollector:
         self.new_contributors_by_month = {}  # YYYY-MM -> count
 
         # AI summaries
-        self.ai_summaries: Dict[
-            str, Dict[str, Any]
-        ] = {}  # page_type -> {summary, error}
+        self.ai_summaries: dict[str, dict[str, Any]] = {}  # page_type -> {summary, error}
 
     ##
     # This should be the main function to extract data from the repository.
@@ -177,9 +176,7 @@ class GitDataCollector(DataCollector):
         DataCollector.collect(self, dir)
 
         self.total_authors += int(
-            get_pipe_output(
-                ["git shortlog -s %s" % get_log_range("HEAD", False), "wc -l"]
-            )
+            get_pipe_output(["git shortlog -s {}".format(get_log_range("HEAD", False)), "wc -l"])
         )
         # self.total_lines = int(getoutput('git-ls-files -z |xargs -0 cat |wc -l'))
 
@@ -200,9 +197,7 @@ class GitDataCollector(DataCollector):
                 continue
 
             tag = tag.replace("refs/tags/", "")
-            output = get_pipe_output(
-                ['git log "%s" --pretty=format:"%%at %%aN" -n 1' % hash]
-            )
+            output = get_pipe_output([f'git log "{hash}" --pretty=format:"%at %aN" -n 1'])
             if len(output) > 0:
                 parts = output.split(" ")
                 stamp = 0
@@ -223,9 +218,7 @@ class GitDataCollector(DataCollector):
         log_range = get_log_range("HEAD", False)
         tags_sorted_by_date_desc = [
             el[1]
-            for el in reversed(
-                sorted([(el[1]["date"], el[0]) for el in list(self.tags.items())])
-            )
+            for el in reversed(sorted([(el[1]["date"], el[0]) for el in list(self.tags.items())]))
         ]
         prev = None
         for tag in reversed(tags_sorted_by_date_desc):
@@ -254,16 +247,15 @@ class GitDataCollector(DataCollector):
         # Outputs "<stamp> <date> <time> <timezone> <author> '<' <mail> '>'"
         lines = get_pipe_output(
             [
-                'git rev-list --pretty=format:"%%at %%ai %%aN <%%aE>" %s'
-                % get_log_range("HEAD", False),
+                'git rev-list --pretty=format:"%at %ai %aN <%aE>" {}'.format(
+                    get_log_range("HEAD", False)
+                ),
                 "grep -v ^commit",
             ]
         ).split("\n")
         # Track email<->author mappings to automatically merge identities that share an email
-        email_to_latest: Dict[
-            str, Tuple[int, str]
-        ] = {}  # email -> (stamp, author_name)
-        author_to_email: Dict[str, str] = {}  # author_name -> primary email
+        email_to_latest: dict[str, tuple[int, str]] = {}  # email -> (stamp, author_name)
+        author_to_email: dict[str, str] = {}  # author_name -> primary email
         for line in lines:
             # Skip empty lines (happens when there are no commits in the date range)
             if not line.strip():
@@ -287,9 +279,7 @@ class GitDataCollector(DataCollector):
             date = datetime.datetime.fromtimestamp(float(stamp))
 
             # Track email<->author mapping to later resolve identity aliases
-            if mail and (
-                mail not in email_to_latest or int(stamp) > email_to_latest[mail][0]
-            ):
+            if mail and (mail not in email_to_latest or int(stamp) > email_to_latest[mail][0]):
                 email_to_latest[mail] = (stamp, author)
             if mail and author not in author_to_email:
                 author_to_email[author] = mail
@@ -303,23 +293,14 @@ class GitDataCollector(DataCollector):
             # activity
             # hour
             hour = date.hour
-            self.activity_by_hour_of_day[hour] = (
-                self.activity_by_hour_of_day.get(hour, 0) + 1
-            )
+            self.activity_by_hour_of_day[hour] = self.activity_by_hour_of_day.get(hour, 0) + 1
             # most active hour?
-            if (
-                self.activity_by_hour_of_day[hour]
-                > self.activity_by_hour_of_day_busiest
-            ):
-                self.activity_by_hour_of_day_busiest = self.activity_by_hour_of_day[
-                    hour
-                ]
+            if self.activity_by_hour_of_day[hour] > self.activity_by_hour_of_day_busiest:
+                self.activity_by_hour_of_day_busiest = self.activity_by_hour_of_day[hour]
 
             # day of week
             day = date.weekday()
-            self.activity_by_day_of_week[day] = (
-                self.activity_by_day_of_week.get(day, 0) + 1
-            )
+            self.activity_by_day_of_week[day] = self.activity_by_day_of_week.get(day, 0) + 1
 
             # domain stats
             if domain not in self.domains:
@@ -334,19 +315,12 @@ class GitDataCollector(DataCollector):
                 self.activity_by_hour_of_week[day].get(hour, 0) + 1
             )
             # most active hour?
-            if (
-                self.activity_by_hour_of_week[day][hour]
-                > self.activity_by_hour_of_week_busiest
-            ):
-                self.activity_by_hour_of_week_busiest = self.activity_by_hour_of_week[
-                    day
-                ][hour]
+            if self.activity_by_hour_of_week[day][hour] > self.activity_by_hour_of_week_busiest:
+                self.activity_by_hour_of_week_busiest = self.activity_by_hour_of_week[day][hour]
 
             # month of year
             month = date.month
-            self.activity_by_month_of_year[month] = (
-                self.activity_by_month_of_year.get(month, 0) + 1
-            )
+            self.activity_by_month_of_year[month] = self.activity_by_month_of_year.get(month, 0) + 1
 
             # yearly/weekly activity
             yyw = date.strftime("%Y-%W")
@@ -370,9 +344,7 @@ class GitDataCollector(DataCollector):
             # author of the month/year
             yymm = date.strftime("%Y-%m")
             if yymm in self.author_of_month:
-                self.author_of_month[yymm][author] = (
-                    self.author_of_month[yymm].get(author, 0) + 1
-                )
+                self.author_of_month[yymm][author] = self.author_of_month[yymm].get(author, 0) + 1
             else:
                 self.author_of_month[yymm] = {}
                 self.author_of_month[yymm][author] = 1
@@ -380,9 +352,7 @@ class GitDataCollector(DataCollector):
 
             yy = date.year
             if yy in self.author_of_year:
-                self.author_of_year[yy][author] = (
-                    self.author_of_year[yy].get(author, 0) + 1
-                )
+                self.author_of_year[yy][author] = self.author_of_year[yy].get(author, 0) + 1
             else:
                 self.author_of_year[yy] = {}
                 self.author_of_year[yy][author] = 1
@@ -403,16 +373,12 @@ class GitDataCollector(DataCollector):
                 self.active_days.add(yymmdd)
 
             # timezone
-            self.commits_by_timezone[timezone] = (
-                self.commits_by_timezone.get(timezone, 0) + 1
-            )
+            self.commits_by_timezone[timezone] = self.commits_by_timezone.get(timezone, 0) + 1
 
         # Build canonical name mapping: merge authors that share the same email
         # (same person who committed with different name/email configurations)
-        email_to_canonical = {
-            email: name for email, (_, name) in email_to_latest.items()
-        }
-        name_to_canonical: Dict[str, str] = {}
+        email_to_canonical = {email: name for email, (_, name) in email_to_latest.items()}
+        name_to_canonical: dict[str, str] = {}
         for name in self.authors.keys():
             email = author_to_email.get(name)
             if email:
@@ -431,9 +397,7 @@ class GitDataCollector(DataCollector):
             aa = self.authors.pop(alias)
             ca["commits"] = ca.get("commits", 0) + aa.get("commits", 0)
             ca["lines_added"] = ca.get("lines_added", 0) + aa.get("lines_added", 0)
-            ca["lines_removed"] = ca.get("lines_removed", 0) + aa.get(
-                "lines_removed", 0
-            )
+            ca["lines_removed"] = ca.get("lines_removed", 0) + aa.get("lines_removed", 0)
             if "first_commit_stamp" in aa and (
                 "first_commit_stamp" not in ca
                 or aa["first_commit_stamp"] < ca["first_commit_stamp"]
@@ -446,9 +410,7 @@ class GitDataCollector(DataCollector):
             if "active_days" in aa:
                 ca.setdefault("active_days", set()).update(aa["active_days"])
             if "last_active_day" in aa:
-                ca["last_active_day"] = max(
-                    ca.get("last_active_day", ""), aa["last_active_day"]
-                )
+                ca["last_active_day"] = max(ca.get("last_active_day", ""), aa["last_active_day"])
 
         # Merge aliases in time-based author dicts
         for period_dict in (self.author_of_month, self.author_of_year):
@@ -461,7 +423,7 @@ class GitDataCollector(DataCollector):
 
         # Merge aliases in tag author dicts
         for tag in self.tags:
-            merged_authors: Dict[str, int] = {}
+            merged_authors: dict[str, int] = {}
             for author, commits in self.tags[tag]["authors"].items():
                 resolved = name_to_canonical.get(author, author)
                 merged_authors[resolved] = merged_authors.get(resolved, 0) + commits
@@ -474,8 +436,7 @@ class GitDataCollector(DataCollector):
         revlines = (
             get_pipe_output(
                 [
-                    'git rev-list --pretty=format:"%%at %%T" %s'
-                    % get_log_range("HEAD", False),
+                    'git rev-list --pretty=format:"%at %T" {}'.format(get_log_range("HEAD", False)),
                     "grep -v ^commit",
                 ]
             )
@@ -500,9 +461,7 @@ class GitDataCollector(DataCollector):
                 revs_to_read.append((time, rev))
 
         # Read revisions from repo
-        time_rev_count = parallel_map_with_fallback(
-            get_num_of_files_from_rev, revs_to_read
-        )
+        time_rev_count = parallel_map_with_fallback(get_num_of_files_from_rev, revs_to_read)
 
         # Update cache with new revisions and append then to general list
         for time, rev, count in time_rev_count:
@@ -520,11 +479,11 @@ class GitDataCollector(DataCollector):
             try:
                 self.files_by_stamp[int(stamp)] = int(files)
             except ValueError:
-                print('Warning: failed to parse line "%s"' % line)
+                print(f'Warning: failed to parse line "{line}"')
 
         # extensions and size of files
         lines = get_pipe_output(
-            ["git ls-tree -r -l -z %s" % get_commit_range("HEAD", end_only=True)]
+            ["git ls-tree -r -l -z {}".format(get_commit_range("HEAD", end_only=True))]
         ).split("\000")
         blobs_to_read = []
         for line in lines:
@@ -567,9 +526,7 @@ class GitDataCollector(DataCollector):
                 blobs_to_read.append((ext, blob_id))
 
         # Get info about line count for new blob's that wasn't found in cache
-        ext_blob_linecount = parallel_map_with_fallback(
-            get_num_of_lines_in_blob, blobs_to_read
-        )
+        ext_blob_linecount = parallel_map_with_fallback(get_num_of_lines_in_blob, blobs_to_read)
 
         # Update cache and write down info about number of number of lines
         for ext, blob_id, linecount in ext_blob_linecount:
@@ -590,8 +547,9 @@ class GitDataCollector(DataCollector):
             extra = "--first-parent -m"
         lines = get_pipe_output(
             [
-                'git log --shortstat %s --pretty=format:"%%at %%aN" %s'
-                % (extra, get_log_range("HEAD", False))
+                'git log --shortstat {} --pretty=format:"%at %aN" {}'.format(
+                    extra, get_log_range("HEAD", False)
+                )
             ]
         ).split("\n")
         lines.reverse()
@@ -636,9 +594,9 @@ class GitDataCollector(DataCollector):
 
                         files, inserted, deleted = 0, 0, 0
                     except ValueError:
-                        print('Warning: unexpected line "%s"' % line)
+                        print(f'Warning: unexpected line "{line}"')
                 else:
-                    print('Warning: unexpected line "%s"' % line)
+                    print(f'Warning: unexpected line "{line}"')
             else:
                 numbers = get_stat_summary_counts(line)
 
@@ -650,7 +608,7 @@ class GitDataCollector(DataCollector):
                     self.total_lines_removed += deleted
 
                 else:
-                    print('Warning: failed to handle line "%s"' % line)
+                    print(f'Warning: failed to handle line "{line}"')
                     (files, inserted, deleted) = (0, 0, 0)
                 # self.changes_by_date[stamp] = { 'files': files, 'ins': inserted, 'del': deleted }
         self.total_lines += total_lines
@@ -665,8 +623,9 @@ class GitDataCollector(DataCollector):
         # committed what, not just through mainline)
         lines = get_pipe_output(
             [
-                'git log --shortstat --date-order --pretty=format:"%%at %%aN" %s'
-                % (get_log_range("HEAD", False))
+                'git log --shortstat --date-order --pretty=format:"%at %aN" {}'.format(
+                    get_log_range("HEAD", False)
+                )
             ]
         ).split("\n")
         lines.reverse()
@@ -696,9 +655,7 @@ class GitDataCollector(DataCollector):
                                 "lines_removed": 0,
                                 "commits": 0,
                             }
-                        self.authors[author]["commits"] = (
-                            self.authors[author].get("commits", 0) + 1
-                        )
+                        self.authors[author]["commits"] = self.authors[author].get("commits", 0) + 1
                         self.authors[author]["lines_added"] = (
                             self.authors[author].get("lines_added", 0) + inserted
                         )
@@ -709,29 +666,29 @@ class GitDataCollector(DataCollector):
                             self.changes_by_date_by_author[stamp] = {}
                         if author not in self.changes_by_date_by_author[stamp]:
                             self.changes_by_date_by_author[stamp][author] = {}
-                        self.changes_by_date_by_author[stamp][author]["lines_added"] = (
-                            self.authors[author]["lines_added"]
-                        )
-                        self.changes_by_date_by_author[stamp][author]["commits"] = (
-                            self.authors[author]["commits"]
-                        )
+                        self.changes_by_date_by_author[stamp][author]["lines_added"] = self.authors[
+                            author
+                        ]["lines_added"]
+                        self.changes_by_date_by_author[stamp][author]["commits"] = self.authors[
+                            author
+                        ]["commits"]
                         files, inserted, deleted = 0, 0, 0
                     except ValueError:
-                        print('Warning: unexpected line "%s"' % line)
+                        print(f'Warning: unexpected line "{line}"')
                 else:
-                    print('Warning: unexpected line "%s"' % line)
+                    print(f'Warning: unexpected line "{line}"')
             else:
                 numbers = get_stat_summary_counts(line)
 
                 if len(numbers) == 3:
                     (files, inserted, deleted) = [int(el) for el in numbers]
                 else:
-                    print('Warning: failed to handle line "%s"' % line)
+                    print(f'Warning: failed to handle line "{line}"')
                     (files, inserted, deleted) = (0, 0, 0)
 
         # File churn: count how many commits touched each file
         churn_output = get_pipe_output(
-            ['git log --format="" --name-only %s' % get_log_range("HEAD", False)]
+            ['git log --format="" --name-only {}'.format(get_log_range("HEAD", False))]
         )
         for line in churn_output.split("\n"):
             line = line.strip()
@@ -764,9 +721,9 @@ class GitDataCollector(DataCollector):
         for name in self.authors:
             a = self.authors[name]
             if "first_commit_stamp" in a:
-                first_month = datetime.datetime.fromtimestamp(
-                    a["first_commit_stamp"]
-                ).strftime("%Y-%m")
+                first_month = datetime.datetime.fromtimestamp(a["first_commit_stamp"]).strftime(
+                    "%Y-%m"
+                )
                 self.new_contributors_by_month[first_month] = (
                     self.new_contributors_by_month.get(first_month, 0) + 1
                 )
@@ -826,7 +783,7 @@ class GitDataCollector(DataCollector):
         return self.total_size
 
     def rev_to_date(self, rev):
-        stamp = int(get_pipe_output(['git log --pretty=format:%%at "%s" -n 1' % rev]))
+        stamp = int(get_pipe_output([f'git log --pretty=format:%at "{rev}" -n 1']))
         return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
 
 
@@ -850,14 +807,14 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
         print("FATAL: Output path is not a directory or does not exist")
         return 1
 
-    print("Output path: %s" % outputpath)
+    print(f"Output path: {outputpath}")
     cachefile = os.path.join(outputpath, "gitstats.cache")
 
     data = GitDataCollector()
     data.load_cache(cachefile)
 
     for gitpath in gitpath:
-        print("Git path: %s" % gitpath)
+        print(f"Git path: {gitpath}")
 
         prevdir = os.getcwd()
         os.chdir(gitpath)
@@ -878,9 +835,7 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
             summarizer = AISummarizer(conf)
             summarizer.set_cache_dir(os.path.join(outputpath, ".ai_cache"))
             force_refresh = conf.get("refresh_ai", False)
-            data.ai_summaries = summarizer.generate_all_summaries(
-                data.__dict__, force_refresh
-            )
+            data.ai_summaries = summarizer.generate_all_summaries(data.__dict__, force_refresh)
             print("AI summaries generated successfully")
         except Exception as e:
             print(f"Warning: Failed to generate AI summaries: {str(e)}")
@@ -910,12 +865,7 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
     time_end = time.time()
     exectime_internal = time_end - time_start
     print(
-        "Execution time %.5f secs, %.5f secs (%.2f %%) in external commands)"
-        % (
-            exectime_internal,
-            exectime_external,
-            (100.0 * exectime_external) / exectime_internal,
-        )
+        f"Execution time {exectime_internal:.5f} secs, {exectime_external:.5f} secs ({(100.0 * exectime_external) / exectime_internal:.2f} %) in external commands)"
     )
     if sys.stdin.isatty():
         python_cmd = "python" if os.name == "nt" else "python3"

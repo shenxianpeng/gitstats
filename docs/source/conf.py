@@ -6,9 +6,7 @@ from datetime import datetime
 # Required
 project = "GitStats"
 author = "Xianpeng Shen"
-copyright = (
-    f"2008 - {datetime.now().year}, Xianpeng Shen, Heikki Hokkainen, and contributors"
-)
+copyright = f"2008 - {datetime.now().year}, Xianpeng Shen, Heikki Hokkainen, and contributors"
 
 source_suffix = {
     ".rst": "restructuredtext",

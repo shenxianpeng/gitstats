@@ -1,7 +1,8 @@
 import os
-import nox
 import shutil
 from pathlib import Path
+
+import nox
 
 
 @nox.session
@@ -9,6 +10,14 @@ def lint(session: nox.Session) -> None:
     """Run linter"""
     session.install("pre-commit")
     session.run("pre-commit", "run", "--all-files", external=True)
+
+
+@nox.session
+def test(session: nox.Session) -> None:
+    """Run tests"""
+    session.install("--upgrade", "pip")
+    session.install("-e", ".[test]")
+    session.run("pytest", *session.posargs, external=True)
 
 
 @nox.session

@@ -8,10 +8,10 @@ import datetime
 import hashlib
 import json
 import logging
-from typing import Dict, Any, Optional
 from pathlib import Path
+from typing import Any
 
-from gitstats.ai_providers import AIProviderFactory, AIProviderError
+from gitstats.ai_providers import AIProviderError, AIProviderFactory
 
 logger = logging.getLogger("gitstats")
 
@@ -45,7 +45,7 @@ class AISummarizer:
         "de": "Geben Sie Ihre Analyse auf Deutsch an.",
     }
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         """
         Initialize the AI summarizer.
 
@@ -54,7 +54,7 @@ class AISummarizer:
         """
         self.config = config
         self.provider = None
-        self.cache_dir: Optional[Path] = None
+        self.cache_dir: Path | None = None
         self.cache_enabled = config.get("ai_cache_enabled", True)
 
         # Initialize AI provider if enabled
@@ -86,7 +86,7 @@ class AISummarizer:
         ).hexdigest()[:8]
         return f"{page_type}_{data_hash}_{config_hash}"
 
-    def _get_cached_summary(self, cache_key: str) -> Optional[str]:
+    def _get_cached_summary(self, cache_key: str) -> str | None:
         """Retrieve cached summary if available."""
         if not self.cache_enabled or not self.cache_dir:
             return None
@@ -94,7 +94,7 @@ class AISummarizer:
         cache_file = self.cache_dir / f"{cache_key}.json"
         if cache_file.exists():
             try:
-                with open(cache_file, "r", encoding="utf-8") as f:
+                with open(cache_file, encoding="utf-8") as f:
                     cached_data = json.load(f)
                     logger.info(f"Using cached AI summary for {cache_key}")
                     return cached_data["summary"]
@@ -118,22 +118,16 @@ class AISummarizer:
     def _get_language_instruction(self) -> str:
         """Get language-specific instruction for prompts."""
         language = self.config.get("ai_language", "en")
-        return self.LANGUAGE_INSTRUCTIONS.get(
-            language, self.LANGUAGE_INSTRUCTIONS["en"]
-        )
+        return self.LANGUAGE_INSTRUCTIONS.get(language, self.LANGUAGE_INSTRUCTIONS["en"])
 
     def _is_bot_account(self, author_name: str) -> bool:
         """Check if an author name is a bot account."""
         author_lower = author_name.lower()
         return any(pattern.lower() in author_lower for pattern in self.BOT_PATTERNS)
 
-    def _filter_human_authors(self, authors: Dict[str, Any]) -> Dict[str, Any]:
+    def _filter_human_authors(self, authors: dict[str, Any]) -> dict[str, Any]:
         """Filter out bot accounts from authors dictionary."""
-        return {
-            name: info
-            for name, info in authors.items()
-            if not self._is_bot_account(name)
-        }
+        return {name: info for name, info in authors.items() if not self._is_bot_account(name)}
 
     def _get_field_value(self, obj: Any, key: str, default: Any = None) -> Any:
         """Get value from dict key or object attribute."""
@@ -141,14 +135,14 @@ class AISummarizer:
             return obj.get(key, default)
         return getattr(obj, key, default)
 
-    def _get_lines_of_code(self, data: Dict[str, Any]) -> int:
+    def _get_lines_of_code(self, data: dict[str, Any]) -> int:
         """Extract total lines of code with fallback logic."""
         if isinstance(data, dict):
             lines = data.get("total_lines_of_code")
             return lines if lines is not None else data.get("total_lines", 0)
         return getattr(data, "total_lines", 0)
 
-    def _get_commit_date(self, data: Dict[str, Any], date_type: str) -> str:
+    def _get_commit_date(self, data: dict[str, Any], date_type: str) -> str:
         """Extract commit date (first or last) with multiple fallback strategies."""
         method_name = f"get_{date_type}_commit_date"
         dict_key = f"{date_type}_commit_date"
@@ -188,17 +182,16 @@ class AISummarizer:
         except (TypeError, ValueError):
             return 0
 
-    def _format_top_authors(self, human_authors: Dict[str, Any], limit: int = 5) -> str:
+    def _format_top_authors(self, human_authors: dict[str, Any], limit: int = 5) -> str:
         """Format top contributors as a string."""
         top_authors = sorted(
             human_authors.items(), key=lambda x: x[1].get("commits", 0), reverse=True
         )[:limit]
         return "\n".join(
-            f"  - {name}: {info.get('commits', 0)} commits"
-            for name, info in top_authors
+            f"  - {name}: {info.get('commits', 0)} commits" for name, info in top_authors
         )
 
-    def prepare_index_data(self, data: Dict[str, Any]) -> str:
+    def prepare_index_data(self, data: dict[str, Any]) -> str:
         """Prepare data context for index page summary."""
         # Extract basic statistics
         commits_count = self._get_field_value(data, "total_commits", 0)
@@ -235,7 +228,7 @@ Note: Bot accounts (like dependabot[bot], pre-commit-ci[bot]) are excluded from 
 """
         return context
 
-    def prepare_activity_data(self, data: Dict[str, Any]) -> str:
+    def prepare_activity_data(self, data: dict[str, Any]) -> str:
         """Prepare data context for activity page summary."""
         commits_by_year = data.get("commits_by_year", {})
         commits_by_hour = data.get("activity_by_hour_of_day", {})
@@ -266,10 +259,7 @@ Note: Bot accounts (like dependabot[bot], pre-commit-ci[bot]) are excluded from 
 
         # Year over year trend
         years_str = "\n".join(
-            [
-                f"  - {year}: {count} commits"
-                for year, count in sorted(commits_by_year.items())
-            ]
+            [f"  - {year}: {count} commits" for year, count in sorted(commits_by_year.items())]
         )
 
         context = f"""Activity Patterns:
@@ -285,7 +275,7 @@ Timezone Distribution: {len(commits_by_timezone)} different timezones
 """
         return context
 
-    def prepare_authors_data(self, data: Dict[str, Any]) -> str:
+    def prepare_authors_data(self, data: dict[str, Any]) -> str:
         """Prepare data context for authors page summary."""
         authors = data.get("authors", {})
 
@@ -318,12 +308,8 @@ Timezone Distribution: {len(commits_by_timezone)} different timezones
                 if total_commits > 0
                 else 0
             )
-            top_5_commits = sum(
-                info.get("commits", 0) for _, info in authors_by_commits[:5]
-            )
-            top_5_percentage = (
-                (top_5_commits / total_commits * 100) if total_commits > 0 else 0
-            )
+            top_5_commits = sum(info.get("commits", 0) for _, info in authors_by_commits[:5])
+            top_5_percentage = (top_5_commits / total_commits * 100) if total_commits > 0 else 0
         else:
             top_author_percentage = 0
             top_5_percentage = 0
@@ -345,7 +331,7 @@ Note: Bot accounts (dependabot[bot], pre-commit-ci[bot], etc.) are excluded from
 """
         return context
 
-    def prepare_lines_data(self, data: Dict[str, Any]) -> str:
+    def prepare_lines_data(self, data: dict[str, Any]) -> str:
         """Prepare data context for lines page summary."""
         total_lines = data.get("total_lines", 0)
         total_added = data.get("total_lines_added", 0)
@@ -361,7 +347,9 @@ Note: Bot accounts (dependabot[bot], pre-commit-ci[bot], etc.) are excluded from
                 end_lines = lines_by_date[dates[-1]]
                 growth = end_lines - start_lines
                 growth_rate = (growth / start_lines * 100) if start_lines > 0 else 0
-                trend_str = f"Growth from {start_lines:,} to {end_lines:,} lines ({growth_rate:+.1f}%)"
+                trend_str = (
+                    f"Growth from {start_lines:,} to {end_lines:,} lines ({growth_rate:+.1f}%)"
+                )
             else:
                 trend_str = f"Current: {total_lines:,} lines"
         else:
@@ -399,8 +387,8 @@ Top 5 Contributors by Lines:
         return context
 
     def generate_summary(
-        self, page_type: str, data: Dict[str, Any], force_refresh: bool = False
-    ) -> Dict[str, Any]:
+        self, page_type: str, data: dict[str, Any], force_refresh: bool = False
+    ) -> dict[str, Any]:
         """
         Generate AI summary for a specific page type.
 
@@ -425,7 +413,9 @@ Top 5 Contributors by Lines:
                 prompt_focus = "provide a high-level overview focusing on the most interesting aspects of this repository's development."
             elif page_type == "activity":
                 data_context = self.prepare_activity_data(data)
-                prompt_focus = "identify the most notable patterns in commit activity and development rhythm."
+                prompt_focus = (
+                    "identify the most notable patterns in commit activity and development rhythm."
+                )
             elif page_type == "lines":
                 data_context = self.prepare_lines_data(data)
                 prompt_focus = "summarize the codebase growth trajectory and what it indicates about the project."
@@ -481,8 +471,8 @@ Generate your analysis:"""
         return result
 
     def generate_all_summaries(
-        self, data: Dict[str, Any], force_refresh: bool = False
-    ) -> Dict[str, Dict[str, Any]]:
+        self, data: dict[str, Any], force_refresh: bool = False
+    ) -> dict[str, dict[str, Any]]:
         """
         Generate summaries for all report pages.
 

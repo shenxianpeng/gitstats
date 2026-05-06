@@ -4,12 +4,12 @@
 # GPLv2 / GPLv3
 import os
 import re
+import subprocess
 import sys
 import time
-import subprocess
-from gitstats import ON_LINUX, exectime_external, load_config
 from importlib.metadata import version
 
+from gitstats import ON_LINUX, exectime_external, load_config
 
 conf = load_config()
 
@@ -88,7 +88,7 @@ def get_pipe_output(cmds, quiet=False):
     if not quiet:
         if ON_LINUX and os.isatty(1):
             print("\r", end=" ")
-        print("[%.5f] >> %s" % (end - start, " | ".join(cmds)))
+        print("[{:.5f}] >> {}".format(end - start, " | ".join(cmds)))
     exectime_external += end - start
     return result
 
@@ -108,7 +108,7 @@ def get_commit_range(defaultrange="HEAD", end_only=False):
         if commit_begin_str.isdigit():
             commit_begin_str = f"{conf['commit_end']}~{commit_begin_str}"
 
-        return "%s..%s" % (commit_begin_str, conf["commit_end"])
+        return "{}..{}".format(commit_begin_str, conf["commit_end"])
     return defaultrange
 
 
@@ -166,7 +166,7 @@ def get_num_of_lines_in_blob(ext_blob):
     return (
         ext,
         blob_id,
-        int(get_pipe_output(["git cat-file blob %s" % blob_id, "wc -l"]).split()[0]),
+        int(get_pipe_output([f"git cat-file blob {blob_id}", "wc -l"]).split()[0]),
     )
 
 
@@ -178,11 +178,7 @@ def get_num_of_files_from_rev(time_rev):
     return (
         int(time),
         rev,
-        int(
-            get_pipe_output(['git ls-tree -r --name-only "%s"' % rev, "wc -l"]).split(
-                "\n"
-            )[0]
-        ),
+        int(get_pipe_output([f'git ls-tree -r --name-only "{rev}"', "wc -l"]).split("\n")[0]),
     )
 
 
@@ -208,15 +204,13 @@ def get_log_range(defaultrange="HEAD", end_only=True):
 
     # Date range filtering
     if len(conf["start_date"]) > 0:
-        options.append('--since="%s"' % conf["start_date"])
+        options.append('--since="{}"'.format(conf["start_date"]))
     if len(conf["end_date"]) > 0:
-        options.append('--until="%s"' % conf["end_date"])
+        options.append('--until="{}"'.format(conf["end_date"]))
 
     # Author filtering
     if len(conf["authors"]) > 0:
-        authors_list = [
-            author.strip() for author in conf["authors"].split(",") if author.strip()
-        ]
+        authors_list = [author.strip() for author in conf["authors"].split(",") if author.strip()]
         for author in authors_list:
             # Escape possible double quotes or special characters in author
             safe_author = author.replace('"', r"\"")
@@ -224,5 +218,5 @@ def get_log_range(defaultrange="HEAD", end_only=True):
 
     # Combine options with commit range
     if options:
-        return '%s "%s"' % (" ".join(options), commit_range)
+        return '{} "{}"'.format(" ".join(options), commit_range)
     return commit_range
