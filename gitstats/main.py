@@ -871,7 +871,9 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
     )
     if sys.stdin.isatty():
         python_cmd = "python" if os.name == "nt" else "python3"
-        logger.info(f"To view the report, run: {python_cmd} -m http.server 8000 --bind 127.0.0.1 -d {outputpath}")
+        logger.info(
+            f"To view the report, run: {python_cmd} -m http.server 8000 --bind 127.0.0.1 -d {outputpath}"
+        )
 
     return 0
 
