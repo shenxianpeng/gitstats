@@ -17,8 +17,6 @@ from gitstats.utils import (
     get_version,
 )
 
-conf = load_config()
-
 
 class ReportCreator:
     """Creates the actual report based on given data."""
@@ -57,7 +55,7 @@ class HTMLReportCreator(ReportCreator):
         # copy static files to the report directory
         basedir = os.path.dirname(os.path.abspath(__file__))
         for file in (
-            conf["style"],
+            load_config()["style"],
             "sortable.js",
             "chart.umd.min.js",
             "arrow-up.gif",
@@ -413,7 +411,7 @@ class HTMLReportCreator(ReportCreator):
 
     def _build_author_time_series(self, data):
         """Build per-author cumulative lines and commits time series for Chart.js."""
-        authors_to_plot = data.get_authors(conf["max_authors"])
+        authors_to_plot = data.get_authors(load_config()["max_authors"])
         lines_by_authors = {a: 0 for a in authors_to_plot}
         commits_by_authors = {a: 0 for a in authors_to_plot}
         time_labels = []
@@ -453,7 +451,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<tr><th>Author</th><th>Commits (%)</th><th>+ lines</th><th>- lines</th><th>First commit</th><th>Last commit</th><th class="unsortable">Age</th><th>Active days</th><th># by commits</th></tr>'
         )
-        for author in data.get_authors(conf["max_authors"]):
+        for author in data.get_authors(load_config()["max_authors"]):
             info = data.get_author_info(author)
             f.write(
                 "<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%d</td></tr>"
@@ -473,8 +471,8 @@ class HTMLReportCreator(ReportCreator):
         f.write("</table>")
 
         allauthors = data.get_authors()
-        if len(allauthors) > conf["max_authors"]:
-            rest = allauthors[conf["max_authors"] :]
+        if len(allauthors) > load_config()["max_authors"]:
+            rest = allauthors[load_config()["max_authors"] :]
             f.write(
                 '<p class="moreauthors">These didn\'t make it to the top: {}</p>'.format(
                     ", ".join(rest)
@@ -495,8 +493,11 @@ class HTMLReportCreator(ReportCreator):
                 x_ticks_rotate=True,
             )
         )
-        if len(allauthors) > conf["max_authors"]:
-            f.write('<p class="moreauthors">Only top %d authors shown</p>' % conf["max_authors"])
+        if len(allauthors) > load_config()["max_authors"]:
+            f.write(
+                '<p class="moreauthors">Only top %d authors shown</p>'
+                % load_config()["max_authors"]
+            )
 
         f.write(html_header(2, "Commits per Author"))
         f.write(
@@ -509,22 +510,25 @@ class HTMLReportCreator(ReportCreator):
                 x_ticks_rotate=True,
             )
         )
-        if len(allauthors) > conf["max_authors"]:
-            f.write('<p class="moreauthors">Only top %d authors shown</p>' % conf["max_authors"])
+        if len(allauthors) > load_config()["max_authors"]:
+            f.write(
+                '<p class="moreauthors">Only top %d authors shown</p>'
+                % load_config()["max_authors"]
+            )
 
         # Authors :: Author of Month
         f.write(html_header(2, "Author of Month"))
         f.write('<table class="sortable" id="aom">')
         f.write(
             '<tr><th>Month</th><th>Author</th><th>Commits (%%)</th><th class="unsortable">Next top %d</th><th>Number of authors</th></tr>'
-            % conf["authors_top"]
+            % load_config()["authors_top"]
         )
         for yymm in reversed(sorted(data.author_of_month.keys())):
             author_dict = data.author_of_month[yymm]
             authors = get_keys_sorted_by_values(author_dict)
             authors.reverse()
             commits = data.author_of_month[yymm][authors[0]]
-            authors_str = ", ".join(authors[1 : conf["authors_top"] + 1])
+            authors_str = ", ".join(authors[1 : load_config()["authors_top"] + 1])
             f.write(
                 "<tr><td>%s</td><td>%s</td><td>%d (%.2f%% of %d)</td><td>%s</td><td>%d</td></tr>"
                 % (
@@ -543,14 +547,14 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Author of Year"))
         f.write(
             '<table class="sortable" id="aoy"><tr><th>Year</th><th>Author</th><th>Commits (%%)</th><th class="unsortable">Next top %d</th><th>Number of authors</th></tr>'
-            % conf["authors_top"]
+            % load_config()["authors_top"]
         )
         for yy in reversed(sorted(data.author_of_year.keys())):
             author_dict = data.author_of_year[yy]
             authors = get_keys_sorted_by_values(author_dict)
             authors.reverse()
             commits = data.author_of_year[yy][authors[0]]
-            authors_str = ", ".join(authors[1 : conf["authors_top"] + 1])
+            authors_str = ", ".join(authors[1 : load_config()["authors_top"] + 1])
             f.write(
                 "<tr><td>%s</td><td>%s</td><td>%d (%.2f%% of %d)</td><td>%s</td><td>%d</td></tr>"
                 % (
@@ -576,7 +580,7 @@ class HTMLReportCreator(ReportCreator):
         dom_values = []
         n = 0
         for domain in domains_by_commits:
-            if n == conf["max_domains"]:
+            if n == load_config()["max_domains"]:
                 break
             n += 1
             info = data.get_domain_info(domain)
@@ -819,7 +823,7 @@ class HTMLReportCreator(ReportCreator):
         Create a dedicated AI Insights page with all AI-generated summaries.
         """
         # Get language from config
-        language = conf.get("ai_language", "en")
+        language = load_config().get("ai_language", "en")
 
         f = open(path + "/ai-insights.html", "w", encoding="utf-8")
         self.print_header(f)
@@ -1017,7 +1021,7 @@ class HTMLReportCreator(ReportCreator):
 	</script>
 </head>
 <body>
-""".format(self.title, conf["style"], get_version)
+""".format(self.title, load_config()["style"], get_version)
         )
 
     def print_nav(self, file) -> None:
