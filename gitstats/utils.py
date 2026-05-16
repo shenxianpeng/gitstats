@@ -208,7 +208,9 @@ def get_log_range(defaultrange="HEAD", end_only=True):
 
     # Author filtering
     if len(load_config()["authors"]) > 0:
-        authors_list = [author.strip() for author in load_config()["authors"].split(",") if author.strip()]
+        authors_list = [
+            author.strip() for author in load_config()["authors"].split(",") if author.strip()
+        ]
         for author in authors_list:
             # Escape possible double quotes or special characters in author
             safe_author = author.replace('"', r"\"")

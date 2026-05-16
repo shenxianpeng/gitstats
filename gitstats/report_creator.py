@@ -494,7 +494,10 @@ class HTMLReportCreator(ReportCreator):
             )
         )
         if len(allauthors) > load_config()["max_authors"]:
-            f.write('<p class="moreauthors">Only top %d authors shown</p>' % load_config()["max_authors"])
+            f.write(
+                '<p class="moreauthors">Only top %d authors shown</p>'
+                % load_config()["max_authors"]
+            )
 
         f.write(html_header(2, "Commits per Author"))
         f.write(
@@ -508,7 +511,10 @@ class HTMLReportCreator(ReportCreator):
             )
         )
         if len(allauthors) > load_config()["max_authors"]:
-            f.write('<p class="moreauthors">Only top %d authors shown</p>' % load_config()["max_authors"])
+            f.write(
+                '<p class="moreauthors">Only top %d authors shown</p>'
+                % load_config()["max_authors"]
+            )
 
         # Authors :: Author of Month
         f.write(html_header(2, "Author of Month"))
