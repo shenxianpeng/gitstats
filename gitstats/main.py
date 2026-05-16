@@ -130,10 +130,10 @@ class DataCollector:
 
     ##
     # This should be the main function to extract data from the repository.
-    def collect(self, dir):
-        self.dir = dir
+    def collect(self, repo_dir):
+        self.dir = repo_dir
         if len(conf["project_name"]) == 0:
-            self.project_name = os.path.basename(os.path.abspath(dir))
+            self.project_name = os.path.basename(os.path.abspath(repo_dir))
         else:
             self.project_name = conf["project_name"]
 
@@ -172,8 +172,8 @@ class DataCollector:
 
 
 class GitDataCollector(DataCollector):
-    def collect(self, dir):
-        DataCollector.collect(self, dir)
+    def collect(self, repo_dir):
+        DataCollector.collect(self, repo_dir)
 
         self.total_authors += int(
             get_pipe_output(["git shortlog -s {}".format(get_log_range("HEAD", False)), "wc -l"])
