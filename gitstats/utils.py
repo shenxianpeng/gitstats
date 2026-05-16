@@ -2,7 +2,6 @@
 # GPLv2 / GPLv3
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
 # GPLv2 / GPLv3
-import logging
 import os
 import re
 import shlex
