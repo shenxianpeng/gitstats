@@ -4,6 +4,7 @@
 # GPLv2 / GPLv3
 import argparse
 import datetime
+import logging
 import os
 import pickle
 import re
@@ -29,6 +30,7 @@ from gitstats.utils import (
 
 os.environ["LC_ALL"] = "C"
 
+logger = logging.getLogger("gitstats")
 
 conf = load_config()
 
@@ -52,8 +54,8 @@ def parallel_map_with_fallback(func, items):
     except OSError as e:
         # Fallback to sequential processing if multiprocessing fails
         # (common in restricted environments like Netlify)
-        print(
-            f"Warning: Multiprocessing not available ({e}), falling back to sequential processing"
+        logger.warning(
+            f"Multiprocessing not available ({e}), falling back to sequential processing"
         )
         return [func(item) for item in items]
 
@@ -142,7 +144,7 @@ class DataCollector:
     def load_cache(self, cachefile):
         if not os.path.exists(cachefile):
             return
-        print("Loading cache...")
+        logger.info("Loading cache...")
         f = open(cachefile, "rb")
         try:
             self.cache = pickle.loads(zlib.decompress(f.read()))
@@ -157,7 +159,7 @@ class DataCollector:
 
     # Save cacheable data
     def save_cache(self, cachefile):
-        print("Saving cache...")
+        logger.info("Saving cache...")
         tempfile = cachefile + ".tmp"
         f = open(tempfile, "wb")
         # pickle.dump(self.cache, f)
@@ -479,7 +481,7 @@ class GitDataCollector(DataCollector):
             try:
                 self.files_by_stamp[int(stamp)] = int(files)
             except ValueError:
-                print(f'Warning: failed to parse line "{line}"')
+                logger.warning(f'Failed to parse line "{line}"')
 
         # extensions and size of files
         lines = get_pipe_output(
@@ -594,9 +596,9 @@ class GitDataCollector(DataCollector):
 
                         files, inserted, deleted = 0, 0, 0
                     except ValueError:
-                        print(f'Warning: unexpected line "{line}"')
+                        logger.warning(f'Unexpected line "{line}"')
                 else:
-                    print(f'Warning: unexpected line "{line}"')
+                    logger.warning(f'Unexpected line "{line}"')
             else:
                 numbers = get_stat_summary_counts(line)
 
@@ -608,7 +610,7 @@ class GitDataCollector(DataCollector):
                     self.total_lines_removed += deleted
 
                 else:
-                    print(f'Warning: failed to handle line "{line}"')
+                    logger.warning(f'Failed to handle line "{line}"')
                     (files, inserted, deleted) = (0, 0, 0)
                 # self.changes_by_date[stamp] = { 'files': files, 'ins': inserted, 'del': deleted }
         self.total_lines += total_lines
@@ -674,16 +676,16 @@ class GitDataCollector(DataCollector):
                         ]["commits"]
                         files, inserted, deleted = 0, 0, 0
                     except ValueError:
-                        print(f'Warning: unexpected line "{line}"')
+                        logger.warning(f'Unexpected line "{line}"')
                 else:
-                    print(f'Warning: unexpected line "{line}"')
+                    logger.warning(f'Unexpected line "{line}"')
             else:
                 numbers = get_stat_summary_counts(line)
 
                 if len(numbers) == 3:
                     (files, inserted, deleted) = [int(el) for el in numbers]
                 else:
-                    print(f'Warning: failed to handle line "{line}"')
+                    logger.warning(f'Failed to handle line "{line}"')
                     (files, inserted, deleted) = (0, 0, 0)
 
         # File churn: count how many commits touched each file
@@ -804,49 +806,49 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
         pass
 
     if not os.path.isdir(outputpath):
-        print("FATAL: Output path is not a directory or does not exist")
+        logger.error("FATAL: Output path is not a directory or does not exist")
         return 1
 
-    print(f"Output path: {outputpath}")
+    logger.info(f"Output path: {outputpath}")
     cachefile = os.path.join(outputpath, "gitstats.cache")
 
     data = GitDataCollector()
     data.load_cache(cachefile)
 
     for gitpath in gitpath:
-        print(f"Git path: {gitpath}")
+        logger.info(f"Git path: {gitpath}")
 
         prevdir = os.getcwd()
         os.chdir(gitpath)
 
-        print("Collecting data...")
+        logger.info("Collecting data...")
         data.collect(gitpath)
 
         os.chdir(prevdir)
 
-    print("Refining data...")
+    logger.info("Refining data...")
     data.save_cache(cachefile)
     data.refine()
 
     # Generate AI summaries if enabled
     if conf.get("ai_enabled", False):
         try:
-            print("Generating AI summaries...")
+            logger.info("Generating AI summaries...")
             summarizer = AISummarizer(conf)
             summarizer.set_cache_dir(os.path.join(outputpath, ".ai_cache"))
             force_refresh = conf.get("refresh_ai", False)
             data.ai_summaries = summarizer.generate_all_summaries(data.__dict__, force_refresh)
-            print("AI summaries generated successfully")
+            logger.info("AI summaries generated successfully")
         except Exception as e:
-            print(f"Warning: Failed to generate AI summaries: {str(e)}")
-            print("Report will be generated without AI insights")
+            logger.warning(f"Failed to generate AI summaries: {str(e)}")
+            logger.info("Report will be generated without AI insights")
             data.ai_summaries = {}
     else:
         data.ai_summaries = {}
 
     os.chdir(rundir)
 
-    print("Generating report...")
+    logger.info("Generating report...")
     html_report = HTMLReportCreator()
     html_report.create(data, outputpath)
 
@@ -855,24 +857,21 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
         if extra_fmt == "json":
             import json
 
-            print(f'Generating JSON file: "{output_file}"')
+            logger.info(f'Generating JSON file: "{output_file}"')
             with open(output_file, "w", encoding="utf-8") as file:
                 json.dump(data.__dict__, file, default=str)
         else:
-            print(f"Error: Unsupported format '{extra_fmt}'")
+            logger.error(f"Unsupported format '{extra_fmt}'")
             return 1
 
     time_end = time.time()
     exectime_internal = time_end - time_start
-    print(
+    logger.info(
         f"Execution time {exectime_internal:.5f} secs, {exectime_external:.5f} secs ({(100.0 * exectime_external) / exectime_internal:.2f} %) in external commands)"
     )
     if sys.stdin.isatty():
         python_cmd = "python" if os.name == "nt" else "python3"
-        print("To view the report, run:")
-        print()
-        print(f"  {python_cmd} -m http.server 8000 --bind 127.0.0.1 -d {outputpath}")
-        print()
+        logger.info(f"To view the report, run: {python_cmd} -m http.server 8000 --bind 127.0.0.1 -d {outputpath}")
 
     return 0
 
@@ -952,6 +951,12 @@ def get_parser() -> argparse.ArgumentParser:
 
 
 def main() -> int:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(message)s",
+        stream=sys.stdout,
+    )
+
     parser = get_parser()
     args = parser.parse_args()
     gitpath = args.gitpath

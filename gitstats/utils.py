@@ -2,6 +2,7 @@
 # GPLv2 / GPLv3
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
 # GPLv2 / GPLv3
+import logging
 import os
 import re
 import subprocess
@@ -10,6 +11,8 @@ import time
 from importlib.metadata import version
 
 from gitstats import ON_LINUX, exectime_external, load_config
+
+logger = logging.getLogger("gitstats")
 
 conf = load_config()
 
@@ -42,8 +45,7 @@ def get_pipe_output(cmds, quiet=False):
     global exectime_external
     start = time.time()
     if not quiet and ON_LINUX and os.isatty(1):
-        print(">> " + " | ".join(cmds), end=" ")
-        sys.stdout.flush()
+        logger.debug(">> " + " | ".join(cmds))
 
     # Handle cross-platform cases
     if len(cmds) == 2 and cmds[1] == "wc -l":
@@ -86,9 +88,7 @@ def get_pipe_output(cmds, quiet=False):
 
     end = time.time()
     if not quiet:
-        if ON_LINUX and os.isatty(1):
-            print("\r", end=" ")
-        print("[{:.5f}] >> {}".format(end - start, " | ".join(cmds)))
+        logger.debug("[{:.5f}] >> {}".format(end - start, " | ".join(cmds)))
     exectime_external += end - start
     return result
 
