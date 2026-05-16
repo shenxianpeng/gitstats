@@ -11,8 +11,6 @@ from importlib.metadata import version
 
 from gitstats import ON_LINUX, exectime_external, load_config
 
-conf = load_config()
-
 
 def count_lines_in_text(text: str | None) -> int:
     """Cross-platform function to count lines in text"""
@@ -94,21 +92,21 @@ def get_pipe_output(cmds: list[str], quiet: bool = False) -> str:
 
 
 def get_commit_range(defaultrange: str = "HEAD", end_only: bool = False) -> str:
-    if len(conf["commit_end"]) > 0:
-        commit_begin = conf["commit_begin"]
+    if len(load_config["commit_end"]) > 0:
+        commit_begin = load_config["commit_begin"]
 
         # Convert commit_begin to string for consistent handling
         commit_begin_str = str(commit_begin)
 
         # If end_only or no commit_begin specified, return just the end
         if end_only or len(commit_begin_str) == 0:
-            return conf["commit_end"]
+            return load_config()["commit_end"]
 
         # Handle numeric commit_begin as "N commits ago"
         if commit_begin_str.isdigit():
-            commit_begin_str = f"{conf['commit_end']}~{commit_begin_str}"
+            commit_begin_str = f"{load_config()['commit_end']}~{commit_begin_str}"
 
-        return "{}..{}".format(commit_begin_str, conf["commit_end"])
+        return "{}..{}".format(commit_begin_str, load_config()["commit_end"])
     return defaultrange
 
 
@@ -117,7 +115,7 @@ def get_excluded_extensions() -> set[str]:
     Get the set of excluded file extensions from config.
     Returns a set of lowercase extensions.
     """
-    exclude_ext_str = conf.get("exclude_exts", "")
+    exclude_ext_str = load_config().get("exclude_exts", "")
     if not exclude_ext_str:
         return set()
     return {ext.strip().lower() for ext in exclude_ext_str.split(",") if ext.strip()}
@@ -203,14 +201,16 @@ def get_log_range(defaultrange: str = "HEAD", end_only: bool = True) -> str:
     options = []
 
     # Date range filtering
-    if len(conf["start_date"]) > 0:
-        options.append('--since="{}"'.format(conf["start_date"]))
-    if len(conf["end_date"]) > 0:
-        options.append('--until="{}"'.format(conf["end_date"]))
+    if len(load_config()["start_date"]) > 0:
+        options.append('--since="{}"'.format(load_config()["start_date"]))
+    if len(load_config()["end_date"]) > 0:
+        options.append('--until="{}"'.format(load_config()["end_date"]))
 
     # Author filtering
-    if len(conf["authors"]) > 0:
-        authors_list = [author.strip() for author in conf["authors"].split(",") if author.strip()]
+    if len(load_config()["authors"]) > 0:
+        authors_list = [
+            author.strip() for author in load_config()["authors"].split(",") if author.strip()
+        ]
         for author in authors_list:
             # Escape possible double quotes or special characters in author
             safe_author = author.replace('"', r"\"")
