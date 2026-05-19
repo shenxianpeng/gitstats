@@ -25,11 +25,15 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v6
+      with:
+        fetch-depth: 0  # full history for gitstats integration
 
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+        cache-dependency-path: 'pyproject.toml'
 
     - name: Configure git
       run: |
@@ -37,111 +41,41 @@ jobs:
         git config --global user.email "ci@test.com"
         git config --global init.defaultBranch main
 
+    - name: Install dependencies
+      run: pip install -e ".[test]"
+
     - name: Run pytest
+      run: python -m pytest tests/ -v --tb=short
+
+    - name: Generate GitStats Report (smoke test)
+      if: ${{ matrix.python-version == '3.10' }}
+      env:
+        FONTCONFIG_FILE: /dev/null
       run: |
-        pip install -e ".[test]"
-        python -m pytest tests/ -v --tb=short
+        pip install -e "."
+        gitstats . test-report -f json
+
+    - name: Upload report artifact
+      if: ${{ matrix.python-version == '3.10' }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: test-report-${{ matrix.os }}
+        path: test-report
 
   test-docs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Code
       uses: actions/checkout@v6
+
     - name: Set up Python 3.12
       uses: actions/setup-python@v6
       with:
         python-version: 3.12
+        cache: 'pip'
+        cache-dependency-path: 'pyproject.toml'
+
     - name: Build Docs
       run: |
         pip install nox
         nox -s docs
-
-  test-windows:
-    runs-on: windows-2022
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
-
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0 # get all history.
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Generate GitStats Report
-      run: |
-        python -m venv venv
-        .\venv\Scripts\activate.bat
-        # for testing
-        pip install .
-        gitstats . test-report-windows -f json
-
-    - name: Save GitStats Report
-      if: ${{ matrix.python-version == '3.10' }}
-      uses: actions/upload-artifact@v7
-      with:
-        name: test-report-windows
-        path: test-report-windows
-
-  test-macos:
-    runs-on: macos-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
-
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0 # get all history.
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Generate GitStats Report
-      env:
-        FONTCONFIG_FILE: /dev/null
-      run: |
-        python3 -m venv venv
-        source venv/bin/activate
-        # for testing
-        pip install .
-        gitstats . test-report-macos -f json
-
-    - name: Save GitStats Report
-      if: ${{ matrix.python-version == '3.10' }}
-      uses: actions/upload-artifact@v7
-      with:
-        name: test-report-macos
-        path: test-report-macos
-
-  test-linux:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
-
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v6
-      with:
-        fetch-depth: 0 # get all history.
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Generate GitStats Report
-      env:
-        FONTCONFIG_FILE: /dev/null
-      run: |
-        pip install nox
-        nox -s build
