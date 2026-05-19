@@ -4,12 +4,11 @@
 # GPLv2 / GPLv3
 import argparse
 import datetime
+import json
 import os
-import pickle
 import re
 import sys
 import time
-import zlib
 from multiprocessing import Pool
 from typing import Any
 
@@ -143,14 +142,13 @@ class DataCollector:
         if not os.path.exists(cachefile):
             return
         print("Loading cache...")
-        f = open(cachefile, "rb")
         try:
-            self.cache = pickle.loads(zlib.decompress(f.read()))
-        except (zlib.error, pickle.UnpicklingError):  # Specific exceptions
-            # temporary hack to upgrade non-compressed caches
-            f.seek(0)
-            self.cache = pickle.load(f)
-        f.close()
+            with open(cachefile, encoding="utf-8") as f:
+                self.cache = json.load(f)
+        except (json.JSONDecodeError, ValueError):
+            # Corrupted or legacy pickle cache - start fresh
+            print("Warning: cache is corrupted, starting fresh")
+            self.cache = {}
 
     def get_stamp_created(self):
         return self.stamp_created
@@ -159,11 +157,8 @@ class DataCollector:
     def save_cache(self, cachefile):
         print("Saving cache...")
         tempfile = cachefile + ".tmp"
-        f = open(tempfile, "wb")
-        # pickle.dump(self.cache, f)
-        data = zlib.compress(pickle.dumps(self.cache))
-        f.write(data)
-        f.close()
+        with open(tempfile, "w", encoding="utf-8") as f:
+            json.dump(self.cache, f)
         try:
             os.remove(cachefile)
         except OSError:
