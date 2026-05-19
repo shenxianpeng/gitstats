@@ -4,6 +4,7 @@
 # GPLv2 / GPLv3
 import os
 import re
+import shlex
 import subprocess
 import sys
 import time
@@ -36,47 +37,59 @@ def get_git_version():
     return get_pipe_output(["git --version"]).split("\n")[0]
 
 
-def get_pipe_output(cmds, quiet=False):
+def _run_command(cmd: str) -> bytes:
+    """Run a single command safely without shell=True."""
+    args = shlex.split(cmd)
+    result = subprocess.run(args, capture_output=True, text=False, check=False)
+    return result.stdout
+
+
+def _run_pipe_chain(cmds: list[str]) -> bytes:
+    """Run a chain of piped commands safely without shell=True."""
+    if not cmds:
+        return b""
+
+    args = shlex.split(cmds[0])
+    p = subprocess.Popen(args, stdout=subprocess.PIPE)
+    processes = [p]
+
+    for cmd in cmds[1:]:
+        args = shlex.split(cmd)
+        p = subprocess.Popen(args, stdin=p.stdout, stdout=subprocess.PIPE)
+        processes.append(p)
+
+    output, _ = p.communicate()
+    for proc in processes:
+        proc.wait()
+    return output
+
+
+def get_pipe_output(cmds: list[str], quiet: bool = False) -> str:
     global exectime_external
     start = time.time()
     if not quiet and ON_LINUX and os.isatty(1):
         print(">> " + " | ".join(cmds), end=" ")
         sys.stdout.flush()
 
-    # Handle cross-platform cases
+    # Handle cross-platform cases with Python equivalents (no shell pipes)
     if len(cmds) == 2 and cmds[1] == "wc -l":
-        # Handle line counting cross-platform
-        p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
-        output = p.communicate()[0]
-        p.wait()
+        output = _run_command(cmds[0])
         try:
             text = output.decode("utf-8", errors="replace").rstrip("\n")
         except UnicodeDecodeError:
-            # Fallback for binary files
             text = output.decode("latin-1", errors="replace").rstrip("\n")
         line_count = count_lines_in_text(text)
         result = str(line_count)
     elif len(cmds) == 2 and cmds[1].startswith("grep -v"):
-        # Handle grep -v cross-platform
         pattern = cmds[1].split("grep -v ")[1]
-        p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
-        output = p.communicate()[0]
-        p.wait()
+        output = _run_command(cmds[0])
         try:
             text = output.decode("utf-8", errors="replace").rstrip("\n")
         except UnicodeDecodeError:
             text = output.decode("latin-1", errors="replace").rstrip("\n")
         result = filter_lines_by_pattern(text, pattern)
     else:
-        # Standard pipe behavior for other cases
-        p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
-        processes = [p]
-        for x in cmds[1:]:
-            p = subprocess.Popen(x, stdin=p.stdout, stdout=subprocess.PIPE, shell=True)
-            processes.append(p)
-        output = p.communicate()[0]
-        for p in processes:
-            p.wait()
+        output = _run_pipe_chain(cmds)
         try:
             result = output.decode("utf-8", errors="replace").rstrip("\n")
         except UnicodeDecodeError:
