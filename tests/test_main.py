@@ -1,7 +1,6 @@
 """Tests for gitstats.main – DataCollector, parameter parsing, and integration with real git repos."""
 
 import os
-import pickle
 from unittest.mock import patch
 
 import pytest
@@ -65,18 +64,12 @@ class TestDataCollector:
 
     def test_load_cache_empty(self, temp_dir):
         cachefile = os.path.join(temp_dir, "empty.cache")
-        with open(cachefile, "wb") as f:
-            f.write(b"not a pickle at all")
+        with open(cachefile, "w") as f:
+            f.write("not valid json")
 
         dc = DataCollector()
-        # Known: load_cache has a double-failure issue where the fallback
-        # pickle.load in the except block is not guarded.
-        # This test verifies this edge case doesn't silently corrupt data.
-        try:
-            dc.load_cache(cachefile)
-        except (pickle.UnpicklingError, pickle.PickleError):
-            pass  # expected: fallback also fails
-        # Cache should remain empty
+        # JSON cache gracefully handles corrupted files
+        dc.load_cache(cachefile)
         assert dc.cache == {}
 
     def test_get_stamp_created(self):

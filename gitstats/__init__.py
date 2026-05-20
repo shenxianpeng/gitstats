@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import platform
 import time
+from typing import Any
 
 exectime_internal: float = 0.0
 exectime_external: float = 0.0
@@ -12,7 +13,7 @@ time_start: float = time.time()
 ON_LINUX: bool = platform.system() == "Linux"
 WEEKDAYS: tuple[str, ...] = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
-DEFAULT_CONFIG = {
+DEFAULT_CONFIG: dict[str, Any] = {
     "max_domains": 10,  # Maximum number of domains to display in "Domains by Commits".
     "max_ext_length": 10,  # Maximum length of file extensions shown in statistics.
     "style": "gitstats.css",  # CSS stylesheet for the generated report.
@@ -40,7 +41,7 @@ DEFAULT_CONFIG = {
 }
 
 
-_config: dict[str, int | str | bool] | None = None
+_config: dict[str, Any] | None = None
 
 
 # Internationalization translations for AI Insights page
@@ -174,7 +175,7 @@ def get_i18n_text(key: str, language: str = "en") -> str:
     return translations.get(key, AI_INSIGHTS_I18N["en"].get(key, key))
 
 
-def load_config(file_path: str = "gitstats.conf") -> dict[str, int | str | bool]:
+def load_config(file_path: str = "gitstats.conf") -> dict[str, Any]:
     """Load configuration from a file, or fall back to defaults."""
     import configparser
     import os

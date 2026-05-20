@@ -9,6 +9,7 @@ import math
 import os
 import shutil
 import time
+from typing import Any
 
 from gitstats import WEEKDAYS, get_i18n_text, load_config
 from gitstats.utils import (
@@ -153,7 +154,7 @@ class HTMLReportCreator(ReportCreator):
         # generate years to show (previous N years from now)
         now = datetime.datetime.now()
         deltayear = datetime.timedelta(365)
-        years = []
+        years: list[str] = []
         stampcur = now
         for i in range(0, YEARS):
             years.insert(0, stampcur.strftime("%Y"))
@@ -179,7 +180,7 @@ class HTMLReportCreator(ReportCreator):
         # generate weeks to show (previous N weeks from now)
         now = datetime.datetime.now()
         deltaweek = datetime.timedelta(7)
-        weeks = []
+        weeks: list[str] = []
         stampcur = now
         for i in range(0, WEEKS):
             weeks.insert(0, stampcur.strftime("%Y-%W"))

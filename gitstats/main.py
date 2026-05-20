@@ -4,12 +4,11 @@
 # GPLv2 / GPLv3
 import argparse
 import datetime
+import json
 import os
-import pickle
 import re
 import sys
 import time
-import zlib
 from multiprocessing import Pool
 from typing import Any
 
@@ -62,68 +61,69 @@ class DataCollector:
     """Manages data collection from a revision control repository."""
 
     def __init__(self) -> None:
-        self.stamp_created = time.time()
-        self.cache = {}
-        self.total_authors = 0
-        self.activity_by_hour_of_day = {}  # hour -> commits
-        self.activity_by_day_of_week = {}  # day -> commits
-        self.activity_by_month_of_year = {}  # month [1-12] -> commits
-        self.activity_by_hour_of_week = {}  # weekday -> hour -> commits
-        self.activity_by_hour_of_day_busiest = 0
-        self.activity_by_hour_of_week_busiest = 0
-        self.activity_by_year_week = {}  # yy_wNN -> commits
-        self.activity_by_year_week_peak = 0
+        self.stamp_created: float = time.time()
+        self.cache: dict[str, Any] = {}
+        self.total_authors: int = 0
+        self.activity_by_hour_of_day: dict[int, int] = {}  # hour -> commits
+        self.activity_by_day_of_week: dict[int, int] = {}  # day -> commits
+        self.activity_by_month_of_year: dict[int, int] = {}  # month [1-12] -> commits
+        self.activity_by_hour_of_week: dict[int, dict[int, int]] = {}  # weekday -> hour -> commits
+        self.activity_by_hour_of_day_busiest: int = 0
+        self.activity_by_hour_of_week_busiest: int = 0
+        self.activity_by_year_week: dict[str, int] = {}  # yy_wNN -> commits
+        self.activity_by_year_week_peak: int = 0
 
-        self.authors = {}  # name -> {commits, first_commit_stamp, last_commit_stamp, last_active_day, active_days, lines_added, lines_removed}
+        self.authors: dict[str, dict[str, Any]] = {}  # name -> author stats
 
-        self.total_commits = 0
-        self.total_files = 0
-        self.authors_by_commits = 0
+        self.total_commits: int = 0
+        self.total_files: int = 0
+        self.authors_by_commits: list[str] = []
 
         # domains
-        self.domains = {}  # domain -> commits
+        self.domains: dict[str, dict[str, int]] = {}  # domain -> commits
 
         # author of the month
-        self.author_of_month = {}  # month -> author -> commits
-        self.author_of_year = {}  # year -> author -> commits
-        self.commits_by_month = {}  # month -> commits
-        self.commits_by_year = {}  # year -> commits
-        self.lines_added_by_month = {}  # month -> lines added
-        self.lines_added_by_year = {}  # year -> lines added
-        self.lines_removed_by_month = {}  # month -> lines removed
-        self.lines_removed_by_year = {}  # year -> lines removed
-        self.first_commit_stamp = 0
-        self.last_commit_stamp = 0
-        self.last_active_day = None
-        self.active_days = set()
+        self.author_of_month: dict[str, dict[str, int]] = {}  # month -> author -> commits
+        self.author_of_year: dict[int, dict[str, int]] = {}  # year -> author -> commits
+        self.commits_by_month: dict[str, int] = {}  # month -> commits
+        self.commits_by_year: dict[int, int] = {}  # year -> commits
+        self.lines_added_by_month: dict[str, int] = {}  # month -> lines added
+        self.lines_added_by_year: dict[int, int] = {}  # year -> lines added
+        self.lines_removed_by_month: dict[str, int] = {}  # month -> lines removed
+        self.lines_removed_by_year: dict[int, int] = {}  # year -> lines removed
+        self.first_commit_stamp: int = 0
+        self.last_commit_stamp: int = 0
+        self.last_active_day: str | None = None
+        self.active_days: set[str] = set()
 
         # lines
-        self.total_lines = 0
-        self.total_lines_added = 0
-        self.total_lines_removed = 0
+        self.total_lines: int = 0
+        self.total_lines_added: int = 0
+        self.total_lines_removed: int = 0
 
         # size
-        self.total_size = 0
+        self.total_size: int = 0
 
         # timezone
-        self.commits_by_timezone = {}  # timezone -> commits
+        self.commits_by_timezone: dict[str, int] = {}  # timezone -> commits
 
         # tags
-        self.tags = {}
+        self.tags: dict[str, dict[str, Any]] = {}
 
-        self.files_by_stamp = {}  # stamp -> files
+        self.files_by_stamp: dict[int, int] = {}  # stamp -> files
 
         # extensions
-        self.extensions = {}  # extension -> files, lines
+        self.extensions: dict[str, dict[str, int]] = {}  # extension -> files, lines
 
         # line statistics
-        self.changes_by_date = {}  # stamp -> { files, ins, del }
+        self.changes_by_date: dict[int, dict[str, int]] = {}  # stamp -> { files, ins, del }
+        self.changes_by_date_by_author: dict[int, dict[str, dict[str, int]]] = {}
 
         # file churn: number of commits that touched each file path
-        self.file_churn = {}  # filepath -> commit count
+        self.file_churn: dict[str, int] = {}  # filepath -> commit count
 
         # new contributors per month
-        self.new_contributors_by_month = {}  # YYYY-MM -> count
+        self.new_contributors_by_month: dict[str, int] = {}  # YYYY-MM -> count
 
         # AI summaries
         self.ai_summaries: dict[str, dict[str, Any]] = {}  # page_type -> {summary, error}
@@ -143,14 +143,13 @@ class DataCollector:
         if not os.path.exists(cachefile):
             return
         print("Loading cache...")
-        f = open(cachefile, "rb")
         try:
-            self.cache = pickle.loads(zlib.decompress(f.read()))
-        except (zlib.error, pickle.UnpicklingError):  # Specific exceptions
-            # temporary hack to upgrade non-compressed caches
-            f.seek(0)
-            self.cache = pickle.load(f)
-        f.close()
+            with open(cachefile, encoding="utf-8") as f:
+                self.cache = json.load(f)
+        except (json.JSONDecodeError, ValueError):
+            # Corrupted or legacy pickle cache - start fresh
+            print("Warning: cache is corrupted, starting fresh")
+            self.cache = {}
 
     def get_stamp_created(self) -> float:
         return self.stamp_created
@@ -159,11 +158,8 @@ class DataCollector:
     def save_cache(self, cachefile: str) -> None:
         print("Saving cache...")
         tempfile = cachefile + ".tmp"
-        f = open(tempfile, "wb")
-        # pickle.dump(self.cache, f)
-        data = zlib.compress(pickle.dumps(self.cache))
-        f.write(data)
-        f.close()
+        with open(tempfile, "w", encoding="utf-8") as f:
+            json.dump(self.cache, f)
         try:
             os.remove(cachefile)
         except OSError:
@@ -239,9 +235,9 @@ class GitDataCollector(DataCollector):
                 if len(parts) < 3:
                     continue
                 commits = int(parts[1])
-                author = parts[2]
+                tag_author = parts[2]
                 self.tags[tag]["commits"] += commits
-                self.tags[tag]["authors"][author] = commits
+                self.tags[tag]["authors"][tag_author] = commits
 
         # Collect revision statistics
         # Outputs "<stamp> <date> <time> <timezone> <author> '<' <mail> '>'"
@@ -414,12 +410,12 @@ class GitDataCollector(DataCollector):
 
         # Merge aliases in time-based author dicts
         for period_dict in (self.author_of_month, self.author_of_year):
-            for period in period_dict:
+            for author_counts in period_dict.values():
                 for alias, canonical in name_to_canonical.items():
-                    if alias in period_dict[period]:
-                        period_dict[period][canonical] = period_dict[period].get(
+                    if alias in author_counts:
+                        author_counts[canonical] = author_counts.get(
                             canonical, 0
-                        ) + period_dict[period].pop(alias)
+                        ) + author_counts.pop(alias)
 
         # Merge aliases in tag author dicts
         for tag in self.tags:
@@ -475,9 +471,9 @@ class GitDataCollector(DataCollector):
             parts = line.split(" ")
             if len(parts) != 2:
                 continue
-            (stamp, files) = parts[0:2]
+            (stamp_text, files_text) = parts[0:2]
             try:
-                self.files_by_stamp[int(stamp)] = int(files)
+                self.files_by_stamp[int(stamp_text)] = int(files_text)
             except ValueError:
                 print(f'Warning: failed to parse line "{line}"')
 
@@ -557,7 +553,6 @@ class GitDataCollector(DataCollector):
         inserted = 0
         deleted = 0
         total_lines = 0
-        author = None
         for line in lines:
             if len(line) == 0:
                 continue
@@ -567,7 +562,7 @@ class GitDataCollector(DataCollector):
                 pos = line.find(" ")
                 if pos != -1:
                     try:
-                        (stamp, author) = (int(line[:pos]), line[pos + 1 :])
+                        stamp = int(line[:pos])
                         self.changes_by_date[stamp] = {
                             "files": files,
                             "ins": inserted,
@@ -632,7 +627,7 @@ class GitDataCollector(DataCollector):
         files = 0
         inserted = 0
         deleted = 0
-        author = None
+        author = ""
         stamp = 0
         for line in lines:
             if len(line) == 0:
