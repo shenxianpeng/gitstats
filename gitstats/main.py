@@ -168,7 +168,7 @@ class DataCollector:
 
 
 class GitDataCollector(DataCollector):
-    def collect(self, repo_dir: str) -> None:
+    def collect(self, repo_dir):
         DataCollector.collect(self, repo_dir)
 
         self.total_authors += int(
@@ -235,9 +235,9 @@ class GitDataCollector(DataCollector):
                 if len(parts) < 3:
                     continue
                 commits = int(parts[1])
-                tag_author = parts[2]
+                author = parts[2]
                 self.tags[tag]["commits"] += commits
-                self.tags[tag]["authors"][tag_author] = commits
+                self.tags[tag]["authors"][author] = commits
 
         # Collect revision statistics
         # Outputs "<stamp> <date> <time> <timezone> <author> '<' <mail> '>'"
@@ -410,12 +410,12 @@ class GitDataCollector(DataCollector):
 
         # Merge aliases in time-based author dicts
         for period_dict in (self.author_of_month, self.author_of_year):
-            for author_counts in period_dict.values():
+            for period in period_dict:
                 for alias, canonical in name_to_canonical.items():
-                    if alias in author_counts:
-                        author_counts[canonical] = author_counts.get(
+                    if alias in period_dict[period]:
+                        period_dict[period][canonical] = period_dict[period].get(
                             canonical, 0
-                        ) + author_counts.pop(alias)
+                        ) + period_dict[period].pop(alias)
 
         # Merge aliases in tag author dicts
         for tag in self.tags:
@@ -471,9 +471,9 @@ class GitDataCollector(DataCollector):
             parts = line.split(" ")
             if len(parts) != 2:
                 continue
-            (stamp_text, files_text) = parts[0:2]
+            (stamp, files) = parts[0:2]
             try:
-                self.files_by_stamp[int(stamp_text)] = int(files_text)
+                self.files_by_stamp[int(stamp)] = int(files)
             except ValueError:
                 print(f'Warning: failed to parse line "{line}"')
 
@@ -553,6 +553,7 @@ class GitDataCollector(DataCollector):
         inserted = 0
         deleted = 0
         total_lines = 0
+        author = None
         for line in lines:
             if len(line) == 0:
                 continue
@@ -562,7 +563,7 @@ class GitDataCollector(DataCollector):
                 pos = line.find(" ")
                 if pos != -1:
                     try:
-                        stamp = int(line[:pos])
+                        (stamp, author) = (int(line[:pos]), line[pos + 1 :])
                         self.changes_by_date[stamp] = {
                             "files": files,
                             "ins": inserted,
@@ -627,7 +628,7 @@ class GitDataCollector(DataCollector):
         files = 0
         inserted = 0
         deleted = 0
-        author = ""
+        author = None
         stamp = 0
         for line in lines:
             if len(line) == 0:

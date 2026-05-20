@@ -128,7 +128,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body>\n</html>")
         f.close()
 
-    def create_activity_html(self, data: Any, path: str) -> None:
+    def create_activity_html(self, data, path):
         ###
         # Activity
         f = open(path + "/activity.html", "w", encoding="utf-8")
@@ -154,7 +154,7 @@ class HTMLReportCreator(ReportCreator):
         # generate years to show (previous N years from now)
         now = datetime.datetime.now()
         deltayear = datetime.timedelta(365)
-        years: list[str] = []
+        years = []
         stampcur = now
         for i in range(0, YEARS):
             years.insert(0, stampcur.strftime("%Y"))
@@ -180,7 +180,7 @@ class HTMLReportCreator(ReportCreator):
         # generate weeks to show (previous N weeks from now)
         now = datetime.datetime.now()
         deltaweek = datetime.timedelta(7)
-        weeks: list[str] = []
+        weeks = []
         stampcur = now
         for i in range(0, WEEKS):
             weeks.insert(0, stampcur.strftime("%Y-%W"))
@@ -1131,4 +1131,4 @@ def get_keys_sorted_by_values(d: dict[str, int]) -> list[str]:
 
 # dict['author'] = { 'commits': 512 } - ...key(dict, 'commits')
 def get_keys_sorted_by_value_key(d: dict[str, dict[str, Any]], key: str) -> list[str]:
-    return [el[1] for el in sorted([(d[el][key], el) for el in list(d.keys())])]
+    return [el[1] for el in sorted([(d[el][key], el) for el in d.keys()])]
