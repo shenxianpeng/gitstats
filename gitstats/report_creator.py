@@ -9,6 +9,7 @@ import math
 import os
 import shutil
 import time
+from typing import Any
 
 from gitstats import WEEKDAYS, get_i18n_text, load_config
 from gitstats.utils import (
@@ -48,7 +49,7 @@ class HTMLReportCreator(ReportCreator):
     def _heat_td_class(cls, value, max_value):
         return f"heat heat{cls._heat_level(value, max_value)}"
 
-    def create(self, data, path):
+    def create(self, data: Any, path: str) -> None:
         ReportCreator.create(self, data, path)
         self.title = data.project_name
 
@@ -77,7 +78,7 @@ class HTMLReportCreator(ReportCreator):
         if hasattr(data, "ai_summaries") and data.ai_summaries:
             self.create_ai_insights_html(data, path)
 
-    def create_index_html(self, data, path):
+    def create_index_html(self, data: Any, path: str) -> None:
         f = open(path + "/index.html", "w", encoding="utf-8")
         format = "%Y-%m-%d %H:%M:%S"
         self.print_header(f)
@@ -435,7 +436,7 @@ class HTMLReportCreator(ReportCreator):
         cba_datasets = [{"label": a, "data": per_author_commits[a]} for a in authors_to_plot]
         return time_labels, loc_datasets, cba_datasets
 
-    def create_authors_html(self, data, path):
+    def create_authors_html(self, data: Any, path: str) -> None:
         ###
         # Authors
         f = open(path + "/authors.html", "w", encoding="utf-8")
@@ -632,7 +633,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-    def create_files_html(self, data, path):
+    def create_files_html(self, data: Any, path: str) -> None:
         ###
         # Files
         f = open(path + "/files.html", "w", encoding="utf-8")
@@ -745,7 +746,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-    def create_lines_html(self, data, path):
+    def create_lines_html(self, data: Any, path: str) -> None:
         ###
         # Lines
         f = open(path + "/lines.html", "w", encoding="utf-8")
@@ -775,7 +776,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-    def create_tags_html(self, data, path):
+    def create_tags_html(self, data: Any, path: str) -> None:
         ###
         # tags.html
         f = open(path + "/tags.html", "w", encoding="utf-8")
@@ -818,7 +819,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-    def create_ai_insights_html(self, data, path):
+    def create_ai_insights_html(self, data: Any, path: str) -> None:
         """
         Create a dedicated AI Insights page with all AI-generated summaries.
         """
@@ -974,7 +975,7 @@ class HTMLReportCreator(ReportCreator):
 </script>
 """
 
-    def print_header(self, file) -> None:
+    def print_header(self, file: Any) -> None:
         """
         Write the HTML document header and opening body tag into the provided writable file.
 
@@ -1024,7 +1025,7 @@ class HTMLReportCreator(ReportCreator):
 """.format(self.title, load_config()["style"], get_version)
         )
 
-    def print_nav(self, file) -> None:
+    def print_nav(self, file: Any) -> None:
         """
         Write the navigation bar HTML (page links and a client-side theme-toggle button) to the given writable file-like object.
 
@@ -1070,7 +1071,7 @@ class HTMLReportCreator(ReportCreator):
             """
         )
 
-    def get_ai_summary_html(self, page_type):
+    def get_ai_summary_html(self, page_type: str) -> str:
         """
         Generate HTML for AI-powered summary section.
 
@@ -1109,7 +1110,7 @@ class HTMLReportCreator(ReportCreator):
         """
 
 
-def html_header(level, text):
+def html_header(level: int, text: str) -> str:
     name = html_linkify(text)
     return '\n<h%d id="%s"><a href="#%s">%s</a></h%d>\n\n' % (
         level,
@@ -1120,14 +1121,14 @@ def html_header(level, text):
     )
 
 
-def html_linkify(text):
+def html_linkify(text: str) -> str:
     return text.lower().replace(" ", "_")
 
 
-def get_keys_sorted_by_values(dict):
-    return [el[1] for el in sorted([(el[1], el[0]) for el in list(dict.items())])]
+def get_keys_sorted_by_values(d: dict[str, int]) -> list[str]:
+    return [el[1] for el in sorted([(el[1], el[0]) for el in list(d.items())])]
 
 
 # dict['author'] = { 'commits': 512 } - ...key(dict, 'commits')
-def get_keys_sorted_by_value_key(d, key):
-    return [el[1] for el in sorted([(d[el][key], el) for el in list(d.keys())])]
+def get_keys_sorted_by_value_key(d: dict[str, dict[str, Any]], key: str) -> list[str]:
+    return [el[1] for el in sorted([(d[el][key], el) for el in d.keys()])]

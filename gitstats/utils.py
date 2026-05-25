@@ -13,14 +13,14 @@ from importlib.metadata import version
 from gitstats import ON_LINUX, exectime_external, load_config
 
 
-def count_lines_in_text(text):
+def count_lines_in_text(text: str | None) -> int:
     """Cross-platform function to count lines in text"""
     if not text or not text.strip():
         return 0
     return len(text.strip().split("\n"))
 
 
-def filter_lines_by_pattern(text, pattern):
+def filter_lines_by_pattern(text: str | None, pattern: str) -> str:
     """Filter out lines matching a pattern (cross-platform grep -v replacement)"""
     if not text or not text.strip():
         return ""
@@ -29,11 +29,11 @@ def filter_lines_by_pattern(text, pattern):
     return "\n".join(filtered_lines)
 
 
-def get_version():
+def get_version() -> str:
     return version("gitstats")
 
 
-def get_git_version():
+def get_git_version() -> str:
     return get_pipe_output(["git --version"]).split("\n")[0]
 
 
@@ -104,7 +104,7 @@ def get_pipe_output(cmds: list[str], quiet: bool = False) -> str:
     return result
 
 
-def get_commit_range(defaultrange="HEAD", end_only=False):
+def get_commit_range(defaultrange: str = "HEAD", end_only: bool = False) -> str:
     if len(load_config()["commit_end"]) > 0:
         commit_begin = load_config()["commit_begin"]
 
@@ -123,7 +123,7 @@ def get_commit_range(defaultrange="HEAD", end_only=False):
     return defaultrange
 
 
-def get_excluded_extensions():
+def get_excluded_extensions() -> set[str]:
     """
     Get the set of excluded file extensions from config.
     Returns a set of lowercase extensions.
@@ -134,7 +134,7 @@ def get_excluded_extensions():
     return {ext.strip().lower() for ext in exclude_ext_str.split(",") if ext.strip()}
 
 
-def should_exclude_file(ext):
+def should_exclude_file(ext: str) -> bool:
     """
     Check if a file should be excluded from line counting based on extension.
     Returns True if the file extension is in the exclude_exts configuration.
@@ -151,7 +151,7 @@ def should_exclude_file(ext):
     return ext.lower() in excluded_extensions
 
 
-def get_num_of_lines_in_blob(ext_blob):
+def get_num_of_lines_in_blob(ext_blob: tuple[str, str]) -> tuple[str, str, int]:
     """
     Get number of lines in blob.
     Returns 0 for binary files (detected by null bytes).
@@ -181,7 +181,7 @@ def get_num_of_lines_in_blob(ext_blob):
     )
 
 
-def get_num_of_files_from_rev(time_rev):
+def get_num_of_files_from_rev(time_rev: tuple[str, str]) -> tuple[int, str, int]:
     """
     Get number of files changed in commit
     """
@@ -193,7 +193,7 @@ def get_num_of_files_from_rev(time_rev):
     )
 
 
-def get_stat_summary_counts(line):
+def get_stat_summary_counts(line: str) -> list[str | int]:
     numbers = re.findall(r"\d+", line)
     if len(numbers) == 1:
         # neither insertions nor deletions: may probably only happen for "0 files changed"
@@ -208,7 +208,7 @@ def get_stat_summary_counts(line):
     return numbers
 
 
-def get_log_range(defaultrange="HEAD", end_only=True):
+def get_log_range(defaultrange: str = "HEAD", end_only: bool = True) -> str:
     commit_range = get_commit_range(defaultrange, end_only)
     # Build git log options
     options = []
