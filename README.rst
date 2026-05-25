@@ -59,6 +59,13 @@ Installation
 
    pip install gitstats
 
+Or, using `uv <https://docs.astral.sh/uv/>`_ (recommended):
+
+.. code-block:: bash
+
+   uv pip install gitstats      # install into current environment
+   uvx gitstats . report        # run instantly, no install required
+
 
 gitstats is compatible with Python 3.10 and newer.
 
