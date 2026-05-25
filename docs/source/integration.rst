@@ -6,7 +6,7 @@ Use gitstats integration with CI/CD tools.
 Use gitstats in GitHub Actions
 ------------------------------
 
-If you want to use gitstats with CI like GitHub Actions or Jenkins to generate reports and deploy them, please the following examples.
+If you want to use gitstats with CI like GitHub Actions, GitLab CI, or Jenkins to generate reports and deploy them, see the following examples.
 
 Use gitstats in GitHub Actions to generate reports and deploy them to GitHub Pages.
 
@@ -45,6 +45,45 @@ Use gitstats in GitHub Actions to generate reports and deploy them to GitHub Pag
             github_token: ${{ secrets.GITHUB_TOKEN }}
             publish_dir: gitstats-report
 
+
+Use gitstats in GitLab CI
+-------------------------
+
+Use gitstats in GitLab CI to generate reports and publish them to GitLab Pages.
+
+.. code-block:: yaml
+
+    gitstats-report:
+      image: python:3.12
+      stage: report
+      rules:
+        - if: $CI_PIPELINE_SOURCE == "schedule"
+        - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        GIT_DEPTH: 0          # fetch all history
+      before_script:
+        - pip install gitstats
+      script:
+        - gitstats . public   # output to public/ for GitLab Pages
+      artifacts:
+        paths:
+          - public
+        expire_in: 30 days
+      # Optional: deploy to GitLab Pages
+      # GitLab Pages requires a 'pages' job with artifacts in public/
+
+    # Uncomment the job below to publish to GitLab Pages automatically.
+    # pages:
+    #   stage: deploy
+    #   needs: [gitstats-report]
+    #   script:
+    #     - mv public/index.html public/index.html  # artifact is already in public/
+    #   artifacts:
+    #     paths:
+    #       - public
+
+Schedule a weekly run via **Build → Pipeline schedules** in your GitLab project
+(e.g., ``0 0 * * 0`` for every Sunday at 00:00).
 
 Use gitstats in Jenkins
 -----------------------
