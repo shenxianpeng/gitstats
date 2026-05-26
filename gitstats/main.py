@@ -34,6 +34,21 @@ logger = logging.getLogger("gitstats")
 conf = load_config()
 
 
+def configure_logging(verbose: bool = False, quiet: bool = False) -> None:
+    level = logging.INFO
+    if verbose:
+        level = logging.DEBUG
+    elif quiet:
+        level = logging.WARNING
+
+    logging.basicConfig(
+        level=level,
+        format="%(message)s",
+        stream=sys.stderr,
+        force=True,
+    )
+
+
 def parallel_map_with_fallback(func, items):
     """Apply a function to items using multiprocessing, with sequential fallback.
 
@@ -915,6 +930,18 @@ def get_parser() -> argparse.ArgumentParser:
         help="Generate additional output format",
     )
 
+    logging_group = parser.add_mutually_exclusive_group()
+    logging_group.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Enable debug logging",
+    )
+    logging_group.add_argument(
+        "--quiet",
+        action="store_true",
+        help="Only show warnings and errors",
+    )
+
     # AI-powered features
     parser.add_argument(
         "--ai",
@@ -949,14 +976,10 @@ def get_parser() -> argparse.ArgumentParser:
 
 
 def main() -> int:
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(message)s",
-        stream=sys.stdout,
-    )
-
     parser = get_parser()
     args = parser.parse_args()
+    configure_logging(verbose=args.verbose, quiet=args.quiet)
+
     gitpath = args.gitpath
     outputpath = os.path.abspath(args.outputpath)
     extra_fmt = args.format
