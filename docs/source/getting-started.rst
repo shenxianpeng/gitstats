@@ -89,19 +89,22 @@ Basic Syntax
 - ``-v, --version`` - Show program version number
 - ``-c key=value, --config key=value`` - Override configuration values (can be used multiple times)
 - ``-f {json}, --format {json}`` - Generate additional output format
+- ``--verbose`` - Enable debug logging, including command-level details
+- ``--quiet`` - Only show warnings and errors
 
 Full Help Output
 ~~~~~~~~~~~~~~~~
 
 .. code-block:: text
 
-    usage: gitstats [-h] [-v] [-c key=value] [-f {json}] <gitpath> <outputpath>
+    usage: gitstats [-h] [-v] [-c key=value] [-f {json}] [--verbose | --quiet]
+                    <gitpath> [<gitpath> ...] <outputpath>
 
     Generate statistics for a Git repository.
 
     positional arguments:
-      <gitpath>             Path(s) to the Git repository.
-      <outputpath>          Path to the directory where the output will be stored.
+      <gitpath>             Path(s) to the Git repository
+      <outputpath>          Path to the directory where the output will be stored
 
     options:
       -h, --help            show this help message and exit
@@ -111,6 +114,8 @@ Full Help Output
                             times. See configuration documentation for available options.
       -f {json}, --format {json}
                             Generate additional output format.
+      --verbose             Enable debug logging
+      --quiet               Only show warnings and errors
 
 Examples
 --------
@@ -132,6 +137,18 @@ Generate report with JSON output:
 .. code-block:: bash
 
     gitstats . report --format json
+
+Show command-level debug logs:
+
+.. code-block:: bash
+
+    gitstats --verbose . report
+
+Show only warnings and errors:
+
+.. code-block:: bash
+
+    gitstats --quiet . report
 
 Override configuration values:
 

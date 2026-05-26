@@ -77,6 +77,13 @@ Usage
 
    gitstats <gitpath> <outputpath>
 
+Use ``--verbose`` to show debug-level command logs, or ``--quiet`` to show only warnings and errors:
+
+.. code-block:: bash
+
+   gitstats --verbose . report
+   gitstats --quiet . report
+
 
 Run ``gitstats --help`` for more options, or check the `documentation <https://gitstats.readthedocs.io/en/latest/getting-started.html>`_.
 

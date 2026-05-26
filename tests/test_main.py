@@ -437,6 +437,8 @@ class TestCLI:
         assert args.gitpath == ["some-repo"]
         assert args.outputpath == "out-dir"
         assert args.format is None
+        assert args.verbose is False
+        assert args.quiet is False
         assert args.ai is None
         assert args.refresh_ai is False
 
@@ -487,6 +489,23 @@ class TestCLI:
             ]
         )
         assert args.config == ["max_authors=5", "processes=2"]
+
+    def test_parser_verbose(self):
+        parser = get_parser()
+        args = parser.parse_args(["--verbose", "repo", "out"])
+        assert args.verbose is True
+        assert args.quiet is False
+
+    def test_parser_quiet(self):
+        parser = get_parser()
+        args = parser.parse_args(["--quiet", "repo", "out"])
+        assert args.quiet is True
+        assert args.verbose is False
+
+    def test_parser_verbose_quiet_are_mutually_exclusive(self):
+        parser = get_parser()
+        with pytest.raises(SystemExit):
+            parser.parse_args(["--verbose", "--quiet", "repo", "out"])
 
     def test_parser_version(self, capsys):
         parser = get_parser()
