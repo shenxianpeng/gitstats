@@ -185,16 +185,18 @@ class DataCollector:
 
 
 class GitDataCollector(DataCollector):
-    def collect(self, repo_dir):
+    def collect(self, repo_dir: str) -> None:
         DataCollector.collect(self, repo_dir)
 
-        self.total_authors += int(
-            get_pipe_output(["git shortlog -s {}".format(get_log_range("HEAD", False)), "wc -l"])
-        )
-        # self.total_lines = int(getoutput('git-ls-files -z |xargs -0 cat |wc -l'))
+        self._collect_tags()
+        email_to_latest, author_to_email = self._collect_commits()
+        name_to_canonical = self._resolve_author_aliases(email_to_latest, author_to_email)
+        self._collect_file_stats()
+        self._collect_line_stats()
+        self._collect_author_line_stats(name_to_canonical)
+        self._collect_file_churn()
 
-        # tags
-        # Only include tags that are reachable within the commit range
+    def _collect_tags(self) -> None:
         log_range = get_log_range("HEAD", False)
         tag_commits = get_pipe_output([f"git rev-list {log_range}"]).strip().split("\n")
         tag_commits_set = set(tag_commits) if tag_commits[0] else set()
@@ -256,8 +258,12 @@ class GitDataCollector(DataCollector):
                 self.tags[tag]["commits"] += commits
                 self.tags[tag]["authors"][author] = commits
 
-        # Collect revision statistics
-        # Outputs "<stamp> <date> <time> <timezone> <author> '<' <mail> '>'"
+    def _collect_commits(self) -> tuple[dict[str, tuple[int, str]], dict[str, str]]:
+        self.total_authors += int(
+            get_pipe_output(["git shortlog -s {}".format(get_log_range("HEAD", False)), "wc -l"])
+        )
+        # self.total_lines = int(getoutput('git-ls-files -z |xargs -0 cat |wc -l'))
+
         lines = get_pipe_output(
             [
                 'git rev-list --pretty=format:"%at %ai %aN <%aE>" {}'.format(
@@ -388,8 +394,13 @@ class GitDataCollector(DataCollector):
             # timezone
             self.commits_by_timezone[timezone] = self.commits_by_timezone.get(timezone, 0) + 1
 
-        # Build canonical name mapping: merge authors that share the same email
-        # (same person who committed with different name/email configurations)
+        return email_to_latest, author_to_email
+
+    def _resolve_author_aliases(
+        self,
+        email_to_latest: dict[str, tuple[int, str]],
+        author_to_email: dict[str, str],
+    ) -> dict[str, str]:
         email_to_canonical = {email: name for email, (_, name) in email_to_latest.items()}
         name_to_canonical: dict[str, str] = {}
         for name in self.authors.keys():
@@ -427,12 +438,12 @@ class GitDataCollector(DataCollector):
 
         # Merge aliases in time-based author dicts
         for period_dict in (self.author_of_month, self.author_of_year):
-            for period in period_dict:
+            for period_authors in period_dict.values():
                 for alias, canonical in name_to_canonical.items():
-                    if alias in period_dict[period]:
-                        period_dict[period][canonical] = period_dict[period].get(
+                    if alias in period_authors:
+                        period_authors[canonical] = period_authors.get(
                             canonical, 0
-                        ) + period_dict[period].pop(alias)
+                        ) + period_authors.pop(alias)
 
         # Merge aliases in tag author dicts
         for tag in self.tags:
@@ -445,7 +456,9 @@ class GitDataCollector(DataCollector):
         # Update total_authors to reflect merged identities
         self.total_authors = len(self.authors)
 
-        # outputs "<stamp> <files>" for each revision
+        return name_to_canonical
+
+    def _collect_file_stats(self) -> None:
         revlines = (
             get_pipe_output(
                 [
@@ -548,10 +561,7 @@ class GitDataCollector(DataCollector):
             self.cache["lines_in_blob"][blob_id] = linecount
             self.extensions[ext]["lines"] += self.cache["lines_in_blob"][blob_id]
 
-        # line statistics
-        # outputs:
-        #  N files changed, N insertions (+), N deletions(-)
-        # <stamp> <author>
+    def _collect_line_stats(self) -> None:
         self.changes_by_date = {}  # stamp -> { files, ins, del }
         # computation of lines of code by date is better done
         # on a linear history.
@@ -570,7 +580,6 @@ class GitDataCollector(DataCollector):
         inserted = 0
         deleted = 0
         total_lines = 0
-        author = None
         for line in lines:
             if len(line) == 0:
                 continue
@@ -580,7 +589,7 @@ class GitDataCollector(DataCollector):
                 pos = line.find(" ")
                 if pos != -1:
                     try:
-                        (stamp, author) = (int(line[:pos]), line[pos + 1 :])
+                        stamp = int(line[:pos])
                         self.changes_by_date[stamp] = {
                             "files": files,
                             "ins": inserted,
@@ -626,9 +635,7 @@ class GitDataCollector(DataCollector):
                 # self.changes_by_date[stamp] = { 'files': files, 'ins': inserted, 'del': deleted }
         self.total_lines += total_lines
 
-        # Per-author statistics
-
-        # defined for stamp, author only if author committed at this timestamp.
+    def _collect_author_line_stats(self, name_to_canonical: dict[str, str]) -> None:
         self.changes_by_date_by_author = {}  # stamp -> author -> lines_added
 
         # Similar to the above, but never use --first-parent
@@ -642,7 +649,6 @@ class GitDataCollector(DataCollector):
             ]
         ).split("\n")
         lines.reverse()
-        files = 0
         inserted = 0
         deleted = 0
         author = None
@@ -685,7 +691,7 @@ class GitDataCollector(DataCollector):
                         self.changes_by_date_by_author[stamp][author]["commits"] = self.authors[
                             author
                         ]["commits"]
-                        files, inserted, deleted = 0, 0, 0
+                        inserted, deleted = 0, 0
                     except ValueError:
                         logger.warning(f'Unexpected line "{line}"')
                 else:
@@ -694,12 +700,12 @@ class GitDataCollector(DataCollector):
                 numbers = get_stat_summary_counts(line)
 
                 if len(numbers) == 3:
-                    (files, inserted, deleted) = [int(el) for el in numbers]
+                    (_, inserted, deleted) = [int(el) for el in numbers]
                 else:
                     logger.warning(f'Failed to handle line "{line}"')
-                    (files, inserted, deleted) = (0, 0, 0)
+                    inserted, deleted = 0, 0
 
-        # File churn: count how many commits touched each file
+    def _collect_file_churn(self) -> None:
         churn_output = get_pipe_output(
             ['git log --format="" --name-only {}'.format(get_log_range("HEAD", False))]
         )
