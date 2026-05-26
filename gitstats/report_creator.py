@@ -9,6 +9,7 @@ import math
 import os
 import shutil
 import time
+from typing import Any
 
 from gitstats import WEEKDAYS, get_i18n_text, load_config
 from gitstats.utils import (
@@ -16,8 +17,6 @@ from gitstats.utils import (
     get_pipe_output,
     get_version,
 )
-
-conf = load_config()
 
 
 class ReportCreator:
@@ -50,14 +49,14 @@ class HTMLReportCreator(ReportCreator):
     def _heat_td_class(cls, value, max_value):
         return f"heat heat{cls._heat_level(value, max_value)}"
 
-    def create(self, data, path):
+    def create(self, data: Any, path: str) -> None:
         ReportCreator.create(self, data, path)
         self.title = data.project_name
 
         # copy static files to the report directory
         basedir = os.path.dirname(os.path.abspath(__file__))
         for file in (
-            conf["style"],
+            load_config()["style"],
             "sortable.js",
             "chart.umd.min.js",
             "arrow-up.gif",
@@ -79,7 +78,7 @@ class HTMLReportCreator(ReportCreator):
         if hasattr(data, "ai_summaries") and data.ai_summaries:
             self.create_ai_insights_html(data, path)
 
-    def create_index_html(self, data, path):
+    def create_index_html(self, data: Any, path: str) -> None:
         f = open(path + "/index.html", "w", encoding="utf-8")
         format = "%Y-%m-%d %H:%M:%S"
         self.print_header(f)
@@ -413,7 +412,7 @@ class HTMLReportCreator(ReportCreator):
 
     def _build_author_time_series(self, data):
         """Build per-author cumulative lines and commits time series for Chart.js."""
-        authors_to_plot = data.get_authors(conf["max_authors"])
+        authors_to_plot = data.get_authors(load_config()["max_authors"])
         lines_by_authors = {a: 0 for a in authors_to_plot}
         commits_by_authors = {a: 0 for a in authors_to_plot}
         time_labels = []
@@ -437,7 +436,7 @@ class HTMLReportCreator(ReportCreator):
         cba_datasets = [{"label": a, "data": per_author_commits[a]} for a in authors_to_plot]
         return time_labels, loc_datasets, cba_datasets
 
-    def create_authors_html(self, data, path):
+    def create_authors_html(self, data: Any, path: str) -> None:
         ###
         # Authors
         f = open(path + "/authors.html", "w", encoding="utf-8")
@@ -453,7 +452,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<tr><th>Author</th><th>Commits (%)</th><th>+ lines</th><th>- lines</th><th>First commit</th><th>Last commit</th><th class="unsortable">Age</th><th>Active days</th><th># by commits</th></tr>'
         )
-        for author in data.get_authors(conf["max_authors"]):
+        for author in data.get_authors(load_config()["max_authors"]):
             info = data.get_author_info(author)
             f.write(
                 "<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%d</td></tr>"
@@ -473,8 +472,8 @@ class HTMLReportCreator(ReportCreator):
         f.write("</table>")
 
         allauthors = data.get_authors()
-        if len(allauthors) > conf["max_authors"]:
-            rest = allauthors[conf["max_authors"] :]
+        if len(allauthors) > load_config()["max_authors"]:
+            rest = allauthors[load_config()["max_authors"] :]
             f.write(
                 '<p class="moreauthors">These didn\'t make it to the top: {}</p>'.format(
                     ", ".join(rest)
@@ -495,8 +494,11 @@ class HTMLReportCreator(ReportCreator):
                 x_ticks_rotate=True,
             )
         )
-        if len(allauthors) > conf["max_authors"]:
-            f.write('<p class="moreauthors">Only top %d authors shown</p>' % conf["max_authors"])
+        if len(allauthors) > load_config()["max_authors"]:
+            f.write(
+                '<p class="moreauthors">Only top %d authors shown</p>'
+                % load_config()["max_authors"]
+            )
 
         f.write(html_header(2, "Commits per Author"))
         f.write(
@@ -509,22 +511,25 @@ class HTMLReportCreator(ReportCreator):
                 x_ticks_rotate=True,
             )
         )
-        if len(allauthors) > conf["max_authors"]:
-            f.write('<p class="moreauthors">Only top %d authors shown</p>' % conf["max_authors"])
+        if len(allauthors) > load_config()["max_authors"]:
+            f.write(
+                '<p class="moreauthors">Only top %d authors shown</p>'
+                % load_config()["max_authors"]
+            )
 
         # Authors :: Author of Month
         f.write(html_header(2, "Author of Month"))
         f.write('<table class="sortable" id="aom">')
         f.write(
             '<tr><th>Month</th><th>Author</th><th>Commits (%%)</th><th class="unsortable">Next top %d</th><th>Number of authors</th></tr>'
-            % conf["authors_top"]
+            % load_config()["authors_top"]
         )
         for yymm in reversed(sorted(data.author_of_month.keys())):
             author_dict = data.author_of_month[yymm]
             authors = get_keys_sorted_by_values(author_dict)
             authors.reverse()
             commits = data.author_of_month[yymm][authors[0]]
-            authors_str = ", ".join(authors[1 : conf["authors_top"] + 1])
+            authors_str = ", ".join(authors[1 : load_config()["authors_top"] + 1])
             f.write(
                 "<tr><td>%s</td><td>%s</td><td>%d (%.2f%% of %d)</td><td>%s</td><td>%d</td></tr>"
                 % (
@@ -543,14 +548,14 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Author of Year"))
         f.write(
             '<table class="sortable" id="aoy"><tr><th>Year</th><th>Author</th><th>Commits (%%)</th><th class="unsortable">Next top %d</th><th>Number of authors</th></tr>'
-            % conf["authors_top"]
+            % load_config()["authors_top"]
         )
         for yy in reversed(sorted(data.author_of_year.keys())):
             author_dict = data.author_of_year[yy]
             authors = get_keys_sorted_by_values(author_dict)
             authors.reverse()
             commits = data.author_of_year[yy][authors[0]]
-            authors_str = ", ".join(authors[1 : conf["authors_top"] + 1])
+            authors_str = ", ".join(authors[1 : load_config()["authors_top"] + 1])
             f.write(
                 "<tr><td>%s</td><td>%s</td><td>%d (%.2f%% of %d)</td><td>%s</td><td>%d</td></tr>"
                 % (
@@ -576,7 +581,7 @@ class HTMLReportCreator(ReportCreator):
         dom_values = []
         n = 0
         for domain in domains_by_commits:
-            if n == conf["max_domains"]:
+            if n == load_config()["max_domains"]:
                 break
             n += 1
             info = data.get_domain_info(domain)
@@ -628,7 +633,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-    def create_files_html(self, data, path):
+    def create_files_html(self, data: Any, path: str) -> None:
         ###
         # Files
         f = open(path + "/files.html", "w", encoding="utf-8")
@@ -741,7 +746,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-    def create_lines_html(self, data, path):
+    def create_lines_html(self, data: Any, path: str) -> None:
         ###
         # Lines
         f = open(path + "/lines.html", "w", encoding="utf-8")
@@ -771,7 +776,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-    def create_tags_html(self, data, path):
+    def create_tags_html(self, data: Any, path: str) -> None:
         ###
         # tags.html
         f = open(path + "/tags.html", "w", encoding="utf-8")
@@ -814,12 +819,12 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-    def create_ai_insights_html(self, data, path):
+    def create_ai_insights_html(self, data: Any, path: str) -> None:
         """
         Create a dedicated AI Insights page with all AI-generated summaries.
         """
         # Get language from config
-        language = conf.get("ai_language", "en")
+        language = load_config().get("ai_language", "en")
 
         f = open(path + "/ai-insights.html", "w", encoding="utf-8")
         self.print_header(f)
@@ -970,7 +975,7 @@ class HTMLReportCreator(ReportCreator):
 </script>
 """
 
-    def print_header(self, file) -> None:
+    def print_header(self, file: Any) -> None:
         """
         Write the HTML document header and opening body tag into the provided writable file.
 
@@ -1017,10 +1022,10 @@ class HTMLReportCreator(ReportCreator):
 	</script>
 </head>
 <body>
-""".format(self.title, conf["style"], get_version)
+""".format(self.title, load_config()["style"], get_version)
         )
 
-    def print_nav(self, file) -> None:
+    def print_nav(self, file: Any) -> None:
         """
         Write the navigation bar HTML (page links and a client-side theme-toggle button) to the given writable file-like object.
 
@@ -1066,7 +1071,7 @@ class HTMLReportCreator(ReportCreator):
             """
         )
 
-    def get_ai_summary_html(self, page_type):
+    def get_ai_summary_html(self, page_type: str) -> str:
         """
         Generate HTML for AI-powered summary section.
 
@@ -1105,7 +1110,7 @@ class HTMLReportCreator(ReportCreator):
         """
 
 
-def html_header(level, text):
+def html_header(level: int, text: str) -> str:
     name = html_linkify(text)
     return '\n<h%d id="%s"><a href="#%s">%s</a></h%d>\n\n' % (
         level,
@@ -1116,14 +1121,14 @@ def html_header(level, text):
     )
 
 
-def html_linkify(text):
+def html_linkify(text: str) -> str:
     return text.lower().replace(" ", "_")
 
 
-def get_keys_sorted_by_values(dict):
-    return [el[1] for el in sorted([(el[1], el[0]) for el in list(dict.items())])]
+def get_keys_sorted_by_values(d: dict[str, int]) -> list[str]:
+    return [el[1] for el in sorted([(el[1], el[0]) for el in list(d.items())])]
 
 
 # dict['author'] = { 'commits': 512 } - ...key(dict, 'commits')
-def get_keys_sorted_by_value_key(d, key):
-    return [el[1] for el in sorted([(d[el][key], el) for el in list(d.keys())])]
+def get_keys_sorted_by_value_key(d: dict[str, dict[str, Any]], key: str) -> list[str]:
+    return [el[1] for el in sorted([(d[el][key], el) for el in d.keys()])]

@@ -4,13 +4,12 @@
 # GPLv2 / GPLv3
 import argparse
 import datetime
+import json
 import logging
 import os
-import pickle
 import re
 import sys
 import time
-import zlib
 from multiprocessing import Pool
 from typing import Any
 
@@ -63,109 +62,106 @@ def parallel_map_with_fallback(func, items):
 class DataCollector:
     """Manages data collection from a revision control repository."""
 
-    def __init__(self):
-        self.stamp_created = time.time()
-        self.cache = {}
-        self.total_authors = 0
-        self.activity_by_hour_of_day = {}  # hour -> commits
-        self.activity_by_day_of_week = {}  # day -> commits
-        self.activity_by_month_of_year = {}  # month [1-12] -> commits
-        self.activity_by_hour_of_week = {}  # weekday -> hour -> commits
-        self.activity_by_hour_of_day_busiest = 0
-        self.activity_by_hour_of_week_busiest = 0
-        self.activity_by_year_week = {}  # yy_wNN -> commits
-        self.activity_by_year_week_peak = 0
+    def __init__(self) -> None:
+        self.stamp_created: float = time.time()
+        self.cache: dict[str, Any] = {}
+        self.total_authors: int = 0
+        self.activity_by_hour_of_day: dict[int, int] = {}  # hour -> commits
+        self.activity_by_day_of_week: dict[int, int] = {}  # day -> commits
+        self.activity_by_month_of_year: dict[int, int] = {}  # month [1-12] -> commits
+        self.activity_by_hour_of_week: dict[int, dict[int, int]] = {}  # weekday -> hour -> commits
+        self.activity_by_hour_of_day_busiest: int = 0
+        self.activity_by_hour_of_week_busiest: int = 0
+        self.activity_by_year_week: dict[str, int] = {}  # yy_wNN -> commits
+        self.activity_by_year_week_peak: int = 0
 
-        self.authors = {}  # name -> {commits, first_commit_stamp, last_commit_stamp, last_active_day, active_days, lines_added, lines_removed}
+        self.authors: dict[str, dict[str, Any]] = {}  # name -> author stats
 
-        self.total_commits = 0
-        self.total_files = 0
-        self.authors_by_commits = 0
+        self.total_commits: int = 0
+        self.total_files: int = 0
+        self.authors_by_commits: list[str] = []
 
         # domains
-        self.domains = {}  # domain -> commits
+        self.domains: dict[str, dict[str, int]] = {}  # domain -> commits
 
         # author of the month
-        self.author_of_month = {}  # month -> author -> commits
-        self.author_of_year = {}  # year -> author -> commits
-        self.commits_by_month = {}  # month -> commits
-        self.commits_by_year = {}  # year -> commits
-        self.lines_added_by_month = {}  # month -> lines added
-        self.lines_added_by_year = {}  # year -> lines added
-        self.lines_removed_by_month = {}  # month -> lines removed
-        self.lines_removed_by_year = {}  # year -> lines removed
-        self.first_commit_stamp = 0
-        self.last_commit_stamp = 0
-        self.last_active_day = None
-        self.active_days = set()
+        self.author_of_month: dict[str, dict[str, int]] = {}  # month -> author -> commits
+        self.author_of_year: dict[int, dict[str, int]] = {}  # year -> author -> commits
+        self.commits_by_month: dict[str, int] = {}  # month -> commits
+        self.commits_by_year: dict[int, int] = {}  # year -> commits
+        self.lines_added_by_month: dict[str, int] = {}  # month -> lines added
+        self.lines_added_by_year: dict[int, int] = {}  # year -> lines added
+        self.lines_removed_by_month: dict[str, int] = {}  # month -> lines removed
+        self.lines_removed_by_year: dict[int, int] = {}  # year -> lines removed
+        self.first_commit_stamp: int = 0
+        self.last_commit_stamp: int = 0
+        self.last_active_day: str | None = None
+        self.active_days: set[str] = set()
 
         # lines
-        self.total_lines = 0
-        self.total_lines_added = 0
-        self.total_lines_removed = 0
+        self.total_lines: int = 0
+        self.total_lines_added: int = 0
+        self.total_lines_removed: int = 0
 
         # size
-        self.total_size = 0
+        self.total_size: int = 0
 
         # timezone
-        self.commits_by_timezone = {}  # timezone -> commits
+        self.commits_by_timezone: dict[str, int] = {}  # timezone -> commits
 
         # tags
-        self.tags = {}
+        self.tags: dict[str, dict[str, Any]] = {}
 
-        self.files_by_stamp = {}  # stamp -> files
+        self.files_by_stamp: dict[int, int] = {}  # stamp -> files
 
         # extensions
-        self.extensions = {}  # extension -> files, lines
+        self.extensions: dict[str, dict[str, int]] = {}  # extension -> files, lines
 
         # line statistics
-        self.changes_by_date = {}  # stamp -> { files, ins, del }
+        self.changes_by_date: dict[int, dict[str, int]] = {}  # stamp -> { files, ins, del }
+        self.changes_by_date_by_author: dict[int, dict[str, dict[str, int]]] = {}
 
         # file churn: number of commits that touched each file path
-        self.file_churn = {}  # filepath -> commit count
+        self.file_churn: dict[str, int] = {}  # filepath -> commit count
 
         # new contributors per month
-        self.new_contributors_by_month = {}  # YYYY-MM -> count
+        self.new_contributors_by_month: dict[str, int] = {}  # YYYY-MM -> count
 
         # AI summaries
         self.ai_summaries: dict[str, dict[str, Any]] = {}  # page_type -> {summary, error}
 
     ##
     # This should be the main function to extract data from the repository.
-    def collect(self, dir):
-        self.dir = dir
+    def collect(self, repo_dir: str) -> None:
+        self.dir = repo_dir
         if len(conf["project_name"]) == 0:
-            self.project_name = os.path.basename(os.path.abspath(dir))
+            self.project_name = os.path.basename(os.path.abspath(repo_dir))
         else:
             self.project_name = conf["project_name"]
 
     ##
     # Load cacheable data
-    def load_cache(self, cachefile):
+    def load_cache(self, cachefile: str) -> None:
         if not os.path.exists(cachefile):
             return
         logger.info("Loading cache...")
-        f = open(cachefile, "rb")
         try:
-            self.cache = pickle.loads(zlib.decompress(f.read()))
-        except (zlib.error, pickle.UnpicklingError):  # Specific exceptions
-            # temporary hack to upgrade non-compressed caches
-            f.seek(0)
-            self.cache = pickle.load(f)
-        f.close()
+            with open(cachefile, encoding="utf-8") as f:
+                self.cache = json.load(f)
+        except (json.JSONDecodeError, ValueError):
+            # Corrupted or legacy pickle cache - start fresh
+            logger.warning("Warning: cache is corrupted, starting fresh")
+            self.cache = {}
 
-    def get_stamp_created(self):
+    def get_stamp_created(self) -> float:
         return self.stamp_created
 
     # Save cacheable data
-    def save_cache(self, cachefile):
+    def save_cache(self, cachefile: str) -> None:
         logger.info("Saving cache...")
         tempfile = cachefile + ".tmp"
-        f = open(tempfile, "wb")
-        # pickle.dump(self.cache, f)
-        data = zlib.compress(pickle.dumps(self.cache))
-        f.write(data)
-        f.close()
+        with open(tempfile, "w", encoding="utf-8") as f:
+            json.dump(self.cache, f)
         try:
             os.remove(cachefile)
         except OSError:
@@ -174,8 +170,8 @@ class DataCollector:
 
 
 class GitDataCollector(DataCollector):
-    def collect(self, dir):
-        DataCollector.collect(self, dir)
+    def collect(self, repo_dir):
+        DataCollector.collect(self, repo_dir)
 
         self.total_authors += int(
             get_pipe_output(["git shortlog -s {}".format(get_log_range("HEAD", False)), "wc -l"])
@@ -697,7 +693,7 @@ class GitDataCollector(DataCollector):
             if line:
                 self.file_churn[line] = self.file_churn.get(line, 0) + 1
 
-    def refine(self):
+    def refine(self) -> None:
         # authors
         # name -> {place_by_commits, commits_frac, date_first, date_last, timedelta}
         self.authors_by_commits = get_keys_sorted_by_value_key(self.authors, "commits")
@@ -730,61 +726,61 @@ class GitDataCollector(DataCollector):
                     self.new_contributors_by_month.get(first_month, 0) + 1
                 )
 
-    def get_active_days(self):
+    def get_active_days(self) -> set[str]:
         return self.active_days
 
-    def get_activity_by_day_of_week(self):
+    def get_activity_by_day_of_week(self) -> dict[int, int]:
         return self.activity_by_day_of_week
 
-    def get_activity_by_hour_of_day(self):
+    def get_activity_by_hour_of_day(self) -> dict[int, int]:
         return self.activity_by_hour_of_day
 
-    def get_author_info(self, author):
+    def get_author_info(self, author: str) -> dict[str, Any]:
         return self.authors[author]
 
-    def get_authors(self, limit=None):
+    def get_authors(self, limit: int | None = None) -> list[str]:
         res = get_keys_sorted_by_value_key(self.authors, "commits")
         res.reverse()
         return res[:limit]
 
-    def get_commit_delta_days(self):
+    def get_commit_delta_days(self) -> float:
         return (self.last_commit_stamp / 86400 - self.first_commit_stamp / 86400) + 1
 
-    def get_domain_info(self, domain):
+    def get_domain_info(self, domain: str) -> dict[str, int]:
         return self.domains[domain]
 
-    def get_domains(self):
+    def get_domains(self) -> list[str]:
         return list(self.domains.keys())
 
-    def get_first_commit_date(self):
+    def get_first_commit_date(self) -> datetime.datetime:
         return datetime.datetime.fromtimestamp(self.first_commit_stamp)
 
-    def get_last_commit_date(self):
+    def get_last_commit_date(self) -> datetime.datetime:
         return datetime.datetime.fromtimestamp(self.last_commit_stamp)
 
-    def get_tags(self):
+    def get_tags(self) -> list[str]:
         lines = get_pipe_output(["git show-ref --tags", "cut -d/ -f3"])
         return lines.split("\n")
 
-    def get_tag_date(self, tag):
+    def get_tag_date(self, tag: str) -> str:
         return self.rev_to_date("tags/" + tag)
 
-    def get_total_authors(self):
+    def get_total_authors(self) -> int:
         return self.total_authors
 
-    def get_total_commits(self):
+    def get_total_commits(self) -> int:
         return self.total_commits
 
-    def get_total_files(self):
+    def get_total_files(self) -> int:
         return self.total_files
 
-    def get_total_loc(self):
+    def get_total_loc(self) -> int:
         return self.total_lines
 
-    def get_total_size(self):
+    def get_total_size(self) -> int:
         return self.total_size
 
-    def rev_to_date(self, rev):
+    def rev_to_date(self, rev: str) -> str:
         stamp = int(get_pipe_output([f'git log --pretty=format:%at "{rev}" -n 1']))
         return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
 

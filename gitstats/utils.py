@@ -5,6 +5,7 @@
 import logging
 import os
 import re
+import shlex
 import subprocess
 import time
 from importlib.metadata import version
@@ -13,17 +14,15 @@ from gitstats import ON_LINUX, exectime_external, load_config
 
 logger = logging.getLogger("gitstats")
 
-conf = load_config()
 
-
-def count_lines_in_text(text):
+def count_lines_in_text(text: str | None) -> int:
     """Cross-platform function to count lines in text"""
     if not text or not text.strip():
         return 0
     return len(text.strip().split("\n"))
 
 
-def filter_lines_by_pattern(text, pattern):
+def filter_lines_by_pattern(text: str | None, pattern: str) -> str:
     """Filter out lines matching a pattern (cross-platform grep -v replacement)"""
     if not text or not text.strip():
         return ""
@@ -32,54 +31,66 @@ def filter_lines_by_pattern(text, pattern):
     return "\n".join(filtered_lines)
 
 
-def get_version():
+def get_version() -> str:
     return version("gitstats")
 
 
-def get_git_version():
+def get_git_version() -> str:
     return get_pipe_output(["git --version"]).split("\n")[0]
 
 
-def get_pipe_output(cmds, quiet=False):
+def _run_command(cmd: str) -> bytes:
+    """Run a single command safely without shell=True."""
+    args = shlex.split(cmd)
+    result = subprocess.run(args, capture_output=True, text=False, check=False)
+    return result.stdout
+
+
+def _run_pipe_chain(cmds: list[str]) -> bytes:
+    """Run a chain of piped commands safely without shell=True."""
+    if not cmds:
+        return b""
+
+    args = shlex.split(cmds[0])
+    p = subprocess.Popen(args, stdout=subprocess.PIPE)
+    processes = [p]
+
+    for cmd in cmds[1:]:
+        args = shlex.split(cmd)
+        p = subprocess.Popen(args, stdin=p.stdout, stdout=subprocess.PIPE)
+        processes.append(p)
+
+    output, _ = p.communicate()
+    for proc in processes:
+        proc.wait()
+    return output
+
+
+def get_pipe_output(cmds: list[str], quiet: bool = False) -> str:
     global exectime_external
     start = time.time()
     if not quiet and ON_LINUX and os.isatty(1):
         logger.debug(">> " + " | ".join(cmds))
 
-    # Handle cross-platform cases
+    # Handle cross-platform cases with Python equivalents (no shell pipes)
     if len(cmds) == 2 and cmds[1] == "wc -l":
-        # Handle line counting cross-platform
-        p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
-        output = p.communicate()[0]
-        p.wait()
+        output = _run_command(cmds[0])
         try:
             text = output.decode("utf-8", errors="replace").rstrip("\n")
         except UnicodeDecodeError:
-            # Fallback for binary files
             text = output.decode("latin-1", errors="replace").rstrip("\n")
         line_count = count_lines_in_text(text)
         result = str(line_count)
     elif len(cmds) == 2 and cmds[1].startswith("grep -v"):
-        # Handle grep -v cross-platform
         pattern = cmds[1].split("grep -v ")[1]
-        p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
-        output = p.communicate()[0]
-        p.wait()
+        output = _run_command(cmds[0])
         try:
             text = output.decode("utf-8", errors="replace").rstrip("\n")
         except UnicodeDecodeError:
             text = output.decode("latin-1", errors="replace").rstrip("\n")
         result = filter_lines_by_pattern(text, pattern)
     else:
-        # Standard pipe behavior for other cases
-        p = subprocess.Popen(cmds[0], stdout=subprocess.PIPE, shell=True)
-        processes = [p]
-        for x in cmds[1:]:
-            p = subprocess.Popen(x, stdin=p.stdout, stdout=subprocess.PIPE, shell=True)
-            processes.append(p)
-        output = p.communicate()[0]
-        for p in processes:
-            p.wait()
+        output = _run_pipe_chain(cmds)
         try:
             result = output.decode("utf-8", errors="replace").rstrip("\n")
         except UnicodeDecodeError:
@@ -92,37 +103,37 @@ def get_pipe_output(cmds, quiet=False):
     return result
 
 
-def get_commit_range(defaultrange="HEAD", end_only=False):
-    if len(conf["commit_end"]) > 0:
-        commit_begin = conf["commit_begin"]
+def get_commit_range(defaultrange: str = "HEAD", end_only: bool = False) -> str:
+    if len(load_config()["commit_end"]) > 0:
+        commit_begin = load_config()["commit_begin"]
 
         # Convert commit_begin to string for consistent handling
         commit_begin_str = str(commit_begin)
 
         # If end_only or no commit_begin specified, return just the end
         if end_only or len(commit_begin_str) == 0:
-            return conf["commit_end"]
+            return load_config()["commit_end"]
 
         # Handle numeric commit_begin as "N commits ago"
         if commit_begin_str.isdigit():
-            commit_begin_str = f"{conf['commit_end']}~{commit_begin_str}"
+            commit_begin_str = f"{load_config()['commit_end']}~{commit_begin_str}"
 
-        return "{}..{}".format(commit_begin_str, conf["commit_end"])
+        return "{}..{}".format(commit_begin_str, load_config()["commit_end"])
     return defaultrange
 
 
-def get_excluded_extensions():
+def get_excluded_extensions() -> set[str]:
     """
     Get the set of excluded file extensions from config.
     Returns a set of lowercase extensions.
     """
-    exclude_ext_str = conf.get("exclude_exts", "")
+    exclude_ext_str = load_config().get("exclude_exts", "")
     if not exclude_ext_str:
         return set()
     return {ext.strip().lower() for ext in exclude_ext_str.split(",") if ext.strip()}
 
 
-def should_exclude_file(ext):
+def should_exclude_file(ext: str) -> bool:
     """
     Check if a file should be excluded from line counting based on extension.
     Returns True if the file extension is in the exclude_exts configuration.
@@ -139,7 +150,7 @@ def should_exclude_file(ext):
     return ext.lower() in excluded_extensions
 
 
-def get_num_of_lines_in_blob(ext_blob):
+def get_num_of_lines_in_blob(ext_blob: tuple[str, str]) -> tuple[str, str, int]:
     """
     Get number of lines in blob.
     Returns 0 for binary files (detected by null bytes).
@@ -169,7 +180,7 @@ def get_num_of_lines_in_blob(ext_blob):
     )
 
 
-def get_num_of_files_from_rev(time_rev):
+def get_num_of_files_from_rev(time_rev: tuple[str, str]) -> tuple[int, str, int]:
     """
     Get number of files changed in commit
     """
@@ -181,7 +192,7 @@ def get_num_of_files_from_rev(time_rev):
     )
 
 
-def get_stat_summary_counts(line):
+def get_stat_summary_counts(line: str) -> list[str | int]:
     numbers = re.findall(r"\d+", line)
     if len(numbers) == 1:
         # neither insertions nor deletions: may probably only happen for "0 files changed"
@@ -196,20 +207,22 @@ def get_stat_summary_counts(line):
     return numbers
 
 
-def get_log_range(defaultrange="HEAD", end_only=True):
+def get_log_range(defaultrange: str = "HEAD", end_only: bool = True) -> str:
     commit_range = get_commit_range(defaultrange, end_only)
     # Build git log options
     options = []
 
     # Date range filtering
-    if len(conf["start_date"]) > 0:
-        options.append('--since="{}"'.format(conf["start_date"]))
-    if len(conf["end_date"]) > 0:
-        options.append('--until="{}"'.format(conf["end_date"]))
+    if len(load_config()["start_date"]) > 0:
+        options.append('--since="{}"'.format(load_config()["start_date"]))
+    if len(load_config()["end_date"]) > 0:
+        options.append('--until="{}"'.format(load_config()["end_date"]))
 
     # Author filtering
-    if len(conf["authors"]) > 0:
-        authors_list = [author.strip() for author in conf["authors"].split(",") if author.strip()]
+    if len(load_config()["authors"]) > 0:
+        authors_list = [
+            author.strip() for author in load_config()["authors"].split(",") if author.strip()
+        ]
         for author in authors_list:
             # Escape possible double quotes or special characters in author
             safe_author = author.replace('"', r"\"")
