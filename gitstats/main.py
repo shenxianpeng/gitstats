@@ -933,7 +933,7 @@ def get_parser() -> argparse.ArgumentParser:
         "gitpath",
         metavar="<gitpath>",
         nargs="+",
-        help="Path to the Git repository (only the first path is analyzed; multi-repo is not yet supported – see https://github.com/shenxianpeng/gitstats/issues/234). An optional output directory may follow.",
+        help="Path to the Git repository",
     )
     parser.add_argument(
         "outputpath",
