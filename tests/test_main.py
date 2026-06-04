@@ -426,6 +426,27 @@ class TestRunIntegration:
         json_path = f"{output}.json"
         assert os.path.exists(json_path), f"Expected {json_path} to exist"
 
+    def test_run_multi_repo_guarded(self, git_repo, git_repo_minimal, temp_dir):
+        """run() with multiple repos should warn and only process the first."""
+        import gitstats
+        import gitstats.main
+
+        cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
+        gitstats._config = cfg
+        gitstats.main.conf = cfg
+        gitstats.utils.conf = cfg
+        gitstats.report_creator.conf = cfg
+
+        output = os.path.join(temp_dir, "report")
+        # Pass two repos – the second should be ignored with a warning
+        ret = run([git_repo, git_repo_minimal], output)
+
+        assert ret == 0
+        assert os.path.isdir(output)
+        # Report is generated for the first repo only
+        for page in ("index", "activity", "authors", "files", "lines", "tags"):
+            assert os.path.exists(f"{output}/{page}.html")
+
 
 # ── get_parser / CLI ─────────────────────────────────────────────────────
 
