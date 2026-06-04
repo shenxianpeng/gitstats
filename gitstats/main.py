@@ -823,6 +823,22 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
     logger.info(f"Output path: {outputpath}")
     cachefile = os.path.join(outputpath, "gitstats.cache")
 
+    # Guard: multi-repository analysis is not yet supported.
+    # When multiple paths are given, stats from all repos are merged into
+    # one report with the wrong project name (last repo wins).
+    # Track: https://github.com/shenxianpeng/gitstats/issues/234
+    if len(gitpath) > 1:
+        logger.error(
+            "Multi-repository analysis is not supported. "
+            "Only the first repository will be analyzed: %s",
+            gitpath[0],
+        )
+        logger.info(
+            "Track multi-repo dashboard feature: "
+            "https://github.com/shenxianpeng/gitstats/issues/234"
+        )
+        gitpath = gitpath[:1]
+
     data = GitDataCollector()
     data.load_cache(cachefile)
 
@@ -914,7 +930,10 @@ def get_parser() -> argparse.ArgumentParser:
 
     # Positional arguments
     parser.add_argument(
-        "gitpath", metavar="<gitpath>", nargs="+", help="Path(s) to the Git repository"
+        "gitpath",
+        metavar="<gitpath>",
+        nargs="+",
+        help="Path to the Git repository (only the first path is analyzed; multi-repo is not yet supported – see https://github.com/shenxianpeng/gitstats/issues/234). An optional output directory may follow.",
     )
     parser.add_argument(
         "outputpath",
