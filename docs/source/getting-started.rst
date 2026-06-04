@@ -29,7 +29,7 @@ Generate a basic report by running:
 
 .. code-block:: bash
 
-    gitstats . report
+    gitstats .
 
 .. tip::
 
@@ -37,12 +37,16 @@ Generate a basic report by running:
 
     .. code-block:: bash
 
-        uvx gitstats . report
+        uvx gitstats .
 
 Where:
 
 - ``.`` is the current directory (your Git repository), you can specify any Git repository path.
-- ``report`` is the output directory where HTML files will be generated
+- By default, reports are generated into ``gitstats-report/``. You can specify a custom output directory:
+
+  .. code-block:: bash
+
+      gitstats . my-custom-report
 
 View a live example: https://shenxianpeng.github.io/gitstats/index.html
 
@@ -54,7 +58,7 @@ To generate both HTML and JSON formats:
 
 .. code-block:: bash
 
-    gitstats . report --format json
+    gitstats . --format json
 
 This creates a ``report.json`` file alongside the HTML report.
 
@@ -76,12 +80,12 @@ Basic Syntax
 
 .. code-block:: bash
 
-    gitstats [options] <gitpath> <outputpath>
+    gitstats [options] <gitpath> [<outputpath>]
 
 **Arguments:**
 
 - ``<gitpath>`` - Path to your Git repository (e.g., ``.`` for current directory)
-- ``<outputpath>`` - Directory where the report will be generated
+- ``<outputpath>`` - Directory where the report will be generated (default: ``gitstats-report``)
 
 **Options:**
 
@@ -98,13 +102,13 @@ Full Help Output
 .. code-block:: text
 
     usage: gitstats [-h] [-v] [-c key=value] [-f {json}] [--verbose | --quiet]
-                    <gitpath> [<gitpath> ...] <outputpath>
+                    <gitpath> [<gitpath> ...] [<outputpath>]
 
     Generate statistics for a Git repository.
 
     positional arguments:
       <gitpath>             Path(s) to the Git repository
-      <outputpath>          Path to the directory where the output will be stored
+      <outputpath>          Path to the output directory (default: gitstats-report)
 
     options:
       -h, --help            show this help message and exit
@@ -124,6 +128,12 @@ Generate report for current directory:
 
 .. code-block:: bash
 
+    gitstats .
+
+Generate report to a custom output directory:
+
+.. code-block:: bash
+
     gitstats . my-report
 
 Generate report for specific repository:
@@ -136,24 +146,24 @@ Generate report with JSON output:
 
 .. code-block:: bash
 
-    gitstats . report --format json
+    gitstats . --format json
 
 Show command-level debug logs:
 
 .. code-block:: bash
 
-    gitstats --verbose . report
+    gitstats --verbose .
 
 Show only warnings and errors:
 
 .. code-block:: bash
 
-    gitstats --quiet . report
+    gitstats --quiet .
 
 Override configuration values:
 
 .. code-block:: bash
 
-    gitstats . report -c max_authors=10 -c authors_top=3
+    gitstats . -c max_authors=10 -c authors_top=3
 
 For more configuration options, see the :doc:`configuration` page.

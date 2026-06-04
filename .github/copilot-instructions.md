@@ -128,9 +128,10 @@ Always run `pre-commit run --all-files` before committing.
 ### Command Line Usage
 
 ```bash
-gitstats <gitpath> <outputpath>
-gitstats . report  # Analyze current repo, output to 'report/'
-gitstats . report -f json  # Also generate JSON output
+gitstats <gitpath> [<outputpath>]
+gitstats .             # Analyze current repo, output to 'gitstats-report/'
+gitstats . report      # Analyze current repo, output to 'report/'
+gitstats . -f json     # Also generate JSON output
 ```
 
 ### Git Operations
