@@ -18,13 +18,13 @@ Enter
 Sleep 8s
 
 # Step 2: Generate a report for the cloned repo
-Type "gitstats . /tmp/demo/report"
+Type "gitstats ."
 Sleep 300ms
 Enter
 Sleep 15s
 
 # Step 3: Show the generated output files
-Type "python3 -m http.server 8000 --bind 127.0.0.1 -d /tmp/demo/report"
+Type "python3 -m http.server 8000 --bind 127.0.0.1 -d gitstats-report"
 Sleep 300ms
 Enter
 Sleep 2s
