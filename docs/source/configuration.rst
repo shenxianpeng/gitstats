@@ -45,7 +45,7 @@ For example:
 
 .. code-block:: bash
 
-   gitstats . report -c max_authors=10 -c authors_top=3
+   gitstats . -c max_authors=10 -c authors_top=3
 
 This command will generate a report with a maximum of 10 authors displayed and the top 3 authors shown.
 
@@ -54,10 +54,10 @@ Filtering examples:
 .. code-block:: bash
 
    # Filter commits by date range
-   gitstats . report -c start_date=2024-01-01 -c end_date=2024-12-31
+   gitstats . -c start_date=2024-01-01 -c end_date=2024-12-31
 
    # Filter commits by specific authors
-   gitstats . report -c authors="John Doe,Jane Smith"
+   gitstats . -c authors="John Doe,Jane Smith"
 
    # Combine multiple filters
-   gitstats . report -c start_date=2024-01-01 -c authors="John Doe"
+   gitstats . -c start_date=2024-01-01 -c authors="John Doe"

@@ -44,7 +44,7 @@
 Example
 -------
 
-``gitstats . report`` generates this `gitstats report <https://shenxianpeng.github.io/gitstats/index.html>`_.
+``gitstats .`` generates this `gitstats report <https://shenxianpeng.github.io/gitstats/index.html>`_.
 
 .. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/demo.gif
    :alt: gitstats terminal demo
@@ -64,7 +64,7 @@ Or, using `uv <https://docs.astral.sh/uv/>`_ (recommended):
 .. code-block:: bash
 
    uv pip install gitstats      # install into current environment
-   uvx gitstats . report        # run instantly, no install required
+   uvx gitstats .              # run instantly, no install required
 
 
 gitstats is compatible with Python 3.10 and newer.
@@ -75,14 +75,16 @@ Usage
 
 .. code-block:: bash
 
-   gitstats <gitpath> <outputpath>
+   gitstats <gitpath> [<outputpath>]
+
+If ``<outputpath>`` is omitted, reports are written to ``gitstats-report/`` by default.
 
 Use ``--verbose`` to show debug-level command logs, or ``--quiet`` to show only warnings and errors:
 
 .. code-block:: bash
 
-   gitstats --verbose . report
-   gitstats --quiet . report
+   gitstats --verbose .
+   gitstats --quiet .
 
 
 Run ``gitstats --help`` for more options, or check the `documentation <https://gitstats.readthedocs.io/en/latest/getting-started.html>`_.
@@ -130,7 +132,7 @@ GitStats supports AI-powered insights to enhance your repository analysis with n
 
    # Enable AI with OpenAI
    export OPENAI_API_KEY=your-api-key
-   gitstats --ai --ai-provider openai <gitpath> <outputpath>
+   gitstats --ai --ai-provider openai <gitpath> [<outputpath>]
 
 For detailed setup instructions, configuration options, and examples, see the `AI Integration Documentation <https://gitstats.readthedocs.io/en/stable/ai-integration.html>`_.
 
