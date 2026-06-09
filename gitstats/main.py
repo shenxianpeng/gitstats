@@ -112,6 +112,7 @@ class DataCollector:
         self.last_commit_stamp: int = 0
         self.last_active_day: str | None = None
         self.active_days: set[str] = set()
+        self.longest_streak: int = 0  # longest consecutive active days streak
 
         # lines
         self.total_lines: int = 0
@@ -741,8 +742,23 @@ class GitDataCollector(DataCollector):
                     self.new_contributors_by_month.get(first_month, 0) + 1
                 )
 
+        # Compute longest consecutive active days streak
+        dates = sorted(datetime.datetime.strptime(d, "%Y-%m-%d") for d in self.active_days)
+        longest, current = 0, 0
+        for i, d in enumerate(dates):
+            if i == 0:
+                current = 1
+            else:
+                diff = (d - dates[i - 1]).days
+                current = current + 1 if diff <= 1 else 1
+            longest = max(longest, current)
+        self.longest_streak = longest
+
     def get_active_days(self) -> set[str]:
         return self.active_days
+
+    def get_longest_streak(self) -> int:
+        return self.longest_streak
 
     def get_activity_by_day_of_week(self) -> dict[int, int]:
         return self.activity_by_day_of_week
