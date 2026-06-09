@@ -41,7 +41,7 @@ def generate_summary(json_path: str, repo_url: str = "") -> str:
     first_ts = data.get("first_commit_stamp", 0)
     last_ts = data.get("last_commit_stamp", 0)
 
-    lines = [f"## 📊 GitStats Report"]
+    lines = ["## 📊 GitStats Report"]
     if repo_url:
         lines.append(f"**Repository:** <{repo_url}>")
     lines.append("")
