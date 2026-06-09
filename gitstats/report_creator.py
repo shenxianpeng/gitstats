@@ -112,6 +112,9 @@ class HTMLReportCreator(ReportCreator):
                 (100.0 * len(data.get_active_days()) / data.get_commit_delta_days()),
             )
         )
+        f.write(
+            f"<tr><td>Longest Streak</td><td>{data.get_longest_streak()} consecutive active days</td></tr>"
+        )
         f.write(f"<tr><td>Total Files</td><td>{data.get_total_files()}</td></tr>")
         f.write(
             "<tr><td>Total Lines of Code</td><td>%s (%d added, %d removed)</td></tr>"
@@ -135,6 +138,14 @@ class HTMLReportCreator(ReportCreator):
         self.print_header(f)
         self.print_nav(f)
         f.write("<h1>Activity</h1>")
+
+        # Streak summary
+        longest_streak = data.get_longest_streak()
+        if longest_streak > 0:
+            f.write(
+                "<p><strong>Longest Streak:</strong> %d consecutive active days. "
+                "A long streak indicates sustained development momentum.</p>" % longest_streak
+            )
 
         # f.write('<h2>Last 30 days</h2>')
 
