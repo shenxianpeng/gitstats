@@ -1,0 +1,218 @@
+# ----------------------------------------------------------------------
+# GitStats Report — reusable workflow
+# ----------------------------------------------------------------------
+# Call this workflow from your repo to generate a gitstats HTML/JSON
+# report, upload it as a build artifact, and (optionally) post a summary
+# comment on the pull request.
+#
+# Example caller (in your repo's .github/workflows/ci.yml):
+#
+#   jobs:
+#     gitstats:
+#       uses: shenxianpeng/gitstats/.github/workflows/gitstats-report.yml@main
+#       with:
+#         artifact-name: my-project-stats
+#       secrets: inherit
+# ----------------------------------------------------------------------
+name: GitStats Report
+
+on:
+  workflow_call:
+    inputs:
+      gitpath:
+        description: 'Path to Git repository'
+        type: string
+        default: '.'
+
+      outputpath:
+        description: 'Output directory for the report'
+        type: string
+        default: 'gitstats-report'
+
+      python-version:
+        description: 'Python version'
+        type: string
+        default: '3.12'
+
+      format:
+        description: 'Additional output format (json / none)'
+        type: string
+        default: 'json'
+
+      artifact-name:
+        description: 'Name for the uploaded artifact'
+        type: string
+        default: 'gitstats-report'
+
+      retention-days:
+        description: 'Artifact retention days'
+        type: string
+        default: '30'
+
+      config:
+        description: 'Extra gitstats config overrides (comma-separated key=value)'
+        type: string
+        default: ''
+
+      verbose:
+        description: 'Enable debug logging'
+        type: boolean
+        default: false
+
+      comment-on-pr:
+        description: 'Post a stats summary comment on the pull request'
+        type: boolean
+        default: true
+
+      deploy-pages:
+        description: 'Deploy the report to GitHub Pages (requires pages setup)'
+        type: boolean
+        default: false
+
+      pages-destination-dir:
+        description: 'Subdirectory under gh-pages root (empty = root)'
+        type: string
+        default: ''
+
+    outputs:
+      artifact-url:
+        description: 'Download URL of the uploaded artifact'
+        value: ${{ jobs.generate-report.outputs.artifact-url }}
+      artifact-id:
+        description: 'ID of the uploaded artifact'
+        value: ${{ jobs.generate-report.outputs.artifact-id }}
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+  pages: write
+  id-token: write
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-url: ${{ steps.action.outputs.artifact-url }}
+      artifact-id: ${{ steps.action.outputs.artifact-id }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run GitStats Report action
+        id: action
+        uses: shenxianpeng/gitstats/.github/actions/gitstats-report@main
+        with:
+          gitpath: ${{ inputs.gitpath }}
+          outputpath: ${{ inputs.outputpath }}
+          python-version: ${{ inputs.python-version }}
+          format: ${{ inputs.format }}
+          artifact-name: ${{ inputs.artifact-name }}
+          retention-days: ${{ inputs.retention-days }}
+          config: ${{ inputs.config }}
+          verbose: ${{ inputs.verbose }}
+
+      # ----------------------------------------------------------------
+      # PR comment with summary (only on pull_request events)
+      # ----------------------------------------------------------------
+      - name: Generate PR comment body
+        if: inputs.comment-on-pr && inputs.format == 'json' && github.event_name == 'pull_request'
+        id: pr-body
+        shell: python
+        run: |
+          import json, os, sys
+
+          report_path = "${{ inputs.outputpath }}/test-report.json"
+          try:
+              data = json.loads(open(report_path).read())
+          except (FileNotFoundError, json.JSONDecodeError):
+              print("::warning::Could not read report JSON; falling back to generic comment.")
+              data = {}
+
+          total_commits = data.get("total_commits", 0)
+          total_files = data.get("total_files", 0)
+          total_lines = data.get("total_lines", 0)
+          total_authors = data.get("total_authors", 0)
+          longest_streak = data.get("longest_streak", 0)
+
+          def fmt(n):
+              return f"{n:,}"
+
+          body = []
+          body.append("## \U0001F4CA GitStats Report")
+          body.append("")
+          body.append("| Metric | Value |")
+          body.append("| ------ | ----- |")
+          body.append(f"| Total Commits | {fmt(total_commits)} |")
+          body.append(f"| Total Files | {fmt(total_files)} |")
+          body.append(f"| Lines of Code | {fmt(total_lines)} |")
+          body.append(f"| Authors | {fmt(total_authors)} |")
+          body.append(f"| Longest Streak | {longest_streak} days |")
+
+          if total_commits > 0:
+              authors_data = data.get("authors", {})
+              sorted_authors = sorted(
+                  authors_data.items(),
+                  key=lambda x: x[1].get("commits", 0),
+                  reverse=True,
+              )[:10]
+              if sorted_authors:
+                  body.append("")
+                  body.append("### \U0001F51D Top Contributors")
+                  body.append("| Author | Commits | Lines Added | Lines Removed |")
+                  body.append("| ------ | ------- | ----------- | ------------- |")
+                  for name, stats in sorted_authors:
+                      body.append(
+                          f"| {name} | {fmt(stats.get('commits', 0))} "
+                          f"| {fmt(stats.get('lines_added', 0))} "
+                          f"| {fmt(stats.get('lines_removed', 0))} |"
+                      )
+
+          body.append("")
+          body.append(
+              "\U00002139 **How to view:** Download the artifact from the "
+              "workflow run summary, extract the zip, and open `index.html` "
+              "in your browser."
+          )
+          body.append("")
+          body.append(
+              "<sub>Generated by [GitStats]"
+              "(https://github.com/shenxianpeng/gitstats) · "
+              "[Documentation](https://gitstats.readthedocs.io/)</sub>"
+          )
+          body.append("<!-- GITSTATS-REPORT -->")
+
+          with open("/tmp/pr-comment.md", "w") as f:
+              f.write("\n".join(body))
+
+      - name: Find existing comment
+        if: inputs.comment-on-pr && github.event_name == 'pull_request'
+        id: find-comment
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e  # v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '<!-- GITSTATS-REPORT -->'
+
+      - name: Create or update PR comment
+        if: inputs.comment-on-pr && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043  # v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body-path: /tmp/pr-comment.md
+          edit-mode: replace
+          reactions: 'rocket'
+
+      # ----------------------------------------------------------------
+      # Deploy to GitHub Pages (optional)
+      # ----------------------------------------------------------------
+      - name: Deploy to GitHub Pages
+        if: inputs.deploy-pages
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453  # v4.1.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ${{ inputs.outputpath }}
+          destination_dir: ${{ inputs.pages-destination-dir }}

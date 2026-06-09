@@ -87,6 +87,32 @@ Use ``--verbose`` to show debug-level command logs, or ``--quiet`` to show only 
 
 Run ``gitstats --help`` for more options, or check the `documentation <https://gitstats.readthedocs.io/en/latest/getting-started.html>`_.
 
+GitHub Action 🤖
+-----------------
+
+GitStats provides a `GitHub Action <.github/actions/gitstats-report/>`_ to automate report generation
+in your CI/CD pipelines. On every push or pull request it can:
+
+- Generate an interactive HTML report (and optional JSON)
+- Upload the report as a workflow artifact
+- Post a summary comment on the pull request
+- Deploy the report to GitHub Pages
+
+**Quick Start** — add this to ``.github/workflows/gitstats.yml`` in your repo:
+
+.. code-block:: yaml
+
+   name: GitStats Report
+   on: [pull_request, push]
+   jobs:
+     report:
+       uses: shenxianpeng/gitstats/.github/workflows/gitstats-report.yml@main
+       with:
+         artifact-name: repo-stats
+       secrets: inherit
+
+See the `Action README <.github/actions/gitstats-report/README.md>`_ for full options and examples.
+
 What's New in v2.0.0
 --------------------
 
