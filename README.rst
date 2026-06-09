@@ -90,7 +90,7 @@ Run ``gitstats --help`` for more options, or check the `documentation <https://g
 GitHub Action 🤖
 -----------------
 
-GitStats provides a `GitHub Action <.github/actions/gitstats-report/>`_ to automate report generation
+GitStats provides a `GitHub Action <action.yml>`_ to automate report generation
 in your CI/CD pipelines. On every push or pull request it can:
 
 - Generate an interactive HTML report (and optional JSON)
@@ -111,7 +111,7 @@ in your CI/CD pipelines. On every push or pull request it can:
          artifact-name: repo-stats
        secrets: inherit
 
-See the `Action README <.github/actions/gitstats-report/README.md>`_ for full options and examples.
+See the `action.yml <action.yml>`_ for full inputs and outputs reference.
 
 What's New in v2.0.0
 --------------------

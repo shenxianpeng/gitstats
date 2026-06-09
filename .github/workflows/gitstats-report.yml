@@ -84,7 +84,7 @@ on:
 
 permissions:
   contents: read
-  actions: read
+  actions: write
   pull-requests: write
   pages: write
   id-token: write
@@ -93,8 +93,8 @@ jobs:
   generate-report:
     runs-on: ubuntu-latest
     outputs:
-      artifact-url: ${{ steps.action.outputs.artifact-url }}
-      artifact-id: ${{ steps.action.outputs.artifact-id }}
+      artifact-url: ${{ steps.upload.outputs.artifact-url }}
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -103,16 +103,22 @@ jobs:
 
       - name: Run GitStats Report action
         id: action
-        uses: shenxianpeng/gitstats/.github/actions/gitstats-report@main
+        uses: shenxianpeng/gitstats@main
         with:
           gitpath: ${{ inputs.gitpath }}
           outputpath: ${{ inputs.outputpath }}
           python-version: ${{ inputs.python-version }}
           format: ${{ inputs.format }}
-          artifact-name: ${{ inputs.artifact-name }}
-          retention-days: ${{ inputs.retention-days }}
           config: ${{ inputs.config }}
           verbose: ${{ inputs.verbose }}
+
+      - name: Upload Report Artifact
+        id: upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: ${{ inputs.outputpath }}
+          retention-days: ${{ inputs.retention-days }}
 
       # ----------------------------------------------------------------
       # PR comment with summary (only on pull_request events)
