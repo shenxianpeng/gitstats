@@ -1,0 +1,103 @@
+name: 'GitStats Report'
+description: |
+  Generate an HTML/JSON statistics report from a Git repository using gitstats.
+
+  See https://github.com/shenxianpeng/gitstats for full documentation.
+
+author: 'Xianpeng Shen'
+branding:
+  icon: 'bar-chart-2'
+  color: 'green'
+
+inputs:
+  gitpath:
+    description: >
+      Path to the Git repository to analyze. Usually '.' for the checked-out
+      repo. Use a relative path (e.g. 'subfolder/repo') when the repo is in a
+      subdirectory.
+    required: false
+    default: '.'
+
+  outputpath:
+    description: 'Directory where the HTML/JSON report will be written.'
+    required: false
+    default: 'gitstats-report'
+
+  python-version:
+    description: 'Python version used to run gitstats.'
+    required: false
+    default: '3.12'
+
+  format:
+    description: |
+      Additional output format. 'json' produces a machine-readable JSON file
+      alongside the HTML report. Use 'none' for HTML only.
+    required: false
+    default: 'json'
+
+  config:
+    description: |
+      Extra configuration overrides in key=value form (e.g.
+      'max_authors=30,authors_top=10'). Passed to gitstats via --config.
+    required: false
+    default: ''
+
+  verbose:
+    description: 'Enable debug-level logging from gitstats.'
+    required: false
+    default: 'false'
+
+outputs:
+  report-path:
+    description: 'Absolute path to the generated report directory.'
+    value: ${{ steps.realpath.outputs.path }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install gitstats
+      shell: bash
+      run: pip install gitstats
+
+    - name: Generate GitStats Report
+      id: generate
+      shell: bash
+      env:
+        FONTCONFIG_FILE: /dev/null
+      run: |
+        args=("${{ inputs.gitpath }}" "${{ inputs.outputpath }}")
+
+        # Add format flag
+        if [ "${{ inputs.format }}" != "none" ]; then
+          args+=("-f" "${{ inputs.format }}")
+        fi
+
+        # Add verbose flag
+        if [ "${{ inputs.verbose }}" == "true" ]; then
+          args+=("--verbose")
+        fi
+
+        # Add per-config overrides
+        if [ -n "${{ inputs.config }}" ]; then
+          IFS=',' read -ra KV <<< "${{ inputs.config }}"
+          for kv in "${KV[@]}"; do
+            args+=("-c" "$kv")
+          done
+        fi
+
+        echo "Running: gitstats ${args[*]}"
+        gitstats "${args[@]}"
+
+        # Report file listing for debugging
+        echo "Report contents:"
+        ls -la "${{ inputs.outputpath }}"
+
+    - name: Compute real output path
+      id: realpath
+      shell: bash
+      run: echo "path=$(realpath '${{ inputs.outputpath }}')" >> "$GITHUB_OUTPUT"
