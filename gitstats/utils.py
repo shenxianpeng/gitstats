@@ -14,6 +14,8 @@ from gitstats import ON_LINUX, exectime_external, load_config
 
 logger = logging.getLogger("gitstats")
 
+_WC_L_CMD = "wc -l"
+
 
 def count_lines_in_text(text: str | None) -> int:
     """Cross-platform function to count lines in text"""
@@ -73,7 +75,7 @@ def get_pipe_output(cmds: list[str], quiet: bool = False) -> str:
         logger.debug(">> " + " | ".join(cmds))
 
     # Handle cross-platform cases with Python equivalents (no shell pipes)
-    if len(cmds) == 2 and cmds[1] == "wc -l":
+    if len(cmds) == 2 and cmds[1] == _WC_L_CMD:
         output = _run_command(cmds[0])
         try:
             text = output.decode("utf-8", errors="replace").rstrip("\n")
@@ -176,7 +178,7 @@ def get_num_of_lines_in_blob(ext_blob: tuple[str, str]) -> tuple[str, str, int]:
     return (
         ext,
         blob_id,
-        int(get_pipe_output([f"git cat-file blob {blob_id}", "wc -l"]).split()[0]),
+        int(get_pipe_output([f"git cat-file blob {blob_id}", _WC_L_CMD]).split()[0]),
     )
 
 
@@ -188,7 +190,7 @@ def get_num_of_files_from_rev(time_rev: tuple[str, str]) -> tuple[int, str, int]
     return (
         int(time),
         rev,
-        int(get_pipe_output([f'git ls-tree -r --name-only "{rev}"', "wc -l"]).split("\n")[0]),
+        int(get_pipe_output([f'git ls-tree -r --name-only "{rev}"', _WC_L_CMD]).split("\n")[0]),
     )
 
 

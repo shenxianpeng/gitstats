@@ -18,6 +18,10 @@ from gitstats.utils import (
     get_version,
 )
 
+_FLEX_CONTAINER = '<div style="display:flex;gap:24px;align-items:flex-start">'
+_FLEX_CHILD = '<div style="flex:1;min-width:0">'
+_FLEX_CLOSE = "</div></div>"
+
 
 class ReportCreator:
     """Creates the actual report based on given data."""
@@ -253,7 +257,7 @@ class HTMLReportCreator(ReportCreator):
         # Day of Week
         f.write(html_header(2, "Day of Week"))
         day_of_week = data.get_activity_by_day_of_week()
-        f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
+        f.write(_FLEX_CONTAINER)
         f.write("<table><tr><th>Day</th><th>Total (%)</th></tr>")
         for d in range(0, 7):
             f.write("<tr>")
@@ -269,7 +273,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</table>")
         dow_labels = list(WEEKDAYS)
         dow_values = [day_of_week.get(d, 0) for d in range(0, 7)]
-        f.write('<div style="flex:1;min-width:0">')
+        f.write(_FLEX_CHILD)
         f.write(
             self._render_chartjs(
                 "chart-day-of-week",
@@ -281,7 +285,7 @@ class HTMLReportCreator(ReportCreator):
                 aspect_ratio=4,
             )
         )
-        f.write("</div></div>")
+        f.write(_FLEX_CLOSE)
 
         # Hour of Week
         f.write(html_header(2, "Hour of Week"))
@@ -305,7 +309,7 @@ class HTMLReportCreator(ReportCreator):
 
         # Month of Year
         f.write(html_header(2, "Month of Year"))
-        f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
+        f.write(_FLEX_CONTAINER)
         f.write("<table><tr><th>Month</th><th>Commits (%)</th></tr>")
         for mm in range(1, 13):
             commits = data.activity_by_month_of_year.get(mm, 0)
@@ -316,7 +320,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</table>")
         moy_labels = list(range(1, 13))
         moy_values = [data.activity_by_month_of_year.get(mm, 0) for mm in moy_labels]
-        f.write('<div style="flex:1;min-width:0">')
+        f.write(_FLEX_CHILD)
         f.write(
             self._render_chartjs(
                 "chart-month-of-year",
@@ -328,15 +332,15 @@ class HTMLReportCreator(ReportCreator):
                 aspect_ratio=4,
             )
         )
-        f.write("</div></div>")
+        f.write(_FLEX_CLOSE)
 
         # Commits by year/month
         f.write(html_header(2, "Commits by year/month"))
-        f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
+        f.write(_FLEX_CONTAINER)
         f.write(
             "<table><tr><th>Month</th><th>Commits</th><th>Lines added</th><th>Lines removed</th></tr>"
         )
-        for yymm in reversed(sorted(data.commits_by_month.keys())):
+        for yymm in sorted(data.commits_by_month.keys(), reverse=True):
             f.write(
                 "<tr><td>%s</td><td>%d</td><td>%d</td><td>%d</td></tr>"
                 % (
@@ -349,7 +353,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</table>")
         cbym_keys = sorted(data.commits_by_month.keys())
         cbym_values = [data.commits_by_month[k] for k in cbym_keys]
-        f.write('<div style="flex:1;min-width:0">')
+        f.write(_FLEX_CHILD)
         f.write(
             self._render_chartjs(
                 "chart-commits-by-year-month",
@@ -360,15 +364,15 @@ class HTMLReportCreator(ReportCreator):
                 x_ticks_rotate=True,
             )
         )
-        f.write("</div></div>")
+        f.write(_FLEX_CLOSE)
 
         # Commits by year
         f.write(html_header(2, "Commits by Year"))
-        f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
+        f.write(_FLEX_CONTAINER)
         f.write(
             "<table><tr><th>Year</th><th>Commits (% of all)</th><th>Lines added</th><th>Lines removed</th></tr>"
         )
-        for yy in reversed(sorted(data.commits_by_year.keys())):
+        for yy in sorted(data.commits_by_year.keys(), reverse=True):
             f.write(
                 "<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d</td><td>%d</td></tr>"
                 % (
@@ -390,7 +394,7 @@ class HTMLReportCreator(ReportCreator):
         else:
             cby_all_years = []
         cby_values = [data.commits_by_year.get(y, 0) for y in cby_all_years]
-        f.write('<div style="flex:1;min-width:0">')
+        f.write(_FLEX_CHILD)
         f.write(
             self._render_chartjs(
                 "chart-commits-by-year",
@@ -400,7 +404,7 @@ class HTMLReportCreator(ReportCreator):
                 y_label="Commits",
             )
         )
-        f.write("</div></div>")
+        f.write(_FLEX_CLOSE)
 
         # Commits by timezone
         f.write(html_header(2, "Commits by Timezone"))
@@ -424,8 +428,8 @@ class HTMLReportCreator(ReportCreator):
     def _build_author_time_series(self, data):
         """Build per-author cumulative lines and commits time series for Chart.js."""
         authors_to_plot = data.get_authors(load_config()["max_authors"])
-        lines_by_authors = {a: 0 for a in authors_to_plot}
-        commits_by_authors = {a: 0 for a in authors_to_plot}
+        lines_by_authors = dict.fromkeys(authors_to_plot, 0)
+        commits_by_authors = dict.fromkeys(authors_to_plot, 0)
         time_labels = []
         per_author_lines = {a: [] for a in authors_to_plot}
         per_author_commits = {a: [] for a in authors_to_plot}
@@ -535,7 +539,7 @@ class HTMLReportCreator(ReportCreator):
             '<tr><th>Month</th><th>Author</th><th>Commits (%%)</th><th class="unsortable">Next top %d</th><th>Number of authors</th></tr>'
             % load_config()["authors_top"]
         )
-        for yymm in reversed(sorted(data.author_of_month.keys())):
+        for yymm in sorted(data.author_of_month.keys(), reverse=True):
             author_dict = data.author_of_month[yymm]
             authors = get_keys_sorted_by_values(author_dict)
             authors.reverse()
@@ -561,7 +565,7 @@ class HTMLReportCreator(ReportCreator):
             '<table class="sortable" id="aoy"><tr><th>Year</th><th>Author</th><th>Commits (%%)</th><th class="unsortable">Next top %d</th><th>Number of authors</th></tr>'
             % load_config()["authors_top"]
         )
-        for yy in reversed(sorted(data.author_of_year.keys())):
+        for yy in sorted(data.author_of_year.keys(), reverse=True):
             author_dict = data.author_of_year[yy]
             authors = get_keys_sorted_by_values(author_dict)
             authors.reverse()
@@ -585,7 +589,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Commits by Domains"))
         domains_by_commits = get_keys_sorted_by_value_key(data.domains, "commits")
         domains_by_commits.reverse()  # most first
-        f.write('<div style="display:flex;gap:24px;align-items:flex-start">')
+        f.write(_FLEX_CONTAINER)
         f.write("<table>")
         f.write("<tr><th>Domains</th><th>Total (%)</th></tr>")
         dom_labels = []
@@ -607,7 +611,7 @@ class HTMLReportCreator(ReportCreator):
                 )
             )
         f.write("</table>")
-        f.write('<div style="flex:1;min-width:0">')
+        f.write(_FLEX_CHILD)
         f.write(
             self._render_chartjs(
                 "chart-domains",
@@ -618,7 +622,7 @@ class HTMLReportCreator(ReportCreator):
                 x_ticks_rotate=True,
             )
         )
-        f.write("</div></div>")
+        f.write(_FLEX_CLOSE)
 
         # Contributor Growth Over Time
         if data.new_contributors_by_month:
@@ -809,7 +813,7 @@ class HTMLReportCreator(ReportCreator):
         # sort the tags by date desc
         tags_sorted_by_date_desc = [
             el[1]
-            for el in reversed(sorted([(el[1]["date"], el[0]) for el in list(data.tags.items())]))
+            for el in sorted([(el[1]["date"], el[0]) for el in data.tags.items()], reverse=True)
         ]
         for tag in tags_sorted_by_date_desc:
             authorinfo = []
@@ -1137,7 +1141,7 @@ def html_linkify(text: str) -> str:
 
 
 def get_keys_sorted_by_values(d: dict[str, int]) -> list[str]:
-    return [el[1] for el in sorted([(el[1], el[0]) for el in list(d.items())])]
+    return [el[1] for el in sorted([(el[1], el[0]) for el in d.items()])]
 
 
 # dict['author'] = { 'commits': 512 } - ...key(dict, 'commits')

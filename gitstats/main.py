@@ -164,7 +164,7 @@ class DataCollector:
         try:
             with open(cachefile, encoding="utf-8") as f:
                 self.cache = json.load(f)
-        except (json.JSONDecodeError, ValueError):
+        except ValueError:
             # Corrupted or legacy pickle cache - start fresh
             logger.warning("Warning: cache is corrupted, starting fresh")
             self.cache = {}
@@ -232,7 +232,7 @@ class GitDataCollector(DataCollector):
         log_range = get_log_range("HEAD", False)
         tags_sorted_by_date_desc = [
             el[1]
-            for el in reversed(sorted([(el[1]["date"], el[0]) for el in list(self.tags.items())]))
+            for el in sorted([(el[1]["date"], el[0]) for el in self.tags.items()], reverse=True)
         ]
         prev = None
         for tag in reversed(tags_sorted_by_date_desc):

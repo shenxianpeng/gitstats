@@ -70,8 +70,8 @@ class AISummarizer:
                 }
                 self.provider = AIProviderFactory.create(provider_name, provider_config)
                 logger.info(f"Initialized AI provider: {provider_name}")
-            except Exception as e:
-                logger.error(f"Failed to initialize AI provider: {str(e)}")
+            except Exception:
+                logger.exception("Failed to initialize AI provider")
                 raise
 
     def set_cache_dir(self, cache_dir: str):
@@ -462,10 +462,10 @@ Generate your analysis:"""
             result["summary"] = summary
 
         except AIProviderError as e:
-            logger.error(f"AI provider error: {str(e)}")
+            logger.exception("AI provider error")
             result["error"] = str(e)
         except Exception as e:
-            logger.error(f"Unexpected error generating summary: {str(e)}")
+            logger.exception("Unexpected error generating summary")
             result["error"] = f"Unexpected error: {str(e)}"
 
         return result
