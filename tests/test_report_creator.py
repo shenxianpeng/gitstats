@@ -524,7 +524,7 @@ def test_build_author_time_series_empty(mock_data_collector):
     creator.data = mock_data_collector
     # With empty changes_by_date_by_author, should return empty
     mock_data_collector.changes_by_date_by_author = {}
-    labels, loc_ds, cba_ds = creator._build_author_time_series(mock_data_collector)
+    labels, loc_ds, _ = creator._build_author_time_series(mock_data_collector)
     assert labels == []
     # Even with no time-series data, datasets have entries per author with empty data
     assert len(loc_ds) == len(mock_data_collector.get_authors(20))
@@ -547,7 +547,7 @@ def test_build_author_time_series_basic(mock_data_collector):
         },
     }
 
-    labels, loc_ds, cba_ds = creator._build_author_time_series(mock_data_collector)
+    labels, loc_ds, _ = creator._build_author_time_series(mock_data_collector)
 
     assert len(labels) == 2
     assert any("Alice Smith" in str(ds) for ds in loc_ds)

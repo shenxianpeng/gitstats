@@ -224,9 +224,7 @@ def mock_data_collector():
     data.get_last_commit_date.return_value = datetime.datetime(2023, 4, 1, 0, 0)
 
     # Active days
-    data.get_active_days.return_value = set(
-        ["2023-01-01", "2023-01-15", "2023-02-01", "2023-03-10"]
-    )
+    data.get_active_days.return_value = {"2023-01-01", "2023-01-15", "2023-02-01", "2023-03-10"}
     data.get_longest_streak.return_value = 4
     data.longest_streak = 4
     data.get_commit_delta_days.return_value = 120
