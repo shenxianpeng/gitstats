@@ -168,6 +168,10 @@ table.noborders td {
 	border: none;
 	background: transparent;
 	padding: var(--space-1) var(--space-2);
+	font-size: var(--font-size-xs);
+	color: var(--text-secondary);
+	font-variant-numeric: tabular-nums;
+	font-family: var(--font-mono);
 }
 
 .vtable {
@@ -419,12 +423,7 @@ table.noborders td:hover .bar {
 	opacity: 1;
 }
 
-table.noborders td {
-	font-size: var(--font-size-xs);
-	color: var(--text-secondary);
-	font-variant-numeric: tabular-nums;
-	font-family: var(--font-mono);
-}
+
 
 /* ===== Misc ===== */
 .moreauthors {
