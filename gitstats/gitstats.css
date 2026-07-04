@@ -532,3 +532,26 @@ table.noborders td:hover .bar {
 	font-size: var(--font-size-sm);
 	color: var(--text-secondary);
 }
+
+/* ===== Footer ===== */
+.footer {
+	margin-top: var(--space-6);
+	padding: var(--space-4) 0;
+	border-top: 1px solid var(--border-strong);
+	text-align: center;
+}
+
+.footer-generated {
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+	color: var(--text-muted);
+}
+
+.footer-generated a {
+	color: var(--link-color);
+	text-decoration: none;
+}
+
+.footer-generated a:hover {
+	text-decoration: underline;
+}

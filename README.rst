@@ -32,7 +32,11 @@
    :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
    :alt: GitHub contributors
 
-|pypi-version| |python-versions| |python-download| |test-badge| |docs-badge| |contributors|
+.. |marketplace| image:: https://img.shields.io/badge/GitHub_Marketplace-gitstats--action-blue.svg
+   :target: https://github.com/marketplace/actions/gitstats-action
+   :alt: GitHub Marketplace
+
+|pypi-version| |python-versions| |python-download| |test-badge| |docs-badge| |contributors| |marketplace|
 
 ``$ gitstats``
 ===============
@@ -40,6 +44,11 @@
 📊 Generate insightful visual reports from Git.
 
 📘 Documentation: `gitstats.readthedocs.io <https://gitstats.readthedocs.io/>`_
+
+.. contents:: Table of Contents
+   :depth: 2
+   :local:
+
 
 Example
 -------
@@ -88,6 +97,23 @@ Use ``--verbose`` to show debug-level command logs, or ``--quiet`` to show only 
 
 
 Run ``gitstats --help`` for more options, or check the `documentation <https://gitstats.readthedocs.io/en/latest/getting-started.html>`_.
+
+
+GitHub Action
+-------------
+
+Automate your gitstats report generation with the official `GitStats Action <https://github.com/marketplace/actions/gitstats-action>`_.
+
+.. code-block:: yaml
+
+   - uses: shenxianpeng/gitstats-action@v0.1.1
+     with:
+       deploy-to-pages: true
+
+With just one ``uses`` line, the Action generates a full gitstats report and deploys it to GitHub Pages automatically.
+
+See the `gitstats-action repository <https://github.com/shenxianpeng/gitstats-action>`_ for detailed inputs, examples, and advanced usage (AI-powered reports, custom config, manual deploy, etc.).
+
 
 What's New in v2.0.0
 --------------------
