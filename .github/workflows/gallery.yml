@@ -1,0 +1,76 @@
+name: Gallery — Weekly Reports
+
+on:
+  schedule:
+    # Monday 03:00 UTC+3 = Monday 00:00 UTC
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - { id: linux,      name: "Linux Kernel", url: "torvalds/linux"        }
+          - { id: cpython,    name: "CPython",      url: "python/cpython"        }
+          - { id: vscode,     name: "VS Code",      url: "microsoft/vscode"      }
+          - { id: git,        name: "Git",          url: "git/git"               }
+          - { id: nginx,      name: "nginx",        url: "nginx/nginx"           }
+          - { id: kubernetes, name: "Kubernetes",   url: "kubernetes/kubernetes" }
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # setuptools-scm needs tags to derive the version shown in reports
+          fetch-depth: 0
+          fetch-tags: true
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      - name: Install GitStats
+        run: pipx install --python "$(which python)" .
+
+      - name: Generate Report
+        env:
+          FONTCONFIG_FILE: /dev/null
+        run: |
+          git clone "https://github.com/${{ matrix.repo.url }}.git" /tmp/repo
+          gitstats /tmp/repo "report"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: report-${{ matrix.repo.id }}
+          path: report/
+
+  deploy:
+    needs: generate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: report-*
+          path: gallery
+
+      - name: Assemble Gallery
+        run: |
+          # Each artifact is in gallery/report-<id>/, rename to gallery/<id>/
+          for d in gallery/report-*; do
+            id="${d#gallery/report-}"
+            mv "$d" "gallery/$id"
+          done
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gallery
+          destination_dir: gallery
+          keep_files: true
