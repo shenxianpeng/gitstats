@@ -45,6 +45,11 @@
 
 📘 Documentation: `gitstats.readthedocs.io <https://gitstats.readthedocs.io/>`_
 
+.. contents:: Table of Contents
+   :depth: 2
+   :local:
+
+
 Example
 -------
 
