@@ -63,7 +63,6 @@ class HTMLReportCreator(ReportCreator):
             load_config()["style"],
             "sortable.js",
             "chart.umd.min.js",
-            "collaboration.js",
             "arrow-up.gif",
             "arrow-down.gif",
             "arrow-none.gif",
@@ -78,7 +77,6 @@ class HTMLReportCreator(ReportCreator):
         self.create_files_html(data, path)
         self.create_lines_html(data, path)
         self.create_tags_html(data, path)
-        self.create_collaboration_html(data, path)
 
         # Create AI Insights page if AI is enabled
         if hasattr(data, "ai_summaries") and data.ai_summaries:
@@ -842,168 +840,6 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-    def create_collaboration_html(self, data: Any, path: str) -> None:
-        """Create a collaboration network page showing a force-directed graph
-        of authors who frequently modify the same files together.
-
-        The force simulation engine is in collaboration.js. Only the node/link
-        data is inlined as global JSON variables COLLAB_NODES / COLLAB_LINKS.
-        """
-        f = open(path + "/collaboration.html", "w", encoding="utf-8")
-        self.print_header(f)
-        self.print_nav(f)
-        f.write("<h1>Collaboration Network</h1>")
-
-        # Build nodes and links from collaboration_graph
-        _raw_collab = getattr(data, "collaboration_graph", {})
-        collab = _raw_collab if isinstance(_raw_collab, dict) else {}
-        _raw_af = getattr(data, "author_files", {})
-        author_files = _raw_af if isinstance(_raw_af, dict) else {}
-
-        if not collab:
-            f.write('<div class="collab-empty">')
-            f.write(
-                "<p>No collaboration data available. "
-                "This graph shows authors who frequently modify the same files.</p>"
-            )
-            f.write("</div>")
-            self.print_footer(f)
-            f.write("</body></html>")
-            f.close()
-            return
-
-        # Only include authors with at least some collaboration
-        authors_with_edges = set()
-        for a in collab:
-            for b in collab[a]:
-                if collab[a][b] > 0:
-                    authors_with_edges.add(a)
-                    authors_with_edges.add(b)
-
-        # Build nodes list
-        nodes_list = []
-        author_to_idx: dict[str, int] = {}
-        for idx, author in enumerate(sorted(authors_with_edges)):
-            file_count = len(author_files.get(author, {}))
-            size = max(8, min(40, file_count // 2 + 5))
-            nodes_list.append({"id": author, "fileCount": file_count, "size": size})
-            author_to_idx[author] = idx
-
-        # Build links list
-        links_list = []
-        for a in collab:
-            for b, w in collab[a].items():
-                if a < b and w > 0:
-                    links_list.append({"source": a, "target": b, "weight": w})
-
-        if not links_list:
-            f.write('<div class="collab-empty">')
-            f.write(
-                "<p>No collaboration links found between authors. "
-                "Try analyzing a larger commit range.</p>"
-            )
-            f.write("</div>")
-            self.print_footer(f)
-            f.write("</body></html>")
-            f.close()
-            return
-
-        # Build a score based on sum of edge weights per node
-        node_score: dict[str, int] = {}
-        for link in links_list:
-            node_score[link["source"]] = node_score.get(link["source"], 0) + link["weight"]
-            node_score[link["target"]] = node_score.get(link["target"], 0) + link["weight"]
-
-        top_nodes = set(sorted(node_score, key=lambda x: node_score[x], reverse=True)[:50])
-
-        # Filter nodes and links to top 50
-        filtered_authors = sorted(top_nodes)
-        filtered_links = [
-            link
-            for link in links_list
-            if link["source"] in top_nodes and link["target"] in top_nodes
-        ]
-
-        # Re-index for the filtered list
-        filtered_idx: dict[str, int] = {}
-        filtered_nodes: list[dict] = []
-        for idx, author in enumerate(filtered_authors):
-            file_count = len(author_files.get(author, {}))
-            size = max(8, min(40, file_count // 2 + 5))
-            filtered_nodes.append(
-                {
-                    "id": author,
-                    "fileCount": file_count,
-                    "size": size,
-                    "score": node_score.get(author, 0),
-                }
-            )
-            filtered_idx[author] = idx
-
-        filtered_links_typed = [
-            {
-                "source": filtered_idx[lnk["source"]],
-                "target": filtered_idx[lnk["target"]],
-                "weight": lnk["weight"],
-                "type": "collaboration",
-            }
-            for lnk in filtered_links
-        ]
-
-        nodes_json = json.dumps(filtered_nodes, ensure_ascii=False).replace("</", "<\\/")
-        links_json = json.dumps(filtered_links_typed, ensure_ascii=False).replace("</", "<\\/")
-
-        # Inline data as global variables; simulation engine is in collaboration.js
-        f.write(f"""
-        <div class="collab-intro">
-            <p>This force-directed graph shows <strong>collaboration patterns</strong> among authors.
-            Nodes represent authors; edges connect authors who modified <strong>the same files</strong>.
-            Thicker edges = stronger collaboration. Larger nodes = more files touched.</p>
-            <p><strong>Tip:</strong> Drag nodes to explore. Hover over a node to see details.</p>
-        </div>
-
-        <div class="collab-legend">
-            <span class="collab-legend-item"><span class="collab-legend-dot" style="background:#5b8dee"></span> Author node (size = files touched)</span>
-            <span class="collab-legend-item"><span class="collab-legend-line"></span> Collaboration (thickness = strength)</span>
-        </div>
-
-        <div id="collab-graph" class="collab-graph-container">
-            <svg id="collab-svg" width="100%%" height="520"></svg>
-            <div id="collab-tooltip" class="collab-tooltip" style="display:none;"></div>
-        </div>
-
-        <script>
-        var COLLAB_NODES = {nodes_json};
-        var COLLAB_LINKS = {links_json};
-        </script>
-        <script type="text/javascript" src="collaboration.js"></script>
-        """)
-
-        # Collaboration as table view
-        if filtered_links:
-            f.write(html_header(2, "Collaboration Details"))
-            f.write(
-                '<table class="sortable" id="collab-table"><tr>'
-                '<th>Author</th><th>Collaborator</th><th class="unsortable">Shared Files</th>'
-                "</tr>"
-            )
-            sorted_links = sorted(filtered_links, key=lambda x: x["weight"], reverse=True)
-            for link in sorted_links[:20]:
-                f.write(
-                    "<tr><td>%s</td><td>%s</td><td>%d</td></tr>"
-                    % (link["source"], link["target"], link["weight"])
-                )
-            f.write("</table>")
-            if len(sorted_links) > 20:
-                f.write(
-                    '<p class="moreauthors">Showing top 20 collaboration pairs. '
-                    "Total: %d pairs found.</p>" % len(sorted_links)
-                )
-
-        self.print_footer(f)
-        f.write("</body></html>")
-        f.close()
-
     def create_ai_insights_html(self, data: Any, path: str) -> None:
         """
         Create a dedicated AI Insights page with all AI-generated summaries.
@@ -1237,7 +1073,6 @@ class HTMLReportCreator(ReportCreator):
         has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
 
         ai_link = '<li><a href="ai-insights.html">AI Insights</a></li>' if has_ai else ""
-        collab_link = '<li><a href="collaboration.html">Collaboration</a></li>'
 
         github_icon = (
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" '
@@ -1263,7 +1098,6 @@ class HTMLReportCreator(ReportCreator):
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
-            {collab_link}
             {ai_link}
             </ul>
             <div class="nav-right">
