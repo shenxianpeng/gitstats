@@ -533,6 +533,68 @@ table.noborders td:hover .bar {
 	color: var(--text-secondary);
 }
 
+/* ===== Hotspots Analysis ===== */
+.hotspots-intro {
+	padding: var(--space-4);
+	margin: var(--space-4) 0;
+	background-color: var(--surface-color);
+	border: 1px solid var(--border-strong);
+	border-left: 3px solid var(--danger-color);
+}
+
+.hotspots-intro p {
+	margin: var(--space-2) 0;
+	line-height: 1.6;
+}
+
+.hotspots-intro ul {
+	margin: var(--space-2) 0;
+	padding-left: var(--space-5);
+}
+
+.hotspots-intro li {
+	margin: var(--space-1) 0;
+	font-size: var(--font-size-sm);
+}
+
+.hotspot-dot {
+	font-size: 12px;
+	margin-right: var(--space-1);
+}
+
+.hotspot-critical { color: #cf222e; }
+.hotspot-warning { color: #e16f24; }
+.hotspot-calm { color: #1a7f37; }
+.hotspot-safe { color: #5b8dee; }
+
+[data-theme="dark"] .hotspot-critical { color: #f87171; }
+[data-theme="dark"] .hotspot-warning { color: #fbbf24; }
+[data-theme="dark"] .hotspot-calm { color: #4ade80; }
+[data-theme="dark"] .hotspot-safe { color: #6b95c8; }
+
+.hotspots-summary {
+	margin: var(--space-3) 0;
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+}
+
+.risk-critical {
+	color: #cf222e;
+	font-weight: 600;
+}
+
+.risk-warning {
+	color: #e16f24;
+	font-weight: 600;
+}
+
+.risk-monitor {
+	color: var(--text-secondary);
+}
+
+[data-theme="dark"] .risk-critical { color: #f87171; }
+[data-theme="dark"] .risk-warning { color: #fbbf24; }
+
 /* ===== Footer ===== */
 .footer {
 	margin-top: var(--space-6);
