@@ -859,21 +859,9 @@ class HTMLReportCreator(ReportCreator):
 
         f.write("""
         <div class="hotspots-intro">
-            <p><strong>Hotspots</strong> are files that combine high change frequency with large size.
-            These are the most bug-prone files in your codebase — they change often
-            <em>and</em> have many lines of code, making each change risky.</p>
-            <p><strong>Quadrant guide:</strong></p>
-            <ul>
-                <li><span class="hotspot-dot hotspot-critical">⬤</span> <strong>Critical (top-right):</strong>
-                High churn + large size — refactoring candidates</li>
-                <li><span class="hotspot-dot hotspot-warning">⬤</span> <strong>Warning (top-left):</strong>
-                High churn but small — frequent changes, lower risk</li>
-                <li><span class="hotspot-dot hotspot-calm">⬤</span> <strong>Stable (bottom-right):</strong>
-                Large but rarely changed — mature code</li>
-                <li><span class="hotspot-dot hotspot-safe">⬤</span> <strong>Safe (bottom-left):</strong>
-                Small and rarely changed</li>
-            </ul>
-            <p>Dashed lines show the median values for file size and change frequency.</p>
+            <p>Files changed often <em>and</em> large in size are the most bug-prone.
+            Each dot is a file — bigger dot = higher risk.
+            Dashed lines show the median file size and change frequency.</p>
         </div>
         """)
 
@@ -915,9 +903,6 @@ class HTMLReportCreator(ReportCreator):
         scatter_json = json.dumps(scatter_points).replace("</", "<\\/")
 
         f.write(f"""
-        <div class="hotspots-summary">
-            <p>Showing {len(scatter_points)} files with at least one change.</p>
-        </div>
         <div style="max-width:100%;margin-bottom:8px">
             <canvas id="chart-hotspots"></canvas>
         </div>
@@ -1055,72 +1040,49 @@ class HTMLReportCreator(ReportCreator):
         </script>
         """)
 
-        # Table of top hotspot files
-        f.write(html_header(2, "Top Hotspot Files"))
-        f.write(
-            "<p><em>Sorted by hotspot score (churn × √lines). Higher score = higher risk.</em></p>"
-        )
-
-        # Sort by score descending, take top 50
+        # Compute quartile thresholds to identify Critical files only
         scatter_points.sort(key=lambda p: p["score"], reverse=True)
-        top_hotspots = scatter_points[:50]
-
-        # Use quartile-based thresholds for risk levels (data-adaptive)
-        sorted_scores = sorted(p["score"] for p in top_hotspots)
+        sorted_scores = sorted(p["score"] for p in scatter_points)
         n_scores = len(sorted_scores)
-        if n_scores >= 4:
-            threshold_warning = sorted_scores[n_scores // 4]  # 25th percentile
-            threshold_critical = sorted_scores[3 * n_scores // 4]  # 75th percentile
-        else:
-            threshold_warning = 0
-            threshold_critical = sorted_scores[-1] if sorted_scores else 0
+        threshold_critical = (
+            sorted_scores[3 * n_scores // 4]
+            if n_scores >= 4
+            else (sorted_scores[-1] if sorted_scores else 0)
+        )
+        critical_files = [p for p in scatter_points if p["score"] >= threshold_critical]
 
-        f.write("""
-        <table class="sortable" id="hotspots">
-        <tr>
-            <th>File</th>
-            <th>Lines of Code</th>
-            <th>Times Changed</th>
-            <th>Hotspot Score</th>
-            <th>Risk Level</th>
-        </tr>
+        # Summary stat line
+        total_hotspot = sum(1 for p in scatter_points if p["x"] >= median_x and p["y"] >= median_y)
+        f.write(f"""
+        <div class="hotspots-summary">
+            <span class="hotspot-stat">{len(scatter_points)} files changed</span>
+            <span class="hotspot-stat-sep">|</span>
+            <span class="hotspot-stat"><strong class="risk-critical">{len(critical_files)} critical</strong> (top 25% by score)</span>
+            <span class="hotspot-stat-sep">|</span>
+            <span class="hotspot-stat">{total_hotspot} in top-right quadrant</span>
+            <span class="hotspot-stat-sep">|</span>
+            <span class="hotspot-stat">median {median_x} lines, {median_y} changes</span>
+        </div>
         """)
 
-        for p in top_hotspots:
-            score = p["score"]
-            if score >= threshold_critical:
-                risk = "Critical"
-                risk_class = "risk-critical"
-            elif score >= threshold_warning:
-                risk = "Warning"
-                risk_class = "risk-warning"
-            else:
-                risk = "Monitor"
-                risk_class = "risk-monitor"
-            f.write(
-                '<tr><td>%s</td><td>%d</td><td>%d</td><td>%.1f</td><td class="%s">%s</td></tr>'
-                % (html.escape(p["path"]), p["x"], p["y"], score, risk_class, risk)
-            )
-
-        f.write("</table>")
-
-        # Stats summary
-        f.write(html_header(2, "Summary Statistics"))
-        total_hotspot_candidates = sum(
-            1 for p in scatter_points if p["x"] >= median_x and p["y"] >= median_y
-        )
-        f.write("<dl>")
-        f.write("<dt>Files analyzed</dt><dd>%d</dd>" % len(scatter_points))
-        f.write("<dt>Median file size</dt><dd>%d lines</dd>" % median_x)
-        f.write("<dt>Median change frequency</dt><dd>%d commits</dd>" % median_y)
-        f.write(
-            "<dt>Critical hotspots (top-right quadrant)</dt><dd>%d</dd>" % total_hotspot_candidates
-        )
-        f.write(
-            "<dt>Total lines in hotspots</dt><dd>%d</dd>"
-            % sum(p["x"] for p in scatter_points if p["x"] >= median_x and p["y"] >= median_y)
-        )
-        f.write("</dl>")
+        # Only show Critical files in the table
+        if critical_files:
+            f.write(html_header(2, f"Critical Hotspots ({len(critical_files)})"))
+            f.write("""
+            <table class="sortable" id="hotspots">
+            <tr>
+                <th>File</th>
+                <th>Lines</th>
+                <th>Changes</th>
+                <th>Score</th>
+            </tr>
+            """)
+            for p in critical_files:
+                f.write(
+                    "<tr><td>%s</td><td>%d</td><td>%d</td><td>%.1f</td></tr>"
+                    % (html.escape(p["path"]), p["x"], p["y"], p["score"])
+                )
+            f.write("</table>")
 
         self.print_footer(f)
         f.write("</body></html>")
