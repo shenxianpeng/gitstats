@@ -33,12 +33,12 @@ jobs:
           set -e
           github="https://github.com"
 
-          git clone --depth 15000 "$github/torvalds/linux.git"        /tmp/linux
-          git clone --depth 10000 "$github/python/cpython.git"        /tmp/cpython
-          git clone --depth 10000 "$github/microsoft/vscode.git"      /tmp/vscode
-          git clone --depth  8000 "$github/git/git.git"               /tmp/git
-          git clone --depth  8000 "$github/nginx/nginx.git"           /tmp/nginx
-          git clone --depth 10000 "$github/kubernetes/kubernetes.git" /tmp/kubernetes
+          git clone "$github/torvalds/linux.git"        /tmp/linux
+          git clone "$github/python/cpython.git"        /tmp/cpython
+          git clone "$github/microsoft/vscode.git"      /tmp/vscode
+          git clone "$github/git/git.git"               /tmp/git
+          git clone "$github/nginx/nginx.git"           /tmp/nginx
+          git clone "$github/kubernetes/kubernetes.git" /tmp/kubernetes
 
           for repo in linux cpython vscode git nginx kubernetes; do
             python -m gitstats "/tmp/$repo" "gallery/$repo"
