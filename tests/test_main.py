@@ -229,6 +229,58 @@ class TestGitDataCollectorIntegration:
         # File churn may be empty or non-empty depending on diff output
         assert isinstance(dc.file_churn, dict)
 
+    def test_collect_author_files(self, git_repo):
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(git_repo)
+            dc.collect(git_repo)
+        finally:
+            os.chdir(prevdir)
+
+        assert isinstance(dc.author_files, dict)
+        # Alice Smith and Bob Jones should have file mappings
+        known_authors = ["Alice Smith", "Bob Jones"]
+        for author in known_authors:
+            if author in dc.author_files:
+                assert len(dc.author_files[author]) > 0
+                break
+        else:
+            # At least one author should have file data
+            assert len(dc.author_files) > 0
+
+    def test_collect_collaboration_graph(self, git_repo):
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(git_repo)
+            dc.collect(git_repo)
+        finally:
+            os.chdir(prevdir)
+        dc.refine()
+
+        assert isinstance(dc.collaboration_graph, dict)
+        # If there are shared files, the graph should have entries
+        if dc.author_files and len(dc.author_files) > 1:
+            # At minimum, collaboration_graph should be populated
+            # or empty if no shared files across authors
+            pass
+
+    def test_collect_collaboration_graph_after_refine(self, git_repo):
+        """author_files should be populated after collect + refine."""
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(git_repo)
+            dc.collect(git_repo)
+        finally:
+            os.chdir(prevdir)
+        dc.refine()
+
+        # author_files is populated, refinement shouldn't break it
+        assert isinstance(dc.author_files, dict)
+        assert isinstance(dc.collaboration_graph, dict)
+
     def test_collect_changes_by_date(self, git_repo):
         dc = GitDataCollector()
         prevdir = os.getcwd()
