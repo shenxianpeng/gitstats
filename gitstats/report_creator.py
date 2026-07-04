@@ -998,7 +998,7 @@ class HTMLReportCreator(ReportCreator):
                 options: {{
                     responsive: true,
                     maintainAspectRatio: true,
-                    aspectRatio: 1.6,
+                    aspectRatio: 3.0,
                     plugins: {{
                         legend: {{ display: false }},
                         tooltip: {{
