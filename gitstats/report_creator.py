@@ -1040,32 +1040,24 @@ class HTMLReportCreator(ReportCreator):
         </script>
         """)
 
-        # Compute quartile thresholds to identify Critical files only
-        scatter_points.sort(key=lambda p: p["score"], reverse=True)
-        sorted_scores = sorted(p["score"] for p in scatter_points)
-        n_scores = len(sorted_scores)
-        threshold_critical = (
-            sorted_scores[3 * n_scores // 4]
-            if n_scores >= 4
-            else (sorted_scores[-1] if sorted_scores else 0)
-        )
-        critical_files = [p for p in scatter_points if p["score"] >= threshold_critical]
+        # Critical files = top-right quadrant of the scatter plot
+        # (above median in both lines and changes)
+        # This ensures red dots on the chart match the files in the table
+        critical_files = [p for p in scatter_points if p["x"] >= median_x and p["y"] >= median_y]
+        critical_files.sort(key=lambda p: p["score"], reverse=True)
 
         # Summary stat line
-        total_hotspot = sum(1 for p in scatter_points if p["x"] >= median_x and p["y"] >= median_y)
         f.write(f"""
         <div class="hotspots-summary">
             <span class="hotspot-stat">{len(scatter_points)} files changed</span>
             <span class="hotspot-stat-sep">|</span>
-            <span class="hotspot-stat"><strong class="risk-critical">{len(critical_files)} critical</strong> (top 25% by score)</span>
-            <span class="hotspot-stat-sep">|</span>
-            <span class="hotspot-stat">{total_hotspot} in top-right quadrant</span>
+            <span class="hotspot-stat"><strong class="risk-critical">{len(critical_files)} critical</strong> (top-right quadrant)</span>
             <span class="hotspot-stat-sep">|</span>
             <span class="hotspot-stat">median {median_x} lines, {median_y} changes</span>
         </div>
         """)
 
-        # Only show Critical files in the table
+        # Show critical files in the table (matches red dots on the scatter plot)
         if critical_files:
             f.write(html_header(2, f"Critical Hotspots ({len(critical_files)})"))
             f.write("""
