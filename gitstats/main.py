@@ -949,12 +949,14 @@ def get_parser() -> argparse.ArgumentParser:
         "gitpath",
         metavar="<gitpath>",
         nargs="+",
-        help="Path to the Git repository",
+        help="Path to the Git repository. An optional output directory may follow.",
     )
     parser.add_argument(
         "outputpath",
         metavar="<outputpath>",
-        help="Path to the directory where the output will be stored",
+        nargs="?",
+        default=None,
+        help="Path to the output directory (default: gitstats-report)",
     )
 
     parser.add_argument(
@@ -1014,6 +1016,16 @@ def main() -> int:
     parser = get_parser()
     args = parser.parse_args()
     configure_logging(verbose=args.verbose, quiet=args.quiet)
+
+    # Resolve positional arguments: gitpath (nargs='+') consumes all positional args.
+    # If outputpath is None and more than one arg was given, move the last arg from
+    # gitpath to outputpath.
+    if args.outputpath is None:
+        if len(args.gitpath) > 1:
+            *repo_paths, args.outputpath = args.gitpath
+            args.gitpath = repo_paths
+        else:
+            args.outputpath = "gitstats-report"
 
     gitpath = args.gitpath
     outputpath = os.path.abspath(args.outputpath)

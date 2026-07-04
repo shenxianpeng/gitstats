@@ -455,13 +455,21 @@ class TestCLI:
     def test_parser_defaults(self):
         parser = get_parser()
         args = parser.parse_args(["some-repo", "out-dir"])
-        assert args.gitpath == ["some-repo"]
-        assert args.outputpath == "out-dir"
+        # With nargs='+' + nargs='?', argparse greedily consumes all
+        # positional args into gitpath. Resolution happens in main().
+        assert args.gitpath == ["some-repo", "out-dir"]
+        assert args.outputpath is None
         assert args.format is None
         assert args.verbose is False
         assert args.quiet is False
         assert args.ai is None
         assert args.refresh_ai is False
+
+    def test_parser_single_path(self):
+        parser = get_parser()
+        args = parser.parse_args(["some-repo"])
+        assert args.gitpath == ["some-repo"]
+        assert args.outputpath is None
 
     def test_parser_format(self):
         parser = get_parser()
@@ -553,6 +561,24 @@ def test_main_basic(git_repo_minimal, temp_dir):
     with patch.object(sys, "argv", ["gitstats", git_repo_minimal, output]):
         ret = main()
     assert ret == 0
+
+
+def test_main_default_outputpath(git_repo_minimal, temp_dir):
+    """Test main() without explicit outputpath (uses default gitstats-report)."""
+    import gitstats
+    import gitstats.main
+
+    cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
+    gitstats._config = cfg
+    gitstats.main.conf = cfg
+
+    import sys
+
+    with patch.object(sys, "argv", ["gitstats", git_repo_minimal]):
+        ret = main()
+    assert ret == 0
+    # Default output dir should have been created
+    assert os.path.isdir("gitstats-report")
 
 
 def test_main_with_config_override(git_repo_minimal, temp_dir):
