@@ -77,6 +77,7 @@ class HTMLReportCreator(ReportCreator):
         self.create_files_html(data, path)
         self.create_lines_html(data, path)
         self.create_tags_html(data, path)
+        self.create_collaboration_html(data, path)
 
         # Create AI Insights page if AI is enabled
         if hasattr(data, "ai_summaries") and data.ai_summaries:
@@ -840,6 +841,405 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def create_collaboration_html(self, data: Any, path: str) -> None:
+        """Create a collaboration network page showing a force-directed graph
+        of authors who frequently modify the same files together.
+        """
+        f = open(path + "/collaboration.html", "w", encoding="utf-8")
+        self.print_header(f)
+        self.print_nav(f)
+        f.write("<h1>Collaboration Network</h1>")
+
+        # Build nodes and links from collaboration_graph
+        _raw_collab = getattr(data, "collaboration_graph", {})
+        collab = _raw_collab if isinstance(_raw_collab, dict) else {}
+        _raw_af = getattr(data, "author_files", {})
+        author_files = _raw_af if isinstance(_raw_af, dict) else {}
+
+        if not collab:
+            f.write('<div class="collab-empty">')
+            f.write(
+                "<p>No collaboration data available. "
+                "This graph shows authors who frequently modify the same files.</p>"
+            )
+            f.write("</div>")
+            self.print_footer(f)
+            f.write("</body></html>")
+            f.close()
+            return
+
+        # Only include authors with at least some collaboration
+        # A node should appear if it has at least one edge
+        authors_with_edges = set()
+        for a in collab:
+            for b in collab[a]:
+                if collab[a][b] > 0:
+                    authors_with_edges.add(a)
+                    authors_with_edges.add(b)
+
+        # Build nodes list
+        nodes_list = []
+        author_to_idx: dict[str, int] = {}
+        for idx, author in enumerate(sorted(authors_with_edges)):
+            # Node size = number of files touched (with a minimum)
+            file_count = len(author_files.get(author, {}))
+            size = max(8, min(40, file_count // 2 + 5))
+            nodes_list.append({"id": author, "fileCount": file_count, "size": size})
+            author_to_idx[author] = idx
+
+        # Build links list (only include edges with weight >= threshold)
+        links_list = []
+        max_weight = 0
+        for a in collab:
+            for b, w in collab[a].items():
+                if a < b and w > 0:
+                    links_list.append({"source": a, "target": b, "weight": w})
+                    max_weight = max(max_weight, w)
+
+        if not links_list:
+            f.write('<div class="collab-empty">')
+            f.write(
+                "<p>No collaboration links found between authors. "
+                "Try analyzing a larger commit range.</p>"
+            )
+            f.write("</div>")
+            self.print_footer(f)
+            f.write("</body></html>")
+            f.close()
+            return
+
+        # Limit to top authors for visual clarity (most collaborative)
+        # Build a score based on sum of edge weights per node
+        node_score: dict[str, int] = {}
+        for link in links_list:
+            node_score[link["source"]] = node_score.get(link["source"], 0) + link["weight"]
+            node_score[link["target"]] = node_score.get(link["target"], 0) + link["weight"]
+
+        top_nodes = set(
+            sorted(node_score, key=node_score.get, reverse=True)[:50]  # type: ignore[arg-type]
+        )
+
+        # Filter nodes and links
+        filtered_authors = sorted(top_nodes)
+        filtered_links = [
+            link
+            for link in links_list
+            if link["source"] in top_nodes and link["target"] in top_nodes
+        ]
+
+        # Re-index for the filtered list
+        filtered_idx: dict[str, int] = {}
+        filtered_nodes: list[dict] = []
+        for idx, author in enumerate(filtered_authors):
+            file_count = len(author_files.get(author, {}))
+            size = max(8, min(40, file_count // 2 + 5))
+            filtered_nodes.append(
+                {
+                    "id": author,
+                    "fileCount": file_count,
+                    "size": size,
+                    "score": node_score.get(author, 0),
+                }
+            )
+            filtered_idx[author] = idx
+
+        type_key = "type"
+        filtered_links_typed = [
+            {
+                "source": filtered_idx[lnk["source"]],
+                "target": filtered_idx[lnk["target"]],
+                "weight": lnk["weight"],
+                type_key: "collaboration",
+            }
+            for lnk in filtered_links
+        ]
+
+        nodes_json = json.dumps(filtered_nodes, ensure_ascii=False).replace("</", "<\\/")
+        links_json = json.dumps(filtered_links_typed, ensure_ascii=False).replace("</", "<\\/")
+
+        f.write(f"""
+        <div class="collab-intro">
+            <p>This force-directed graph shows <strong>collaboration patterns</strong> among authors.
+            Nodes represent authors; edges connect authors who modified <strong>the same files</strong>.
+            Thicker edges = stronger collaboration. Larger nodes = more files touched.</p>
+            <p><strong>Tip:</strong> Drag nodes to explore. Hover over a node to see details.</p>
+        </div>
+
+        <div class="collab-legend">
+            <span class="collab-legend-item"><span class="collab-legend-dot" style="background:#5b8dee"></span> Author node (size = files touched)</span>
+            <span class="collab-legend-item"><span class="collab-legend-line"></span> Collaboration (thickness = strength)</span>
+        </div>
+
+        <div id="collab-graph" class="collab-graph-container">
+            <svg id="collab-svg" width="100%" height="520"></svg>
+            <div id="collab-tooltip" class="collab-tooltip" style="display:none;"></div>
+        </div>
+
+        <script>
+        (function() {{
+            var svgEl = document.getElementById('collab-svg');
+            var ns = 'http://www.w3.org/2000/svg';
+            var width = svgEl.parentElement.clientWidth || 960;
+            var height = 520;
+            svgEl.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+
+            var nodes = {nodes_json};
+            var links = {links_json};
+
+            var COLORS = ['#5b8dee','#1a7f37','#cf222e','#8250df','#e16f24','#0550ae','#9a6700','#656d76','#297c6b','#b08800'];
+
+            // Tooltip
+            var tooltip = document.getElementById('collab-tooltip');
+
+            // Initialize node positions randomly for visible animation
+            var cx = width / 2, cy = height / 2;
+            nodes.forEach(function(n, i) {{
+                n.x = cx + (Math.random() - 0.5) * width * 0.7;
+                n.y = cy + (Math.random() - 0.5) * height * 0.7;
+                n.vx = 0; n.vy = 0;
+                n.fixed = false;
+            }});
+
+            // Map link indices to node references
+            links.forEach(function(l) {{
+                l.sourceNode = nodes[l.source];
+                l.targetNode = nodes[l.target];
+            }});
+
+            // Build SVG elements
+            var g = document.createElementNS(ns, 'g');
+            svgEl.appendChild(g);
+
+            // Line elements for edges
+            var lineEls = [];
+            links.forEach(function(l) {{
+                var el = document.createElementNS(ns, 'line');
+                el.setAttribute('stroke', '#999');
+                el.setAttribute('stroke-opacity', '0.4');
+                el.setAttribute('stroke-width', Math.max(1, Math.sqrt(l.weight) * 0.8).toString());
+                g.appendChild(el);
+                lineEls.push(el);
+            }});
+
+            // Node groups (circle + text)
+            var nodeEls = [];
+            nodes.forEach(function(n, i) {{
+                var ng = document.createElementNS(ns, 'g');
+                ng.style.cursor = 'grab';
+
+                var circle = document.createElementNS(ns, 'circle');
+                circle.setAttribute('r', n.size);
+                circle.setAttribute('fill', COLORS[i % COLORS.length]);
+                circle.setAttribute('stroke', '#fff');
+                circle.setAttribute('stroke-width', '1.5');
+                circle.setAttribute('opacity', '0.85');
+                ng.appendChild(circle);
+
+                var text = document.createElementNS(ns, 'text');
+                text.textContent = n.id;
+                var textColor = getCSSVar('--text-color') || '#211e1e';
+                text.setAttribute('x', n.size + 4);
+                text.setAttribute('y', 4);
+                text.setAttribute('font-size', '11px');
+                text.setAttribute('font-family', '-apple-system, BlinkMacSystemFont, "Segoe UI", monospace');
+                text.setAttribute('fill', textColor);
+                text.setAttribute('pointer-events', 'none');
+                ng.appendChild(text);
+
+                g.appendChild(ng);
+                nodeEls.push(ng);
+
+                // Hover
+                ng.addEventListener('mouseover', function(e) {{
+                    var collabWith = links
+                        .filter(function(l) {{ return l.sourceNode === n || l.targetNode === n; }})
+                        .sort(function(a, b) {{ return b.weight - a.weight; }})
+                        .slice(0, 10);
+
+                    var tipHtml = '<strong>' + n.id + '</strong><br/>' +
+                        'Files touched: ' + n.fileCount + '<br/>' +
+                        'Collaboration score: ' + n.score + '<br/>' +
+                        '<hr style="margin:4px 0"/>' +
+                        '<em>Top collaborators:</em><br/>';
+
+                    if (collabWith.length === 0) {{
+                        tipHtml += '<span style="color:#888">(no collaborators shown)</span>';
+                    }} else {{
+                        collabWith.forEach(function(l) {{
+                            var other = l.sourceNode === n ? l.targetNode.id : l.sourceNode.id;
+                            tipHtml += other + ' (' + l.weight + ' files)<br/>';
+                        }});
+                    }}
+
+                    var container = document.getElementById('collab-graph');
+                    var cr = container.getBoundingClientRect();
+                    tooltip.innerHTML = tipHtml;
+                    tooltip.style.display = 'block';
+                    // Measure and flip if overflowing right edge
+                    var tipW = tooltip.offsetWidth;
+                    var spaceRight = cr.right - e.clientX - 15;
+                    var left;
+                    if (spaceRight < tipW) {{
+                        left = e.clientX - cr.left - tipW - 15;
+                    }} else {{
+                        left = e.clientX - cr.left + 15;
+                    }}
+                    tooltip.style.left = Math.max(4, left) + 'px';
+                    tooltip.style.top = (e.clientY - cr.top - 10) + 'px';
+                }});
+                ng.addEventListener('mouseout', function() {{
+                    tooltip.style.display = 'none';
+                }});
+
+                // Drag with viewBox coordinate mapping
+                var dragStartX, dragStartY, startX, startY, dragScaleX, dragScaleY;
+                ng.addEventListener('mousedown', function(e) {{
+                    e.preventDefault();
+                    n.fixed = true;
+                    ng.style.cursor = 'grabbing';
+                    var rect = svgEl.getBoundingClientRect();
+                    dragScaleX = width / rect.width;
+                    dragScaleY = height / rect.height;
+                    dragStartX = e.clientX;
+                    dragStartY = e.clientY;
+                    startX = n.x;
+                    startY = n.y;
+
+                    function onMove(ev) {{
+                        var dx = (ev.clientX - dragStartX) * dragScaleX;
+                        var dy = (ev.clientY - dragStartY) * dragScaleY;
+                        n.x = Math.max(20, Math.min(width - 20, startX + dx));
+                        n.y = Math.max(20, Math.min(height - 20, startY + dy));
+                        render();
+                    }}
+                    function onUp() {{
+                        document.removeEventListener('mousemove', onMove);
+                        document.removeEventListener('mouseup', onUp);
+                        ng.style.cursor = 'grab';
+                        setTimeout(function() {{ n.fixed = false; }}, 800);
+                    }}
+                    document.addEventListener('mousemove', onMove);
+                    document.addEventListener('mouseup', onUp);
+                }});
+            }});
+
+            // Force simulation — strong enough for visible animation
+            var alpha = 1.0;
+            var alphaMin = 0.003;
+            var alphaDecay = 0.015;
+            var repulsion = 8000;
+            var attraction = 0.04;
+            var centering = 0.003;
+            var friction = 0.55;
+
+            function tick() {{
+                // Repulsion (all node pairs)
+                for (var i = 0; i < nodes.length; i++) {{
+                    for (var j = i + 1; j < nodes.length; j++) {{
+                        var a = nodes[i], b = nodes[j];
+                        var dx = b.x - a.x, dy = b.y - a.y;
+                        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                        var force = repulsion * alpha / (dist * dist + 1);
+                        a.vx -= force * dx / dist;
+                        a.vy -= force * dy / dist;
+                        b.vx += force * dx / dist;
+                        b.vy += force * dy / dist;
+                    }}
+                }}
+
+                // Attraction (along edges)
+                for (var k = 0; k < links.length; k++) {{
+                    var s = links[k].sourceNode, t = links[k].targetNode;
+                    var dx = t.x - s.x, dy = t.y - s.y;
+                    var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                    var force = (dist - 120) * attraction * alpha;
+                    s.vx += force * dx / dist;
+                    s.vy += force * dy / dist;
+                    t.vx -= force * dx / dist;
+                    t.vy -= force * dy / dist;
+                }}
+
+                // Centering
+                for (i = 0; i < nodes.length; i++) {{
+                    var n = nodes[i];
+                    n.vx += (cx - n.x) * centering * alpha;
+                    n.vy += (cy - n.y) * centering * alpha;
+                }}
+
+                // Update positions
+                for (i = 0; i < nodes.length; i++) {{
+                    var n = nodes[i];
+                    if (n.fixed) continue;
+                    n.vx *= friction;
+                    n.vy *= friction;
+                    n.x += n.vx;
+                    n.y += n.vy;
+                    // Clamp to visible area
+                    n.x = Math.max(20, Math.min(width - 20, n.x));
+                    n.y = Math.max(20, Math.min(height - 20, n.y));
+                }}
+
+                render();
+
+                alpha -= alphaDecay;
+                if (alpha > alphaMin) {{
+                    requestAnimationFrame(tick);
+                }}
+            }}
+
+            function render() {{
+                for (var ri = 0; ri < links.length; ri++) {{
+                    var l = links[ri];
+                    lineEls[ri].setAttribute('x1', l.sourceNode.x);
+                    lineEls[ri].setAttribute('y1', l.sourceNode.y);
+                    lineEls[ri].setAttribute('x2', l.targetNode.x);
+                    lineEls[ri].setAttribute('y2', l.targetNode.y);
+                }}
+                for (var rj = 0; rj < nodes.length; rj++) {{
+                    nodeEls[rj].setAttribute('transform', 'translate(' + nodes[rj].x + ',' + nodes[rj].y + ')');
+                }}
+            }}
+
+            tick();
+            render();
+
+            // Handle theme changes
+            document.addEventListener('themechange', function() {{
+                var c = getCSSVar('--text-color') || '#211e1e';
+                nodeEls.forEach(function(ng) {{
+                    var t = ng.querySelector('text');
+                    if (t) t.setAttribute('fill', c);
+                }});
+            }});
+        }})();
+        </script>
+        """)
+
+        # Collaboration as table view
+        if filtered_links:
+            f.write(html_header(2, "Collaboration Details"))
+            f.write(
+                '<table class="sortable" id="collab-table"><tr>'
+                '<th>Author</th><th>Collaborator</th><th class="unsortable">Shared Files</th>'
+                "</tr>"
+            )
+            sorted_links = sorted(filtered_links, key=lambda x: x["weight"], reverse=True)
+            for link in sorted_links[:20]:
+                f.write(
+                    "<tr><td>%s</td><td>%s</td><td>%d</td></tr>"
+                    % (link["source"], link["target"], link["weight"])
+                )
+            f.write("</table>")
+            if len(sorted_links) > 20:
+                f.write(
+                    '<p class="moreauthors">Showing top 20 collaboration pairs. '
+                    "Total: %d pairs found.</p>" % len(sorted_links)
+                )
+
+        self.print_footer(f)
+        f.write("</body></html>")
+        f.close()
+
     def create_ai_insights_html(self, data: Any, path: str) -> None:
         """
         Create a dedicated AI Insights page with all AI-generated summaries.
@@ -1073,6 +1473,7 @@ class HTMLReportCreator(ReportCreator):
         has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
 
         ai_link = '<li><a href="ai-insights.html">AI Insights</a></li>' if has_ai else ""
+        collab_link = '<li><a href="collaboration.html">Collaboration</a></li>'
 
         github_icon = (
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" '
@@ -1098,6 +1499,7 @@ class HTMLReportCreator(ReportCreator):
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
+            {collab_link}
             {ai_link}
             </ul>
             <div class="nav-right">
