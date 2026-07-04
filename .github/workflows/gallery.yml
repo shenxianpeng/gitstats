@@ -1,0 +1,40 @@
+name: Gallery — Weekly Reports
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"   # Every Monday 00:00 UTC
+  workflow_dispatch:        # Manual trigger
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      - name: Install GitStats
+        run: |
+          pip install --upgrade pip
+          pip install -e .
+
+      - name: Generate Gallery
+        env:
+          FONTCONFIG_FILE: /dev/null
+        run: python scripts/generate_gallery.py
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./gallery
+          destination_dir: gallery
+          keep_files: true
