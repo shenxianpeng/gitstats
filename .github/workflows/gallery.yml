@@ -9,14 +9,20 @@ on:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
-    permissions:
-      contents: write
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        repo:
+          - { id: linux,       name: "Linux Kernel",   url: "torvalds/linux"          }
+          - { id: cpython,     name: "CPython",        url: "python/cpython"          }
+          - { id: vscode,      name: "VS Code",        url: "microsoft/vscode"        }
+          - { id: git,         name: "Git",             url: "git/git"                }
+          - { id: nginx,       name: "nginx",           url: "nginx/nginx"            }
+          - { id: kubernetes,  name: "Kubernetes",      url: "kubernetes/kubernetes"  }
 
     steps:
       - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
       - uses: actions/setup-python@v6
         with:
@@ -27,27 +33,36 @@ jobs:
           pip install --upgrade pip
           pip install -e .
 
-      - name: Generate Reports
+      - name: Generate Report
         env:
           FONTCONFIG_FILE: /dev/null
         run: |
-          set -e
-          github="https://github.com"
+          git clone "https://github.com/${{ matrix.repo.url }}.git" /tmp/repo
+          python -m gitstats /tmp/repo "report"
 
-          git clone "$github/torvalds/linux.git"        /tmp/linux
-          git clone "$github/python/cpython.git"        /tmp/cpython
-          git clone "$github/microsoft/vscode.git"      /tmp/vscode
-          git clone "$github/git/git.git"               /tmp/git
-          git clone "$github/nginx/nginx.git"           /tmp/nginx
-          git clone "$github/kubernetes/kubernetes.git" /tmp/kubernetes
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: report-${{ matrix.repo.id }}
+          path: report/
 
-          pids=""
-          for repo in linux cpython vscode git nginx kubernetes; do
-            python -m gitstats "/tmp/$repo" "gallery/$repo" &
-            pids="$pids $!"
-          done
-          for pid in $pids; do
-            wait $pid || exit 1
+  deploy:
+    needs: generate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: report-*
+          path: gallery
+
+      - name: Assemble Gallery
+        run: |
+          # Each artifact is in gallery/report-<id>/, rename to gallery/<id>/
+          for d in gallery/report-*; do
+            id="${d#gallery/report-}"
+            mv "$d" "gallery/$id"
           done
 
       - name: Deploy to GitHub Pages

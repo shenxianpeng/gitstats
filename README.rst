@@ -66,22 +66,22 @@ Check out the `GitStats Gallery <https://shenxianpeng.github.io/gitstats/gallery
      - Report
      - Repository
    * - Linux Kernel
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/repos/linux/index.html>`_
+     - `Report <https://shenxianpeng.github.io/gitstats/gallery/linux/index.html>`_
      - `torvalds/linux <https://github.com/torvalds/linux>`_
    * - CPython
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/repos/cpython/index.html>`_
+     - `Report <https://shenxianpeng.github.io/gitstats/gallery/cpython/index.html>`_
      - `python/cpython <https://github.com/python/cpython>`_
    * - VS Code
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/repos/vscode/index.html>`_
+     - `Report <https://shenxianpeng.github.io/gitstats/gallery/vscode/index.html>`_
      - `microsoft/vscode <https://github.com/microsoft/vscode>`_
    * - Git
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/repos/git/index.html>`_
+     - `Report <https://shenxianpeng.github.io/gitstats/gallery/git/index.html>`_
      - `git/git <https://github.com/git/git>`_
    * - nginx
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/repos/nginx/index.html>`_
+     - `Report <https://shenxianpeng.github.io/gitstats/gallery/nginx/index.html>`_
      - `nginx/nginx <https://github.com/nginx/nginx>`_
    * - Kubernetes
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/repos/kubernetes/index.html>`_
+     - `Report <https://shenxianpeng.github.io/gitstats/gallery/kubernetes/index.html>`_
      - `kubernetes/kubernetes <https://github.com/kubernetes/kubernetes>`_
 
 .. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/demo.gif
