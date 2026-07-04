@@ -23,6 +23,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          # setuptools-scm needs tags to derive the version shown in reports
+          fetch-depth: 0
+          fetch-tags: true
 
       - uses: actions/setup-python@v6
         with:
