@@ -29,16 +29,14 @@ jobs:
           python-version: "3.10"
 
       - name: Install GitStats
-        run: |
-          pip install --upgrade pip
-          pip install -e .
+        run: pipx install --python "$(which python)" .
 
       - name: Generate Report
         env:
           FONTCONFIG_FILE: /dev/null
         run: |
           git clone "https://github.com/${{ matrix.repo.url }}.git" /tmp/repo
-          python -m gitstats /tmp/repo "report"
+          gitstats /tmp/repo "report"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
