@@ -2,8 +2,8 @@ name: Gallery — Weekly Reports
 
 on:
   schedule:
-    # Monday 03:00 CST (UTC+8) = Sunday 19:00 UTC
-    - cron: "0 19 * * 0"
+    # Monday 03:00 UTC+3 = Monday 00:00 UTC
+    - cron: "0 0 * * 1"
   workflow_dispatch:
 
 jobs:
