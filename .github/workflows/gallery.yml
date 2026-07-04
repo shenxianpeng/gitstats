@@ -2,8 +2,8 @@ name: Gallery — Weekly Reports
 
 on:
   schedule:
-    - cron: "0 0 * * 1"   # Every Monday 00:00 UTC
-  workflow_dispatch:        # Manual trigger
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
 
 jobs:
   generate:
@@ -26,10 +26,23 @@ jobs:
           pip install --upgrade pip
           pip install -e .
 
-      - name: Generate Gallery
+      - name: Generate Reports
         env:
           FONTCONFIG_FILE: /dev/null
-        run: python scripts/generate_gallery.py
+        run: |
+          set -e
+          github="https://github.com"
+
+          git clone --depth 15000 "$github/torvalds/linux.git"        /tmp/linux
+          git clone --depth 10000 "$github/python/cpython.git"        /tmp/cpython
+          git clone --depth 10000 "$github/microsoft/vscode.git"      /tmp/vscode
+          git clone --depth  8000 "$github/git/git.git"               /tmp/git
+          git clone --depth  8000 "$github/nginx/nginx.git"           /tmp/nginx
+          git clone --depth 10000 "$github/kubernetes/kubernetes.git" /tmp/kubernetes
+
+          for repo in linux cpython vscode git nginx kubernetes; do
+            python -m gitstats "/tmp/$repo" "gallery/$repo"
+          done
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453
