@@ -66,9 +66,10 @@ def parallel_map_with_fallback(func, items):
         pool.terminate()
         pool.join()
         return results
-    except OSError as e:
+    except (OSError, RuntimeError) as e:
         # Fallback to sequential processing if multiprocessing fails
-        # (common in restricted environments like Netlify)
+        # (common in restricted environments like Netlify,
+        #  or on Windows where process spawning may not be available)
         logger.warning(
             f"Multiprocessing not available ({e}), falling back to sequential processing"
         )
@@ -791,8 +792,17 @@ class GitDataCollector(DataCollector):
         return datetime.datetime.fromtimestamp(self.last_commit_stamp)
 
     def get_tags(self) -> list[str]:
-        lines = get_pipe_output(["git show-ref --tags", "cut -d/ -f3"])
-        return lines.split("\n")
+        lines = get_pipe_output(["git show-ref --tags"])
+        tags = []
+        for line in lines.split("\n"):
+            if not line.strip():
+                continue
+            # Line format: "<hash> refs/tags/<tagname>"
+            parts = line.split()
+            if len(parts) >= 2:
+                tag = parts[-1].replace("refs/tags/", "")
+                tags.append(tag)
+        return tags
 
     def get_tag_date(self, tag: str) -> str:
         return self.rev_to_date("tags/" + tag)
