@@ -929,26 +929,41 @@ class HTMLReportCreator(ReportCreator):
             var medianY = {median_y};
 
             // Build Chart.js scatter datasets with color by quadrant
+            // Point size scales with hotspot score: bigger = riskier
+            var allScores = points.map(function(p) {{ return p.score; }});
+            var maxScore = Math.max.apply(null, allScores);
+            var minScore = Math.min.apply(null, allScores);
+            var scoreRange = maxScore - minScore || 1;
+
             var scatterData = points.map(function(p) {{
                 var color;
+                var quadrant;
                 if (p.x >= medianX && p.y >= medianY) {{
                     color = '#cf222e';  // critical (top-right)
+                    quadrant = 'critical';
                 }} else if (p.x < medianX && p.y >= medianY) {{
                     color = '#e16f24';  // warning (top-left)
+                    quadrant = 'warning';
                 }} else if (p.x >= medianX && p.y < medianY) {{
                     color = '#1a7f37';  // calm (bottom-right)
+                    quadrant = 'calm';
                 }} else {{
                     color = '#5b8dee';  // safe (bottom-left)
+                    quadrant = 'safe';
                 }}
+                // Normalize radius: 3 (min) to 12 (max) based on score percentile
+                var norm = (p.score - minScore) / scoreRange;
+                var radius = 3 + norm * 9;
                 return {{
                     x: p.x,
                     y: p.y,
                     path: p.path,
                     score: p.score,
+                    quadrant: quadrant,
                     backgroundColor: color,
                     borderColor: color,
-                    pointRadius: 4,
-                    pointHoverRadius: 7,
+                    pointRadius: radius,
+                    pointHoverRadius: radius + 4,
                 }};
             }});
 
@@ -992,8 +1007,6 @@ class HTMLReportCreator(ReportCreator):
                     datasets: [{{
                         label: 'Files',
                         data: scatterData,
-                        pointRadius: 4,
-                        pointHoverRadius: 7,
                         pointHitRadius: 10,
                     }}]
                 }},
@@ -1051,7 +1064,16 @@ class HTMLReportCreator(ReportCreator):
         # Sort by score descending, take top 50
         scatter_points.sort(key=lambda p: p["score"], reverse=True)
         top_hotspots = scatter_points[:50]
-        max_score = max(p["score"] for p in top_hotspots) if top_hotspots else 1
+
+        # Use quartile-based thresholds for risk levels (data-adaptive)
+        sorted_scores = sorted(p["score"] for p in top_hotspots)
+        n_scores = len(sorted_scores)
+        if n_scores >= 4:
+            threshold_warning = sorted_scores[n_scores // 4]  # 25th percentile
+            threshold_critical = sorted_scores[3 * n_scores // 4]  # 75th percentile
+        else:
+            threshold_warning = 0
+            threshold_critical = sorted_scores[-1] if sorted_scores else 0
 
         f.write("""
         <table class="sortable" id="hotspots">
@@ -1066,16 +1088,15 @@ class HTMLReportCreator(ReportCreator):
 
         for p in top_hotspots:
             score = p["score"]
-            risk = (
-                "Critical"
-                if score >= max_score * 0.66
-                else ("Warning" if score >= max_score * 0.33 else "Monitor")
-            )
-            risk_class = (
-                "risk-critical"
-                if score >= max_score * 0.66
-                else ("risk-warning" if score >= max_score * 0.33 else "risk-monitor")
-            )
+            if score >= threshold_critical:
+                risk = "Critical"
+                risk_class = "risk-critical"
+            elif score >= threshold_warning:
+                risk = "Warning"
+                risk_class = "risk-warning"
+            else:
+                risk = "Monitor"
+                risk_class = "risk-monitor"
             f.write(
                 '<tr><td>%s</td><td>%d</td><td>%d</td><td>%.1f</td><td class="%s">%s</td></tr>'
                 % (html.escape(p["path"]), p["x"], p["y"], score, risk_class, risk)
