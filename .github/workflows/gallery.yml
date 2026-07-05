@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         repo:
-          - { id: linux,      name: "Linux Kernel", url: "torvalds/linux"        }
+          # - { id: linux,      name: "Linux Kernel", url: "torvalds/linux"        }
           - { id: cpython,    name: "CPython",      url: "python/cpython"        }
           - { id: vscode,     name: "VS Code",      url: "microsoft/vscode"      }
           - { id: git,        name: "Git",          url: "git/git"               }
