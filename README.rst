@@ -65,9 +65,6 @@ Check out the `GitStats Gallery <https://shenxianpeng.github.io/gitstats/gallery
    * - Project
      - Report
      - Repository
-   * - Linux Kernel
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/linux/index.html>`_
-     - `torvalds/linux <https://github.com/torvalds/linux>`_
    * - CPython
      - `Report <https://shenxianpeng.github.io/gitstats/gallery/cpython/index.html>`_
      - `python/cpython <https://github.com/python/cpython>`_
