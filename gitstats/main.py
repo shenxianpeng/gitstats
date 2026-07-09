@@ -140,6 +140,9 @@ class DataCollector:
         # file churn: number of commits that touched each file path
         self.file_churn: dict[str, int] = {}  # filepath -> commit count
 
+        # hotspot files: change frequency × file size analysis
+        self.hotspot_files: dict[str, dict[str, int]] = {}  # filepath -> { churn, lines, score }
+
         # new contributors per month
         self.new_contributors_by_month: dict[str, int] = {}  # YYYY-MM -> count
 
@@ -549,6 +552,22 @@ class GitDataCollector(DataCollector):
             self.cache["lines_in_blob"][blob_id] = linecount
             self.extensions[ext]["lines"] += self.cache["lines_in_blob"][blob_id]
 
+        # Collect per-file line counts for hotspot analysis
+        # Re-parse the same ls-tree output; line counts are now resolved in cache
+        self.hotspot_files = {}
+        for ls_line in lines:
+            if not ls_line:
+                continue
+            ls_parts = re.split(r"\s+", ls_line, 4)
+            if ls_parts[0] == "160000" and ls_parts[3] == "-":
+                continue
+            hs_blob_id = ls_parts[2]
+            fullpath = ls_parts[4]
+            hs_lines = 0
+            if "lines_in_blob" in self.cache and hs_blob_id in self.cache["lines_in_blob"]:
+                hs_lines = self.cache["lines_in_blob"][hs_blob_id]
+            self.hotspot_files[fullpath] = {"lines": hs_lines, "churn": 0, "score": 0.0}
+
         # line statistics
         # outputs:
         #  N files changed, N insertions (+), N deletions(-)
@@ -753,6 +772,15 @@ class GitDataCollector(DataCollector):
                 current = current + 1 if diff <= 1 else 1
             longest = max(longest, current)
         self.longest_streak = longest
+
+        # Merge file_churn into hotspot_files and compute hotspot score
+        for filepath in self.hotspot_files:
+            churn = self.file_churn.get(filepath, 0)
+            self.hotspot_files[filepath]["churn"] = churn
+            lines = self.hotspot_files[filepath]["lines"]
+            # Hotspot score: churn * sqrt(lines) — amplifies files that are both
+            # frequently changed AND large in size
+            self.hotspot_files[filepath]["score"] = churn * (lines**0.5)
 
     def get_active_days(self) -> set[str]:
         return self.active_days

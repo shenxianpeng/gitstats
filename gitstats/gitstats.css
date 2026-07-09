@@ -533,6 +533,44 @@ table.noborders td:hover .bar {
 	color: var(--text-secondary);
 }
 
+/* ===== Hotspots Analysis ===== */
+.hotspots-intro {
+	padding: var(--space-3) var(--space-4);
+	margin: var(--space-3) 0;
+	background-color: var(--surface-color);
+	border: 1px solid var(--border-strong);
+	border-left: 3px solid var(--danger-color);
+}
+
+.hotspots-intro p {
+	margin: 0;
+	line-height: 1.6;
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+}
+
+.hotspots-summary {
+	margin: var(--space-3) 0;
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+	font-family: var(--font-mono);
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-1);
+}
+
+.hotspot-stat-sep {
+	color: var(--text-muted);
+	margin: 0 var(--space-1);
+}
+
+.risk-critical {
+	color: #cf222e;
+	font-weight: 700;
+}
+
+[data-theme="dark"] .risk-critical { color: #f87171; }
+
 /* ===== Footer ===== */
 .footer {
 	margin-top: var(--space-6);

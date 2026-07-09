@@ -77,6 +77,7 @@ class HTMLReportCreator(ReportCreator):
         self.create_files_html(data, path)
         self.create_lines_html(data, path)
         self.create_tags_html(data, path)
+        self.create_hotspots_html(data, path)
 
         # Create AI Insights page if AI is enabled
         if hasattr(data, "ai_summaries") and data.ai_summaries:
@@ -840,6 +841,245 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def create_hotspots_html(self, data: Any, path: str) -> None:
+        """
+        Create a Hotspots Analysis page with scatter plot of change frequency × file size.
+
+        Hotspots are files that are both frequently changed and large in size —
+        they are the most bug-prone files in the codebase (CodeScene concept).
+        """
+        hotspot_data = getattr(data, "hotspot_files", {})
+        if not hotspot_data:
+            return
+
+        f = open(path + "/hotspots.html", "w", encoding="utf-8")
+        self.print_header(f)
+        self.print_nav(f)
+        f.write("<h1>Hotspots Analysis</h1>")
+
+        f.write("""
+        <div class="hotspots-intro">
+            <p>Files changed often <em>and</em> large in size are the most bug-prone.
+            Each dot is a file — bigger dot = higher risk.
+            Dashed lines show the median file size and change frequency.</p>
+        </div>
+        """)
+
+        # Build scatter data: filter to files with churn > 0 and lines > 0
+        scatter_points = []
+        for filepath, info in hotspot_data.items():
+            churn = info.get("churn", 0)
+            lines = info.get("lines", 0)
+            score = info.get("score", 0.0)
+            if churn > 0 and lines > 0:
+                scatter_points.append(
+                    {
+                        "path": filepath,
+                        "x": lines,
+                        "y": churn,
+                        "score": round(score, 1),
+                    }
+                )
+
+        if not scatter_points:
+            f.write(
+                "<p>No hotspot data available. Files must have been touched by at least one commit and have > 0 lines.</p>"
+            )
+            self.print_footer(f)
+            f.write("</body></html>")
+            f.close()
+            return
+
+        # Compute medians for quadrant lines
+        lines_list = [p["x"] for p in scatter_points]
+        churn_list = [p["y"] for p in scatter_points]
+        lines_list.sort()
+        churn_list.sort()
+        n = len(scatter_points)
+        median_x = lines_list[n // 2] if n else 0
+        median_y = churn_list[n // 2] if n else 0
+
+        # Serialize to JSON for Chart.js
+        scatter_json = json.dumps(scatter_points).replace("</", "<\\/")
+
+        f.write(f"""
+        <div style="max-width:100%;margin-bottom:8px">
+            <canvas id="chart-hotspots"></canvas>
+        </div>
+        <script>
+        (function() {{
+            var points = {scatter_json};
+
+            var medianX = {median_x};
+            var medianY = {median_y};
+
+            // Build Chart.js scatter datasets with color by quadrant
+            // Point size scales with hotspot score: bigger = riskier
+            var allScores = points.map(function(p) {{ return p.score; }});
+            var maxScore = Math.max.apply(null, allScores);
+            var minScore = Math.min.apply(null, allScores);
+            var scoreRange = maxScore - minScore || 1;
+
+            var scatterData = points.map(function(p) {{
+                var color;
+                var quadrant;
+                if (p.x >= medianX && p.y >= medianY) {{
+                    color = '#cf222e';  // critical (top-right)
+                    quadrant = 'critical';
+                }} else if (p.x < medianX && p.y >= medianY) {{
+                    color = '#e16f24';  // warning (top-left)
+                    quadrant = 'warning';
+                }} else if (p.x >= medianX && p.y < medianY) {{
+                    color = '#1a7f37';  // calm (bottom-right)
+                    quadrant = 'calm';
+                }} else {{
+                    color = '#5b8dee';  // safe (bottom-left)
+                    quadrant = 'safe';
+                }}
+                // Normalize radius: 3 (min) to 12 (max) based on score percentile
+                var norm = (p.score - minScore) / scoreRange;
+                var radius = 3 + norm * 9;
+                return {{
+                    x: p.x,
+                    y: p.y,
+                    path: p.path,
+                    score: p.score,
+                    quadrant: quadrant,
+                    backgroundColor: color,
+                    borderColor: color,
+                    pointRadius: radius,
+                    pointHoverRadius: radius + 4,
+                }};
+            }});
+
+            // Custom plugin to draw quadrant median lines
+            var quadrantPlugin = {{
+                id: 'quadrantLines',
+                afterDraw: function(chart) {{
+                    var ctx = chart.ctx;
+                    var chartArea = chart.chartArea;
+                    var xScale = chart.scales.x;
+                    var yScale = chart.scales.y;
+
+                    var x = xScale.getPixelForValue(medianX);
+                    var y = yScale.getPixelForValue(medianY);
+
+                    ctx.save();
+                    ctx.strokeStyle = 'rgba(100, 100, 100, 0.6)';
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([6, 4]);
+
+                    // Vertical line (median file size)
+                    ctx.beginPath();
+                    ctx.moveTo(x, chartArea.top);
+                    ctx.lineTo(x, chartArea.bottom);
+                    ctx.stroke();
+
+                    // Horizontal line (median change frequency)
+                    ctx.beginPath();
+                    ctx.moveTo(chartArea.left, y);
+                    ctx.lineTo(chartArea.right, y);
+                    ctx.stroke();
+
+                    ctx.restore();
+                }}
+            }};
+
+            var ctx = document.getElementById('chart-hotspots').getContext('2d');
+            new Chart(ctx, {{
+                type: 'scatter',
+                data: {{
+                    datasets: [{{
+                        label: 'Files',
+                        data: scatterData,
+                        pointHitRadius: 10,
+                    }}]
+                }},
+                options: {{
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    aspectRatio: 3.0,
+                    plugins: {{
+                        legend: {{ display: false }},
+                        tooltip: {{
+                            callbacks: {{
+                                label: function(context) {{
+                                    var p = context.raw;
+                                    return ' ' + p.path + ' | ' + p.x + ' lines, changed ' + p.y + ' times, score: ' + p.score;
+                                }}
+                            }}
+                        }}
+                    }},
+                    scales: {{
+                        x: {{
+                            type: 'logarithmic',
+                            title: {{ display: true, text: 'File Size (lines of code)' }},
+                            min: 1,
+                            ticks: {{
+                                callback: function(value) {{
+                                    if (value >= 1000) return (value/1000) + 'k';
+                                    return value;
+                                }}
+                            }}
+                        }},
+                        y: {{
+                            type: 'logarithmic',
+                            title: {{ display: true, text: 'Change Frequency (commits)' }},
+                            min: 1,
+                            ticks: {{
+                                callback: function(value) {{
+                                    return value;
+                                }}
+                            }}
+                        }}
+                    }}
+                }},
+                plugins: [quadrantPlugin]
+            }});
+        }})();
+        </script>
+        """)
+
+        # Critical files = top-right quadrant of the scatter plot
+        # (above median in both lines and changes)
+        # This ensures red dots on the chart match the files in the table
+        critical_files = [p for p in scatter_points if p["x"] >= median_x and p["y"] >= median_y]
+        critical_files.sort(key=lambda p: p["score"], reverse=True)
+
+        # Summary stat line
+        f.write(f"""
+        <div class="hotspots-summary">
+            <span class="hotspot-stat">{len(scatter_points)} files changed</span>
+            <span class="hotspot-stat-sep">|</span>
+            <span class="hotspot-stat"><strong class="risk-critical">{len(critical_files)} critical</strong> (top-right quadrant)</span>
+            <span class="hotspot-stat-sep">|</span>
+            <span class="hotspot-stat">median {median_x} lines, {median_y} changes</span>
+        </div>
+        """)
+
+        # Show critical files in the table (matches red dots on the scatter plot)
+        if critical_files:
+            f.write(html_header(2, f"Critical Hotspots ({len(critical_files)})"))
+            f.write("""
+            <table class="sortable" id="hotspots">
+            <tr>
+                <th>File</th>
+                <th>Lines</th>
+                <th>Changes</th>
+                <th>Score</th>
+            </tr>
+            """)
+            for p in critical_files:
+                f.write(
+                    "<tr><td>%s</td><td>%d</td><td>%d</td><td>%.1f</td></tr>"
+                    % (html.escape(p["path"]), p["x"], p["y"], p["score"])
+                )
+            f.write("</table>")
+
+        self.print_footer(f)
+        f.write("</body></html>")
+        f.close()
+
     def create_ai_insights_html(self, data: Any, path: str) -> None:
         """
         Create a dedicated AI Insights page with all AI-generated summaries.
@@ -1098,6 +1338,7 @@ class HTMLReportCreator(ReportCreator):
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
             {ai_link}
             </ul>
             <div class="nav-right">
