@@ -23,12 +23,15 @@ def generate(gallery_root: str) -> None:
             or entry in (".", "..")
         ):
             continue
-        entry_path = os.path.join(abs_root, entry)
+        entry_path = os.path.realpath(os.path.join(abs_root, entry))
+        # Ensure the resolved path is still inside the gallery root
+        if not entry_path.startswith(abs_root + os.sep):
+            continue
         report_path = os.path.join(entry_path, "index.html")
         if os.path.isdir(entry_path) and os.path.isfile(report_path):
             display_name = entry.capitalize()
             # Try to read a friendlier name from a .name file
-            name_file = os.path.join(entry_path, ".name")
+            name_file = os.path.realpath(os.path.join(entry_path, ".name"))
             if os.path.isfile(name_file):
                 with open(name_file) as f:
                     display_name = f.read().strip()
@@ -118,7 +121,7 @@ def generate(gallery_root: str) -> None:
 </body>
 </html>
 """
-    index_path = os.path.join(abs_root, "index.html")
+    index_path = os.path.realpath(os.path.join(abs_root, "index.html"))
     with open(index_path, "w") as f:
         f.write(html)
     print(f"✅ Gallery index generated: {index_path}")
