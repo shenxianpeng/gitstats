@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Generate an index.html for the gallery directory."""
 
-import json
 import os
 import sys
 from datetime import datetime
@@ -93,8 +92,8 @@ def generate(gallery_root: str) -> None:
   <div class="grid">
 """
     for repo in repos:
-        html += f"""    <a class="card" href="{repo['id']}/index.html">
-      <h2>{repo['name']}</h2>
+        html += f"""    <a class="card" href="{repo["id"]}/index.html">
+      <h2>{repo["name"]}</h2>
       <p>gitstats report</p>
       <span class="arrow">→</span>
     </a>
