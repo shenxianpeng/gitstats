@@ -3,21 +3,35 @@
 
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 def generate(gallery_root: str) -> None:
     """Scan gallery/<id>/ subdirectories for index.html and generate an index page."""
+    # Resolve to an absolute path and ensure it is a directory
+    abs_root = os.path.realpath(gallery_root)
+    if not os.path.isdir(abs_root):
+        print(f"Error: {gallery_root} is not a directory", file=sys.stderr)
+        sys.exit(1)
+
     repos = []
-    for entry in sorted(os.listdir(gallery_root)):
-        entry_path = os.path.join(gallery_root, entry)
+    for entry in sorted(os.listdir(abs_root)):
+        # Prevent path traversal: reject entries with separators or parent refs
+        if (
+            os.path.sep in entry
+            or (os.path.altsep and os.path.altsep in entry)
+            or entry in (".", "..")
+        ):
+            continue
+        entry_path = os.path.join(abs_root, entry)
         report_path = os.path.join(entry_path, "index.html")
         if os.path.isdir(entry_path) and os.path.isfile(report_path):
             display_name = entry.capitalize()
             # Try to read a friendlier name from a .name file
             name_file = os.path.join(entry_path, ".name")
             if os.path.isfile(name_file):
-                display_name = open(name_file).read().strip()
+                with open(name_file) as f:
+                    display_name = f.read().strip()
             repos.append({"id": entry, "name": display_name})
 
     repos.sort(key=lambda r: r["name"].lower())
@@ -88,7 +102,7 @@ def generate(gallery_root: str) -> None:
     Live reports for open-source projects —
     <a href="https://github.com/shenxianpeng/gitstats">GitStats</a>
   </p>
-  <p class="updated">Last updated: {datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")}</p>
+  <p class="updated">Last updated: {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")}</p>
   <div class="grid">
 """
     for repo in repos:
@@ -104,7 +118,7 @@ def generate(gallery_root: str) -> None:
 </body>
 </html>
 """
-    index_path = os.path.join(gallery_root, "index.html")
+    index_path = os.path.join(abs_root, "index.html")
     with open(index_path, "w") as f:
         f.write(html)
     print(f"✅ Gallery index generated: {index_path}")
