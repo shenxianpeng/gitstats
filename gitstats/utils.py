@@ -42,23 +42,31 @@ def get_git_version() -> str:
 
 
 def _run_command(cmd: str) -> bytes:
-    """Run a single command safely without shell=True."""
-    args = shlex.split(cmd)
+    """Run a single command safely without shell=True.
+
+    Uses posix=True on all platforms since git commands use POSIX-style
+    argument quoting (e.g. --pretty=format:"%at %aN").
+    """
+    args = shlex.split(cmd, posix=True)
     result = subprocess.run(args, capture_output=True, text=False, check=False)
     return result.stdout
 
 
 def _run_pipe_chain(cmds: list[str]) -> bytes:
-    """Run a chain of piped commands safely without shell=True."""
+    """Run a chain of piped commands safely without shell=True.
+
+    Uses posix=True on all platforms since git commands use POSIX-style
+    argument quoting (e.g. --pretty=format:"%at %aN").
+    """
     if not cmds:
         return b""
 
-    args = shlex.split(cmds[0])
+    args = shlex.split(cmds[0], posix=True)
     p = subprocess.Popen(args, stdout=subprocess.PIPE)
     processes = [p]
 
     for cmd in cmds[1:]:
-        args = shlex.split(cmd)
+        args = shlex.split(cmd, posix=True)
         p = subprocess.Popen(args, stdin=p.stdout, stdout=subprocess.PIPE)
         processes.append(p)
 

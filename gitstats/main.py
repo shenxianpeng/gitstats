@@ -26,6 +26,7 @@ from gitstats.utils import (
     get_version,
     should_exclude_file,
 )
+from gitstats.wrapped import WrappedCardGenerator
 
 os.environ["LC_ALL"] = "C"
 
@@ -65,9 +66,10 @@ def parallel_map_with_fallback(func, items):
         pool.terminate()
         pool.join()
         return results
-    except OSError as e:
+    except (OSError, RuntimeError) as e:
         # Fallback to sequential processing if multiprocessing fails
-        # (common in restricted environments like Netlify)
+        # (common in restricted environments like Netlify,
+        #  or on Windows where process spawning may not be available)
         logger.warning(
             f"Multiprocessing not available ({e}), falling back to sequential processing"
         )
@@ -790,8 +792,17 @@ class GitDataCollector(DataCollector):
         return datetime.datetime.fromtimestamp(self.last_commit_stamp)
 
     def get_tags(self) -> list[str]:
-        lines = get_pipe_output(["git show-ref --tags", "cut -d/ -f3"])
-        return lines.split("\n")
+        lines = get_pipe_output(["git show-ref --tags"])
+        tags = []
+        for line in lines.split("\n"):
+            if not line.strip():
+                continue
+            # Line format: "<hash> refs/tags/<tagname>"
+            parts = line.split()
+            if len(parts) >= 2:
+                tag = parts[-1].replace("refs/tags/", "")
+                tags.append(tag)
+        return tags
 
     def get_tag_date(self, tag: str) -> str:
         return self.rev_to_date("tags/" + tag)
@@ -816,7 +827,7 @@ class GitDataCollector(DataCollector):
         return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
 
 
-def run(gitpath, outputpath, extra_fmt=None) -> int:
+def run(gitpath, outputpath, extra_fmt=None, wrapped_config=None) -> int:
     """Run the gitstats program.
     Args:
         gitpath: path to the git repository
@@ -906,6 +917,24 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
         else:
             logger.error(f"Unsupported format '{extra_fmt}'")
             return 1
+
+    # Generate Wrapped card if requested
+    if wrapped_config and wrapped_config.get("enabled", False):
+        logger.info("Generating Wrapped card...")
+        try:
+            generator = WrappedCardGenerator(
+                data=data,
+                year=wrapped_config.get("year"),
+                theme=wrapped_config.get("theme", "midnight"),
+            )
+            wrapped_path = wrapped_config.get("output")
+            if not wrapped_path:
+                year_str = wrapped_config.get("year") or datetime.datetime.now().year
+                wrapped_path = os.path.join(outputpath, f"wrapped-{year_str}.svg")
+            generator.generate(output_path=wrapped_path)
+            logger.info(f"To view the card, open: {wrapped_path}")
+        except Exception as e:
+            logger.warning(f"Failed to generate Wrapped card: {e}")
 
     time_end = time.time()
     exectime_internal = time_end - time_start
@@ -1009,6 +1038,31 @@ def get_parser() -> argparse.ArgumentParser:
         help="Force refresh AI-generated summaries (ignore cache)",
     )
 
+    # Wrapped card generation
+    parser.add_argument(
+        "--wrapped",
+        action="store_true",
+        default=False,
+        help="Generate a shareable 'Repo Wrapped' SVG card alongside the report",
+    )
+    parser.add_argument(
+        "--wrapped-year",
+        type=int,
+        default=None,
+        help="Year for the Wrapped card (default: current year)",
+    )
+    parser.add_argument(
+        "--wrapped-theme",
+        choices=["midnight", "sunset", "clean"],
+        default="midnight",
+        help="Color theme for the Wrapped card (default: midnight)",
+    )
+    parser.add_argument(
+        "--wrapped-output",
+        default=None,
+        help="Output path for the Wrapped SVG card (default: <outputpath>/wrapped-<year>.svg)",
+    )
+
     return parser
 
 
@@ -1062,7 +1116,17 @@ def main() -> int:
     # Store refresh_ai flag for later use
     conf["refresh_ai"] = args.refresh_ai if hasattr(args, "refresh_ai") else False
 
-    run(gitpath, outputpath, extra_fmt=extra_fmt)
+    # Build wrapped config
+    wrapped_config = None
+    if args.wrapped:
+        wrapped_config = {
+            "enabled": True,
+            "year": args.wrapped_year,
+            "theme": args.wrapped_theme,
+            "output": args.wrapped_output,
+        }
+
+    run(gitpath, outputpath, extra_fmt=extra_fmt, wrapped_config=wrapped_config)
 
     return 0
 
