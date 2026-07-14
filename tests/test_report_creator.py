@@ -586,6 +586,7 @@ def test_create_all_pages(mock_data_collector, temp_dir):
         "files.html",
         "lines.html",
         "tags.html",
+        "collaboration.html",
     ]
     for fname in expected_files:
         path = f"{temp_dir}/{fname}"
@@ -609,5 +610,5 @@ def test_create_copies_static_files(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
     creator.create(mock_data_collector, temp_dir)
 
-    for fname in ("sortable.js", "chart.umd.min.js", "gitstats.css"):
+    for fname in ("sortable.js", "chart.umd.min.js", "gitstats.css", "collaboration.js"):
         assert os.path.exists(f"{temp_dir}/{fname}"), f"Missing static file: {fname}"
