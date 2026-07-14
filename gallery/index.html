@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitStats Gallery</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f8f9fa;
+    color: #1f2937;
+    line-height: 1.6;
+    padding: 2rem 1rem;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  h1 a { color: inherit; text-decoration: none; }
+  h1 a:hover { color: #2563eb; }
+  .subtitle {
+    color: #6b7280;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+  }
+  .subtitle a { color: #2563eb; text-decoration: none; }
+  .subtitle a:hover { text-decoration: underline; }
+  .updated { font-size: 0.875rem; color: #9ca3af; margin-bottom: 1.5rem; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1rem;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.25rem;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+  }
+  .card:hover {
+    border-color: #2563eb;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+  }
+  .card h2 { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.25rem; }
+  .card p { font-size: 0.875rem; color: #6b7280; }
+  .card .arrow { margin-top: auto; align-self: flex-end; font-size: 1.25rem; color: #2563eb; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1><a href=".">📊 GitStats Gallery</a></h1>
+  <p class="subtitle">
+    Live reports for open-source projects —
+    <a href="https://github.com/shenxianpeng/gitstats">GitStats</a>
+  </p>
+  <p class="updated">Last updated: 2026-07-14 10:15 UTC</p>
+  <div class="grid">
+    <a class="card" href="cpython/index.html">
+      <h2>Cpython</h2>
+      <p>gitstats report</p>
+      <span class="arrow">→</span>
+    </a>
+    <a class="card" href="git/index.html">
+      <h2>Git</h2>
+      <p>gitstats report</p>
+      <span class="arrow">→</span>
+    </a>
+    <a class="card" href="kubernetes/index.html">
+      <h2>Kubernetes</h2>
+      <p>gitstats report</p>
+      <span class="arrow">→</span>
+    </a>
+    <a class="card" href="nginx/index.html">
+      <h2>Nginx</h2>
+      <p>gitstats report</p>
+      <span class="arrow">→</span>
+    </a>
+    <a class="card" href="vscode/index.html">
+      <h2>Vscode</h2>
+      <p>gitstats report</p>
+      <span class="arrow">→</span>
+    </a>
+  </div>
+</div>
+</body>
+</html>
