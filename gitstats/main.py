@@ -802,34 +802,46 @@ class GitDataCollector(DataCollector):
         The most connected authors are effectively always among the top
         committers, and the report renders only the 50 most-connected nodes.
         """
-        # Distinct authors per file (across everyone, not just the shortlist)
-        # drives the popular-file damping factor.
-        file_author_count: dict[str, int] = {}
-        for files_dict in self.author_files.values():
-            for filepath in files_dict:
-                file_author_count[filepath] = file_author_count.get(filepath, 0) + 1
-
+        file_author_count = self._count_authors_per_file()
         max_authors = conf["ownership_max_authors"]
         authors_list = [
             a for a in self.authors_by_commits if a in self.author_files and not a.endswith("[bot]")
         ][:max_authors]
         for i, author_a in enumerate(authors_list):
-            files_a = set(self.author_files[author_a].keys())
-            for j in range(i + 1, len(authors_list)):
-                author_b = authors_list[j]
-                files_b = set(self.author_files[author_b].keys())
-                common_files = files_a & files_b
-                if not common_files:
-                    continue
-                weight = 0.0
-                for f in common_files:
-                    shared = min(self.author_files[author_a][f], self.author_files[author_b][f])
-                    weight += shared / max(1, file_author_count[f] - 1)
-                weight = round(weight, 2)
+            for author_b in authors_list[i + 1 :]:
+                weight = self._ownership_pair_weight(author_a, author_b, file_author_count)
                 if weight <= 0:
                     continue
                 self.ownership_graph.setdefault(author_a, {})[author_b] = weight
                 self.ownership_graph.setdefault(author_b, {})[author_a] = weight
+
+    def _count_authors_per_file(self) -> dict[str, int]:
+        """Count how many distinct authors touched each file.
+
+        Drives the popular-file damping factor and is computed across everyone,
+        not just the shortlist considered for the graph.
+        """
+        counts: dict[str, int] = {}
+        for files_dict in self.author_files.values():
+            for filepath in files_dict:
+                counts[filepath] = counts.get(filepath, 0) + 1
+        return counts
+
+    def _ownership_pair_weight(
+        self, author_a: str, author_b: str, file_author_count: dict[str, int]
+    ) -> float:
+        """Damped shared-ownership weight between two authors.
+
+        Each shared file contributes ``min(count_a, count_b)`` divided by how
+        many authors touched it, so ubiquitous files count for little.
+        """
+        files_a = self.author_files[author_a]
+        files_b = self.author_files[author_b]
+        weight = 0.0
+        for f in files_a.keys() & files_b.keys():
+            shared = min(files_a[f], files_b[f])
+            weight += shared / max(1, file_author_count[f] - 1)
+        return round(weight, 2)
 
     def get_active_days(self) -> set[str]:
         return self.active_days
