@@ -15,20 +15,18 @@ from typing import Any
 logger = logging.getLogger("gitstats")
 
 
-def _write_within(output_path: str, base_dir: str | None, content: str) -> str:
-    """Write ``content`` to ``output_path``, confined to ``base_dir``.
+def _write_within(directory: str, filename: str, content: str) -> str:
+    """Write ``content`` into ``directory`` under a sanitized file name.
 
-    The path is resolved and checked to stay within the boundary directory
-    before any filesystem access, so a crafted path cannot escape it (directory
-    traversal). When ``base_dir`` is None the output path's own resolved
-    directory is used as the boundary. Returns the resolved path written to.
+    ``filename`` is reduced to its base name, dropping any directory components
+    or traversal segments, so the write cannot escape ``directory`` regardless
+    of what the caller passed. ``directory`` must already exist. Returns the
+    path written to.
     """
-    target = os.path.abspath(output_path)
-    base = os.path.abspath(base_dir) if base_dir else os.path.dirname(target)
-    base = base or os.path.abspath(".")
-    if os.path.commonpath([base, target]) != base:
-        raise ValueError(f"Refusing to write outside {base}: {output_path}")
-    os.makedirs(os.path.dirname(target) or ".", exist_ok=True)
+    safe_name = os.path.basename(filename)
+    if not safe_name or safe_name in (os.curdir, os.pardir):
+        raise ValueError(f"Invalid output file name: {filename!r}")
+    target = os.path.join(directory, safe_name)
     with open(target, "w", encoding="utf-8") as f:
         f.write(content)
     return target
@@ -386,11 +384,12 @@ class WrappedCardGenerator:
         """Generate the Wrapped card and save to a file.
 
         Args:
-            output_path: Path to save the SVG.  Auto-generated if None.
-            base_dir: Directory the card must stay within. When provided, the
-                resolved output path is validated against it so a crafted path
-                cannot escape the intended output directory. Defaults to the
-                output path's own directory.
+            output_path: Where to save the SVG. Only its file name is used; the
+                directory comes from ``base_dir`` (or the path's own directory).
+                Auto-generated if None.
+            base_dir: Existing directory to write the card into. The card's file
+                name is stripped to its base name so a crafted path cannot escape
+                this directory.
 
         Returns:
             The path to the generated SVG file.
@@ -399,9 +398,10 @@ class WrappedCardGenerator:
         svg = self._render_card(stats)
 
         if output_path is None:
-            output_path = os.path.join(base_dir or ".", f"gitstats-wrapped-{self.year}.svg")
+            output_path = f"gitstats-wrapped-{self.year}.svg"
 
-        output_path = _write_within(output_path, base_dir, svg)
+        directory = base_dir if base_dir else (os.path.dirname(output_path) or ".")
+        output_path = _write_within(directory, os.path.basename(output_path), svg)
 
         logger.info(f"Wrapped card saved: {output_path}")
         return output_path

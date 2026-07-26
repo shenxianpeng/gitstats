@@ -3,8 +3,6 @@
 import os
 from unittest.mock import MagicMock
 
-import pytest
-
 from gitstats.wrapped import (
     MONTH_NAMES,
     WrappedCardGenerator,
@@ -12,15 +10,15 @@ from gitstats.wrapped import (
 )
 
 
-def test_write_within_rejects_traversal(tmp_path):
+def test_write_within_strips_traversal(tmp_path):
     base = str(tmp_path)
-    # A normal name inside the base is written and its resolved path returned.
-    ok = _write_within(os.path.join(base, "card.svg"), base, "<svg/>")
+    # A plain name is written directly inside the directory.
+    ok = _write_within(base, "card.svg", "<svg/>")
     assert ok == os.path.join(base, "card.svg")
     assert os.path.exists(ok)
-    # A traversal path escaping the base is rejected before any write.
-    with pytest.raises(ValueError):
-        _write_within(os.path.join(base, "..", "escape.svg"), base, "<svg/>")
+    # Any directory components in the name are stripped, so the write stays in base.
+    ok2 = _write_within(base, "../../escape.svg", "<svg/>")
+    assert ok2 == os.path.join(base, "escape.svg")
     assert not os.path.exists(os.path.join(os.path.dirname(base), "escape.svg"))
 
 
