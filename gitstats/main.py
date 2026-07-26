@@ -140,11 +140,11 @@ class DataCollector:
         # file churn: number of commits that touched each file path
         self.file_churn: dict[str, int] = {}  # filepath -> commit count
 
-        # collaboration network: author -> file -> commit count
+        # code ownership: author -> file -> commit count
         self.author_files: dict[str, dict[str, int]] = {}
 
-        # collaboration graph: adjacency matrix, authorA -> authorB -> weight
-        self.collaboration_graph: dict[str, dict[str, int]] = {}
+        # code ownership graph: adjacency matrix, authorA -> authorB -> weight
+        self.ownership_graph: dict[str, dict[str, float]] = {}
 
         # new contributors per month
         self.new_contributors_by_month: dict[str, int] = {}  # YYYY-MM -> count
@@ -449,7 +449,7 @@ class GitDataCollector(DataCollector):
                 merged_authors[resolved] = merged_authors.get(resolved, 0) + commits
             self.tags[tag]["authors"] = merged_authors
 
-        # Merge aliases in author_files (collaboration network)
+        # Merge aliases in author_files (code ownership)
         merged_author_files: dict[str, dict[str, int]] = {}
         for author, files_dict in self.author_files.items():
             canonical = name_to_canonical.get(author, author)
@@ -720,7 +720,7 @@ class GitDataCollector(DataCollector):
 
         # Single name-only pass drives two metrics:
         #   * file_churn        -> how many commits touched each file
-        #   * author_files      -> which files each author touches (collaboration)
+        #   * author_files      -> which files each author touches (code ownership)
         # Each commit is prefixed with a "COMMIT:<author>" marker line; the lines
         # that follow are the file paths changed by that commit.
         churn_output = get_pipe_output(
@@ -785,23 +785,34 @@ class GitDataCollector(DataCollector):
             longest = max(longest, current)
         self.longest_streak = longest
 
-        self._build_collaboration_graph()
+        self._build_ownership_graph()
 
-    def _build_collaboration_graph(self) -> None:
-        """Populate ``collaboration_graph`` from ``author_files``.
+    def _build_ownership_graph(self) -> None:
+        """Populate ``ownership_graph`` from ``author_files``.
 
-        Two authors are linked when they have touched the same file; the edge
-        weight sums ``min(count_a, count_b)`` over their shared files.
+        Two authors are linked when they have edited the same files. Each shared
+        file contributes ``min(count_a, count_b)`` damped by the inverse of how
+        many authors touched that file, so ubiquitous files (READMEs, configs
+        that nearly everyone edits) barely count and do not turn the graph into a
+        hairball, while files shared by only a couple of authors count for full
+        weight.
 
         Only the top-N committers (bots excluded) are considered so the
         O(authors^2) pairwise comparison stays bounded on large repositories.
-        The most collaborative authors are effectively always among the top
+        The most connected authors are effectively always among the top
         committers, and the report renders only the 50 most-connected nodes.
         """
-        max_collab_authors = conf["collaboration_max_authors"]
+        # Distinct authors per file (across everyone, not just the shortlist)
+        # drives the popular-file damping factor.
+        file_author_count: dict[str, int] = {}
+        for files_dict in self.author_files.values():
+            for filepath in files_dict:
+                file_author_count[filepath] = file_author_count.get(filepath, 0) + 1
+
+        max_authors = conf["ownership_max_authors"]
         authors_list = [
             a for a in self.authors_by_commits if a in self.author_files and not a.endswith("[bot]")
-        ][:max_collab_authors]
+        ][:max_authors]
         for i, author_a in enumerate(authors_list):
             files_a = set(self.author_files[author_a].keys())
             for j in range(i + 1, len(authors_list)):
@@ -810,12 +821,15 @@ class GitDataCollector(DataCollector):
                 common_files = files_a & files_b
                 if not common_files:
                     continue
-                weight = sum(
-                    min(self.author_files[author_a][f], self.author_files[author_b][f])
-                    for f in common_files
-                )
-                self.collaboration_graph.setdefault(author_a, {})[author_b] = weight
-                self.collaboration_graph.setdefault(author_b, {})[author_a] = weight
+                weight = 0.0
+                for f in common_files:
+                    shared = min(self.author_files[author_a][f], self.author_files[author_b][f])
+                    weight += shared / max(1, file_author_count[f] - 1)
+                weight = round(weight, 2)
+                if weight <= 0:
+                    continue
+                self.ownership_graph.setdefault(author_a, {})[author_b] = weight
+                self.ownership_graph.setdefault(author_b, {})[author_a] = weight
 
     def get_active_days(self) -> set[str]:
         return self.active_days

@@ -261,7 +261,7 @@ class TestGitDataCollectorIntegration:
         assert dc.file_churn["main.py"] == 2
         assert dc.file_churn["utils.py"] == 1
 
-    def test_collect_collaboration_graph_empty_without_shared_files(self, git_repo):
+    def test_ownership_graph_empty_without_shared_files(self, git_repo):
         """Alice and Bob share no files in the fixture, so the graph is empty."""
         dc = GitDataCollector()
         prevdir = os.getcwd()
@@ -272,10 +272,14 @@ class TestGitDataCollectorIntegration:
             os.chdir(prevdir)
         dc.refine()
 
-        assert dc.collaboration_graph == {}
+        assert dc.ownership_graph == {}
 
-    def test_build_collaboration_graph_weights(self):
-        """Edge weight sums min(count_a, count_b) over shared files."""
+    def test_build_ownership_graph_weights(self):
+        """Edge weight sums min(count_a, count_b) over shared files.
+
+        Each file here is touched by exactly two authors, so the popular-file
+        damping factor is 1 and weights equal the raw shared counts.
+        """
         dc = GitDataCollector()
         dc.author_files = {
             "A": {"f1": 3, "f2": 1},
@@ -284,16 +288,38 @@ class TestGitDataCollectorIntegration:
         }
         dc.authors_by_commits = ["A", "B", "C"]
 
-        dc._build_collaboration_graph()
+        dc._build_ownership_graph()
 
         # A&B share f1 -> min(3,5)=3 ; A&C share f2 -> min(1,4)=1 ; B&C share nothing
-        assert dc.collaboration_graph == {
-            "A": {"B": 3, "C": 1},
-            "B": {"A": 3},
-            "C": {"A": 1},
+        assert dc.ownership_graph == {
+            "A": {"B": 3.0, "C": 1.0},
+            "B": {"A": 3.0},
+            "C": {"A": 1.0},
         }
 
-    def test_build_collaboration_graph_excludes_bots(self):
+    def test_build_ownership_graph_damps_popular_files(self):
+        """Files touched by many authors contribute less than exclusive ones."""
+        dc = GitDataCollector()
+        dc.author_files = {
+            "A": {"pop": 4, "ab": 2},
+            "B": {"pop": 4, "ab": 2},
+            "C": {"pop": 4},
+        }
+        dc.authors_by_commits = ["A", "B", "C"]
+
+        dc._build_ownership_graph()
+
+        # "pop" is touched by all 3 authors -> factor 1/(3-1)=0.5 per shared edit;
+        # "ab" is touched by only A and B -> factor 1/(2-1)=1.
+        # A&B: pop 4*0.5 + ab 2*1 = 4.0 ; A&C and B&C: pop 4*0.5 = 2.0
+        assert dc.ownership_graph["A"]["B"] == 4.0
+        assert dc.ownership_graph["A"]["C"] == 2.0
+        assert dc.ownership_graph["B"]["C"] == 2.0
+        # The pair sharing an exclusive file outranks pairs joined only by the
+        # ubiquitous file.
+        assert dc.ownership_graph["A"]["B"] > dc.ownership_graph["A"]["C"]
+
+    def test_build_ownership_graph_excludes_bots(self):
         """Authors whose name ends with [bot] are not linked into the graph."""
         dc = GitDataCollector()
         dc.author_files = {
@@ -302,11 +328,11 @@ class TestGitDataCollectorIntegration:
         }
         dc.authors_by_commits = ["dependabot[bot]", "A"]
 
-        dc._build_collaboration_graph()
+        dc._build_ownership_graph()
 
-        assert dc.collaboration_graph == {}
+        assert dc.ownership_graph == {}
 
-    def test_build_collaboration_graph_respects_author_cap(self):
+    def test_build_ownership_graph_respects_author_cap(self):
         """Only the top-N committers are considered when building the graph."""
         dc = GitDataCollector()
         dc.author_files = {
@@ -317,11 +343,11 @@ class TestGitDataCollectorIntegration:
         # Most-committing first; cap of 2 drops C entirely.
         dc.authors_by_commits = ["A", "B", "C"]
 
-        with patch("gitstats.main.conf", {"collaboration_max_authors": 2}):
-            dc._build_collaboration_graph()
+        with patch("gitstats.main.conf", {"ownership_max_authors": 2}):
+            dc._build_ownership_graph()
 
-        assert set(dc.collaboration_graph) == {"A", "B"}
-        assert "C" not in dc.collaboration_graph
+        assert set(dc.ownership_graph) == {"A", "B"}
+        assert "C" not in dc.ownership_graph
 
     def test_collect_changes_by_date(self, git_repo):
         dc = GitDataCollector()

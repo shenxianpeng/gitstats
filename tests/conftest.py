@@ -347,16 +347,16 @@ def mock_data_collector():
         "Dockerfile": 2,
     }
 
-    # Collaboration network (mock data for page generation tests)
+    # Code ownership (mock data for page generation tests)
     data.author_files = {
         "Alice Smith": {"main.py": 5, "utils.py": 3, "README.md": 2},
         "Bob Jones": {"main.py": 3, "utils.py": 4, "README.md": 1, "Makefile": 2},
         "Charlie Brown": {"utils.py": 1, "README.md": 1},
     }
-    data.collaboration_graph = {
-        "Alice Smith": {"Bob Jones": 3, "Charlie Brown": 1},
-        "Bob Jones": {"Alice Smith": 3, "Charlie Brown": 1},
-        "Charlie Brown": {"Alice Smith": 1, "Bob Jones": 1},
+    data.ownership_graph = {
+        "Alice Smith": {"Bob Jones": 3.0, "Charlie Brown": 1.0},
+        "Bob Jones": {"Alice Smith": 3.0, "Charlie Brown": 1.0},
+        "Charlie Brown": {"Alice Smith": 1.0, "Bob Jones": 1.0},
     }
 
     # Changes by date (lines)

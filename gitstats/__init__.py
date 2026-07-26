@@ -19,7 +19,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "style": "gitstats.css",  # CSS stylesheet for the generated report.
     "max_authors": 20,  # Maximum number of authors to list in "Authors".
     "authors_top": 5,  # Number of top authors to highlight.
-    "collaboration_max_authors": 100,  # Cap authors considered when building the collaboration graph (bounds cost on large repos).
+    "ownership_max_authors": 100,  # Cap authors considered when building the code ownership graph (bounds cost on large repos).
     "commit_begin": "",  # Start of commit range (empty = include all commits).
     "commit_end": "HEAD",  # End of commit range (default: HEAD).
     "linear_linestats": 1,  # Enable linear history for line statistics (1 = enabled, 0 = disabled).

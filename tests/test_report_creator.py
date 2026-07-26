@@ -586,7 +586,7 @@ def test_create_all_pages(mock_data_collector, temp_dir):
         "files.html",
         "lines.html",
         "tags.html",
-        "collaboration.html",
+        "ownership.html",
     ]
     for fname in expected_files:
         path = f"{temp_dir}/{fname}"
@@ -610,25 +610,25 @@ def test_create_copies_static_files(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
     creator.create(mock_data_collector, temp_dir)
 
-    for fname in ("sortable.js", "chart.umd.min.js", "gitstats.css", "collaboration.js"):
+    for fname in ("sortable.js", "chart.umd.min.js", "gitstats.css", "ownership.js"):
         assert os.path.exists(f"{temp_dir}/{fname}"), f"Missing static file: {fname}"
 
 
-# ── Collaboration page ───────────────────────────────────────────────────
+# ── Code ownership page ──────────────────────────────────────────────────
 
 
-def test_collaboration_page_renders_graph_and_table(mock_data_collector, temp_dir):
+def test_ownership_page_renders_graph_and_table(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
     creator.create(mock_data_collector, temp_dir)
 
-    with open(f"{temp_dir}/collaboration.html", encoding="utf-8") as f:
+    with open(f"{temp_dir}/ownership.html", encoding="utf-8") as f:
         content = f.read()
 
     # Data payload and engine are wired up
-    assert "var COLLAB_NODES" in content
-    assert "var COLLAB_LINKS" in content
-    assert 'src="collaboration.js"' in content
-    # Table lists collaborating authors
+    assert "var OWNERSHIP_NODES" in content
+    assert "var OWNERSHIP_LINKS" in content
+    assert 'src="ownership.js"' in content
+    # Table lists authors who share ownership
     assert "Alice Smith" in content
     assert "Bob Jones" in content
     # SVG width attribute is valid (regression: f-string used to emit 100%%)
@@ -640,32 +640,32 @@ def test_open_report_file_confined_to_report_dir(temp_dir):
     creator = HTMLReportCreator()
 
     # A normal page name opens inside the report directory.
-    f = creator._open_report_file(temp_dir, "collaboration.html")
+    f = creator._open_report_file(temp_dir, "ownership.html")
     f.close()
-    assert os.path.exists(f"{temp_dir}/collaboration.html")
+    assert os.path.exists(f"{temp_dir}/ownership.html")
 
     # A traversal filename is rejected rather than escaping the directory.
     with pytest.raises(ValueError):
         creator._open_report_file(temp_dir, "../escape.html")
 
 
-def test_collaboration_page_empty_state(mock_data_collector, temp_dir):
-    mock_data_collector.collaboration_graph = {}
+def test_ownership_page_empty_state(mock_data_collector, temp_dir):
+    mock_data_collector.ownership_graph = {}
     creator = HTMLReportCreator()
     creator.create(mock_data_collector, temp_dir)
 
-    with open(f"{temp_dir}/collaboration.html", encoding="utf-8") as f:
+    with open(f"{temp_dir}/ownership.html", encoding="utf-8") as f:
         content = f.read()
 
-    assert "collab-empty" in content
-    assert "var COLLAB_NODES" not in content
+    assert "ownership-empty" in content
+    assert "var OWNERSHIP_NODES" not in content
     assert "</html>" in content
 
 
-def test_collaboration_page_escapes_author_names(mock_data_collector, temp_dir):
-    mock_data_collector.collaboration_graph = {
-        "Al<ice>": {"Bob & Co": 4},
-        "Bob & Co": {"Al<ice>": 4},
+def test_ownership_page_escapes_author_names(mock_data_collector, temp_dir):
+    mock_data_collector.ownership_graph = {
+        "Al<ice>": {"Bob & Co": 4.0},
+        "Bob & Co": {"Al<ice>": 4.0},
     }
     mock_data_collector.author_files = {
         "Al<ice>": {"main.py": 4},
@@ -674,7 +674,7 @@ def test_collaboration_page_escapes_author_names(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
     creator.create(mock_data_collector, temp_dir)
 
-    with open(f"{temp_dir}/collaboration.html", encoding="utf-8") as f:
+    with open(f"{temp_dir}/ownership.html", encoding="utf-8") as f:
         content = f.read()
 
     # Table cells must be HTML-escaped

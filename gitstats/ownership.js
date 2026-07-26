@@ -1,25 +1,26 @@
 /**
- * GitStats — Collaboration Network Force-Directed Graph Engine
+ * GitStats — Code Ownership Force-Directed Graph Engine
  *
- * Renders a force-directed graph showing collaboration patterns among authors.
- * Nodes = authors (size by files touched), edges = collaboration (thickness by shared files).
+ * Renders a force-directed graph showing shared code ownership among authors.
+ * Nodes = authors (size by files touched), edges = shared files (thickness by
+ * coupling score, with ubiquitous files damped).
  *
  * Expects global variables (inlined in HTML):
- *   COLLAB_NODES  — Array of {id, fileCount, size, score}
- *   COLLAB_LINKS  — Array of {source, target, weight, type}
+ *   OWNERSHIP_NODES  — Array of {id, fileCount, size, score}
+ *   OWNERSHIP_LINKS  — Array of {source, target, weight}
  *
  * Also requires getCSSVar() from the theme toggle script.
  */
 (function () {
-  var svgEl = document.getElementById("collab-svg");
+  var svgEl = document.getElementById("ownership-svg");
   if (!svgEl) return;
   var ns = "http://www.w3.org/2000/svg";
   var width = svgEl.parentElement.clientWidth || 960;
   var height = 520;
   svgEl.setAttribute("viewBox", "0 0 " + width + " " + height);
 
-  var nodes = typeof COLLAB_NODES !== "undefined" ? COLLAB_NODES : [];
-  var links = typeof COLLAB_LINKS !== "undefined" ? COLLAB_LINKS : [];
+  var nodes = typeof OWNERSHIP_NODES !== "undefined" ? OWNERSHIP_NODES : [];
+  var links = typeof OWNERSHIP_LINKS !== "undefined" ? OWNERSHIP_LINKS : [];
 
   if (!nodes.length) return;
 
@@ -36,7 +37,7 @@
     "#b08800",
   ];
 
-  var tooltip = document.getElementById("collab-tooltip");
+  var tooltip = document.getElementById("ownership-tooltip");
 
   // Initialize node positions
   var cx = width / 2,
@@ -106,7 +107,7 @@
 
     // Hover tooltip
     ng.addEventListener("mouseover", function (e) {
-      var collabWith = links
+      var sharedWith = links
         .filter(function (l) {
           return l.sourceNode === n || l.targetNode === n;
         })
@@ -128,7 +129,7 @@
       frag.appendChild(document.createElement("br"));
 
       frag.appendChild(
-        document.createTextNode("Collaboration score: " + n.score)
+        document.createTextNode("Coupling score: " + n.score)
       );
       frag.appendChild(document.createElement("br"));
 
@@ -137,27 +138,27 @@
       frag.appendChild(hr);
 
       var hdr = document.createElement("em");
-      hdr.textContent = "Top collaborators:";
+      hdr.textContent = "Shares files with:";
       frag.appendChild(hdr);
       frag.appendChild(document.createElement("br"));
 
-      if (collabWith.length === 0) {
+      if (sharedWith.length === 0) {
         var none = document.createElement("span");
         none.style.color = "#888";
-        none.textContent = "(no collaborators shown)";
+        none.textContent = "(none shown)";
         frag.appendChild(none);
       } else {
-        collabWith.forEach(function (l) {
+        sharedWith.forEach(function (l) {
           var other =
             l.sourceNode === n ? l.targetNode.id : l.sourceNode.id;
           frag.appendChild(
-            document.createTextNode(other + " (" + l.weight + " files)")
+            document.createTextNode(other + " (coupling " + l.weight + ")")
           );
           frag.appendChild(document.createElement("br"));
         });
       }
 
-      var container = document.getElementById("collab-graph");
+      var container = document.getElementById("ownership-graph");
       var cr = container.getBoundingClientRect();
       while (tooltip.firstChild) {
         tooltip.removeChild(tooltip.firstChild);

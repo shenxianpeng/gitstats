@@ -63,7 +63,7 @@ class HTMLReportCreator(ReportCreator):
             load_config()["style"],
             "sortable.js",
             "chart.umd.min.js",
-            "collaboration.js",
+            "ownership.js",
             "arrow-up.gif",
             "arrow-down.gif",
             "arrow-none.gif",
@@ -78,7 +78,7 @@ class HTMLReportCreator(ReportCreator):
         self.create_files_html(data, path)
         self.create_lines_html(data, path)
         self.create_tags_html(data, path)
-        self.create_collaboration_html(data, path)
+        self.create_ownership_html(data, path)
 
         # Create AI Insights page if AI is enabled
         if hasattr(data, "ai_summaries") and data.ai_summaries:
@@ -855,39 +855,39 @@ class HTMLReportCreator(ReportCreator):
             raise ValueError(f"Refusing to write outside report directory: {filename}")
         return open(target, "w", encoding="utf-8")
 
-    def create_collaboration_html(self, data: Any, path: str) -> None:
-        """Create a collaboration network page showing a force-directed graph
-        of authors who frequently modify the same files together.
+    def create_ownership_html(self, data: Any, path: str) -> None:
+        """Create a code ownership page showing a force-directed graph of authors
+        who work on the same files.
 
-        The force simulation engine is in collaboration.js. Only the node/link
-        data is inlined as global JSON variables COLLAB_NODES / COLLAB_LINKS.
+        The force simulation engine is in ownership.js. Only the node/link data
+        is inlined as global JSON variables OWNERSHIP_NODES / OWNERSHIP_LINKS.
         """
-        f = self._open_report_file(path, "collaboration.html")
+        f = self._open_report_file(path, "ownership.html")
         self.print_header(f)
         self.print_nav(f)
-        f.write("<h1>Collaboration Network</h1>")
+        f.write("<h1>Code Ownership</h1>")
 
-        # Build nodes and links from collaboration_graph
-        _raw_collab = getattr(data, "collaboration_graph", {})
-        collab = _raw_collab if isinstance(_raw_collab, dict) else {}
+        # Build nodes and links from ownership_graph
+        _raw_graph = getattr(data, "ownership_graph", {})
+        graph = _raw_graph if isinstance(_raw_graph, dict) else {}
         _raw_af = getattr(data, "author_files", {})
         author_files = _raw_af if isinstance(_raw_af, dict) else {}
 
         # Collect undirected links (deduped via a < b) from the graph.
         links_list = [
             {"source": a, "target": b, "weight": w}
-            for a in collab
-            for b, w in collab[a].items()
+            for a in graph
+            for b, w in graph[a].items()
             if a < b and w > 0
         ]
 
         if not links_list:
-            self._write_collab_empty(f)
+            self._write_ownership_empty(f)
             return
 
         # Score each node by the sum of its edge weights, then keep the top 50
         # most-connected authors so large repos stay readable.
-        node_score: dict[str, int] = {}
+        node_score: dict[str, float] = {}
         for link in links_list:
             node_score[link["source"]] = node_score.get(link["source"], 0) + link["weight"]
             node_score[link["target"]] = node_score.get(link["target"], 0) + link["weight"]
@@ -911,7 +911,7 @@ class HTMLReportCreator(ReportCreator):
                     "id": author,
                     "fileCount": file_count,
                     "size": size,
-                    "score": node_score.get(author, 0),
+                    "score": round(node_score.get(author, 0), 2),
                 }
             )
             filtered_idx[author] = idx
@@ -928,43 +928,44 @@ class HTMLReportCreator(ReportCreator):
         nodes_json = json.dumps(filtered_nodes, ensure_ascii=False).replace("</", "<\\/")
         links_json = json.dumps(indexed_links, ensure_ascii=False).replace("</", "<\\/")
 
-        # Inline data as global variables; simulation engine is in collaboration.js
+        # Inline data as global variables; simulation engine is in ownership.js
         f.write(f"""
-        <div class="collab-intro">
-            <p>This force-directed graph shows <strong>collaboration patterns</strong> among authors.
-            Nodes represent authors; edges connect authors who modified <strong>the same files</strong>.
-            Thicker edges = stronger collaboration. Larger nodes = more files touched.</p>
+        <div class="ownership-intro">
+            <p>This force-directed graph shows <strong>shared code ownership</strong> among authors.
+            Nodes represent authors; edges connect authors who edit <strong>the same files</strong>.
+            Files touched by nearly everyone (READMEs, configs) are down-weighted, so a thick edge
+            means two authors share ownership of code that few others touch. Larger nodes = more files touched.</p>
             <p><strong>Tip:</strong> Drag nodes to explore. Hover over a node to see details.</p>
         </div>
 
-        <div class="collab-legend">
-            <span class="collab-legend-item"><span class="collab-legend-dot" style="background:#5b8dee"></span> Author node (size = files touched)</span>
-            <span class="collab-legend-item"><span class="collab-legend-line"></span> Collaboration (thickness = strength)</span>
+        <div class="ownership-legend">
+            <span class="ownership-legend-item"><span class="ownership-legend-dot" style="background:#5b8dee"></span> Author node (size = files touched)</span>
+            <span class="ownership-legend-item"><span class="ownership-legend-line"></span> Shared files (thickness = coupling score)</span>
         </div>
 
-        <div id="collab-graph" class="collab-graph-container">
-            <svg id="collab-svg" width="100%" height="520"></svg>
-            <div id="collab-tooltip" class="collab-tooltip" style="display:none;"></div>
+        <div id="ownership-graph" class="ownership-graph-container">
+            <svg id="ownership-svg" width="100%" height="520"></svg>
+            <div id="ownership-tooltip" class="ownership-tooltip" style="display:none;"></div>
         </div>
 
         <script>
-        var COLLAB_NODES = {nodes_json};
-        var COLLAB_LINKS = {links_json};
+        var OWNERSHIP_NODES = {nodes_json};
+        var OWNERSHIP_LINKS = {links_json};
         </script>
-        <script type="text/javascript" src="collaboration.js"></script>
+        <script type="text/javascript" src="ownership.js"></script>
         """)
 
-        # Collaboration as table view
-        f.write(html_header(2, "Collaboration Details"))
+        # Ownership pairs as table view
+        f.write(html_header(2, "Shared Ownership Details"))
         f.write(
-            '<table class="sortable" id="collab-table"><tr>'
-            '<th>Author</th><th>Collaborator</th><th class="unsortable">Shared Files</th>'
+            '<table class="sortable" id="ownership-table"><tr>'
+            '<th>Author</th><th>Shares with</th><th class="unsortable">Coupling score</th>'
             "</tr>"
         )
         sorted_links = sorted(filtered_links, key=lambda x: x["weight"], reverse=True)
         for link in sorted_links[:20]:
             f.write(
-                "<tr><td>%s</td><td>%s</td><td>%d</td></tr>"
+                "<tr><td>%s</td><td>%s</td><td>%s</td></tr>"
                 % (
                     html.escape(link["source"]),
                     html.escape(link["target"]),
@@ -974,7 +975,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</table>")
         if len(sorted_links) > 20:
             f.write(
-                '<p class="moreauthors">Showing top 20 collaboration pairs. '
+                '<p class="moreauthors">Showing top 20 ownership pairs. '
                 "Total: %d pairs found.</p>" % len(sorted_links)
             )
 
@@ -982,13 +983,13 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-    def _write_collab_empty(self, f: Any) -> None:
-        """Write the empty-state body for the collaboration page and close it."""
-        f.write('<div class="collab-empty">')
+    def _write_ownership_empty(self, f: Any) -> None:
+        """Write the empty-state body for the code ownership page and close it."""
+        f.write('<div class="ownership-empty">')
         f.write(
-            "<p>No collaboration data available. This graph shows authors "
-            "who frequently modify the same files. Try analyzing a larger "
-            "commit range with more than one contributor.</p>"
+            "<p>No shared ownership data available. This graph shows authors "
+            "who edit the same files. Try analyzing a larger commit range with "
+            "more than one contributor.</p>"
         )
         f.write("</div>")
         self.print_footer(f)
@@ -1228,7 +1229,7 @@ class HTMLReportCreator(ReportCreator):
         has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
 
         ai_link = '<li><a href="ai-insights.html">AI Insights</a></li>' if has_ai else ""
-        collab_link = '<li><a href="collaboration.html">Collaboration</a></li>'
+        ownership_link = '<li><a href="ownership.html">Code Ownership</a></li>'
 
         github_icon = (
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" '
@@ -1254,7 +1255,7 @@ class HTMLReportCreator(ReportCreator):
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
-            {collab_link}
+            {ownership_link}
             {ai_link}
             </ul>
             <div class="nav-right">
