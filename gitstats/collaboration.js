@@ -115,32 +115,54 @@
         })
         .slice(0, 10);
 
-      var tipHtml =
-        "<strong>" +
-        n.id +
-        '</strong><br/>' +
-        "Files touched: " +
-        n.fileCount +
-        "<br/>" +
-        "Collaboration score: " +
-        n.score +
-        '<br/>' +
-        '<hr style="margin:4px 0"/>' +
-        "<em>Top collaborators:</em><br/>";
+      // Build the tooltip with DOM APIs (never innerHTML): author names come
+      // from git history and could otherwise inject markup (DOM-based XSS).
+      var frag = document.createDocumentFragment();
+
+      var nameEl = document.createElement("strong");
+      nameEl.textContent = n.id;
+      frag.appendChild(nameEl);
+      frag.appendChild(document.createElement("br"));
+
+      frag.appendChild(document.createTextNode("Files touched: " + n.fileCount));
+      frag.appendChild(document.createElement("br"));
+
+      frag.appendChild(
+        document.createTextNode("Collaboration score: " + n.score)
+      );
+      frag.appendChild(document.createElement("br"));
+
+      var hr = document.createElement("hr");
+      hr.style.margin = "4px 0";
+      frag.appendChild(hr);
+
+      var hdr = document.createElement("em");
+      hdr.textContent = "Top collaborators:";
+      frag.appendChild(hdr);
+      frag.appendChild(document.createElement("br"));
 
       if (collabWith.length === 0) {
-        tipHtml += '<span style="color:#888">(no collaborators shown)</span>';
+        var none = document.createElement("span");
+        none.style.color = "#888";
+        none.textContent = "(no collaborators shown)";
+        frag.appendChild(none);
       } else {
         collabWith.forEach(function (l) {
           var other =
             l.sourceNode === n ? l.targetNode.id : l.sourceNode.id;
-          tipHtml += other + " (" + l.weight + " files)<br/>";
+          frag.appendChild(
+            document.createTextNode(other + " (" + l.weight + " files)")
+          );
+          frag.appendChild(document.createElement("br"));
         });
       }
 
       var container = document.getElementById("collab-graph");
       var cr = container.getBoundingClientRect();
-      tooltip.innerHTML = tipHtml;
+      while (tooltip.firstChild) {
+        tooltip.removeChild(tooltip.firstChild);
+      }
+      tooltip.appendChild(frag);
       tooltip.style.display = "block";
       var tipW = tooltip.offsetWidth;
       var spaceRight = cr.right - e.clientX - 15;
