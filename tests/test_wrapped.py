@@ -191,7 +191,7 @@ class TestWrappedCardGenerator:
         path = gen.generate(output_path=os.path.join(temp_dir, "wrapped-test.svg"))
 
         assert os.path.exists(path)
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             content = f.read()
 
         # Basic XML validity checks
@@ -210,7 +210,7 @@ class TestWrappedCardGenerator:
         gen = WrappedCardGenerator(data, year=2025, theme="midnight")
         path = gen.generate(output_path=os.path.join(temp_dir, "midnight.svg"))
 
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             content = f.read()
 
         assert "#0f0c29" in content  # midnight bg_start
@@ -221,7 +221,7 @@ class TestWrappedCardGenerator:
         gen = WrappedCardGenerator(data, year=2025, theme="sunset")
         path = gen.generate(output_path=os.path.join(temp_dir, "sunset.svg"))
 
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             content = f.read()
 
         assert "#1a0a1e" in content  # sunset bg_start
@@ -233,7 +233,7 @@ class TestWrappedCardGenerator:
         gen = WrappedCardGenerator(data, year=2025, theme="clean")
         path = gen.generate(output_path=os.path.join(temp_dir, "clean.svg"))
 
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             content = f.read()
 
         assert "#f8fafc" in content  # clean bg_start
@@ -257,7 +257,7 @@ class TestWrappedCardGenerator:
         gen = WrappedCardGenerator(data, year=2025)
         path = gen.generate(output_path=os.path.join(temp_dir, "full.svg"))
 
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             content = f.read()
 
         assert "50" in content  # total commits (from commits_by_year[2025])
@@ -277,7 +277,7 @@ class TestWrappedCardGenerator:
         gen = WrappedCardGenerator(data, year=2025)
         path = gen.generate(output_path=os.path.join(temp_dir, "chart.svg"))
 
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             content = f.read()
 
         for month_num in range(1, 13):
