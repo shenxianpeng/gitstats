@@ -229,6 +229,27 @@ class TestGitDataCollectorIntegration:
         # File churn may be empty or non-empty depending on diff output
         assert isinstance(dc.file_churn, dict)
 
+    def test_collect_author_files(self, git_repo):
+        """The name-only pass records which files each author touched."""
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(git_repo)
+            dc.collect(git_repo)
+        finally:
+            os.chdir(prevdir)
+
+        # Alice: README.md + main.py (2 commits) + logo.png + .gitignore; Bob: utils.py
+        assert dc.author_files["Alice Smith"] == {
+            "README.md": 1,
+            "main.py": 2,
+            "logo.png": 1,
+            ".gitignore": 1,
+        }
+        assert dc.author_files["Bob Jones"] == {"utils.py": 1}
+        # file_churn comes from the same pass
+        assert dc.file_churn["main.py"] == 2
+
     def test_collect_changes_by_date(self, git_repo):
         dc = GitDataCollector()
         prevdir = os.getcwd()

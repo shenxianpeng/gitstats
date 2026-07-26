@@ -347,6 +347,13 @@ def mock_data_collector():
         "Dockerfile": 2,
     }
 
+    # Code ownership: author -> file -> commits touching it
+    data.author_files = {
+        "Alice Smith": {"main.py": 10, "utils.py": 2, "solo_alice.py": 4},
+        "Bob Jones": {"main.py": 5, "utils.py": 8, "README.md": 8},
+        "Charlie Brown": {"main.py": 1},
+    }
+
     # Changes by date (lines)
     data.changes_by_date = {}
 
