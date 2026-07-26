@@ -77,6 +77,7 @@ class HTMLReportCreator(ReportCreator):
         self.create_files_html(data, path)
         self.create_lines_html(data, path)
         self.create_tags_html(data, path)
+        self.create_ownership_html(data, path)
 
         # Create AI Insights page if AI is enabled
         if hasattr(data, "ai_summaries") and data.ai_summaries:
@@ -840,6 +841,154 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def _open_report_file(self, path: str, filename: str) -> Any:
+        """Open a report page for writing, confined to the report directory.
+
+        ``filename`` is always a hard-coded page name; resolving the target and
+        checking it stays under the report root guards against directory
+        traversal.
+        """
+        base = os.path.abspath(path)
+        target = os.path.abspath(os.path.join(base, filename))
+        if os.path.commonpath([base, target]) != base:
+            raise ValueError(f"Refusing to write outside report directory: {filename}")
+        return open(target, "w", encoding="utf-8")
+
+    def create_ownership_html(self, data: Any, path: str) -> None:
+        """Create the Code Ownership page.
+
+        Turns the per-author file-edit data into actionable views: files with a
+        single owner (bus-factor / knowledge-silo risk), how ownership is
+        concentrated per author, and the files touched by the most people
+        (coordination hotspots).
+        """
+        f = self._open_report_file(path, "ownership.html")
+        self.print_header(f)
+        self.print_nav(f)
+        f.write("<h1>Code Ownership</h1>")
+
+        author_files = getattr(data, "author_files", {})
+        if not isinstance(author_files, dict):
+            author_files = {}
+        ownership = compute_code_ownership(author_files)
+
+        if not ownership["files"]:
+            f.write(
+                '<div class="ownership-summary"><p>No ownership data available. '
+                "Ownership is derived from which files each author changes; try "
+                "analyzing a repository with commit history.</p></div>"
+            )
+            self.print_footer(f)
+            f.write("</body></html>")
+            f.close()
+            return
+
+        total = ownership["total_files"]
+        single = ownership["single_owner_files"]
+        single_pct = (100.0 * single / total) if total else 0.0
+
+        # Summary
+        f.write(
+            '<div class="ownership-summary">'
+            "<p>Ownership is measured by how many commits each author made to each "
+            "file. It highlights <strong>bus-factor risk</strong> (files only one "
+            "person has ever touched) and where knowledge is concentrated.</p>"
+            "<dl>"
+            "<dt>Files tracked</dt><dd>%d</dd>"
+            "<dt>Single-owner files</dt><dd>%d (%.1f%%)</dd>"
+            "<dt>Contributors</dt><dd>%d</dd>"
+            "</dl></div>" % (total, single, single_pct, len(ownership["authors"]))
+        )
+
+        # Bus-factor risk: single-owner files, most-changed first
+        f.write(html_header(2, "Bus Factor Risk — Single-Owner Files"))
+        f.write(
+            "<p><em>Files only one author has ever changed. The more a file has "
+            "changed, the more knowledge is at risk if that person leaves.</em></p>"
+        )
+        risk_files = [fs for fs in ownership["files"] if fs["contributors"] == 1]
+        if risk_files:
+            f.write(
+                '<table class="sortable" id="ownership-busfactor">'
+                "<tr><th>File</th><th>Sole owner</th><th>Commits</th></tr>"
+            )
+            for fs in risk_files[:50]:
+                f.write(
+                    "<tr><td>%s</td><td>%s</td><td>%d</td></tr>"
+                    % (html.escape(fs["path"]), html.escape(fs["owner"]), fs["edits"])
+                )
+            f.write("</table>")
+            if len(risk_files) > 50:
+                f.write(
+                    '<p class="moreauthors">Showing top 50 of %d single-owner files.</p>'
+                    % len(risk_files)
+                )
+        else:
+            f.write("<p>No single-owner files — every file has multiple contributors.</p>")
+
+        # Ownership concentration by author
+        f.write(html_header(2, "Ownership by Author"))
+        f.write(
+            "<p><em>Primary owner = the author with the most commits to a file. "
+            "Solely owned = files only that author has touched.</em></p>"
+        )
+        f.write(
+            '<table class="sortable" id="ownership-by-author">'
+            "<tr><th>Author</th><th>Files owned</th><th>Solely owned</th>"
+            "<th>Files touched</th></tr>"
+        )
+        for a in ownership["authors"][:25]:
+            f.write(
+                "<tr><td>%s</td><td>%d</td><td>%d</td><td>%d</td></tr>"
+                % (
+                    html.escape(a["author"]),
+                    a["files_owned"],
+                    a["files_solely_owned"],
+                    a["files_touched"],
+                )
+            )
+        f.write("</table>")
+        if len(ownership["authors"]) > 25:
+            f.write(
+                '<p class="moreauthors">Showing top 25 of %d contributors.</p>'
+                % len(ownership["authors"])
+            )
+
+        # Coordination hotspots: files with the most contributors
+        f.write(html_header(2, "Most Shared Files"))
+        f.write(
+            "<p><em>Files touched by the most people — shared code where changes "
+            "are most likely to need coordination.</em></p>"
+        )
+        shared = sorted(
+            (fs for fs in ownership["files"] if fs["contributors"] >= 2),
+            key=lambda x: (x["contributors"], x["edits"]),
+            reverse=True,
+        )
+        if shared:
+            f.write(
+                '<table class="sortable" id="ownership-shared">'
+                "<tr><th>File</th><th>Contributors</th><th>Primary owner</th>"
+                "<th>Owner share</th></tr>"
+            )
+            for fs in shared[:20]:
+                f.write(
+                    "<tr><td>%s</td><td>%d</td><td>%s</td><td>%.1f%%</td></tr>"
+                    % (
+                        html.escape(fs["path"]),
+                        fs["contributors"],
+                        html.escape(fs["owner"]),
+                        fs["ownership_pct"],
+                    )
+                )
+            f.write("</table>")
+        else:
+            f.write("<p>No files have more than one contributor yet.</p>")
+
+        self.print_footer(f)
+        f.write("</body></html>")
+        f.close()
+
     def create_ai_insights_html(self, data: Any, path: str) -> None:
         """
         Create a dedicated AI Insights page with all AI-generated summaries.
@@ -1098,6 +1247,7 @@ class HTMLReportCreator(ReportCreator):
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
             {ai_link}
             </ul>
             <div class="nav-right">
@@ -1145,6 +1295,75 @@ class HTMLReportCreator(ReportCreator):
             </div>
         </div>
         """
+
+
+def compute_code_ownership(author_files: dict[str, dict[str, int]]) -> dict[str, Any]:
+    """Derive per-file ownership and per-author stats from author edit counts.
+
+    Args:
+        author_files: mapping of author -> file path -> number of commits that
+            author made touching the file.
+
+    Bot accounts (names ending in ``[bot]``) are excluded so ownership reflects
+    human contributors. Returns a dict with:
+        files:   per-file stats (path, edits, owner, owner_edits, ownership_pct,
+                 contributors), sorted by edits descending;
+        authors: per-author stats (author, files_owned, files_solely_owned,
+                 files_touched), sorted by files owned then files touched;
+        total_files, single_owner_files.
+    """
+    # Invert to file -> {author: edits}, dropping bots.
+    file_authors: dict[str, dict[str, int]] = {}
+    for author, files in author_files.items():
+        if author.endswith("[bot]"):
+            continue
+        for filepath, count in files.items():
+            file_authors.setdefault(filepath, {})[author] = count
+
+    files_stats: list[dict[str, Any]] = []
+    author_owned: dict[str, int] = {}
+    author_solely: dict[str, int] = {}
+    author_touched: dict[str, int] = {}
+    for filepath, authors in file_authors.items():
+        edits = sum(authors.values())
+        # Primary owner: most edits; ties broken alphabetically for determinism.
+        owner = max(sorted(authors), key=lambda a: authors[a])
+        contributors = len(authors)
+        files_stats.append(
+            {
+                "path": filepath,
+                "edits": edits,
+                "owner": owner,
+                "owner_edits": authors[owner],
+                "ownership_pct": round(100.0 * authors[owner] / edits, 1) if edits else 0.0,
+                "contributors": contributors,
+            }
+        )
+        author_owned[owner] = author_owned.get(owner, 0) + 1
+        if contributors == 1:
+            author_solely[owner] = author_solely.get(owner, 0) + 1
+        for a in authors:
+            author_touched[a] = author_touched.get(a, 0) + 1
+
+    files_stats.sort(key=lambda x: x["edits"], reverse=True)
+
+    authors_stats = [
+        {
+            "author": a,
+            "files_owned": author_owned.get(a, 0),
+            "files_solely_owned": author_solely.get(a, 0),
+            "files_touched": author_touched[a],
+        }
+        for a in author_touched
+    ]
+    authors_stats.sort(key=lambda x: (x["files_owned"], x["files_touched"]), reverse=True)
+
+    return {
+        "files": files_stats,
+        "authors": authors_stats,
+        "total_files": len(files_stats),
+        "single_owner_files": sum(1 for fs in files_stats if fs["contributors"] == 1),
+    }
 
 
 def html_header(level: int, text: str) -> str:

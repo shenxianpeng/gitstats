@@ -140,6 +140,9 @@ class DataCollector:
         # file churn: number of commits that touched each file path
         self.file_churn: dict[str, int] = {}  # filepath -> commit count
 
+        # code ownership: author -> file path -> number of commits touching it
+        self.author_files: dict[str, dict[str, int]] = {}
+
         # new contributors per month
         self.new_contributors_by_month: dict[str, int] = {}  # YYYY-MM -> count
 
@@ -700,14 +703,28 @@ class GitDataCollector(DataCollector):
                     logger.warning(f'Failed to handle line "{line}"')
                     (files, inserted, deleted) = (0, 0, 0)
 
-        # File churn: count how many commits touched each file
+        # Single name-only pass drives two metrics:
+        #   * file_churn   -> how many commits touched each file
+        #   * author_files -> which files each author touches (code ownership)
+        # Each commit is prefixed with a "COMMIT:<author>" marker line; the lines
+        # that follow are the file paths changed by that commit. Authors are
+        # resolved to their canonical identity so aliases merge here directly.
         churn_output = get_pipe_output(
-            ['git log --format="" --name-only {}'.format(get_log_range("HEAD", False))]
+            ['git log --format="COMMIT:%aN" --name-only {}'.format(get_log_range("HEAD", False))]
         )
+        current_author = None
         for line in churn_output.split("\n"):
             line = line.strip()
-            if line:
-                self.file_churn[line] = self.file_churn.get(line, 0) + 1
+            if not line:
+                continue
+            if line.startswith("COMMIT:"):
+                current_author = name_to_canonical.get(line[7:], line[7:])
+                continue
+            # A changed-file line.
+            self.file_churn[line] = self.file_churn.get(line, 0) + 1
+            if current_author:
+                author_map = self.author_files.setdefault(current_author, {})
+                author_map[line] = author_map.get(line, 0) + 1
 
     def refine(self) -> None:
         # authors

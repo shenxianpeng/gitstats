@@ -8,6 +8,7 @@ import pytest
 from gitstats.report_creator import (
     HTMLReportCreator,
     ReportCreator,
+    compute_code_ownership,
     get_keys_sorted_by_value_key,
     get_keys_sorted_by_values,
     html_header,
@@ -586,6 +587,7 @@ def test_create_all_pages(mock_data_collector, temp_dir):
         "files.html",
         "lines.html",
         "tags.html",
+        "ownership.html",
     ]
     for fname in expected_files:
         path = f"{temp_dir}/{fname}"
@@ -611,3 +613,92 @@ def test_create_copies_static_files(mock_data_collector, temp_dir):
 
     for fname in ("sortable.js", "chart.umd.min.js", "gitstats.css"):
         assert os.path.exists(f"{temp_dir}/{fname}"), f"Missing static file: {fname}"
+
+
+# ── Code ownership ───────────────────────────────────────────────────────
+
+
+def test_compute_code_ownership_stats():
+    author_files = {
+        "Alice": {"a.py": 3, "shared.py": 2},
+        "Bob": {"shared.py": 5, "b.py": 1},
+        "release[bot]": {"shared.py": 99},  # bots excluded
+    }
+    result = compute_code_ownership(author_files)
+
+    files = {fs["path"]: fs for fs in result["files"]}
+    # a.py: only Alice -> single owner
+    assert files["a.py"]["contributors"] == 1
+    assert files["a.py"]["owner"] == "Alice"
+    # shared.py: Alice 2 + Bob 5 -> Bob owns, bot ignored, 2 contributors
+    assert files["shared.py"]["contributors"] == 2
+    assert files["shared.py"]["owner"] == "Bob"
+    assert files["shared.py"]["edits"] == 7
+    assert files["shared.py"]["ownership_pct"] == round(100.0 * 5 / 7, 1)
+
+    assert result["total_files"] == 3
+    assert result["single_owner_files"] == 2  # a.py and b.py
+
+    authors = {a["author"]: a for a in result["authors"]}
+    assert "release[bot]" not in authors
+    assert authors["Alice"]["files_owned"] == 1  # a.py
+    assert authors["Alice"]["files_solely_owned"] == 1
+    assert authors["Bob"]["files_owned"] == 2  # shared.py + b.py
+    assert authors["Bob"]["files_touched"] == 2
+
+
+def test_compute_code_ownership_empty():
+    assert compute_code_ownership({}) == {
+        "files": [],
+        "authors": [],
+        "total_files": 0,
+        "single_owner_files": 0,
+    }
+
+
+def test_ownership_page_renders(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/ownership.html", encoding="utf-8") as f:
+        content = f.read()
+
+    assert "Code Ownership" in content
+    assert "Bus Factor Risk" in content
+    # solo_alice.py is only touched by Alice -> appears as a single-owner file
+    assert "solo_alice.py" in content
+    assert "Alice Smith" in content
+    assert "</html>" in content
+
+
+def test_ownership_page_empty_state(mock_data_collector, temp_dir):
+    mock_data_collector.author_files = {}
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/ownership.html", encoding="utf-8") as f:
+        content = f.read()
+
+    assert "No ownership data available" in content
+    assert "</html>" in content
+
+
+def test_ownership_page_escapes_names(mock_data_collector, temp_dir):
+    mock_data_collector.author_files = {"Al<ice>": {"we<i>rd.py": 3}}
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/ownership.html", encoding="utf-8") as f:
+        content = f.read()
+
+    assert "Al&lt;ice&gt;" in content
+    assert "we&lt;i&gt;rd.py" in content
+
+
+def test_open_report_file_confined_to_report_dir(temp_dir):
+    creator = HTMLReportCreator()
+    f = creator._open_report_file(temp_dir, "ownership.html")
+    f.close()
+    assert os.path.exists(f"{temp_dir}/ownership.html")
+    with pytest.raises(ValueError):
+        creator._open_report_file(temp_dir, "../escape.html")
