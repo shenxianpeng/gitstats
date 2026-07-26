@@ -230,6 +230,7 @@ class TestGitDataCollectorIntegration:
         assert isinstance(dc.file_churn, dict)
 
     def test_collect_author_files(self, git_repo):
+        """The single name-only pass records exactly which files each author touched."""
         dc = GitDataCollector()
         prevdir = os.getcwd()
         try:
@@ -238,18 +239,30 @@ class TestGitDataCollectorIntegration:
         finally:
             os.chdir(prevdir)
 
-        assert isinstance(dc.author_files, dict)
-        # Alice Smith and Bob Jones should have file mappings
-        known_authors = ["Alice Smith", "Bob Jones"]
-        for author in known_authors:
-            if author in dc.author_files:
-                assert len(dc.author_files[author]) > 0
-                break
-        else:
-            # At least one author should have file data
-            assert len(dc.author_files) > 0
+        # Alice: README.md + main.py (2 commits) + logo.png + .gitignore; Bob: utils.py
+        assert dc.author_files["Alice Smith"] == {
+            "README.md": 1,
+            "main.py": 2,
+            "logo.png": 1,
+            ".gitignore": 1,
+        }
+        assert dc.author_files["Bob Jones"] == {"utils.py": 1}
 
-    def test_collect_collaboration_graph(self, git_repo):
+    def test_collect_file_churn_from_shared_pass(self, git_repo):
+        """file_churn is derived from the same pass; main.py was touched twice."""
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(git_repo)
+            dc.collect(git_repo)
+        finally:
+            os.chdir(prevdir)
+
+        assert dc.file_churn["main.py"] == 2
+        assert dc.file_churn["utils.py"] == 1
+
+    def test_collect_collaboration_graph_empty_without_shared_files(self, git_repo):
+        """Alice and Bob share no files in the fixture, so the graph is empty."""
         dc = GitDataCollector()
         prevdir = os.getcwd()
         try:
@@ -259,27 +272,56 @@ class TestGitDataCollectorIntegration:
             os.chdir(prevdir)
         dc.refine()
 
-        assert isinstance(dc.collaboration_graph, dict)
-        # If there are shared files, the graph should have entries
-        if dc.author_files and len(dc.author_files) > 1:
-            # At minimum, collaboration_graph should be populated
-            # or empty if no shared files across authors
-            pass
+        assert dc.collaboration_graph == {}
 
-    def test_collect_collaboration_graph_after_refine(self, git_repo):
-        """author_files should be populated after collect + refine."""
+    def test_build_collaboration_graph_weights(self):
+        """Edge weight sums min(count_a, count_b) over shared files."""
         dc = GitDataCollector()
-        prevdir = os.getcwd()
-        try:
-            os.chdir(git_repo)
-            dc.collect(git_repo)
-        finally:
-            os.chdir(prevdir)
-        dc.refine()
+        dc.author_files = {
+            "A": {"f1": 3, "f2": 1},
+            "B": {"f1": 5, "f3": 2},
+            "C": {"f2": 4},
+        }
+        dc.authors_by_commits = ["A", "B", "C"]
 
-        # author_files is populated, refinement shouldn't break it
-        assert isinstance(dc.author_files, dict)
-        assert isinstance(dc.collaboration_graph, dict)
+        dc._build_collaboration_graph()
+
+        # A&B share f1 -> min(3,5)=3 ; A&C share f2 -> min(1,4)=1 ; B&C share nothing
+        assert dc.collaboration_graph == {
+            "A": {"B": 3, "C": 1},
+            "B": {"A": 3},
+            "C": {"A": 1},
+        }
+
+    def test_build_collaboration_graph_excludes_bots(self):
+        """Authors whose name ends with [bot] are not linked into the graph."""
+        dc = GitDataCollector()
+        dc.author_files = {
+            "A": {"f1": 2},
+            "dependabot[bot]": {"f1": 9},
+        }
+        dc.authors_by_commits = ["dependabot[bot]", "A"]
+
+        dc._build_collaboration_graph()
+
+        assert dc.collaboration_graph == {}
+
+    def test_build_collaboration_graph_respects_author_cap(self):
+        """Only the top-N committers are considered when building the graph."""
+        dc = GitDataCollector()
+        dc.author_files = {
+            "A": {"f1": 1},
+            "B": {"f1": 1},
+            "C": {"f1": 1},
+        }
+        # Most-committing first; cap of 2 drops C entirely.
+        dc.authors_by_commits = ["A", "B", "C"]
+
+        with patch("gitstats.main.conf", {"collaboration_max_authors": 2}):
+            dc._build_collaboration_graph()
+
+        assert set(dc.collaboration_graph) == {"A", "B"}
+        assert "C" not in dc.collaboration_graph
 
     def test_collect_changes_by_date(self, git_repo):
         dc = GitDataCollector()

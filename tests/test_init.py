@@ -35,6 +35,7 @@ def test_default_config_keys():
         "style",
         "max_authors",
         "authors_top",
+        "collaboration_max_authors",
         "commit_begin",
         "commit_end",
         "linear_linestats",

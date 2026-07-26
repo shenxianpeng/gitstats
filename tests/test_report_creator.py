@@ -612,3 +612,58 @@ def test_create_copies_static_files(mock_data_collector, temp_dir):
 
     for fname in ("sortable.js", "chart.umd.min.js", "gitstats.css", "collaboration.js"):
         assert os.path.exists(f"{temp_dir}/{fname}"), f"Missing static file: {fname}"
+
+
+# ── Collaboration page ───────────────────────────────────────────────────
+
+
+def test_collaboration_page_renders_graph_and_table(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/collaboration.html", encoding="utf-8") as f:
+        content = f.read()
+
+    # Data payload and engine are wired up
+    assert "var COLLAB_NODES" in content
+    assert "var COLLAB_LINKS" in content
+    assert 'src="collaboration.js"' in content
+    # Table lists collaborating authors
+    assert "Alice Smith" in content
+    assert "Bob Jones" in content
+    # SVG width attribute is valid (regression: f-string used to emit 100%%)
+    assert 'width="100%"' in content
+    assert "100%%" not in content
+
+
+def test_collaboration_page_empty_state(mock_data_collector, temp_dir):
+    mock_data_collector.collaboration_graph = {}
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/collaboration.html", encoding="utf-8") as f:
+        content = f.read()
+
+    assert "collab-empty" in content
+    assert "var COLLAB_NODES" not in content
+    assert "</html>" in content
+
+
+def test_collaboration_page_escapes_author_names(mock_data_collector, temp_dir):
+    mock_data_collector.collaboration_graph = {
+        "Al<ice>": {"Bob & Co": 4},
+        "Bob & Co": {"Al<ice>": 4},
+    }
+    mock_data_collector.author_files = {
+        "Al<ice>": {"main.py": 4},
+        "Bob & Co": {"main.py": 4},
+    }
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/collaboration.html", encoding="utf-8") as f:
+        content = f.read()
+
+    # Table cells must be HTML-escaped
+    assert "Al&lt;ice&gt;" in content
+    assert "Bob &amp; Co" in content

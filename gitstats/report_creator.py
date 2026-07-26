@@ -860,74 +860,37 @@ class HTMLReportCreator(ReportCreator):
         _raw_af = getattr(data, "author_files", {})
         author_files = _raw_af if isinstance(_raw_af, dict) else {}
 
-        if not collab:
-            f.write('<div class="collab-empty">')
-            f.write(
-                "<p>No collaboration data available. "
-                "This graph shows authors who frequently modify the same files.</p>"
-            )
-            f.write("</div>")
-            self.print_footer(f)
-            f.write("</body></html>")
-            f.close()
-            return
-
-        # Only include authors with at least some collaboration
-        authors_with_edges = set()
-        for a in collab:
-            for b in collab[a]:
-                if collab[a][b] > 0:
-                    authors_with_edges.add(a)
-                    authors_with_edges.add(b)
-
-        # Build nodes list
-        nodes_list = []
-        author_to_idx: dict[str, int] = {}
-        for idx, author in enumerate(sorted(authors_with_edges)):
-            file_count = len(author_files.get(author, {}))
-            size = max(8, min(40, file_count // 2 + 5))
-            nodes_list.append({"id": author, "fileCount": file_count, "size": size})
-            author_to_idx[author] = idx
-
-        # Build links list
-        links_list = []
-        for a in collab:
-            for b, w in collab[a].items():
-                if a < b and w > 0:
-                    links_list.append({"source": a, "target": b, "weight": w})
+        # Collect undirected links (deduped via a < b) from the graph.
+        links_list = [
+            {"source": a, "target": b, "weight": w}
+            for a in collab
+            for b, w in collab[a].items()
+            if a < b and w > 0
+        ]
 
         if not links_list:
-            f.write('<div class="collab-empty">')
-            f.write(
-                "<p>No collaboration links found between authors. "
-                "Try analyzing a larger commit range.</p>"
-            )
-            f.write("</div>")
-            self.print_footer(f)
-            f.write("</body></html>")
-            f.close()
+            self._write_collab_empty(f)
             return
 
-        # Build a score based on sum of edge weights per node
+        # Score each node by the sum of its edge weights, then keep the top 50
+        # most-connected authors so large repos stay readable.
         node_score: dict[str, int] = {}
         for link in links_list:
             node_score[link["source"]] = node_score.get(link["source"], 0) + link["weight"]
             node_score[link["target"]] = node_score.get(link["target"], 0) + link["weight"]
 
         top_nodes = set(sorted(node_score, key=lambda x: node_score[x], reverse=True)[:50])
-
-        # Filter nodes and links to top 50
-        filtered_authors = sorted(top_nodes)
         filtered_links = [
             link
             for link in links_list
             if link["source"] in top_nodes and link["target"] in top_nodes
         ]
 
-        # Re-index for the filtered list
+        # Build the node list (sorted for stable indices) and an author -> index
+        # map so links can reference nodes by position in the JSON payload.
         filtered_idx: dict[str, int] = {}
         filtered_nodes: list[dict] = []
-        for idx, author in enumerate(filtered_authors):
+        for idx, author in enumerate(sorted(top_nodes)):
             file_count = len(author_files.get(author, {}))
             size = max(8, min(40, file_count // 2 + 5))
             filtered_nodes.append(
@@ -940,18 +903,17 @@ class HTMLReportCreator(ReportCreator):
             )
             filtered_idx[author] = idx
 
-        filtered_links_typed = [
+        indexed_links = [
             {
                 "source": filtered_idx[lnk["source"]],
                 "target": filtered_idx[lnk["target"]],
                 "weight": lnk["weight"],
-                "type": "collaboration",
             }
             for lnk in filtered_links
         ]
 
         nodes_json = json.dumps(filtered_nodes, ensure_ascii=False).replace("</", "<\\/")
-        links_json = json.dumps(filtered_links_typed, ensure_ascii=False).replace("</", "<\\/")
+        links_json = json.dumps(indexed_links, ensure_ascii=False).replace("</", "<\\/")
 
         # Inline data as global variables; simulation engine is in collaboration.js
         f.write(f"""
@@ -968,7 +930,7 @@ class HTMLReportCreator(ReportCreator):
         </div>
 
         <div id="collab-graph" class="collab-graph-container">
-            <svg id="collab-svg" width="100%%" height="520"></svg>
+            <svg id="collab-svg" width="100%" height="520"></svg>
             <div id="collab-tooltip" class="collab-tooltip" style="display:none;"></div>
         </div>
 
@@ -980,26 +942,42 @@ class HTMLReportCreator(ReportCreator):
         """)
 
         # Collaboration as table view
-        if filtered_links:
-            f.write(html_header(2, "Collaboration Details"))
+        f.write(html_header(2, "Collaboration Details"))
+        f.write(
+            '<table class="sortable" id="collab-table"><tr>'
+            '<th>Author</th><th>Collaborator</th><th class="unsortable">Shared Files</th>'
+            "</tr>"
+        )
+        sorted_links = sorted(filtered_links, key=lambda x: x["weight"], reverse=True)
+        for link in sorted_links[:20]:
             f.write(
-                '<table class="sortable" id="collab-table"><tr>'
-                '<th>Author</th><th>Collaborator</th><th class="unsortable">Shared Files</th>'
-                "</tr>"
+                "<tr><td>%s</td><td>%s</td><td>%d</td></tr>"
+                % (
+                    html.escape(link["source"]),
+                    html.escape(link["target"]),
+                    link["weight"],
+                )
             )
-            sorted_links = sorted(filtered_links, key=lambda x: x["weight"], reverse=True)
-            for link in sorted_links[:20]:
-                f.write(
-                    "<tr><td>%s</td><td>%s</td><td>%d</td></tr>"
-                    % (link["source"], link["target"], link["weight"])
-                )
-            f.write("</table>")
-            if len(sorted_links) > 20:
-                f.write(
-                    '<p class="moreauthors">Showing top 20 collaboration pairs. '
-                    "Total: %d pairs found.</p>" % len(sorted_links)
-                )
+        f.write("</table>")
+        if len(sorted_links) > 20:
+            f.write(
+                '<p class="moreauthors">Showing top 20 collaboration pairs. '
+                "Total: %d pairs found.</p>" % len(sorted_links)
+            )
 
+        self.print_footer(f)
+        f.write("</body></html>")
+        f.close()
+
+    def _write_collab_empty(self, f: Any) -> None:
+        """Write the empty-state body for the collaboration page and close it."""
+        f.write('<div class="collab-empty">')
+        f.write(
+            "<p>No collaboration data available. This graph shows authors "
+            "who frequently modify the same files. Try analyzing a larger "
+            "commit range with more than one contributor.</p>"
+        )
+        f.write("</div>")
         self.print_footer(f)
         f.write("</body></html>")
         f.close()

@@ -718,33 +718,27 @@ class GitDataCollector(DataCollector):
                     logger.warning(f'Failed to handle line "{line}"')
                     (files, inserted, deleted) = (0, 0, 0)
 
-        # File churn: count how many commits touched each file
+        # Single name-only pass drives two metrics:
+        #   * file_churn        -> how many commits touched each file
+        #   * author_files      -> which files each author touches (collaboration)
+        # Each commit is prefixed with a "COMMIT:<author>" marker line; the lines
+        # that follow are the file paths changed by that commit.
         churn_output = get_pipe_output(
-            ['git log --format="" --name-only {}'.format(get_log_range("HEAD", False))]
-        )
-        for line in churn_output.split("\n"):
-            line = line.strip()
-            if line:
-                self.file_churn[line] = self.file_churn.get(line, 0) + 1
-
-        # Collaboration network: who edits the same files together
-        collab_output = get_pipe_output(
             ['git log --format="COMMIT:%aN" --name-only {}'.format(get_log_range("HEAD", False))]
         )
         current_author = None
-        for line in collab_output.split("\n"):
+        for line in churn_output.split("\n"):
             line = line.strip()
             if not line:
                 continue
             if line.startswith("COMMIT:"):
-                current_author = line[7:]
-                current_author = name_to_canonical.get(current_author, current_author)
-            elif current_author:
-                if current_author not in self.author_files:
-                    self.author_files[current_author] = {}
-                self.author_files[current_author][line] = (
-                    self.author_files[current_author].get(line, 0) + 1
-                )
+                current_author = name_to_canonical.get(line[7:], line[7:])
+                continue
+            # A changed-file line.
+            self.file_churn[line] = self.file_churn.get(line, 0) + 1
+            if current_author:
+                author_map = self.author_files.setdefault(current_author, {})
+                author_map[line] = author_map.get(line, 0) + 1
 
     def refine(self) -> None:
         # authors
@@ -791,27 +785,37 @@ class GitDataCollector(DataCollector):
             longest = max(longest, current)
         self.longest_streak = longest
 
-        # Build collaboration graph from author_files
-        authors_list = [a for a in self.author_files.keys() if not a.endswith("[bot]")]
+        self._build_collaboration_graph()
+
+    def _build_collaboration_graph(self) -> None:
+        """Populate ``collaboration_graph`` from ``author_files``.
+
+        Two authors are linked when they have touched the same file; the edge
+        weight sums ``min(count_a, count_b)`` over their shared files.
+
+        Only the top-N committers (bots excluded) are considered so the
+        O(authors^2) pairwise comparison stays bounded on large repositories.
+        The most collaborative authors are effectively always among the top
+        committers, and the report renders only the 50 most-connected nodes.
+        """
+        max_collab_authors = conf["collaboration_max_authors"]
+        authors_list = [
+            a for a in self.authors_by_commits if a in self.author_files and not a.endswith("[bot]")
+        ][:max_collab_authors]
         for i, author_a in enumerate(authors_list):
             files_a = set(self.author_files[author_a].keys())
             for j in range(i + 1, len(authors_list)):
                 author_b = authors_list[j]
                 files_b = set(self.author_files[author_b].keys())
                 common_files = files_a & files_b
-                if common_files:
-                    weight = 0
-                    for f in common_files:
-                        weight += min(
-                            self.author_files[author_a][f],
-                            self.author_files[author_b][f],
-                        )
-                    if author_a not in self.collaboration_graph:
-                        self.collaboration_graph[author_a] = {}
-                    if author_b not in self.collaboration_graph:
-                        self.collaboration_graph[author_b] = {}
-                    self.collaboration_graph[author_a][author_b] = weight
-                    self.collaboration_graph[author_b][author_a] = weight
+                if not common_files:
+                    continue
+                weight = sum(
+                    min(self.author_files[author_a][f], self.author_files[author_b][f])
+                    for f in common_files
+                )
+                self.collaboration_graph.setdefault(author_a, {})[author_b] = weight
+                self.collaboration_graph.setdefault(author_b, {})[author_a] = weight
 
     def get_active_days(self) -> set[str]:
         return self.active_days
