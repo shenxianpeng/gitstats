@@ -26,7 +26,12 @@ def _write_within(directory: str, filename: str, content: str) -> str:
     safe_name = os.path.basename(filename)
     if not safe_name or safe_name in (os.curdir, os.pardir):
         raise ValueError(f"Invalid output file name: {filename!r}")
-    target = os.path.join(directory, safe_name)
+    base = os.path.abspath(directory)
+    target = os.path.abspath(os.path.join(base, safe_name))
+    # Validate the constructed path stays within the target directory before
+    # touching the filesystem.
+    if os.path.commonpath([base, target]) != base:
+        raise ValueError(f"Refusing to write outside {base}: {filename!r}")
     with open(target, "w", encoding="utf-8") as f:
         f.write(content)
     return target
