@@ -646,6 +646,7 @@ def test_create_all_pages(mock_data_collector, temp_dir):
         "lines.html",
         "tags.html",
         "ownership.html",
+        "hotspots.html",
     ]
     for fname in expected_files:
         path = f"{temp_dir}/{fname}"
@@ -760,3 +761,44 @@ def test_open_report_file_confined_to_report_dir(temp_dir):
     assert os.path.exists(f"{temp_dir}/ownership.html")
     with pytest.raises(ValueError):
         creator._open_report_file(temp_dir, "../escape.html")
+
+
+# ── Hotspots page ────────────────────────────────────────────────────────
+
+
+def test_hotspots_page_renders(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/hotspots.html", encoding="utf-8") as f:
+        content = f.read()
+
+    assert "Hotspots Analysis" in content
+    # scatter data inlined for Chart.js
+    assert "chart-hotspots" in content
+    assert "main.py" in content
+    assert "</html>" in content
+
+
+def test_hotspots_page_skipped_when_no_data(mock_data_collector, temp_dir):
+    mock_data_collector.hotspot_files = {}
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    # With no hotspot data the page is not generated at all
+    assert not os.path.exists(f"{temp_dir}/hotspots.html")
+
+
+def test_hotspots_page_escapes_paths(mock_data_collector, temp_dir):
+    mock_data_collector.hotspot_files = {
+        "we<i>rd.py": {"churn": 9, "lines": 500, "score": 201.0},
+        "plain.py": {"churn": 2, "lines": 10, "score": 6.0},
+    }
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/hotspots.html", encoding="utf-8") as f:
+        content = f.read()
+
+    # The table cell must be HTML-escaped
+    assert "we&lt;i&gt;rd.py" in content
