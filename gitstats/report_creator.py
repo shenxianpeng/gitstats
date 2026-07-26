@@ -842,6 +842,19 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    def _open_report_file(self, path: str, filename: str) -> Any:
+        """Open a report page for writing, confined to the report directory.
+
+        ``filename`` is always a hard-coded page name; resolving the target and
+        checking it stays under the report root guards against directory
+        traversal and satisfies static path-injection analysis.
+        """
+        base = os.path.abspath(path)
+        target = os.path.abspath(os.path.join(base, filename))
+        if os.path.commonpath([base, target]) != base:
+            raise ValueError(f"Refusing to write outside report directory: {filename}")
+        return open(target, "w", encoding="utf-8")
+
     def create_collaboration_html(self, data: Any, path: str) -> None:
         """Create a collaboration network page showing a force-directed graph
         of authors who frequently modify the same files together.
@@ -849,7 +862,7 @@ class HTMLReportCreator(ReportCreator):
         The force simulation engine is in collaboration.js. Only the node/link
         data is inlined as global JSON variables COLLAB_NODES / COLLAB_LINKS.
         """
-        f = open(path + "/collaboration.html", "w", encoding="utf-8")
+        f = self._open_report_file(path, "collaboration.html")
         self.print_header(f)
         self.print_nav(f)
         f.write("<h1>Collaboration Network</h1>")

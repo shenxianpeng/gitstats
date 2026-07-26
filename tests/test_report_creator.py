@@ -636,6 +636,19 @@ def test_collaboration_page_renders_graph_and_table(mock_data_collector, temp_di
     assert "100%%" not in content
 
 
+def test_open_report_file_confined_to_report_dir(temp_dir):
+    creator = HTMLReportCreator()
+
+    # A normal page name opens inside the report directory.
+    f = creator._open_report_file(temp_dir, "collaboration.html")
+    f.close()
+    assert os.path.exists(f"{temp_dir}/collaboration.html")
+
+    # A traversal filename is rejected rather than escaping the directory.
+    with pytest.raises(ValueError):
+        creator._open_report_file(temp_dir, "../escape.html")
+
+
 def test_collaboration_page_empty_state(mock_data_collector, temp_dir):
     mock_data_collector.collaboration_graph = {}
     creator = HTMLReportCreator()
