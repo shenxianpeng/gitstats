@@ -15,18 +15,22 @@ from typing import Any
 logger = logging.getLogger("gitstats")
 
 
-def _validate_output_path(output_path: str, base_dir: str | None = None) -> str:
-    """Resolve ``output_path`` and ensure it stays within ``base_dir``.
+def _write_within(output_path: str, base_dir: str | None, content: str) -> str:
+    """Write ``content`` to ``output_path``, confined to ``base_dir``.
 
-    Guards the filesystem writes against a path that escapes the intended
-    output directory (directory traversal). When ``base_dir`` is None the
-    output path's own resolved directory is used as the boundary.
+    The path is resolved and checked to stay within the boundary directory
+    before any filesystem access, so a crafted path cannot escape it (directory
+    traversal). When ``base_dir`` is None the output path's own resolved
+    directory is used as the boundary. Returns the resolved path written to.
     """
     target = os.path.abspath(output_path)
     base = os.path.abspath(base_dir) if base_dir else os.path.dirname(target)
     base = base or os.path.abspath(".")
     if os.path.commonpath([base, target]) != base:
         raise ValueError(f"Refusing to write outside {base}: {output_path}")
+    os.makedirs(os.path.dirname(target) or ".", exist_ok=True)
+    with open(target, "w", encoding="utf-8") as f:
+        f.write(content)
     return target
 
 
@@ -397,11 +401,7 @@ class WrappedCardGenerator:
         if output_path is None:
             output_path = os.path.join(base_dir or ".", f"gitstats-wrapped-{self.year}.svg")
 
-        output_path = _validate_output_path(output_path, base_dir)
-        os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
-
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(svg)
+        output_path = _write_within(output_path, base_dir, svg)
 
         logger.info(f"Wrapped card saved: {output_path}")
         return output_path

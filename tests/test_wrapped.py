@@ -8,18 +8,20 @@ import pytest
 from gitstats.wrapped import (
     MONTH_NAMES,
     WrappedCardGenerator,
-    _validate_output_path,
+    _write_within,
 )
 
 
-def test_validate_output_path_rejects_traversal(tmp_path):
+def test_write_within_rejects_traversal(tmp_path):
     base = str(tmp_path)
-    # A normal name inside the base is accepted and resolved to absolute.
-    ok = _validate_output_path(os.path.join(base, "card.svg"), base_dir=base)
+    # A normal name inside the base is written and its resolved path returned.
+    ok = _write_within(os.path.join(base, "card.svg"), base, "<svg/>")
     assert ok == os.path.join(base, "card.svg")
-    # A traversal path escaping the base is rejected.
+    assert os.path.exists(ok)
+    # A traversal path escaping the base is rejected before any write.
     with pytest.raises(ValueError):
-        _validate_output_path(os.path.join(base, "..", "escape.svg"), base_dir=base)
+        _write_within(os.path.join(base, "..", "escape.svg"), base, "<svg/>")
+    assert not os.path.exists(os.path.join(os.path.dirname(base), "escape.svg"))
 
 
 def _make_mock_data(**overrides):
