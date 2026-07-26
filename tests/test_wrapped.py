@@ -3,10 +3,23 @@
 import os
 from unittest.mock import MagicMock
 
+import pytest
+
 from gitstats.wrapped import (
     MONTH_NAMES,
     WrappedCardGenerator,
+    _validate_output_path,
 )
+
+
+def test_validate_output_path_rejects_traversal(tmp_path):
+    base = str(tmp_path)
+    # A normal name inside the base is accepted and resolved to absolute.
+    ok = _validate_output_path(os.path.join(base, "card.svg"), base_dir=base)
+    assert ok == os.path.join(base, "card.svg")
+    # A traversal path escaping the base is rejected.
+    with pytest.raises(ValueError):
+        _validate_output_path(os.path.join(base, "..", "escape.svg"), base_dir=base)
 
 
 def _make_mock_data(**overrides):

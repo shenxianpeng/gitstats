@@ -949,10 +949,15 @@ def run(gitpath, outputpath, extra_fmt=None, wrapped_config=None) -> int:
                 theme=wrapped_config.get("theme", "midnight"),
             )
             wrapped_path = wrapped_config.get("output")
-            if not wrapped_path:
+            if wrapped_path:
+                # Explicit path: confine the card to its own directory.
+                base_dir = os.path.dirname(os.path.abspath(wrapped_path)) or outputpath
+            else:
+                # Default: write the card inside the report directory.
                 year_str = wrapped_config.get("year") or datetime.datetime.now().year
                 wrapped_path = os.path.join(outputpath, f"wrapped-{year_str}.svg")
-            generator.generate(output_path=wrapped_path)
+                base_dir = outputpath
+            wrapped_path = generator.generate(output_path=wrapped_path, base_dir=base_dir)
             logger.info(f"To view the card, open: {wrapped_path}")
         except Exception as e:
             logger.warning(f"Failed to generate Wrapped card: {e}")
