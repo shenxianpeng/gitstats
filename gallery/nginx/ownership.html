@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - repo</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats <function get_version at 0x7fa023b50700>">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			updateThemeIcon(newTheme);
+		}
+
+		function updateThemeIcon(theme) {
+			const button = document.getElementById('theme-toggle');
+			if (button) {
+				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', function() {
+			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		});
+	</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            </div>
+            </div>
+            <h1>Code Ownership</h1><div class="ownership-summary"><p>Ownership is measured by how many commits each author made to each file. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl><dt>Files tracked</dt><dd>792</dd><dt>Single-owner files</dt><dd>246 (31.1%)</dd><dt>Contributors</dt><dd>133</dd></dl></div>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus Factor Risk — Single-Owner Files</a></h2>
+
+<p><em>Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</em></p><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th>Commits</th></tr><tr><td>src/http/modules/proxy/ngx_http_proxy_handler.c</td><td>Igor Sysoev</td><td>93</td></tr><tr><td>src/http/ngx_http_write_filter.c</td><td>Igor Sysoev</td><td>73</td></tr><tr><td>src/http/ngx_http_header_filter.c</td><td>Igor Sysoev</td><td>67</td></tr><tr><td>src/http/ngx_http_event.c</td><td>Igor Sysoev</td><td>66</td></tr><tr><td>src/http/modules/ngx_http_index_handler.c</td><td>Igor Sysoev</td><td>62</td></tr><tr><td>src/http/modules/ngx_http_static_handler.c</td><td>Igor Sysoev</td><td>61</td></tr><tr><td>src/http/modules/ngx_http_gzip_filter.c</td><td>Igor Sysoev</td><td>61</td></tr><tr><td>src/http/modules/proxy/ngx_http_proxy_upstream.c</td><td>Igor Sysoev</td><td>58</td></tr><tr><td>src/http/modules/proxy/ngx_http_proxy_handler.h</td><td>Igor Sysoev</td><td>54</td></tr><tr><td>src/http/ngx_http_output_filter.c</td><td>Igor Sysoev</td><td>54</td></tr><tr><td>src/imap/ngx_imap_handler.c</td><td>Igor Sysoev</td><td>39</td></tr><tr><td>src/http/modules/ngx_http_range_filter.c</td><td>Igor Sysoev</td><td>34</td></tr><tr><td>src/core/ngx_hunk.h</td><td>Igor Sysoev</td><td>34</td></tr><tr><td>src/http/ngx_http_log_handler.c</td><td>Igor Sysoev</td><td>32</td></tr><tr><td>auto/cc</td><td>Igor Sysoev</td><td>31</td></tr><tr><td>src/http/ngx_http_cache.c</td><td>Igor Sysoev</td><td>30</td></tr><tr><td>src/core/ngx_modules.c</td><td>Igor Sysoev</td><td>27</td></tr><tr><td>src/core/ngx_hunk.c</td><td>Igor Sysoev</td><td>27</td></tr><tr><td>src/imap/ngx_imap_auth_http_module.c</td><td>Igor Sysoev</td><td>25</td></tr><tr><td>src/imap/ngx_imap.h</td><td>Igor Sysoev</td><td>24</td></tr><tr><td>src/http/modules/ngx_http_charset_filter.c</td><td>Igor Sysoev</td><td>23</td></tr><tr><td>auto/os/features</td><td>Igor Sysoev</td><td>22</td></tr><tr><td>src/http/modules/ngx_http_ssi_filter.c</td><td>Igor Sysoev</td><td>22</td></tr><tr><td>src/http/modules/ngx_http_chunked_filter.c</td><td>Igor Sysoev</td><td>22</td></tr><tr><td>src/os/win32/ngx_types.h</td><td>Igor Sysoev</td><td>21</td></tr><tr><td>src/http/modules/proxy/ngx_http_proxy_cache.c</td><td>Igor Sysoev</td><td>20</td></tr><tr><td>src/event/ngx_event_proxy.c</td><td>Igor Sysoev</td><td>19</td></tr><tr><td>src/core/ngx_alloc.c</td><td>Igor Sysoev</td><td>18</td></tr><tr><td>src/imap/ngx_imap_core_module.c</td><td>Igor Sysoev</td><td>17</td></tr><tr><td>src/imap/ngx_imap_proxy_module.c</td><td>Igor Sysoev</td><td>16</td></tr><tr><td>src/http/modules/proxy/ngx_http_proxy_header.c</td><td>Igor Sysoev</td><td>16</td></tr><tr><td>src/core/ngx_garbage_collector.c</td><td>Igor Sysoev</td><td>15</td></tr><tr><td>src/imap/ngx_imap_parse.c</td><td>Igor Sysoev</td><td>15</td></tr><tr><td>src/http/modules/ngx_http_rewrite_handler.c</td><td>Igor Sysoev</td><td>15</td></tr><tr><td>src/http/modules/proxy/ngx_http_event_proxy_handler.c</td><td>Igor Sysoev</td><td>15</td></tr><tr><td>src/http/modules/ngx_http_event_proxy_handler.c</td><td>Igor Sysoev</td><td>15</td></tr><tr><td>src/http/modules/ngx_http_userid_filter.c</td><td>Igor Sysoev</td><td>14</td></tr><tr><td>src/core/ngx_atomic.h</td><td>Igor Sysoev</td><td>14</td></tr><tr><td>src/event/modules/ngx_kqueue_module.h</td><td>Igor Sysoev</td><td>13</td></tr><tr><td>src/os/unix/ngx_types.h</td><td>Igor Sysoev</td><td>13</td></tr><tr><td>src/http/ngx_http_core.c</td><td>Igor Sysoev</td><td>13</td></tr><tr><td>src/imap/ngx_imap_proxy.c</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>src/http/modules/ngx_http_headers_filter.c</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>auto/func</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>src/http/modules/ngx_http_not_modified_filter.c</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>src/http/ngx_http_headers.c</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>src/http/modules/ngx_http_log_handler.c</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>src/event/ngx_event_proxy.h</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>src/http/ngx_http_config.c</td><td>Igor Sysoev</td><td>11</td></tr><tr><td>auto/fmt/fmt</td><td>Igor Sysoev</td><td>11</td></tr></table><p class="moreauthors">Showing top 50 of 246 single-owner files.</p>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by Author</a></h2>
+
+<p><em>Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</em></p><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th>Files owned</th><th>Solely owned</th><th>Files touched</th></tr><tr><td>Igor Sysoev</td><td>563</td><td>194</td><td>593</td></tr><tr><td>Roman Arutyunyan</td><td>50</td><td>7</td><td>211</td></tr><tr><td>Ruslan Ermilov</td><td>41</td><td>6</td><td>309</td></tr><tr><td>Maxim Dounin</td><td>36</td><td>8</td><td>336</td></tr><tr><td>Vladimir Homutov</td><td>34</td><td>4</td><td>164</td></tr><tr><td>Sergey Kandaurov</td><td>16</td><td>0</td><td>247</td></tr><tr><td>Valentin Bartenev</td><td>15</td><td>5</td><td>179</td></tr><tr><td>Alessandro Fael Garcia</td><td>12</td><td>6</td><td>13</td></tr><tr><td>Andrew Clayton</td><td>10</td><td>8</td><td>37</td></tr><tr><td>Eugene Grebenschikov</td><td>2</td><td>2</td><td>9</td></tr><tr><td>Evan Miller</td><td>2</td><td>2</td><td>3</td></tr><tr><td>Piotr Sikora</td><td>1</td><td>0</td><td>84</td></tr><tr><td>Dmitry Volyntsev</td><td>1</td><td>0</td><td>50</td></tr><tr><td>Andrei Belov</td><td>1</td><td>0</td><td>34</td></tr><tr><td>Aleksei Bavshin</td><td>1</td><td>0</td><td>17</td></tr><tr><td>Zhidao HONG</td><td>1</td><td>0</td><td>9</td></tr><tr><td>Pavel Pautov</td><td>1</td><td>1</td><td>8</td></tr><tr><td>Maryna Herasimovich</td><td>1</td><td>1</td><td>6</td></tr><tr><td>Orgad Shaneh</td><td>1</td><td>1</td><td>6</td></tr><tr><td>Gena Makhomed</td><td>1</td><td>0</td><td>3</td></tr><tr><td>Jordan Zebor</td><td>1</td><td>0</td><td>1</td></tr><tr><td>Armin Grodon</td><td>1</td><td>1</td><td>1</td></tr><tr><td>Maxim Konovalov</td><td>0</td><td>0</td><td>366</td></tr><tr><td>Eran Kornblau</td><td>0</td><td>0</td><td>16</td></tr><tr><td>Vadim Zhestikov</td><td>0</td><td>0</td><td>12</td></tr></table><p class="moreauthors">Showing top 25 of 133 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most Shared Files</a></h2>
+
+<p><em>Files touched by the most people — shared code where changes are most likely to need coordination.</em></p><table class="sortable" id="ownership-shared"><tr><th>File</th><th>Contributors</th><th>Primary owner</th><th>Owner share</th></tr><tr><td>src/http/ngx_http_upstream.c</td><td>25</td><td>Igor Sysoev</td><td>43.6%</td></tr><tr><td>src/event/ngx_event_openssl.c</td><td>22</td><td>Maxim Dounin</td><td>33.4%</td></tr><tr><td>src/http/modules/ngx_http_proxy_module.c</td><td>20</td><td>Igor Sysoev</td><td>48.3%</td></tr><tr><td>src/http/modules/ngx_http_ssl_module.c</td><td>17</td><td>Igor Sysoev</td><td>36.1%</td></tr><tr><td>src/http/ngx_http_core_module.c</td><td>16</td><td>Igor Sysoev</td><td>71.7%</td></tr><tr><td>src/http/modules/ngx_http_uwsgi_module.c</td><td>16</td><td>Maxim Dounin</td><td>34.5%</td></tr><tr><td>src/event/ngx_event_openssl.h</td><td>15</td><td>Igor Sysoev</td><td>30.2%</td></tr><tr><td>src/http/modules/ngx_http_fastcgi_module.c</td><td>14</td><td>Igor Sysoev</td><td>59.4%</td></tr><tr><td>src/http/ngx_http_variables.c</td><td>14</td><td>Igor Sysoev</td><td>59.2%</td></tr><tr><td>src/http/ngx_http_upstream.h</td><td>14</td><td>Igor Sysoev</td><td>43.0%</td></tr><tr><td>src/core/ngx_resolver.c</td><td>14</td><td>Igor Sysoev</td><td>33.6%</td></tr><tr><td>src/http/modules/ngx_http_ssi_filter_module.c</td><td>14</td><td>Igor Sysoev</td><td>73.3%</td></tr><tr><td>src/http/ngx_http_request.c</td><td>13</td><td>Igor Sysoev</td><td>59.1%</td></tr><tr><td>src/http/ngx_http.c</td><td>13</td><td>Igor Sysoev</td><td>76.1%</td></tr><tr><td>src/http/modules/ngx_http_scgi_module.c</td><td>13</td><td>Maxim Dounin</td><td>39.3%</td></tr><tr><td>src/mail/ngx_mail_ssl_module.c</td><td>13</td><td>Igor Sysoev</td><td>30.9%</td></tr><tr><td>src/core/nginx.h</td><td>12</td><td>Igor Sysoev</td><td>66.5%</td></tr><tr><td>auto/options</td><td>12</td><td>Igor Sysoev</td><td>62.0%</td></tr><tr><td>src/core/ngx_cycle.c</td><td>12</td><td>Igor Sysoev</td><td>70.4%</td></tr><tr><td>src/core/ngx_connection.c</td><td>12</td><td>Igor Sysoev</td><td>54.3%</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

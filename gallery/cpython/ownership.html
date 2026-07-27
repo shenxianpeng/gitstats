@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - repo</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats <function get_version at 0x7fa079150670>">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			updateThemeIcon(newTheme);
+		}
+
+		function updateThemeIcon(theme) {
+			const button = document.getElementById('theme-toggle');
+			if (button) {
+				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', function() {
+			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		});
+	</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            </div>
+            </div>
+            <h1>Code Ownership</h1><div class="ownership-summary"><p>Ownership is measured by how many commits each author made to each file. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl><dt>Files tracked</dt><dd>27500</dd><dt>Single-owner files</dt><dd>5372 (19.5%)</dd><dt>Contributors</dt><dd>3600</dd></dl></div>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus Factor Risk — Single-Owner Files</a></h2>
+
+<p><em>Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</em></p><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th>Commits</th></tr><tr><td>ChangeLog</td><td>Guido van Rossum</td><td>70</td></tr><tr><td>Lib/importlib/NOTES</td><td>Brett Cannon</td><td>50</td></tr><tr><td>Mac/Build/PythonCore.mcp</td><td>Jack Jansen</td><td>45</td></tr><tr><td>Doc/tools/mkhowto.sh</td><td>Fred Drake</td><td>38</td></tr><tr><td>Mac/Demo/building.html</td><td>Jack Jansen</td><td>35</td></tr><tr><td>Mac/mwerks/projects/build.macppc.shared/PythonCorePPC.mu.hqx</td><td>Jack Jansen</td><td>34</td></tr><tr><td>Include/internal/pycore_coreconfig.h</td><td>Victor Stinner</td><td>33</td></tr><tr><td>Mac/mwerks/projects/build.macppc.shared/PythonPPC.mu.hqx</td><td>Jack Jansen</td><td>33</td></tr><tr><td>Mac/mwerks/projects/PlugIns/toolboxmodules.ppc.mu.hqx</td><td>Jack Jansen</td><td>32</td></tr><tr><td>Mac/mwerks/projects/build.mac68k.stand/Python68K.mu.hqx</td><td>Jack Jansen</td><td>32</td></tr><tr><td>Mac/mwerks/projects/build.macppc.shared/PythonAppletPPC.mu.hqx</td><td>Jack Jansen</td><td>32</td></tr><tr><td>Mac/Relnotes</td><td>Jack Jansen</td><td>31</td></tr><tr><td>Mac/Build/PythonStandSmall.prj</td><td>Jack Jansen</td><td>31</td></tr><tr><td>Mac/mwerks/projects/PlugIns/ctb.ppc.mu.hqx</td><td>Jack Jansen</td><td>31</td></tr><tr><td>Mac/mwerks/projects/PlugIns/imgmodules.ppc.mu.hqx</td><td>Jack Jansen</td><td>31</td></tr><tr><td>Mac/mwerks/projects/PlugIns/macspeech.ppc.mu.hqx</td><td>Jack Jansen</td><td>31</td></tr><tr><td>Mac/Include/pythonresources.h</td><td>Jack Jansen</td><td>30</td></tr><tr><td>Mac/scripts/EditPythonPrefs.py</td><td>Jack Jansen</td><td>30</td></tr><tr><td>Mac/Include/macbuildno.h</td><td>Jack Jansen</td><td>28</td></tr><tr><td>Mac/mwerks/mwerks_nonshared_config.h</td><td>Jack Jansen</td><td>28</td></tr><tr><td>Mac/Build/PythonCore.prj</td><td>Jack Jansen</td><td>27</td></tr><tr><td>Mac/Resources/bundle.rsrc.hqx</td><td>Jack Jansen</td><td>27</td></tr><tr><td>Mac/Build/PythonCorePPC.prj</td><td>Jack Jansen</td><td>26</td></tr><tr><td>Mac/Resources/dialogs.rsrc.hqx</td><td>Jack Jansen</td><td>26</td></tr><tr><td>Misc/RPM/python-3.3.spec</td><td>Georg Brandl</td><td>25</td></tr><tr><td>Mac/Build/PythonStandalone.mcp</td><td>Jack Jansen</td><td>25</td></tr><tr><td>Mac/Modules/qt/Qtmodule.c</td><td>Jack Jansen</td><td>25</td></tr><tr><td>PCbuild9/pythoncore.vcproj</td><td>Christian Heimes</td><td>24</td></tr><tr><td>Mac/Build/PythonInterpreter.mcp</td><td>Jack Jansen</td><td>24</td></tr><tr><td>Mac/Distributions/binary.include</td><td>Jack Jansen</td><td>24</td></tr><tr><td>Mac/Resources/pythonpath.rsrc.hqx</td><td>Jack Jansen</td><td>24</td></tr><tr><td>Mac/mwerks/projects/PlugIns/_tkinter.ppc.mu.hqx</td><td>Jack Jansen</td><td>24</td></tr><tr><td>Tools/msi/bundle/Default.thm</td><td>Steve Dower</td><td>23</td></tr><tr><td>Misc/python-mode-old.el</td><td>Guido van Rossum</td><td>23</td></tr><tr><td>Mac/mwerks/mwerks_shared_config.h</td><td>Jack Jansen</td><td>23</td></tr><tr><td>Mac/Build/PythonCore.exp</td><td>Jack Jansen</td><td>23</td></tr><tr><td>Mac/Build/PythonCoreCarbon.exp</td><td>Jack Jansen</td><td>23</td></tr><tr><td>Tools/faqwiz/faqmain.py</td><td>Guido van Rossum</td><td>22</td></tr><tr><td>Include/errors.h</td><td>Guido van Rossum</td><td>22</td></tr><tr><td>Mac/scripts/EditPythonPrefs.rsrc.hqx</td><td>Jack Jansen</td><td>22</td></tr><tr><td>Mac/mwerks/projects/PlugIns/waste.ppc.mu.hqx</td><td>Jack Jansen</td><td>21</td></tr><tr><td>Demo/sgi/video/README</td><td>Guido van Rossum</td><td>20</td></tr><tr><td>Lib/pathlib/_os.py</td><td>Barney Gale</td><td>20</td></tr><tr><td>Mac/Build/Printing.prj</td><td>Jack Jansen</td><td>20</td></tr><tr><td>Mac/Build/calldll.ppc.prj</td><td>Jack Jansen</td><td>20</td></tr><tr><td>Mac/Build/icglue.prj</td><td>Jack Jansen</td><td>20</td></tr><tr><td>Mac/mwerks/projects/build.macppc.stand/PythonStandalone.mu.hqx</td><td>Jack Jansen</td><td>20</td></tr><tr><td>Tools/msi/common.wxs</td><td>Steve Dower</td><td>19</td></tr><tr><td>Tools/compiler/compiler/ast.py</td><td>Jeremy Hylton</td><td>19</td></tr><tr><td>PCbuild9/pyproject.vsprops</td><td>Christian Heimes</td><td>19</td></tr></table><p class="moreauthors">Showing top 50 of 5372 single-owner files.</p>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by Author</a></h2>
+
+<p><em>Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</em></p><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th>Files owned</th><th>Solely owned</th><th>Files touched</th></tr><tr><td>Hugo van Kemenade</td><td>2541</td><td>67</td><td>4170</td></tr><tr><td>Guido van Rossum</td><td>1954</td><td>709</td><td>4296</td></tr><tr><td>Jack Jansen</td><td>1542</td><td>1041</td><td>1929</td></tr><tr><td>Victor Stinner</td><td>1160</td><td>219</td><td>4105</td></tr><tr><td>Pablo Galindo</td><td>1109</td><td>72</td><td>2942</td></tr><tr><td>Serhiy Storchaka</td><td>1046</td><td>227</td><td>3750</td></tr><tr><td>Ned Deily</td><td>996</td><td>26</td><td>1657</td></tr><tr><td>Georg Brandl</td><td>841</td><td>46</td><td>3039</td></tr><tr><td>Fred Drake</td><td>777</td><td>106</td><td>1648</td></tr><tr><td>T. Wouters</td><td>683</td><td>4</td><td>5094</td></tr><tr><td>Christian Heimes</td><td>604</td><td>72</td><td>2350</td></tr><tr><td>Steve Dower</td><td>554</td><td>213</td><td>1263</td></tr><tr><td>Benjamin Peterson</td><td>465</td><td>25</td><td>2699</td></tr><tr><td>Martin v. Löwis</td><td>416</td><td>188</td><td>1923</td></tr><tr><td>Gregory P. Smith</td><td>399</td><td>25</td><td>1171</td></tr><tr><td>Eric Snow</td><td>363</td><td>163</td><td>975</td></tr><tr><td>Mark Shannon</td><td>287</td><td>10</td><td>701</td></tr><tr><td>Brett Cannon</td><td>279</td><td>41</td><td>1371</td></tr><tr><td>Erlend E. Aasland</td><td>275</td><td>14</td><td>801</td></tr><tr><td>Antoine Pitrou</td><td>263</td><td>21</td><td>1467</td></tr><tr><td>Pablo Galindo Salgado</td><td>260</td><td>79</td><td>829</td></tr><tr><td>Irit Katriel</td><td>234</td><td>9</td><td>637</td></tr><tr><td>Barry Warsaw</td><td>231</td><td>88</td><td>1040</td></tr><tr><td>Jason R. Coombs</td><td>224</td><td>97</td><td>372</td></tr><tr><td>Mark Dickinson</td><td>216</td><td>1</td><td>681</td></tr></table><p class="moreauthors">Showing top 25 of 3600 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most Shared Files</a></h2>
+
+<p><em>Files touched by the most people — shared code where changes are most likely to need coordination.</em></p><table class="sortable" id="ownership-shared"><tr><th>File</th><th>Contributors</th><th>Primary owner</th><th>Owner share</th></tr><tr><td>Misc/ACKS</td><td>484</td><td>Antoine Pitrou</td><td>11.1%</td></tr><tr><td>configure</td><td>216</td><td>Martin v. Löwis</td><td>11.2%</td></tr><tr><td>Misc/NEWS</td><td>197</td><td>Antoine Pitrou</td><td>9.1%</td></tr><tr><td>Modules/posixmodule.c</td><td>189</td><td>Victor Stinner</td><td>14.4%</td></tr><tr><td>configure.ac</td><td>186</td><td>Christian Heimes</td><td>13.7%</td></tr><tr><td>Makefile.pre.in</td><td>179</td><td>Victor Stinner</td><td>13.4%</td></tr><tr><td>Python/ceval.c</td><td>166</td><td>Guido van Rossum</td><td>15.2%</td></tr><tr><td>Modules/socketmodule.c</td><td>162</td><td>Guido van Rossum</td><td>17.2%</td></tr><tr><td>Doc/library/stdtypes.rst</td><td>160</td><td>Georg Brandl</td><td>20.2%</td></tr><tr><td>Objects/typeobject.c</td><td>149</td><td>Guido van Rossum</td><td>15.2%</td></tr><tr><td>Doc/library/functions.rst</td><td>138</td><td>Georg Brandl</td><td>21.9%</td></tr><tr><td>Objects/unicodeobject.c</td><td>136</td><td>Victor Stinner</td><td>31.5%</td></tr><tr><td>Doc/library/os.rst</td><td>135</td><td>Georg Brandl</td><td>19.4%</td></tr><tr><td>Lib/test/test_socket.py</td><td>127</td><td>Guido van Rossum</td><td>10.1%</td></tr><tr><td>Doc/reference/datamodel.rst</td><td>126</td><td>Georg Brandl</td><td>20.0%</td></tr><tr><td>Doc/library/typing.rst</td><td>124</td><td>Alex Waygood</td><td>12.0%</td></tr><tr><td>pyconfig.h.in</td><td>123</td><td>Martin v. Löwis</td><td>16.3%</td></tr><tr><td>Lib/inspect.py</td><td>122</td><td>Yury Selivanov</td><td>15.9%</td></tr><tr><td>Doc/library/sys.rst</td><td>121</td><td>Georg Brandl</td><td>17.7%</td></tr><tr><td>Python/bltinmodule.c</td><td>117</td><td>Guido van Rossum</td><td>23.9%</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

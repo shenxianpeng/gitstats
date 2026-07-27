@@ -533,6 +533,23 @@ table.noborders td:hover .bar {
 	color: var(--text-secondary);
 }
 
+/* ===== Code Ownership ===== */
+.ownership-summary {
+	padding: var(--space-4);
+	margin: var(--space-4) 0;
+	background-color: var(--surface-color);
+	border: 1px solid var(--border-strong);
+}
+
+.ownership-summary p:first-child {
+	margin-top: 0;
+}
+
+.ownership-summary p {
+	color: var(--text-secondary);
+	line-height: 1.6;
+}
+
 /* ===== Footer ===== */
 .footer {
 	margin-top: var(--space-6);
