@@ -1,5 +1,6 @@
 """Tests for gitstats.report_creator – HTML generation, helpers, chart rendering."""
 
+import datetime
 import os
 from io import StringIO
 
@@ -555,6 +556,63 @@ def test_build_author_time_series_basic(mock_data_collector):
     # Each author dataset should have 2 data points
     for ds in loc_ds:
         assert len(ds["data"]) == 2
+
+
+def test_build_author_time_series_downsample(mock_data_collector):
+    """When total_points > MAX_POINTS (500), downsampling kicks in."""
+    creator = HTMLReportCreator()
+    creator.data = mock_data_collector
+
+    # Build 1000 timestamps (one per hour for ~42 days) to trigger downsampling
+    base_stamp = 1670000000  # 2022-12-02
+    authors = mock_data_collector.get_authors(20)  # Alice, Bob, Charlie
+    changes = {}
+    for i in range(1000):
+        stamp = base_stamp + i * 3600  # one data point per hour
+        author = authors[i % len(authors)]
+        changes[stamp] = {
+            author: {
+                "lines_added": (i + 1) * 10,
+                "commits": i + 1,
+            }
+        }
+    mock_data_collector.changes_by_date_by_author = changes
+
+    labels, loc_ds, cba_ds = creator._build_author_time_series(mock_data_collector)
+
+    # Should be downsampled to ~500 + 1 (last point ensured)
+    assert len(labels) <= 502, f"Expected ≤502 labels, got {len(labels)}"
+    assert len(labels) >= 498, f"Expected ≥498 labels, got {len(labels)}"
+
+    # All authors should be present in both charts
+    assert len(loc_ds) == len(authors)
+    assert len(cba_ds) == len(authors)
+
+    # Each author dataset should have the same number of data points as labels
+    for ds in loc_ds:
+        assert len(ds["data"]) == len(labels), (
+            f"Author {ds['label']} has {len(ds['data'])} points, expected {len(labels)}"
+        )
+    for ds in cba_ds:
+        assert len(ds["data"]) == len(labels)
+
+    # The last timestamp should always be included
+    last_expected = datetime.datetime.fromtimestamp(sorted(changes.keys())[-1]).strftime("%Y-%m-%d")
+    assert labels[-1] == last_expected, f"Last label should be {last_expected}, got {labels[-1]}"
+
+    # Data values should be monotonically non-decreasing (cumulative)
+    for ds in loc_ds:
+        values = ds["data"]
+        for j in range(1, len(values)):
+            assert values[j] >= values[j - 1], (
+                f"{ds['label']} LOC not monotonic at index {j}: {values[j - 1]} -> {values[j]}"
+            )
+    for ds in cba_ds:
+        values = ds["data"]
+        for j in range(1, len(values)):
+            assert values[j] >= values[j - 1], (
+                f"{ds['label']} commits not monotonic at index {j}: {values[j - 1]} -> {values[j]}"
+            )
 
 
 # ── ReportCreator base class ─────────────────────────────────────────────
