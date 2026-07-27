@@ -451,26 +451,50 @@ class HTMLReportCreator(ReportCreator):
         f.write("</tr></table>")
 
     def _build_author_time_series(self, data):
-        """Build per-author cumulative lines and commits time series for Chart.js."""
+        """Build per-author cumulative lines and commits time series for Chart.js.
+
+        For large repositories, data points are automatically downsampled to keep
+        the HTML file size manageable and Chart.js rendering fast. Since the stored
+        values are already cumulative, downsampling preserves the chart shape.
+        """
         authors_to_plot = data.get_authors(load_config()["max_authors"])
+        sorted_stamps = sorted(data.changes_by_date_by_author.keys())
+        total_points = len(sorted_stamps)
+
+        # Target max ~500 data points per chart to prevent browser lag and huge HTML.
+        # 500 points covers ~10 years at weekly granularity — more than enough for
+        # cumulative line charts.
+        MAX_POINTS = 500
+        if total_points > MAX_POINTS:
+            step = total_points / MAX_POINTS
+            sampled_indices = {int(i * step) for i in range(MAX_POINTS)}
+            sampled_indices.add(total_points - 1)  # ensure the last point is always included
+        else:
+            sampled_indices = set(range(total_points))
+
         lines_by_authors = dict.fromkeys(authors_to_plot, 0)
         commits_by_authors = dict.fromkeys(authors_to_plot, 0)
         time_labels = []
         per_author_lines = {a: [] for a in authors_to_plot}
         per_author_commits = {a: [] for a in authors_to_plot}
 
-        for stamp in sorted(data.changes_by_date_by_author.keys()):
-            time_labels.append(datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d"))
-            for author in authors_to_plot:
-                if author in data.changes_by_date_by_author[stamp]:
+        for i, stamp in enumerate(sorted_stamps):
+            # Update running totals: only the author(s) of this commit changed
+            for author in data.changes_by_date_by_author[stamp]:
+                if author in authors_to_plot:
                     lines_by_authors[author] = data.changes_by_date_by_author[stamp][author][
                         "lines_added"
                     ]
                     commits_by_authors[author] = data.changes_by_date_by_author[stamp][author][
                         "commits"
                     ]
-                per_author_lines[author].append(lines_by_authors[author])
-                per_author_commits[author].append(commits_by_authors[author])
+
+            # Only record a data point if this index is in the sampled set
+            if i in sampled_indices:
+                time_labels.append(datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d"))
+                for author in authors_to_plot:
+                    per_author_lines[author].append(lines_by_authors[author])
+                    per_author_commits[author].append(commits_by_authors[author])
 
         loc_datasets = [{"label": a, "data": per_author_lines[a]} for a in authors_to_plot]
         cba_datasets = [{"label": a, "data": per_author_commits[a]} for a in authors_to_plot]
