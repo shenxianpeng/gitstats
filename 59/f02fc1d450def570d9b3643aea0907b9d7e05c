@@ -1,0 +1,27 @@
+docs/source/configuration.rst
+  s_47c36357fa834c::t_3745a2a4524d6d 12
+gitstats/report_creator.py
+  s_47c36357fa834c::t_37ba5304146b5a 851-852
+  s_47c36357fa834c::t_49654db6ff98f6 846,850,853-860
+gitstats.conf
+  s_47c36357fa834c::t_1150e5e91f7f65 17-19,21-22
+  s_47c36357fa834c::t_f35d4debbc1fe8 20
+gitstats/__init__.py
+  s_47c36357fa834c::t_b9276adf3fd1dc 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "59f02fc1d450def570d9b3643aea0907b9d7e05c",
+  "prompts": {},
+  "sessions": {
+    "s_47c36357fa834c": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019fa467-6710-7e06-afc3-0dbf10cf9b0f",
+        "model": "deepseek-v4-flash"
+      },
+      "human_author": "shenxianpeng <xianpeng.shen@gmail.com>"
+    }
+  }
+}
