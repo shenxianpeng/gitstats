@@ -843,11 +843,21 @@ class HTMLReportCreator(ReportCreator):
             el[1]
             for el in sorted([(el[1]["date"], el[0]) for el in data.tags.items()], reverse=True)
         ]
+        max_tags_authors = load_config()["max_tags_authors"]
         for tag in tags_sorted_by_date_desc:
             authorinfo = []
             self.authors_by_commits = get_keys_sorted_by_values(data.tags[tag]["authors"])
-            for i in reversed(self.authors_by_commits):
-                authorinfo.append("%s (%d)" % (i, data.tags[tag]["authors"][i]))
+            authors_reversed = list(reversed(self.authors_by_commits))
+            # max_tags_authors < 0 (e.g., -1) means no limit
+            if max_tags_authors >= 0 and len(authors_reversed) > max_tags_authors:
+                authors_shown = authors_reversed[:max_tags_authors]
+                remaining = len(authors_reversed) - max_tags_authors
+                for i in authors_shown:
+                    authorinfo.append("%s (%d)" % (i, data.tags[tag]["authors"][i]))
+                authorinfo.append("<em>and %d more authors</em>" % remaining)
+            else:
+                for i in authors_reversed:
+                    authorinfo.append("%s (%d)" % (i, data.tags[tag]["authors"][i]))
             f.write(
                 "<tr><td>%s</td><td>%s</td><td>%d</td><td>%s</td></tr>"
                 % (

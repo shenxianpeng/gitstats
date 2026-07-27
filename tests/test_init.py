@@ -34,6 +34,7 @@ def test_default_config_keys():
         "max_ext_length",
         "style",
         "max_authors",
+        "max_tags_authors",
         "authors_top",
         "commit_begin",
         "commit_end",
