@@ -42,7 +42,7 @@ jobs:
         git config --global init.defaultBranch main
 
     - name: Install uv
-      run: 'pip install --only-binary :all: uv'
+      run: pip install --only-binary :all: uv
 
     - name: Install dependencies
       run: |
@@ -80,7 +80,7 @@ jobs:
         cache-dependency-path: 'pyproject.toml'
 
     - name: Install uv
-      run: 'pip install --only-binary :all: uv'
+      run: pip install --only-binary :all: uv
 
     - name: Build Docs
       run: |
