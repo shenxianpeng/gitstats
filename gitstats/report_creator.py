@@ -146,6 +146,24 @@ class HTMLReportCreator(ReportCreator):
         f.write("<h1>Activity</h1>")
 
         # Streak summary
+        self._write_streak_summary(f, data)
+
+        self._write_yearly_activity_section(f, data)
+        self._write_weekly_activity_section(f, data)
+        self._write_hour_of_day_section(f, data)
+        self._write_day_of_week_section(f, data)
+        self._write_hour_of_week_section(f, data)
+        self._write_month_of_year_section(f, data)
+        self._write_commits_by_year_month_section(f, data)
+        self._write_commits_by_year_section(f, data)
+        self._write_commits_by_timezone_section(f, data)
+
+        self.print_footer(f)
+        f.write("</body></html>")
+        f.close()
+
+    def _write_streak_summary(self, f, data) -> None:
+        """Write streak summary paragraph."""
         longest_streak = data.get_longest_streak()
         if longest_streak > 0:
             f.write(
@@ -153,27 +171,23 @@ class HTMLReportCreator(ReportCreator):
                 "A long streak indicates sustained development momentum.</p>" % longest_streak
             )
 
-        # f.write('<h2>Last 30 days</h2>')
-
-        # f.write('<h2>Last 12 months</h2>')
-
-        # Yearly activity
+    def _write_yearly_activity_section(self, f, data) -> None:
+        """Write yearly activity section with chart."""
         log_output = get_pipe_output(["git log --reverse --pretty=format:%ct"], quiet=True)
         first_commit_timestamp = log_output.split("\n")[0] if log_output else ""
         if first_commit_timestamp:
-            repo_age_years = (time.time() - int(first_commit_timestamp)) / 31536000  # 365 days
-            YEARS = max(5, int(math.ceil(repo_age_years / 5.0)) * 5)
+            repo_age_years = (time.time() - int(first_commit_timestamp)) / 31536000
+            years_count = max(5, int(math.ceil(repo_age_years / 5.0)) * 5)
         else:
-            YEARS = 5
+            years_count = 5
         f.write(html_header(2, "Yearly activity"))
-        f.write("<p>Last %d years</p>" % YEARS)
+        f.write("<p>Last %d years</p>" % years_count)
 
-        # generate years to show (previous N years from now)
         now = datetime.datetime.now()
         deltayear = datetime.timedelta(365)
-        years = []
+        years: list[str] = []
         stampcur = now
-        for i in range(0, YEARS):
+        for _ in range(years_count):
             years.insert(0, stampcur.strftime("%Y"))
             stampcur -= deltayear
 
@@ -189,17 +203,17 @@ class HTMLReportCreator(ReportCreator):
             )
         )
 
-        # Weekly activity
-        WEEKS = 32
+    def _write_weekly_activity_section(self, f, data) -> None:
+        """Write weekly activity section with chart."""
+        weeks_count = 32
         f.write(html_header(2, "Weekly activity"))
-        f.write("<p>Last %d weeks</p>" % WEEKS)
+        f.write("<p>Last %d weeks</p>" % weeks_count)
 
-        # generate weeks to show (previous N weeks from now)
         now = datetime.datetime.now()
         deltaweek = datetime.timedelta(7)
-        weeks = []
+        weeks: list[str] = []
         stampcur = now
-        for i in range(0, WEEKS):
+        for _ in range(weeks_count):
             weeks.insert(0, stampcur.strftime("%Y-%W"))
             stampcur -= deltaweek
 
@@ -216,35 +230,37 @@ class HTMLReportCreator(ReportCreator):
             )
         )
 
-        # Hour of Day
+    def _write_hour_of_day_section(self, f, data) -> None:
+        """Write hour of day section with table and chart."""
         f.write(html_header(2, "Hour of Day"))
         totalcommits = data.get_total_commits()
         hour_of_day = data.get_activity_by_hour_of_day()
+        busiest = data.activity_by_hour_of_day_busiest
+
         f.write("<table><tr><th>Hour</th>")
-        for i in range(0, 24):
+        for i in range(24):
             f.write("<th>%d</th>" % i)
         f.write("</tr>\n<tr><th>Commits</th>")
-        for i in range(0, 24):
+        for i in range(24):
             if i in hour_of_day:
                 f.write(
                     '<td class="%s">%d</td>'
-                    % (
-                        self._heat_td_class(hour_of_day[i], data.activity_by_hour_of_day_busiest),
-                        hour_of_day[i],
-                    )
+                    % (self._heat_td_class(hour_of_day[i], busiest), hour_of_day[i])
                 )
             else:
                 f.write(f'<td class="{self._heat_td_class(0, 0)}">0</td>')
         f.write("</tr>\n<tr><th>%</th>")
-        for i in range(0, 24):
+        for i in range(24):
             if i in hour_of_day:
                 f.write(
-                    f'<td class="{self._heat_td_class(hour_of_day[i], data.activity_by_hour_of_day_busiest)}">{(100.0 * hour_of_day[i]) / totalcommits:.2f}</td>'
+                    f'<td class="{self._heat_td_class(hour_of_day[i], busiest)}">'
+                    f"{(100.0 * hour_of_day[i]) / totalcommits:.2f}</td>"
                 )
             else:
                 f.write(f'<td class="{self._heat_td_class(0, 0)}">0.00</td>')
         f.write("</tr></table>")
-        h_labels = list(range(0, 24))
+
+        h_labels = list(range(24))
         h_values = [hour_of_day.get(h, 0) for h in h_labels]
         f.write(
             self._render_chartjs(
@@ -256,12 +272,15 @@ class HTMLReportCreator(ReportCreator):
             )
         )
 
-        # Day of Week
+    def _write_day_of_week_section(self, f, data) -> None:
+        """Write day of week section with table and chart."""
         f.write(html_header(2, "Day of Week"))
         day_of_week = data.get_activity_by_day_of_week()
+        totalcommits = data.get_total_commits()
+
         f.write(_FLEX_CONTAINER)
         f.write("<table><tr><th>Day</th><th>Total (%)</th></tr>")
-        for d in range(0, 7):
+        for d in range(7):
             f.write("<tr>")
             f.write(f"<th>{WEEKDAYS[d]}</th>")
             if d in day_of_week:
@@ -274,7 +293,7 @@ class HTMLReportCreator(ReportCreator):
             f.write("</tr>")
         f.write("</table>")
         dow_labels = list(WEEKDAYS)
-        dow_values = [day_of_week.get(d, 0) for d in range(0, 7)]
+        dow_values = [day_of_week.get(d, 0) for d in range(7)]
         f.write(_FLEX_CHILD)
         f.write(
             self._render_chartjs(
@@ -289,16 +308,17 @@ class HTMLReportCreator(ReportCreator):
         )
         f.write(_FLEX_CLOSE)
 
-        # Hour of Week
+    def _write_hour_of_week_section(self, f, data) -> None:
+        """Write hour of week section as a heat table."""
         f.write(html_header(2, "Hour of Week"))
         f.write("<table>")
         f.write("<tr><th>Weekday</th>")
-        for hour in range(0, 24):
+        for hour in range(24):
             f.write("<th>%d</th>" % hour)
         f.write("</tr>")
-        for weekday in range(0, 7):
+        for weekday in range(7):
             f.write(f"<tr><th>{WEEKDAYS[weekday]}</th>")
-            for hour in range(0, 24):
+            for hour in range(24):
                 commits = data.activity_by_hour_of_week.get(weekday, {}).get(hour, 0)
                 f.write(
                     '<td class="{}">{}</td>'.format(
@@ -309,15 +329,17 @@ class HTMLReportCreator(ReportCreator):
             f.write("</tr>")
         f.write("</table>")
 
-        # Month of Year
+    def _write_month_of_year_section(self, f, data) -> None:
+        """Write month of year section with table and chart."""
         f.write(html_header(2, "Month of Year"))
         f.write(_FLEX_CONTAINER)
         f.write("<table><tr><th>Month</th><th>Commits (%)</th></tr>")
+        total = data.get_total_commits()
         for mm in range(1, 13):
             commits = data.activity_by_month_of_year.get(mm, 0)
             f.write(
                 "<tr><td>%d</td><td>%d (%.2f %%)</td></tr>"
-                % (mm, commits, (100.0 * commits) / data.get_total_commits())
+                % (mm, commits, (100.0 * commits) / total)
             )
         f.write("</table>")
         moy_labels = list(range(1, 13))
@@ -336,7 +358,8 @@ class HTMLReportCreator(ReportCreator):
         )
         f.write(_FLEX_CLOSE)
 
-        # Commits by year/month
+    def _write_commits_by_year_month_section(self, f, data) -> None:
+        """Write commits by year/month section with table and chart."""
         f.write(html_header(2, "Commits by year/month"))
         f.write(_FLEX_CONTAINER)
         f.write(
@@ -368,19 +391,21 @@ class HTMLReportCreator(ReportCreator):
         )
         f.write(_FLEX_CLOSE)
 
-        # Commits by year
+    def _write_commits_by_year_section(self, f, data) -> None:
+        """Write commits by year section with table and chart."""
         f.write(html_header(2, "Commits by Year"))
         f.write(_FLEX_CONTAINER)
         f.write(
             "<table><tr><th>Year</th><th>Commits (% of all)</th><th>Lines added</th><th>Lines removed</th></tr>"
         )
+        total = data.get_total_commits()
         for yy in sorted(data.commits_by_year.keys(), reverse=True):
             f.write(
                 "<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d</td><td>%d</td></tr>"
                 % (
                     yy,
                     data.commits_by_year.get(yy, 0),
-                    (100.0 * data.commits_by_year.get(yy, 0)) / data.get_total_commits(),
+                    (100.0 * data.commits_by_year.get(yy, 0)) / total,
                     data.lines_added_by_year.get(yy, 0),
                     data.lines_removed_by_year.get(yy, 0),
                 )
@@ -408,10 +433,11 @@ class HTMLReportCreator(ReportCreator):
         )
         f.write(_FLEX_CLOSE)
 
-        # Commits by timezone
+    def _write_commits_by_timezone_section(self, f, data) -> None:
+        """Write commits by timezone section as a heat table."""
         f.write(html_header(2, "Commits by Timezone"))
         max_commits_on_tz = max(data.commits_by_timezone.values())
-        tz_sorted = sorted(list(data.commits_by_timezone.keys()), key=lambda n: int(n))
+        tz_sorted = sorted(data.commits_by_timezone, key=lambda n: int(n))
         f.write('<table class="heat"><tr>')
         for i in tz_sorted:
             f.write(f"<th>{i}</th>")
@@ -423,10 +449,6 @@ class HTMLReportCreator(ReportCreator):
                 % (self._heat_td_class(commits, max_commits_on_tz), commits)
             )
         f.write("</tr></table>")
-
-        self.print_footer(f)
-        f.write("</body></html>")
-        f.close()
 
     def _build_author_time_series(self, data):
         """Build per-author cumulative lines and commits time series for Chart.js."""
@@ -1327,7 +1349,7 @@ def compute_code_ownership(author_files: dict[str, dict[str, int]]) -> dict[str,
     for filepath, authors in file_authors.items():
         edits = sum(authors.values())
         # Primary owner: most edits; ties broken alphabetically for determinism.
-        owner = max(sorted(authors), key=lambda a: authors[a])
+        owner = max(zip(authors.values(), authors.keys()))[1]
         contributors = len(authors)
         files_stats.append(
             {

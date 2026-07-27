@@ -41,19 +41,23 @@ jobs:
         git config --global user.email "ci@test.com"
         git config --global init.defaultBranch main
 
+    - name: Install uv
+      run: 'pip install --only-binary :all: uv'
+
     - name: Install dependencies
-      run: pip install -e ".[test]"
+      run: |
+        uv sync --frozen --no-build --no-install-project --extra test
+        uv pip install --editable .
 
     - name: Run pytest
-      run: python -m pytest tests/ -v --tb=short
+      run: uv run python -m pytest tests/ -v --tb=short
 
     - name: Generate GitStats Report (smoke test)
       if: ${{ matrix.python-version == '3.10' }}
       env:
         FONTCONFIG_FILE: /dev/null
       run: |
-        pip install -e "."
-        gitstats . test-report -f json
+        uv run gitstats . test-report -f json
 
     - name: Upload report artifact
       if: ${{ matrix.python-version == '3.10' }}
@@ -75,7 +79,11 @@ jobs:
         cache: 'pip'
         cache-dependency-path: 'pyproject.toml'
 
+    - name: Install uv
+      run: 'pip install --only-binary :all: uv'
+
     - name: Build Docs
       run: |
-        pip install nox
-        nox -s docs
+        uv sync --frozen --no-build --no-install-project --extra dev
+        uv pip install --editable .
+        uv run nox -s docs

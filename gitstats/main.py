@@ -760,6 +760,10 @@ class GitDataCollector(DataCollector):
                 )
 
         # Compute longest consecutive active days streak
+        self._compute_longest_streak()
+
+    def _compute_longest_streak(self) -> None:
+        """Compute longest consecutive active days streak."""
         dates = sorted(datetime.datetime.strptime(d, "%Y-%m-%d") for d in self.active_days)
         longest, current = 0, 0
         for i, d in enumerate(dates):
@@ -1029,6 +1033,37 @@ def get_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _apply_config_from_args(conf: dict, args) -> None:
+    """Apply config key=value overrides from CLI arguments."""
+    for item in args.config:
+        try:
+            key, value = item.split("=", 1)
+        except ValueError:
+            raise ValueError("Config must be in the form key=value")
+        if key not in conf:
+            raise KeyError(f'No such key "{key}" in config')
+        # Convert numeric strings to integers to match config file behavior
+        if value.isdigit():
+            conf[key] = int(value)
+        elif value.lower() in ("true", "false"):
+            conf[key] = value.lower() == "true"
+        else:
+            conf[key] = value
+
+
+def _apply_ai_args(conf: dict, args) -> None:
+    """Apply AI-related CLI arguments (take precedence over config)."""
+    if args.ai is not None:
+        conf["ai_enabled"] = args.ai
+    if args.ai_provider:
+        conf["ai_provider"] = args.ai_provider
+    if args.ai_model:
+        conf["ai_model"] = args.ai_model
+    if args.ai_language:
+        conf["ai_language"] = args.ai_language
+    conf["refresh_ai"] = args.refresh_ai if hasattr(args, "refresh_ai") else False
+
+
 def main() -> int:
     parser = get_parser()
     args = parser.parse_args()
@@ -1048,36 +1083,13 @@ def main() -> int:
     outputpath = os.path.abspath(args.outputpath)
     extra_fmt = args.format
 
-    for item in args.config:
-        try:
-            key, value = item.split("=", 1)
-            if key not in conf:
-                parser.error(f'No such key "{key}" in config')
-            # Convert numeric strings to integers to match config file behavior
-            if value.isdigit():
-                conf[key] = int(value)
-            elif value.lower() in ("true", "false"):
-                conf[key] = value.lower() == "true"
-            else:
-                conf[key] = value
-        except ValueError:
-            parser.error("Config must be in the form key=value")
+    try:
+        _apply_config_from_args(conf, args)
+    except (ValueError, KeyError) as e:
+        parser.error(str(e))
 
     # Handle AI CLI arguments (CLI takes precedence over config)
-    if args.ai is not None:
-        conf["ai_enabled"] = args.ai
-
-    if args.ai_provider:
-        conf["ai_provider"] = args.ai_provider
-
-    if args.ai_model:
-        conf["ai_model"] = args.ai_model
-
-    if args.ai_language:
-        conf["ai_language"] = args.ai_language
-
-    # Store refresh_ai flag for later use
-    conf["refresh_ai"] = args.refresh_ai if hasattr(args, "refresh_ai") else False
+    _apply_ai_args(conf, args)
 
     run(gitpath, outputpath, extra_fmt=extra_fmt)
 
