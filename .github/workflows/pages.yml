@@ -23,12 +23,16 @@ jobs:
       with:
         python-version: "3.10"
 
+    - name: Install uv
+      run: 'pip install --only-binary :all: uv'
+
     - name: Generate GitStats Report
       env:
         FONTCONFIG_FILE: /dev/null
       run: |
-        pip install nox
-        nox -s build
+        uv sync --frozen --no-build --no-install-project --extra dev
+        uv pip install --editable .
+        uv run nox -s build
 
     - name: Save GitStats Report
       uses: actions/upload-artifact@v7
