@@ -1,0 +1,21 @@
+tests/test_report_creator.py
+  s_26d97c573c68a2::t_0fe6c92cfd3568 561-593,595-599,602-607,609-613,615-617
+  s_26d97c573c68a2::t_ad779372155cd8 594,600-601,608,614
+  s_26d97c573c68a2::t_60b8133fe8624d 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "d1fa82d3bd0514d82fe4a7e16204ff540d365995",
+  "prompts": {},
+  "sessions": {
+    "s_26d97c573c68a2": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019fa4c7-18a9-71af-b410-64b2ea72d084",
+        "model": "deepseek-v4-flash"
+      },
+      "human_author": "shenxianpeng <xianpeng.shen@gmail.com>"
+    }
+  }
+}
