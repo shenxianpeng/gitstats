@@ -514,11 +514,20 @@ class HTMLReportCreator(ReportCreator):
         allauthors = data.get_authors()
         if len(allauthors) > load_config()["max_authors"]:
             rest = allauthors[load_config()["max_authors"] :]
-            f.write(
-                '<p class="moreauthors">These didn\'t make it to the top: {}</p>'.format(
-                    ", ".join(rest)
+            max_list = load_config()["max_authors_list"]
+            if len(rest) > max_list:
+                shown = ", ".join(rest[:max_list])
+                more = len(rest) - max_list
+                f.write(
+                    f'<p class="moreauthors">These didn\'t make it to the top:'
+                    f" {shown}<em>, and {more} more authors</em></p>"
                 )
-            )
+            else:
+                f.write(
+                    '<p class="moreauthors">These didn\'t make it to the top: {}</p>'.format(
+                        ", ".join(rest)
+                    )
+                )
 
         # Build per-author time series data for Chart.js
         time_labels, loc_datasets, cba_datasets = self._build_author_time_series(data)
