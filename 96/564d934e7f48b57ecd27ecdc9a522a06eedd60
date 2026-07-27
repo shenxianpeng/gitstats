@@ -1,0 +1,28 @@
+gitstats/__init__.py
+  s_18494177032438::t_1be3b306196ae5 22
+tests/test_init.py
+  s_18494177032438::t_e21eae2fc4bb37 38
+  s_18494177032438::t_a34e0e5a2b1ce2 66
+gitstats/report_creator.py
+  s_18494177032438::t_d8a41f82d44df7 517-518,521,524-529
+  s_18494177032438::t_99b20d1b5a09ba 519-520,522
+  s_18494177032438::t_a90fdaf73c7613 523
+gitstats.conf
+  s_18494177032438::t_ed29ae3583b67d 23-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "96564d934e7f48b57ecd27ecdc9a522a06eedd60",
+  "prompts": {},
+  "sessions": {
+    "s_18494177032438": {
+      "agent_id": {
+        "tool": "pi",
+        "id": "019fa494-2015-7271-a8b5-0861741de001",
+        "model": "deepseek-v4-flash"
+      },
+      "human_author": "shenxianpeng <xianpeng.shen@gmail.com>"
+    }
+  }
+}
