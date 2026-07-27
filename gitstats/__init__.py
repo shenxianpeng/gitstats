@@ -18,6 +18,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "max_ext_length": 10,  # Maximum length of file extensions shown in statistics.
     "style": "gitstats.css",  # CSS stylesheet for the generated report.
     "max_authors": 20,  # Maximum number of authors to list in "Authors".
+    "max_tags_authors": 50,  # Maximum number of authors per tag in "Tags" page.
     "authors_top": 5,  # Number of top authors to highlight.
     "commit_begin": "",  # Start of commit range (empty = include all commits).
     "commit_end": "HEAD",  # End of commit range (default: HEAD).

@@ -9,6 +9,7 @@ You can create a ``gitstats.conf`` file in the current directory to customize th
 * ``style`` - CSS stylesheet for the generated report. Default: ``gitstats.css``.
 * ``max_authors`` - Maximum number of authors to list in "Authors". Default: ``20``.
 * ``authors_top`` - Number of top authors to highlight. Default: ``5``.
+* ``max_tags_authors`` - Maximum number of authors to display per tag in "Tags" page. Set to ``-1`` to show all authors (no limit). Default: ``50``.
 * ``commit_begin`` - Start of commit range (empty = include all commits). For example, ``10`` for last 10 commits. Default: ``""`` (empty).
 * ``commit_end`` - End of commit range. Default: ``HEAD``.
 * ``linear_linestats`` - Enable linear history for line statistics (``1`` = enabled, ``0`` = disabled). Default: ``1``.
