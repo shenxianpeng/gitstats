@@ -35,6 +35,7 @@ def test_default_config_keys():
         "style",
         "max_authors",
         "max_tags_authors",
+        "max_authors_list",
         "authors_top",
         "commit_begin",
         "commit_end",
@@ -62,6 +63,7 @@ def test_default_config_types():
     """Verify config values have correct types."""
     assert isinstance(DEFAULT_CONFIG["max_domains"], int)
     assert isinstance(DEFAULT_CONFIG["max_authors"], int)
+    assert isinstance(DEFAULT_CONFIG["max_authors_list"], int)
     assert isinstance(DEFAULT_CONFIG["ai_enabled"], bool)
     assert isinstance(DEFAULT_CONFIG["processes"], int)
     assert isinstance(DEFAULT_CONFIG["ai_language"], str)
