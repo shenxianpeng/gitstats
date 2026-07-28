@@ -45,7 +45,7 @@
 
 📘 Documentation: `gitstats.readthedocs.io <https://gitstats.readthedocs.io/>`_
 
-⚡ `GitStats Gallery <https://shenxianpeng.github.io/gitstats/gallery/>`_ — live reports for CPython, VS Code, Git, nginx, Kubernetes, Node.js, Django, Rust, and more.
+⚡ `GitStats Gallery <https://shenxianpeng.github.io/gitstats/gallery/>`_ — live reports for CPython, VS Code, Git, nginx, Kubernetes, Node.js, Django, Rust, React, Homebrew, and more.
 
 .. contents:: Table of Contents
    :depth: 2
@@ -58,43 +58,6 @@ Example
 ``gitstats .`` generates this `gitstats report <https://shenxianpeng.github.io/gitstats/index.html>`_.
 
 Check out the `GitStats Gallery <https://shenxianpeng.github.io/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly.
-
-.. list-table:: Featured Reports
-   :header-rows: 1
-
-   * - Project
-     - Report
-     - Repository
-   * - CPython
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/cpython/index.html>`_
-     - `python/cpython <https://github.com/python/cpython>`_
-   * - VS Code
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/vscode/index.html>`_
-     - `microsoft/vscode <https://github.com/microsoft/vscode>`_
-   * - Git
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/git/index.html>`_
-     - `git/git <https://github.com/git/git>`_
-   * - nginx
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/nginx/index.html>`_
-     - `nginx/nginx <https://github.com/nginx/nginx>`_
-   * - Kubernetes
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/kubernetes/index.html>`_
-     - `kubernetes/kubernetes <https://github.com/kubernetes/kubernetes>`_
-   * - Node.js
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/nodejs/index.html>`_
-     - `nodejs/node <https://github.com/nodejs/node>`_
-   * - Django
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/django/index.html>`_
-     - `django/django <https://github.com/django/django>`_
-   * - Rust
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/rust/index.html>`_
-     - `rust-lang/rust <https://github.com/rust-lang/rust>`_
-   * - React
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/react/index.html>`_
-     - `facebook/react <https://github.com/facebook/react>`_
-   * - Homebrew
-     - `Report <https://shenxianpeng.github.io/gitstats/gallery/homebrew/index.html>`_
-     - `Homebrew/brew <https://github.com/Homebrew/brew>`_
 
 .. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/demo.gif
    :alt: gitstats terminal demo
