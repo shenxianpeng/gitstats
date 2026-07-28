@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - repo</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats <function get_version at 0x7f9703e548b0>">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			updateThemeIcon(newTheme);
+		}
+
+		function updateThemeIcon(theme) {
+			const button = document.getElementById('theme-toggle');
+			if (button) {
+				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', function() {
+			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		});
+	</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            </div>
+            </div>
+            <h1>Code Ownership</h1><div class="ownership-summary"><p>Ownership is measured by how many commits each author made to each file. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl><dt>Files tracked</dt><dd>176799</dd><dt>Single-owner files</dt><dd>67610 (38.2%)</dd><dt>Contributors</dt><dd>7550</dd></dl></div>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus Factor Risk — Single-Owner Files</a></h2>
+
+<p><em>Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</em></p><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th>Commits</th></tr><tr><td>crates/libanalysis/src/lib.rs</td><td>Alex Kladov</td><td>54</td></tr><tr><td>crates/libsyntax2/src/grammar.ron</td><td>Alex Kladov</td><td>52</td></tr><tr><td>crates/libsyntax2/src/ast/generated.rs</td><td>Alex Kladov</td><td>49</td></tr><tr><td>src/syntax_kinds/generated.rs</td><td>Alex Kladov</td><td>46</td></tr><tr><td>grammar.ron</td><td>Alex Kladov</td><td>46</td></tr><tr><td>src/grammar.ron</td><td>Alex Kladov</td><td>42</td></tr><tr><td>crates/ra_analysis/src/descriptors/module/mod.rs</td><td>Alex Kladov</td><td>41</td></tr><tr><td>crates/server/src/main_loop/mod.rs</td><td>Alex Kladov</td><td>39</td></tr><tr><td>patches/stdlib-lock.toml</td><td>bjorn3</td><td>38</td></tr><tr><td>library/compiler-builtins/libm/crates/libm-test/src/precision.rs</td><td>Trevor Gross</td><td>38</td></tr><tr><td>crates/libeditor/tests/test.rs</td><td>Alex Kladov</td><td>38</td></tr><tr><td>.github/workflows/rustc.yml</td><td>bjorn3</td><td>37</td></tr><tr><td>crates/libeditor/src/lib.rs</td><td>Alex Kladov</td><td>35</td></tr><tr><td>crates/server/src/main_loop/handlers.rs</td><td>Alex Kladov</td><td>34</td></tr><tr><td>library/compiler-builtins/libm/crates/libm-test/src/mpfloat.rs</td><td>Trevor Gross</td><td>33</td></tr><tr><td>crates/server/src/main.rs</td><td>Alex Kladov</td><td>31</td></tr><tr><td>library/compiler-builtins/libm/crates/libm-test/tests/compare_built_musl.rs</td><td>Trevor Gross</td><td>30</td></tr><tr><td>src/doc/rustc-dev-guide/ci/sembr/src/main.rs</td><td>Tshepang Mbambo</td><td>29</td></tr><tr><td>library/compiler-builtins/libm/crates/libm-test/Cargo.toml</td><td>Trevor Gross</td><td>29</td></tr><tr><td>library/compiler-builtins/libm/crates/libm-test/benches/random.rs</td><td>Trevor Gross</td><td>28</td></tr><tr><td>src/librustc/ty/print.rs</td><td>Eduard-Mihai Burtescu</td><td>28</td></tr><tr><td>src/parser/grammar/items/mod.rs</td><td>Alex Kladov</td><td>27</td></tr><tr><td>scripts/cargo-clif.rs</td><td>bjorn3</td><td>26</td></tr><tr><td>crates/libeditor/src/completion.rs</td><td>Alex Kladov</td><td>26</td></tr><tr><td>crates/libeditor/src/code_actions.rs</td><td>Alex Kladov</td><td>26</td></tr><tr><td>library/compiler-builtins/libm/crates/libm-test/tests/multiprecision.rs</td><td>Trevor Gross</td><td>25</td></tr><tr><td>crates/libsyntax2/src/ast/mod.rs</td><td>Alex Kladov</td><td>25</td></tr><tr><td>clippy_dev/src/crater.rs</td><td>Matthias Krüger</td><td>24</td></tr><tr><td>crates/ra_ide/src/references/classify.rs</td><td>Alex Kladov</td><td>24</td></tr><tr><td>crates/server/src/req.rs</td><td>Alex Kladov</td><td>24</td></tr><tr><td>library/alloc/src/io/mod.rs</td><td>Zachary Harrold</td><td>23</td></tr><tr><td>library/compiler-builtins/libm/src/math/generic/mod.rs</td><td>Trevor Gross</td><td>23</td></tr><tr><td>crates/ra_hir_def/src/keys.rs</td><td>Alex Kladov</td><td>23</td></tr><tr><td>crates/ra_syntax/src/ast/node_ext.rs</td><td>Alex Kladov</td><td>23</td></tr><tr><td>crates/ra_analysis/src/descriptors/module/nameres.rs</td><td>Alex Kladov</td><td>23</td></tr><tr><td>src/rustdoc/prune_undoc_pass.rs</td><td>Brian Anderson</td><td>23</td></tr><tr><td>patches/0002-Disable-u128-and-i128-in-libcore.patch</td><td>bjorn3</td><td>22</td></tr><tr><td>examples/mini_core_hello_world.rs</td><td>bjorn3</td><td>22</td></tr><tr><td>example.rs</td><td>bjorn3</td><td>22</td></tr><tr><td>library/stdarch/crates/core_arch/src/loongarch64/lasx/portable.rs</td><td>WANG Rui</td><td>21</td></tr><tr><td>library/stdarch/crates/core_arch/src/loongarch64/lsx/portable.rs</td><td>WANG Rui</td><td>21</td></tr><tr><td>library/stdarch/crates/stdarch-gen-loongarch/lasx.spec</td><td>WANG Rui</td><td>21</td></tr><tr><td>library/compiler-builtins/libm/.github/workflows/main.yaml</td><td>Trevor Gross</td><td>21</td></tr><tr><td>library/compiler-builtins/libm/crates/util/src/main.rs</td><td>Trevor Gross</td><td>21</td></tr><tr><td>crates/assists/src/handlers/extract_function.rs</td><td>Vladyslav Katasonov</td><td>21</td></tr><tr><td>examples/mini_core.rs</td><td>bjorn3</td><td>20</td></tr><tr><td>tests/mir-opt/coverage/instrument_coverage.main.InstrumentCoverage.diff</td><td>Zalathar</td><td>20</td></tr><tr><td>library/compiler-builtins/libm/crates/libm-test/src/test_traits.rs</td><td>Trevor Gross</td><td>20</td></tr><tr><td>src/yellow/syntax.rs</td><td>Alex Kladov</td><td>20</td></tr><tr><td>src/parser/grammar/mod.rs</td><td>Alex Kladov</td><td>20</td></tr></table><p class="moreauthors">Showing top 50 of 67610 single-owner files.</p>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by Author</a></h2>
+
+<p><em>Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</em></p><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th>Files owned</th><th>Solely owned</th><th>Files touched</th></tr><tr><td>Vadim Petrochenkov</td><td>9249</td><td>3264</td><td>16603</td></tr><tr><td>Albert Larsan</td><td>6739</td><td>6708</td><td>27736</td></tr><tr><td>Esteban Küber</td><td>6609</td><td>2012</td><td>15532</td></tr><tr><td>Jieyou Xu</td><td>6366</td><td>221</td><td>13269</td></tr><tr><td>Ralf Jung</td><td>6305</td><td>1821</td><td>11398</td></tr><tr><td>Oliver Scherer</td><td>5929</td><td>1586</td><td>16638</td></tr><tr><td>Alex Kladov</td><td>5333</td><td>3911</td><td>6964</td></tr><tr><td>Philipp Krones</td><td>5042</td><td>43</td><td>6269</td></tr><tr><td>David Wood</td><td>4904</td><td>4562</td><td>13723</td></tr><tr><td>Michael Goulet</td><td>4836</td><td>1658</td><td>11442</td></tr><tr><td>Guillaume Gomez</td><td>4258</td><td>2774</td><td>12652</td></tr><tr><td>Felix S. Klock II</td><td>4192</td><td>3178</td><td>8677</td></tr><tr><td>Mark Rousskov</td><td>4099</td><td>66</td><td>18331</td></tr><tr><td>Niko Matsakis</td><td>3148</td><td>1144</td><td>8334</td></tr><tr><td>Noratrieb</td><td>2991</td><td>116</td><td>10391</td></tr><tr><td>Alex Crichton</td><td>2902</td><td>615</td><td>10441</td></tr><tr><td>lcnr</td><td>2610</td><td>663</td><td>5031</td></tr><tr><td>Lukas Wirth</td><td>2281</td><td>552</td><td>4884</td></tr><tr><td>Nicholas Nethercote</td><td>1745</td><td>166</td><td>6714</td></tr><tr><td>Patrick Walton</td><td>1713</td><td>45</td><td>4581</td></tr><tr><td>Yuki Okushi</td><td>1707</td><td>647</td><td>3732</td></tr><tr><td>Matthew Jasper</td><td>1705</td><td>372</td><td>5056</td></tr><tr><td>Zalathar</td><td>1565</td><td>670</td><td>2519</td></tr><tr><td>Camille Gillot</td><td>1533</td><td>481</td><td>6317</td></tr><tr><td>Urgau</td><td>1346</td><td>643</td><td>3484</td></tr></table><p class="moreauthors">Showing top 25 of 7550 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most Shared Files</a></h2>
+
+<p><em>Files touched by the most people — shared code where changes are most likely to need coordination.</em></p><table class="sortable" id="ownership-shared"><tr><th>File</th><th>Contributors</th><th>Primary owner</th><th>Owner share</th></tr><tr><td>Cargo.lock</td><td>516</td><td>bjorn3</td><td>9.9%</td></tr><tr><td>README.md</td><td>408</td><td>Ralf Jung</td><td>13.5%</td></tr><tr><td>clippy_lints/src/lib.rs</td><td>395</td><td>Philipp Krones</td><td>12.0%</td></tr><tr><td>CHANGELOG.md</td><td>363</td><td>Philipp Krones</td><td>11.8%</td></tr><tr><td>compiler/rustc_span/src/symbol.rs</td><td>280</td><td>Nicholas Nethercote</td><td>5.4%</td></tr><tr><td>src/libsyntax/parse/parser.rs</td><td>263</td><td>Patrick Walton</td><td>11.3%</td></tr><tr><td>clippy_lints/src/methods/mod.rs</td><td>239</td><td>Philipp Krones</td><td>14.9%</td></tr><tr><td>src/librustdoc/clean/mod.rs</td><td>231</td><td>Guillaume Gomez</td><td>12.2%</td></tr><tr><td>compiler/rustc_target/src/spec/mod.rs</td><td>216</td><td>Ralf Jung</td><td>6.9%</td></tr><tr><td>src/librustdoc/lib.rs</td><td>210</td><td>Alex Crichton</td><td>10.4%</td></tr><tr><td>Cargo.toml</td><td>206</td><td>bjorn3</td><td>14.2%</td></tr><tr><td>src/lib.rs</td><td>205</td><td>bjorn3</td><td>27.4%</td></tr><tr><td>src/librustc_typeck/check/mod.rs</td><td>204</td><td>Niko Matsakis</td><td>11.7%</td></tr><tr><td>library/std/src/lib.rs</td><td>202</td><td>Ralf Jung</td><td>5.6%</td></tr><tr><td>src/tools/compiletest/src/runtest.rs</td><td>191</td><td>Zalathar</td><td>7.8%</td></tr><tr><td>compiler/rustc_session/src/options.rs</td><td>190</td><td>Nicholas Nethercote</td><td>5.0%</td></tr><tr><td>library/core/src/lib.rs</td><td>180</td><td>Ralf Jung</td><td>9.2%</td></tr><tr><td>src/libstd/lib.rs</td><td>179</td><td>Alex Crichton</td><td>25.1%</td></tr><tr><td>src/doc/rustc/src/platform-support.md</td><td>177</td><td>Eric Huss</td><td>3.2%</td></tr><tr><td>src/libsyntax/feature_gate.rs</td><td>173</td><td>Vadim Petrochenkov</td><td>10.7%</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

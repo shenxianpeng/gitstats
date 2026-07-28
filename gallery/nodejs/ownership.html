@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - repo</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats <function get_version at 0x7f2f402108b0>">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			updateThemeIcon(newTheme);
+		}
+
+		function updateThemeIcon(theme) {
+			const button = document.getElementById('theme-toggle');
+			if (button) {
+				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', function() {
+			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		});
+	</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            </div>
+            </div>
+            <h1>Code Ownership</h1><div class="ownership-summary"><p>Ownership is measured by how many commits each author made to each file. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl><dt>Files tracked</dt><dd>124583</dd><dt>Single-owner files</dt><dd>53001 (42.5%)</dd><dt>Contributors</dt><dd>4266</dd></dl></div>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus Factor Risk — Single-Owner Files</a></h2>
+
+<p><em>Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</em></p><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th>Commits</th></tr><tr><td>src/net.cc</td><td>Ryan Dahl</td><td>115</td></tr><tr><td>deps/npm/html/doc/changelog.html</td><td>Isaac Z. Schlueter</td><td>84</td></tr><tr><td>deps/npm/html/api/bin.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/bugs.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/commands.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/config.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/deprecate.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/docs.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/edit.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/explore.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/help-search.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/init.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/install.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/link.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/load.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/ls.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/npm.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/outdated.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/owner.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/pack.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/prefix.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/prune.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/publish.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/rebuild.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/restart.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/root.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/run-script.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/search.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/start.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/stop.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/submodule.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/tag.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/test.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/uninstall.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/unpublish.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/update.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/version.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/view.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/whoami.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/adduser.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/bin.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/bugs.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/build.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/bundle.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/cache.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/coding-style.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/completion.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/config.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/deprecate.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/developers.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr></table><p class="moreauthors">Showing top 50 of 53001 single-owner files.</p>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by Author</a></h2>
+
+<p><em>Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</em></p><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th>Files owned</th><th>Solely owned</th><th>Files touched</th></tr><tr><td>Michaël Zasso</td><td>27677</td><td>17335</td><td>41348</td></tr><tr><td>Node.js GitHub Bot</td><td>10628</td><td>2838</td><td>15198</td></tr><tr><td>Rich Trott</td><td>9198</td><td>1477</td><td>17310</td></tr><tr><td>Rebecca Turner</td><td>6391</td><td>1064</td><td>9135</td></tr><tr><td>Ruben Bridgewater</td><td>5765</td><td>72</td><td>7812</td></tr><tr><td>npm team</td><td>5494</td><td>3515</td><td>6149</td></tr><tr><td>Shigeki Ohtsu</td><td>5167</td><td>1320</td><td>6363</td></tr><tr><td>Ryan Dahl</td><td>4184</td><td>2159</td><td>6606</td></tr><tr><td>Isaac Z. Schlueter</td><td>3759</td><td>2324</td><td>7813</td></tr><tr><td>Joyee Cheung</td><td>3210</td><td>2692</td><td>4529</td></tr><tr><td>Chengzhong Wu</td><td>3039</td><td>2247</td><td>3926</td></tr><tr><td>Yosuke Furukawa</td><td>2773</td><td>641</td><td>3077</td></tr><tr><td>Kat Marchán</td><td>2484</td><td>1143</td><td>7975</td></tr><tr><td>Ben Noordhuis</td><td>2318</td><td>1262</td><td>8698</td></tr><tr><td>Myles Borins</td><td>2311</td><td>987</td><td>10202</td></tr><tr><td>René</td><td>1995</td><td>1795</td><td>2175</td></tr><tr><td>Roman Reiss</td><td>1892</td><td>351</td><td>4004</td></tr><tr><td>Sam Roberts</td><td>1827</td><td>132</td><td>4258</td></tr><tr><td>Colin Ihrig</td><td>1614</td><td>612</td><td>9037</td></tr><tr><td>James M Snell</td><td>1363</td><td>470</td><td>4372</td></tr><tr><td>Steven R. Loomis</td><td>1065</td><td>124</td><td>1234</td></tr><tr><td>Ali Ijaz Sheikh</td><td>1022</td><td>842</td><td>3854</td></tr><tr><td>Rafael Gonzaga</td><td>992</td><td>190</td><td>3125</td></tr><tr><td>Timothy J Fontaine</td><td>985</td><td>117</td><td>2680</td></tr><tr><td>Refael Ackermann</td><td>926</td><td>145</td><td>3122</td></tr></table><p class="moreauthors">Showing top 25 of 4266 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most Shared Files</a></h2>
+
+<p><em>Files touched by the most people — shared code where changes are most likely to need coordination.</em></p><table class="sortable" id="ownership-shared"><tr><th>File</th><th>Contributors</th><th>Primary owner</th><th>Owner share</th></tr><tr><td>README.md</td><td>300</td><td>Rich Trott</td><td>16.6%</td></tr><tr><td>doc/api/fs.md</td><td>230</td><td>Rich Trott</td><td>7.3%</td></tr><tr><td>src/node.cc</td><td>221</td><td>Ryan Dahl</td><td>20.5%</td></tr><tr><td>lib/fs.js</td><td>189</td><td>Joyee Cheung</td><td>6.6%</td></tr><tr><td>doc/api/http.md</td><td>184</td><td>Luigi Pinca</td><td>6.9%</td></tr><tr><td>lib/net.js</td><td>171</td><td>Ryan Dahl</td><td>21.4%</td></tr><tr><td>doc/api/stream.md</td><td>164</td><td>Robert Nagy</td><td>10.9%</td></tr><tr><td>node.gyp</td><td>162</td><td>Joyee Cheung</td><td>9.9%</td></tr><tr><td>doc/api/cli.md</td><td>162</td><td>Rafael Gonzaga</td><td>6.6%</td></tr><tr><td>doc/api/process.md</td><td>157</td><td>Rich Trott</td><td>8.0%</td></tr><tr><td>Makefile</td><td>156</td><td>Ryan Dahl</td><td>13.8%</td></tr><tr><td>doc/api/errors.md</td><td>150</td><td>James M Snell</td><td>8.5%</td></tr><tr><td>src/node_crypto.cc</td><td>143</td><td>Ben Noordhuis</td><td>21.9%</td></tr><tr><td>lib/internal/errors.js</td><td>138</td><td>Ruben Bridgewater</td><td>10.7%</td></tr><tr><td>doc/api/crypto.md</td><td>138</td><td>Tobias Nießen</td><td>23.4%</td></tr><tr><td>common.gypi</td><td>136</td><td>Michaël Zasso</td><td>31.5%</td></tr><tr><td>lib/repl.js</td><td>133</td><td>Ruben Bridgewater</td><td>11.6%</td></tr><tr><td>lib/util.js</td><td>125</td><td>Ruben Bridgewater</td><td>14.1%</td></tr><tr><td>doc/api/http2.md</td><td>118</td><td>James M Snell</td><td>11.8%</td></tr><tr><td>BUILDING.md</td><td>117</td><td>Rich Trott</td><td>11.1%</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

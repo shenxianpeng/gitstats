@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - repo</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats <function get_version at 0x7f2f402108b0>">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			updateThemeIcon(newTheme);
+		}
+
+		function updateThemeIcon(theme) {
+			const button = document.getElementById('theme-toggle');
+			if (button) {
+				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', function() {
+			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		});
+	</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            </div>
+            </div>
+            <h1>Tags</h1><dl><dt>Total tags</dt><dd>4</dd><dt>Average commits per tag</dt><dd>11887.75</dd></dl><table class="tags"><tr><th>Name</th><th>Date</th><th>Commits</th><th>Authors</th></tr><tr><td>v0.1.6</td><td>2009-08-22</td><td>47145</td><td>Rich Trott (3151), Ryan Dahl (2630), Ben Noordhuis (2291), Isaac Z. Schlueter (1655), Anna Henningsen (1655), Michaël Zasso (1353), Joyee Cheung (1249), James M Snell (1233), Colin Ihrig (1186), Antoine du Hamel (1113), Node.js GitHub Bot (1023), Ruben Bridgewater (848), Tobias Nießen (781), Fedor Indutny (781), Daniel Bevenius (605), Bert Belder (598), Rafael Gonzaga (431), Richard Lau (426), Michael Dawson (412), Filip Skokan (395), Chengzhong Wu (380), Yagiz Nizipli (375), Brian White (374), Rod Vagg (369), Trevor Norris (365), Sam Roberts (354), Robert Nagy (350), Luigi Pinca (345), vsemozhetbyt (332), Timothy J Fontaine (332), Refael Ackermann (326), Myles Borins (291), dependabot[bot] (282), Matteo Collina (269), Shigeki Ohtsu (221), Anatoli Papirovski (220), Jiawen Geng (214), Marco Ippolito (203), Nathan Rajlich (197), Darshan Sen (191), Aviv Keller (180), Moshe Atlow (179), Jeremiah Senkpiel (165), Shelley Vohr (164), Livia Medeiros (159), Evan Lucas (159), Koichi Kobayashi (157), Gabriel Schulhof (156), Timothy Gu (154), Guy Bedford (151), <em>and 4217 more authors</em></td></tr><tr><td>v0.1.1</td><td>2009-07-27</td><td>47222</td><td>Rich Trott (3151), Ryan Dahl (2706), Ben Noordhuis (2291), Isaac Z. Schlueter (1655), Anna Henningsen (1655), Michaël Zasso (1353), Joyee Cheung (1249), James M Snell (1233), Colin Ihrig (1186), Antoine du Hamel (1113), Node.js GitHub Bot (1023), Ruben Bridgewater (848), Tobias Nießen (781), Fedor Indutny (781), Daniel Bevenius (605), Bert Belder (598), Rafael Gonzaga (431), Richard Lau (426), Michael Dawson (412), Filip Skokan (395), Chengzhong Wu (380), Yagiz Nizipli (375), Brian White (374), Rod Vagg (369), Trevor Norris (365), Sam Roberts (354), Robert Nagy (350), Luigi Pinca (345), vsemozhetbyt (332), Timothy J Fontaine (332), Refael Ackermann (326), Myles Borins (291), dependabot[bot] (282), Matteo Collina (269), Shigeki Ohtsu (221), Anatoli Papirovski (220), Jiawen Geng (214), Marco Ippolito (203), Nathan Rajlich (197), Darshan Sen (191), Aviv Keller (180), Moshe Atlow (179), Jeremiah Senkpiel (165), Shelley Vohr (164), Livia Medeiros (159), Evan Lucas (159), Koichi Kobayashi (157), Gabriel Schulhof (156), Timothy Gu (154), Guy Bedford (151), <em>and 4217 more authors</em></td></tr><tr><td>v0.0.6</td><td>2009-06-24</td><td>47280</td><td>Rich Trott (3151), Ryan Dahl (2753), Ben Noordhuis (2291), Isaac Z. Schlueter (1655), Anna Henningsen (1655), Michaël Zasso (1353), Joyee Cheung (1249), James M Snell (1233), Colin Ihrig (1186), Antoine du Hamel (1113), Node.js GitHub Bot (1023), Ruben Bridgewater (848), Tobias Nießen (781), Fedor Indutny (781), Daniel Bevenius (605), Bert Belder (598), Rafael Gonzaga (431), Richard Lau (426), Michael Dawson (412), Filip Skokan (395), Chengzhong Wu (380), Yagiz Nizipli (375), Brian White (374), Rod Vagg (369), Trevor Norris (365), Sam Roberts (354), Robert Nagy (350), Luigi Pinca (345), vsemozhetbyt (332), Timothy J Fontaine (332), Refael Ackermann (326), Myles Borins (291), dependabot[bot] (282), Matteo Collina (269), Shigeki Ohtsu (221), Anatoli Papirovski (220), Jiawen Geng (214), Marco Ippolito (203), Nathan Rajlich (197), Darshan Sen (191), Aviv Keller (180), Moshe Atlow (179), Jeremiah Senkpiel (165), Shelley Vohr (164), Livia Medeiros (159), Evan Lucas (159), Koichi Kobayashi (157), Gabriel Schulhof (156), Timothy Gu (154), Guy Bedford (151), <em>and 4218 more authors</em></td></tr><tr><td>v0.0.4</td><td>2009-06-12</td><td>47551</td><td>Rich Trott (3151), Ryan Dahl (3021), Ben Noordhuis (2291), Isaac Z. Schlueter (1655), Anna Henningsen (1655), Michaël Zasso (1353), Joyee Cheung (1249), James M Snell (1233), Colin Ihrig (1186), Antoine du Hamel (1113), Node.js GitHub Bot (1023), Ruben Bridgewater (848), Tobias Nießen (781), Fedor Indutny (781), Daniel Bevenius (605), Bert Belder (598), Rafael Gonzaga (431), Richard Lau (426), Michael Dawson (412), Filip Skokan (395), Chengzhong Wu (380), Yagiz Nizipli (375), Brian White (374), Rod Vagg (369), Trevor Norris (365), Sam Roberts (354), Robert Nagy (350), Luigi Pinca (345), vsemozhetbyt (332), Timothy J Fontaine (332), Refael Ackermann (326), Myles Borins (291), dependabot[bot] (282), Matteo Collina (269), Shigeki Ohtsu (221), Anatoli Papirovski (220), Jiawen Geng (214), Marco Ippolito (203), Nathan Rajlich (197), Darshan Sen (191), Aviv Keller (180), Moshe Atlow (179), Jeremiah Senkpiel (165), Shelley Vohr (164), Livia Medeiros (159), Evan Lucas (159), Koichi Kobayashi (157), Gabriel Schulhof (156), Timothy Gu (154), Guy Bedford (151), <em>and 4218 more authors</em></td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>
