@@ -45,7 +45,7 @@
 
 📘 Documentation: `gitstats.readthedocs.io <https://gitstats.readthedocs.io/>`_
 
-⚡ `GitStats Gallery <https://shenxianpeng.github.io/gitstats/gallery/>`_ — live reports for CPython, VS Code, Git, nginx, Kubernetes, Node.js, Django, Rust, React, Homebrew, and more.
+⚡ `GitStats Gallery <https://shenxianpeng.github.io/gitstats/gallery/>`_ — live reports for CPython, VS Code, Git, nginx, Kubernetes, Node.js, Django, Rust, and more.
 
 .. contents:: Table of Contents
    :depth: 2
