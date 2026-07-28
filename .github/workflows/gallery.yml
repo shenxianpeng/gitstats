@@ -14,12 +14,16 @@ jobs:
       fail-fast: false
       matrix:
         repo:
-          # - { id: linux,      name: "Linux Kernel", url: "torvalds/linux"        }
           - { id: cpython,    name: "CPython",      url: "python/cpython"        }
           - { id: vscode,     name: "VS Code",      url: "microsoft/vscode"      }
           - { id: git,        name: "Git",          url: "git/git"               }
           - { id: nginx,      name: "nginx",        url: "nginx/nginx"           }
           - { id: kubernetes, name: "Kubernetes",   url: "kubernetes/kubernetes" }
+          - { id: nodejs,     name: "Node.js",      url: "nodejs/node"           }
+          - { id: django,     name: "Django",       url: "django/django"         }
+          - { id: rust,       name: "Rust",         url: "rust-lang/rust"        }
+          - { id: react,      name: "React",        url: "facebook/react"        }
+          - { id: homebrew,   name: "Homebrew",     url: "Homebrew/brew"         }
 
     steps:
       - uses: actions/checkout@v7
@@ -68,6 +72,17 @@ jobs:
             id="${d#gallery/report-}"
             mv "$d" "gallery/$id"
           done
+          # Write .name files for proper display names in the gallery index
+          echo "CPython"    > gallery/cpython/.name
+          echo "VS Code"    > gallery/vscode/.name
+          echo "Git"        > gallery/git/.name
+          echo "nginx"      > gallery/nginx/.name
+          echo "Kubernetes" > gallery/kubernetes/.name
+          echo "Node.js"    > gallery/nodejs/.name
+          echo "Django"     > gallery/django/.name
+          echo "Rust"       > gallery/rust/.name
+          echo "React"      > gallery/react/.name
+          echo "Homebrew"   > gallery/homebrew/.name
 
       - name: Generate Gallery Index Page
         run: python scripts/generate_gallery_index.py gallery

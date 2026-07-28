@@ -45,7 +45,7 @@
 
 📘 Documentation: `gitstats.readthedocs.io <https://gitstats.readthedocs.io/>`_
 
-⚡ `GitStats Gallery <https://shenxianpeng.github.io/gitstats/gallery/>`_ — live reports for CPython, VS Code, Git, nginx, Kubernetes, and more.
+⚡ `GitStats Gallery <https://shenxianpeng.github.io/gitstats/gallery/>`_ — live reports for CPython, VS Code, Git, nginx, Kubernetes, Node.js, Django, Rust, React, Homebrew, and more.
 
 .. contents:: Table of Contents
    :depth: 2
@@ -80,6 +80,21 @@ Check out the `GitStats Gallery <https://shenxianpeng.github.io/gitstats/gallery
    * - Kubernetes
      - `Report <https://shenxianpeng.github.io/gitstats/gallery/kubernetes/index.html>`_
      - `kubernetes/kubernetes <https://github.com/kubernetes/kubernetes>`_
+   * - Node.js
+     - `Report <https://shenxianpeng.github.io/gitstats/gallery/nodejs/index.html>`_
+     - `nodejs/node <https://github.com/nodejs/node>`_
+   * - Django
+     - `Report <https://shenxianpeng.github.io/gitstats/gallery/django/index.html>`_
+     - `django/django <https://github.com/django/django>`_
+   * - Rust
+     - `Report <https://shenxianpeng.github.io/gitstats/gallery/rust/index.html>`_
+     - `rust-lang/rust <https://github.com/rust-lang/rust>`_
+   * - React
+     - `Report <https://shenxianpeng.github.io/gitstats/gallery/react/index.html>`_
+     - `facebook/react <https://github.com/facebook/react>`_
+   * - Homebrew
+     - `Report <https://shenxianpeng.github.io/gitstats/gallery/homebrew/index.html>`_
+     - `Homebrew/brew <https://github.com/Homebrew/brew>`_
 
 .. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/demo.gif
    :alt: gitstats terminal demo
