@@ -44,8 +44,7 @@
 📊 Generate insightful visual reports from Git.
 
 📘 Documentation: `gitstats.readthedocs.io <https://gitstats.readthedocs.io/>`_
-
-⚡ `GitStats Gallery <https://shenxianpeng.github.io/gitstats/gallery/>`_ — live reports for CPython, VS Code, Git, nginx, Kubernetes, Node.js, Django, Rust, React, Homebrew, and more.
+📊 GitStats Gallery: `shenxianpeng.github.io/gitstats/gallery/ <https://shenxianpeng.github.io/gitstats/gallery/>`_
 
 .. contents:: Table of Contents
    :depth: 2
