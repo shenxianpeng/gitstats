@@ -607,9 +607,7 @@ def test_generate_summary_activity_and_lines_page_types_supported():
     activity_result = summarizer.generate_summary(
         "activity", {"commits_by_year": {2023: 5}, "authors": {}}
     )
-    lines_result = summarizer.generate_summary(
-        "lines", {"total_lines": 10, "authors": {}}
-    )
+    lines_result = summarizer.generate_summary("lines", {"total_lines": 10, "authors": {}})
 
     assert activity_result["error"] is None
     assert lines_result["error"] is None
