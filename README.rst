@@ -1,9 +1,12 @@
-.. start-of-about
+.. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/banner-dark.png#gh-dark-mode-only
+   :alt: gitstats — git history statistics
+   :width: 100%
 
-.. figure:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/logo.png
-   :alt: Project Logo
-   :align: center
-   :width: 200px
+.. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/banner-light.png#gh-light-mode-only
+   :alt: gitstats — git history statistics
+   :width: 100%
+
+.. start-of-about
 
 .. |pypi-version| image:: https://img.shields.io/pypi/v/gitstats?color=blue
    :target: https://pypi.org/project/gitstats/
