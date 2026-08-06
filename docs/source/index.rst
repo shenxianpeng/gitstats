@@ -1,6 +1,11 @@
 Welcome to GitStats documentation!
 ==================================
 
+.. figure:: logo.png
+   :alt: Project Logo
+   :align: center
+   :width: 200px
+
 .. include:: ../../README.rst
    :start-after: .. start-of-about
    :end-before: .. end-of-about
