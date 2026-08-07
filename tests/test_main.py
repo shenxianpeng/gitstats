@@ -1,5 +1,6 @@
 """Tests for gitstats.main – DataCollector, parameter parsing, and integration with real git repos."""
 
+import datetime
 import os
 from unittest.mock import patch
 
@@ -400,6 +401,151 @@ class TestGitDataCollectorIntegration:
         # Should be exactly one entry for Alice
         assert "Alice Smith" in dc.authors
         assert dc.authors["Alice Smith"]["commits"] > 0
+
+
+# ── collect() phases (unit-testable without a repository) ────────────────
+
+
+class TestCollectPhases:
+    """Each collection phase is exercised on its own, no git required."""
+
+    def test_record_activity_accumulates_histograms(self):
+        dc = GitDataCollector()
+        # Wed 2024-05-08 14:xx  (weekday 2), plus a second commit the same hour
+        d1 = datetime.datetime(2024, 5, 8, 14, 30)
+        d2 = datetime.datetime(2024, 5, 8, 14, 45)
+        d3 = datetime.datetime(2024, 5, 9, 9, 0)  # Thu, different hour
+
+        for d in (d1, d2, d3):
+            dc._record_activity(d)
+
+        assert dc.activity_by_hour_of_day == {14: 2, 9: 1}
+        assert dc.activity_by_day_of_week == {2: 2, 3: 1}
+        assert dc.activity_by_hour_of_week[2][14] == 2
+        assert dc.activity_by_month_of_year == {5: 3}
+        assert dc.activity_by_hour_of_day_busiest == 2
+        assert dc.activity_by_hour_of_week_busiest == 2
+        # all three fall in the same calendar week
+        assert dc.activity_by_year_week == {d1.strftime("%Y-%W"): 3}
+        assert dc.activity_by_year_week_peak == 3
+
+    def test_record_author_commit_tracks_span_and_active_days(self):
+        dc = GitDataCollector()
+        early = datetime.datetime(2024, 1, 10, 9, 0)
+        late = datetime.datetime(2024, 3, 20, 9, 0)
+
+        # deliberately out of order: stamps may arrive in any order
+        dc._record_author_commit("Ann", int(late.timestamp()), late)
+        dc._record_author_commit("Ann", int(early.timestamp()), early)
+        dc._record_author_commit("Bo", int(late.timestamp()), late)
+
+        ann = dc.authors["Ann"]
+        assert ann["first_commit_stamp"] == int(early.timestamp())
+        assert ann["last_commit_stamp"] == int(late.timestamp())
+        assert ann["active_days"] == {"2024-01-10", "2024-03-20"}
+        assert dc.commits_by_month == {"2024-03": 2, "2024-01": 1}
+        assert dc.commits_by_year == {2024: 3}
+        assert dc.author_of_month["2024-03"] == {"Ann": 1, "Bo": 1}
+        assert dc.active_days == {"2024-01-10", "2024-03-20"}
+
+    def test_merge_author_aliases_folds_shared_email(self):
+        """Two names on one email collapse into the most recent name."""
+        dc = GitDataCollector()
+        dc.authors = {
+            "old name": {
+                "commits": 2,
+                "lines_added": 10,
+                "lines_removed": 1,
+                "first_commit_stamp": 100,
+                "last_commit_stamp": 200,
+                "active_days": {"2024-01-01"},
+                "last_active_day": "2024-01-01",
+            },
+            "New Name": {
+                "commits": 3,
+                "lines_added": 5,
+                "lines_removed": 2,
+                "first_commit_stamp": 300,
+                "last_commit_stamp": 400,
+                "active_days": {"2024-02-02"},
+                "last_active_day": "2024-02-02",
+            },
+        }
+        dc.author_of_month = {"2024-01": {"old name": 2}, "2024-02": {"New Name": 3}}
+        dc.author_of_year = {2024: {"old name": 2, "New Name": 3}}
+        dc.tags = {"v1": {"authors": {"old name": 2, "New Name": 1}}}
+
+        # both names share one email; the later stamp wins the canonical name
+        mapping = dc._merge_author_aliases(
+            email_to_latest={"a@x.com": (400, "New Name")},
+            author_to_email={"old name": "a@x.com", "New Name": "a@x.com"},
+        )
+
+        assert mapping == {"old name": "New Name"}
+        assert set(dc.authors) == {"New Name"}
+        merged = dc.authors["New Name"]
+        assert merged["commits"] == 5
+        assert merged["lines_added"] == 15
+        assert merged["first_commit_stamp"] == 100  # earliest wins
+        assert merged["last_commit_stamp"] == 400  # latest wins
+        assert merged["active_days"] == {"2024-01-01", "2024-02-02"}
+        # period and tag dicts are re-keyed onto the canonical name
+        assert dc.author_of_month["2024-01"] == {"New Name": 2}
+        assert dc.author_of_year[2024] == {"New Name": 5}
+        assert dc.tags["v1"]["authors"] == {"New Name": 3}
+        assert dc.total_authors == 1
+
+    def test_merge_author_aliases_noop_for_distinct_emails(self):
+        dc = GitDataCollector()
+        dc.authors = {"Ann": {"commits": 1}, "Bo": {"commits": 1}}
+
+        mapping = dc._merge_author_aliases(
+            email_to_latest={"a@x.com": (1, "Ann"), "b@x.com": (2, "Bo")},
+            author_to_email={"Ann": "a@x.com", "Bo": "b@x.com"},
+        )
+
+        assert mapping == {}
+        assert set(dc.authors) == {"Ann", "Bo"}
+        assert dc.total_authors == 2
+
+    def test_collect_calls_every_phase(self, git_repo):
+        """collect() is an orchestrator: each phase runs exactly once."""
+        dc = GitDataCollector()
+        called = []
+
+        def spy(name, result=None):
+            def _f(*args, **kwargs):
+                called.append(name)
+                return result
+
+            return _f
+
+        dc._collect_tags = spy("tags")
+        dc._collect_commit_stats = spy("commits", ({}, {}))
+        dc._merge_author_aliases = spy("aliases", {})
+        dc._collect_files_by_stamp = spy("files")
+        dc._collect_extensions = spy("extensions")
+        dc._collect_line_stats = spy("lines")
+        dc._collect_per_author_line_stats = spy("author_lines")
+        dc._collect_file_churn_and_ownership = spy("churn")
+
+        prevdir = os.getcwd()
+        try:
+            os.chdir(git_repo)
+            dc.collect(git_repo)
+        finally:
+            os.chdir(prevdir)
+
+        assert called == [
+            "tags",
+            "commits",
+            "aliases",
+            "files",
+            "extensions",
+            "lines",
+            "author_lines",
+            "churn",
+        ]
 
 
 # ── run() integration ────────────────────────────────────────────────────
