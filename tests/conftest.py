@@ -354,6 +354,14 @@ def mock_data_collector():
         "Charlie Brown": {"main.py": 1},
     }
 
+    # Hotspots: filepath -> { churn, lines, score }
+    data.hotspot_files = {
+        "main.py": {"churn": 15, "lines": 400, "score": 300.0},
+        "utils.py": {"churn": 10, "lines": 120, "score": 109.5},
+        "README.md": {"churn": 8, "lines": 60, "score": 62.0},
+        "Dockerfile": {"churn": 2, "lines": 30, "score": 11.0},
+    }
+
     # Changes by date (lines)
     data.changes_by_date = {}
 
