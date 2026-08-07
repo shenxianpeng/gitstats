@@ -74,6 +74,19 @@ def parallel_map_with_fallback(func, items):
         return [func(item) for item in items]
 
 
+def _merge_period_aliases(
+    period_authors: dict[str, int], name_to_canonical: dict[str, str]
+) -> None:
+    """Fold aliased authors into their canonical name within one period.
+
+    ``period_authors`` maps author -> commit count for a single month or year
+    and is updated in place.
+    """
+    for alias, canonical in name_to_canonical.items():
+        if alias in period_authors:
+            period_authors[canonical] = period_authors.get(canonical, 0) + period_authors.pop(alias)
+
+
 class DataCollector:
     """Manages data collection from a revision control repository."""
 
@@ -473,14 +486,11 @@ class GitDataCollector(DataCollector):
             if "last_active_day" in aa:
                 ca["last_active_day"] = max(ca.get("last_active_day", ""), aa["last_active_day"])
 
-        # Merge aliases in time-based author dicts
-        for period_dict in (self.author_of_month, self.author_of_year):
-            for period in period_dict:
-                for alias, canonical in name_to_canonical.items():
-                    if alias in period_dict[period]:
-                        period_dict[period][canonical] = period_dict[period].get(
-                            canonical, 0
-                        ) + period_dict[period].pop(alias)
+        # Merge aliases in time-based author dicts. The two dicts are keyed
+        # differently (month string vs. year int) but their values share one
+        # shape, so the merge works on the inner author->commits dicts.
+        for period_authors in (*self.author_of_month.values(), *self.author_of_year.values()):
+            _merge_period_aliases(period_authors, name_to_canonical)
 
         # Merge aliases in tag author dicts
         for tag in self.tags:
