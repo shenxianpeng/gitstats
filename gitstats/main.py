@@ -74,6 +74,19 @@ def parallel_map_with_fallback(func, items):
         return [func(item) for item in items]
 
 
+def _merge_period_aliases(
+    period_authors: dict[str, int], name_to_canonical: dict[str, str]
+) -> None:
+    """Fold aliased authors into their canonical name within one period.
+
+    ``period_authors`` maps author -> commit count for a single month or year
+    and is updated in place.
+    """
+    for alias, canonical in name_to_canonical.items():
+        if alias in period_authors:
+            period_authors[canonical] = period_authors.get(canonical, 0) + period_authors.pop(alias)
+
+
 class DataCollector:
     """Manages data collection from a revision control repository."""
 
@@ -190,15 +203,35 @@ class DataCollector:
 
 class GitDataCollector(DataCollector):
     def collect(self, repo_dir):
+        """Collect all statistics from the repository.
+
+        Each phase below owns one slice of the data model; the only value
+        passed between them is the author-alias mapping, which later phases
+        need to attribute work to canonical identities.
+        """
         DataCollector.collect(self, repo_dir)
 
         self.total_authors += int(
             get_pipe_output(["git shortlog -s {}".format(get_log_range("HEAD", False)), "wc -l"])
         )
-        # self.total_lines = int(getoutput('git-ls-files -z |xargs -0 cat |wc -l'))
 
-        # tags
-        # Only include tags that are reachable within the commit range
+        self._collect_tags()
+        email_to_latest, author_to_email = self._collect_commit_stats()
+        name_to_canonical = self._merge_author_aliases(email_to_latest, author_to_email)
+        self._collect_files_by_stamp()
+        self._collect_extensions()
+        self._collect_line_stats()
+        self._collect_per_author_line_stats(name_to_canonical)
+        self._collect_file_churn_and_ownership(name_to_canonical)
+
+    # ── collection phases ────────────────────────────────────────────────
+
+    def _collect_tags(self) -> None:
+        """Populate ``tags`` with each tag's date, commit count and authors.
+
+        Only tags whose commit is reachable within the configured commit range
+        are included.
+        """
         log_range = get_log_range("HEAD", False)
         tag_commits = get_pipe_output([f"git rev-list {log_range}"]).strip().split("\n")
         tag_commits_set = set(tag_commits) if tag_commits[0] else set()
@@ -232,7 +265,6 @@ class GitDataCollector(DataCollector):
 
         # collect info on tags, starting from latest
         # Only collect statistics for commits within our range
-        log_range = get_log_range("HEAD", False)
         tags_sorted_by_date_desc = [
             el[1]
             for el in sorted([(el[1]["date"], el[0]) for el in self.tags.items()], reverse=True)
@@ -260,7 +292,12 @@ class GitDataCollector(DataCollector):
                 self.tags[tag]["commits"] += commits
                 self.tags[tag]["authors"][author] = commits
 
-        # Collect revision statistics
+    def _collect_commit_stats(self) -> tuple[dict[str, tuple[int, str]], dict[str, str]]:
+        """Walk every commit, accumulating activity, domain and author stats.
+
+        Returns the two mappings needed to resolve author identities:
+        ``email -> (latest stamp, author name)`` and ``author name -> email``.
+        """
         # Outputs "<stamp> <date> <time> <timezone> <author> '<' <mail> '>'"
         lines = get_pipe_output(
             [
@@ -307,17 +344,7 @@ class GitDataCollector(DataCollector):
             if self.first_commit_stamp == 0 or stamp < self.first_commit_stamp:
                 self.first_commit_stamp = stamp
 
-            # activity
-            # hour
-            hour = date.hour
-            self.activity_by_hour_of_day[hour] = self.activity_by_hour_of_day.get(hour, 0) + 1
-            # most active hour?
-            if self.activity_by_hour_of_day[hour] > self.activity_by_hour_of_day_busiest:
-                self.activity_by_hour_of_day_busiest = self.activity_by_hour_of_day[hour]
-
-            # day of week
-            day = date.weekday()
-            self.activity_by_day_of_week[day] = self.activity_by_day_of_week.get(day, 0) + 1
+            self._record_activity(date)
 
             # domain stats
             if domain not in self.domains:
@@ -325,73 +352,103 @@ class GitDataCollector(DataCollector):
             # commits
             self.domains[domain]["commits"] = self.domains[domain].get("commits", 0) + 1
 
-            # hour of week
-            if day not in self.activity_by_hour_of_week:
-                self.activity_by_hour_of_week[day] = {}
-            self.activity_by_hour_of_week[day][hour] = (
-                self.activity_by_hour_of_week[day].get(hour, 0) + 1
-            )
-            # most active hour?
-            if self.activity_by_hour_of_week[day][hour] > self.activity_by_hour_of_week_busiest:
-                self.activity_by_hour_of_week_busiest = self.activity_by_hour_of_week[day][hour]
-
-            # month of year
-            month = date.month
-            self.activity_by_month_of_year[month] = self.activity_by_month_of_year.get(month, 0) + 1
-
-            # yearly/weekly activity
-            yyw = date.strftime("%Y-%W")
-            self.activity_by_year_week[yyw] = self.activity_by_year_week.get(yyw, 0) + 1
-            if self.activity_by_year_week_peak < self.activity_by_year_week[yyw]:
-                self.activity_by_year_week_peak = self.activity_by_year_week[yyw]
-
-            # author stats
-            if author not in self.authors:
-                self.authors[author] = {}
-            # commits, note again that commits may be in any date order because of cherry-picking and patches
-            if "last_commit_stamp" not in self.authors[author]:
-                self.authors[author]["last_commit_stamp"] = stamp
-            if stamp > self.authors[author]["last_commit_stamp"]:
-                self.authors[author]["last_commit_stamp"] = stamp
-            if "first_commit_stamp" not in self.authors[author]:
-                self.authors[author]["first_commit_stamp"] = stamp
-            if stamp < self.authors[author]["first_commit_stamp"]:
-                self.authors[author]["first_commit_stamp"] = stamp
-
-            # author of the month/year
-            yymm = date.strftime("%Y-%m")
-            if yymm in self.author_of_month:
-                self.author_of_month[yymm][author] = self.author_of_month[yymm].get(author, 0) + 1
-            else:
-                self.author_of_month[yymm] = {}
-                self.author_of_month[yymm][author] = 1
-            self.commits_by_month[yymm] = self.commits_by_month.get(yymm, 0) + 1
-
-            yy = date.year
-            if yy in self.author_of_year:
-                self.author_of_year[yy][author] = self.author_of_year[yy].get(author, 0) + 1
-            else:
-                self.author_of_year[yy] = {}
-                self.author_of_year[yy][author] = 1
-            self.commits_by_year[yy] = self.commits_by_year.get(yy, 0) + 1
-
-            # authors: active days
-            yymmdd = date.strftime("%Y-%m-%d")
-            if "last_active_day" not in self.authors[author]:
-                self.authors[author]["last_active_day"] = yymmdd
-                self.authors[author]["active_days"] = set([yymmdd])
-            elif yymmdd != self.authors[author]["last_active_day"]:
-                self.authors[author]["last_active_day"] = yymmdd
-                self.authors[author]["active_days"].add(yymmdd)
-
-            # project: active days
-            if yymmdd != self.last_active_day:
-                self.last_active_day = yymmdd
-                self.active_days.add(yymmdd)
+            self._record_author_commit(author, stamp, date)
 
             # timezone
             self.commits_by_timezone[timezone] = self.commits_by_timezone.get(timezone, 0) + 1
 
+        return email_to_latest, author_to_email
+
+    def _record_activity(self, date: datetime.datetime) -> None:
+        """Accumulate the time-of-commit histograms for a single commit."""
+        # hour
+        hour = date.hour
+        self.activity_by_hour_of_day[hour] = self.activity_by_hour_of_day.get(hour, 0) + 1
+        # most active hour?
+        if self.activity_by_hour_of_day[hour] > self.activity_by_hour_of_day_busiest:
+            self.activity_by_hour_of_day_busiest = self.activity_by_hour_of_day[hour]
+
+        # day of week
+        day = date.weekday()
+        self.activity_by_day_of_week[day] = self.activity_by_day_of_week.get(day, 0) + 1
+
+        # hour of week
+        if day not in self.activity_by_hour_of_week:
+            self.activity_by_hour_of_week[day] = {}
+        self.activity_by_hour_of_week[day][hour] = (
+            self.activity_by_hour_of_week[day].get(hour, 0) + 1
+        )
+        # most active hour?
+        if self.activity_by_hour_of_week[day][hour] > self.activity_by_hour_of_week_busiest:
+            self.activity_by_hour_of_week_busiest = self.activity_by_hour_of_week[day][hour]
+
+        # month of year
+        month = date.month
+        self.activity_by_month_of_year[month] = self.activity_by_month_of_year.get(month, 0) + 1
+
+        # yearly/weekly activity
+        yyw = date.strftime("%Y-%W")
+        self.activity_by_year_week[yyw] = self.activity_by_year_week.get(yyw, 0) + 1
+        if self.activity_by_year_week_peak < self.activity_by_year_week[yyw]:
+            self.activity_by_year_week_peak = self.activity_by_year_week[yyw]
+
+    def _record_author_commit(self, author: str, stamp: int, date: datetime.datetime) -> None:
+        """Accumulate per-author and per-period stats for a single commit."""
+        # author stats
+        if author not in self.authors:
+            self.authors[author] = {}
+        # commits, note again that commits may be in any date order because of cherry-picking and patches
+        if "last_commit_stamp" not in self.authors[author]:
+            self.authors[author]["last_commit_stamp"] = stamp
+        if stamp > self.authors[author]["last_commit_stamp"]:
+            self.authors[author]["last_commit_stamp"] = stamp
+        if "first_commit_stamp" not in self.authors[author]:
+            self.authors[author]["first_commit_stamp"] = stamp
+        if stamp < self.authors[author]["first_commit_stamp"]:
+            self.authors[author]["first_commit_stamp"] = stamp
+
+        # author of the month/year
+        yymm = date.strftime("%Y-%m")
+        if yymm in self.author_of_month:
+            self.author_of_month[yymm][author] = self.author_of_month[yymm].get(author, 0) + 1
+        else:
+            self.author_of_month[yymm] = {}
+            self.author_of_month[yymm][author] = 1
+        self.commits_by_month[yymm] = self.commits_by_month.get(yymm, 0) + 1
+
+        yy = date.year
+        if yy in self.author_of_year:
+            self.author_of_year[yy][author] = self.author_of_year[yy].get(author, 0) + 1
+        else:
+            self.author_of_year[yy] = {}
+            self.author_of_year[yy][author] = 1
+        self.commits_by_year[yy] = self.commits_by_year.get(yy, 0) + 1
+
+        # authors: active days
+        yymmdd = date.strftime("%Y-%m-%d")
+        if "last_active_day" not in self.authors[author]:
+            self.authors[author]["last_active_day"] = yymmdd
+            self.authors[author]["active_days"] = set([yymmdd])
+        elif yymmdd != self.authors[author]["last_active_day"]:
+            self.authors[author]["last_active_day"] = yymmdd
+            self.authors[author]["active_days"].add(yymmdd)
+
+        # project: active days
+        if yymmdd != self.last_active_day:
+            self.last_active_day = yymmdd
+            self.active_days.add(yymmdd)
+
+    def _merge_author_aliases(
+        self,
+        email_to_latest: dict[str, tuple[int, str]],
+        author_to_email: dict[str, str],
+    ) -> dict[str, str]:
+        """Fold authors that share an email into one canonical identity.
+
+        Merges the alias entries in ``authors``, the per-period author dicts and
+        the tag author dicts, then returns the ``alias -> canonical`` mapping so
+        later phases can attribute their data to the same identities.
+        """
         # Build canonical name mapping: merge authors that share the same email
         # (same person who committed with different name/email configurations)
         email_to_canonical = {email: name for email, (_, name) in email_to_latest.items()}
@@ -429,14 +486,11 @@ class GitDataCollector(DataCollector):
             if "last_active_day" in aa:
                 ca["last_active_day"] = max(ca.get("last_active_day", ""), aa["last_active_day"])
 
-        # Merge aliases in time-based author dicts
-        for period_dict in (self.author_of_month, self.author_of_year):
-            for period in period_dict:
-                for alias, canonical in name_to_canonical.items():
-                    if alias in period_dict[period]:
-                        period_dict[period][canonical] = period_dict[period].get(
-                            canonical, 0
-                        ) + period_dict[period].pop(alias)
+        # Merge aliases in time-based author dicts. The two dicts are keyed
+        # differently (month string vs. year int) but their values share one
+        # shape, so the merge works on the inner author->commits dicts.
+        for period_authors in (*self.author_of_month.values(), *self.author_of_year.values()):
+            _merge_period_aliases(period_authors, name_to_canonical)
 
         # Merge aliases in tag author dicts
         for tag in self.tags:
@@ -449,6 +503,10 @@ class GitDataCollector(DataCollector):
         # Update total_authors to reflect merged identities
         self.total_authors = len(self.authors)
 
+        return name_to_canonical
+
+    def _collect_files_by_stamp(self) -> None:
+        """Record the file count of every revision, using the blob cache."""
         # outputs "<stamp> <files>" for each revision
         revlines = (
             get_pipe_output(
@@ -498,6 +556,8 @@ class GitDataCollector(DataCollector):
             except ValueError:
                 logger.warning(f'Failed to parse line "{line}"')
 
+    def _collect_extensions(self) -> None:
+        """Count files, total size and lines per file extension at HEAD."""
         # extensions and size of files
         lines = get_pipe_output(
             ["git ls-tree -r -l -z {}".format(get_commit_range("HEAD", end_only=True))]
@@ -552,6 +612,12 @@ class GitDataCollector(DataCollector):
             self.cache["lines_in_blob"][blob_id] = linecount
             self.extensions[ext]["lines"] += self.cache["lines_in_blob"][blob_id]
 
+    def _collect_line_stats(self) -> None:
+        """Record lines added/removed over time (``changes_by_date``).
+
+        Computed on a linear history when ``linear_linestats`` is enabled, since
+        lines-of-code over time is better measured along the mainline.
+        """
         # line statistics
         # outputs:
         #  N files changed, N insertions (+), N deletions(-)
@@ -574,17 +640,17 @@ class GitDataCollector(DataCollector):
         inserted = 0
         deleted = 0
         total_lines = 0
-        author = None
         for line in lines:
             if len(line) == 0:
                 continue
 
-            # <stamp> <author>
+            # <stamp> <author>; only the stamp matters here, the author is
+            # attributed in _collect_per_author_line_stats
             if re.search("files? changed", line) is None:
                 pos = line.find(" ")
                 if pos != -1:
                     try:
-                        (stamp, author) = (int(line[:pos]), line[pos + 1 :])
+                        stamp = int(line[:pos])
                         self.changes_by_date[stamp] = {
                             "files": files,
                             "ins": inserted,
@@ -627,17 +693,18 @@ class GitDataCollector(DataCollector):
                 else:
                     logger.warning(f'Failed to handle line "{line}"')
                     (files, inserted, deleted) = (0, 0, 0)
-                # self.changes_by_date[stamp] = { 'files': files, 'ins': inserted, 'del': deleted }
         self.total_lines += total_lines
 
-        # Per-author statistics
+    def _collect_per_author_line_stats(self, name_to_canonical: dict[str, str]) -> None:
+        """Record each author's commits and line counts over time.
 
+        Unlike :meth:`_collect_line_stats` this never uses ``--first-parent``:
+        every commit must be walked to know who committed what, not just the
+        mainline.
+        """
         # defined for stamp, author only if author committed at this timestamp.
         self.changes_by_date_by_author = {}  # stamp -> author -> lines_added
 
-        # Similar to the above, but never use --first-parent
-        # (we need to walk through every commit to know who
-        # committed what, not just through mainline)
         lines = get_pipe_output(
             [
                 'git log --shortstat --date-order --pretty=format:"%at %aN" {}'.format(
@@ -646,7 +713,6 @@ class GitDataCollector(DataCollector):
             ]
         ).split("\n")
         lines.reverse()
-        files = 0
         inserted = 0
         deleted = 0
         author = None
@@ -689,7 +755,7 @@ class GitDataCollector(DataCollector):
                         self.changes_by_date_by_author[stamp][author]["commits"] = self.authors[
                             author
                         ]["commits"]
-                        files, inserted, deleted = 0, 0, 0
+                        inserted, deleted = 0, 0
                     except ValueError:
                         logger.warning(f'Unexpected line "{line}"')
                 else:
@@ -698,17 +764,22 @@ class GitDataCollector(DataCollector):
                 numbers = get_stat_summary_counts(line)
 
                 if len(numbers) == 3:
-                    (files, inserted, deleted) = [int(el) for el in numbers]
+                    # the file count is unused here; only line deltas matter
+                    (_, inserted, deleted) = [int(el) for el in numbers]
                 else:
                     logger.warning(f'Failed to handle line "{line}"')
-                    (files, inserted, deleted) = (0, 0, 0)
+                    (inserted, deleted) = (0, 0)
 
-        # Single name-only pass drives two metrics:
-        #   * file_churn   -> how many commits touched each file
-        #   * author_files -> which files each author touches (code ownership)
-        # Each commit is prefixed with a "COMMIT:<author>" marker line; the lines
-        # that follow are the file paths changed by that commit. Authors are
-        # resolved to their canonical identity so aliases merge here directly.
+    def _collect_file_churn_and_ownership(self, name_to_canonical: dict[str, str]) -> None:
+        """Record how often each file changes and who changes it.
+
+        A single name-only pass drives two metrics:
+        ``file_churn`` (commits touching each file) and ``author_files``
+        (which files each author touches, for code ownership). Each commit is
+        prefixed with a ``COMMIT:<author>`` marker line; the lines that follow
+        are the file paths changed by that commit. Authors are resolved to their
+        canonical identity so aliases merge here directly.
+        """
         churn_output = get_pipe_output(
             ['git log --format="COMMIT:%aN" --name-only {}'.format(get_log_range("HEAD", False))]
         )
