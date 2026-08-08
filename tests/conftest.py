@@ -270,6 +270,7 @@ def mock_data_collector():
     data.authors = {
         "Alice Smith": {
             "commits": 30,
+            "first_commit_stamp": 1673776800,  # 2023-01-15
             "lines_added": 2000,
             "lines_removed": 500,
             "date_first": "2023-01-15",
@@ -281,6 +282,7 @@ def mock_data_collector():
         },
         "Bob Jones": {
             "commits": 15,
+            "first_commit_stamp": 1675245600,  # 2023-02-01
             "lines_added": 800,
             "lines_removed": 300,
             "date_first": "2023-02-01",
@@ -292,6 +294,7 @@ def mock_data_collector():
         },
         "Charlie Brown": {
             "commits": 5,
+            "first_commit_stamp": 1678442400,  # 2023-03-10
             "lines_added": 200,
             "lines_removed": 200,
             "date_first": "2023-03-10",

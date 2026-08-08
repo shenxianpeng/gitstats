@@ -9,7 +9,9 @@ import pytest
 from gitstats.report_creator import (
     HTMLReportCreator,
     ReportCreator,
+    _classify_eras,
     compute_code_ownership,
+    compute_project_history,
     get_keys_sorted_by_value_key,
     get_keys_sorted_by_values,
     html_header,
@@ -646,6 +648,7 @@ def test_create_all_pages(mock_data_collector, temp_dir):
         "lines.html",
         "tags.html",
         "ownership.html",
+        "history.html",
     ]
     for fname in expected_files:
         path = f"{temp_dir}/{fname}"
@@ -760,3 +763,115 @@ def test_open_report_file_confined_to_report_dir(temp_dir):
     assert os.path.exists(f"{temp_dir}/ownership.html")
     with pytest.raises(ValueError):
         creator._open_report_file(temp_dir, "../escape.html")
+
+
+# ── Project history ──────────────────────────────────────────────────────
+
+
+def test_classify_eras_full_arc():
+    """A long life: birth, surge, silence, revival, peak — all detected."""
+    eras = _classify_eras({2019: 55, 2020: 20, 2021: 2, 2023: 30, 2024: 120, 2025: 60, 2026: 25})
+    # median of non-zero years (2,20,25,30,55,60,120) = 30
+    assert eras[2019] == "birth"
+    assert eras[2021] == "quiet"  # 2 <= 0.35 * 30
+    assert eras[2022] == "dormant"  # gap year, no commits at all
+    assert eras[2023] == "revival"  # back at the baseline after silence
+    assert eras[2024] == "peak"  # the maximum year
+    assert eras[2025] == "surge"  # 60 >= 1.6 * 30
+    assert eras[2026] == "steady"
+
+
+def test_classify_eras_tiny_history():
+    """With under three active years only structural labels apply."""
+    assert _classify_eras({2024: 10}) == {2024: "birth"}
+    assert _classify_eras({2024: 10, 2025: 100}) == {2024: "birth", 2025: "steady"}
+    assert _classify_eras({}) == {}
+
+
+def test_compute_project_history_fields(mock_data_collector):
+    history = compute_project_history(mock_data_collector)
+
+    assert history["first_year"] == 2023
+    assert history["last_year"] == 2023
+    assert history["peak_year"] == 2023
+    assert history["total_releases"] == 2  # v1.0.0 + v1.1.0
+
+    (y,) = history["years"]
+    assert y["year"] == 2023
+    assert y["era"] == "birth"
+    assert y["commits"] == 50
+    assert y["commits_pct"] == 100.0
+    assert y["top_author"] == "Alice Smith"
+    assert y["top_author_commits"] == 30
+    # all three authors first appeared in 2023, ranked by that year's commits
+    assert y["newcomers"] == ["Alice Smith", "Bob Jones", "Charlie Brown"]
+    assert y["releases"] == ["v1.0.0", "v1.1.0"]
+
+
+def test_compute_project_history_excludes_bots():
+    class Data:
+        commits_by_year = {2024: 10}
+        author_of_year = {2024: {"dependabot[bot]": 8, "Ann": 2}}
+        lines_added_by_year = {}
+        lines_removed_by_year = {}
+        authors = {
+            "Ann": {"first_commit_stamp": 1704067200},  # 2024-01-01
+            "dependabot[bot]": {"first_commit_stamp": 1704067200},
+        }
+        tags = {}
+
+    (y,) = compute_project_history(Data())["years"]
+    assert y["top_author"] == "Ann"  # the bot outnumbers her but is skipped
+    assert y["newcomers"] == ["Ann"]
+    assert y["active_authors"] == 2  # raw count still includes everyone
+
+
+def test_compute_project_history_empty():
+    class Data:
+        commits_by_year = {}
+
+    history = compute_project_history(Data())
+    assert history["years"] == []
+    assert history["first_year"] is None
+
+
+def test_history_page_renders(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/history.html", encoding="utf-8") as f:
+        content = f.read()
+
+    assert "History" in content
+    assert "BIRTH" in content
+    assert "Alice Smith" in content
+    assert "v1.0.0" in content
+    assert "</html>" in content
+
+
+def test_history_page_empty_state(mock_data_collector, temp_dir):
+    mock_data_collector.commits_by_year = {}
+    creator = HTMLReportCreator()
+    creator.data = mock_data_collector
+    creator.title = "t"
+    creator.create_history_html(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/history.html", encoding="utf-8") as f:
+        content = f.read()
+
+    assert "No history to tell yet" in content
+    assert "</html>" in content
+
+
+def test_history_page_escapes_names(mock_data_collector, temp_dir):
+    mock_data_collector.author_of_year = {2023: {"Al<ice>": 50}}
+    mock_data_collector.authors = {"Al<ice>": {"first_commit_stamp": 1673776800}}
+    creator = HTMLReportCreator()
+    creator.data = mock_data_collector
+    creator.title = "t"
+    creator.create_history_html(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/history.html", encoding="utf-8") as f:
+        content = f.read()
+
+    assert "Al&lt;ice&gt;" in content
