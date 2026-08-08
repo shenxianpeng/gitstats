@@ -7,6 +7,7 @@ import html
 import json
 import math
 import os
+import re
 import shutil
 import time
 from typing import Any
@@ -1113,25 +1114,54 @@ class HTMLReportCreator(ReportCreator):
             )
         )
 
+        # Optional AI narration: parsed into per-year chapters and laid over
+        # the deterministic facts, which stay visible either way so the story
+        # can always be checked against the record it was written from.
+        ai_summaries = getattr(data, "ai_summaries", {}) or {}
+        chronicle_text = (ai_summaries.get("chronicle") or {}).get("summary") or ""
+        chronicle = parse_chronicle(chronicle_text) if chronicle_text else None
+
+        if chronicle and chronicle["prologue"]:
+            f.write(
+                '<div class="history-prologue"><p>%s</p>'
+                '<p class="history-ai-note">AI narration, generated from the facts below.</p></div>'
+                % html.escape(chronicle["prologue"])
+            )
+        if chronicle_text and (not chronicle or not chronicle["chapters"]):
+            # The model ignored the format: show its text whole rather than lose it.
+            f.write(
+                '<div class="history-prologue"><p>%s</p>'
+                '<p class="history-ai-note">AI narration, generated from the facts below.</p></div>'
+                % html.escape(chronicle_text)
+            )
+
         max_commits = max(y["commits"] for y in years)
         for entry in years:
             era = entry["era"]
             desc = self._ERA_DESCRIPTIONS.get(era, "")
             bar_pct = round(100.0 * entry["commits"] / max_commits, 1) if max_commits else 0.0
+            chapter = chronicle["chapters"].get(entry["year"]) if chronicle else None
 
             f.write('<div class="history-year">')
             f.write(
                 '<div class="history-year-head">'
                 '<span class="history-year-num">%d</span>'
                 '<span class="history-era history-era-%s">%s</span>'
-                "%s</div>"
+                "%s%s</div>"
                 % (
                     entry["year"],
                     era,
                     era.upper(),
-                    f'<span class="history-era-desc">{desc}</span>' if desc else "",
+                    '<span class="history-chapter-title">%s</span>' % html.escape(chapter["title"])
+                    if chapter and chapter["title"]
+                    else "",
+                    f'<span class="history-era-desc">{desc}</span>'
+                    if desc and not (chapter and chapter["title"])
+                    else "",
                 )
             )
+            if chapter and chapter["story"]:
+                f.write('<p class="history-story">%s</p>' % html.escape(chapter["story"]))
             f.write(
                 '<div class="history-bar-track"><div class="history-bar" '
                 'style="width:%s%%"></div></div>' % bar_pct
@@ -1684,6 +1714,40 @@ def compute_project_history(data: Any) -> dict[str, Any]:
         "peak_year": max(year_commits, key=lambda y: (year_commits[y], y)),
         "total_releases": total_releases,
     }
+
+
+def parse_chronicle(text: str) -> dict[str, Any]:
+    """Split AI chronicle text into a prologue and per-year chapters.
+
+    Expects ``[PROLOGUE]`` and ``[YEAR <n>] <title>`` marker lines; everything
+    between markers belongs to the preceding one. Tolerant by design: years
+    the model skipped simply have no chapter, and text with no markers at all
+    yields no chapters so the caller can fall back to showing it whole.
+    """
+    prologue = ""
+    chapters: dict[int, dict[str, str]] = {}
+    current: dict[str, str] | None = None
+    in_prologue = False
+    prologue_lines: list[str] = []
+    marker = re.compile(r"^\[YEAR\s+(\d{4})\]\s*(.*)$")
+
+    for raw_line in text.splitlines():
+        line = raw_line.strip()
+        m = marker.match(line)
+        if m:
+            in_prologue = False
+            current = {"title": m.group(2).strip(), "story": ""}
+            chapters[int(m.group(1))] = current
+        elif line == "[PROLOGUE]":
+            in_prologue = True
+            current = None
+        elif in_prologue:
+            prologue_lines.append(line)
+        elif current is not None and line:
+            current["story"] = (current["story"] + " " + line).strip()
+
+    prologue = " ".join(line for line in prologue_lines if line).strip()
+    return {"prologue": prologue, "chapters": chapters}
 
 
 def html_header(level: int, text: str) -> str:

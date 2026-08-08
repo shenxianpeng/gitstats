@@ -548,6 +548,52 @@ class TestCollectPhases:
         ]
 
 
+# ── commit subject sampling (grounds the AI chronicle) ──────────────────
+
+
+def test_sample_evenly():
+    from gitstats.main import _sample_evenly
+
+    assert _sample_evenly([], 10) == []
+    assert _sample_evenly(["a", "b"], 10) == ["a", "b"]
+    sampled = _sample_evenly([str(i) for i in range(100)], 10)
+    assert len(sampled) == 10
+    assert sampled[0] == "0"
+    # evenly spread and order preserved
+    assert sampled == sorted(sampled, key=int)
+    assert int(sampled[-1]) >= 90
+
+
+class TestCommitSubjects:
+    def test_collected_when_ai_enabled(self, git_repo):
+        import gitstats.main as main_mod
+
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(git_repo)
+            with patch.dict(main_mod.conf, {"ai_enabled": True}):
+                dc.collect(git_repo)
+        finally:
+            os.chdir(prevdir)
+
+        subjects = dc.commit_subjects_by_year
+        assert set(subjects) == {2023}
+        assert "Initial commit" in subjects[2023]
+        assert len(subjects[2023]) <= 10
+
+    def test_skipped_when_ai_disabled(self, git_repo):
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(git_repo)
+            dc.collect(git_repo)
+        finally:
+            os.chdir(prevdir)
+
+        assert dc.commit_subjects_by_year == {}
+
+
 # ── run() integration ────────────────────────────────────────────────────
 
 
