@@ -78,6 +78,7 @@ class HTMLReportCreator(ReportCreator):
         self.create_lines_html(data, path)
         self.create_tags_html(data, path)
         self.create_ownership_html(data, path)
+        self.create_history_html(data, path)
 
         # Create AI Insights page if AI is enabled
         if hasattr(data, "ai_summaries") and data.ai_summaries:
@@ -1054,6 +1055,131 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    _ERA_DESCRIPTIONS = {
+        "birth": "first commits",
+        "peak": "busiest year",
+        "surge": "well above the usual pace",
+        "revival": "active again after a lull",
+        "quiet": "well below the usual pace",
+        "dormant": "no commits",
+        "steady": "",
+    }
+
+    def create_history_html(self, data: Any, path: str) -> None:
+        """Create the History page: the project's life, one year at a time.
+
+        A deterministic timeline derived entirely from already-collected data:
+        each year is classified against the repository's own baseline (birth,
+        peak, surge, quiet, dormant, revival), and carries its commit volume,
+        the year's leading author, the contributors who made their first
+        commit that year, and the releases tagged in it.
+        """
+        f = self._open_report_file(path, "history.html")
+        self.print_header(f)
+        self.print_nav(f)
+        f.write("<h1>History</h1>")
+
+        history = compute_project_history(data)
+        years = history["years"]
+
+        if not years:
+            f.write(
+                '<div class="history-summary"><p>No history to tell yet — '
+                "this repository has no commits in the analyzed range.</p></div>"
+            )
+            self.print_footer(f)
+            f.write("</body></html>")
+            f.close()
+            return
+
+        span = history["last_year"] - history["first_year"] + 1
+        f.write(
+            '<div class="history-summary">'
+            "<p>The project's life, one year at a time, told from the commit "
+            "record: how activity rose and fell against the project's own "
+            "baseline, who arrived when, and what was released.</p>"
+            "<dl>"
+            "<dt>Span</dt><dd>%d – %d (%d year%s)</dd>"
+            "<dt>Peak year</dt><dd>%d</dd>"
+            "<dt>Releases</dt><dd>%d</dd>"
+            "</dl></div>"
+            % (
+                history["first_year"],
+                history["last_year"],
+                span,
+                "s" if span != 1 else "",
+                history["peak_year"],
+                history["total_releases"],
+            )
+        )
+
+        max_commits = max(y["commits"] for y in years)
+        for entry in years:
+            era = entry["era"]
+            desc = self._ERA_DESCRIPTIONS.get(era, "")
+            bar_pct = round(100.0 * entry["commits"] / max_commits, 1) if max_commits else 0.0
+
+            f.write('<div class="history-year">')
+            f.write(
+                '<div class="history-year-head">'
+                '<span class="history-year-num">%d</span>'
+                '<span class="history-era history-era-%s">%s</span>'
+                "%s</div>"
+                % (
+                    entry["year"],
+                    era,
+                    era.upper(),
+                    f'<span class="history-era-desc">{desc}</span>' if desc else "",
+                )
+            )
+            f.write(
+                '<div class="history-bar-track"><div class="history-bar" '
+                'style="width:%s%%"></div></div>' % bar_pct
+            )
+
+            if entry["commits"]:
+                facts = "%d commits (%s%%) &middot; +%d / &minus;%d lines &middot; %d author%s" % (
+                    entry["commits"],
+                    entry["commits_pct"],
+                    entry["lines_added"],
+                    entry["lines_removed"],
+                    entry["active_authors"],
+                    "s" if entry["active_authors"] != 1 else "",
+                )
+                f.write(f'<p class="history-facts">{facts}</p>')
+                if entry["top_author"]:
+                    f.write(
+                        '<p class="history-people">Led by <strong>%s</strong> (%d commits)</p>'
+                        % (html.escape(entry["top_author"]), entry["top_author_commits"])
+                    )
+                if entry["newcomers"]:
+                    f.write(
+                        '<p class="history-people">First commits: %s%s</p>'
+                        % (
+                            ", ".join(html.escape(n) for n in entry["newcomers"][:6]),
+                            " (+%d more)" % (len(entry["newcomers"]) - 6)
+                            if len(entry["newcomers"]) > 6
+                            else "",
+                        )
+                    )
+                if entry["releases"]:
+                    f.write(
+                        '<p class="history-people">Released: %s%s</p>'
+                        % (
+                            ", ".join(html.escape(t) for t in entry["releases"][:5]),
+                            " (+%d more)" % (len(entry["releases"]) - 5)
+                            if len(entry["releases"]) > 5
+                            else "",
+                        )
+                    )
+            else:
+                f.write('<p class="history-facts">No commits this year.</p>')
+            f.write("</div>")
+
+        self.print_footer(f)
+        f.write("</body></html>")
+        f.close()
+
     def create_ai_insights_html(self, data: Any, path: str) -> None:
         """
         Create a dedicated AI Insights page with all AI-generated summaries.
@@ -1313,6 +1439,7 @@ class HTMLReportCreator(ReportCreator):
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
             <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="history.html">History</a></li>
             {ai_link}
             </ul>
             <div class="nav-right">
@@ -1428,6 +1555,134 @@ def compute_code_ownership(author_files: dict[str, dict[str, int]]) -> dict[str,
         "authors": authors_stats,
         "total_files": len(files_stats),
         "single_owner_files": sum(1 for fs in files_stats if fs["contributors"] == 1),
+    }
+
+
+def _classify_eras(year_commits: dict[int, int]) -> dict[int, str]:
+    """Assign each year of the project's span one era label.
+
+    Labels are relative to the repository's own baseline (the median of its
+    non-zero years), so a "surge" in a small project and in a huge one mean
+    the same thing: well above what is normal *for that project*. The span is
+    contiguous — years without commits appear as "dormant" instead of being
+    skipped, because silence is part of the story.
+
+    Priority per year: birth > dormant > peak > revival > surge > quiet > steady.
+    """
+    if not year_commits:
+        return {}
+    first, last = min(year_commits), max(year_commits)
+    span = {y: year_commits.get(y, 0) for y in range(first, last + 1)}
+    active = [c for c in span.values() if c > 0]
+    med = sorted(active)[len(active) // 2]
+    peak_year = max(span, key=lambda y: (span[y], y))
+    # With under three active years there is no meaningful baseline to
+    # compare against, so only the structural labels apply.
+    tiny = len(active) < 3
+
+    eras: dict[int, str] = {}
+    prev = ""
+    for y in sorted(span):
+        c = span[y]
+        if y == first:
+            era = "birth"
+        elif c == 0:
+            era = "dormant"
+        elif y == peak_year and not tiny:
+            era = "peak"
+        elif prev in ("dormant", "quiet") and c >= med:
+            era = "revival"
+        elif not tiny and c >= 1.6 * med:
+            era = "surge"
+        elif not tiny and c <= 0.35 * med:
+            era = "quiet"
+        else:
+            era = "steady"
+        eras[y] = era
+        prev = era
+    return eras
+
+
+def compute_project_history(data: Any) -> dict[str, Any]:
+    """Derive a chronological, per-year account of the project from collected data.
+
+    Everything here is computed from data the collector already gathered —
+    no extra git traffic. Bot accounts (names ending in ``[bot]``) are left
+    out of the people-facing fields. Returns a dict with:
+        years: one entry per calendar year of the span (gap years included),
+               each carrying commits, line deltas, author counts, the top
+               author, newcomers (authors whose first commit fell in that
+               year, most active first) and the releases tagged that year;
+        first_year, last_year, peak_year, total_releases.
+    """
+    year_commits: dict[int, int] = dict(getattr(data, "commits_by_year", {}) or {})
+    if not year_commits:
+        return {
+            "years": [],
+            "first_year": None,
+            "last_year": None,
+            "peak_year": None,
+            "total_releases": 0,
+        }
+
+    eras = _classify_eras(year_commits)
+    author_of_year = getattr(data, "author_of_year", {}) or {}
+    lines_added = getattr(data, "lines_added_by_year", {}) or {}
+    lines_removed = getattr(data, "lines_removed_by_year", {}) or {}
+
+    # Authors whose first commit fell in each year (bots excluded).
+    newcomers_by_year: dict[int, list[str]] = {}
+    for name, info in (getattr(data, "authors", {}) or {}).items():
+        stamp = info.get("first_commit_stamp") if isinstance(info, dict) else None
+        if not stamp or name.endswith("[bot]"):
+            continue
+        yy = datetime.datetime.fromtimestamp(stamp).year
+        newcomers_by_year.setdefault(yy, []).append(name)
+
+    # Releases (tags) by the year they were made.
+    releases_by_year: dict[int, list[tuple[str, str]]] = {}
+    total_releases = 0
+    for tag, info in (getattr(data, "tags", {}) or {}).items():
+        date = str(info.get("date", ""))
+        if len(date) >= 4 and date[:4].isdigit():
+            releases_by_year.setdefault(int(date[:4]), []).append((date, tag))
+            total_releases += 1
+
+    total_commits = sum(year_commits.values())
+    years: list[dict[str, Any]] = []
+    for y in sorted(eras):
+        commits = year_commits.get(y, 0)
+        year_authors = author_of_year.get(y, {})
+        humans = {a: c for a, c in year_authors.items() if not a.endswith("[bot]")}
+        ranked = sorted(humans or year_authors, key=lambda a: (year_authors[a], a), reverse=True)
+        top_author = ranked[0] if ranked else ""
+        newcomers = sorted(
+            newcomers_by_year.get(y, []),
+            key=lambda a: (year_authors.get(a, 0), a),
+            reverse=True,
+        )
+        years.append(
+            {
+                "year": y,
+                "era": eras[y],
+                "commits": commits,
+                "commits_pct": round(100.0 * commits / total_commits, 1) if total_commits else 0.0,
+                "lines_added": lines_added.get(y, 0),
+                "lines_removed": lines_removed.get(y, 0),
+                "active_authors": len(year_authors),
+                "top_author": top_author,
+                "top_author_commits": year_authors.get(top_author, 0),
+                "newcomers": newcomers,
+                "releases": [t for _, t in sorted(releases_by_year.get(y, []))],
+            }
+        )
+
+    return {
+        "years": years,
+        "first_year": years[0]["year"],
+        "last_year": years[-1]["year"],
+        "peak_year": max(year_commits, key=lambda y: (year_commits[y], y)),
+        "total_releases": total_releases,
     }
 
 

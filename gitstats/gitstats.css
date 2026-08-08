@@ -550,6 +550,102 @@ table.noborders td:hover .bar {
 	line-height: 1.6;
 }
 
+/* ===== History ===== */
+.history-summary {
+	padding: var(--space-4);
+	margin: var(--space-4) 0;
+	background-color: var(--surface-color);
+	border: 1px solid var(--border-strong);
+}
+
+.history-summary p:first-child {
+	margin-top: 0;
+}
+
+.history-summary p {
+	color: var(--text-secondary);
+	line-height: 1.6;
+}
+
+.history-year {
+	padding: var(--space-3) var(--space-4);
+	margin-bottom: var(--space-3);
+	border: 1px solid var(--border-color);
+	border-left: 3px solid var(--border-strong);
+}
+
+.history-year-head {
+	display: flex;
+	align-items: baseline;
+	gap: var(--space-3);
+	margin-bottom: var(--space-2);
+}
+
+.history-year-num {
+	font-family: var(--font-mono);
+	font-size: var(--font-size-lg);
+	font-weight: 700;
+	color: var(--text-color);
+}
+
+.history-era {
+	font-family: var(--font-mono);
+	font-size: var(--font-size-xs);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	padding: 1px var(--space-2);
+	border: 1px solid var(--border-strong);
+	color: var(--text-secondary);
+}
+
+.history-era-birth {
+	color: var(--link-color);
+	border-color: var(--link-color);
+}
+
+.history-era-peak,
+.history-era-surge,
+.history-era-revival {
+	color: var(--success-color);
+	border-color: var(--success-color);
+}
+
+.history-era-quiet,
+.history-era-dormant {
+	color: var(--text-muted);
+	border-color: var(--border-color);
+}
+
+.history-era-desc {
+	font-size: var(--font-size-sm);
+	color: var(--text-muted);
+}
+
+.history-bar-track {
+	height: 6px;
+	margin-bottom: var(--space-2);
+	background-color: var(--surface-color);
+	border: 1px solid var(--border-color);
+}
+
+.history-bar {
+	height: 100%;
+	background-color: var(--bar-color);
+}
+
+.history-facts {
+	margin: var(--space-1) 0;
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+}
+
+.history-people {
+	margin: var(--space-1) 0;
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+}
+
 /* ===== Footer ===== */
 .footer {
 	margin-top: var(--space-6);
