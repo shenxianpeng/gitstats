@@ -629,11 +629,11 @@ def test_generate_all_summaries_covers_index_activity_lines():
     }
     summaries = summarizer.generate_all_summaries(data)
 
-    assert set(summaries.keys()) == {"index", "activity", "lines"}
-    for page_type in ("index", "activity", "lines"):
+    assert set(summaries.keys()) == {"index", "activity", "lines", "chronicle"}
+    for page_type in ("index", "activity", "lines", "chronicle"):
         assert summaries[page_type]["error"] is None
         assert summaries[page_type]["summary"] == "<p>Looks good.</p>"
-    assert mock_provider.generate_summary.call_count == 3
+    assert mock_provider.generate_summary.call_count == 4
 
 
 def test_generate_all_summaries_without_provider_all_error():
@@ -641,7 +641,7 @@ def test_generate_all_summaries_without_provider_all_error():
     data = {"total_commits": 10, "authors": {}}
     summaries = summarizer.generate_all_summaries(data)
 
-    assert set(summaries.keys()) == {"index", "activity", "lines"}
+    assert set(summaries.keys()) == {"index", "activity", "lines", "chronicle"}
     for page_type in summaries:
         assert summaries[page_type]["error"] == "AI provider not initialized"
 
@@ -653,10 +653,82 @@ def test_generate_all_summaries_force_refresh_propagated(tmp_path):
 
     data = {"total_commits": 10, "authors": {}, "commits_by_year": {}, "total_lines": 0}
     summarizer.generate_all_summaries(data)
-    assert mock_provider.generate_summary.call_count == 3
+    assert mock_provider.generate_summary.call_count == 4
 
     mock_provider.generate_summary.return_value = "<p>v2</p>"
     summaries = summarizer.generate_all_summaries(data, force_refresh=True)
-    assert mock_provider.generate_summary.call_count == 6
+    assert mock_provider.generate_summary.call_count == 8
     for page_type in summaries:
         assert summaries[page_type]["summary"] == "<p>v2</p>"
+
+
+# ── chronicle ─────────────────────────────────────────────────────────────
+
+
+CHRONICLE_DATA = {
+    "project_name": "demo",
+    "commits_by_year": {2023: 40, 2024: 80},
+    "author_of_year": {2023: {"Ann": 40}, 2024: {"Ann": 50, "Bo": 30}},
+    "lines_added_by_year": {2023: 100, 2024: 300},
+    "lines_removed_by_year": {2023: 10, 2024: 30},
+    "authors": {
+        "Ann": {"first_commit_stamp": 1673776800},  # 2023
+        "Bo": {"first_commit_stamp": 1717200000},  # 2024
+    },
+    "tags": {"v1.0": {"date": "2024-06-01"}},
+    "commit_subjects_by_year": {2023: ["Initial commit"], 2024: ["Add feature X"]},
+}
+
+
+def test_prepare_chronicle_data_fact_pack():
+    summarizer = make_summarizer()
+    context = summarizer.prepare_chronicle_data(CHRONICLE_DATA)
+
+    assert "Project History of demo (2023 - 2024)" in context
+    assert "Year 2023 [birth]: 40 commits" in context
+    assert "Leading author: Ann (40 commits)" in context
+    assert "First-time contributors: Bo" in context
+    assert "Releases: v1.0" in context
+    assert '"Add feature X"' in context
+
+
+def test_prepare_chronicle_data_empty():
+    summarizer = make_summarizer()
+    context = summarizer.prepare_chronicle_data({"commits_by_year": {}})
+    assert "no commits" in context
+
+
+def test_generate_summary_chronicle_prompt_and_result():
+    summarizer = make_summarizer()
+    provider = Mock()
+    provider.generate_summary.return_value = (
+        "[PROLOGUE]\nA story.\n[YEAR 2023] Beginnings\nAnn started alone."
+    )
+    summarizer.provider = provider
+    summarizer.cache_enabled = False
+
+    result = summarizer.generate_summary("chronicle", CHRONICLE_DATA)
+
+    assert result["error"] is None
+    assert "[YEAR 2023]" in result["summary"]
+    prompt = provider.generate_summary.call_args[0][1]
+    # chronicle-specific format contract, grounded on the fact pack
+    assert "[PROLOGUE]" in prompt
+    assert "[YEAR <year>]" in prompt
+    assert "PLAIN TEXT" in prompt
+    assert "never invent" in prompt
+    assert "Year 2023 [birth]" in prompt
+    # the analytics-page requirements must not leak into the chronicle prompt
+    assert "<ul><li>" not in prompt
+
+
+def test_generate_all_summaries_includes_chronicle():
+    summarizer = make_summarizer()
+    provider = Mock()
+    provider.generate_summary.return_value = "text"
+    summarizer.provider = provider
+    summarizer.cache_enabled = False
+
+    summaries = summarizer.generate_all_summaries(CHRONICLE_DATA)
+
+    assert set(summaries) == {"index", "activity", "lines", "chronicle"}
