@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - repo</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats <function get_version at 0x7f45457c0ee0>">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			updateThemeIcon(newTheme);
+		}
+
+		function updateThemeIcon(theme) {
+			const button = document.getElementById('theme-toggle');
+			if (button) {
+				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', function() {
+			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		});
+	</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="history.html">History</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            </div>
+            </div>
+            <h1>History</h1><div class="history-summary"><p>The project's life, one year at a time, told from the commit record: how activity rose and fell against the project's own baseline, who arrived when, and what was released.</p><dl><dt>Span</dt><dd>2015 – 2026 (12 years)</dd><dt>Peak year</dt><dd>2026</dd><dt>Releases</dt><dd>7</dd></dl></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2015</span><span class="history-era history-era-birth">BIRTH</span><span class="history-era-desc">first commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:7.9%"></div></div><p class="history-facts">1398 commits (0.9%) &middot; +957357 / &minus;264006 lines &middot; 61 authors</p><p class="history-people">Led by <strong>Benjamin Pasero</strong> (271 commits)</p><p class="history-people">First commits: Benjamin Pasero, David Storey, Johannes Rieken, João Moreno, Isidor Nikolic, Martin Aeschlimann (+55 more)</p><p class="history-people">Released: 0.10.5</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2016</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:67.8%"></div></div><p class="history-facts">12008 commits (7.4%) &middot; +1044929 / &minus;986888 lines &middot; 200 authors</p><p class="history-people">Led by <strong>Benjamin Pasero</strong> (2274 commits)</p><p class="history-people">First commits: Sandeep Somavarapu, Pine Wu, Christof Marti, Matt Bierner, roblourens, bgashler1@users.noreply.github.com (+176 more)</p><p class="history-people">Released: 0.10.7-insiders, 0.10.10-insiders, 0.10.12-insiders, 1.1.0-insider</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2017</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:82.2%"></div></div><p class="history-facts">14565 commits (8.9%) &middot; +778438 / &minus;598521 lines &middot; 344 authors</p><p class="history-people">Led by <strong>João Moreno</strong> (1676 commits)</p><p class="history-people">First commits: Michel Kaporin, Amy Qiu, Daniel Ye, Christopher Leidigh, Ryan Adolf, Keegan Carruthers-Smith (+283 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2018</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:91.8%"></div></div><p class="history-facts">16278 commits (10.0%) &middot; +533771 / &minus;491196 lines &middot; 439 authors</p><p class="history-people">Led by <strong>Johannes Rieken</strong> (1772 commits)</p><p class="history-people">First commits: Jackson Kearl, Alex Ross, Miguel Solorio, Till Salinger, misolori, Chris Patterson (+368 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2019</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:83.8%"></div></div><p class="history-facts">14857 commits (9.1%) &middot; +544289 / &minus;371975 lines &middot; 373 authors</p><p class="history-people">Led by <strong>Matt Bierner</strong> (1806 commits)</p><p class="history-people">First commits: Gabriel DeBacker, pi1024e, Logan Ramos, Robo, Phil Marshall, Kamran Ayub (+279 more)</p><p class="history-people">Released: 1.38.0</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2020</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:88.8%"></div></div><p class="history-facts">15738 commits (9.7%) &middot; +436639 / &minus;259514 lines &middot; 388 authors</p><p class="history-people">Led by <strong>Benjamin Pasero</strong> (1652 commits)</p><p class="history-people">First commits: Raymond Zhao, Aditya Thakral, Chuck Lantz, Megan Rogge, Wenlu Wang, mjcrouch (+301 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2021</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:91.7%"></div></div><p class="history-facts">16257 commits (10.0%) &middot; +571300 / &minus;331142 lines &middot; 348 authors</p><p class="history-people">Led by <strong>Daniel Imms</strong> (1623 commits)</p><p class="history-people">First commits: Henning Dieterichs, Harald Kirschner, Joyce Er, Andrea Mah, Liangcheng Juves, tanhakabir (+247 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2022</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:74.1%"></div></div><p class="history-facts">13132 commits (8.1%) &middot; +574421 / &minus;353503 lines &middot; 343 authors</p><p class="history-people">Led by <strong>Daniel Imms</strong> (1505 commits)</p><p class="history-people">First commits: aiday-mar, Justin Chen, Aaron Munger, Benjamin Christopher Simmonds, Aiday Marlen Kyzy, Michael Lively (+232 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2023</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:74.1%"></div></div><p class="history-facts">13128 commits (8.1%) &middot; +524674 / &minus;338917 lines &middot; 305 authors</p><p class="history-people">Led by <strong>Megan Rogge</strong> (1779 commits)</p><p class="history-people">First commits: BeniBenj, hsfzxjy, Meghan Kulkarni, tisilent, Chapman Pendery, Jacob Jaeggli (+182 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2024</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:62.4%"></div></div><p class="history-facts">11064 commits (6.8%) &middot; +891207 / &minus;364072 lines &middot; 284 authors</p><p class="history-people">Led by <strong>Daniel Imms</strong> (1826 commits)</p><p class="history-people">First commits: Osvaldo Ortega, BABA, Florian Verdonck, RedCMD, aslezar, John Willard (+171 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2025</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:94.1%"></div></div><p class="history-facts">16681 commits (10.2%) &middot; +821731 / &minus;493674 lines &middot; 366 authors</p><p class="history-people">Led by <strong>Daniel Imms</strong> (1833 commits)</p><p class="history-people">First commits: Copilot, Dmitriy Vasyura, Lee Murray, mrleemurray, Elijah King, Bryan Chen (+240 more)</p><p class="history-people">Released: 1.106.0</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2026</span><span class="history-era history-era-peak">PEAK</span><span class="history-era-desc">busiest year</span></div><div class="history-bar-track"><div class="history-bar" style="width:100.0%"></div></div><p class="history-facts">17723 commits (10.9%) &middot; +3545827 / &minus;917538 lines &middot; 323 authors</p><p class="history-people">Led by <strong>Matt Bierner</strong> (1016 commits)</p><p class="history-people">First commits: vritant24, Giuseppe Cianci, Courtney Webster, cwebster-99, Aashna Garg, Yogeshwaran C (+211 more)</p></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>
