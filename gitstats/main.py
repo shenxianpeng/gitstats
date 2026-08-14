@@ -1032,16 +1032,29 @@ def _run_single_repo(
     if extra_fmt:
         if extra_fmt == "json":
             if json_sibling:
-                output_file = os.path.join(gitpath, f"{outputpath}.{extra_fmt}")
+                sibling = os.path.join(gitpath, f"{outputpath}.{extra_fmt}")
+                _dump_json_within(os.path.dirname(sibling), os.path.basename(sibling), data)
             else:
-                output_file = os.path.join(outputpath, "gitstats.json")
-            logger.info(f'Generating JSON file: "{output_file}"')
-            with open(output_file, "w", encoding="utf-8") as file:
-                json.dump(data.__dict__, file, default=str)
+                _dump_json_within(outputpath, "gitstats.json", data)
         else:
             raise RuntimeError(f"Unsupported format '{extra_fmt}'")
 
     return data
+
+
+def _dump_json_within(directory: str, filename: str, data: DataCollector) -> None:
+    """Write the collector dump as JSON inside ``directory``.
+
+    The target is resolved from the basename only and checked to stay under
+    ``directory`` before writing, guarding against directory traversal.
+    """
+    base = os.path.abspath(directory)
+    target = os.path.abspath(os.path.join(base, os.path.basename(filename)))
+    if os.path.commonpath([base, target]) != base:
+        raise ValueError(f"Refusing to write outside output directory: {filename}")
+    logger.info(f'Generating JSON file: "{target}"')
+    with open(target, "w", encoding="utf-8") as file:
+        json.dump(data.__dict__, file, default=str)
 
 
 def run(gitpath, outputpath, extra_fmt=None) -> int:

@@ -191,7 +191,13 @@ class AggregateReportCreator:
 
     @staticmethod
     def _copy_assets(path: str) -> None:
+        """Copy the shared static assets into the output root.
+
+        Asset names are hard-coded; each destination is resolved and checked
+        to stay under the output root before writing.
+        """
         basedir = os.path.dirname(os.path.abspath(__file__))
+        base = os.path.abspath(path)
         for file in (
             load_config()["style"],
             "sortable.js",
@@ -200,8 +206,11 @@ class AggregateReportCreator:
             "arrow-none.gif",
         ):
             src = os.path.join(basedir, file)
+            target = os.path.abspath(os.path.join(base, os.path.basename(file)))
+            if os.path.commonpath([base, target]) != base:
+                raise ValueError(f"Refusing to write outside report directory: {file}")
             if os.path.exists(src):
-                shutil.copyfile(src, os.path.join(path, file))
+                shutil.copyfile(src, target)
 
     @staticmethod
     def _open_portfolio_file(path: str) -> Any:
