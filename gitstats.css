@@ -633,6 +633,40 @@ table.noborders td:hover .bar {
 	background-color: var(--bar-color);
 }
 
+.history-prologue {
+	padding: var(--space-4);
+	margin: var(--space-4) 0;
+	border: 1px solid var(--border-color);
+	border-left: 3px solid var(--link-color);
+}
+
+.history-prologue p {
+	margin: 0 0 var(--space-2);
+	line-height: 1.7;
+	color: var(--text-color);
+	max-width: 72ch;
+}
+
+.history-ai-note {
+	font-family: var(--font-mono);
+	font-size: var(--font-size-xs) !important;
+	color: var(--text-muted) !important;
+	letter-spacing: 0.04em;
+}
+
+.history-chapter-title {
+	font-size: var(--font-size-md);
+	font-style: italic;
+	color: var(--text-color);
+}
+
+.history-story {
+	margin: var(--space-2) 0;
+	line-height: 1.7;
+	color: var(--text-color);
+	max-width: 72ch;
+}
+
 .history-facts {
 	margin: var(--space-1) 0;
 	font-family: var(--font-mono);
