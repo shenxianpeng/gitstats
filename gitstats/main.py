@@ -74,6 +74,14 @@ def parallel_map_with_fallback(func, items):
         return [func(item) for item in items]
 
 
+def _sample_evenly(items: list[str], k: int) -> list[str]:
+    """Pick up to ``k`` items spread evenly across the list, order preserved."""
+    if len(items) <= k:
+        return list(items)
+    step = len(items) / k
+    return [items[int(i * step)] for i in range(k)]
+
+
 def _merge_period_aliases(
     period_authors: dict[str, int], name_to_canonical: dict[str, str]
 ) -> None:
@@ -156,6 +164,10 @@ class DataCollector:
         # code ownership: author -> file path -> number of commits touching it
         self.author_files: dict[str, dict[str, int]] = {}
 
+        # evenly sampled commit subjects per year (collected only when AI
+        # features are enabled; they ground the AI chronicle narration)
+        self.commit_subjects_by_year: dict[int, list[str]] = {}
+
         # new contributors per month
         self.new_contributors_by_month: dict[str, int] = {}  # YYYY-MM -> count
 
@@ -223,6 +235,8 @@ class GitDataCollector(DataCollector):
         self._collect_line_stats()
         self._collect_per_author_line_stats(name_to_canonical)
         self._collect_file_churn_and_ownership(name_to_canonical)
+        if conf["ai_enabled"]:
+            self._collect_commit_subjects()
 
     # ── collection phases ────────────────────────────────────────────────
 
@@ -796,6 +810,36 @@ class GitDataCollector(DataCollector):
             if current_author:
                 author_map = self.author_files.setdefault(current_author, {})
                 author_map[line] = author_map.get(line, 0) + 1
+
+    def _collect_commit_subjects(self) -> None:
+        """Sample commit subjects per year to ground the AI chronicle.
+
+        One subjects-only pass in chronological order; each year keeps an
+        evenly spaced sample so the whole span stays represented no matter
+        how large the repository is. Only runs when AI features are enabled.
+        """
+        output = get_pipe_output(
+            ['git log --reverse --format="%at %s" {}'.format(get_log_range("HEAD", False))]
+        )
+        by_year: dict[int, list[str]] = {}
+        for line in output.split("\n"):
+            line = line.strip()
+            if not line:
+                continue
+            pos = line.find(" ")
+            if pos == -1:
+                continue
+            try:
+                year = datetime.datetime.fromtimestamp(int(line[:pos])).year
+            except ValueError:
+                continue
+            subject = line[pos + 1 :].strip()
+            if subject:
+                by_year.setdefault(year, []).append(subject[:100])
+
+        self.commit_subjects_by_year = {
+            year: _sample_evenly(subjects, 10) for year, subjects in by_year.items()
+        }
 
     def refine(self) -> None:
         # authors

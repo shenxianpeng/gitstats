@@ -16,6 +16,7 @@ from gitstats.report_creator import (
     get_keys_sorted_by_values,
     html_header,
     html_linkify,
+    parse_chronicle,
 )
 
 # ── html_linkify ─────────────────────────────────────────────────────────
@@ -875,3 +876,81 @@ def test_history_page_escapes_names(mock_data_collector, temp_dir):
         content = f.read()
 
     assert "Al&lt;ice&gt;" in content
+
+
+# ── AI chronicle parsing and rendering ───────────────────────────────────
+
+
+def test_parse_chronicle_full():
+    text = """[PROLOGUE]
+A small tool grew into a project.
+Told entirely from its commits.
+[YEAR 2007] The first year
+One author laid the groundwork.
+It compiled on the second try.
+[YEAR 2008] Growing pains
+New contributors arrived."""
+    parsed = parse_chronicle(text)
+
+    assert parsed["prologue"] == "A small tool grew into a project. Told entirely from its commits."
+    assert parsed["chapters"][2007]["title"] == "The first year"
+    assert (
+        parsed["chapters"][2007]["story"]
+        == "One author laid the groundwork. It compiled on the second try."
+    )
+    assert parsed["chapters"][2008]["title"] == "Growing pains"
+
+
+def test_parse_chronicle_without_prologue_or_title():
+    parsed = parse_chronicle("[YEAR 2020]\nJust a story line.")
+    assert parsed["prologue"] == ""
+    assert parsed["chapters"][2020] == {"title": "", "story": "Just a story line."}
+
+
+def test_parse_chronicle_unstructured_text():
+    parsed = parse_chronicle("The model ignored the format entirely.")
+    assert parsed["chapters"] == {}
+    assert parsed["prologue"] == ""
+
+
+def test_history_page_renders_chronicle(mock_data_collector, temp_dir):
+    mock_data_collector.ai_summaries = {
+        "chronicle": {
+            "summary": (
+                "[PROLOGUE]\nHow test-project came to be.\n"
+                "[YEAR 2023] The <first> year\nAlice & Bob built it."
+            ),
+            "error": None,
+        }
+    }
+    creator = HTMLReportCreator()
+    creator.data = mock_data_collector
+    creator.title = "t"
+    creator.create_history_html(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/history.html", encoding="utf-8") as f:
+        content = f.read()
+
+    assert "How test-project came to be." in content
+    assert "AI narration, generated from the facts below." in content
+    # chapter title and story are HTML-escaped and attached to the year block
+    assert "The &lt;first&gt; year" in content
+    assert "Alice &amp; Bob built it." in content
+    # the deterministic facts remain visible alongside the story
+    assert "50 commits (100.0%)" in content
+
+
+def test_history_page_chronicle_fallback_when_unparseable(mock_data_collector, temp_dir):
+    mock_data_collector.ai_summaries = {
+        "chronicle": {"summary": "A free-form narrative without markers.", "error": None}
+    }
+    creator = HTMLReportCreator()
+    creator.data = mock_data_collector
+    creator.title = "t"
+    creator.create_history_html(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/history.html", encoding="utf-8") as f:
+        content = f.read()
+
+    # shown whole rather than dropped
+    assert "A free-form narrative without markers." in content
