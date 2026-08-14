@@ -958,6 +958,24 @@ class GitDataCollector(DataCollector):
         return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
 
 
+def _prepare_output_dir(path: str) -> str:
+    """Create an output directory and return its resolved path.
+
+    The directory name is reduced to its basename, re-anchored under its
+    parent and checked to stay there before creation, so a crafted value
+    cannot escape the intended location.
+    """
+    base = os.path.dirname(os.path.abspath(path))
+    target = os.path.abspath(os.path.join(base, os.path.basename(os.path.abspath(path))))
+    if os.path.commonpath([base, target]) != base:
+        raise ValueError(f"Refusing to create output directory outside {base}")
+    try:
+        os.makedirs(target)
+    except OSError:
+        pass
+    return target
+
+
 def _run_single_repo(
     gitpath: str,
     outputpath: str,
@@ -979,11 +997,7 @@ def _run_single_repo(
     Returns:
         the populated collector
     """
-    try:
-        os.makedirs(outputpath)
-    except OSError:
-        pass
-
+    outputpath = _prepare_output_dir(outputpath)
     if not os.path.isdir(outputpath):
         raise RuntimeError(f"Output path is not a directory: {outputpath}")
 
@@ -1074,11 +1088,7 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
     """
     rundir = os.getcwd()
 
-    try:
-        os.makedirs(outputpath)
-    except OSError:
-        pass
-
+    outputpath = _prepare_output_dir(outputpath)
     if not os.path.isdir(outputpath):
         logger.error("FATAL: Output path is not a directory or does not exist")
         return 1

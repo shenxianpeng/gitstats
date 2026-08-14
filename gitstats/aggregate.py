@@ -158,11 +158,8 @@ def load_repo_summaries(outputpath: str) -> list[dict[str, Any]]:
     except OSError:
         return []
     for entry in entries:
-        candidate = os.path.realpath(os.path.join(base, entry))
-        if os.path.commonpath([base, candidate]) != base or not os.path.isdir(candidate):
-            continue
-        summary_file = os.path.join(candidate, "summary.json")
-        if not os.path.isfile(summary_file):
+        summary_file = os.path.realpath(os.path.join(base, os.path.basename(entry), "summary.json"))
+        if os.path.commonpath([base, summary_file]) != base or not os.path.isfile(summary_file):
             continue
         try:
             with open(summary_file, encoding="utf-8") as f:
