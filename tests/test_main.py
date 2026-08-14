@@ -618,6 +618,9 @@ class TestRunIntegration:
         assert os.path.isdir(output)
         for page in ("index", "activity", "authors", "files", "lines", "tags"):
             assert os.path.exists(f"{output}/{page}.html")
+        # Single-repo mode keeps the flat layout and adds a summary.json
+        assert os.path.exists(f"{output}/summary.json")
+        assert not any(e.is_dir() for e in os.scandir(output) if e.name != ".ai_cache")
 
     def test_run_with_json(self, git_repo, temp_dir):
         """run() with extra_fmt='json' should produce a JSON file."""
@@ -639,8 +642,10 @@ class TestRunIntegration:
         json_path = f"{output}.json"
         assert os.path.exists(json_path), f"Expected {json_path} to exist"
 
-    def test_run_multi_repo_guarded(self, git_repo, git_repo_minimal, temp_dir):
-        """run() with multiple repos should warn and only process the first."""
+    def test_run_multi_repo_aggregate(self, git_repo, git_repo_minimal, temp_dir):
+        """run() with multiple repos writes per-repo reports and a portfolio page."""
+        import json
+
         import gitstats
         import gitstats.main
 
@@ -651,14 +656,71 @@ class TestRunIntegration:
         gitstats.report_creator.conf = cfg
 
         output = os.path.join(temp_dir, "report")
-        # Pass two repos – the second should be ignored with a warning
         ret = run([git_repo, git_repo_minimal], output)
 
         assert ret == 0
-        assert os.path.isdir(output)
-        # Report is generated for the first repo only
-        for page in ("index", "activity", "authors", "files", "lines", "tags"):
-            assert os.path.exists(f"{output}/{page}.html")
+        # Each repository gets a full report in its own subdirectory
+        for slug in ("git_repo", "git_repo_minimal"):
+            for page in ("index", "activity", "authors", "files", "lines", "tags"):
+                assert os.path.exists(f"{output}/{slug}/{page}.html")
+            with open(f"{output}/{slug}/summary.json", encoding="utf-8") as f:
+                summary = json.load(f)
+            assert summary["schema_version"] == 1
+            assert summary["name"] == slug
+            assert summary["report_path"] == f"{slug}/index.html"
+            assert summary["total_commits"] > 0
+
+        # Aggregate portfolio page at the output root links both repos
+        with open(f"{output}/index.html", encoding="utf-8") as f:
+            index = f.read()
+        assert 'href="git_repo/index.html"' in index
+        assert 'href="git_repo_minimal/index.html"' in index
+        assert "Totals" in index
+        # Per-repo pages must not leak into the output root
+        assert not os.path.exists(f"{output}/activity.html")
+
+    def test_run_multi_repo_tolerates_failure(self, git_repo, temp_dir):
+        """One broken repo is reported on the portfolio page, not fatal."""
+        import gitstats
+        import gitstats.main
+
+        cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
+        gitstats._config = cfg
+        gitstats.main.conf = cfg
+        gitstats.utils.conf = cfg
+        gitstats.report_creator.conf = cfg
+
+        not_a_repo = os.path.join(temp_dir, "not_a_repo")
+        os.makedirs(not_a_repo)
+        output = os.path.join(temp_dir, "report")
+        ret = run([git_repo, not_a_repo], output)
+
+        assert ret == 0
+        assert os.path.exists(f"{output}/git_repo/index.html")
+        with open(f"{output}/index.html", encoding="utf-8") as f:
+            index = f.read()
+        assert "Failed Repositories" in index
+        assert "not_a_repo" in index
+
+    def test_run_multi_repo_all_failed(self, temp_dir):
+        """run() returns 1 when no repository could be analyzed."""
+        import gitstats
+        import gitstats.main
+
+        cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
+        gitstats._config = cfg
+        gitstats.main.conf = cfg
+        gitstats.utils.conf = cfg
+        gitstats.report_creator.conf = cfg
+
+        bad_one = os.path.join(temp_dir, "bad_one")
+        bad_two = os.path.join(temp_dir, "bad_two")
+        os.makedirs(bad_one)
+        os.makedirs(bad_two)
+        output = os.path.join(temp_dir, "report")
+        ret = run([bad_one, bad_two], output)
+
+        assert ret == 1
 
 
 # ── get_parser / CLI ─────────────────────────────────────────────────────

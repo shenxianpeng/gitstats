@@ -14,6 +14,12 @@ from multiprocessing import Pool
 from typing import Any
 
 from gitstats import exectime_external, load_config, time_start
+from gitstats.aggregate import (
+    AggregateReportCreator,
+    _slugify_repo,
+    compute_repo_summary,
+    write_repo_summary,
+)
 from gitstats.ai_summarizer import AISummarizer
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.utils import (
@@ -952,58 +958,52 @@ class GitDataCollector(DataCollector):
         return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
 
 
-def run(gitpath, outputpath, extra_fmt=None) -> int:
-    """Run the gitstats program.
+def _run_single_repo(
+    gitpath: str,
+    outputpath: str,
+    extra_fmt: str | None = None,
+    project_name: str | None = None,
+    json_sibling: bool = True,
+) -> DataCollector:
+    """Collect, refine and render the full report for one repository.
+
     Args:
         gitpath: path to the git repository
-        outputpath: path to the output directory
-        extra_fmt: extra format
+        outputpath: directory receiving this repository's report
+        extra_fmt: extra output format ("json")
+        project_name: overrides the report's project name (multi-repo runs
+            ignore the process-global ``project_name`` config, which would
+            rename every repository identically)
+        json_sibling: write the extra JSON next to the output directory
+            (single-repo behavior) instead of inside it
     Returns:
-        0 on success, 1 on failure
+        the populated collector
     """
-    rundir = os.getcwd()
-
     try:
         os.makedirs(outputpath)
     except OSError:
         pass
 
     if not os.path.isdir(outputpath):
-        logger.error("FATAL: Output path is not a directory or does not exist")
-        return 1
+        raise RuntimeError(f"Output path is not a directory: {outputpath}")
 
     logger.info(f"Output path: {outputpath}")
     cachefile = os.path.join(outputpath, "gitstats.cache")
 
-    # Guard: multi-repository analysis is not yet supported.
-    # When multiple paths are given, stats from all repos are merged into
-    # one report with the wrong project name (last repo wins).
-    # Track: https://github.com/shenxianpeng/gitstats/issues/234
-    if len(gitpath) > 1:
-        logger.error(
-            "Multi-repository analysis is not supported. "
-            "Only the first repository will be analyzed: %s",
-            gitpath[0],
-        )
-        logger.info(
-            "Track multi-repo dashboard feature: "
-            "https://github.com/shenxianpeng/gitstats/issues/234"
-        )
-        gitpath = gitpath[:1]
-
     data = GitDataCollector()
     data.load_cache(cachefile)
 
-    for gitpath in gitpath:
-        logger.info(f"Git path: {gitpath}")
-
-        prevdir = os.getcwd()
-        os.chdir(gitpath)
-
+    logger.info(f"Git path: {gitpath}")
+    prevdir = os.getcwd()
+    os.chdir(gitpath)
+    try:
         logger.info("Collecting data...")
         data.collect(gitpath)
-
+    finally:
         os.chdir(prevdir)
+
+    if project_name is not None:
+        data.project_name = project_name
 
     logger.info("Refining data...")
     data.save_cache(cachefile)
@@ -1025,23 +1025,64 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
     else:
         data.ai_summaries = {}
 
-    os.chdir(rundir)
-
     logger.info("Generating report...")
     html_report = HTMLReportCreator()
     html_report.create(data, outputpath)
 
     if extra_fmt:
-        output_file = os.path.join(gitpath, f"{outputpath}.{extra_fmt}")
         if extra_fmt == "json":
-            import json
-
+            if json_sibling:
+                output_file = os.path.join(gitpath, f"{outputpath}.{extra_fmt}")
+            else:
+                output_file = os.path.join(outputpath, "gitstats.json")
             logger.info(f'Generating JSON file: "{output_file}"')
             with open(output_file, "w", encoding="utf-8") as file:
                 json.dump(data.__dict__, file, default=str)
         else:
-            logger.error(f"Unsupported format '{extra_fmt}'")
-            return 1
+            raise RuntimeError(f"Unsupported format '{extra_fmt}'")
+
+    return data
+
+
+def run(gitpath, outputpath, extra_fmt=None) -> int:
+    """Run the gitstats program.
+
+    With one repository path the report lands directly in ``outputpath``
+    (the historical layout). With several paths each repository gets its own
+    subdirectory plus a ``summary.json``, and an aggregate portfolio page is
+    written at ``outputpath/index.html``.
+
+    Args:
+        gitpath: list of paths to git repositories
+        outputpath: path to the output directory
+        extra_fmt: extra format
+    Returns:
+        0 if at least one repository was analyzed, 1 otherwise
+    """
+    rundir = os.getcwd()
+
+    try:
+        os.makedirs(outputpath)
+    except OSError:
+        pass
+
+    if not os.path.isdir(outputpath):
+        logger.error("FATAL: Output path is not a directory or does not exist")
+        return 1
+
+    exit_code = 0
+    try:
+        if len(gitpath) == 1:
+            try:
+                data = _run_single_repo(gitpath[0], outputpath, extra_fmt)
+            except RuntimeError as e:
+                logger.error(f"FATAL: {e}")
+                return 1
+            write_repo_summary(compute_repo_summary(data, "index.html"), outputpath)
+        else:
+            exit_code = _run_multi_repo(gitpath, outputpath, extra_fmt)
+    finally:
+        os.chdir(rundir)
 
     time_end = time.time()
     exectime_internal = time_end - time_start
@@ -1054,6 +1095,48 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
             f"To view the report, run: {python_cmd} -m http.server 8000 --bind 127.0.0.1 -d {outputpath}"
         )
 
+    return exit_code
+
+
+def _run_multi_repo(gitpaths: list, outputpath: str, extra_fmt=None) -> int:
+    """Analyze several repositories and assemble the portfolio page."""
+    summaries = []
+    failures = []
+    seen_slugs: dict[str, int] = {}
+    for path in gitpaths:
+        try:
+            slug = _slugify_repo(path)
+        except ValueError as e:
+            logger.warning(f"Skipping repository {path!r}: {e}")
+            failures.append({"name": path, "path": path, "error": str(e)})
+            continue
+        count = seen_slugs.get(slug, 0) + 1
+        seen_slugs[slug] = count
+        if count > 1:
+            slug = f"{slug}-{count}"
+        repo_outdir = os.path.join(outputpath, slug)
+        try:
+            data = _run_single_repo(
+                path,
+                repo_outdir,
+                extra_fmt,
+                project_name=slug,
+                json_sibling=False,
+            )
+        except Exception as e:
+            logger.warning(f"Skipping repository {path!r}: {e}")
+            failures.append({"name": slug, "path": path, "error": str(e)})
+            continue
+        summary = compute_repo_summary(data, f"{slug}/index.html")
+        write_repo_summary(summary, repo_outdir)
+        summaries.append(summary)
+
+    if not summaries:
+        logger.error("FATAL: No repository could be analyzed")
+        return 1
+
+    logger.info("Generating portfolio page...")
+    AggregateReportCreator().create(summaries, failures, outputpath)
     return 0
 
 
@@ -1085,7 +1168,11 @@ def get_parser() -> argparse.ArgumentParser:
         "gitpath",
         metavar="<gitpath>",
         nargs="+",
-        help="Path to the Git repository. An optional output directory may follow.",
+        help=(
+            "Path(s) to Git repositories. With two or more positional arguments, "
+            "the last one is the output directory. Multiple repositories produce "
+            "per-repository reports plus an aggregate portfolio page."
+        ),
     )
     parser.add_argument(
         "outputpath",
@@ -1206,9 +1293,7 @@ def main() -> int:
     # Handle AI CLI arguments (CLI takes precedence over config)
     _apply_ai_args(conf, args)
 
-    run(gitpath, outputpath, extra_fmt=extra_fmt)
-
-    return 0
+    return run(gitpath, outputpath, extra_fmt=extra_fmt)
 
 
 if __name__ == "__main__":
