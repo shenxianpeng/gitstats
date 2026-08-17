@@ -14,6 +14,7 @@ from typing import Any
 
 from gitstats import WEEKDAYS, get_i18n_text, load_config
 from gitstats.utils import (
+    format_int,
     get_git_version,
     get_pipe_output,
     get_version,
@@ -122,16 +123,20 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             f"<tr><td>Longest Streak</td><td>{data.get_longest_streak()} consecutive active days</td></tr>"
         )
-        f.write(f"<tr><td>Total Files</td><td>{data.get_total_files()}</td></tr>")
+        f.write(f"<tr><td>Total Files</td><td>{format_int(data.get_total_files())}</td></tr>")
         f.write(
-            "<tr><td>Total Lines of Code</td><td>%s (%d added, %d removed)</td></tr>"
-            % (data.get_total_loc(), data.total_lines_added, data.total_lines_removed)
+            "<tr><td>Total Lines of Code</td><td>%s (%s added, %s removed)</td></tr>"
+            % (
+                format_int(data.get_total_loc()),
+                format_int(data.total_lines_added),
+                format_int(data.total_lines_removed),
+            )
         )
         f.write(
-            f"<tr><td>Total Commits</td><td>{data.get_total_commits()} (average {float(data.get_total_commits()) / len(data.get_active_days()):.1f} commits per active day, {float(data.get_total_commits()) / data.get_commit_delta_days():.1f} per all days)</td></tr>"
+            f"<tr><td>Total Commits</td><td>{format_int(data.get_total_commits())} (average {float(data.get_total_commits()) / len(data.get_active_days()):.1f} commits per active day, {float(data.get_total_commits()) / data.get_commit_delta_days():.1f} per all days)</td></tr>"
         )
         f.write(
-            f"<tr><td>Authors</td><td>{data.get_total_authors()} (average {(1.0 * data.get_total_commits()) / data.get_total_authors():.1f} commits per author)</td></tr>"
+            f"<tr><td>Authors</td><td>{format_int(data.get_total_authors())} (average {(1.0 * data.get_total_commits()) / data.get_total_authors():.1f} commits per author)</td></tr>"
         )
         f.write("</table>")
 

@@ -5,6 +5,7 @@ import pytest
 from gitstats.utils import (
     count_lines_in_text,
     filter_lines_by_pattern,
+    format_int,
     get_commit_range,
     get_excluded_extensions,
     get_log_range,
@@ -205,3 +206,25 @@ def test_get_log_range_with_authors():
     result = get_log_range()
     assert '--author="Alice"' in result
     assert '--author="Hui"' in result
+
+
+# ── format_int ───────────────────────────────────────────────────────────
+
+
+def test_format_int_thousands():
+    assert format_int(44025623) == "44,025,623"
+    assert format_int(1020339) == "1,020,339"
+
+
+def test_format_int_small_numbers_unchanged():
+    assert format_int(0) == "0"
+    assert format_int(999) == "999"
+
+
+def test_format_int_numeric_strings():
+    assert format_int("1234") == "1,234"
+
+
+def test_format_int_non_numeric_passthrough():
+    assert format_int("n/a") == "n/a"
+    assert format_int(None) == "None"
