@@ -1429,7 +1429,7 @@ class HTMLReportCreator(ReportCreator):
 	</script>
 </head>
 <body>
-""".format(self.title, load_config()["style"], get_version)
+""".format(self.title, load_config()["style"], get_version())
         )
 
     def print_nav(self, file: Any) -> None:

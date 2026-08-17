@@ -94,6 +94,20 @@ Usage
 
 If ``<outputpath>`` is omitted, reports are written to ``gitstats-report/`` by default.
 
+Analyze several repositories at once to get a portfolio overview — useful for
+seeing how all of a team's projects are doing in one place:
+
+.. code-block:: bash
+
+   gitstats repo1 repo2 repo3 <outputpath>
+
+Each repository gets its full report in ``<outputpath>/<repo>/`` along with a
+machine-readable ``summary.json``, and an aggregate page at
+``<outputpath>/index.html`` shows a sortable table of every repository —
+commits, authors, recent activity, lines of code and a health label — linking
+into the individual reports. Repositories that fail to analyze are listed on
+the page without stopping the run.
+
 Use ``--verbose`` to show debug-level command logs, or ``--quiet`` to show only warnings and errors:
 
 .. code-block:: bash
