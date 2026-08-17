@@ -78,11 +78,10 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install GitStats
-        run: pip install .
-
       - name: Generate Gallery Portfolio Page
-        run: python scripts/generate_gallery_portfolio.py gallery
+        # The script only needs the gitstats modules from this checkout
+        # (stdlib-only imports), so no package installation is required.
+        run: PYTHONPATH="$PWD" python scripts/generate_gallery_portfolio.py gallery
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
