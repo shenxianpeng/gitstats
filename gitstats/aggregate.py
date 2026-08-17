@@ -21,7 +21,7 @@ from typing import Any
 
 from gitstats import load_config
 from gitstats.report_creator import _classify_eras
-from gitstats.utils import get_version
+from gitstats.utils import format_int, get_version
 
 logger = logging.getLogger("gitstats")
 
@@ -314,18 +314,20 @@ class AggregateReportCreator:
         for summary in summaries:
             distinct_authors.update((summary.get("author_commits") or {}).keys())
         total_commits = sum(s.get("total_commits", 0) for s in summaries)
+        commits_12mo = sum(s.get("commits_last_12mo", 0) for s in summaries)
+        active_repos = sum(1 for s in summaries if s.get("commits_last_12mo", 0) > 0)
         total_lines = sum(s.get("total_lines", 0) for s in summaries)
-        total_tags = sum(s.get("total_tags", 0) for s in summaries)
-        last_commit = max((s.get("last_commit", "") for s in summaries), default="")
 
         f.write("<h2>Totals</h2>")
         f.write("<table border='1' cellspacing='0' cellpadding='4'>")
         f.write(f"<tr><td>Repositories</td><td>{len(summaries)}</td></tr>")
-        f.write(f"<tr><td>Total Commits</td><td>{total_commits}</td></tr>")
-        f.write(f"<tr><td>Distinct Authors</td><td>{len(distinct_authors)}</td></tr>")
-        f.write(f"<tr><td>Total Lines of Code</td><td>{total_lines}</td></tr>")
-        f.write(f"<tr><td>Total Tags</td><td>{total_tags}</td></tr>")
-        f.write(f"<tr><td>Last Commit</td><td>{html.escape(last_commit)}</td></tr>")
+        f.write(f"<tr><td>Total Commits</td><td>{format_int(total_commits)}</td></tr>")
+        f.write(f"<tr><td>Commits (last 12 mo)</td><td>{format_int(commits_12mo)}</td></tr>")
+        f.write(f"<tr><td>Distinct Authors</td><td>{format_int(len(distinct_authors))}</td></tr>")
+        f.write(
+            f"<tr><td>Active Repositories (12 mo)</td><td>{active_repos} / {len(summaries)}</td></tr>"
+        )
+        f.write(f"<tr><td>Lines of Code</td><td>{format_int(total_lines)}</td></tr>")
         f.write("</table>")
 
     @staticmethod
@@ -334,8 +336,8 @@ class AggregateReportCreator:
         f.write('<table class="sortable" id="portfolio">')
         f.write(
             "<tr><th>Repository</th><th>Health</th><th>Commits</th><th>Authors</th>"
-            "<th>Active (12 mo)</th><th>Files</th><th>Lines</th>"
-            "<th>Last Commit</th><th>Age (days)</th></tr>"
+            "<th>Active (12 mo)</th><th>Files</th><th>Lines of Code</th>"
+            "<th>Last Commit</th><th>Since</th></tr>"
         )
         ordered = sorted(summaries, key=lambda s: -s.get("total_commits", 0))
         for summary in ordered:
@@ -348,16 +350,17 @@ class AggregateReportCreator:
                 else ""
             )
             last_commit = html.escape((summary.get("last_commit", "") or "")[:10])
+            since = html.escape((summary.get("first_commit", "") or "")[:4])
             f.write(
                 f'<tr><td><a href="{link}">{name}</a></td>'
                 f"<td>{era_html}</td>"
-                f"<td>{summary.get('total_commits', 0)}</td>"
-                f"<td>{summary.get('total_authors', 0)}</td>"
-                f"<td>{summary.get('active_authors_12mo', 0)}</td>"
-                f"<td>{summary.get('total_files', 0)}</td>"
-                f"<td>{summary.get('total_lines', 0)}</td>"
+                f"<td>{format_int(summary.get('total_commits', 0))}</td>"
+                f"<td>{format_int(summary.get('total_authors', 0))}</td>"
+                f"<td>{format_int(summary.get('active_authors_12mo', 0))}</td>"
+                f"<td>{format_int(summary.get('total_files', 0))}</td>"
+                f"<td>{format_int(summary.get('total_lines', 0))}</td>"
                 f"<td>{last_commit}</td>"
-                f"<td>{summary.get('age_days', 0)}</td></tr>"
+                f"<td>{since}</td></tr>"
             )
         f.write("</table>")
 

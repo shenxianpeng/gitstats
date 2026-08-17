@@ -341,6 +341,8 @@ def test_create_index_html(mock_data_collector, temp_dir):
     assert "Total Commits" in html
     assert "Authors" in html
     assert "</html>" in html
+    # Large counts use thousands separators (total_lines=2000, added=3000, removed=1000)
+    assert "2,000 (3,000 added, 1,000 removed)" in html
 
 
 # ── HTMLReportCreator.create_activity_html ───────────────────────────────

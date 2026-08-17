@@ -9,6 +9,7 @@ import shlex
 import subprocess
 import time
 from importlib.metadata import PackageNotFoundError, version
+from typing import Any
 
 from gitstats import ON_LINUX, exectime_external, load_config
 
@@ -39,6 +40,18 @@ def get_version() -> str:
         return version("gitstats")
     except PackageNotFoundError:
         return "dev"
+
+
+def format_int(value: Any) -> str:
+    """Render an integer with thousands separators (44025623 -> "44,025,623").
+
+    Non-numeric values are returned unchanged so callers can pass through
+    already-formatted or missing data.
+    """
+    try:
+        return f"{int(value):,}"
+    except (TypeError, ValueError):
+        return str(value)
 
 
 def get_git_version() -> str:

@@ -172,8 +172,52 @@ class TestAggregateReportCreator:
         # Distinct authors = union, not the naive per-repo sum
         assert "<tr><td>Distinct Authors</td><td>2</td></tr>" in html
         assert "<tr><td>Total Commits</td><td>150</td></tr>" in html
+        # Activity insight rows
+        assert "<tr><td>Commits (last 12 mo)</td><td>20</td></tr>" in html
+        assert "<tr><td>Active Repositories (12 mo)</td><td>2 / 2</td></tr>" in html
+        assert "<tr><td>Lines of Code</td><td>2,000</td></tr>" in html
+        # Low-insight totals rows are gone (Last Commit remains a table column)
+        assert "<tr><td>Total Tags</td>" not in html
+        assert "<tr><td>Last Commit</td>" not in html
+        assert "<tr><td>Total Lines of Code</td>" not in html
+        # Repo table: Since column (first-commit year) replaces Age (days)
+        assert "<th>Since</th>" in html
+        assert "Age (days)" not in html
+        assert "<td>2020</td>" in html
+        assert "<th>Lines of Code</th>" in html
         # Sorted by commits: alpha row before beta row
         assert html.index('href="alpha/index.html"') < html.index('href="beta/index.html"')
+
+    def test_thousands_separators(self, temp_dir):
+        html = self._render(
+            temp_dir,
+            [
+                _summary(
+                    "mega",
+                    1234567,
+                    {"A": 1234567},
+                    total_lines=44025623,
+                    commits_last_12mo=78432,
+                )
+            ],
+        )
+
+        assert "<tr><td>Total Commits</td><td>1,234,567</td></tr>" in html
+        assert "<tr><td>Commits (last 12 mo)</td><td>78,432</td></tr>" in html
+        assert "<tr><td>Lines of Code</td><td>44,025,623</td></tr>" in html
+        assert "<td>1,234,567</td>" in html
+        assert "<td>44,025,623</td>" in html
+
+    def test_inactive_repo_counted(self, temp_dir):
+        html = self._render(
+            temp_dir,
+            [
+                _summary("alpha", 100, {"A": 100}),
+                _summary("stale", 50, {"B": 50}, commits_last_12mo=0),
+            ],
+        )
+
+        assert "<tr><td>Active Repositories (12 mo)</td><td>1 / 2</td></tr>" in html
 
     def test_assets_copied(self, temp_dir):
         self._render(temp_dir, [_summary("alpha", 1, {"A": 1})])
