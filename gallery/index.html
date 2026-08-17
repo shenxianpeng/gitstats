@@ -1,122 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GitStats Gallery</title>
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background: #f8f9fa;
-    color: #1f2937;
-    line-height: 1.6;
-    padding: 2rem 1rem;
-  }
-  .container { max-width: 900px; margin: 0 auto; }
-  h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  h1 a { color: inherit; text-decoration: none; }
-  h1 a:hover { color: #2563eb; }
-  .subtitle {
-    color: #6b7280;
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-  }
-  .subtitle a { color: #2563eb; text-decoration: none; }
-  .subtitle a:hover { text-decoration: underline; }
-  .updated { font-size: 0.875rem; color: #9ca3af; margin-bottom: 1.5rem; }
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1rem;
-  }
-  .card {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 1.25rem;
-    transition: box-shadow 0.15s, border-color 0.15s;
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-  }
-  .card:hover {
-    border-color: #2563eb;
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
-  }
-  .card h2 { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.25rem; }
-  .card p { font-size: 0.875rem; color: #6b7280; }
-  .card .arrow { margin-top: auto; align-self: flex-end; font-size: 1.25rem; color: #2563eb; }
-</style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - GitStats Gallery</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats dev">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script>
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme');
+			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+			document.documentElement.setAttribute('data-theme', newTheme);
+			localStorage.setItem('theme', newTheme);
+			updateThemeIcon(newTheme);
+		}
+
+		function updateThemeIcon(theme) {
+			const button = document.getElementById('theme-toggle');
+			if (button) {
+				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
+				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', function() {
+			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		});
+	</script>
 </head>
 <body>
-<div class="container">
-  <h1><a href=".">📊 GitStats Gallery</a></h1>
-  <p class="subtitle">
-    Live reports for open-source projects —
-    <a href="https://github.com/shenxianpeng/gitstats">GitStats</a>
-  </p>
-  <p class="updated">Last updated: 2026-08-17 01:25 UTC</p>
-  <div class="grid">
-    <a class="card" href="cpython/index.html">
-      <h2>CPython</h2>
-      <p>gitstats report</p>
-      <span class="arrow">→</span>
-    </a>
-    <a class="card" href="django/index.html">
-      <h2>Django</h2>
-      <p>gitstats report</p>
-      <span class="arrow">→</span>
-    </a>
-    <a class="card" href="git/index.html">
-      <h2>Git</h2>
-      <p>gitstats report</p>
-      <span class="arrow">→</span>
-    </a>
-    <a class="card" href="homebrew/index.html">
-      <h2>Homebrew</h2>
-      <p>gitstats report</p>
-      <span class="arrow">→</span>
-    </a>
-    <a class="card" href="kubernetes/index.html">
-      <h2>Kubernetes</h2>
-      <p>gitstats report</p>
-      <span class="arrow">→</span>
-    </a>
-    <a class="card" href="nginx/index.html">
-      <h2>nginx</h2>
-      <p>gitstats report</p>
-      <span class="arrow">→</span>
-    </a>
-    <a class="card" href="nodejs/index.html">
-      <h2>Node.js</h2>
-      <p>gitstats report</p>
-      <span class="arrow">→</span>
-    </a>
-    <a class="card" href="react/index.html">
-      <h2>React</h2>
-      <p>gitstats report</p>
-      <span class="arrow">→</span>
-    </a>
-    <a class="card" href="rust/index.html">
-      <h2>Rust</h2>
-      <p>gitstats report</p>
-      <span class="arrow">→</span>
-    </a>
-    <a class="card" href="vscode/index.html">
-      <h2>VS Code</h2>
-      <p>gitstats report</p>
-      <span class="arrow">→</span>
-    </a>
-  </div>
-</div>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">GitStats Gallery</a></li>
+            </ul>
+            <div class="nav-right">
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            </div>
+            </div>
+            <h1>GitStats Gallery</h1><p class="portfolio-subtitle">10 repositories &middot; generated by gitstats dev on 2026-08-17 15:27:39</p><h2>Totals</h2><table border='1' cellspacing='0' cellpadding='4'><tr><td>Repositories</td><td>10</td></tr><tr><td>Total Commits</td><td>1020339</td></tr><tr><td>Distinct Authors</td><td>30148</td></tr><tr><td>Total Lines of Code</td><td>44025623</td></tr><tr><td>Total Tags</td><td>1240</td></tr><tr><td>Last Commit</td><td>2026-08-17 13:30:59</td></tr></table><h2>Repositories</h2><table class="sortable" id="portfolio"><tr><th>Repository</th><th>Health</th><th>Commits</th><th>Authors</th><th>Active (12 mo)</th><th>Files</th><th>Lines</th><th>Last Commit</th><th>Age (days)</th></tr><tr><td><a href="rust/index.html">Rust</a></td><td><span class="history-era history-era-steady">steady</span></td><td>336833</td><td>7620</td><td>1257</td><td>62052</td><td>6048211</td><td>2026-08-17</td><td>5906</td></tr><tr><td><a href="vscode/index.html">VS Code</a></td><td><span class="history-era history-era-peak">peak</span></td><td>163420</td><td>2826</td><td>434</td><td>17926</td><td>5574427</td><td>2026-08-17</td><td>3930</td></tr><tr><td><a href="kubernetes/index.html">Kubernetes</a></td><td><span class="history-era history-era-steady">steady</span></td><td>140379</td><td>4794</td><td>565</td><td>31300</td><td>7233334</td><td>2026-08-17</td><td>4455</td></tr><tr><td><a href="cpython/index.html">CPython</a></td><td><span class="history-era history-era-steady">steady</span></td><td>132804</td><td>3641</td><td>763</td><td>6085</td><td>3185274</td><td>2026-08-17</td><td>13157</td></tr><tr><td><a href="git/index.html">Git</a></td><td><span class="history-era history-era-steady">steady</span></td><td>81925</td><td>2341</td><td>210</td><td>4845</td><td>1622200</td><td>2026-08-15</td><td>7800</td></tr><tr><td><a href="homebrew/index.html">Homebrew</a></td><td><span class="history-era history-era-steady">steady</span></td><td>51876</td><td>1296</td><td>172</td><td>3171</td><td>462915</td><td>2026-08-17</td><td>6298</td></tr><tr><td><a href="nodejs/index.html">Node.js</a></td><td><span class="history-era history-era-steady">steady</span></td><td>47899</td><td>4293</td><td>394</td><td>51376</td><td>17317747</td><td>2026-08-17</td><td>6392</td></tr><tr><td><a href="django/index.html">Django</a></td><td><span class="history-era history-era-steady">steady</span></td><td>34877</td><td>3159</td><td>218</td><td>7084</td><td>1116557</td><td>2026-08-14</td><td>7703</td></tr><tr><td><a href="react/index.html">React</a></td><td><span class="history-era history-era-quiet">quiet</span></td><td>21639</td><td>1916</td><td>87</td><td>7202</td><td>1164763</td><td>2026-08-14</td><td>4827</td></tr><tr><td><a href="nginx/index.html">nginx</a></td><td><span class="history-era history-era-steady">steady</span></td><td>8687</td><td>135</td><td>38</td><td>537</td><td>300195</td><td>2026-08-11</td><td>8771</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body>
 </html>
