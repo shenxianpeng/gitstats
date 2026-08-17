@@ -8,7 +8,7 @@ import re
 import shlex
 import subprocess
 import time
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, version
 
 from gitstats import ON_LINUX, exectime_external, load_config
 
@@ -34,7 +34,11 @@ def filter_lines_by_pattern(text: str | None, pattern: str) -> str:
 
 
 def get_version() -> str:
-    return version("gitstats")
+    """Installed package version, or "dev" when running from a source checkout."""
+    try:
+        return version("gitstats")
+    except PackageNotFoundError:
+        return "dev"
 
 
 def get_git_version() -> str:
