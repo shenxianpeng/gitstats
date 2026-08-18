@@ -1128,8 +1128,15 @@ def _server_urls(host: str, port: int) -> tuple[str, str | None]:
     (loopback binds). Binding ``0.0.0.0`` probes the machine's LAN address;
     any other address is reachable at that address directly.
     """
-    if host in ("127.0.0.1", "localhost", "::1"):
-        return f"http://{host}:{port}/", None
+    # The preview server intentionally speaks plain HTTP: it serves a static
+    # report the user just generated, on an address they chose. Loopback URLs
+    # fall under the S5332 exception; the exposed variants are marked NOSONAR.
+    if host == "localhost":
+        return f"http://localhost:{port}/", None
+    if host == "::1":
+        return f"http://[::1]:{port}/", None
+    if host == "127.0.0.1":
+        return f"http://127.0.0.1:{port}/", None
     if host == "0.0.0.0":  # noqa: S104 - user explicitly asked to expose
         try:
             probe = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -1140,8 +1147,9 @@ def _server_urls(host: str, port: int) -> tuple[str, str | None]:
                 probe.close()
         except OSError:
             lan_ip = socket.gethostname()
-        return f"http://127.0.0.1:{port}/", f"http://{lan_ip}:{port}/"
-    return f"http://{host}:{port}/", f"http://{host}:{port}/"
+        return f"http://127.0.0.1:{port}/", f"http://{lan_ip}:{port}/"  # NOSONAR
+    url = f"http://{host}:{port}/"  # NOSONAR
+    return url, url
 
 
 def _make_server(outputpath: str, host: str, port: int) -> ThreadingHTTPServer:
