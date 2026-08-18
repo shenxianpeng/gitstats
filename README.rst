@@ -108,6 +108,14 @@ commits, authors, recent activity, lines of code and a health label — linking
 into the individual reports. Repositories that fail to analyze are listed on
 the page without stopping the run.
 
+Add ``--serve`` to preview the generated report right away — gitstats starts a
+local web server and prints the URL (bound to ``127.0.0.1`` by default; pass
+``--host 0.0.0.0`` to expose it on your network, ``--port`` to pick a port):
+
+.. code-block:: bash
+
+   gitstats --serve .
+
 Use ``--verbose`` to show debug-level command logs, or ``--quiet`` to show only warnings and errors:
 
 .. code-block:: bash
