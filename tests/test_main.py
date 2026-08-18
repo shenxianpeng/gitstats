@@ -9,6 +9,8 @@ import pytest
 from gitstats.main import (
     DataCollector,
     GitDataCollector,
+    _make_server,
+    _server_urls,
     get_parser,
     main,
     parallel_map_with_fallback,
@@ -739,6 +741,16 @@ class TestCLI:
         assert args.quiet is False
         assert args.ai is None
         assert args.refresh_ai is False
+        assert args.serve is False
+        assert args.host == "127.0.0.1"
+        assert args.port == 8000
+
+    def test_parser_serve_flags(self):
+        parser = get_parser()
+        args = parser.parse_args(["--serve", "--host", "0.0.0.0", "--port", "0", "repo"])
+        assert args.serve is True
+        assert args.host == "0.0.0.0"
+        assert args.port == 0
 
     def test_parser_single_path(self):
         parser = get_parser()
@@ -874,3 +886,45 @@ def test_main_with_config_override(git_repo_minimal, temp_dir):
     assert ret == 0
     # After run, main.conf should have the override
     assert gitstats.main.conf["max_authors"] == 10
+
+
+# ── --serve preview server ───────────────────────────────────────────────
+
+
+class TestServe:
+    def test_server_urls_loopback(self):
+        local, network = _server_urls("127.0.0.1", 8000)
+        assert local == "http://127.0.0.1:8000/"
+        assert network is None
+
+    def test_server_urls_all_interfaces(self):
+        local, network = _server_urls("0.0.0.0", 8123)
+        assert local == "http://127.0.0.1:8123/"
+        assert network is not None
+        assert network.startswith("http://")
+        assert ":8123/" in network
+
+    def test_server_urls_explicit_host(self):
+        local, network = _server_urls("192.168.1.5", 8000)
+        assert local == "http://192.168.1.5:8000/"
+        assert network == "http://192.168.1.5:8000/"
+
+    def test_serves_report_directory(self, temp_dir):
+        import threading
+        import urllib.request
+
+        with open(os.path.join(temp_dir, "index.html"), "w", encoding="utf-8") as f:
+            f.write("<html><body>portfolio</body></html>")
+
+        server = _make_server(temp_dir, "127.0.0.1", 0)
+        port = server.server_address[1]
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            with urllib.request.urlopen(f"http://127.0.0.1:{port}/index.html") as resp:
+                assert resp.status == 200
+                assert b"portfolio" in resp.read()
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=5)

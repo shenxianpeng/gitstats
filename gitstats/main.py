@@ -8,8 +8,11 @@ import json
 import logging
 import os
 import re
+import socket
 import sys
 import time
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from multiprocessing import Pool
 from typing import Any
 
@@ -1113,12 +1116,71 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
         f"Execution time {exectime_internal:.5f} secs, {exectime_external:.5f} secs ({(100.0 * exectime_external) / exectime_internal:.2f} %) in external commands)"
     )
     if sys.stdin.isatty():
-        python_cmd = "python" if os.name == "nt" else "python3"
-        logger.info(
-            f"To view the report, run: {python_cmd} -m http.server 8000 --bind 127.0.0.1 -d {outputpath}"
-        )
+        logger.info("To view the report, re-run with --serve (see gitstats --help)")
 
     return exit_code
+
+
+def _server_urls(host: str, port: int) -> tuple[str, str | None]:
+    """Return the (local, network) URLs to show for a bound server.
+
+    ``network`` is None when the server is only reachable from this machine
+    (loopback binds). Binding ``0.0.0.0`` probes the machine's LAN address;
+    any other address is reachable at that address directly.
+    """
+    # The preview server intentionally speaks plain HTTP: it serves a static
+    # report the user just generated, on an address they chose. Loopback URLs
+    # fall under the S5332 exception; the exposed variants are marked NOSONAR.
+    if host == "localhost":
+        return f"http://localhost:{port}/", None
+    if host == "::1":
+        return f"http://[::1]:{port}/", None
+    if host == "127.0.0.1":
+        return f"http://127.0.0.1:{port}/", None
+    if host == "0.0.0.0":  # noqa: S104 - user explicitly asked to expose
+        try:
+            probe = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            try:
+                probe.connect(("192.0.2.1", 80))  # no traffic sent; picks the outbound iface
+                lan_ip = probe.getsockname()[0]
+            finally:
+                probe.close()
+        except OSError:
+            lan_ip = socket.gethostname()
+        return f"http://127.0.0.1:{port}/", f"http://{lan_ip}:{port}/"  # NOSONAR
+    url = f"http://{host}:{port}/"  # NOSONAR
+    return url, url
+
+
+def _make_server(outputpath: str, host: str, port: int) -> ThreadingHTTPServer:
+    """Build a static file server rooted at the report directory."""
+    handler = partial(SimpleHTTPRequestHandler, directory=outputpath)
+    return ThreadingHTTPServer((host, port), handler)
+
+
+def _serve_report(outputpath: str, host: str, port: int) -> int:
+    """Serve the generated report until interrupted. Returns an exit code."""
+    try:
+        server = _make_server(outputpath, host, port)
+    except OSError as e:
+        logger.error(f"Cannot serve on {host}:{port}: {e}")
+        return 1
+
+    bound_port = server.server_address[1]
+    local_url, network_url = _server_urls(host, bound_port)
+    network_line = network_url or "use --host 0.0.0.0 to expose"
+    print(f"\n  gitstats v{get_version()}  report ready\n")
+    print(f"  ➜  Local:    {local_url}")
+    print(f"  ➜  Network:  {network_line}\n")
+    print("  press Ctrl+C to stop\n")
+
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\n  stopped")
+    finally:
+        server.server_close()
+    return 0
 
 
 def _run_multi_repo(gitpaths: list, outputpath: str, extra_fmt=None) -> int:
@@ -1211,6 +1273,23 @@ def get_parser() -> argparse.ArgumentParser:
         choices=["json"],
         required=False,
         help="Generate additional output format",
+    )
+
+    parser.add_argument(
+        "--serve",
+        action="store_true",
+        help="After generating the report, serve it over HTTP until Ctrl+C",
+    )
+    parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="Address to bind the --serve server to (default: 127.0.0.1, local only; use 0.0.0.0 to expose)",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="Port for the --serve server (default: 8000; 0 picks a free port)",
     )
 
     logging_group = parser.add_mutually_exclusive_group()
@@ -1316,7 +1395,10 @@ def main() -> int:
     # Handle AI CLI arguments (CLI takes precedence over config)
     _apply_ai_args(conf, args)
 
-    return run(gitpath, outputpath, extra_fmt=extra_fmt)
+    exit_code = run(gitpath, outputpath, extra_fmt=extra_fmt)
+    if exit_code == 0 and args.serve:
+        return _serve_report(outputpath, args.host, args.port)
+    return exit_code
 
 
 if __name__ == "__main__":
