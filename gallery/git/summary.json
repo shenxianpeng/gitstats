@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.4.0.post1.dev12",
-  "generated_at": "2026-08-17T19:19:34+00:00",
+  "generated_by": "gitstats 2.5.0",
+  "generated_at": "2026-08-24T00:21:17+00:00",
   "name": "Git",
   "report_path": "index.html",
   "first_commit": "2005-04-07 22:13:13",
-  "last_commit": "2026-08-15 16:20:27",
-  "age_days": 7800,
-  "active_days": 7282,
-  "total_commits": 81925,
+  "last_commit": "2026-08-20 14:30:52",
+  "age_days": 7805,
+  "active_days": 7287,
+  "total_commits": 81966,
   "total_authors": 2341,
-  "active_authors_12mo": 210,
-  "commits_last_12mo": 3628,
-  "total_files": 4845,
-  "total_lines": 1622200,
-  "lines_added": 3822551,
-  "lines_removed": 2200351,
+  "active_authors_12mo": 208,
+  "commits_last_12mo": 3669,
+  "total_files": 4846,
+  "total_lines": 1623646,
+  "lines_added": 3824146,
+  "lines_removed": 2200500,
   "total_tags": 0,
   "era": "steady",
   "top_authors": [
     {
       "name": "Junio C Hamano",
-      "commits": 28475
+      "commits": 28483
     },
     {
       "name": "Jeff King",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Patrick Steinhardt",
-      "commits": 2337
+      "commits": 2348
     },
     {
       "name": "\u00c6var Arnfj\u00f6r\u00f0 Bjarmason",
@@ -41,13 +41,15 @@
     }
   ],
   "author_commits": {
-    "Junio C Hamano": 28475,
+    "Junio C Hamano": 28483,
     "Elijah Newren": 1237,
+    "Kristoffer Haugsbakk": 174,
+    "Patrick Steinhardt": 2348,
+    "Harald Nordgren": 30,
     "D. Ben Knoble": 29,
     "Christian Couder": 703,
     "Kenneth Lorber": 1,
     "Lucas Zamboni Orioli": 2,
-    "Kristoffer Haugsbakk": 161,
     "Nikolaus Schuetz": 1,
     "Jeff King": 4734,
     "Johannes Schindelin": 2500,
@@ -63,11 +65,9 @@
     "Calvin Wan": 26,
     "Jean-No\u00ebl Avila": 264,
     "\u00c9ric NICOLAS": 1,
-    "Harald Nordgren": 21,
     "Tian Yuchen": 26,
     "brian m. carlson": 936,
     "Sahitya Chandra": 2,
-    "Patrick Steinhardt": 2337,
     "Travor Liu": 1,
     "Kristofer Karlsson": 22,
     "Johannes Sixt": 606,
@@ -2405,6 +2405,6 @@
     "2023": 2835,
     "2024": 3967,
     "2025": 3491,
-    "2026": 2527
+    "2026": 2568
   }
 }

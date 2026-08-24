@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.4.0.post1.dev12",
-  "generated_at": "2026-08-17T19:42:10+00:00",
+  "generated_by": "gitstats 2.5.0",
+  "generated_at": "2026-08-24T00:47:12+00:00",
   "name": "Kubernetes",
   "report_path": "index.html",
   "first_commit": "2014-06-06 23:40:48",
-  "last_commit": "2026-08-17 13:26:19",
-  "age_days": 4455,
-  "active_days": 4408,
-  "total_commits": 140379,
+  "last_commit": "2026-08-20 15:28:25",
+  "age_days": 4458,
+  "active_days": 4411,
+  "total_commits": 140389,
   "total_authors": 4794,
-  "active_authors_12mo": 564,
-  "commits_last_12mo": 7876,
+  "active_authors_12mo": 556,
+  "commits_last_12mo": 7886,
   "total_files": 31300,
-  "total_lines": 7233334,
-  "lines_added": 27663971,
-  "lines_removed": 20430637,
+  "total_lines": 7233793,
+  "lines_added": 27664713,
+  "lines_removed": 20430920,
   "total_tags": 0,
   "era": "steady",
   "top_authors": [
@@ -33,7 +33,7 @@
     },
     {
       "name": "Jordan Liggitt",
-      "commits": 2190
+      "commits": 2191
     },
     {
       "name": "Tim Hockin",
@@ -41,18 +41,19 @@
     }
   ],
   "author_commits": {
+    "Kubernetes Release Robot": 306,
+    "Jordan Liggitt": 2191,
     "thc1006": 15,
     "Benjamin Elder": 453,
+    "Rajalakshmi Girish": 18,
     "Vyom Yadav": 1,
-    "Jordan Liggitt": 2190,
     "Maciej Szulik": 558,
     "Davanum Srinivas": 1077,
-    "Kubernetes Release Robot": 302,
     "Sergey Kanzhelev": 151,
+    "Damien Grisonnet": 39,
     "Maksim Korotkov": 1,
     "Hemant Kumar": 411,
     "Troy Chiu": 24,
-    "Damien Grisonnet": 38,
     "zylxjtu": 27,
     "xigang": 32,
     "Lucas K\u00e4ldstr\u00f6m": 387,
@@ -508,7 +509,6 @@
     "Angelos Kolaitis": 4,
     "Vikas": 3,
     "lucming": 5,
-    "Rajalakshmi-Girish": 17,
     "Kirsten Laskoski": 1,
     "Mike Spreitzer": 221,
     "Dev1622": 8,
@@ -4849,6 +4849,6 @@
     "2023": 7532,
     "2024": 7043,
     "2025": 7144,
-    "2026": 5514
+    "2026": 5524
   }
 }
