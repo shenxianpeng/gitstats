@@ -13,6 +13,7 @@ import time
 from typing import Any
 
 from gitstats import WEEKDAYS, get_i18n_text, load_config
+from gitstats.badge import create_badges
 from gitstats.utils import (
     format_int,
     get_git_version,
@@ -72,6 +73,9 @@ class HTMLReportCreator(ReportCreator):
             src = basedir + "/" + file
             if os.path.exists(src):
                 shutil.copyfile(src, path + "/" + file)
+
+        # shareable badges served alongside the report (see gitstats/badge.py)
+        create_badges(data, path)
 
         self.create_index_html(data, path)
         self.create_activity_html(data, path)

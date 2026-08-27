@@ -39,7 +39,15 @@
    :target: https://github.com/marketplace/actions/gitstats-action
    :alt: GitHub Marketplace
 
-|pypi-version| |python-versions| |python-download| |test-badge| |docs-badge| |contributors| |marketplace|
+.. |gitstats-report| image:: https://shenxianpeng.github.io/gitstats/badge.svg
+   :target: https://shenxianpeng.github.io/gitstats/
+   :alt: GitStats report
+
+.. |gitstats-last-commit| image:: https://shenxianpeng.github.io/gitstats/badges/last-commit.svg
+   :target: https://shenxianpeng.github.io/gitstats/
+   :alt: GitStats last commit
+
+|pypi-version| |python-versions| |python-download| |test-badge| |docs-badge| |contributors| |marketplace| |gitstats-report|
 
 ``$ gitstats``
 ===============
@@ -133,6 +141,101 @@ Automate your gitstats report generation with the official `GitStats Action <htt
 With just one ``uses`` line, the Action generates a full gitstats report and deploys it to GitHub Pages automatically.
 
 See the `gitstats-action repository <https://github.com/shenxianpeng/gitstats-action>`_ for detailed inputs, examples, and advanced usage (AI-powered reports, custom config, manual deploy, etc.).
+
+
+Share Your Report with a Badge
+------------------------------
+
+Every report ships with a ``badge.svg`` next to ``index.html`` — a
+shields.io-style badge in the gitstats brand colors that shows live
+repository data (commit count by default). Because the badge lives inside
+the report directory, wherever you host the report the badge is served from
+the same URL, and it refreshes automatically every time the report is
+regenerated.
+
+This repository eats its own dog food — these are live badges served from
+the `demo report <https://shenxianpeng.github.io/gitstats/>`_ (click one):
+
+|gitstats-report| |gitstats-last-commit|
+
+Embed it in your README so visitors can jump straight to the report:
+
+.. code-block:: markdown
+
+   [![GitStats](https://<your-report-url>/badge.svg)](https://<your-report-url>/)
+
+Or in reStructuredText:
+
+.. code-block:: rst
+
+   .. image:: https://<your-report-url>/badge.svg
+      :target: https://<your-report-url>/
+      :alt: GitStats report
+
+**Projects on GitHub** — the easiest path is the
+`GitStats Action <https://github.com/marketplace/actions/gitstats-action>`_
+with ``deploy-to-pages: true`` (see above). After the first run, the workflow's
+job summary contains ready-to-copy badge markdown pointing at your GitHub
+Pages report, e.g. ``https://<owner>.github.io/<repo>/badge.svg``.
+
+**Projects hosted elsewhere** — publish the report output directory with any
+static hosting you already use (GitLab Pages, Netlify, an internal web
+server, ...) and point the badge at it. For example, on GitLab CI:
+
+.. code-block:: yaml
+
+   pages:
+     script:
+       - pip install gitstats
+       - gitstats . public
+     artifacts:
+       paths:
+         - public
+
+then embed ``https://<group>.gitlab.io/<project>/badge.svg`` linking to
+``https://<group>.gitlab.io/<project>/``.
+
+Customizing the badge
+~~~~~~~~~~~~~~~~~~~~~
+
+Static hosting can't vary a file on ``?query`` parameters, so customization
+works through pre-rendered files and configuration instead.
+
+**Pick a metric by URL.** Alongside ``badge.svg``, every report contains a
+``badges/`` directory with one badge per metric — switching what the badge
+says is just switching the URL:
+
+- ``badges/commits.svg`` — ``1,234 commits``
+- ``badges/last-commit.svg`` — ``Aug 2026`` (date of the latest commit)
+- ``badges/authors.svg`` — ``12 authors``
+- ``badges/files.svg`` — ``245 files``
+- ``badges/lines.svg`` — ``44,025 lines``
+
+**Style with config keys.** The ``badge_*`` options control every generated
+badge (including which metric ``badge.svg`` itself shows):
+
+.. code-block:: bash
+
+   gitstats -c badge_metric=last-commit \
+            -c badge_label="my project" \
+            -c badge_color=green \
+            -c badge_style=flat-square . gitstats-report
+
+``badge_color`` accepts shields.io color names (``brightgreen``, ``green``,
+``yellow``, ``orange``, ``red``, ``blue``, ``lightgrey``), hex values like
+``#30a14e``, or any SVG color. ``badge_style`` is ``flat`` (rounded, subtle
+gradient) or ``flat-square`` (sharp corners, matching the report's angular
+terminal aesthetic).
+
+**Full shields.io customization.** Each metric is also exported as
+``badges/<metric>.json`` in the `shields.io endpoint schema
+<https://shields.io/badges/endpoint-badge>`_. Point shields at it and use
+any of their URL parameters — arbitrary colors, ``style=for-the-badge``,
+logos — while the data stays yours and stays live:
+
+.. code-block:: markdown
+
+   [![GitStats](https://img.shields.io/endpoint?url=https://<your-report-url>/badges/commits.json&style=for-the-badge&color=orange)](https://<your-report-url>/)
 
 
 What's New in v2.0.0

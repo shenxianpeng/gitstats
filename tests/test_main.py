@@ -620,7 +620,9 @@ class TestRunIntegration:
             assert os.path.exists(f"{output}/{page}.html")
         # Single-repo mode keeps the flat layout and adds a summary.json
         assert os.path.exists(f"{output}/summary.json")
-        assert not any(e.is_dir() for e in os.scandir(output) if e.name != ".ai_cache")
+        assert not any(
+            e.is_dir() for e in os.scandir(output) if e.name not in (".ai_cache", "badges")
+        )
 
     def test_run_with_json(self, git_repo, temp_dir):
         """run() with extra_fmt='json' should produce a JSON file."""
