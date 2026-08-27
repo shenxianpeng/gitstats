@@ -135,6 +135,53 @@ With just one ``uses`` line, the Action generates a full gitstats report and dep
 See the `gitstats-action repository <https://github.com/shenxianpeng/gitstats-action>`_ for detailed inputs, examples, and advanced usage (AI-powered reports, custom config, manual deploy, etc.).
 
 
+Share Your Report with a Badge
+------------------------------
+
+Every report ships with a ``badge.svg`` next to ``index.html`` — a
+shields.io-style badge in the gitstats brand colors that shows the
+repository's live commit count. Because the badge lives inside the report
+directory, wherever you host the report the badge is served from the same
+URL, and it refreshes automatically every time the report is regenerated.
+
+Embed it in your README so visitors can jump straight to the report:
+
+.. code-block:: markdown
+
+   [![GitStats](https://<your-report-url>/badge.svg)](https://<your-report-url>/)
+
+Or in reStructuredText:
+
+.. code-block:: rst
+
+   .. image:: https://<your-report-url>/badge.svg
+      :target: https://<your-report-url>/
+      :alt: GitStats report
+
+**Projects on GitHub** — the easiest path is the
+`GitStats Action <https://github.com/marketplace/actions/gitstats-action>`_
+with ``deploy-to-pages: true`` (see above). After the first run, the workflow's
+job summary contains ready-to-copy badge markdown pointing at your GitHub
+Pages report, e.g. ``https://<owner>.github.io/<repo>/badge.svg``.
+
+**Projects hosted elsewhere** — publish the report output directory with any
+static hosting you already use (GitLab Pages, Netlify, an internal web
+server, ...) and point the badge at it. For example, on GitLab CI:
+
+.. code-block:: yaml
+
+   pages:
+     script:
+       - pip install gitstats
+       - gitstats . public
+     artifacts:
+       paths:
+         - public
+
+then embed ``https://<group>.gitlab.io/<project>/badge.svg`` linking to
+``https://<group>.gitlab.io/<project>/``.
+
+
 What's New in v2.0.0
 --------------------
 

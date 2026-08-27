@@ -121,3 +121,21 @@ Use gitstats in Jenkins to generate reports and publish them to Jenkins server.
             }
         }
     }
+
+Add a report badge to your README
+---------------------------------
+
+Every generated report includes a ``badge.svg`` next to ``index.html`` — a
+shields.io-style badge in the gitstats brand colors showing the repository's
+live commit count. It is served from the same place as the report and
+refreshes automatically on every regeneration, so once the report is deployed
+(GitHub Pages, GitLab Pages, Jenkins, any static hosting) you can embed:
+
+.. code-block:: markdown
+
+   [![GitStats](https://<your-report-url>/badge.svg)](https://<your-report-url>/)
+
+For GitHub projects using the `GitStats Action
+<https://github.com/marketplace/actions/gitstats-action>`_ with
+``deploy-to-pages: true``, the workflow's job summary prints ready-to-copy
+badge markdown pointing at your GitHub Pages report.
