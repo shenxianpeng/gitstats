@@ -5,7 +5,6 @@ import xml.etree.ElementTree as ET
 
 from gitstats.badge import BADGE_FILENAME, create_badge_svg, render_badge
 
-
 # ── render_badge ─────────────────────────────────────────────────────────
 
 
