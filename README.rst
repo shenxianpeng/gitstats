@@ -139,10 +139,11 @@ Share Your Report with a Badge
 ------------------------------
 
 Every report ships with a ``badge.svg`` next to ``index.html`` — a
-shields.io-style badge in the gitstats brand colors that shows the
-repository's live commit count. Because the badge lives inside the report
-directory, wherever you host the report the badge is served from the same
-URL, and it refreshes automatically every time the report is regenerated.
+shields.io-style badge in the gitstats brand colors that shows live
+repository data (commit count by default). Because the badge lives inside
+the report directory, wherever you host the report the badge is served from
+the same URL, and it refreshes automatically every time the report is
+regenerated.
 
 Embed it in your README so visitors can jump straight to the report:
 
@@ -180,6 +181,48 @@ server, ...) and point the badge at it. For example, on GitLab CI:
 
 then embed ``https://<group>.gitlab.io/<project>/badge.svg`` linking to
 ``https://<group>.gitlab.io/<project>/``.
+
+Customizing the badge
+~~~~~~~~~~~~~~~~~~~~~
+
+Static hosting can't vary a file on ``?query`` parameters, so customization
+works through pre-rendered files and configuration instead.
+
+**Pick a metric by URL.** Alongside ``badge.svg``, every report contains a
+``badges/`` directory with one badge per metric — switching what the badge
+says is just switching the URL:
+
+- ``badges/commits.svg`` — ``1,234 commits``
+- ``badges/last-commit.svg`` — ``Aug 2026`` (date of the latest commit)
+- ``badges/authors.svg`` — ``12 authors``
+- ``badges/files.svg`` — ``245 files``
+- ``badges/lines.svg`` — ``44,025 lines``
+
+**Style with config keys.** The ``badge_*`` options control every generated
+badge (including which metric ``badge.svg`` itself shows):
+
+.. code-block:: bash
+
+   gitstats -c badge_metric=last-commit \
+            -c badge_label="my project" \
+            -c badge_color=green \
+            -c badge_style=flat-square . gitstats-report
+
+``badge_color`` accepts shields.io color names (``brightgreen``, ``green``,
+``yellow``, ``orange``, ``red``, ``blue``, ``lightgrey``), hex values like
+``#30a14e``, or any SVG color. ``badge_style`` is ``flat`` (rounded, subtle
+gradient) or ``flat-square`` (sharp corners, matching the report's angular
+terminal aesthetic).
+
+**Full shields.io customization.** Each metric is also exported as
+``badges/<metric>.json`` in the `shields.io endpoint schema
+<https://shields.io/badges/endpoint-badge>`_. Point shields at it and use
+any of their URL parameters — arbitrary colors, ``style=for-the-badge``,
+logos — while the data stays yours and stays live:
+
+.. code-block:: markdown
+
+   [![GitStats](https://img.shields.io/endpoint?url=https://<your-report-url>/badges/commits.json&style=for-the-badge&color=orange)](https://<your-report-url>/)
 
 
 What's New in v2.0.0

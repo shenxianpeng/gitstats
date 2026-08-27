@@ -30,6 +30,11 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "end_date": "",  # Ending date for commits, passed as --until to Git (optional). Format: YYYY-MM-DD.
     "authors": "",  # Comma-separated list of authors to filter commits (empty = include all authors).
     "exclude_exts": "",  # File extensions to exclude from line counting (others detected via null bytes).
+    # Shareable badge (badge.svg and badges/ in the report output)
+    "badge_metric": "commits",  # Metric shown by badge.svg: commits, last-commit, authors, files, lines.
+    "badge_label": "gitstats",  # Left-side badge text.
+    "badge_color": "",  # Value-segment color: shields name (green, orange, ...), hex, or any SVG color (empty = brand blue).
+    "badge_style": "flat",  # Badge shape: flat (rounded, subtle gradient) or flat-square (sharp corners).
     # AI-powered features
     "ai_enabled": False,  # Enable AI-powered summaries (requires AI provider configuration).
     "ai_provider": "openai",  # AI provider: openai, claude, gemini, ollama.

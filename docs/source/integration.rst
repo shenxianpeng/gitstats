@@ -126,14 +126,25 @@ Add a report badge to your README
 ---------------------------------
 
 Every generated report includes a ``badge.svg`` next to ``index.html`` — a
-shields.io-style badge in the gitstats brand colors showing the repository's
-live commit count. It is served from the same place as the report and
-refreshes automatically on every regeneration, so once the report is deployed
-(GitHub Pages, GitLab Pages, Jenkins, any static hosting) you can embed:
+shields.io-style badge in the gitstats brand colors showing live repository
+data (commit count by default). It is served from the same place as the
+report and refreshes automatically on every regeneration, so once the report
+is deployed (GitHub Pages, GitLab Pages, Jenkins, any static hosting) you
+can embed:
 
 .. code-block:: markdown
 
    [![GitStats](https://<your-report-url>/badge.svg)](https://<your-report-url>/)
+
+The report also contains a ``badges/`` directory with one pre-rendered badge
+per metric (``commits``, ``last-commit``, ``authors``, ``files``,
+``lines``) — pick a different metric by pointing at
+``badges/<metric>.svg``. The ``badge_metric``, ``badge_label``,
+``badge_color`` and ``badge_style`` config keys customize the label, color
+and shape, and ``badges/<metric>.json`` exposes each metric in the
+`shields.io endpoint schema <https://shields.io/badges/endpoint-badge>`_ for
+full URL-parameter customization via ``img.shields.io/endpoint``. See the
+README's "Share Your Report with a Badge" section for details.
 
 For GitHub projects using the `GitStats Action
 <https://github.com/marketplace/actions/gitstats-action>`_ with

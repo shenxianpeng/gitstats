@@ -19,6 +19,10 @@ You can create a ``gitstats.conf`` file in the current directory to customize th
 * ``end_date`` - Ending date for commits, passed as --until to Git (optional). Format: ``YYYY-MM-DD``. Default: ``""`` (empty).
 * ``authors`` - Comma-separated list of authors to filter commits. Only commits from these authors will be included (uses OR logic: commits from any of the listed authors). If empty, all authors are included. Default: ``""`` (empty).
 * ``exclude_exts`` - Comma-separated list of file extensions to exclude from line counting. If empty, no files are excluded. Files with null bytes in their content are automatically detected as binary and excluded from line counting. This detection occurs in addition to any extensions specified in exclude_exts. Default: ``""`` (empty).
+* ``badge_metric`` - Metric shown by the default ``badge.svg`` in the report output: ``commits``, ``last-commit``, ``authors``, ``files`` or ``lines``. All metrics are always pre-rendered in ``badges/<metric>.svg`` regardless of this choice. Default: ``commits``.
+* ``badge_label`` - Left-side text of the generated badges. Default: ``gitstats``.
+* ``badge_color`` - Value-segment color of the generated badges: a shields.io color name (``brightgreen``, ``green``, ``yellowgreen``, ``yellow``, ``orange``, ``red``, ``blue``, ``lightgrey``), a hex value like ``#30a14e``, or any SVG color. Default: ``""`` (gitstats brand blue).
+* ``badge_style`` - Badge shape: ``flat`` (rounded corners, subtle gradient) or ``flat-square`` (sharp corners). Default: ``flat``.
 
 Here is an example ``gitstats.conf`` file:
 
