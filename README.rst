@@ -39,7 +39,15 @@
    :target: https://github.com/marketplace/actions/gitstats-action
    :alt: GitHub Marketplace
 
-|pypi-version| |python-versions| |python-download| |test-badge| |docs-badge| |contributors| |marketplace|
+.. |gitstats-report| image:: https://shenxianpeng.github.io/gitstats/badge.svg
+   :target: https://shenxianpeng.github.io/gitstats/
+   :alt: GitStats report
+
+.. |gitstats-last-commit| image:: https://shenxianpeng.github.io/gitstats/badges/last-commit.svg
+   :target: https://shenxianpeng.github.io/gitstats/
+   :alt: GitStats last commit
+
+|pypi-version| |python-versions| |python-download| |test-badge| |docs-badge| |contributors| |marketplace| |gitstats-report|
 
 ``$ gitstats``
 ===============
@@ -144,6 +152,11 @@ repository data (commit count by default). Because the badge lives inside
 the report directory, wherever you host the report the badge is served from
 the same URL, and it refreshes automatically every time the report is
 regenerated.
+
+This repository eats its own dog food — these are live badges served from
+the `demo report <https://shenxianpeng.github.io/gitstats/>`_ (click one):
+
+|gitstats-report| |gitstats-last-commit|
 
 Embed it in your README so visitors can jump straight to the report:
 
