@@ -142,7 +142,7 @@ Automate your gitstats report generation with the official `GitStats Action <htt
 
 .. code-block:: yaml
 
-   - uses: shenxianpeng/gitstats-action@v0.1.1
+   - uses: shenxianpeng/gitstats-action@v1
      with:
        deploy-to-pages: true
 
