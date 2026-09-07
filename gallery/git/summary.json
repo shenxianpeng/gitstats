@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.6.0.post1.dev2",
-  "generated_at": "2026-08-31T04:23:09+00:00",
+  "generated_at": "2026-09-07T03:30:51+00:00",
   "name": "Git",
   "report_path": "index.html",
   "first_commit": "2005-04-07 22:13:13",
-  "last_commit": "2026-08-28 18:04:57",
-  "age_days": 7813,
-  "active_days": 7295,
-  "total_commits": 82085,
-  "total_authors": 2343,
+  "last_commit": "2026-09-02 16:21:59",
+  "age_days": 7818,
+  "active_days": 7299,
+  "total_commits": 82135,
+  "total_authors": 2345,
   "active_authors_12mo": 208,
-  "commits_last_12mo": 3788,
+  "commits_last_12mo": 3591,
   "total_files": 4849,
-  "total_lines": 1625598,
-  "lines_added": 3827059,
-  "lines_removed": 2201461,
+  "total_lines": 1626491,
+  "lines_added": 3828628,
+  "lines_removed": 2202137,
   "total_tags": 0,
   "era": "steady",
   "top_authors": [
     {
       "name": "Junio C Hamano",
-      "commits": 28517
+      "commits": 28533
     },
     {
       "name": "Jeff King",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Patrick Steinhardt",
-      "commits": 2358
+      "commits": 2375
     },
     {
       "name": "\u00c6var Arnfj\u00f6r\u00f0 Bjarmason",
@@ -41,15 +41,20 @@
     }
   ],
   "author_commits": {
-    "Junio C Hamano": 28517,
-    "Kristoffer Haugsbakk": 176,
+    "Junio C Hamano": 28533,
+    "Patrick Steinhardt": 2375,
+    "Kristoffer Haugsbakk": 177,
+    "Justin Tobler": 115,
+    "Yoichi NAKAYAMA": 5,
+    "Friel": 1,
     "Shlok Kulshreshtha": 7,
+    "Tian Yuchen": 27,
     "Colin Hinton": 1,
     "Swapnil Saste | INDIA": 1,
     "Elijah Newren": 1241,
     "Siddharth Shrimali": 17,
+    "Vincent Mailhol": 4,
     "Johannes Schindelin": 2527,
-    "Patrick Steinhardt": 2358,
     "Christian Couder": 716,
     "Kristofer Karlsson": 31,
     "Harald Nordgren": 31,
@@ -69,14 +74,12 @@
     "Calvin Wan": 26,
     "Jean-No\u00ebl Avila": 264,
     "\u00c9ric NICOLAS": 1,
-    "Tian Yuchen": 26,
     "brian m. carlson": 936,
     "Sahitya Chandra": 2,
     "Travor Liu": 1,
     "Johannes Sixt": 606,
     "Michael Montalbo": 21,
     "Marcelo Machado Lage": 2,
-    "Justin Tobler": 106,
     "Chen Linxuan": 3,
     "Taylor Blau": 934,
     "Gatla Vishweshwar Reddy": 1,
@@ -527,7 +530,6 @@
     "Rudy Rigot": 1,
     "Alison Winters": 2,
     "Paul Smith": 2,
-    "Yoichi Nakayama": 4,
     "Andreas Hasenack": 1,
     "Ronan Pigott": 2,
     "Vlad-Stefan Harbuz": 1,
@@ -2407,6 +2409,6 @@
     "2023": 2835,
     "2024": 3967,
     "2025": 3491,
-    "2026": 2687
+    "2026": 2737
   }
 }
