@@ -1,39 +1,39 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.6.0.post1.dev2",
-  "generated_at": "2026-09-07T03:30:51+00:00",
+  "generated_at": "2026-09-14T03:57:35+00:00",
   "name": "Git",
   "report_path": "index.html",
   "first_commit": "2005-04-07 22:13:13",
-  "last_commit": "2026-09-02 16:21:59",
-  "age_days": 7818,
-  "active_days": 7299,
-  "total_commits": 82135,
-  "total_authors": 2345,
-  "active_authors_12mo": 208,
-  "commits_last_12mo": 3591,
+  "last_commit": "2026-09-11 16:45:10",
+  "age_days": 7827,
+  "active_days": 7309,
+  "total_commits": 82209,
+  "total_authors": 2347,
+  "active_authors_12mo": 209,
+  "commits_last_12mo": 3665,
   "total_files": 4849,
-  "total_lines": 1626491,
-  "lines_added": 3828628,
-  "lines_removed": 2202137,
+  "total_lines": 1627277,
+  "lines_added": 3829842,
+  "lines_removed": 2202565,
   "total_tags": 0,
   "era": "steady",
   "top_authors": [
     {
       "name": "Junio C Hamano",
-      "commits": 28533
+      "commits": 28555
     },
     {
       "name": "Jeff King",
-      "commits": 4735
+      "commits": 4739
     },
     {
       "name": "Johannes Schindelin",
-      "commits": 2527
+      "commits": 2540
     },
     {
       "name": "Patrick Steinhardt",
-      "commits": 2375
+      "commits": 2376
     },
     {
       "name": "\u00c6var Arnfj\u00f6r\u00f0 Bjarmason",
@@ -41,34 +41,38 @@
     }
   ],
   "author_commits": {
-    "Junio C Hamano": 28533,
-    "Patrick Steinhardt": 2375,
+    "Junio C Hamano": 28555,
+    "Jeff King": 4739,
+    "Patrick Steinhardt": 2376,
+    "Johannes Schindelin": 2540,
+    "Johannes Sixt": 614,
+    "Hardik Kumar": 1,
+    "Harald Nordgren": 32,
+    "Toon Claes": 47,
+    "Elijah Newren": 1245,
+    "Yoichi NAKAYAMA": 10,
+    "Nikolaus Schuetz": 3,
+    "Ren\u00e9 Scharfe": 1400,
+    "Karthik Nayak": 253,
     "Kristoffer Haugsbakk": 177,
     "Justin Tobler": 115,
-    "Yoichi NAKAYAMA": 5,
     "Friel": 1,
+    "Lutz Lengemann": 1,
     "Shlok Kulshreshtha": 7,
     "Tian Yuchen": 27,
     "Colin Hinton": 1,
     "Swapnil Saste | INDIA": 1,
-    "Elijah Newren": 1241,
     "Siddharth Shrimali": 17,
     "Vincent Mailhol": 4,
-    "Johannes Schindelin": 2527,
     "Christian Couder": 716,
     "Kristofer Karlsson": 31,
-    "Harald Nordgren": 31,
     "Pablo Sabater": 31,
-    "Jeff King": 4735,
     "D. Ben Knoble": 29,
     "Kenneth Lorber": 1,
     "Lucas Zamboni Orioli": 2,
-    "Nikolaus Schuetz": 1,
     "David Lin": 2,
-    "Toon Claes": 44,
     "Ted Nyman": 8,
     "Phillip Wood": 370,
-    "Ren\u00e9 Scharfe": 1396,
     "Adrian Friedli": 1,
     "Eric Ju": 4,
     "Calvin Wan": 26,
@@ -77,12 +81,11 @@
     "brian m. carlson": 936,
     "Sahitya Chandra": 2,
     "Travor Liu": 1,
-    "Johannes Sixt": 606,
     "Michael Montalbo": 21,
     "Marcelo Machado Lage": 2,
+    "Gatla Vishweshwar Reddy": 2,
     "Chen Linxuan": 3,
     "Taylor Blau": 934,
-    "Gatla Vishweshwar Reddy": 1,
     "Henrique Ferreiro": 1,
     "Dominique Martinet": 1,
     "Shardul Natu": 3,
@@ -131,7 +134,6 @@
     "Greg Hurrell": 42,
     "Siddh Raman Pant": 1,
     "J\u00f6rg Thalheim": 3,
-    "Karthik Nayak": 249,
     "Philippe Blain": 159,
     "Ethan Dickson": 1,
     "Jonas Rebmann": 3,
@@ -2409,6 +2411,6 @@
     "2023": 2835,
     "2024": 3967,
     "2025": 3491,
-    "2026": 2737
+    "2026": 2811
   }
 }
