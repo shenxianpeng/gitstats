@@ -29,6 +29,7 @@ import json
 import logging
 import os
 from typing import Any
+from xml.sax.saxutils import escape, quoteattr
 
 from gitstats import load_config
 from gitstats.utils import format_int
@@ -134,7 +135,15 @@ def render_badge(label: str, value: str, color: str = "", style: str = "flat") -
     value_cx = (label_w + value_w / 2.0) * 10
     value_len = value_tw * 10
 
+    # Widths are measured on the raw text, but everything written into the
+    # SVG has to be escaped: a label like "R&D" or "<3" would otherwise
+    # produce a document no SVG renderer can parse.
     title = f"{label}: {value}"
+    aria_label = quoteattr(title)
+    title_text = escape(title)
+    label_text = escape(label)
+    value_text = escape(value)
+    value_bg = escape(value_bg, {'"': "&quot;"})
 
     bars = "".join(
         f'<rect x="{x}" y="{y}" width="3" height="{h}" rx="1" fill="{color}"/>'
@@ -152,8 +161,8 @@ def render_badge(label: str, value: str, color: str = "", style: str = "flat") -
         clip = f'<clipPath id="r"><rect width="{total_w:.0f}" height="20" rx="3" fill="#fff"/></clipPath>'
         clip_open = '<g clip-path="url(#r)">'
 
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{total_w:.0f}" height="20" role="img" aria-label="{title}">
-  <title>{title}</title>
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{total_w:.0f}" height="20" role="img" aria-label={aria_label}>
+  <title>{title_text}</title>
   <linearGradient id="s" x2="0" y2="100%">
     <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
     <stop offset="1" stop-opacity=".1"/>
@@ -166,10 +175,10 @@ def render_badge(label: str, value: str, color: str = "", style: str = "flat") -
   </g>
   <g transform="translate({icon_x},3.5)">{bars}</g>
   <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
-    <text aria-hidden="true" x="{label_cx:.0f}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="{label_len:.0f}">{label}</text>
-    <text x="{label_cx:.0f}" y="140" transform="scale(.1)" textLength="{label_len:.0f}">{label}</text>
-    <text aria-hidden="true" x="{value_cx:.0f}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="{value_len:.0f}">{value}</text>
-    <text x="{value_cx:.0f}" y="140" transform="scale(.1)" textLength="{value_len:.0f}">{value}</text>
+    <text aria-hidden="true" x="{label_cx:.0f}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="{label_len:.0f}">{label_text}</text>
+    <text x="{label_cx:.0f}" y="140" transform="scale(.1)" textLength="{label_len:.0f}">{label_text}</text>
+    <text aria-hidden="true" x="{value_cx:.0f}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="{value_len:.0f}">{value_text}</text>
+    <text x="{value_cx:.0f}" y="140" transform="scale(.1)" textLength="{value_len:.0f}">{value_text}</text>
   </g>
 </svg>
 """
