@@ -39,12 +39,12 @@
    :target: https://github.com/marketplace/actions/gitstats-action
    :alt: GitHub Marketplace
 
-.. |gitstats-report| image:: https://shenxianpeng.github.io/gitstats/badge.svg
-   :target: https://shenxianpeng.github.io/gitstats/
+.. |gitstats-report| image:: https://shenxianpeng.dev/gitstats/badge.svg
+   :target: https://shenxianpeng.dev/gitstats/
    :alt: GitStats report
 
-.. |gitstats-last-commit| image:: https://shenxianpeng.github.io/gitstats/badges/last-commit.svg
-   :target: https://shenxianpeng.github.io/gitstats/
+.. |gitstats-last-commit| image:: https://shenxianpeng.dev/gitstats/badges/last-commit.svg
+   :target: https://shenxianpeng.dev/gitstats/
    :alt: GitStats last commit
 
 |pypi-version| |python-versions| |python-download| |test-badge| |docs-badge| |contributors| |marketplace| |gitstats-report|
@@ -55,7 +55,7 @@
 📊 Generate insightful visual reports from Git.
 
 📘 Documentation: `gitstats.readthedocs.io <https://gitstats.readthedocs.io/>`_
-📊 GitStats Gallery: `shenxianpeng.github.io/gitstats/gallery/ <https://shenxianpeng.github.io/gitstats/gallery/>`_
+📊 GitStats Gallery: `shenxianpeng.dev/gitstats/gallery/ <https://shenxianpeng.dev/gitstats/gallery/>`_
 
 .. contents:: Table of Contents
    :depth: 2
@@ -65,9 +65,9 @@
 Example
 -------
 
-``gitstats .`` generates this `gitstats report <https://shenxianpeng.github.io/gitstats/index.html>`_.
+``gitstats .`` generates this `gitstats report <https://shenxianpeng.dev/gitstats/index.html>`_.
 
-Check out the `GitStats Gallery <https://shenxianpeng.github.io/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly.
+Check out the `GitStats Gallery <https://shenxianpeng.dev/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly.
 
 .. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/demo.gif
    :alt: gitstats terminal demo
@@ -162,7 +162,7 @@ the same URL, and it refreshes automatically every time the report is
 regenerated.
 
 This repository eats its own dog food — these are live badges served from
-the `demo report <https://shenxianpeng.github.io/gitstats/>`_ (click one):
+the `demo report <https://shenxianpeng.dev/gitstats/>`_ (click one):
 
 |gitstats-report| |gitstats-last-commit|
 

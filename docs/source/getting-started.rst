@@ -48,7 +48,7 @@ Where:
 
       gitstats . my-custom-report
 
-View a live example: https://shenxianpeng.github.io/gitstats/index.html
+View a live example: https://shenxianpeng.dev/gitstats/index.html
 
 
 Generate Report with JSON Output
