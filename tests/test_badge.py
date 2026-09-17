@@ -33,6 +33,15 @@ def test_render_badge_contains_label_and_value():
     assert "<title>gitstats: 1,234 commits</title>" in svg
 
 
+def test_render_badge_escapes_xml_special_characters():
+    svg = render_badge("R&D <core>", '5 "commits"')
+    root = ET.fromstring(svg)  # would raise on unescaped & or <
+    texts = {elem.text for elem in root.iter() if elem.text}
+    assert "R&D <core>" in texts
+    assert '5 "commits"' in texts
+    assert root.get("aria-label") == 'R&D <core>: 5 "commits"'
+
+
 def test_render_badge_width_grows_with_value():
     short = ET.fromstring(render_badge("gitstats", "9 commits"))
     long = ET.fromstring(render_badge("gitstats", "1,234,567 commits"))
