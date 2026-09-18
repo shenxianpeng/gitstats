@@ -270,6 +270,22 @@ def test_print_header():
     assert "<body>" in output
 
 
+def test_print_header_escapes_project_name():
+    # The project name defaults to the repository directory name, which can
+    # contain characters that are special in HTML.
+    creator = HTMLReportCreator()
+    creator.title = "R&D</title><script>alert(1)</script>"
+    f = StringIO()
+    creator.print_header(f)
+    output = f.getvalue()
+
+    assert "</title><script>" not in output
+    assert (
+        "<title>GitStats - R&amp;D&lt;/title&gt;&lt;script&gt;alert(1)&lt;/script&gt;</title>"
+        in output
+    )
+
+
 # ── HTMLReportCreator.print_nav ──────────────────────────────────────────
 
 
