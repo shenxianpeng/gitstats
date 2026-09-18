@@ -446,6 +446,30 @@ def test_create_tags_html(mock_data_collector, temp_dir):
     assert "Alice Smith" in html
 
 
+def test_create_tags_html_escapes_tag_names(mock_data_collector, temp_dir):
+    # "<svg/onload=alert(1)>" is a valid git ref name.
+    mock_data_collector.tags = {
+        "<svg/onload=alert(1)>": {
+            "date": "2023-02-20",
+            "commits": 1,
+            "authors": {"A&B": 1},
+            "hash": "abc123",
+            "stamp": 1677000000,
+        },
+    }
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_tags_html(mock_data_collector, temp_dir)
+
+    with open(f"{temp_dir}/tags.html", encoding="utf-8") as f:
+        html = f.read()
+
+    assert "<svg/onload" not in html
+    assert "&lt;svg/onload=alert(1)&gt;" in html
+    assert "A&amp;B (1)" in html
+
+
 # ── HTMLReportCreator.create_ai_insights_html ────────────────────────────
 
 

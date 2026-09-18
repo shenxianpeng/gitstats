@@ -102,7 +102,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Git Overview"))
 
         f.write("<table border='1' cellspacing='0' cellpadding='4'>")
-        f.write(f"<tr><td>Project Name</td><td>{data.project_name}</td></tr>")
+        f.write(f"<tr><td>Project Name</td><td>{html.escape(data.project_name)}</td></tr>")
         f.write(
             "<tr><td>Generated On</td><td>%s (in %d seconds)</td></tr>"
             % (
@@ -532,7 +532,7 @@ class HTMLReportCreator(ReportCreator):
             f.write(
                 "<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%d</td></tr>"
                 % (
-                    author,
+                    html.escape(author),
                     info["commits"],
                     info["commits_frac"],
                     info["lines_added"],
@@ -551,7 +551,7 @@ class HTMLReportCreator(ReportCreator):
             rest = allauthors[load_config()["max_authors"] :]
             max_list = load_config()["max_authors_list"]
             if len(rest) > max_list:
-                shown = ", ".join(rest[:max_list])
+                shown = ", ".join(html.escape(a) for a in rest[:max_list])
                 more = len(rest) - max_list
                 f.write(
                     f'<p class="moreauthors">These didn\'t make it to the top:'
@@ -560,7 +560,7 @@ class HTMLReportCreator(ReportCreator):
             else:
                 f.write(
                     '<p class="moreauthors">These didn\'t make it to the top: {}</p>'.format(
-                        ", ".join(rest)
+                        ", ".join(html.escape(a) for a in rest)
                     )
                 )
 
@@ -613,12 +613,14 @@ class HTMLReportCreator(ReportCreator):
             authors = get_keys_sorted_by_values(author_dict)
             authors.reverse()
             commits = data.author_of_month[yymm][authors[0]]
-            authors_str = ", ".join(authors[1 : load_config()["authors_top"] + 1])
+            authors_str = ", ".join(
+                html.escape(a) for a in authors[1 : load_config()["authors_top"] + 1]
+            )
             f.write(
                 "<tr><td>%s</td><td>%s</td><td>%d (%.2f%% of %d)</td><td>%s</td><td>%d</td></tr>"
                 % (
                     yymm,
-                    authors[0],
+                    html.escape(authors[0]),
                     commits,
                     (100.0 * commits) / data.commits_by_month[yymm],
                     data.commits_by_month[yymm],
@@ -639,12 +641,14 @@ class HTMLReportCreator(ReportCreator):
             authors = get_keys_sorted_by_values(author_dict)
             authors.reverse()
             commits = data.author_of_year[yy][authors[0]]
-            authors_str = ", ".join(authors[1 : load_config()["authors_top"] + 1])
+            authors_str = ", ".join(
+                html.escape(a) for a in authors[1 : load_config()["authors_top"] + 1]
+            )
             f.write(
                 "<tr><td>%s</td><td>%s</td><td>%d (%.2f%% of %d)</td><td>%s</td><td>%d</td></tr>"
                 % (
                     yy,
-                    authors[0],
+                    html.escape(authors[0]),
                     commits,
                     (100.0 * commits) / data.commits_by_year[yy],
                     data.commits_by_year[yy],
@@ -674,7 +678,7 @@ class HTMLReportCreator(ReportCreator):
             f.write(
                 "<tr><th>%s</th><td>%d (%.2f%%)</td></tr>"
                 % (
-                    domain,
+                    html.escape(domain),
                     info["commits"],
                     (100.0 * info["commits"] / data.get_total_commits()),
                 )
@@ -781,7 +785,7 @@ class HTMLReportCreator(ReportCreator):
             f.write(
                 "<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d (%.2f%%)</td><td>%d</td></tr>"
                 % (
-                    ext,
+                    html.escape(ext),
                     files,
                     (100.0 * files) / data.get_total_files(),
                     lines,
@@ -897,15 +901,15 @@ class HTMLReportCreator(ReportCreator):
                 authors_shown = authors_reversed[:max_tags_authors]
                 remaining = len(authors_reversed) - max_tags_authors
                 for i in authors_shown:
-                    authorinfo.append("%s (%d)" % (i, data.tags[tag]["authors"][i]))
+                    authorinfo.append("%s (%d)" % (html.escape(i), data.tags[tag]["authors"][i]))
                 authorinfo.append("<em>and %d more authors</em>" % remaining)
             else:
                 for i in authors_reversed:
-                    authorinfo.append("%s (%d)" % (i, data.tags[tag]["authors"][i]))
+                    authorinfo.append("%s (%d)" % (html.escape(i), data.tags[tag]["authors"][i]))
             f.write(
                 "<tr><td>%s</td><td>%s</td><td>%d</td><td>%s</td></tr>"
                 % (
-                    tag,
+                    html.escape(tag),
                     data.tags[tag]["date"],
                     data.tags[tag]["commits"],
                     ", ".join(authorinfo),
