@@ -152,6 +152,19 @@ class TestGitDataCollectorIntegration:
         assert "Bob Jones" in dc.authors
         assert dc.authors["Alice Smith"]["commits"] > 0
 
+    def test_collect_without_matching_commits(self, git_repo):
+        import gitstats
+
+        gitstats._config["start_date"] = "2099-01-01"
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(git_repo)
+            with pytest.raises(RuntimeError, match="No commits to analyze"):
+                dc.collect(git_repo)
+        finally:
+            os.chdir(prevdir)
+
     def test_collect_tags(self, git_repo):
         dc = GitDataCollector()
         prevdir = os.getcwd()
