@@ -941,6 +941,29 @@ def test_main_with_config_override(git_repo_minimal, temp_dir):
     assert gitstats.main.conf["max_authors"] == 10
 
 
+def test_main_with_negative_config_override(git_repo_minimal, temp_dir):
+    """-c max_tags_authors=-1 (no limit) must reach the report as an integer."""
+    import gitstats
+    import gitstats.main
+    import gitstats.report_creator
+
+    cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
+    gitstats._config = cfg
+    gitstats.main.conf = cfg
+    gitstats.report_creator.conf = cfg
+
+    import sys
+
+    output = os.path.join(temp_dir, "report")
+
+    with patch.object(
+        sys, "argv", ["gitstats", "-c", "max_tags_authors=-1", git_repo_minimal, output]
+    ):
+        ret = main()
+    assert ret == 0
+    assert gitstats.main.conf["max_tags_authors"] == -1
+
+
 # ── --serve preview server ───────────────────────────────────────────────
 
 
