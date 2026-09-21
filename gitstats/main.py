@@ -541,6 +541,13 @@ class GitDataCollector(DataCollector):
             .strip()
             .split("\n")
         )
+        revlines = [line for line in revlines if line.strip()]
+        if not revlines:
+            raise RuntimeError(
+                "No commits to analyze. The repository is empty, or no commit"
+                " matches the configured start_date, end_date, authors or"
+                " commit range."
+            )
         lines = []
         revs_to_read = []
         time_rev_count = []
