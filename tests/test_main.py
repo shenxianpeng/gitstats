@@ -2,6 +2,7 @@
 
 import datetime
 import os
+import subprocess
 from unittest.mock import patch
 
 import pytest
@@ -182,6 +183,43 @@ class TestGitDataCollectorIntegration:
         t = dc.tags["v1.0.0"]
         assert t["commits"] > 0
         assert len(t["authors"]) > 0
+
+    def test_collect_tags_counts_commits_since_previous_tag(self, git_repo):
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(git_repo)
+            dc.collect(git_repo)
+        finally:
+            os.chdir(prevdir)
+
+        # v1.0.0 tags the first two commits, v1.1.0 the next two; the fifth
+        # commit is untagged and must not be counted in either
+        assert dc.tags["v1.0.0"]["commits"] == 2
+        assert dc.tags["v1.1.0"]["commits"] == 2
+
+    def test_collect_annotated_tags(self, git_repo):
+        subprocess.run(
+            ["git", "tag", "-a", "v2.0.0", "-m", "release 2.0.0"],
+            cwd=git_repo,
+            check=True,
+            capture_output=True,
+            env={
+                **os.environ,
+                "GIT_COMMITTER_NAME": "Test",
+                "GIT_COMMITTER_EMAIL": "test@example.com",
+            },
+        )
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(git_repo)
+            dc.collect(git_repo)
+        finally:
+            os.chdir(prevdir)
+
+        assert "v2.0.0" in dc.tags
+        assert dc.tags["v2.0.0"]["commits"] == 1
 
     def test_collect_activity_by_hour(self, git_repo):
         dc = GitDataCollector()

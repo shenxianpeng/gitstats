@@ -259,17 +259,26 @@ class GitDataCollector(DataCollector):
         tag_commits = get_pipe_output([f"git rev-list {log_range}"]).strip().split("\n")
         tag_commits_set = set(tag_commits) if tag_commits[0] else set()
 
-        lines = get_pipe_output(["git show-ref --tags"]).split("\n")
+        # An annotated tag is listed with the hash of the tag object; --dereference
+        # adds a "<tag>^{}" line with the commit it points to, which is the one
+        # that can be found in the commit range.
+        tag_hashes: dict[str, str] = {}
+        lines = get_pipe_output(["git show-ref --tags --dereference"]).split("\n")
         for line in lines:
             if len(line) == 0:
                 continue
-            (hash, tag) = line.split(" ")
+            (hash, ref) = line.split(" ", 1)
+            tag = ref.replace("refs/tags/", "")
+            if tag.endswith("^{}"):
+                tag_hashes[tag[: -len("^{}")]] = hash
+            else:
+                tag_hashes.setdefault(tag, hash)
 
+        for tag, hash in tag_hashes.items():
             # Only include tags whose commit is in our range
             if hash not in tag_commits_set:
                 continue
 
-            tag = tag.replace("refs/tags/", "")
             output = get_pipe_output([f'git log "{hash}" --pretty=format:"%at %aN" -n 1'])
             if len(output) > 0:
                 parts = output.split(" ")
@@ -294,24 +303,24 @@ class GitDataCollector(DataCollector):
         ]
         prev = None
         for tag in reversed(tags_sorted_by_date_desc):
-            # Modify command to only include commits within our range
-            cmd = f'git shortlog -s "{tag}"'
+            cmd = f'git log --format="%H %aN" "{tag}"'
             if prev is not None:
                 cmd += f' "^{prev}"'
-            # Intersect with our commit range and apply filters
-            cmd += f" {log_range}"
             output = get_pipe_output([cmd])
-            if len(output) == 0:
-                continue
-            prev = tag
+            # Keep the commits of our range, which also applies the date and
+            # author filters. Adding the range to the command instead would
+            # add its commits to the tag's, not intersect with them.
+            counts: dict[str, int] = {}
             for line in output.split("\n"):
                 if len(line.strip()) == 0:
                     continue
-                parts = re.split(r"\s+", line, 2)
-                if len(parts) < 3:
-                    continue
-                commits = int(parts[1])
-                author = parts[2]
+                commit, author = line.split(" ", 1)
+                if commit in tag_commits_set:
+                    counts[author] = counts.get(author, 0) + 1
+            if not counts:
+                continue
+            prev = tag
+            for author, commits in counts.items():
                 self.tags[tag]["commits"] += commits
                 self.tags[tag]["authors"][author] = commits
 
