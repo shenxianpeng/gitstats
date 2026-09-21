@@ -296,6 +296,8 @@ Contributing
 
 As an open source project, gitstats welcomes contributions of all forms.
 
+Thanks to all contributors:
+
 .. image:: https://contrib.rocks/image?repo=shenxianpeng/gitstats
    :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
    :alt: Contributors
