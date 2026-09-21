@@ -31,10 +31,6 @@
    :target: https://gitstats.readthedocs.io/
    :alt: Documentation
 
-.. |contributors| image:: https://img.shields.io/github/contributors/shenxianpeng/gitstats
-   :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
-   :alt: GitHub contributors
-
 .. |marketplace| image:: https://img.shields.io/badge/GitHub_Marketplace-gitstats--action-blue.svg
    :target: https://github.com/marketplace/actions/gitstats-action
    :alt: GitHub Marketplace
@@ -47,7 +43,7 @@
    :target: https://shenxianpeng.dev/gitstats/
    :alt: GitStats last commit
 
-|pypi-version| |python-versions| |python-download| |test-badge| |docs-badge| |contributors| |marketplace| |gitstats-report|
+|pypi-version| |python-versions| |test-badge| |docs-badge| |marketplace| |gitstats-report|
 
 ``$ gitstats``
 ===============
@@ -299,6 +295,10 @@ Contributing
 ------------
 
 As an open source project, gitstats welcomes contributions of all forms.
+
+.. image:: https://contrib.rocks/image?repo=shenxianpeng/gitstats
+   :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
+   :alt: Contributors
 
 ----
 
