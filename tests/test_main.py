@@ -734,6 +734,22 @@ class TestRunIntegration:
         # Per-repo pages must not leak into the output root
         assert not os.path.exists(f"{output}/activity.html")
 
+    def test_run_missing_repository_path(self, temp_dir, caplog):
+        """A git path that does not exist is a FATAL error, not a traceback."""
+        import gitstats
+        import gitstats.main
+
+        cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
+        gitstats._config = cfg
+        gitstats.main.conf = cfg
+
+        missing = os.path.join(temp_dir, "missing")
+        output = os.path.join(temp_dir, "report")
+        ret = run([missing], output)
+
+        assert ret == 1
+        assert "Git path is not a directory" in caplog.text
+
     def test_run_multi_repo_tolerates_failure(self, git_repo, temp_dir):
         """One broken repo is reported on the portfolio page, not fatal."""
         import gitstats

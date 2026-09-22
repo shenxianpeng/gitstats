@@ -1016,6 +1016,9 @@ def _run_single_repo(
     Returns:
         the populated collector
     """
+    if not os.path.isdir(gitpath):
+        raise RuntimeError(f"Git path is not a directory: {gitpath}")
+
     outputpath = _prepare_output_dir(outputpath)
     if not os.path.isdir(outputpath):
         raise RuntimeError(f"Output path is not a directory: {outputpath}")
