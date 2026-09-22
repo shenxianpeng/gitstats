@@ -16,7 +16,7 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from multiprocessing import Pool
 from typing import Any
 
-from gitstats import exectime_external, load_config, time_start
+from gitstats import exectime_external, load_config, parse_config_value, time_start
 from gitstats.aggregate import (
     AggregateReportCreator,
     _slugify_repo,
@@ -1365,13 +1365,8 @@ def _apply_config_from_args(conf: dict, args) -> None:
             raise ValueError("Config must be in the form key=value")
         if key not in conf:
             raise KeyError(f'No such key "{key}" in config')
-        # Convert numeric strings to integers to match config file behavior
-        if value.isdigit():
-            conf[key] = int(value)
-        elif value.lower() in ("true", "false"):
-            conf[key] = value.lower() == "true"
-        else:
-            conf[key] = value
+        # Convert the value the same way as the config file does
+        conf[key] = parse_config_value(value)
 
 
 def _apply_ai_args(conf: dict, args) -> None:

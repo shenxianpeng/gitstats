@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import platform
+import re
 import time
 from typing import Any
 
@@ -182,6 +183,19 @@ def get_i18n_text(key: str, language: str = "en") -> str:
     return translations.get(key, AI_INSIGHTS_I18N["en"].get(key, key))
 
 
+def parse_config_value(value: str) -> Any:
+    """Convert a config value from the config file or ``-c key=value``.
+
+    Integers, including negative ones such as ``max_tags_authors = -1``, become
+    ``int`` and ``true``/``false`` become ``bool``; anything else stays a string.
+    """
+    if re.fullmatch(r"-?\d+", value):
+        return int(value)
+    if value.lower() in ("true", "false"):
+        return value.lower() == "true"
+    return value
+
+
 def load_config(file_path: str = "gitstats.conf") -> dict[str, Any]:
     """Load configuration from a file, or fall back to defaults."""
     import configparser
@@ -198,11 +212,5 @@ def load_config(file_path: str = "gitstats.conf") -> dict[str, Any]:
     if os.path.exists(file_path):
         config_parser.read(file_path)
         for k, v in config_parser["gitstats"].items():
-            # Convert to appropriate type
-            if v.isdigit():
-                _config[k] = int(v)
-            elif v.lower() in ("true", "false"):
-                _config[k] = v.lower() == "true"
-            else:
-                _config[k] = v
+            _config[k] = parse_config_value(v)
     return _config
