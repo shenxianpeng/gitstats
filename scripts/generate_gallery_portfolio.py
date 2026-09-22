@@ -29,12 +29,20 @@ def load_gallery_summaries(gallery_root: str) -> list[dict]:
     summaries = []
     for entry in sorted(os.listdir(base)):
         summary_file = os.path.realpath(os.path.join(base, os.path.basename(entry), "summary.json"))
-        if os.path.commonpath([base, summary_file]) != base:
+        try:
+            inside_base = os.path.commonpath([base, summary_file]) == base
+        except ValueError:
+            # e.g. a symlink that resolves onto a different drive on Windows,
+            # or a UNC path mixed with a local one: not inside base either way
+            inside_base = False
+        if not inside_base or not os.path.isfile(summary_file):
             continue
-        if not os.path.isfile(summary_file):
+        try:
+            with open(summary_file, encoding="utf-8") as f:
+                summary = json.load(f)
+        except (OSError, ValueError) as error:
+            print(f"Skipping unreadable summary: {summary_file} ({error})", file=sys.stderr)
             continue
-        with open(summary_file, encoding="utf-8") as f:
-            summary = json.load(f)
         summary["report_path"] = f"{entry}/index.html"
         if not summary.get("name"):
             summary["name"] = entry

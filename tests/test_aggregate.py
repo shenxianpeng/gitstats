@@ -118,6 +118,28 @@ class TestSummaryIO:
     def test_load_missing_root(self, temp_dir):
         assert load_repo_summaries(os.path.join(temp_dir, "nope")) == []
 
+    def test_load_skips_entry_that_commonpath_cannot_compare(self, temp_dir, monkeypatch):
+        # A symlinked entry whose realpath lands on a different drive (or any
+        # path commonpath() cannot compare to base) must be skipped, not
+        # crash the whole call: os.path.commonpath() raises ValueError for
+        # that case, which is not an OSError.
+        repo_dir = os.path.join(temp_dir, "good")
+        os.makedirs(repo_dir)
+        write_repo_summary({"schema_version": 1, "name": "good"}, repo_dir)
+        os.makedirs(os.path.join(temp_dir, "outside_link"))
+
+        real_realpath = os.path.realpath
+
+        def fake_realpath(path):
+            if "outside_link" in path and path.endswith("summary.json"):
+                return r"D:\outside\summary.json"
+            return real_realpath(path)
+
+        monkeypatch.setattr(os.path, "realpath", fake_realpath)
+
+        summaries = load_repo_summaries(temp_dir)
+        assert [s["name"] for s in summaries] == ["good"]
+
 
 # ── AggregateReportCreator ───────────────────────────────────────────────
 
