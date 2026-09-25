@@ -60,6 +60,14 @@
 	--chart-text: #656363;
 	--chart-grid: #e6e5e4;
 
+	/* Multi-series charts (e.g. the top authors) — at least 3:1 on --bg-color */
+	--series-1: #5b8dee;
+	--series-2: #1a7f37;
+	--series-3: #cf222e;
+	--series-4: #8250df;
+	--series-5: #e16f24;
+	--series-6: #0550ae;
+
 	/* Heatmap — GitHub green scale (user preference) */
 	--heat0-bg: #ebedf0;
 	--heat0-color: #1f2328;
@@ -103,6 +111,14 @@
 
 	--chart-text: #b7b1b1;
 	--chart-grid: #3d3838;
+
+	/* Brighter series colors for the dark background (4.9:1 and up) */
+	--series-1: #6ca4f8;
+	--series-2: #3fb950;
+	--series-3: #f85149;
+	--series-4: #a371f7;
+	--series-5: #f0883e;
+	--series-6: #79c0ff;
 
 	/* Heatmap dark — GitHub dark green, empty cells in the page's warm grey */
 	--heat0-bg: #2d2929;

@@ -175,10 +175,16 @@ def test_render_chartjs_multi_dataset():
         ],
     )
     # Multiple datasets: legend displayed
-    assert "legend: { display: true }" in result
-    # Colors should be assigned
-    assert "#5b8dee" in result
-    assert "#1a7f37" in result
+    assert "legend: { display: true, labels: {" in result
+    # Series colors come from CSS variables, so they follow the theme
+    assert (
+        "\"borderColor\": getCSSVar('--series-1'), \"backgroundColor\": getCSSVar('--series-1') + '33'"
+        in result
+    )
+    assert "getCSSVar('--series-2')" in result
+    assert '"series": 2' in result
+    # Line charts show a line sample in the legend
+    assert "usePointStyle: true, pointStyle: 'line'" in result
     # Line-specific properties
     assert "borderWidth" in result
     assert "pointRadius" in result
@@ -908,7 +914,7 @@ def test_render_chartjs_highlight_top_series():
     result = creator._render_chartjs("chart-hl", "line", ["X"], datasets, highlight=5)
     # The first 5 keep distinct colors; the rest are grey and drawn behind
     assert result.count(HTMLReportCreator.OTHER_SERIES_COLOR) == 4  # border + background x 2
-    assert '"label": "A4", "data": [4], "borderColor": "#e16f24"' in result
+    assert '"label": "A4", "data": [4], "borderColor": getCSSVar(\'--series-5\')' in result
     assert '"label": "A5", "data": [5], "borderColor": "rgba(128, 128, 128, 0.45)"' in result
     # Only the highlighted series are listed in the legend
     assert "filter: function(item) { return item.datasetIndex < 5; }" in result

@@ -105,6 +105,11 @@ CHART_SCRIPT = """<script>
 		const bar = getCSSVar('--bar-color');
 		chart.data.datasets.forEach(function(ds) {
 			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
 		});
 	}
 
@@ -1795,7 +1800,9 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-    CHART_COLORS = ["#5b8dee", "#1a7f37", "#cf222e", "#8250df", "#e16f24", "#0550ae"]
+    # Multi-series colors are the CSS variables --series-1 .. --series-6, so
+    # they switch with the theme (see applyChartTheme)
+    SERIES_COLORS = 6
     # Series outside the highlighted top N: a neutral grey readable on both themes
     OTHER_SERIES_COLOR = "rgba(128, 128, 128, 0.45)"
 
@@ -1837,7 +1844,7 @@ class HTMLReportCreator(ReportCreator):
 
         js_datasets = []
         for i, ds in enumerate(datasets):
-            color = self.CHART_COLORS[i % len(self.CHART_COLORS)]
+            series = i % self.SERIES_COLORS + 1
             entry = dict(ds)
             if is_multi and highlight is not None and i >= highlight:
                 entry.setdefault("borderColor", self.OTHER_SERIES_COLOR)
@@ -1847,8 +1854,9 @@ class HTMLReportCreator(ReportCreator):
                 entry.setdefault("borderWidth", 1)
                 entry.setdefault("order", 1)  # higher order is drawn first, i.e. behind
             elif is_multi:
-                entry.setdefault("borderColor", color)
-                entry.setdefault("backgroundColor", color + "33")
+                entry.setdefault("borderColor", f"__CSS_SERIES_{series}__")
+                entry.setdefault("backgroundColor", f"__CSS_SERIES_{series}_FILL__")
+                entry["series"] = series
                 entry.setdefault("fill", False)
                 entry.setdefault("tension", 0.1)
                 entry.setdefault("pointRadius", 0)
@@ -1873,16 +1881,25 @@ class HTMLReportCreator(ReportCreator):
             labels = [int(stamp) * 1000 for stamp in labels]
         labels_json = json.dumps(labels).replace("</", "<\\/")
         datasets_json = json.dumps(js_datasets).replace("</", "<\\/")
-        # Replace quoted placeholder with JS expression
+        # Replace quoted placeholders with JS expressions
         datasets_json = datasets_json.replace('"__CSS_BAR_COLOR__"', "getCSSVar('--bar-color')")
+        for n in range(1, self.SERIES_COLORS + 1):
+            datasets_json = datasets_json.replace(
+                f'"__CSS_SERIES_{n}__"', f"getCSSVar('--series-{n}')"
+            ).replace(f'"__CSS_SERIES_{n}_FILL__"', f"getCSSVar('--series-{n}') + '33'")
 
         legend_display = "true" if is_multi else "false"
+        legend_labels = []
+        if is_multi and chart_type == "line":
+            # a short line in the series color, clearer than a faint filled box
+            legend_labels.append("usePointStyle: true, pointStyle: 'line'")
         if is_multi and highlight is not None:
             # Legend lists only the highlighted series
-            legend_display += (
-                ", labels: { filter: function(item) { return item.datasetIndex < %d; } }"
-                % highlight
+            legend_labels.append(
+                "filter: function(item) { return item.datasetIndex < %d; }" % highlight
             )
+        if legend_labels:
+            legend_display += ", labels: { " + ", ".join(legend_labels) + " }"
         if time_axis:
             # pair each value with its timestamp: {x, y} points on a linear axis
             data_js = f"""datasets: (function(xs, sets) {{
