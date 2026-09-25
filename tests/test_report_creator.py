@@ -1,6 +1,7 @@
 """Tests for gitstats.report_creator – HTML generation, helpers, chart rendering."""
 
 import os
+import re
 from io import StringIO
 
 import pytest
@@ -750,6 +751,28 @@ def test_create_activity_html(mock_data_collector, temp_dir):
         assert f'<span id="{anchor}"></span>' in html
     assert html.index('id="yearly_activity"') < html.index('id="commits_by_year"')
     assert html.index('id="hour_of_week"') < html.index('id="punch_card"')
+
+
+def test_activity_summary_and_section_links(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_activity_html(mock_data_collector, temp_dir)
+    with open(f"{temp_dir}/activity.html", encoding="utf-8") as f:
+        html = f.read()
+
+    # 50 commits, 4 active days, streak 4, busiest hour 14 (15 commits), busiest day Wed (12)
+    assert (
+        '<h1>Activity</h1><p class="page-meta">50 commits &middot; 4 active days &middot; '
+        "longest streak 4 days &middot; busiest hour 14:00 &middot; busiest day Wednesday</p>"
+    ) in html
+    # Every "On this page" link points at a section heading on the page
+    toc = re.search(r'<nav class="page-toc" aria-label="On this page">(.*?)</nav>', html).group(1)
+    targets = re.findall(r'href="#([^"]+)"', toc)
+    assert len(targets) == 6
+    for target in targets:
+        assert f'<h2 id="{target}">' in html, target
+    assert "Longest Streak:" not in html  # folded into the summary line
 
 
 def test_activity_punch_card(mock_data_collector, temp_dir):

@@ -483,8 +483,7 @@ class HTMLReportCreator(ReportCreator):
         self.print_nav(f, "activity.html")
         f.write("<h1>Activity</h1>")
 
-        # Streak summary
-        self._write_streak_summary(f, data)
+        self._write_activity_intro(f, data)
 
         # From the long view down to the daily rhythm
         self._write_commits_by_year_section(f, data)
@@ -498,14 +497,40 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-    def _write_streak_summary(self, f, data) -> None:
-        """Write streak summary paragraph."""
-        longest_streak = data.get_longest_streak()
-        if longest_streak > 0:
-            f.write(
-                "<p><strong>Longest Streak:</strong> %d consecutive active days. "
-                "A long streak indicates sustained development momentum.</p>" % longest_streak
-            )
+    # The Activity page's sections, in page order, for its "On this page" links
+    ACTIVITY_SECTIONS = (
+        ("Commits by Year", "By year"),
+        ("Commits by year/month", "By month"),
+        ("Weekly activity", "Last weeks"),
+        ("Punch Card", "Punch card"),
+        ("Month of Year", "Month of year"),
+        ("Commits by Timezone", "Timezones"),
+    )
+
+    def _write_activity_intro(self, f, data) -> None:
+        """A one-line summary of the page's numbers, then links to its sections."""
+        full_days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        streak = data.get_longest_streak()
+        hours = data.get_activity_by_hour_of_day()
+        days = data.get_activity_by_day_of_week()
+        parts = [
+            f"{format_int(data.get_total_commits())} commits",
+            f"{format_int(len(data.get_active_days()))} active days",
+            f"longest streak {streak} day{'' if streak == 1 else 's'}",
+        ]
+        if hours:
+            parts.append(f"busiest hour {max(hours, key=lambda h: (hours[h], -h)):02d}:00")
+        if days:
+            parts.append(f"busiest day {full_days[max(days, key=lambda d: (days[d], -d))]}")
+        f.write('<p class="page-meta">' + " &middot; ".join(parts) + "</p>")
+        links = "".join(
+            f'<a href="#{html_linkify(title)}">{label}</a>'
+            for title, label in self.ACTIVITY_SECTIONS
+        )
+        f.write(
+            '<nav class="page-toc" aria-label="On this page">'
+            f"<span>On this page</span>{links}</nav>"
+        )
 
     def _write_weekly_activity_section(self, f, data) -> None:
         """Write weekly activity section with chart."""

@@ -168,6 +168,33 @@ dd {
 	color: var(--text-secondary);
 }
 
+/* "On this page" links to a long page's sections */
+.page-toc {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-2);
+	margin: calc(-1 * var(--space-3)) 0 var(--space-5);
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+}
+
+.page-toc > span {
+	margin-right: var(--space-1);
+	color: var(--text-secondary);
+}
+
+.page-toc a {
+	padding: 2px var(--space-2);
+	border: 1px solid var(--border-color);
+	color: var(--text-color);
+}
+
+.page-toc a:hover {
+	border-color: var(--border-strong);
+	text-decoration: none;
+}
+
 .chart-note {
 	margin: 0;
 	font-size: var(--font-size-sm);
