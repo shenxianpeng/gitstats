@@ -886,6 +886,31 @@ def test_create_copies_static_files(mock_data_collector, temp_dir):
 
     for fname in ("sortable.js", "chart.umd.min.js", "gitstats.css"):
         assert os.path.exists(f"{temp_dir}/{fname}"), f"Missing static file: {fname}"
+    # Sort arrows are drawn by CSS now; the old GIFs are no longer shipped
+    assert not any(name.endswith(".gif") for name in os.listdir(temp_dir))
+    with open(f"{temp_dir}/sortable.js", "rb") as f:
+        sortable = f.read()
+    assert b"<img" not in sortable
+    assert b'data-sort="none"' in sortable
+
+
+def test_small_formatting_fixes(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+
+    def page(name):
+        with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
+            return f.read()
+
+    # Author span is compact, with the exact day count on hover (Alice: 150 days)
+    assert '<td class="nowrap" title="150 days">5 mo</td>' in page("authors.html")
+    # Average file size in readable units (50000 bytes / 25 files)
+    assert "<dt>Average file size</dt><dd>2.0 KB</dd>" in page("files.html")
+    # Timezone cells carry one "heat" class, not "heat heat heatN"
+    activity = page("activity.html")
+    assert "heat heat heat" not in activity
+    assert '<td class="heat heat4">30</td>' in activity
+    # Tag names and dates don't wrap
+    assert '<td class="nowrap">v1.0.0</td>' in page("tags.html")
 
 
 # ── Code ownership ───────────────────────────────────────────────────────

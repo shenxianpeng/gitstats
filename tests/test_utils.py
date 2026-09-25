@@ -1,10 +1,14 @@
 """Tests for gitstats.utils – pure logic and git helper functions."""
 
+import datetime
+
 import pytest
 
 from gitstats.utils import (
     count_lines_in_text,
     filter_lines_by_pattern,
+    format_bytes,
+    format_duration,
     format_int,
     get_commit_range,
     get_excluded_extensions,
@@ -228,3 +232,35 @@ def test_format_int_numeric_strings():
 def test_format_int_non_numeric_passthrough():
     assert format_int("n/a") == "n/a"
     assert format_int(None) == "None"
+
+
+# ── format_bytes / format_duration ───────────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    "size,expected",
+    [
+        (0, "0 bytes"),
+        (512.4, "512 bytes"),
+        (2000, "2.0 KB"),
+        (161307.78, "157.5 KB"),
+        (5 * 1024 * 1024, "5.0 MB"),
+        (3 * 1024**4, "3072.0 GB"),
+    ],
+)
+def test_format_bytes(size, expected):
+    assert format_bytes(size) == expected
+
+
+@pytest.mark.parametrize(
+    "delta,expected",
+    [
+        (datetime.timedelta(hours=5), "< 1 d"),
+        (datetime.timedelta(days=9, hours=6), "9 d"),
+        (datetime.timedelta(days=62), "2 mo"),
+        (datetime.timedelta(days=359), "12 mo"),
+        (datetime.timedelta(days=2657, hours=2), "7.3 yr"),
+    ],
+)
+def test_format_duration(delta, expected):
+    assert format_duration(delta) == expected

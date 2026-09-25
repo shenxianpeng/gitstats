@@ -2,6 +2,7 @@
 # GPLv2 / GPLv3
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
 # GPLv2 / GPLv3
+import datetime
 import logging
 import os
 import re
@@ -52,6 +53,27 @@ def format_int(value: Any) -> str:
         return f"{int(value):,}"
     except (TypeError, ValueError):
         return str(value)
+
+
+def format_duration(delta: datetime.timedelta) -> str:
+    """Render a span compactly: "< 1 d", "9 d", "12 mo", "7.3 yr"."""
+    days = delta.total_seconds() / 86400
+    if days < 1:
+        return "< 1 d"
+    if days < 30:
+        return f"{int(days)} d"
+    if days < 365:
+        return f"{round(days / 30.44)} mo"
+    return f"{days / 365.25:.1f} yr"
+
+
+def format_bytes(size: float) -> str:
+    """Render a byte count in binary units (161307.78 -> "157.5 KB")."""
+    for unit in ("bytes", "KB", "MB", "GB"):
+        if abs(size) < 1024 or unit == "GB":
+            break
+        size /= 1024
+    return f"{size:.0f} bytes" if unit == "bytes" else f"{size:.1f} {unit}"
 
 
 def get_git_version() -> str:
