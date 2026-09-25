@@ -965,8 +965,30 @@ td.heat {
 	white-space: nowrap;
 }
 
-.punch-card tr.punch-totals > th {
-	padding-top: var(--space-3);
+/* Commits per hour: bars (max 40px) along the top of the grid */
+.punch-card tr.punch-hour-bars > * {
+	padding: var(--space-1) 2px 0;
+	border-bottom: none;
+	vertical-align: bottom;
+}
+
+.punch-vbar {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 2px;
+	height: 56px;
+}
+
+.punch-vbar-value {
+	font-size: 10px;
+	color: var(--text-secondary);
+}
+
+.punch-vbar-fill {
+	width: 70%;
+	background-color: var(--bar-color);
 }
 
 /* "Fewer ■■■■■ More commits" key under a heat grid */

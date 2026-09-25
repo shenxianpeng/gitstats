@@ -786,11 +786,25 @@ def test_activity_punch_card(mock_data_collector, temp_dir):
     # Mon-Fri 9:00-16:00 have one commit each; the busiest cell has 2
     assert '<tr><th>Mon</th><td class="heat heat0"></td>' in html
     assert '<td class="heat heat2">1</td>' in html
-    # Day totals with their share (Mon: 8 of 50)
-    assert '<td class="num punch-total">8 (16.0%)</td>' in html
-    # Hour totals, colored against the busiest hour (14:00, 15 of 50 commits)
-    assert '<td class="heat heat4" title="30.0% of commits">15</td>' in html
-    assert '<td class="num punch-total">50</td>' in html
+    # Day totals with their share (Mon: 8 of 50) and a bar against the busiest day (Wed: 12)
+    assert (
+        '<td class="num punch-total">8 (16.0%)<span class="share-bar share-bar-inline" '
+        'aria-hidden="true"><span style="width: 66.7%"></span></span></td>'
+    ) in html
+    # Commits per hour as bars above the grid: 14:00 is the busiest (15 of 50) -> 40px
+    assert (
+        '<td title="14:00 &middot; 15 commits &middot; 30.0%"><div class="punch-vbar">'
+        '<span class="punch-vbar-value">15</span>'
+        '<span class="punch-vbar-fill" style="height: 40px"></span></div></td>'
+    ) in html
+    # 16:00 has 8 commits -> 21px; an hour without commits has no bar
+    assert '<span class="punch-vbar-fill" style="height: 21px">' in html
+    assert (
+        '<span class="punch-vbar-value"></span><span class="punch-vbar-fill" style="height: 0px">'
+        in html
+    )
+    # The bar row sits between the hour labels and the first weekday
+    assert html.index('class="punch-hour-bars"') < html.index("<tr><th>Mon</th>")
     assert '<p class="heat-legend">Fewer' in html
 
 

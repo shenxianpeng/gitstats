@@ -560,22 +560,27 @@ class HTMLReportCreator(ReportCreator):
         )
 
     def _write_punch_card_section(self, f, data) -> None:
-        """Commits by day of week x hour of day, with a total for every day and hour.
+        """Commits by day of week x hour of day, with bars for every hour and day.
 
-        One grid replaces the former Hour of Day, Day of Week and Hour of Week
-        sections; their anchors are kept so existing links still land here.
+        A row of bars along the top gives the commits per hour of day, and a bar
+        under each day's total gives the share per weekday. One grid replaces
+        the former Hour of Day, Day of Week and Hour of Week sections; their
+        anchors are kept so existing links still land here.
         """
         f.write('<span id="hour_of_day"></span><span id="day_of_week"></span>')
         f.write('<span id="hour_of_week"></span>')
         f.write(html_header(2, "Punch Card"))
         f.write(
             "<p>Commits by day of week and hour of day, in each commit's local time. "
-            "The last column and row are the totals per day and per hour.</p>"
+            "The bars along the top are the commits per hour; the last column is "
+            "the commits per day.</p>"
         )
-        total = data.get_total_commits()
+        total = data.get_total_commits() or 1
         hour_totals = data.get_activity_by_hour_of_day()
         day_totals = data.get_activity_by_day_of_week()
         busiest_cell = data.activity_by_hour_of_week_busiest
+        busiest_hour = max(hour_totals.values(), default=0) or 1
+        busiest_day = max(day_totals.values(), default=0) or 1
 
         f.write('<div class="table-scroll"><table class="punch-card">')
         f.write(
@@ -583,6 +588,19 @@ class HTMLReportCreator(ReportCreator):
             + "".join(f"<th>{hour}</th>" for hour in range(24))
             + '<th class="num">Total</th></tr>'
         )
+        # Commits per hour of day, as bars above the grid
+        f.write('<tr class="punch-hour-bars"><th>Hour</th>')
+        for hour in range(24):
+            commits = hour_totals.get(hour, 0)
+            height = round(40 * commits / busiest_hour) if commits else 0
+            f.write(
+                f'<td title="{hour:02d}:00 &middot; {commits} commits &middot; '
+                f'{100.0 * commits / total:.1f}%"><div class="punch-vbar">'
+                f'<span class="punch-vbar-value">{commits or ""}</span>'
+                f'<span class="punch-vbar-fill" style="height: {max(height, 1 if commits else 0)}px">'
+                "</span></div></td>"
+            )
+        f.write("<td></td></tr>")
         for weekday in range(7):
             f.write(f"<tr><th>{WEEKDAYS[weekday]}</th>")
             for hour in range(24):
@@ -592,17 +610,11 @@ class HTMLReportCreator(ReportCreator):
                 )
             day = day_totals.get(weekday, 0)
             f.write(
-                f'<td class="num punch-total">{format_int(day)} '
-                f"({100.0 * day / total:.1f}%)</td></tr>"
+                f'<td class="num punch-total">{format_int(day)} ({100.0 * day / total:.1f}%)'
+                '<span class="share-bar share-bar-inline" aria-hidden="true">'
+                f'<span style="width: {100.0 * day / busiest_day:.1f}%"></span></span></td></tr>'
             )
-        f.write('<tr class="punch-totals"><th>Total</th>')
-        for hour in range(24):
-            commits = hour_totals.get(hour, 0)
-            f.write(
-                f'<td class="{self._heat_td_class(commits, data.activity_by_hour_of_day_busiest)}"'
-                f' title="{100.0 * commits / total:.1f}% of commits">{commits}</td>'
-            )
-        f.write(f'<td class="num punch-total">{format_int(total)}</td></tr></table></div>')
+        f.write("</table></div>")
         f.write(
             '<p class="heat-legend">Fewer'
             + "".join(f'<span class="heat{level}"></span>' for level in range(5))
