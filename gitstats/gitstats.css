@@ -739,6 +739,29 @@ tr:hover td {
 	.chart-box.has-legend {
 		min-height: 440px;
 	}
+
+	/* Wide tables scroll sideways here: keep the row label (first column)
+	   pinned, with a hairline so scrolled cells visibly pass under it */
+	.table-scroll tr > :first-child {
+		position: sticky;
+		left: 0;
+		z-index: 1;
+		background-color: var(--bg-color);
+		box-shadow: inset -1px 0 0 var(--table-border);
+	}
+
+	.table-scroll tr:hover > td:first-child {
+		background-color: var(--table-hover-bg);
+	}
+
+	/* Same for the contributor timeline: the author name stays in view */
+	.timeline-name {
+		position: sticky;
+		left: 0;
+		z-index: 1;
+		background-color: var(--bg-color);
+		box-shadow: inset -1px 0 0 var(--table-border);
+	}
 }
 
 /* ===== Headings ===== */
