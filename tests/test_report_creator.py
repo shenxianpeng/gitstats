@@ -12,10 +12,12 @@ from gitstats.report_creator import (
     author_html,
     compute_code_ownership,
     compute_project_history,
+    gap_annotations,
     get_keys_sorted_by_value_key,
     get_keys_sorted_by_values,
     html_header,
     html_linkify,
+    longest_zero_run,
     month_range,
     parse_chronicle,
     stat_tiles_html,
@@ -268,6 +270,54 @@ def test_render_chartjs_y_label():
         y_label="Lines of Code",
     )
     assert "title: { display: true, text: 'Lines of Code' }" in result
+
+
+@pytest.mark.parametrize(
+    "values,expected",
+    [
+        ([1, 0, 0, 2, 0, 3], (1, 2)),
+        ([0, 0, 0], (0, 2)),
+        ([1, 2, 3], None),
+        ([], None),
+    ],
+)
+def test_longest_zero_run(values, expected):
+    assert longest_zero_run(values) == expected
+
+
+def test_gap_annotations_band_and_peaks():
+    years = list(range(2007, 2027))
+    values = [107, 29, 45, 36, 28, 17, 11, 19, 2] + [0] * 8 + [68, 90, 95]
+    ann = gap_annotations(years, values, min_gap=2)
+    assert ann["bands"] == [
+        {"from": 9, "to": 16, "text": "No commits 2016 – 2023", "short": "no commits"}
+    ]
+    # The busiest year on each side of the gap
+    assert ann["peaks"] == [
+        {"index": 0, "text": "2007 · 107"},
+        {"index": 19, "text": "2026 · 95"},
+    ]
+
+
+def test_gap_annotations_ignores_short_gaps():
+    assert gap_annotations(["2020", "2021", "2022"], [5, 0, 3], min_gap=2) == {}
+
+
+def test_render_chartjs_annotations():
+    creator = HTMLReportCreator()
+    ann = {"bands": [{"from": 1, "to": 1, "text": "gap", "short": ""}], "peaks": []}
+    result = creator._render_chartjs(
+        "c-ann", "bar", ["A", "B", "C"], [{"label": "C", "data": [1, 0, 2]}], annotations=ann
+    )
+    assert "plugins: [chartAnnotations]," in result
+    assert (
+        'gsAnnotations: {"bands": [{"from": 1, "to": 1, "text": "gap", "short": ""}], "peaks": []}'
+        in result
+    )
+    assert "grace: '10%'" in result
+    plain = creator._render_chartjs("c-plain", "bar", ["A"], [{"label": "C", "data": [1]}])
+    assert "chartAnnotations" not in plain
+    assert "grace" not in plain
 
 
 def test_render_chartjs_lines_have_no_point_markers():

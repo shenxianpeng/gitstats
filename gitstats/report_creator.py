@@ -116,6 +116,64 @@ CHART_SCRIPT = """<script>
 		});
 	});
 
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
 	function formatChartDate(ms, unit) {
 		const d = new Date(ms);
 		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
@@ -339,6 +397,8 @@ class HTMLReportCreator(ReportCreator):
         else:
             years = []
         values = [data.commits_by_year.get(y, 0) for y in years]
+        # Shade the longest run of two or more years without commits
+        annotations = gap_annotations(years, values, min_gap=2)
         f.write(
             self._render_chartjs(
                 "chart-overview-yearly",
@@ -347,22 +407,16 @@ class HTMLReportCreator(ReportCreator):
                 [{"label": "Commits", "data": values}],
                 y_label="Commits",
                 aspect_ratio=5,
+                annotations=annotations,
             )
         )
-
-        # Longest run of years without commits, when it is at least two years
-        gap: tuple[int, int] | None = None
-        run_start: int | None = None
-        for year, commits in zip(years, values):
-            if commits:
-                run_start = None
-                continue
-            if run_start is None:
-                run_start = year
-            if year > run_start and (gap is None or year - run_start > gap[1] - gap[0]):
-                gap = (run_start, year)
-        if gap:
-            f.write(f'<p class="chart-note">No commits from {gap[0]} to {gap[1]}.</p>')
+        if annotations:
+            # the same fact as text, for screen readers and at a glance
+            band = annotations["bands"][0]
+            f.write(
+                f'<p class="chart-note">No commits from {years[band["from"]]} '
+                f"to {years[band['to']]}.</p>"
+            )
         f.write('<p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p>')
 
     def _overview_contributors_html(self, data: Any) -> str:
@@ -574,6 +628,8 @@ class HTMLReportCreator(ReportCreator):
                 [{"label": "Commits", "data": cbym_values}],
                 y_label="Commits",
                 x_ticks_rotate=True,
+                # a year or more without commits gets shaded, with the peaks around it
+                annotations=gap_annotations(cbym_keys, cbym_values, min_gap=12),
             )
         )
         months = sorted(data.commits_by_month.keys(), reverse=True)
@@ -639,6 +695,7 @@ class HTMLReportCreator(ReportCreator):
                 cby_all_years,
                 [{"label": "Commits", "data": cby_values}],
                 y_label="Commits",
+                annotations=gap_annotations(cby_all_years, cby_values, min_gap=2),
             )
         )
         f.write(_FLEX_CLOSE)
@@ -1661,6 +1718,7 @@ class HTMLReportCreator(ReportCreator):
         max_bar_thickness=None,
         time_axis=False,
         highlight=None,
+        annotations=None,
     ):
         """Render a Chart.js chart as inline HTML.
 
@@ -1672,6 +1730,11 @@ class HTMLReportCreator(ReportCreator):
         With ``highlight=N`` (multi-series charts), only the first N series get
         colors and legend entries; the rest are thin grey lines drawn behind
         them, so colors never repeat.
+
+        ``annotations`` (category bar charts) is a dict for the gsAnnotations
+        plugin: ``bands`` ``[{"from": i, "to": j, "text", "short"}]`` shade
+        category ranges, ``peaks`` ``[{"index": i, "text"}]`` label bars, and
+        ``values: True`` labels every non-zero bar. See gap_annotations().
         """
         is_multi = len(datasets) > 1
 
@@ -1753,6 +1816,15 @@ class HTMLReportCreator(ReportCreator):
             else ""
         )
 
+        if annotations:
+            annotations_json = json.dumps(annotations).replace("</", "<\\/")
+            plugins_js = f",\n        gsAnnotations: {annotations_json}"
+            register_js = "\n    plugins: [chartAnnotations],"
+            # headroom so labels above the tallest bar stay inside the chart
+            grace_js = ", grace: '10%'"
+        else:
+            plugins_js = register_js = grace_js = ""
+
         # The chart fills a .chart-box that keeps aspect_ratio on wide screens
         # but has a minimum height, so phones don't get a flattened plot.
         box_class = "chart-box has-legend" if is_multi else "chart-box"
@@ -1763,7 +1835,7 @@ class HTMLReportCreator(ReportCreator):
   var labels = {labels_json};
   applyChartTheme();
   new Chart(ctx, {{
-    type: '{chart_type}',
+    type: '{chart_type}',{register_js}
     data: {{
       {data_js}
     }},
@@ -1771,11 +1843,11 @@ class HTMLReportCreator(ReportCreator):
       responsive: true,
       maintainAspectRatio: false,{interaction_js}
       plugins: {{
-        legend: {{ display: {legend_display} }}{tooltip_js}
+        legend: {{ display: {legend_display} }}{tooltip_js}{plugins_js}
       }},
       scales: {{
         x: {x_scale_js},
-        y: {{ beginAtZero: true, title: {{ display: true, text: '{y_label}' }} }}
+        y: {{ beginAtZero: true{grace_js}, title: {{ display: true, text: '{y_label}' }} }}
       }}{f", datasets: {{ bar: {{ maxBarThickness: {max_bar_thickness} }} }}" if max_bar_thickness else ""}
     }}
   }});
@@ -2156,6 +2228,51 @@ def author_html(name: str) -> str:
     """An author's name, HTML-escaped, with a BOT badge for bot accounts."""
     badge = ' <span class="badge">bot</span>' if is_bot(name) else ""
     return html.escape(name) + badge
+
+
+def longest_zero_run(values: list[int]) -> tuple[int, int] | None:
+    """Index range (inclusive) of the longest run of zeros, or None if there is none."""
+    best: tuple[int, int] | None = None
+    start: int | None = None
+    for i, value in enumerate(values):
+        if value:
+            start = None
+            continue
+        if start is None:
+            start = i
+        if best is None or i - start > best[1] - best[0]:
+            best = (start, i)
+    return best
+
+
+def gap_annotations(labels: list[Any], values: list[int], min_gap: int) -> dict[str, Any]:
+    """Chart annotations for the longest stretch without commits.
+
+    When the longest run of empty buckets is at least ``min_gap`` long, it is
+    shaded ("No commits 2016 – 2023") and the busiest bucket on each side of
+    it is labelled ("2007 · 107"). Otherwise there is nothing to annotate.
+    """
+    gap = longest_zero_run(values)
+    if gap is None or gap[1] - gap[0] + 1 < min_gap:
+        return {}
+    start, end = gap
+    peaks = []
+    for lo, hi in ((0, start), (end + 1, len(values))):
+        segment = values[lo:hi]
+        if segment and max(segment) > 0:
+            i = lo + segment.index(max(segment))
+            peaks.append({"index": i, "text": f"{labels[i]} \u00b7 {values[i]}"})
+    return {
+        "bands": [
+            {
+                "from": start,
+                "to": end,
+                "text": f"No commits {labels[start]} \u2013 {labels[end]}",
+                "short": "no commits",
+            }
+        ],
+        "peaks": peaks,
+    }
 
 
 def month_range(months: Any) -> list[str]:
