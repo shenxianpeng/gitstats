@@ -642,14 +642,62 @@ def test_create_activity_html(mock_data_collector, temp_dir):
         html = f.read()
 
     assert "<h1>Activity</h1>" in html
-    assert "Hour of Day" in html
-    assert "Day of Week" in html
-    assert "Hour of Week" in html
     assert "Month of Year" in html
     assert "Commits by year/month" in html
-    # Should contain chart.js canvases
-    assert '<canvas id="chart-hour-of-day">' in html
-    assert '<canvas id="chart-day-of-week">' in html
+
+    # Coarse to fine: year, month, week, then the daily rhythm
+    order = ["Commits by Year", "Commits by year/month", "Weekly activity", "Punch Card"]
+    positions = [html.index(f">{title}</a></h2>") for title in order]
+    assert positions == sorted(positions)
+
+    # Yearly activity duplicated Commits by Year; Hour of Day, Day of Week and
+    # Hour of Week are merged into the punch card
+    for gone in ("Yearly activity", "Hour of Day", "Day of Week", "Hour of Week"):
+        assert f">{gone}</a></h2>" not in html
+    for chart in ("chart-yearly-activity", "chart-hour-of-day", "chart-day-of-week"):
+        assert f'<canvas id="{chart}">' not in html
+    # ...but their anchors still exist, next to the sections that replaced them
+    for anchor in ("yearly_activity", "hour_of_day", "day_of_week", "hour_of_week"):
+        assert f'<span id="{anchor}"></span>' in html
+    assert html.index('id="yearly_activity"') < html.index('id="commits_by_year"')
+    assert html.index('id="hour_of_week"') < html.index('id="punch_card"')
+
+
+def test_activity_punch_card(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_activity_html(mock_data_collector, temp_dir)
+    with open(f"{temp_dir}/activity.html", encoding="utf-8") as f:
+        html = f.read()
+
+    # Mon-Fri 9:00-16:00 have one commit each; the busiest cell has 2
+    assert '<tr><th>Mon</th><td class="heat heat0"></td>' in html
+    assert '<td class="heat heat2">1</td>' in html
+    # Day totals with their share (Mon: 8 of 50)
+    assert '<td class="num punch-total">8 (16.0%)</td>' in html
+    # Hour totals, colored against the busiest hour (14:00, 15 of 50 commits)
+    assert '<td class="heat heat4" title="30.0% of commits">15</td>' in html
+    assert '<td class="num punch-total">50</td>' in html
+    assert '<p class="heat-legend">Fewer' in html
+
+
+def test_activity_monthly_table_is_folded(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_activity_html(mock_data_collector, temp_dir)
+    with open(f"{temp_dir}/activity.html", encoding="utf-8") as f:
+        html = f.read()
+
+    months = len(mock_data_collector.commits_by_month)
+    summary = (
+        '<details class="table-details"><summary>Table: commits and lines per month '
+        f"({months} months with commits)</summary>"
+    )
+    assert summary in html
+    # The chart comes first, outside the folded table
+    assert html.index('<canvas id="chart-commits-by-year-month">') < html.index(summary)
 
 
 # ── HTMLReportCreator.create_authors_html ────────────────────────────────
