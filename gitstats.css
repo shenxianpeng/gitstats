@@ -166,6 +166,30 @@ table {
 	border: 1px solid var(--border-strong);
 }
 
+/* Wide tables scroll inside their own box instead of widening the page */
+.table-scroll {
+	max-width: 100%;
+	overflow-x: auto;
+	margin-bottom: var(--space-4);
+}
+
+.table-scroll > table {
+	margin-bottom: 0;
+}
+
+/* A table with its chart beside it; the chart wraps below when space runs out */
+.table-with-chart {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-5);
+	align-items: flex-start;
+}
+
+.chart-pane {
+	flex: 1 1 320px;
+	min-width: 0;
+}
+
 table.noborders {
 	border: none;
 	background: transparent;
@@ -238,13 +262,17 @@ tr:hover td {
 	z-index: 100;
 }
 
+/* One row that scrolls sideways when it does not fit, rather than wrapping */
 .nav ul {
 	list-style: none;
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	gap: 0;
 	margin: 0;
 	padding: 0;
+	min-width: 0;
+	overflow-x: auto;
+	scrollbar-width: thin;
 }
 
 .nav li {
@@ -362,6 +390,47 @@ tr:hover td {
 
 [data-theme="dark"] .theme-toggle .icon-sun {
 	display: block;
+}
+
+/* ===== Narrow screens: brand + icons on top, page links in their own scrolling row ===== */
+@media (max-width: 768px) {
+	body {
+		padding: 0 var(--space-4);
+	}
+
+	.nav {
+		flex-wrap: wrap;
+		padding: 0;
+		margin-bottom: var(--space-4);
+	}
+
+	.nav ul {
+		order: 3;
+		flex: 0 0 100%;
+		border-top: 1px solid var(--border-color);
+	}
+
+	.nav li a {
+		min-height: 44px;
+	}
+
+	.nav-right {
+		margin-left: auto;
+		border-left: none;
+		padding-left: 0;
+		gap: 0;
+	}
+
+	.nav-github,
+	.theme-toggle {
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+	}
+
+	.theme-toggle {
+		border-color: transparent;
+	}
 }
 
 /* ===== Headings ===== */
