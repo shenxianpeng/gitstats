@@ -20,7 +20,13 @@ import shutil
 from typing import Any
 
 from gitstats import load_config
-from gitstats.report_creator import _classify_eras
+from gitstats.report_creator import (
+    THEME_INIT_SCRIPT,
+    THEME_SCRIPT,
+    THEME_TOGGLE_BUTTON,
+    _classify_eras,
+    nav_link,
+)
 from gitstats.utils import format_int, get_version
 
 logger = logging.getLogger("gitstats")
@@ -268,34 +274,20 @@ class AggregateReportCreator:
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - {}</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){{var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);}})();</script>
+	{}
 	<link rel="stylesheet" href="{}" type="text/css">
 	<meta name="generator" content="GitStats {}">
 	<script type="text/javascript" src="sortable.js"></script>
-	<script>
-		function toggleTheme() {{
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
-		}}
-
-		function updateThemeIcon(theme) {{
-			const button = document.getElementById('theme-toggle');
-			if (button) {{
-				button.innerHTML = theme === 'dark' ? '☀️' : '\U0001f319';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}}
-		}}
-
-		document.addEventListener('DOMContentLoaded', function() {{
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
-		}});
-	</script>
+	{}
 </head>
 <body>
-""".format(html.escape(title), load_config()["style"], get_version())
+""".format(
+                html.escape(title),
+                THEME_INIT_SCRIPT,
+                load_config()["style"],
+                get_version(),
+                THEME_SCRIPT,
+            )
         )
 
     @staticmethod
@@ -305,10 +297,10 @@ class AggregateReportCreator:
             <div class="nav">
             <a href="index.html" class="nav-brand">GitStats</a>
             <ul>
-            <li><a href="index.html">{html.escape(title)}</a></li>
+            {nav_link("index.html", html.escape(title), current="index.html")}
             </ul>
             <div class="nav-right">
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">\U0001f319</button>
+            {THEME_TOGGLE_BUTTON}
             </div>
             </div>
             """

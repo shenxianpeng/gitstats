@@ -210,6 +210,14 @@ class TestAggregateReportCreator:
         # Sorted by commits: alpha row before beta row
         assert html.index('href="alpha/index.html"') < html.index('href="beta/index.html"')
 
+    def test_shares_report_theme_and_nav(self, temp_dir):
+        html = self._render(temp_dir, [_summary("alpha", 10, {"Alice": 10})])
+
+        assert "prefers-color-scheme: dark" in html
+        assert 'class="icon-sun"' in html
+        assert "\U0001f319" not in html
+        assert html.count('aria-current="page"') == 1
+
     def test_thousands_separators(self, temp_dir):
         html = self._render(
             temp_dir,

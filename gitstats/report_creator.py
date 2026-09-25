@@ -25,6 +25,160 @@ _FLEX_CONTAINER = '<div style="display:flex;gap:24px;align-items:flex-start">'
 _FLEX_CHILD = '<div style="flex:1;min-width:0">'
 _FLEX_CLOSE = "</div></div>"
 
+# Runs before the stylesheet loads so the page never flashes the wrong theme.
+# An explicit choice from the toggle wins; otherwise follow the OS setting.
+THEME_INIT_SCRIPT = (
+    "<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}"
+    "if(t!=='light'&&t!=='dark'){t=window.matchMedia&&"
+    "window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}"
+    "document.documentElement.setAttribute('data-theme',t);})();</script>"
+)
+
+THEME_SCRIPT = """<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	});
+</script>"""
+
+# Chart helpers shared by every chart on a report page (see _render_chartjs).
+CHART_SCRIPT = """<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			scale.grid.color = grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>"""
+
+_THEME_TOGGLE_ICONS = (
+    '<svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" '
+    'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" '
+    'aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+    '<svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" '
+    'fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" '
+    'aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41'
+    'M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>'
+)
+
+THEME_TOGGLE_BUTTON = (
+    '<button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" '
+    f'aria-label="Switch to dark mode">{_THEME_TOGGLE_ICONS}</button>'
+)
+
+NAV_PAGES = (
+    ("index.html", "General"),
+    ("activity.html", "Activity"),
+    ("authors.html", "Authors"),
+    ("files.html", "Files"),
+    ("lines.html", "Lines"),
+    ("tags.html", "Tags"),
+    ("ownership.html", "Code Ownership"),
+    ("history.html", "History"),
+)
+
+
+def nav_link(href: str, label: str, current: str | None = None) -> str:
+    """Return a nav ``<li>``, marking it as the current page when ``href == current``."""
+    if href == current:
+        return f'<li><a href="{href}" class="active" aria-current="page">{label}</a></li>'
+    return f'<li><a href="{href}">{label}</a></li>'
+
 
 class ReportCreator:
     """Creates the actual report based on given data."""
@@ -95,7 +249,7 @@ class HTMLReportCreator(ReportCreator):
         format = "%Y-%m-%d %H:%M:%S"
         self.print_header(f)
 
-        self.print_nav(f)
+        self.print_nav(f, "index.html")
 
         f.write("<h1>General</h1>")
 
@@ -153,7 +307,7 @@ class HTMLReportCreator(ReportCreator):
         # Activity
         f = open(path + "/activity.html", "w", encoding="utf-8")
         self.print_header(f)
-        self.print_nav(f)
+        self.print_nav(f, "activity.html")
         f.write("<h1>Activity</h1>")
 
         # Streak summary
@@ -387,8 +541,8 @@ class HTMLReportCreator(ReportCreator):
                 )
             )
         f.write("</table>")
-        cbym_keys = sorted(data.commits_by_month.keys())
-        cbym_values = [data.commits_by_month[k] for k in cbym_keys]
+        cbym_keys = month_range(data.commits_by_month.keys())
+        cbym_values = [data.commits_by_month.get(k, 0) for k in cbym_keys]
         f.write(_FLEX_CHILD)
         f.write(
             self._render_chartjs(
@@ -502,7 +656,7 @@ class HTMLReportCreator(ReportCreator):
 
             # Only record a data point if this index is in the sampled set
             if i in sampled_indices:
-                time_labels.append(datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d"))
+                time_labels.append(stamp)
                 for author in authors_to_plot:
                     per_author_lines[author].append(lines_by_authors[author])
                     per_author_commits[author].append(commits_by_authors[author])
@@ -517,7 +671,7 @@ class HTMLReportCreator(ReportCreator):
         f = open(path + "/authors.html", "w", encoding="utf-8")
         self.print_header(f)
 
-        self.print_nav(f)
+        self.print_nav(f, "authors.html")
         f.write("<h1>Authors</h1>")
 
         # Authors :: List of authors
@@ -575,7 +729,7 @@ class HTMLReportCreator(ReportCreator):
                 time_labels,
                 loc_datasets,
                 y_label="Lines",
-                x_ticks_rotate=True,
+                time_axis=True,
             )
         )
         if len(allauthors) > load_config()["max_authors"]:
@@ -592,7 +746,7 @@ class HTMLReportCreator(ReportCreator):
                 time_labels,
                 cba_datasets,
                 y_label="Commits",
-                x_ticks_rotate=True,
+                time_axis=True,
             )
         )
         if len(allauthors) > load_config()["max_authors"]:
@@ -704,8 +858,8 @@ class HTMLReportCreator(ReportCreator):
                 "<p><em>Number of first-time contributors per month. "
                 "A growing trend indicates a healthy, welcoming project.</em></p>"
             )
-            nc_keys = sorted(data.new_contributors_by_month.keys())
-            nc_values = [data.new_contributors_by_month[k] for k in nc_keys]
+            nc_keys = month_range(data.new_contributors_by_month.keys())
+            nc_values = [data.new_contributors_by_month.get(k, 0) for k in nc_keys]
             f.write(
                 self._render_chartjs(
                     "chart-contributor-growth",
@@ -727,7 +881,7 @@ class HTMLReportCreator(ReportCreator):
         # Files
         f = open(path + "/files.html", "w", encoding="utf-8")
         self.print_header(f)
-        self.print_nav(f)
+        self.print_nav(f, "files.html")
         f.write("<h1>Files</h1>")
 
         f.write("<dl>\n")
@@ -745,22 +899,23 @@ class HTMLReportCreator(ReportCreator):
         # Files :: File count by date
         f.write(html_header(2, "File count by date"))
 
-        # use set to get rid of duplicate/unnecessary entries, then sort
+        # keep one point per day: the day's last commit
         files_by_date = {}
         for stamp in sorted(data.files_by_stamp.keys()):
             date_str = datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
-            files_by_date[date_str] = data.files_by_stamp[stamp]
+            files_by_date[date_str] = (stamp, data.files_by_stamp[stamp])
 
-        fbd_labels = sorted(files_by_date.keys())
-        fbd_values = [files_by_date[d] for d in fbd_labels]
+        fbd_points = sorted(files_by_date.values())
+        fbd_stamps = [stamp for stamp, _ in fbd_points]
+        fbd_values = [count for _, count in fbd_points]
         f.write(
             self._render_chartjs(
                 "chart-files-by-date",
                 "line",
-                fbd_labels,
+                fbd_stamps,
                 [{"label": "Files", "data": fbd_values}],
                 y_label="Files",
-                x_ticks_rotate=True,
+                time_axis=True,
             )
         )
 
@@ -841,7 +996,7 @@ class HTMLReportCreator(ReportCreator):
         # Lines
         f = open(path + "/lines.html", "w", encoding="utf-8")
         self.print_header(f)
-        self.print_nav(f)
+        self.print_nav(f, "lines.html")
         f.write("<h1>Lines</h1>")
 
         f.write("<dl>\n")
@@ -850,16 +1005,15 @@ class HTMLReportCreator(ReportCreator):
 
         f.write(html_header(2, "Lines of Code"))
         loc_stamps = sorted(data.changes_by_date.keys())
-        loc_labels = [datetime.datetime.fromtimestamp(s).strftime("%Y-%m-%d") for s in loc_stamps]
         loc_values = [data.changes_by_date[s]["lines"] for s in loc_stamps]
         f.write(
             self._render_chartjs(
                 "chart-lines-of-code",
                 "line",
-                loc_labels,
+                loc_stamps,
                 [{"label": "Lines", "data": loc_values}],
                 y_label="Lines",
-                x_ticks_rotate=True,
+                time_axis=True,
             )
         )
 
@@ -872,7 +1026,7 @@ class HTMLReportCreator(ReportCreator):
         # tags.html
         f = open(path + "/tags.html", "w", encoding="utf-8")
         self.print_header(f)
-        self.print_nav(f)
+        self.print_nav(f, "tags.html")
         f.write("<h1>Tags</h1>")
 
         f.write("<dl>")
@@ -944,7 +1098,7 @@ class HTMLReportCreator(ReportCreator):
         """
         f = self._open_report_file(path, "ownership.html")
         self.print_header(f)
-        self.print_nav(f)
+        self.print_nav(f, "ownership.html")
         f.write("<h1>Code Ownership</h1>")
 
         author_files = getattr(data, "author_files", {})
@@ -1090,7 +1244,7 @@ class HTMLReportCreator(ReportCreator):
         """
         f = self._open_report_file(path, "history.html")
         self.print_header(f)
-        self.print_nav(f)
+        self.print_nav(f, "history.html")
         f.write("<h1>History</h1>")
 
         history = compute_project_history(data)
@@ -1232,7 +1386,7 @@ class HTMLReportCreator(ReportCreator):
 
         f = open(path + "/ai-insights.html", "w", encoding="utf-8")
         self.print_header(f)
-        self.print_nav(f)
+        self.print_nav(f, "ai-insights.html")
         f.write(f"<h1>{get_i18n_text('ai_insights_title', language)}</h1>")
 
         f.write(f"""
@@ -1320,8 +1474,15 @@ class HTMLReportCreator(ReportCreator):
         x_ticks_rotate=False,
         aspect_ratio=3,
         max_bar_thickness=None,
+        time_axis=False,
     ):
-        """Render a Chart.js chart as inline HTML."""
+        """Render a Chart.js chart as inline HTML.
+
+        With ``time_axis=True``, ``labels`` are Unix timestamps (seconds) and the
+        x-axis is linear in time, so quiet periods keep their real width instead
+        of collapsing between two adjacent points. Line series are drawn as steps
+        because each point holds its value until the next one.
+        """
         is_multi = len(datasets) > 1
 
         js_datasets = []
@@ -1339,43 +1500,68 @@ class HTMLReportCreator(ReportCreator):
                 # single dataset: use CSS var for theme-aware color
                 entry["backgroundColor"] = "__CSS_BAR_COLOR__"
                 entry["borderColor"] = "__CSS_BAR_COLOR__"
+                entry["themed"] = True
                 if chart_type == "line":
                     entry.setdefault("borderWidth", 1)
                     entry.setdefault("pointRadius", 2)
+            if time_axis and chart_type == "line":
+                entry.setdefault("stepped", True)
             js_datasets.append(entry)
 
+        if time_axis:
+            labels = [int(stamp) * 1000 for stamp in labels]
         labels_json = json.dumps(labels).replace("</", "<\\/")
         datasets_json = json.dumps(js_datasets).replace("</", "<\\/")
         # Replace quoted placeholder with JS expression
         datasets_json = datasets_json.replace('"__CSS_BAR_COLOR__"', "getCSSVar('--bar-color')")
 
-        x_ticks_opts = "maxRotation: 45, minRotation: 45" if x_ticks_rotate else "maxRotation: 0"
         legend_display = "true" if is_multi else "false"
+        if time_axis:
+            # pair each value with its timestamp: {x, y} points on a linear axis
+            data_js = f"""datasets: (function(xs, sets) {{
+        sets.forEach(function(ds) {{
+          ds.data = ds.data.map(function(y, i) {{ return {{ x: xs[i], y: y }}; }});
+        }});
+        return sets;
+      }})(labels, {datasets_json})"""
+            x_scale_js = "timeAxis(labels)"
+            tooltip_js = """,
+        tooltip: { callbacks: { title: function(items) {
+          return items.length ? formatChartDate(items[0].parsed.x) : '';
+        } } }"""
+        else:
+            data_js = f"""labels: labels,
+      datasets: {datasets_json}"""
+            x_ticks_opts = (
+                "maxRotation: 45, minRotation: 45" if x_ticks_rotate else "maxRotation: 0"
+            )
+            x_scale_js = f"{{ ticks: {{ {x_ticks_opts} }} }}"
+            tooltip_js = ""
 
         return f"""<div style="max-width:100%;margin-bottom:8px"><canvas id="{chart_id}"></canvas></div>
 <script>
 (function() {{
   var ctx = document.getElementById('{chart_id}').getContext('2d');
-  var chart = new Chart(ctx, {{
+  var labels = {labels_json};
+  applyChartTheme();
+  new Chart(ctx, {{
     type: '{chart_type}',
     data: {{
-      labels: {labels_json},
-      datasets: {datasets_json}
+      {data_js}
     }},
     options: {{
       responsive: true,
       maintainAspectRatio: true,
       aspectRatio: {aspect_ratio},
       plugins: {{
-        legend: {{ display: {legend_display} }}
+        legend: {{ display: {legend_display} }}{tooltip_js}
       }},
       scales: {{
-        x: {{ ticks: {{ {x_ticks_opts} }} }},
+        x: {x_scale_js},
         y: {{ beginAtZero: true, title: {{ display: true, text: '{y_label}' }} }}
       }}{f", datasets: {{ bar: {{ maxBarThickness: {max_bar_thickness} }} }}" if max_bar_thickness else ""}
     }}
   }});
-  document.addEventListener('themechange', function() {{ chart.update(); }});
 }})();
 </script>
 """
@@ -1412,50 +1598,38 @@ class HTMLReportCreator(ReportCreator):
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - {}</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){{var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);}})();</script>
+	{}
 	<link rel="stylesheet" href="{}" type="text/css">
 	<meta name="generator" content="GitStats {}">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
-	<script>
-		function getCSSVar(v) {{ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }}
-
-		function toggleTheme() {{
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
-		}}
-
-		function updateThemeIcon(theme) {{
-			const button = document.getElementById('theme-toggle');
-			if (button) {{
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}}
-		}}
-
-		document.addEventListener('DOMContentLoaded', function() {{
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
-		}});
-	</script>
+	{}
+	{}
 </head>
 <body>
-""".format(html.escape(self.title), load_config()["style"], get_version())
+""".format(
+                html.escape(self.title),
+                THEME_INIT_SCRIPT,
+                load_config()["style"],
+                get_version(),
+                THEME_SCRIPT,
+                CHART_SCRIPT,
+            )
         )
 
-    def print_nav(self, file: Any) -> None:
+    def print_nav(self, file: Any, current: str | None = None) -> None:
         """
         Write the navigation bar HTML (page links and a client-side theme-toggle button) to the given writable file-like object.
 
         Parameters:
             file: A writable file-like object opened in text mode where the navigation HTML will be written.
+            current: File name of the page being written (e.g. ``"authors.html"``); its link is marked as the current page.
         """
         # Check if AI insights are available
         has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
 
-        ai_link = '<li><a href="ai-insights.html">AI Insights</a></li>' if has_ai else ""
+        links = "\n            ".join(nav_link(href, label, current) for href, label in NAV_PAGES)
+        ai_link = nav_link("ai-insights.html", "AI Insights", current) if has_ai else ""
 
         github_icon = (
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" '
@@ -1475,19 +1649,12 @@ class HTMLReportCreator(ReportCreator):
             <div class="nav">
             <a href="index.html" class="nav-brand">GitStats</a>
             <ul>
-            <li><a href="index.html">General</a></li>
-            <li><a href="activity.html">Activity</a></li>
-            <li><a href="authors.html">Authors</a></li>
-            <li><a href="files.html">Files</a></li>
-            <li><a href="lines.html">Lines</a></li>
-            <li><a href="tags.html">Tags</a></li>
-            <li><a href="ownership.html">Code Ownership</a></li>
-            <li><a href="history.html">History</a></li>
+            {links}
             {ai_link}
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub">{github_icon}</a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            {THEME_TOGGLE_BUTTON}
             </div>
             </div>
             """
@@ -1761,6 +1928,24 @@ def parse_chronicle(text: str) -> dict[str, Any]:
 
     prologue = " ".join(line for line in prologue_lines if line).strip()
     return {"prologue": prologue, "chapters": chapters}
+
+
+def month_range(months: Any) -> list[str]:
+    """Return every ``"YYYY-MM"`` month from the earliest to the latest in ``months``.
+
+    Monthly charts use a category axis, so months without commits must be
+    present (as zeros) or a long quiet period collapses to nothing.
+    """
+    keys = sorted(months)
+    if not keys:
+        return []
+    year, month = map(int, keys[0].split("-"))
+    last = tuple(map(int, keys[-1].split("-")))
+    result = []
+    while (year, month) <= last:
+        result.append(f"{year:04d}-{month:02d}")
+        year, month = (year + 1, 1) if month == 12 else (year, month + 1)
+    return result
 
 
 def html_header(level: int, text: str) -> str:
