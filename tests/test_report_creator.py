@@ -722,6 +722,71 @@ def test_create_authors_html(mock_data_collector, temp_dir):
     assert "Contributor Growth" in html
 
 
+def test_render_chartjs_highlight_top_series():
+    creator = HTMLReportCreator()
+    datasets = [{"label": f"A{i}", "data": [i]} for i in range(7)]
+    result = creator._render_chartjs("chart-hl", "line", ["X"], datasets, highlight=5)
+    # The first 5 keep distinct colors; the rest are grey and drawn behind
+    assert result.count(HTMLReportCreator.OTHER_SERIES_COLOR) == 4  # border + background x 2
+    assert '"label": "A4", "data": [4], "borderColor": "#e16f24"' in result
+    assert '"label": "A5", "data": [5], "borderColor": "rgba(128, 128, 128, 0.45)"' in result
+    # Only the highlighted series are listed in the legend
+    assert "filter: function(item) { return item.datasetIndex < 5; }" in result
+
+
+def test_authors_contributor_timeline(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_authors_html(mock_data_collector, temp_dir)
+    with open(f"{temp_dir}/authors.html", encoding="utf-8") as f:
+        html = f.read()
+
+    # Replaces the cumulative commits line chart; the old anchor still lands here
+    assert '<canvas id="chart-commits-by-author">' not in html
+    assert ">Commits per Author</a></h2>" not in html
+    assert html.index('<span id="commits_per_author"></span>') < html.index(
+        'id="contributor_timeline"'
+    )
+
+    # One row per author, summarised for screen readers
+    assert html.count('<div class="timeline-row') == 3
+    assert 'aria-label="Alice Smith: 30 commits, 2023-01 to 2023-06"' in html
+    # Mock history spans 2023-01..2023-06: six months, no year boundary,
+    # so the axis shows the first and last month
+    assert '<span class="timeline-mark" style="left: 41.667%; --size: 10.2px" ' in html
+    assert 'title="2023-03: 8 commits"' in html
+    assert (
+        '<div class="timeline-axis" aria-hidden="true"><span>2023-01</span><span>2023-06</span>'
+        in html
+    )
+
+    # The lines chart keeps five colors and greys the rest
+    assert "The top 5 authors are in color, the others in grey." in html
+
+
+def test_contributor_timeline_years_and_bots(mock_data_collector):
+    mock_data_collector.author_of_month = {
+        "2019-11": {"Alice Smith": 1},
+        "2021-02": {"dependabot[bot]": 3},
+    }
+    mock_data_collector.get_author_info.side_effect = lambda a: {"commits": 4}
+    html = HTMLReportCreator()._contributor_timeline_html(
+        mock_data_collector, ["Alice Smith", "dependabot[bot]"]
+    )
+    # Year boundaries become gridlines with labels; no month labels needed then
+    assert '<span class="timeline-year" style="left: 12.500%">2020</span>' in html
+    assert '<span class="timeline-year" style="left: 87.500%">2021</span>' in html
+    assert '<div class="timeline-axis" aria-hidden="true"></div>' in html
+    # Bots are marked so CSS can grey them out
+    assert (
+        '<div class="timeline-row bot" role="img" aria-label="dependabot[bot]: 4 commits, 2021-02 to 2021-02">'
+        in html
+    )
+    # A single month still gets a mark; the span has zero width
+    assert "width: 0.000%" in html
+
+
 # ── HTMLReportCreator.create_files_html ──────────────────────────────────
 
 
@@ -887,7 +952,7 @@ def test_build_author_time_series_empty(mock_data_collector):
     creator.data = mock_data_collector
     # With empty changes_by_date_by_author, should return empty
     mock_data_collector.changes_by_date_by_author = {}
-    labels, loc_ds, _ = creator._build_author_time_series(mock_data_collector)
+    labels, loc_ds = creator._build_author_time_series(mock_data_collector)
     assert labels == []
     # Even with no time-series data, datasets have entries per author with empty data
     assert len(loc_ds) == len(mock_data_collector.get_authors(20))
@@ -910,7 +975,7 @@ def test_build_author_time_series_basic(mock_data_collector):
         },
     }
 
-    labels, loc_ds, _ = creator._build_author_time_series(mock_data_collector)
+    labels, loc_ds = creator._build_author_time_series(mock_data_collector)
 
     assert len(labels) == 2
     assert any("Alice Smith" in str(ds) for ds in loc_ds)
@@ -939,23 +1004,20 @@ def test_build_author_time_series_downsample(mock_data_collector):
         }
     mock_data_collector.changes_by_date_by_author = changes
 
-    labels, loc_ds, cba_ds = creator._build_author_time_series(mock_data_collector)
+    labels, loc_ds = creator._build_author_time_series(mock_data_collector)
 
     # Should be downsampled to ~500 + 1 (last point ensured)
     assert len(labels) <= 502, f"Expected ≤502 labels, got {len(labels)}"
     assert len(labels) >= 498, f"Expected ≥498 labels, got {len(labels)}"
 
-    # All authors should be present in both charts
+    # All authors should be present
     assert len(loc_ds) == len(authors)
-    assert len(cba_ds) == len(authors)
 
     # Each author dataset should have the same number of data points as labels
     for ds in loc_ds:
         assert len(ds["data"]) == len(labels), (
             f"Author {ds['label']} has {len(ds['data'])} points, expected {len(labels)}"
         )
-    for ds in cba_ds:
-        assert len(ds["data"]) == len(labels)
 
     # The last timestamp should always be included
     last_expected = sorted(changes.keys())[-1]
@@ -967,12 +1029,6 @@ def test_build_author_time_series_downsample(mock_data_collector):
         for j in range(1, len(values)):
             assert values[j] >= values[j - 1], (
                 f"{ds['label']} LOC not monotonic at index {j}: {values[j - 1]} -> {values[j]}"
-            )
-    for ds in cba_ds:
-        values = ds["data"]
-        for j in range(1, len(values)):
-            assert values[j] >= values[j - 1], (
-                f"{ds['label']} commits not monotonic at index {j}: {values[j - 1]} -> {values[j]}"
             )
 
 

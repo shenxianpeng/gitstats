@@ -5,6 +5,7 @@
 import datetime
 import html
 import json
+import math
 import os
 import re
 import shutil
@@ -660,7 +661,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</tr></table></div>")
 
     def _build_author_time_series(self, data):
-        """Build per-author cumulative lines and commits time series for Chart.js.
+        """Build per-author cumulative added-lines time series for Chart.js.
 
         For large repositories, data points are automatically downsampled to keep
         the HTML file size manageable and Chart.js rendering fast. Since the stored
@@ -682,10 +683,8 @@ class HTMLReportCreator(ReportCreator):
             sampled_indices = set(range(total_points))
 
         lines_by_authors = dict.fromkeys(authors_to_plot, 0)
-        commits_by_authors = dict.fromkeys(authors_to_plot, 0)
         time_labels = []
         per_author_lines = {a: [] for a in authors_to_plot}
-        per_author_commits = {a: [] for a in authors_to_plot}
 
         for i, stamp in enumerate(sorted_stamps):
             # Update running totals: only the author(s) of this commit changed
@@ -694,20 +693,93 @@ class HTMLReportCreator(ReportCreator):
                     lines_by_authors[author] = data.changes_by_date_by_author[stamp][author][
                         "lines_added"
                     ]
-                    commits_by_authors[author] = data.changes_by_date_by_author[stamp][author][
-                        "commits"
-                    ]
 
             # Only record a data point if this index is in the sampled set
             if i in sampled_indices:
                 time_labels.append(stamp)
                 for author in authors_to_plot:
                     per_author_lines[author].append(lines_by_authors[author])
-                    per_author_commits[author].append(commits_by_authors[author])
 
         loc_datasets = [{"label": a, "data": per_author_lines[a]} for a in authors_to_plot]
-        cba_datasets = [{"label": a, "data": per_author_commits[a]} for a in authors_to_plot]
-        return time_labels, loc_datasets, cba_datasets
+        return time_labels, loc_datasets
+
+    def _contributor_timeline_html(self, data: Any, authors: list[str]) -> str:
+        """One row per author on a shared, real time axis.
+
+        A square marks each month with commits (bigger = more commits) and a thin
+        line runs from the author's first to last active month, so who was
+        active when, and for how long, reads at a glance. Plain HTML/CSS: it
+        follows the theme without any script.
+        """
+        months = month_range(data.author_of_month.keys())
+        if not months or not authors:
+            return ""
+        index = {month: i for i, month in enumerate(months)}
+        n = len(months)
+
+        def left(i: float) -> str:
+            return f"{100.0 * i / n:.3f}%"
+
+        per_author: dict[str, dict[str, int]] = {a: {} for a in authors}
+        for month, counts in data.author_of_month.items():
+            for author, commits in counts.items():
+                if author in per_author:
+                    per_author[author][month] = commits
+
+        # Year boundaries as gridlines; label every year, or every 2nd/5th on long histories
+        first_year, last_year = int(months[0][:4]), int(months[-1][:4])
+        span = last_year - first_year + 1
+        every = 1 if span <= 12 else 2 if span <= 24 else 5
+        grid = []
+        for year in range(first_year + 1, last_year + 1):
+            pos = left(index[f"{year}-01"])
+            label = str(year) if year % every == 0 else ""
+            grid.append(f'<span class="timeline-year" style="left: {pos}">{label}</span>')
+
+        rows = []
+        for author in authors:
+            active = sorted(per_author[author])
+            name = html.escape(author)
+            commits = data.get_author_info(author)["commits"]
+            if active:
+                start, end = index[active[0]], index[active[-1]]
+                marks = [
+                    f'<span class="timeline-span" style="left: {left(start + 0.5)}; '
+                    f'width: {left(end - start)}"></span>'
+                ]
+                for month in active:
+                    count = per_author[author][month]
+                    size = min(18.0, 4 + 2.2 * math.sqrt(count))
+                    marks.append(
+                        f'<span class="timeline-mark" style="left: {left(index[month] + 0.5)}; '
+                        f'--size: {size:.1f}px" title="{month}: {count} '
+                        f'commit{"" if count == 1 else "s"}"></span>'
+                    )
+                label = f"{name}: {commits} commits, {active[0]} to {active[-1]}"
+            else:
+                marks = []
+                label = f"{name}: {commits} commits"
+            bot = " bot" if author.endswith("[bot]") else ""
+            rows.append(
+                f'<div class="timeline-row{bot}" role="img" aria-label="{label}">'
+                f'<span class="timeline-name">{name}</span>'
+                f'<span class="timeline-count">{format_int(commits)}</span>'
+                f'<span class="timeline-track">{"".join(marks)}</span></div>'
+            )
+
+        # The axis row shows the year labels from the grid; a history within one
+        # year has no year boundary, so label its first and last month instead
+        ends = "" if grid else f"<span>{months[0]}</span><span>{months[-1]}</span>"
+        return (
+            "<p>One row per author: a square marks each month with commits (bigger means "
+            "more), and the line runs from their first to their last active month. "
+            "Bot accounts are grey.</p>"
+            '<div class="timeline-scroll"><div class="timeline">'
+            f'<div class="timeline-grid" aria-hidden="true">{"".join(grid)}</div>'
+            + "".join(rows)
+            + f'<div class="timeline-axis" aria-hidden="true">{ends}</div>'
+            "</div></div>"
+        )
 
     def create_authors_html(self, data: Any, path: str) -> None:
         ###
@@ -764,7 +836,7 @@ class HTMLReportCreator(ReportCreator):
                 )
 
         # Build per-author time series data for Chart.js
-        time_labels, loc_datasets, cba_datasets = self._build_author_time_series(data)
+        time_labels, loc_datasets = self._build_author_time_series(data)
 
         f.write(html_header(2, "Cumulated Added Lines of Code per Author"))
         f.write(
@@ -775,24 +847,19 @@ class HTMLReportCreator(ReportCreator):
                 loc_datasets,
                 y_label="Lines",
                 time_axis=True,
+                highlight=5,
             )
         )
+        note = "The top 5 authors are in color, the others in grey."
         if len(allauthors) > load_config()["max_authors"]:
-            f.write(
-                '<p class="moreauthors">Only top %d authors shown</p>'
-                % load_config()["max_authors"]
-            )
+            note += " Only the top %d authors are shown." % load_config()["max_authors"]
+        f.write(f'<p class="moreauthors">{note}</p>')
 
-        f.write(html_header(2, "Commits per Author"))
+        # Replaces the former "Commits per Author" line chart; its anchor still lands here
+        f.write('<span id="commits_per_author"></span>')
+        f.write(html_header(2, "Contributor Timeline"))
         f.write(
-            self._render_chartjs(
-                "chart-commits-by-author",
-                "line",
-                time_labels,
-                cba_datasets,
-                y_label="Commits",
-                time_axis=True,
-            )
+            self._contributor_timeline_html(data, data.get_authors(load_config()["max_authors"]))
         )
         if len(allauthors) > load_config()["max_authors"]:
             f.write(
@@ -1579,6 +1646,8 @@ class HTMLReportCreator(ReportCreator):
         f.close()
 
     CHART_COLORS = ["#5b8dee", "#1a7f37", "#cf222e", "#8250df", "#e16f24", "#0550ae"]
+    # Series outside the highlighted top N: a neutral grey readable on both themes
+    OTHER_SERIES_COLOR = "rgba(128, 128, 128, 0.45)"
 
     def _render_chartjs(
         self,
@@ -1591,6 +1660,7 @@ class HTMLReportCreator(ReportCreator):
         aspect_ratio=3,
         max_bar_thickness=None,
         time_axis=False,
+        highlight=None,
     ):
         """Render a Chart.js chart as inline HTML.
 
@@ -1598,6 +1668,10 @@ class HTMLReportCreator(ReportCreator):
         x-axis is linear in time, so quiet periods keep their real width instead
         of collapsing between two adjacent points. Line series are drawn as steps
         because each point holds its value until the next one.
+
+        With ``highlight=N`` (multi-series charts), only the first N series get
+        colors and legend entries; the rest are thin grey lines drawn behind
+        them, so colors never repeat.
         """
         is_multi = len(datasets) > 1
 
@@ -1605,13 +1679,22 @@ class HTMLReportCreator(ReportCreator):
         for i, ds in enumerate(datasets):
             color = self.CHART_COLORS[i % len(self.CHART_COLORS)]
             entry = dict(ds)
-            if is_multi:
+            if is_multi and highlight is not None and i >= highlight:
+                entry.setdefault("borderColor", self.OTHER_SERIES_COLOR)
+                entry.setdefault("backgroundColor", self.OTHER_SERIES_COLOR)
+                entry.setdefault("fill", False)
+                entry.setdefault("pointRadius", 0)
+                entry.setdefault("borderWidth", 1)
+                entry.setdefault("order", 1)  # higher order is drawn first, i.e. behind
+            elif is_multi:
                 entry.setdefault("borderColor", color)
                 entry.setdefault("backgroundColor", color + "33")
                 entry.setdefault("fill", False)
                 entry.setdefault("tension", 0.1)
                 entry.setdefault("pointRadius", 2)
                 entry.setdefault("borderWidth", 1)
+                if highlight is not None:
+                    entry.setdefault("order", 0)
             else:
                 # single dataset: use CSS var for theme-aware color
                 entry["backgroundColor"] = "__CSS_BAR_COLOR__"
@@ -1632,6 +1715,12 @@ class HTMLReportCreator(ReportCreator):
         datasets_json = datasets_json.replace('"__CSS_BAR_COLOR__"', "getCSSVar('--bar-color')")
 
         legend_display = "true" if is_multi else "false"
+        if is_multi and highlight is not None:
+            # Legend lists only the highlighted series
+            legend_display += (
+                ", labels: { filter: function(item) { return item.datasetIndex < %d; } }"
+                % highlight
+            )
         if time_axis:
             # pair each value with its timestamp: {x, y} points on a linear axis
             data_js = f"""datasets: (function(xs, sets) {{
