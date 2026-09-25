@@ -190,6 +190,19 @@ table {
 	min-width: 0;
 }
 
+/* ===== Charts ===== */
+/* Chart.js fills this box (maintainAspectRatio: false). It keeps each chart's
+   proportions on wide screens but never gets flatter than min-height, so the
+   plot stays readable on phones. width: 100% stops min-height from being
+   transferred through aspect-ratio into a minimum width. */
+.chart-box {
+	position: relative;
+	width: 100%;
+	aspect-ratio: var(--chart-ratio, 3);
+	min-height: 240px;
+	margin-bottom: var(--space-2);
+}
+
 table.noborders {
 	border: none;
 	background: transparent;
@@ -430,6 +443,11 @@ tr:hover td {
 
 	.theme-toggle {
 		border-color: transparent;
+	}
+
+	/* A legend with many series wraps onto several lines; leave room for the plot too */
+	.chart-box.has-legend {
+		min-height: 440px;
 	}
 }
 
