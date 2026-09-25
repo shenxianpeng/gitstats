@@ -159,8 +159,8 @@ def test_render_chartjs_single_dataset():
     assert "getCSSVar('--bar-color')" in result
     # Single dataset: no legend, no borderColor in JS
     assert "legend: { display: false }" in result
-    # Y-axis title
-    assert "'Commits'" in result
+    # No y-axis title: the section heading names the unit
+    assert "title: { display: true" not in result
 
 
 def test_render_chartjs_multi_dataset():
@@ -267,16 +267,20 @@ def test_render_chartjs_xss_protection():
     assert "</script>" not in result.replace("</script>", "")
 
 
-def test_render_chartjs_y_label():
+def test_render_chartjs_no_y_axis_title():
+    """Section headings name what a chart counts, so the y-axis carries no title."""
     creator = HTMLReportCreator()
-    result = creator._render_chartjs(
-        "chart-yl",
-        "bar",
-        ["X"],
-        [{"label": "C", "data": [1]}],
-        y_label="Lines of Code",
-    )
-    assert "title: { display: true, text: 'Lines of Code' }" in result
+    result = creator._render_chartjs("chart-yl", "bar", ["X"], [{"label": "C", "data": [1]}])
+    assert "y: { beginAtZero: true }" in result
+    assert "title: { display: true" not in result
+
+
+def test_chart_fonts_are_monospace():
+    creator = HTMLReportCreator()
+    creator.title = "p"
+    f = StringIO()
+    creator.print_header(f)
+    assert "Chart.defaults.font.family = getCSSVar('--font-mono');" in f.getvalue()
 
 
 @pytest.mark.parametrize(

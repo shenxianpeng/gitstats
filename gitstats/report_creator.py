@@ -93,6 +93,9 @@ CHART_SCRIPT = """<script>
 		const grid = getCSSVar('--chart-grid');
 		Chart.defaults.color = text;
 		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
 		if (!chart) return;
 		// Built charts keep the defaults they resolved, so set colors on each one.
 		Object.values(chart.options.scales).forEach(function(scale) {
@@ -410,7 +413,6 @@ class HTMLReportCreator(ReportCreator):
                 "bar",
                 years,
                 [{"label": "Commits", "data": values}],
-                y_label="Commits",
                 aspect_ratio=5,
                 annotations=annotations,
             )
@@ -574,7 +576,6 @@ class HTMLReportCreator(ReportCreator):
                 "bar",
                 [day(m) for m in mondays],
                 [{"label": "Commits", "data": weekly_values}],
-                y_label="Commits",
                 aspect_ratio=5,
             )
         )
@@ -666,7 +667,6 @@ class HTMLReportCreator(ReportCreator):
                 "bar",
                 list(self.MONTH_NAMES),
                 [{"label": "Commits", "data": values}],
-                y_label="Commits",
                 max_bar_thickness=40,
                 aspect_ratio=2,
                 annotations={"values": True},
@@ -685,7 +685,6 @@ class HTMLReportCreator(ReportCreator):
                 "bar",
                 cbym_keys,
                 [{"label": "Commits", "data": cbym_values}],
-                y_label="Commits",
                 x_ticks_rotate=True,
                 # a year or more without commits gets shaded, with the peaks around it
                 annotations=gap_annotations(cbym_keys, cbym_values, min_gap=12),
@@ -753,7 +752,6 @@ class HTMLReportCreator(ReportCreator):
                 "bar",
                 cby_all_years,
                 [{"label": "Commits", "data": cby_values}],
-                y_label="Commits",
                 annotations=gap_annotations(cby_all_years, cby_values, min_gap=2),
             )
         )
@@ -990,7 +988,6 @@ class HTMLReportCreator(ReportCreator):
                 "line",
                 time_labels,
                 loc_datasets,
-                y_label="Lines",
                 time_axis=True,
                 highlight=5,
             )
@@ -1112,7 +1109,6 @@ class HTMLReportCreator(ReportCreator):
                 "bar",
                 dom_labels,
                 [{"label": "Commits", "data": dom_values}],
-                y_label="Commits",
                 x_ticks_rotate=True,
             )
         )
@@ -1133,7 +1129,6 @@ class HTMLReportCreator(ReportCreator):
                     "bar",
                     nc_keys,
                     [{"label": "New contributors", "data": nc_values}],
-                    y_label="New contributors",
                     x_ticks_rotate=True,
                     aspect_ratio=4,
                 )
@@ -1193,7 +1188,6 @@ class HTMLReportCreator(ReportCreator):
                 "line",
                 fbd_stamps,
                 [{"label": "Files", "data": fbd_values}],
-                y_label="Files",
                 time_axis=True,
             )
         )
@@ -1260,7 +1254,6 @@ class HTMLReportCreator(ReportCreator):
                     "bar",
                     churn_labels,
                     [{"label": "Commits", "data": churn_values}],
-                    y_label="Times Changed",
                     x_ticks_rotate=True,
                     aspect_ratio=3,
                 )
@@ -1314,7 +1307,6 @@ class HTMLReportCreator(ReportCreator):
                 "line",
                 loc_stamps,
                 [{"label": "Lines", "data": loc_values}],
-                y_label="Lines",
                 time_axis=True,
             )
         )
@@ -1812,7 +1804,6 @@ class HTMLReportCreator(ReportCreator):
         chart_type,
         labels,
         datasets,
-        y_label="Commits",
         x_ticks_rotate=False,
         aspect_ratio=3,
         max_bar_thickness=None,
@@ -1967,7 +1958,7 @@ class HTMLReportCreator(ReportCreator):
       }},
       scales: {{
         x: {x_scale_js},
-        y: {{ beginAtZero: true{grace_js}, title: {{ display: true, text: '{y_label}' }} }}
+        y: {{ beginAtZero: true{grace_js} }}
       }}{f", datasets: {{ bar: {{ maxBarThickness: {max_bar_thickness} }} }}" if max_bar_thickness else ""}
     }}
   }});
