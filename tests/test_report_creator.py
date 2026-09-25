@@ -269,6 +269,22 @@ def test_render_chartjs_y_label():
     assert "title: { display: true, text: 'Lines of Code' }" in result
 
 
+def test_render_chartjs_lines_have_no_point_markers():
+    creator = HTMLReportCreator()
+    single = creator._render_chartjs("c1", "line", ["X", "Y"], [{"label": "L", "data": [1, 2]}])
+    multi = creator._render_chartjs(
+        "c2", "line", ["X"], [{"label": "A", "data": [1]}, {"label": "B", "data": [2]}]
+    )
+    for result in (single, multi):
+        assert '"pointRadius": 0' in result
+        assert '"pointRadius": 2' not in result
+        assert '"pointHoverRadius": 3' in result
+        # Without markers, tooltips pick the nearest point
+        assert "interaction: { mode: 'nearest', intersect: false }" in result
+    bar = creator._render_chartjs("c3", "bar", ["X"], [{"label": "B", "data": [1]}])
+    assert "interaction:" not in bar
+
+
 def test_render_chartjs_category_axis_by_default():
     creator = HTMLReportCreator()
     result = creator._render_chartjs("chart-cat", "line", ["X"], [{"label": "C", "data": [1]}])

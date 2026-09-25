@@ -1691,7 +1691,8 @@ class HTMLReportCreator(ReportCreator):
                 entry.setdefault("backgroundColor", color + "33")
                 entry.setdefault("fill", False)
                 entry.setdefault("tension", 0.1)
-                entry.setdefault("pointRadius", 2)
+                entry.setdefault("pointRadius", 0)
+                entry.setdefault("pointHoverRadius", 3)
                 entry.setdefault("borderWidth", 1)
                 if highlight is not None:
                     entry.setdefault("order", 0)
@@ -1702,7 +1703,8 @@ class HTMLReportCreator(ReportCreator):
                 entry["themed"] = True
                 if chart_type == "line":
                     entry.setdefault("borderWidth", 1)
-                    entry.setdefault("pointRadius", 2)
+                    entry.setdefault("pointRadius", 0)
+                    entry.setdefault("pointHoverRadius", 3)
             if time_axis and chart_type == "line":
                 entry.setdefault("stepped", True)
             js_datasets.append(entry)
@@ -1743,6 +1745,14 @@ class HTMLReportCreator(ReportCreator):
             x_scale_js = f"{{ ticks: {{ {x_ticks_opts} }} }}"
             tooltip_js = ""
 
+        # Lines have no point markers, so tooltips follow the nearest point
+        # instead of needing the pointer exactly on one
+        interaction_js = (
+            "\n      interaction: { mode: 'nearest', intersect: false },"
+            if chart_type == "line"
+            else ""
+        )
+
         # The chart fills a .chart-box that keeps aspect_ratio on wide screens
         # but has a minimum height, so phones don't get a flattened plot.
         box_class = "chart-box has-legend" if is_multi else "chart-box"
@@ -1759,7 +1769,7 @@ class HTMLReportCreator(ReportCreator):
     }},
     options: {{
       responsive: true,
-      maintainAspectRatio: false,
+      maintainAspectRatio: false,{interaction_js}
       plugins: {{
         legend: {{ display: {legend_display} }}{tooltip_js}
       }},
