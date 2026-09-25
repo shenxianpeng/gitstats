@@ -918,17 +918,29 @@ class HTMLReportCreator(ReportCreator):
         self.print_nav(f, "files.html")
         f.write("<h1>Files</h1>")
 
-        f.write("<dl>\n")
-        f.write(f"<dt>Total files</dt><dd>{format_int(data.get_total_files())}</dd>")
-        f.write(f"<dt>Total lines</dt><dd>{format_int(data.get_total_loc())}</dd>")
-        try:
-            f.write(
-                "<dt>Average file size</dt><dd>%s</dd>"
-                % format_bytes(float(data.get_total_size()) / data.get_total_files())
+        total_files = data.get_total_files()
+        extensions = len(data.extensions)
+        tiles = [
+            (
+                "Files",
+                format_int(total_files),
+                f"{extensions} extension{'' if extensions == 1 else 's'}",
+            ),
+            (
+                "Lines of Code",
+                format_int(data.get_total_loc()),
+                f"{data.get_total_loc() / total_files:.0f} per file" if total_files else "",
+            ),
+        ]
+        if total_files:
+            tiles.append(
+                (
+                    "Average File Size",
+                    format_bytes(float(data.get_total_size()) / total_files),
+                    f"{format_bytes(data.get_total_size())} in total",
+                )
             )
-        except ZeroDivisionError:
-            pass
-        f.write("</dl>\n")
+        f.write(stat_tiles_html(tiles))
 
         # Files :: File count by date
         f.write(html_header(2, "File count by date"))
@@ -1033,9 +1045,32 @@ class HTMLReportCreator(ReportCreator):
         self.print_nav(f, "lines.html")
         f.write("<h1>Lines</h1>")
 
-        f.write("<dl>\n")
-        f.write(f"<dt>Total lines</dt><dd>{format_int(data.get_total_loc())}</dd>")
-        f.write("</dl>\n")
+        total_commits = data.get_total_commits()
+        f.write(
+            stat_tiles_html(
+                [
+                    (
+                        "Lines of Code",
+                        format_int(data.get_total_loc()),
+                        f"in {format_int(data.get_total_files())} files",
+                    ),
+                    (
+                        "Lines Added",
+                        f'<span class="stat-added">+{format_int(data.total_lines_added)}</span>',
+                        f"{data.total_lines_added / total_commits:.0f} per commit"
+                        if total_commits
+                        else "",
+                    ),
+                    (
+                        "Lines Removed",
+                        f'<span class="stat-removed">−{format_int(data.total_lines_removed)}</span>',
+                        f"{data.total_lines_removed / total_commits:.0f} per commit"
+                        if total_commits
+                        else "",
+                    ),
+                ]
+            )
+        )
 
         f.write(html_header(2, "Lines of Code"))
         loc_stamps = sorted(data.changes_by_date.keys())
@@ -1063,14 +1098,26 @@ class HTMLReportCreator(ReportCreator):
         self.print_nav(f, "tags.html")
         f.write("<h1>Tags</h1>")
 
-        f.write("<dl>")
-        f.write("<dt>Total tags</dt><dd>%d</dd>" % len(data.tags))
-        if len(data.tags) > 0:
+        if data.tags:
+            latest = max(data.tags, key=lambda t: (data.tags[t]["date"], t))
             f.write(
-                "<dt>Average commits per tag</dt><dd>%.2f</dd>"
-                % (1.0 * data.get_total_commits() / len(data.tags))
+                stat_tiles_html(
+                    [
+                        (
+                            "Tags",
+                            format_int(len(data.tags)),
+                            f"latest {html.escape(latest)} &middot; {data.tags[latest]['date']}",
+                        ),
+                        (
+                            "Commits per Tag",
+                            f"{data.get_total_commits() / len(data.tags):.1f}",
+                            f"{format_int(data.get_total_commits())} commits in total",
+                        ),
+                    ]
+                )
             )
-        f.write("</dl>")
+        else:
+            f.write(stat_tiles_html([("Tags", "0", "no tags yet")]))
 
         f.write('<div class="table-scroll"><table class="tags">')
         f.write('<tr><th>Name</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr>')
@@ -1161,11 +1208,24 @@ class HTMLReportCreator(ReportCreator):
             "<p>Ownership is measured by how many commits each author made to each "
             "file. It highlights <strong>bus-factor risk</strong> (files only one "
             "person has ever touched) and where knowledge is concentrated.</p>"
-            "<dl>"
-            "<dt>Files tracked</dt><dd>%d</dd>"
-            "<dt>Single-owner files</dt><dd>%d (%.1f%%)</dd>"
-            "<dt>Contributors</dt><dd>%d</dd>"
-            "</dl></div>" % (total, single, single_pct, len(ownership["authors"]))
+            "</div>"
+        )
+        f.write(
+            stat_tiles_html(
+                [
+                    ("Files Tracked", format_int(total), "every file changed in history"),
+                    (
+                        "Single-Owner Files",
+                        format_int(single),
+                        f"{single_pct:.1f}% of tracked files",
+                    ),
+                    (
+                        "Contributors",
+                        format_int(len(ownership["authors"])),
+                        "authors who changed files",
+                    ),
+                ]
+            )
         )
 
         # Bus-factor risk: single-owner files, most-changed first
@@ -1295,23 +1355,34 @@ class HTMLReportCreator(ReportCreator):
             return
 
         span = history["last_year"] - history["first_year"] + 1
+        peak_commits = next(y["commits"] for y in years if y["year"] == history["peak_year"])
+        release_years = [y["year"] for y in years if y["releases"]]
         f.write(
             '<div class="history-summary">'
             "<p>The project's life, one year at a time, told from the commit "
             "record: how activity rose and fell against the project's own "
             "baseline, who arrived when, and what was released.</p>"
-            "<dl>"
-            "<dt>Span</dt><dd>%d – %d (%d year%s)</dd>"
-            "<dt>Peak year</dt><dd>%d</dd>"
-            "<dt>Releases</dt><dd>%d</dd>"
-            "</dl></div>"
-            % (
-                history["first_year"],
-                history["last_year"],
-                span,
-                "s" if span != 1 else "",
-                history["peak_year"],
-                history["total_releases"],
+            "</div>"
+        )
+        f.write(
+            stat_tiles_html(
+                [
+                    (
+                        "Span",
+                        f"{history['first_year']} – {history['last_year']}",
+                        f"{span} year{'s' if span != 1 else ''}",
+                    ),
+                    (
+                        "Peak Year",
+                        str(history["peak_year"]),
+                        f"{format_int(peak_commits)} commits",
+                    ),
+                    (
+                        "Releases",
+                        format_int(history["total_releases"]),
+                        f"latest in {release_years[-1]}" if release_years else "none tagged",
+                    ),
+                ]
             )
         )
 
@@ -1988,17 +2059,28 @@ def stat_tiles_html(tiles: list[tuple[str, str, str]]) -> str:
     """Render headline numbers as a grid of stat tiles (KPI cards).
 
     Each tile is ``(label, value, note)``; ``value`` and ``note`` are inserted
-    as HTML, so callers escape any user-controlled text.
+    as HTML, so callers escape any user-controlled text. An empty note is
+    left out.
+
+    Column counts for wide, medium (<=1024px) and narrow (<=560px) screens
+    are the largest divisors of the tile count up to 6, 3 and 2, so every
+    row is full: 6 tiles -> 6/3/2, 3 -> 3/3/1, 2 -> 2/2/2.
     """
+
+    def columns(limit: int) -> int:
+        n = max(len(tiles), 1)
+        return next(c for c in range(min(n, limit), 0, -1) if n % c == 0)
+
     items = "".join(
         '<div class="stat-tile">'
         f"<dt>{label}</dt>"
         f'<dd class="stat-value">{value}</dd>'
-        f'<dd class="stat-note">{note}</dd>'
-        "</div>"
+        + (f'<dd class="stat-note">{note}</dd>' if note else "")
+        + "</div>"
         for label, value, note in tiles
     )
-    return f'<dl class="stat-tiles">{items}</dl>'
+    style = f"--cols: {columns(6)}; --cols-md: {columns(3)}; --cols-sm: {columns(2)}"
+    return f'<dl class="stat-tiles" style="{style}">{items}</dl>'
 
 
 def html_header(level: int, text: str) -> str:
