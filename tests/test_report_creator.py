@@ -331,6 +331,32 @@ def test_render_chartjs_annotations():
     assert "grace" not in plain
 
 
+def test_render_chartjs_month_axis():
+    creator = HTMLReportCreator()
+    months = month_range(["2020-01", "2023-12"])
+    result = creator._render_chartjs(
+        "c-months", "bar", months, [{"label": "C", "data": [1] * len(months)}], month_axis=True
+    )
+    # Years at each January, horizontal, thinned by monthAxisTick instead of rotated
+    assert "ticks: { autoSkip: false, maxRotation: 0, callback: monthAxisTick }" in result
+    # gridlines only at the labelled years, not at every month
+    assert "grid: { color: monthAxisGrid }" in result
+    assert "minRotation: 45" not in result
+
+
+def test_monthly_charts_use_the_month_axis(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    for page, chart in (
+        ("activity.html", "chart-commits-by-year-month"),
+        ("authors.html", "chart-contributor-growth"),
+    ):
+        with open(os.path.join(temp_dir, page), encoding="utf-8") as f:
+            html = f.read()
+        script = html[html.index(f'<canvas id="{chart}">') :]
+        script = script[: script.index("</script>")]
+        assert "callback: monthAxisTick" in script, chart
+
+
 def test_render_chartjs_lines_have_no_point_markers():
     creator = HTMLReportCreator()
     single = creator._render_chartjs("c1", "line", ["X", "Y"], [{"label": "L", "data": [1, 2]}])

@@ -101,7 +101,8 @@ CHART_SCRIPT = """<script>
 		Object.values(chart.options.scales).forEach(function(scale) {
 			scale.ticks.color = text;
 			scale.title.color = text;
-			scale.grid.color = grid;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
 			scale.border.color = grid;
 		});
 		chart.options.plugins.legend.labels.color = text;
@@ -181,6 +182,25 @@ CHART_SCRIPT = """<script>
 			});
 		}
 	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
 
 	function formatChartDate(ms, unit) {
 		const d = new Date(ms);
@@ -685,7 +705,7 @@ class HTMLReportCreator(ReportCreator):
                 "bar",
                 cbym_keys,
                 [{"label": "Commits", "data": cbym_values}],
-                x_ticks_rotate=True,
+                month_axis=True,
                 # a year or more without commits gets shaded, with the peaks around it
                 annotations=gap_annotations(cbym_keys, cbym_values, min_gap=12),
             )
@@ -1115,7 +1135,7 @@ class HTMLReportCreator(ReportCreator):
                     "bar",
                     nc_keys,
                     [{"label": "New contributors", "data": nc_values}],
-                    x_ticks_rotate=True,
+                    month_axis=True,
                     aspect_ratio=4,
                 )
             )
@@ -1787,6 +1807,7 @@ class HTMLReportCreator(ReportCreator):
         highlight=None,
         annotations=None,
         tooltip_share=False,
+        month_axis=False,
     ):
         """Render a Chart.js chart as inline HTML.
 
@@ -1806,6 +1827,9 @@ class HTMLReportCreator(ReportCreator):
 
         With ``tooltip_share=True`` (single series), the tooltip also gives the
         value's share of the series total: "67 commits (12.1%)".
+
+        With ``month_axis=True``, ``labels`` are "YYYY-MM" months and the x-axis
+        labels only the years (at each January), horizontally.
         """
         is_multi = len(datasets) > 1
 
@@ -1883,10 +1907,15 @@ class HTMLReportCreator(ReportCreator):
         else:
             data_js = f"""labels: labels,
       datasets: {datasets_json}"""
-            x_ticks_opts = (
-                "maxRotation: 45, minRotation: 45" if x_ticks_rotate else "maxRotation: 0"
-            )
-            x_scale_js = f"{{ ticks: {{ {x_ticks_opts} }} }}"
+            if month_axis:
+                x_scale_js = (
+                    "{ ticks: { autoSkip: false, maxRotation: 0, callback: monthAxisTick }, "
+                    "grid: { color: monthAxisGrid } }"
+                )
+            elif x_ticks_rotate:
+                x_scale_js = "{ ticks: { maxRotation: 45, minRotation: 45 } }"
+            else:
+                x_scale_js = "{ ticks: { maxRotation: 0 } }"
             tooltip_js = ""
             if tooltip_share:
                 tooltip_js = """,
