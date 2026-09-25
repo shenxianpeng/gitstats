@@ -1123,22 +1123,27 @@ class HTMLReportCreator(ReportCreator):
             + "</table></div>"
         )
 
-        # Contributor Growth Over Time
+        # Contributor growth: everyone who has contributed so far, month by month
         if data.new_contributors_by_month:
             f.write(html_header(2, "Contributor growth"))
             f.write(
                 '<p class="section-note">'
-                "Number of first-time contributors per month. "
-                "A growing trend indicates a healthy, welcoming project.</p>"
+                "Contributors so far, month by month: each step up is a month in "
+                "which someone made their first commit.</p>"
             )
-            nc_keys = month_range(data.new_contributors_by_month.keys())
-            nc_values = [data.new_contributors_by_month.get(k, 0) for k in nc_keys]
+            new = data.new_contributors_by_month
+            growth_months = month_range([*new, *data.commits_by_month])
+            total, totals, notes = 0, [], []
+            for month in growth_months:
+                total += new.get(month, 0)
+                totals.append(total)
+                notes.append(f"+{new[month]} new" if new.get(month) else "")
             f.write(
                 self._render_chartjs(
                     "chart-contributor-growth",
-                    "bar",
-                    nc_keys,
-                    [{"label": "New contributors", "data": nc_values}],
+                    "line",
+                    growth_months,
+                    [{"label": "Contributors", "data": totals, "stepped": True, "notes": notes}],
                     month_axis=True,
                     aspect_ratio=4,
                 )
@@ -1840,6 +1845,9 @@ class HTMLReportCreator(ReportCreator):
 
         With ``month_axis=True``, ``labels`` are "YYYY-MM" months and the x-axis
         labels only the years (at each January), horizontally.
+
+        A dataset may carry ``notes``, one string per point, shown as an extra
+        tooltip line (e.g. "+2 new"); empty strings add nothing.
         """
         is_multi = len(datasets) > 1
 
@@ -1910,10 +1918,11 @@ class HTMLReportCreator(ReportCreator):
         return sets;
       }})(labels, {datasets_json})"""
             x_scale_js = "timeAxis(labels)"
-            tooltip_js = """,
-        tooltip: { callbacks: { title: function(items) {
+            tooltip_callbacks = [
+                """title: function(items) {
           return items.length ? formatChartDate(items[0].parsed.x) : '';
-        } } }"""
+        }"""
+            ]
         else:
             data_js = f"""labels: labels,
       datasets: {datasets_json}"""
@@ -1926,13 +1935,25 @@ class HTMLReportCreator(ReportCreator):
                 x_scale_js = "{ ticks: { maxRotation: 45, minRotation: 45 } }"
             else:
                 x_scale_js = "{ ticks: { maxRotation: 0 } }"
-            tooltip_js = ""
+            tooltip_callbacks = []
             if tooltip_share:
-                tooltip_js = """,
-        tooltip: { callbacks: { label: function(item) {
+                tooltip_callbacks.append(
+                    """label: function(item) {
           const total = item.dataset.data.reduce(function(a, b) { return a + b; }, 0) || 1;
           return item.parsed.y + ' commits (' + (100 * item.parsed.y / total).toFixed(1) + '%)';
-        } } }"""
+        }"""
+                )
+        if any("notes" in ds for ds in datasets):
+            tooltip_callbacks.append(
+                """afterLabel: function(item) {
+          return (item.dataset.notes || [])[item.dataIndex] || '';
+        }"""
+            )
+        tooltip_js = ""
+        if tooltip_callbacks:
+            tooltip_js = (
+                ",\n        tooltip: { callbacks: { " + ", ".join(tooltip_callbacks) + " } }"
+            )
 
         # Lines have no point markers, so tooltips follow the nearest point
         # instead of needing the pointer exactly on one
@@ -1973,7 +1994,7 @@ class HTMLReportCreator(ReportCreator):
       }},
       scales: {{
         x: {x_scale_js},
-        y: {{ beginAtZero: true{grace_js} }}
+        y: {{ beginAtZero: true{grace_js}, ticks: {{ precision: 0 }} }}
       }}{f", datasets: {{ bar: {{ maxBarThickness: {max_bar_thickness} }} }}" if max_bar_thickness else ""}
     }}
   }});

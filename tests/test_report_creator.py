@@ -271,7 +271,7 @@ def test_render_chartjs_no_y_axis_title():
     """Section headings name what a chart counts, so the y-axis carries no title."""
     creator = HTMLReportCreator()
     result = creator._render_chartjs("chart-yl", "bar", ["X"], [{"label": "C", "data": [1]}])
-    assert "y: { beginAtZero: true }" in result
+    assert "y: { beginAtZero: true, ticks: { precision: 0 } }" in result
     assert "title: { display: true" not in result
 
 
@@ -1744,3 +1744,42 @@ def test_section_descriptions_share_one_style(mock_data_collector, temp_dir):
         assert "<p><em>" not in html, page
         notes += html.count('<p class="section-note">')
     assert notes >= 6
+
+
+def test_contributor_growth_is_cumulative(mock_data_collector, temp_dir):
+    """Contributors so far, as a step line up to the last month with commits."""
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "authors.html")) as f:
+        html = f.read()
+
+    chart = html[html.index('id="chart-contributor-growth"') :]
+    chart = chart[: chart.index("</script>")]
+    assert "type: 'line'" in chart
+    # one new contributor in each of Jan-Mar 2023, then none through June
+    assert '"2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06"' in chart
+    assert '"data": [1, 2, 3, 3, 3, 3], "stepped": true' in chart
+    assert '"notes": ["+1 new", "+1 new", "+1 new", "", "", ""]' in chart
+    assert "afterLabel: function(item)" in chart
+
+
+def test_render_chartjs_merges_tooltip_callbacks():
+    """Notes add an afterLabel line without dropping the chart's other callbacks."""
+    creator = HTMLReportCreator()
+    result = creator._render_chartjs(
+        "c",
+        "bar",
+        ["a", "b"],
+        [{"label": "C", "data": [1, 2], "notes": ["x", ""]}],
+        tooltip_share=True,
+    )
+    assert result.count("tooltip:") == 1
+    assert "label: function(item)" in result
+    assert "afterLabel: function(item)" in result
+
+
+def test_render_chartjs_integer_y_ticks():
+    """Every chart counts whole things, so the y-axis never shows 0.2 steps."""
+    creator = HTMLReportCreator()
+    result = creator._render_chartjs("c", "bar", ["a"], [{"label": "C", "data": [1]}])
+    assert "y: { beginAtZero: true, ticks: { precision: 0 } }" in result
