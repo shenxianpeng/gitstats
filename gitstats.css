@@ -34,7 +34,7 @@
 	--surface-color: #f5f5f4;
 	--text-color: #211e1e;
 	--text-secondary: #656363;
-	--text-muted: #b7b1b1;
+	--text-muted: #716b6b; /* >= 4.5:1 on --bg-color and --surface-color */
 	--border-color: #cfcecd;
 	--border-strong: #9e9a9a;
 	--accent-color: #211e1e;
@@ -81,7 +81,7 @@
 	--surface-color: #2d2929;
 	--text-color: #f1ecec;
 	--text-secondary: #b7b1b1;
-	--text-muted: #656363;
+	--text-muted: #9a9393; /* >= 4.5:1 on --bg-color and --surface-color */
 	--border-color: #3d3838;
 	--border-strong: #656363;
 	--accent-color: #f1ecec;
@@ -308,6 +308,11 @@ table.tags td {
 	vertical-align: top;
 }
 
+/* Dates, tag names and spans read badly when wrapped */
+td.nowrap {
+	white-space: nowrap;
+}
+
 td {
 	background-color: var(--table-bg);
 	padding: var(--space-2) var(--space-3);
@@ -485,12 +490,10 @@ tr:hover td {
 	display: block;
 }
 
-/* ===== Narrow screens: brand + icons on top, page links in their own scrolling row ===== */
-@media (max-width: 768px) {
-	body {
-		padding: 0 var(--space-4);
-	}
-
+/* ===== Below 1024px: brand + icons on top, page links in their own row =====
+   One row needs about 860px (970px with the AI Insights link); switching
+   earlier keeps the links from scrolling inside a squeezed row. */
+@media (max-width: 1024px) {
 	.nav {
 		flex-wrap: wrap;
 		padding: 0;
@@ -523,6 +526,13 @@ tr:hover td {
 
 	.theme-toggle {
 		border-color: transparent;
+	}
+}
+
+/* ===== Phones ===== */
+@media (max-width: 768px) {
+	body {
+		padding: 0 var(--space-4);
 	}
 
 	/* A legend with many series wraps onto several lines; leave room for the plot too */
@@ -592,12 +602,30 @@ img {
 	margin: var(--space-3) 0;
 }
 
-th img {
-	border: none;
-	padding: 0;
-	background-color: transparent;
-	margin: 0;
-	display: inline;
+/* Sort indicator added by sortable.js; the SVG is used as a mask over
+   currentColor so it follows the theme. */
+.sortarrow {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	margin-left: var(--space-1);
+	vertical-align: -1px;
+	background-color: currentColor;
+	opacity: 0.4;
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 4l3-3 3 3M2 6l3 3 3-3' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E") center / contain no-repeat;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 4l3-3 3 3M2 6l3 3 3-3' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.sortarrow[data-sort="asc"] {
+	opacity: 1;
+	-webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 6.5l3-3 3 3' fill='none' stroke='black' stroke-width='1.8'/%3E%3C/svg%3E");
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 6.5l3-3 3 3' fill='none' stroke='black' stroke-width='1.8'/%3E%3C/svg%3E");
+}
+
+.sortarrow[data-sort="desc"] {
+	opacity: 1;
+	-webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 3.5l3 3 3-3' fill='none' stroke='black' stroke-width='1.8'/%3E%3C/svg%3E");
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 3.5l3 3 3-3' fill='none' stroke='black' stroke-width='1.8'/%3E%3C/svg%3E");
 }
 
 /* ===== Links ===== */
