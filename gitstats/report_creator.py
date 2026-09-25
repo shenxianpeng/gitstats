@@ -1549,7 +1549,10 @@ class HTMLReportCreator(ReportCreator):
             x_scale_js = f"{{ ticks: {{ {x_ticks_opts} }} }}"
             tooltip_js = ""
 
-        return f"""<div style="max-width:100%;margin-bottom:8px"><canvas id="{chart_id}"></canvas></div>
+        # The chart fills a .chart-box that keeps aspect_ratio on wide screens
+        # but has a minimum height, so phones don't get a flattened plot.
+        box_class = "chart-box has-legend" if is_multi else "chart-box"
+        return f"""<div class="{box_class}" style="--chart-ratio: {aspect_ratio}"><canvas id="{chart_id}"></canvas></div>
 <script>
 (function() {{
   var ctx = document.getElementById('{chart_id}').getContext('2d');
@@ -1562,8 +1565,7 @@ class HTMLReportCreator(ReportCreator):
     }},
     options: {{
       responsive: true,
-      maintainAspectRatio: true,
-      aspectRatio: {aspect_ratio},
+      maintainAspectRatio: false,
       plugins: {{
         legend: {{ display: {legend_display} }}{tooltip_js}
       }},
