@@ -325,6 +325,8 @@ def test_print_header_theme_defaults_to_system_preference():
     output = f.getvalue()
 
     assert "prefers-color-scheme: dark" in output
+    # On narrow screens the nav scrolls sideways to the current page
+    assert "revealCurrentNavItem();" in output
     # Switching themes notifies the charts so they can recolor
     assert "dispatchEvent(new Event('themechange'))" in output
     assert "addEventListener('themechange'" in output
@@ -803,6 +805,28 @@ def test_create_all_pages(mock_data_collector, temp_dir):
 
     # AI insights page should NOT be created when ai_summaries is empty
     assert not os.path.exists(f"{temp_dir}/ai-insights.html")
+
+
+def test_every_table_scrolls_in_its_own_box(mock_data_collector, temp_dir):
+    """Wide tables must not widen the page on phones."""
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    for fname in os.listdir(temp_dir):
+        if not fname.endswith(".html"):
+            continue
+        with open(os.path.join(temp_dir, fname), encoding="utf-8") as f:
+            content = f.read()
+        assert content.count("<table") == content.count('<div class="table-scroll"><table'), fname
+        assert content.count("</table>") == content.count("</table></div>"), fname
+
+
+def test_table_with_chart_layout_uses_css_class(mock_data_collector, temp_dir):
+    # A class (not inline flex styles) so the chart can wrap below the table on phones
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "activity.html"), encoding="utf-8") as f:
+        content = f.read()
+    assert '<div class="table-with-chart">' in content
+    assert '<div class="chart-pane">' in content
+    assert "display:flex" not in content
 
 
 def test_create_all_pages_with_ai(mock_data_collector_with_ai, temp_dir):
