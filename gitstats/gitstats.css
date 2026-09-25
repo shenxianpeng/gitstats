@@ -1167,25 +1167,54 @@ details.table-details[open] > summary {
 	line-height: 1.6;
 }
 
+/* One row per year, like the rest of the report: hairline separators, no
+   boxes. The year and its era sit in a left column, the facts on the right. */
 .history-year {
-	padding: var(--space-3) var(--space-4);
-	margin-bottom: var(--space-3);
-	border: 1px solid var(--border-color);
-	border-left: 3px solid var(--border-strong);
+	display: grid;
+	grid-template-columns: 10rem minmax(0, 1fr);
+	column-gap: var(--space-5);
+	padding: var(--space-4) 0;
+	border-top: 1px solid var(--table-border);
+}
+
+.history-year > :not(.history-year-head) {
+	grid-column: 2;
 }
 
 .history-year-head {
+	grid-column: 1;
+	grid-row: 1 / span 8;
 	display: flex;
-	align-items: baseline;
-	gap: var(--space-3);
-	margin-bottom: var(--space-2);
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--space-1);
 }
 
 .history-year-num {
 	font-family: var(--font-mono);
-	font-size: var(--font-size-lg);
+	font-size: var(--font-size-xl);
 	font-weight: 700;
+	line-height: 1.1;
 	color: var(--text-color);
+}
+
+@media (max-width: 560px) {
+	.history-year {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.history-year > :not(.history-year-head) {
+		grid-column: 1;
+	}
+
+	.history-year-head {
+		grid-row: auto;
+		flex-direction: row;
+		align-items: baseline;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+		margin-bottom: var(--space-2);
+	}
 }
 
 .history-era {
@@ -1223,9 +1252,8 @@ details.table-details[open] > summary {
 
 .history-bar-track {
 	height: 6px;
-	margin-bottom: var(--space-2);
+	margin: var(--space-1) 0 var(--space-2);
 	background-color: var(--surface-color);
-	border: 1px solid var(--border-color);
 }
 
 .history-bar {
@@ -1233,11 +1261,11 @@ details.table-details[open] > summary {
 	background-color: var(--bar-color);
 }
 
+/* AI narration above the timeline: a quiet panel, no accent bar */
 .history-prologue {
 	padding: var(--space-4);
 	margin: var(--space-4) 0;
-	border: 1px solid var(--border-color);
-	border-left: 3px solid var(--link-color);
+	background-color: var(--surface-color);
 }
 
 .history-prologue p {
