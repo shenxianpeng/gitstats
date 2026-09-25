@@ -1091,7 +1091,7 @@ class HTMLReportCreator(ReportCreator):
             )
             for filepath, count in top_churn:
                 f.write(
-                    '<tr><td class="%s">%s</td><td class="num">%d</td></tr>'
+                    '<tr><td class="%s path">%s</td><td class="num">%d</td></tr>'
                     % (
                         self._heat_td_class(count, max_churn),
                         html.escape(filepath),
@@ -1320,7 +1320,7 @@ class HTMLReportCreator(ReportCreator):
             )
             for fs in risk_files[:50]:
                 f.write(
-                    '<tr><td>%s</td><td>%s</td><td class="num">%d</td></tr>'
+                    '<tr><td class="path">%s</td><td>%s</td><td class="num">%d</td></tr>'
                     % (html.escape(fs["path"]), html.escape(fs["owner"]), fs["edits"])
                 )
             f.write("</table></div>")
@@ -1379,7 +1379,7 @@ class HTMLReportCreator(ReportCreator):
             )
             for fs in shared[:20]:
                 f.write(
-                    '<tr><td>%s</td><td class="num">%d</td><td>%s</td><td class="num">%.1f%%</td></tr>'
+                    '<tr><td class="path">%s</td><td class="num">%d</td><td>%s</td><td class="num">%.1f%%</td></tr>'
                     % (
                         html.escape(fs["path"]),
                         fs["contributors"],

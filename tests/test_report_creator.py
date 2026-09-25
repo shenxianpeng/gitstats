@@ -1229,6 +1229,19 @@ def test_ownership_page_renders(mock_data_collector, temp_dir):
     assert "solo_alice.py" in content
     assert "Alice Smith" in content
     assert "</html>" in content
+    # File paths are set in monospace
+    assert '<td class="path">solo_alice.py</td>' in content
+
+
+def test_file_paths_are_monospace_cells(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(f"{temp_dir}/files.html", encoding="utf-8") as f:
+        files = f.read()
+    # Churn table: the heat class stays, plus the path class
+    assert '<td class="heat heat4 path">main.py</td>' in files
+    with open(f"{temp_dir}/ownership.html", encoding="utf-8") as f:
+        ownership = f.read()
+    assert ownership.count('<td class="path">') >= 2  # single-owner and shared tables
 
 
 def test_ownership_page_empty_state(mock_data_collector, temp_dir):
