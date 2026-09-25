@@ -5,34 +5,120 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - gitstats</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.4.post1.dev1">
+	<meta name="generator" content="GitStats 2.6.5.post1.dev1">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			scale.grid.color = grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -42,7 +128,7 @@
             <li><a href="index.html">General</a></li>
             <li><a href="activity.html">Activity</a></li>
             <li><a href="authors.html">Authors</a></li>
-            <li><a href="files.html">Files</a></li>
+            <li><a href="files.html" class="active" aria-current="page">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
             <li><a href="ownership.html">Code Ownership</a></li>
@@ -51,11 +137,11 @@
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
             <h1>Files</h1><dl>
-<dt>Total files</dt><dd>65</dd><dt>Total lines</dt><dd>15535</dd><dt>Average file size</dt><dd>161307.78 bytes</dd></dl>
+<dt>Total files</dt><dd>65</dd><dt>Total lines</dt><dd>15852</dd><dt>Average file size</dt><dd>161464.88 bytes</dd></dl>
 
 <h2 id="file_count_by_date"><a href="#file_count_by_date">File count by date</a></h2>
 
@@ -63,43 +149,53 @@
 <script>
 (function() {
   var ctx = document.getElementById('chart-files-by-date').getContext('2d');
-  var chart = new Chart(ctx, {
+  var labels = [1185818707000, 1185895453000, 1186082479000, 1186249588000, 1186321571000, 1186504178000, 1186942728000, 1187117020000, 1187284177000, 1187721789000, 1187805908000, 1187957468000, 1188309604000, 1188407445000, 1189081957000, 1189155681000, 1189701775000, 1214646567000, 1214715948000, 1216053881000, 1216128834000, 1221401612000, 1224364037000, 1224531756000, 1224599013000, 1227345415000, 1230018723000, 1231950517000, 1242557579000, 1245348998000, 1245502479000, 1252521237000, 1256580463000, 1257592281000, 1260704988000, 1260803527000, 1261599918000, 1261646604000, 1261735020000, 1261815612000, 1262962164000, 1263080045000, 1263231357000, 1263484422000, 1263588065000, 1263650824000, 1263747379000, 1264922589000, 1267226774000, 1269377539000, 1270213921000, 1276005398000, 1276145510000, 1277251503000, 1277661324000, 1279912829000, 1281165936000, 1285683641000, 1287336441000, 1287602087000, 1293988299000, 1294503288000, 1294601112000, 1294685092000, 1295074832000, 1295305788000, 1295372806000, 1295453271000, 1298043216000, 1300729569000, 1302027851000, 1316030600000, 1317151943000, 1319398261000, 1319555529000, 1321775428000, 1331239213000, 1337522953000, 1337603789000, 1338230600000, 1342204925000, 1342300020000, 1342348798000, 1342556888000, 1342692495000, 1345998781000, 1355664139000, 1355773460000, 1359401944000, 1361691011000, 1374590549000, 1374866700000, 1375108956000, 1379816331000, 1383439049000, 1387631631000, 1394467712000, 1396097946000, 1401393683000, 1401816059000, 1403019741000, 1410533596000, 1410589701000, 1411191519000, 1414096193000, 1415044880000, 1415379974000, 1418093771000, 1436896884000, 1450893921000, 1731618897000, 1731698160000, 1731790253000, 1731881323000, 1731916634000, 1732044577000, 1732213512000, 1732289941000, 1732394727000, 1732664690000, 1732693660000, 1732782802000, 1733002623000, 1733243874000, 1733506263000, 1734035504000, 1735745343000, 1736018253000, 1736201449000, 1736336280000, 1736553574000, 1736553776000, 1736791185000, 1736940691000, 1737052142000, 1737102749000, 1737401481000, 1737421751000, 1737817385000, 1738381479000, 1739411037000, 1740792865000, 1743105363000, 1743262638000, 1743689565000, 1744059528000, 1744182816000, 1744287333000, 1744369058000, 1744640290000, 1746016818000, 1746367802000, 1746818793000, 1746903861000, 1746995061000, 1747078983000, 1748856863000, 1751353000000, 1752671171000, 1753092016000, 1755583891000, 1755903250000, 1756805505000, 1759304842000, 1759666428000, 1759785595000, 1760726770000, 1761977337000, 1763158367000, 1763228722000, 1764456386000, 1764535948000, 1764563493000, 1764663456000, 1765486419000, 1765648369000, 1765736874000, 1766859606000, 1767275916000, 1767637382000, 1768453122000, 1769762300000, 1769938217000, 1770670937000, 1770920866000, 1771530711000, 1772330765000, 1772666654000, 1772734632000, 1772917971000, 1773864451000, 1775022118000, 1775281054000, 1775349027000, 1775498440000, 1775995768000, 1778102635000, 1778972700000, 1779151252000, 1779742426000, 1779816212000, 1780284675000, 1780593884000, 1781030948000, 1782941424000, 1783173774000, 1783277333000, 1783361050000, 1783884857000, 1784022556000, 1785096049000, 1785177176000, 1785215096000, 1785359036000, 1785612134000, 1786008556000, 1786168197000, 1786685374000, 1786991279000, 1787827567000, 1787906357000, 1789453604000, 1789651295000, 1789743902000, 1789833626000, 1790015306000, 1790073789000, 1790352951000];
+  applyChartTheme();
+  new Chart(ctx, {
     type: 'line',
     data: {
-      labels: ["2007-07-30", "2007-07-31", "2007-08-02", "2007-08-04", "2007-08-05", "2007-08-07", "2007-08-12", "2007-08-14", "2007-08-16", "2007-08-21", "2007-08-22", "2007-08-24", "2007-08-28", "2007-08-29", "2007-09-06", "2007-09-07", "2007-09-13", "2008-06-28", "2008-06-29", "2008-07-14", "2008-07-15", "2008-09-14", "2008-10-18", "2008-10-20", "2008-10-21", "2008-11-22", "2008-12-23", "2009-01-14", "2009-05-17", "2009-06-18", "2009-06-20", "2009-09-09", "2009-10-26", "2009-11-07", "2009-12-13", "2009-12-14", "2009-12-23", "2009-12-24", "2009-12-25", "2009-12-26", "2010-01-08", "2010-01-09", "2010-01-11", "2010-01-14", "2010-01-15", "2010-01-16", "2010-01-17", "2010-01-31", "2010-02-26", "2010-03-23", "2010-04-02", "2010-06-08", "2010-06-10", "2010-06-23", "2010-06-27", "2010-07-23", "2010-08-07", "2010-09-28", "2010-10-17", "2010-10-20", "2011-01-02", "2011-01-08", "2011-01-09", "2011-01-10", "2011-01-15", "2011-01-17", "2011-01-18", "2011-01-19", "2011-02-18", "2011-03-21", "2011-04-05", "2011-09-14", "2011-09-27", "2011-10-23", "2011-10-25", "2011-11-20", "2012-03-08", "2012-05-20", "2012-05-21", "2012-05-28", "2012-07-13", "2012-07-14", "2012-07-15", "2012-07-17", "2012-07-19", "2012-08-26", "2012-12-16", "2012-12-17", "2013-01-28", "2013-02-24", "2013-07-23", "2013-07-26", "2013-07-29", "2013-09-22", "2013-11-03", "2013-12-21", "2014-03-10", "2014-03-29", "2014-05-29", "2014-06-03", "2014-06-17", "2014-09-12", "2014-09-13", "2014-09-20", "2014-10-23", "2014-11-03", "2014-11-07", "2014-12-09", "2015-07-14", "2015-12-23", "2024-11-14", "2024-11-15", "2024-11-16", "2024-11-17", "2024-11-18", "2024-11-19", "2024-11-21", "2024-11-22", "2024-11-23", "2024-11-26", "2024-11-27", "2024-11-28", "2024-11-30", "2024-12-03", "2024-12-06", "2024-12-12", "2025-01-01", "2025-01-04", "2025-01-06", "2025-01-08", "2025-01-10", "2025-01-11", "2025-01-13", "2025-01-15", "2025-01-16", "2025-01-17", "2025-01-20", "2025-01-21", "2025-01-25", "2025-02-01", "2025-02-13", "2025-03-01", "2025-03-27", "2025-03-29", "2025-04-03", "2025-04-07", "2025-04-09", "2025-04-10", "2025-04-11", "2025-04-14", "2025-04-30", "2025-05-04", "2025-05-09", "2025-05-10", "2025-05-11", "2025-05-12", "2025-06-02", "2025-07-01", "2025-07-16", "2025-07-21", "2025-08-19", "2025-08-22", "2025-09-02", "2025-10-01", "2025-10-05", "2025-10-06", "2025-10-17", "2025-11-01", "2025-11-14", "2025-11-15", "2025-11-29", "2025-11-30", "2025-12-01", "2025-12-02", "2025-12-11", "2025-12-13", "2025-12-14", "2025-12-27", "2026-01-01", "2026-01-05", "2026-01-15", "2026-01-30", "2026-02-01", "2026-02-09", "2026-02-12", "2026-02-19", "2026-03-01", "2026-03-04", "2026-03-05", "2026-03-07", "2026-03-18", "2026-04-01", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-12", "2026-05-06", "2026-05-16", "2026-05-19", "2026-05-25", "2026-05-26", "2026-06-01", "2026-06-04", "2026-06-09", "2026-07-01", "2026-07-04", "2026-07-05", "2026-07-06", "2026-07-12", "2026-07-14", "2026-07-26", "2026-07-27", "2026-07-28", "2026-07-29", "2026-08-01", "2026-08-06", "2026-08-08", "2026-08-14", "2026-08-17", "2026-08-27", "2026-08-28", "2026-09-15", "2026-09-17", "2026-09-18", "2026-09-19", "2026-09-21", "2026-09-22"],
-      datasets: [{"label": "Files", "data": [2, 2, 3, 3, 3, 9, 10, 10, 11, 12, 12, 12, 12, 12, 12, 12, 9, 9, 9, 9, 9, 9, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 18, 18, 24, 25, 25, 25, 27, 27, 28, 29, 29, 30, 28, 28, 28, 28, 29, 29, 29, 29, 32, 32, 32, 32, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 37, 37, 40, 43, 43, 44, 44, 44, 44, 45, 46, 46, 46, 46, 47, 47, 47, 47, 47, 47, 47, 48, 48, 48, 47, 45, 45, 45, 45, 44, 44, 44, 44, 44, 44, 44, 44, 43, 44, 49, 48, 48, 49, 49, 50, 51, 50, 50, 50, 50, 50, 55, 56, 56, 56, 56, 56, 56, 56, 56, 57, 57, 57, 58, 58, 58, 58, 58, 58, 59, 61, 61, 61, 63, 65, 64, 64, 64, 64, 64, 64, 65], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "borderWidth": 1, "pointRadius": 2}]
+      datasets: (function(xs, sets) {
+        sets.forEach(function(ds) {
+          ds.data = ds.data.map(function(y, i) { return { x: xs[i], y: y }; });
+        });
+        return sets;
+      })(labels, [{"label": "Files", "data": [2, 2, 3, 3, 3, 9, 10, 10, 11, 12, 12, 12, 12, 12, 12, 12, 9, 9, 9, 9, 9, 9, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 18, 18, 24, 25, 25, 25, 27, 27, 28, 29, 29, 30, 28, 28, 28, 28, 29, 29, 29, 29, 32, 32, 32, 32, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 33, 37, 37, 40, 43, 43, 44, 44, 44, 44, 45, 46, 46, 46, 46, 47, 47, 47, 47, 47, 47, 47, 48, 48, 48, 47, 45, 45, 45, 45, 44, 44, 44, 44, 44, 44, 44, 44, 43, 44, 49, 48, 48, 49, 49, 50, 51, 50, 50, 50, 50, 50, 55, 56, 56, 56, 56, 56, 56, 56, 56, 57, 57, 57, 58, 58, 58, 58, 58, 58, 59, 61, 61, 61, 63, 65, 64, 64, 64, 64, 64, 64, 65, 65], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true, "borderWidth": 1, "pointRadius": 2, "stepped": true}])
     },
     options: {
       responsive: true,
       maintainAspectRatio: true,
       aspectRatio: 3,
       plugins: {
-        legend: { display: false }
+        legend: { display: false },
+        tooltip: { callbacks: { title: function(items) {
+          return items.length ? formatChartDate(items[0].parsed.x) : '';
+        } } }
       },
       scales: {
-        x: { ticks: { maxRotation: 45, minRotation: 45 } },
+        x: timeAxis(labels),
         y: { beginAtZero: true, title: { display: true, text: 'Files' } }
       }
     }
   });
-  document.addEventListener('themechange', function() { chart.update(); });
 })();
 </script>
 
 <h2 id="extensions"><a href="#extensions">Extensions</a></h2>
 
-<p><em>Note: Files with excluded extensions are not shown. Configure <code>exclude_exts</code> in gitstats.conf.</em></p><table class="sortable" id="ext"><tr><th>Extension</th><th>Files (%)</th><th>Lines (%)</th><th>Lines/file</th></tr><tr><td>conf</td><td>1 (1.54%)</td><td>109 (0.70%)</td><td>109</td></tr><tr><td>css</td><td>1 (1.54%)</td><td>704 (4.53%)</td><td>704</td></tr><tr><td>gif</td><td>4 (6.15%)</td><td>0 (0.00%)</td><td>0</td></tr><tr><td>js</td><td>2 (3.08%)</td><td>344 (2.21%)</td><td>172</td></tr><tr><td>lock</td><td>1 (1.54%)</td><td>1905 (12.26%)</td><td>1905</td></tr><tr><td>md</td><td>3 (4.62%)</td><td>265 (1.71%)</td><td>88</td></tr><tr><td>png</td><td>3 (4.62%)</td><td>0 (0.00%)</td><td>0</td></tr><tr><td>py</td><td>20 (30.77%)</td><td>9467 (60.94%)</td><td>473</td></tr><tr><td>rst</td><td>11 (16.92%)</td><td>1155 (7.43%)</td><td>105</td></tr><tr><td>tape</td><td>1 (1.54%)</td><td>33 (0.21%)</td><td>33</td></tr><tr><td>toml</td><td>1 (1.54%)</td><td>85 (0.55%)</td><td>85</td></tr><tr><td>yaml</td><td>2 (3.08%)</td><td>64 (0.41%)</td><td>32</td></tr><tr><td>yml</td><td>9 (13.85%)</td><td>361 (2.32%)</td><td>40</td></tr></table>
+<p><em>Note: Files with excluded extensions are not shown. Configure <code>exclude_exts</code> in gitstats.conf.</em></p><table class="sortable" id="ext"><tr><th>Extension</th><th>Files (%)</th><th>Lines (%)</th><th>Lines/file</th></tr><tr><td>conf</td><td>1 (1.54%)</td><td>109 (0.69%)</td><td>109</td></tr><tr><td>css</td><td>1 (1.54%)</td><td>735 (4.64%)</td><td>735</td></tr><tr><td>gif</td><td>4 (6.15%)</td><td>0 (0.00%)</td><td>0</td></tr><tr><td>js</td><td>2 (3.08%)</td><td>344 (2.17%)</td><td>172</td></tr><tr><td>lock</td><td>1 (1.54%)</td><td>1905 (12.02%)</td><td>1905</td></tr><tr><td>md</td><td>3 (4.62%)</td><td>265 (1.67%)</td><td>88</td></tr><tr><td>png</td><td>3 (4.62%)</td><td>0 (0.00%)</td><td>0</td></tr><tr><td>py</td><td>20 (30.77%)</td><td>9753 (61.53%)</td><td>487</td></tr><tr><td>rst</td><td>11 (16.92%)</td><td>1155 (7.29%)</td><td>105</td></tr><tr><td>tape</td><td>1 (1.54%)</td><td>33 (0.21%)</td><td>33</td></tr><tr><td>toml</td><td>1 (1.54%)</td><td>85 (0.54%)</td><td>85</td></tr><tr><td>yaml</td><td>2 (3.08%)</td><td>64 (0.40%)</td><td>32</td></tr><tr><td>yml</td><td>9 (13.85%)</td><td>361 (2.28%)</td><td>40</td></tr></table>
 <h2 id="most_changed_files_(code_churn)"><a href="#most_changed_files_(code_churn)">Most Changed Files (Code Churn)</a></h2>
 
-<p><em>Files touched most often across all commits. High-churn files are hotspots that may benefit from extra review or refactoring.</em></p><table class="sortable" id="churn"><tr><th>File</th><th>Times Changed</th></tr><tr><td class="heat heat4">gitstats</td><td>184</td></tr><tr><td class="heat heat1">doc/TODO.txt</td><td>46</td></tr><tr><td class="heat heat1">gitstats/main.py</td><td>45</td></tr><tr><td class="heat heat1">statgit</td><td>44</td></tr><tr><td class="heat heat1">gitstats/report_creator.py</td><td>42</td></tr><tr><td class="heat heat1">README.md</td><td>36</td></tr><tr><td class="heat heat1">README.rst</td><td>30</td></tr><tr><td class="heat heat1">.github/workflows/test.yml</td><td>27</td></tr><tr><td class="heat heat1">.github/workflows/publish-image.yml</td><td>23</td></tr><tr><td class="heat heat1">pyproject.toml</td><td>22</td></tr><tr><td class="heat heat1">gitstats/utils.py</td><td>19</td></tr><tr><td class="heat heat1">Makefile</td><td>19</td></tr><tr><td class="heat heat1">gitstats/__init__.py</td><td>17</td></tr><tr><td class="heat heat1">.gitignore</td><td>16</td></tr><tr><td class="heat heat1">tests/test_main.py</td><td>15</td></tr><tr><td class="heat heat1">.github/workflows/preview.yml</td><td>15</td></tr><tr><td class="heat heat1">TODO.txt</td><td>15</td></tr><tr><td class="heat heat1">gitstats/gitstats.css</td><td>13</td></tr><tr><td class="heat heat1">gitstats.css</td><td>13</td></tr><tr><td class="heat heat1">.pre-commit-config.yaml</td><td>11</td></tr><tr><td class="heat heat1">noxfile.py</td><td>11</td></tr><tr><td class="heat heat1">Dockerfile</td><td>11</td></tr><tr><td class="heat heat1">doc/gitstats.pod</td><td>11</td></tr><tr><td class="heat heat1">doc/README</td><td>11</td></tr><tr><td class="heat heat1">tests/test_report_creator.py</td><td>9</td></tr></table><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-file-churn"></canvas></div>
+<p><em>Files touched most often across all commits. High-churn files are hotspots that may benefit from extra review or refactoring.</em></p><table class="sortable" id="churn"><tr><th>File</th><th>Times Changed</th></tr><tr><td class="heat heat4">gitstats</td><td>184</td></tr><tr><td class="heat heat1">doc/TODO.txt</td><td>46</td></tr><tr><td class="heat heat1">gitstats/main.py</td><td>45</td></tr><tr><td class="heat heat1">statgit</td><td>44</td></tr><tr><td class="heat heat1">gitstats/report_creator.py</td><td>43</td></tr><tr><td class="heat heat1">README.md</td><td>36</td></tr><tr><td class="heat heat1">README.rst</td><td>30</td></tr><tr><td class="heat heat1">.github/workflows/test.yml</td><td>27</td></tr><tr><td class="heat heat1">.github/workflows/publish-image.yml</td><td>23</td></tr><tr><td class="heat heat1">pyproject.toml</td><td>22</td></tr><tr><td class="heat heat1">gitstats/utils.py</td><td>19</td></tr><tr><td class="heat heat1">Makefile</td><td>19</td></tr><tr><td class="heat heat1">gitstats/__init__.py</td><td>17</td></tr><tr><td class="heat heat1">.gitignore</td><td>16</td></tr><tr><td class="heat heat1">tests/test_main.py</td><td>15</td></tr><tr><td class="heat heat1">.github/workflows/preview.yml</td><td>15</td></tr><tr><td class="heat heat1">TODO.txt</td><td>15</td></tr><tr><td class="heat heat1">gitstats/gitstats.css</td><td>14</td></tr><tr><td class="heat heat1">gitstats.css</td><td>13</td></tr><tr><td class="heat heat1">.pre-commit-config.yaml</td><td>11</td></tr><tr><td class="heat heat1">noxfile.py</td><td>11</td></tr><tr><td class="heat heat1">Dockerfile</td><td>11</td></tr><tr><td class="heat heat1">doc/gitstats.pod</td><td>11</td></tr><tr><td class="heat heat1">doc/README</td><td>11</td></tr><tr><td class="heat heat1">tests/test_report_creator.py</td><td>10</td></tr></table><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-file-churn"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-file-churn').getContext('2d');
-  var chart = new Chart(ctx, {
+  var labels = ["gitstats", "doc/TODO.txt", "gitstats/main.py", "statgit", "gitstats/report_creator.py", "README.md", "README.rst", ".github/workflows/test.yml", ".github/workflows/publish-image.yml", "pyproject.toml", "gitstats/utils.py", "Makefile", "gitstats/__init__.py", ".gitignore", "tests/test_main.py", ".github/workflows/preview.yml", "TODO.txt", "gitstats/gitstats.css", "gitstats.css", ".pre-commit-config.yaml", "noxfile.py", "Dockerfile", "doc/gitstats.pod", "doc/README", "tests/test_report_creator.py"];
+  applyChartTheme();
+  new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: ["gitstats", "doc/TODO.txt", "gitstats/main.py", "statgit", "gitstats/report_creator.py", "README.md", "README.rst", ".github/workflows/test.yml", ".github/workflows/publish-image.yml", "pyproject.toml", "gitstats/utils.py", "Makefile", "gitstats/__init__.py", ".gitignore", "tests/test_main.py", ".github/workflows/preview.yml", "TODO.txt", "gitstats/gitstats.css", "gitstats.css", ".pre-commit-config.yaml", "noxfile.py", "Dockerfile", "doc/gitstats.pod", "doc/README", "tests/test_report_creator.py"],
-      datasets: [{"label": "Commits", "data": [184, 46, 45, 44, 42, 36, 30, 27, 23, 22, 19, 19, 17, 16, 15, 15, 15, 13, 13, 11, 11, 11, 11, 11, 9], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
+      labels: labels,
+      datasets: [{"label": "Commits", "data": [184, 46, 45, 44, 43, 36, 30, 27, 23, 22, 19, 19, 17, 16, 15, 15, 15, 14, 13, 11, 11, 11, 11, 11, 10], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
     },
     options: {
       responsive: true,
@@ -114,7 +210,6 @@
       }
     }
   });
-  document.addEventListener('themechange', function() { chart.update(); });
 })();
 </script>
 <div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>

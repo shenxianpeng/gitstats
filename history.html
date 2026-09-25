@@ -5,34 +5,120 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - gitstats</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.4.post1.dev1">
+	<meta name="generator" content="GitStats 2.6.5.post1.dev1">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			scale.grid.color = grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -46,13 +132,13 @@
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
             <li><a href="ownership.html">Code Ownership</a></li>
-            <li><a href="history.html">History</a></li>
+            <li><a href="history.html" class="active" aria-current="page">History</a></li>
             
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>History</h1><div class="history-summary"><p>The project's life, one year at a time, told from the commit record: how activity rose and fell against the project's own baseline, who arrived when, and what was released.</p><dl><dt>Span</dt><dd>2007 – 2026 (20 years)</dd><dt>Peak year</dt><dd>2007</dd><dt>Releases</dt><dd>44</dd></dl></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2007</span><span class="history-era history-era-birth">BIRTH</span><span class="history-era-desc">first commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:100.0%"></div></div><p class="history-facts">107 commits (19.6%) &middot; +1903 / &minus;479 lines &middot; 1 author</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (107 commits)</p><p class="history-people">First commits: Heikki Hokkanen</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2008</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:27.1%"></div></div><p class="history-facts">29 commits (5.3%) &middot; +1231 / &minus;165 lines &middot; 3 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (24 commits)</p><p class="history-people">First commits: Tobias Gruetzmacher, Shixin Zeng</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2009</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:42.1%"></div></div><p class="history-facts">45 commits (8.2%) &middot; +305 / &minus;123 lines &middot; 2 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (44 commits)</p><p class="history-people">First commits: Matt Parlane</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2010</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:33.6%"></div></div><p class="history-facts">36 commits (6.6%) &middot; +329 / &minus;116 lines &middot; 6 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (26 commits)</p><p class="history-people">First commits: Wulf C. Krueger, Tyler Nielsen, Pekka Enberg, Bo Ørsted Andresen</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2011</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:26.2%"></div></div><p class="history-facts">28 commits (5.1%) &middot; +331 / &minus;120 lines &middot; 7 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (16 commits)</p><p class="history-people">First commits: Matthieu Moy, Kirill Chilikin, Stefano Mosconi, Karel Rank, Chris Cormack</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2012</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:15.9%"></div></div><p class="history-facts">17 commits (3.1%) &middot; +153 / &minus;47 lines &middot; 6 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (8 commits)</p><p class="history-people">First commits: Sven van Haastregt, Alexander Strasser, Thomas R. Koll, Ciaran Gultnieks, Andrey Devyatkin</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2013</span><span class="history-era history-era-quiet">QUIET</span><span class="history-era-desc">well below the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:10.3%"></div></div><p class="history-facts">11 commits (2.0%) &middot; +39 / &minus;21 lines &middot; 5 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (7 commits)</p><p class="history-people">First commits: Stephen Gordon, Ernesto Jiménez, Andreas Motl</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2014</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:17.8%"></div></div><p class="history-facts">19 commits (3.5%) &middot; +75 / &minus;51 lines &middot; 8 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (9 commits)</p><p class="history-people">First commits: Jani Hur, Sylvain Joyeux, Richard Russon (flatcap), Jan Pieper, Diomidis Spinellis, Andrew Lazarus</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2015</span><span class="history-era history-era-quiet">QUIET</span><span class="history-era-desc">well below the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:1.9%"></div></div><p class="history-facts">2 commits (0.4%) &middot; +2 / &minus;2 lines &middot; 2 authors</p><p class="history-people">Led by <strong>Stephan Kuschel</strong> (1 commits)</p><p class="history-people">First commits: Stephan Kuschel, Craig R. Hughes</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2016</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2017</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2018</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2019</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2020</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2021</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2022</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2023</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2024</span><span class="history-era history-era-revival">REVIVAL</span><span class="history-era-desc">active again after a lull</span></div><div class="history-bar-track"><div class="history-bar" style="width:63.6%"></div></div><p class="history-facts">68 commits (12.4%) &middot; +2511 / &minus;1732 lines &middot; 2 authors</p><p class="history-people">Led by <strong>Xianpeng Shen</strong> (65 commits)</p><p class="history-people">First commits: Xianpeng Shen</p><p class="history-people">Released: v0.1.0, v0.3.0, v0.3.1, v0.3.2</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2025</span><span class="history-era history-era-surge">SURGE</span><span class="history-era-desc">well above the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:84.1%"></div></div><p class="history-facts">90 commits (16.5%) &middot; +3572 / &minus;2625 lines &middot; 6 authors</p><p class="history-people">Led by <strong>Xianpeng Shen</strong> (69 commits)</p><p class="history-people">First commits: Pinhong Ma, LiJohnson, Joaquin Bravo Contreras</p><p class="history-people">Released: v0.3.3, v0.4.0, v0.4.1, v0.4.2, v0.4.3 (+16 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2026</span><span class="history-era history-era-surge">SURGE</span><span class="history-era-desc">well above the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:88.8%"></div></div><p class="history-facts">95 commits (17.4%) &middot; +14231 / &minus;3666 lines &middot; 8 authors</p><p class="history-people">Led by <strong>Xianpeng Shen</strong> (65 commits)</p><p class="history-people">First commits: Copilot, Devraj Pal, tomatotomata, harsh8968, Joe Bordes</p><p class="history-people">Released: v1.3.1, v1.4.0, v1.5.0, v1.5.1, v1.6.0 (+14 more)</p></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+            <h1>History</h1><div class="history-summary"><p>The project's life, one year at a time, told from the commit record: how activity rose and fell against the project's own baseline, who arrived when, and what was released.</p><dl><dt>Span</dt><dd>2007 – 2026 (20 years)</dd><dt>Peak year</dt><dd>2007</dd><dt>Releases</dt><dd>45</dd></dl></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2007</span><span class="history-era history-era-birth">BIRTH</span><span class="history-era-desc">first commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:100.0%"></div></div><p class="history-facts">107 commits (19.5%) &middot; +1903 / &minus;479 lines &middot; 1 author</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (107 commits)</p><p class="history-people">First commits: Heikki Hokkanen</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2008</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:27.1%"></div></div><p class="history-facts">29 commits (5.3%) &middot; +1231 / &minus;165 lines &middot; 3 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (24 commits)</p><p class="history-people">First commits: Tobias Gruetzmacher, Shixin Zeng</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2009</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:42.1%"></div></div><p class="history-facts">45 commits (8.2%) &middot; +305 / &minus;123 lines &middot; 2 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (44 commits)</p><p class="history-people">First commits: Matt Parlane</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2010</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:33.6%"></div></div><p class="history-facts">36 commits (6.6%) &middot; +329 / &minus;116 lines &middot; 6 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (26 commits)</p><p class="history-people">First commits: Wulf C. Krueger, Tyler Nielsen, Pekka Enberg, Bo Ørsted Andresen</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2011</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:26.2%"></div></div><p class="history-facts">28 commits (5.1%) &middot; +331 / &minus;120 lines &middot; 7 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (16 commits)</p><p class="history-people">First commits: Matthieu Moy, Kirill Chilikin, Stefano Mosconi, Karel Rank, Chris Cormack</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2012</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:15.9%"></div></div><p class="history-facts">17 commits (3.1%) &middot; +153 / &minus;47 lines &middot; 6 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (8 commits)</p><p class="history-people">First commits: Sven van Haastregt, Alexander Strasser, Thomas R. Koll, Ciaran Gultnieks, Andrey Devyatkin</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2013</span><span class="history-era history-era-quiet">QUIET</span><span class="history-era-desc">well below the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:10.3%"></div></div><p class="history-facts">11 commits (2.0%) &middot; +39 / &minus;21 lines &middot; 5 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (7 commits)</p><p class="history-people">First commits: Stephen Gordon, Ernesto Jiménez, Andreas Motl</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2014</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:17.8%"></div></div><p class="history-facts">19 commits (3.5%) &middot; +75 / &minus;51 lines &middot; 8 authors</p><p class="history-people">Led by <strong>Heikki Hokkanen</strong> (9 commits)</p><p class="history-people">First commits: Jani Hur, Sylvain Joyeux, Richard Russon (flatcap), Jan Pieper, Diomidis Spinellis, Andrew Lazarus</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2015</span><span class="history-era history-era-quiet">QUIET</span><span class="history-era-desc">well below the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:1.9%"></div></div><p class="history-facts">2 commits (0.4%) &middot; +2 / &minus;2 lines &middot; 2 authors</p><p class="history-people">Led by <strong>Stephan Kuschel</strong> (1 commits)</p><p class="history-people">First commits: Stephan Kuschel, Craig R. Hughes</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2016</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2017</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2018</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2019</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2020</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2021</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2022</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2023</span><span class="history-era history-era-dormant">DORMANT</span><span class="history-era-desc">no commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:0.0%"></div></div><p class="history-facts">No commits this year.</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2024</span><span class="history-era history-era-revival">REVIVAL</span><span class="history-era-desc">active again after a lull</span></div><div class="history-bar-track"><div class="history-bar" style="width:63.6%"></div></div><p class="history-facts">68 commits (12.4%) &middot; +2511 / &minus;1732 lines &middot; 2 authors</p><p class="history-people">Led by <strong>Xianpeng Shen</strong> (65 commits)</p><p class="history-people">First commits: Xianpeng Shen</p><p class="history-people">Released: v0.1.0, v0.3.0, v0.3.1, v0.3.2</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2025</span><span class="history-era history-era-surge">SURGE</span><span class="history-era-desc">well above the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:84.1%"></div></div><p class="history-facts">90 commits (16.4%) &middot; +3572 / &minus;2625 lines &middot; 6 authors</p><p class="history-people">Led by <strong>Xianpeng Shen</strong> (69 commits)</p><p class="history-people">First commits: Pinhong Ma, LiJohnson, Joaquin Bravo Contreras</p><p class="history-people">Released: v0.3.3, v0.4.0, v0.4.1, v0.4.2, v0.4.3 (+16 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2026</span><span class="history-era history-era-surge">SURGE</span><span class="history-era-desc">well above the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:89.7%"></div></div><p class="history-facts">96 commits (17.5%) &middot; +14648 / &minus;3766 lines &middot; 8 authors</p><p class="history-people">Led by <strong>Xianpeng Shen</strong> (66 commits)</p><p class="history-people">First commits: Copilot, Devraj Pal, tomatotomata, harsh8968, Joe Bordes</p><p class="history-people">Released: v1.3.1, v1.4.0, v1.5.0, v1.5.1, v1.6.0 (+15 more)</p></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body></html>

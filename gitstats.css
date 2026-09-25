@@ -58,6 +58,10 @@
 
 	--bar-color: #4a7ab5;
 
+	/* Chart.js axes — read by applyChartTheme() on load and on theme switch */
+	--chart-text: #656363;
+	--chart-grid: #e6e5e4;
+
 	/* Heatmap — GitHub green scale (user preference) */
 	--heat0-bg: #ebedf0;
 	--heat0-color: #1f2328;
@@ -100,6 +104,9 @@
 	--link-color: #6b95c8;
 
 	--bar-color: #6b95c8;
+
+	--chart-text: #b7b1b1;
+	--chart-grid: #3d3838;
 
 	/* Heatmap dark — GitHub dark green */
 	--heat0-bg: #1c2128;
@@ -269,6 +276,13 @@ tr:hover td {
 	text-decoration: none;
 }
 
+/* Current page — inverted block */
+.nav li a.active,
+.nav li a.active:hover {
+	color: var(--bg-color);
+	background-color: var(--text-color);
+}
+
 /* ===== Nav Brand ===== */
 .nav-brand {
 	font-family: var(--font-mono);
@@ -317,13 +331,16 @@ tr:hover td {
 
 /* ===== Theme Toggle ===== */
 .theme-toggle {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
 	background: transparent;
 	border: 1px solid var(--border-color);
 	cursor: pointer;
-	padding: var(--space-1) var(--space-2);
-	font-size: var(--font-size-base);
 	color: var(--text-secondary);
-	line-height: 1.4;
 	transition: border-color 0.12s ease, color 0.12s ease;
 	flex-shrink: 0;
 }
@@ -331,6 +348,20 @@ tr:hover td {
 .theme-toggle:hover {
 	border-color: var(--border-strong);
 	color: var(--text-color);
+}
+
+/* The icon shows the theme the button switches to */
+.theme-toggle svg {
+	display: block;
+}
+
+.theme-toggle .icon-sun,
+[data-theme="dark"] .theme-toggle .icon-moon {
+	display: none;
+}
+
+[data-theme="dark"] .theme-toggle .icon-sun {
+	display: block;
 }
 
 /* ===== Headings ===== */
