@@ -1,6 +1,5 @@
 """Tests for gitstats.report_creator – HTML generation, helpers, chart rendering."""
 
-import datetime
 import os
 from io import StringIO
 
@@ -16,6 +15,7 @@ from gitstats.report_creator import (
     get_keys_sorted_by_values,
     html_header,
     html_linkify,
+    month_range,
     parse_chronicle,
 )
 
@@ -251,6 +251,53 @@ def test_render_chartjs_y_label():
     assert "title: { display: true, text: 'Lines of Code' }" in result
 
 
+def test_render_chartjs_category_axis_by_default():
+    creator = HTMLReportCreator()
+    result = creator._render_chartjs("chart-cat", "line", ["X"], [{"label": "C", "data": [1]}])
+    assert "timeAxis(" not in result
+    assert "stepped" not in result
+
+
+def test_render_chartjs_time_axis():
+    creator = HTMLReportCreator()
+    result = creator._render_chartjs(
+        "chart-time",
+        "line",
+        [1_000_000_000, 1_700_000_000],
+        [{"label": "Lines", "data": [10, 20]}],
+        time_axis=True,
+    )
+    # Unix seconds become JS milliseconds on a linear x-axis
+    assert "var labels = [1000000000000, 1700000000000];" in result
+    assert "x: timeAxis(labels)" in result
+    assert "x: xs[i], y: y" in result
+    # Cumulative series hold their value until the next point
+    assert '"stepped": true' in result
+    assert "formatChartDate(items[0].parsed.x)" in result
+
+
+def test_render_chartjs_single_dataset_follows_theme():
+    creator = HTMLReportCreator()
+    result = creator._render_chartjs("chart-th", "bar", ["X"], [{"label": "C", "data": [1]}])
+    assert '"themed": true' in result
+    assert "applyChartTheme();" in result
+
+
+# ── month_range ──────────────────────────────────────────────────────────
+
+
+def test_month_range_fills_gaps():
+    assert month_range(["2015-11", "2016-02"]) == ["2015-11", "2015-12", "2016-01", "2016-02"]
+
+
+def test_month_range_unsorted_input():
+    assert month_range({"2024-03": 1, "2024-01": 2}) == ["2024-01", "2024-02", "2024-03"]
+
+
+def test_month_range_empty():
+    assert month_range([]) == []
+
+
 # ── HTMLReportCreator.print_header ───────────────────────────────────────
 
 
@@ -268,6 +315,19 @@ def test_print_header():
     assert "data-theme" in output
     assert "toggleTheme" in output
     assert "<body>" in output
+
+
+def test_print_header_theme_defaults_to_system_preference():
+    creator = HTMLReportCreator()
+    creator.title = "p"
+    f = StringIO()
+    creator.print_header(f)
+    output = f.getvalue()
+
+    assert "prefers-color-scheme: dark" in output
+    # Switching themes notifies the charts so they can recolor
+    assert "dispatchEvent(new Event('themechange'))" in output
+    assert "addEventListener('themechange'" in output
 
 
 def test_print_header_escapes_project_name():
@@ -337,6 +397,47 @@ def test_print_nav_has_github_link():
 
     assert "github.com" in output
     assert "theme-toggle" in output
+    # SVG icons instead of emoji
+    assert 'class="icon-moon"' in output
+    assert 'class="icon-sun"' in output
+    assert "🌙" not in output
+
+
+def test_print_nav_marks_current_page():
+    from unittest.mock import Mock
+
+    creator = HTMLReportCreator()
+    creator.data = Mock()
+    creator.data.ai_summaries = {}
+
+    f = StringIO()
+    creator.print_nav(f, "authors.html")
+    output = f.getvalue()
+
+    assert '<a href="authors.html" class="active" aria-current="page">Authors</a>' in output
+    assert '<a href="index.html">General</a>' in output
+    assert output.count('aria-current="page"') == 1
+
+
+@pytest.mark.parametrize(
+    "page",
+    [
+        "index.html",
+        "activity.html",
+        "authors.html",
+        "files.html",
+        "lines.html",
+        "tags.html",
+        "ownership.html",
+        "history.html",
+    ],
+)
+def test_each_page_marks_itself_current(mock_data_collector, temp_dir, page):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, page), encoding="utf-8") as f:
+        content = f.read()
+    assert f'<a href="{page}" class="active" aria-current="page">' in content
+    assert content.count('aria-current="page"') == 1
 
 
 # ── HTMLReportCreator.create_index_html ──────────────────────────────────
@@ -642,7 +743,7 @@ def test_build_author_time_series_downsample(mock_data_collector):
         assert len(ds["data"]) == len(labels)
 
     # The last timestamp should always be included
-    last_expected = datetime.datetime.fromtimestamp(sorted(changes.keys())[-1]).strftime("%Y-%m-%d")
+    last_expected = sorted(changes.keys())[-1]
     assert labels[-1] == last_expected, f"Last label should be {last_expected}, got {labels[-1]}"
 
     # Data values should be monotonically non-decreasing (cumulative)
