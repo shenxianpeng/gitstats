@@ -753,6 +753,31 @@ def test_create_activity_html(mock_data_collector, temp_dir):
     assert html.index('id="hour_of_week"') < html.index('id="punch_card"')
 
 
+def test_weekly_activity_labels_weeks_by_monday(mock_data_collector, monkeypatch):
+    import datetime as real_datetime
+
+    class FixedDatetime(real_datetime.datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls(2026, 9, 25, 12, 0)  # a Friday; its week starts on Mon 21 Sep
+
+    monkeypatch.setattr("gitstats.report_creator.datetime.datetime", FixedDatetime)
+    mock_data_collector.activity_by_year_week = {"2026-38": 7}  # "%Y-%W" of 2026-09-21
+    f = StringIO()
+    HTMLReportCreator()._write_weekly_activity_section(f, mock_data_collector)
+    html = f.getvalue()
+
+    # Labels are the weeks' Mondays, not "2026-38" (which reads like a month)
+    assert "Feb 16" in html and "Sep 21" in html
+    assert '"2026-38"' not in html
+    assert "from the week of Feb 16, 2026 to the week of Sep 21, 2026" in html
+    # The value for the current week is still found under its "%Y-%W" key
+    assert (
+        '"data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7]'
+        in html
+    )
+
+
 def test_activity_summary_and_section_links(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
     creator.title = mock_data_collector.project_name

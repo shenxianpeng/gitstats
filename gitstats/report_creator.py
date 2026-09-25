@@ -537,28 +537,39 @@ class HTMLReportCreator(ReportCreator):
         )
 
     def _write_weekly_activity_section(self, f, data) -> None:
-        """Write weekly activity section with chart."""
+        """Commits per week for the last 32 weeks.
+
+        Weeks are labelled by the Monday they start on ("Feb 16"); the "%Y-%W"
+        keys the data is stored under read like months ("2026-07").
+        """
         weeks_count = 32
         f.write(html_header(2, "Weekly activity"))
-        f.write("<p>Last %d weeks</p>" % weeks_count)
 
         now = datetime.datetime.now()
         deltaweek = datetime.timedelta(7)
         weeks: list[str] = []
+        mondays: list[datetime.date] = []
         stampcur = now
         for _ in range(weeks_count):
             weeks.insert(0, stampcur.strftime("%Y-%W"))
+            mondays.insert(0, (stampcur - datetime.timedelta(days=stampcur.weekday())).date())
             stampcur -= deltaweek
 
+        def day(d: datetime.date) -> str:
+            return f"{d:%b} {d.day}"
+
+        f.write(
+            f"<p>Last {weeks_count} weeks, from the week of {day(mondays[0])}, {mondays[0].year} "
+            f"to the week of {day(mondays[-1])}, {mondays[-1].year}.</p>"
+        )
         weekly_values = [data.activity_by_year_week.get(w, 0) for w in weeks]
         f.write(
             self._render_chartjs(
                 "chart-weekly-activity",
                 "bar",
-                weeks,
+                [day(m) for m in mondays],
                 [{"label": "Commits", "data": weekly_values}],
                 y_label="Commits",
-                x_ticks_rotate=True,
                 aspect_ratio=5,
             )
         )
