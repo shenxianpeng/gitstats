@@ -1097,7 +1097,7 @@ class HTMLReportCreator(ReportCreator):
             dom_labels.append(domain)
             dom_values.append(info["commits"])
             f.write(
-                '<tr><th>%s</th><td class="num">%d (%.2f%%)</td></tr>'
+                '<tr><td>%s</td><td class="num">%d (%.2f%%)</td></tr>'
                 % (
                     html.escape(domain),
                     info["commits"],

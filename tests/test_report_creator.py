@@ -905,6 +905,9 @@ def test_create_authors_html(mock_data_collector, temp_dir):
     assert "Author of Year" in html
     assert "Domains" in html
     assert "example.com" in html
+    # Domains are data cells, not uppercased header cells
+    assert "<tr><td>example.com</td>" in html
+    assert "<th>example.com</th>" not in html
     assert "Contributor Growth" in html
 
 
