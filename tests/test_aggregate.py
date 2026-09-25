@@ -218,6 +218,16 @@ class TestAggregateReportCreator:
         assert "\U0001f319" not in html
         assert html.count('aria-current="page"') == 1
 
+    def test_tables_scroll_in_their_own_box(self, temp_dir):
+        html = self._render(
+            temp_dir,
+            [_summary("alpha", 10, {"Alice": 10})],
+            failures=[{"name": "bad", "path": "/x", "error": "boom"}],
+        )
+        assert html.count("<table") == 3
+        assert html.count('<div class="table-scroll"><table') == 3
+        assert html.count("</table></div>") == 3
+
     def test_thousands_separators(self, temp_dir):
         html = self._render(
             temp_dir,

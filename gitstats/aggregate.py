@@ -317,7 +317,7 @@ class AggregateReportCreator:
         total_lines = sum(s.get("total_lines", 0) for s in summaries)
 
         f.write("<h2>Totals</h2>")
-        f.write("<table border='1' cellspacing='0' cellpadding='4'>")
+        f.write('<div class="table-scroll"><table>')
         f.write(f"<tr><td>Repositories</td><td>{len(summaries)}</td></tr>")
         f.write(f"<tr><td>Total Commits</td><td>{format_int(total_commits)}</td></tr>")
         f.write(f"<tr><td>Commits (last 12 mo)</td><td>{format_int(commits_12mo)}</td></tr>")
@@ -326,12 +326,12 @@ class AggregateReportCreator:
             f"<tr><td>Active Repositories (12 mo)</td><td>{active_repos} / {len(summaries)}</td></tr>"
         )
         f.write(f"<tr><td>Lines of Code</td><td>{format_int(total_lines)}</td></tr>")
-        f.write("</table>")
+        f.write("</table></div>")
 
     @staticmethod
     def _write_repo_table(f: Any, summaries: list[dict[str, Any]]) -> None:
         f.write("<h2>Repositories</h2>")
-        f.write('<table class="sortable" id="portfolio">')
+        f.write('<div class="table-scroll"><table class="sortable" id="portfolio">')
         f.write(
             "<tr><th>Repository</th><th>Health</th><th>Commits</th><th>Authors</th>"
             "<th>Active (12 mo)</th><th>Files</th><th>Lines of Code</th>"
@@ -360,18 +360,18 @@ class AggregateReportCreator:
                 f"<td>{last_commit}</td>"
                 f"<td>{since}</td></tr>"
             )
-        f.write("</table>")
+        f.write("</table></div>")
 
     @staticmethod
     def _write_failures(f: Any, failures: list[dict[str, str]]) -> None:
         if not failures:
             return
         f.write("<h2>Failed Repositories</h2>")
-        f.write("<table border='1' cellspacing='0' cellpadding='4'>")
+        f.write('<div class="table-scroll"><table>')
         f.write("<tr><th>Repository</th><th>Error</th></tr>")
         for failure in failures:
             f.write(
                 f"<tr><td>{html.escape(failure.get('name', ''))}</td>"
                 f"<td>{html.escape(failure.get('error', ''))}</td></tr>"
             )
-        f.write("</table>")
+        f.write("</table></div>")

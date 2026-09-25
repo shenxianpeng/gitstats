@@ -21,8 +21,9 @@ from gitstats.utils import (
     get_version,
 )
 
-_FLEX_CONTAINER = '<div style="display:flex;gap:24px;align-items:flex-start">'
-_FLEX_CHILD = '<div style="flex:1;min-width:0">'
+# A table with its chart beside it; the chart wraps below on narrow screens.
+_FLEX_CONTAINER = '<div class="table-with-chart">'
+_FLEX_CHILD = '<div class="chart-pane">'
 _FLEX_CLOSE = "</div></div>"
 
 # Runs before the stylesheet loads so the page never flashes the wrong theme.
@@ -67,8 +68,18 @@ THEME_SCRIPT = """<script>
 		});
 	})();
 
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
 	document.addEventListener('DOMContentLoaded', function() {
 		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
 	});
 </script>"""
 
@@ -255,7 +266,7 @@ class HTMLReportCreator(ReportCreator):
 
         f.write(html_header(2, "Git Overview"))
 
-        f.write("<table border='1' cellspacing='0' cellpadding='4'>")
+        f.write('<div class="table-scroll"><table>')
         f.write(f"<tr><td>Project Name</td><td>{html.escape(data.project_name)}</td></tr>")
         f.write(
             "<tr><td>Generated On</td><td>%s (in %d seconds)</td></tr>"
@@ -296,7 +307,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             f"<tr><td>Authors</td><td>{format_int(data.get_total_authors())} (average {(1.0 * data.get_total_commits()) / data.get_total_authors():.1f} commits per author)</td></tr>"
         )
-        f.write("</table>")
+        f.write("</table></div>")
 
         self.print_footer(f)
         f.write("</body>\n</html>")
@@ -402,7 +413,7 @@ class HTMLReportCreator(ReportCreator):
         hour_of_day = data.get_activity_by_hour_of_day()
         busiest = data.activity_by_hour_of_day_busiest
 
-        f.write("<table><tr><th>Hour</th>")
+        f.write('<div class="table-scroll"><table><tr><th>Hour</th>')
         for i in range(24):
             f.write("<th>%d</th>" % i)
         f.write("</tr>\n<tr><th>Commits</th>")
@@ -423,7 +434,7 @@ class HTMLReportCreator(ReportCreator):
                 )
             else:
                 f.write(f'<td class="{self._heat_td_class(0, 0)}">0.00</td>')
-        f.write("</tr></table>")
+        f.write("</tr></table></div>")
 
         h_labels = list(range(24))
         h_values = [hour_of_day.get(h, 0) for h in h_labels]
@@ -444,7 +455,7 @@ class HTMLReportCreator(ReportCreator):
         totalcommits = data.get_total_commits()
 
         f.write(_FLEX_CONTAINER)
-        f.write("<table><tr><th>Day</th><th>Total (%)</th></tr>")
+        f.write('<div class="table-scroll"><table><tr><th>Day</th><th>Total (%)</th></tr>')
         for d in range(7):
             f.write("<tr>")
             f.write(f"<th>{WEEKDAYS[d]}</th>")
@@ -456,7 +467,7 @@ class HTMLReportCreator(ReportCreator):
             else:
                 f.write("<td>0</td>")
             f.write("</tr>")
-        f.write("</table>")
+        f.write("</table></div>")
         dow_labels = list(WEEKDAYS)
         dow_values = [day_of_week.get(d, 0) for d in range(7)]
         f.write(_FLEX_CHILD)
@@ -476,7 +487,7 @@ class HTMLReportCreator(ReportCreator):
     def _write_hour_of_week_section(self, f, data) -> None:
         """Write hour of week section as a heat table."""
         f.write(html_header(2, "Hour of Week"))
-        f.write("<table>")
+        f.write('<div class="table-scroll"><table>')
         f.write("<tr><th>Weekday</th>")
         for hour in range(24):
             f.write("<th>%d</th>" % hour)
@@ -492,13 +503,13 @@ class HTMLReportCreator(ReportCreator):
                     )
                 )
             f.write("</tr>")
-        f.write("</table>")
+        f.write("</table></div>")
 
     def _write_month_of_year_section(self, f, data) -> None:
         """Write month of year section with table and chart."""
         f.write(html_header(2, "Month of Year"))
         f.write(_FLEX_CONTAINER)
-        f.write("<table><tr><th>Month</th><th>Commits (%)</th></tr>")
+        f.write('<div class="table-scroll"><table><tr><th>Month</th><th>Commits (%)</th></tr>')
         total = data.get_total_commits()
         for mm in range(1, 13):
             commits = data.activity_by_month_of_year.get(mm, 0)
@@ -506,7 +517,7 @@ class HTMLReportCreator(ReportCreator):
                 "<tr><td>%d</td><td>%d (%.2f %%)</td></tr>"
                 % (mm, commits, (100.0 * commits) / total)
             )
-        f.write("</table>")
+        f.write("</table></div>")
         moy_labels = list(range(1, 13))
         moy_values = [data.activity_by_month_of_year.get(mm, 0) for mm in moy_labels]
         f.write(_FLEX_CHILD)
@@ -528,7 +539,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Commits by year/month"))
         f.write(_FLEX_CONTAINER)
         f.write(
-            "<table><tr><th>Month</th><th>Commits</th><th>Lines added</th><th>Lines removed</th></tr>"
+            '<div class="table-scroll"><table><tr><th>Month</th><th>Commits</th><th>Lines added</th><th>Lines removed</th></tr>'
         )
         for yymm in sorted(data.commits_by_month.keys(), reverse=True):
             f.write(
@@ -540,7 +551,7 @@ class HTMLReportCreator(ReportCreator):
                     data.lines_removed_by_month.get(yymm, 0),
                 )
             )
-        f.write("</table>")
+        f.write("</table></div>")
         cbym_keys = month_range(data.commits_by_month.keys())
         cbym_values = [data.commits_by_month.get(k, 0) for k in cbym_keys]
         f.write(_FLEX_CHILD)
@@ -561,7 +572,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Commits by Year"))
         f.write(_FLEX_CONTAINER)
         f.write(
-            "<table><tr><th>Year</th><th>Commits (% of all)</th><th>Lines added</th><th>Lines removed</th></tr>"
+            '<div class="table-scroll"><table><tr><th>Year</th><th>Commits (% of all)</th><th>Lines added</th><th>Lines removed</th></tr>'
         )
         total = data.get_total_commits()
         for yy in sorted(data.commits_by_year.keys(), reverse=True):
@@ -575,7 +586,7 @@ class HTMLReportCreator(ReportCreator):
                     data.lines_removed_by_year.get(yy, 0),
                 )
             )
-        f.write("</table>")
+        f.write("</table></div>")
         if data.commits_by_year:
             cby_all_years = list(
                 range(
@@ -603,7 +614,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Commits by Timezone"))
         max_commits_on_tz = max(data.commits_by_timezone.values())
         tz_sorted = sorted(data.commits_by_timezone, key=lambda n: int(n))
-        f.write('<table class="heat"><tr>')
+        f.write('<div class="table-scroll"><table class="heat"><tr>')
         for i in tz_sorted:
             f.write(f"<th>{i}</th>")
         f.write("</tr>\n<tr>")
@@ -613,7 +624,7 @@ class HTMLReportCreator(ReportCreator):
                 '<td class="heat %s">%d</td>'
                 % (self._heat_td_class(commits, max_commits_on_tz), commits)
             )
-        f.write("</tr></table>")
+        f.write("</tr></table></div>")
 
     def _build_author_time_series(self, data):
         """Build per-author cumulative lines and commits time series for Chart.js.
@@ -677,7 +688,7 @@ class HTMLReportCreator(ReportCreator):
         # Authors :: List of authors
         f.write(html_header(2, "List of Authors"))
 
-        f.write('<table class="authors sortable" id="authors">')
+        f.write('<div class="table-scroll"><table class="authors sortable" id="authors">')
         f.write(
             '<tr><th>Author</th><th>Commits (%)</th><th>+ lines</th><th>- lines</th><th>First commit</th><th>Last commit</th><th class="unsortable">Age</th><th>Active days</th><th># by commits</th></tr>'
         )
@@ -698,7 +709,7 @@ class HTMLReportCreator(ReportCreator):
                     info["place_by_commits"],
                 )
             )
-        f.write("</table>")
+        f.write("</table></div>")
 
         allauthors = data.get_authors()
         if len(allauthors) > load_config()["max_authors"]:
@@ -757,7 +768,7 @@ class HTMLReportCreator(ReportCreator):
 
         # Authors :: Author of Month
         f.write(html_header(2, "Author of Month"))
-        f.write('<table class="sortable" id="aom">')
+        f.write('<div class="table-scroll"><table class="sortable" id="aom">')
         f.write(
             '<tr><th>Month</th><th>Author</th><th>Commits (%%)</th><th class="unsortable">Next top %d</th><th>Number of authors</th></tr>'
             % load_config()["authors_top"]
@@ -783,11 +794,11 @@ class HTMLReportCreator(ReportCreator):
                 )
             )
 
-        f.write("</table>")
+        f.write("</table></div>")
 
         f.write(html_header(2, "Author of Year"))
         f.write(
-            '<table class="sortable" id="aoy"><tr><th>Year</th><th>Author</th><th>Commits (%%)</th><th class="unsortable">Next top %d</th><th>Number of authors</th></tr>'
+            '<div class="table-scroll"><table class="sortable" id="aoy"><tr><th>Year</th><th>Author</th><th>Commits (%%)</th><th class="unsortable">Next top %d</th><th>Number of authors</th></tr>'
             % load_config()["authors_top"]
         )
         for yy in sorted(data.author_of_year.keys(), reverse=True):
@@ -810,14 +821,14 @@ class HTMLReportCreator(ReportCreator):
                     len(authors),
                 )
             )
-        f.write("</table>")
+        f.write("</table></div>")
 
         # Domains
         f.write(html_header(2, "Commits by Domains"))
         domains_by_commits = get_keys_sorted_by_value_key(data.domains, "commits")
         domains_by_commits.reverse()  # most first
         f.write(_FLEX_CONTAINER)
-        f.write("<table>")
+        f.write('<div class="table-scroll"><table>')
         f.write("<tr><th>Domains</th><th>Total (%)</th></tr>")
         dom_labels = []
         dom_values = []
@@ -837,7 +848,7 @@ class HTMLReportCreator(ReportCreator):
                     (100.0 * info["commits"] / data.get_total_commits()),
                 )
             )
-        f.write("</table>")
+        f.write("</table></div>")
         f.write(_FLEX_CHILD)
         f.write(
             self._render_chartjs(
@@ -927,7 +938,7 @@ class HTMLReportCreator(ReportCreator):
             "<p><em>Note: Files with excluded extensions are not shown. Configure <code>exclude_exts</code> in gitstats.conf.</em></p>"
         )
         f.write(
-            '<table class="sortable" id="ext"><tr><th>Extension</th><th>Files (%)</th><th>Lines (%)</th><th>Lines/file</th></tr>'
+            '<div class="table-scroll"><table class="sortable" id="ext"><tr><th>Extension</th><th>Files (%)</th><th>Lines (%)</th><th>Lines/file</th></tr>'
         )
 
         for ext in sorted(data.extensions.keys()):
@@ -948,7 +959,7 @@ class HTMLReportCreator(ReportCreator):
                     lines / files,
                 )
             )
-        f.write("</table>")
+        f.write("</table></div>")
 
         # Files :: Code Churn (most frequently changed files)
         if data.file_churn:
@@ -963,7 +974,7 @@ class HTMLReportCreator(ReportCreator):
             churn_labels = [item[0] for item in top_churn]
             churn_values = [item[1] for item in top_churn]
             f.write(
-                '<table class="sortable" id="churn"><tr><th>File</th><th>Times Changed</th></tr>'
+                '<div class="table-scroll"><table class="sortable" id="churn"><tr><th>File</th><th>Times Changed</th></tr>'
             )
             for filepath, count in top_churn:
                 f.write(
@@ -974,7 +985,7 @@ class HTMLReportCreator(ReportCreator):
                         count,
                     )
                 )
-            f.write("</table>")
+            f.write("</table></div>")
             f.write(
                 self._render_chartjs(
                     "chart-file-churn",
@@ -1038,7 +1049,7 @@ class HTMLReportCreator(ReportCreator):
             )
         f.write("</dl>")
 
-        f.write('<table class="tags">')
+        f.write('<div class="table-scroll"><table class="tags">')
         f.write("<tr><th>Name</th><th>Date</th><th>Commits</th><th>Authors</th></tr>")
         # sort the tags by date desc
         tags_sorted_by_date_desc = [
@@ -1069,7 +1080,7 @@ class HTMLReportCreator(ReportCreator):
                     ", ".join(authorinfo),
                 )
             )
-        f.write("</table>")
+        f.write("</table></div>")
 
         self.print_footer(f)
         f.write("</body></html>")
@@ -1143,7 +1154,7 @@ class HTMLReportCreator(ReportCreator):
         risk_files = [fs for fs in ownership["files"] if fs["contributors"] == 1]
         if risk_files:
             f.write(
-                '<table class="sortable" id="ownership-busfactor">'
+                '<div class="table-scroll"><table class="sortable" id="ownership-busfactor">'
                 "<tr><th>File</th><th>Sole owner</th><th>Commits</th></tr>"
             )
             for fs in risk_files[:50]:
@@ -1151,7 +1162,7 @@ class HTMLReportCreator(ReportCreator):
                     "<tr><td>%s</td><td>%s</td><td>%d</td></tr>"
                     % (html.escape(fs["path"]), html.escape(fs["owner"]), fs["edits"])
                 )
-            f.write("</table>")
+            f.write("</table></div>")
             if len(risk_files) > 50:
                 f.write(
                     '<p class="moreauthors">Showing top 50 of %d single-owner files.</p>'
@@ -1167,7 +1178,7 @@ class HTMLReportCreator(ReportCreator):
             "Solely owned = files only that author has touched.</em></p>"
         )
         f.write(
-            '<table class="sortable" id="ownership-by-author">'
+            '<div class="table-scroll"><table class="sortable" id="ownership-by-author">'
             "<tr><th>Author</th><th>Files owned</th><th>Solely owned</th>"
             "<th>Files touched</th></tr>"
         )
@@ -1181,7 +1192,7 @@ class HTMLReportCreator(ReportCreator):
                     a["files_touched"],
                 )
             )
-        f.write("</table>")
+        f.write("</table></div>")
         if len(ownership["authors"]) > 25:
             f.write(
                 '<p class="moreauthors">Showing top 25 of %d contributors.</p>'
@@ -1201,7 +1212,7 @@ class HTMLReportCreator(ReportCreator):
         )
         if shared:
             f.write(
-                '<table class="sortable" id="ownership-shared">'
+                '<div class="table-scroll"><table class="sortable" id="ownership-shared">'
                 "<tr><th>File</th><th>Contributors</th><th>Primary owner</th>"
                 "<th>Owner share</th></tr>"
             )
@@ -1215,7 +1226,7 @@ class HTMLReportCreator(ReportCreator):
                         fs["ownership_pct"],
                     )
                 )
-            f.write("</table>")
+            f.write("</table></div>")
         else:
             f.write("<p>No files have more than one contributor yet.</p>")
 
