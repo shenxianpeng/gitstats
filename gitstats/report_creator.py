@@ -473,17 +473,19 @@ class HTMLReportCreator(ReportCreator):
         totalcommits = data.get_total_commits()
 
         f.write(_FLEX_CONTAINER)
-        f.write('<div class="table-scroll"><table><tr><th>Day</th><th>Total (%)</th></tr>')
+        f.write(
+            '<div class="table-scroll"><table><tr><th>Day</th><th class="num">Total (%)</th></tr>'
+        )
         for d in range(7):
             f.write("<tr>")
             f.write(f"<th>{WEEKDAYS[d]}</th>")
             if d in day_of_week:
                 f.write(
-                    "<td>%d (%.2f%%)</td>"
+                    '<td class="num">%d (%.2f%%)</td>'
                     % (day_of_week[d], (100.0 * day_of_week[d]) / totalcommits)
                 )
             else:
-                f.write("<td>0</td>")
+                f.write('<td class="num">0</td>')
             f.write("</tr>")
         f.write("</table></div>")
         dow_labels = list(WEEKDAYS)
@@ -527,12 +529,14 @@ class HTMLReportCreator(ReportCreator):
         """Write month of year section with table and chart."""
         f.write(html_header(2, "Month of Year"))
         f.write(_FLEX_CONTAINER)
-        f.write('<div class="table-scroll"><table><tr><th>Month</th><th>Commits (%)</th></tr>')
+        f.write(
+            '<div class="table-scroll"><table><tr><th>Month</th><th class="num">Commits (%)</th></tr>'
+        )
         total = data.get_total_commits()
         for mm in range(1, 13):
             commits = data.activity_by_month_of_year.get(mm, 0)
             f.write(
-                "<tr><td>%d</td><td>%d (%.2f %%)</td></tr>"
+                '<tr><td>%d</td><td class="num">%d (%.2f %%)</td></tr>'
                 % (mm, commits, (100.0 * commits) / total)
             )
         f.write("</table></div>")
@@ -557,11 +561,11 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Commits by year/month"))
         f.write(_FLEX_CONTAINER)
         f.write(
-            '<div class="table-scroll"><table><tr><th>Month</th><th>Commits</th><th>Lines added</th><th>Lines removed</th></tr>'
+            '<div class="table-scroll"><table><tr><th>Month</th><th class="num">Commits</th><th class="num">Lines added</th><th class="num">Lines removed</th></tr>'
         )
         for yymm in sorted(data.commits_by_month.keys(), reverse=True):
             f.write(
-                "<tr><td>%s</td><td>%d</td><td>%d</td><td>%d</td></tr>"
+                '<tr><td>%s</td><td class="num">%d</td><td class="num">%d</td><td class="num">%d</td></tr>'
                 % (
                     yymm,
                     data.commits_by_month.get(yymm, 0),
@@ -590,12 +594,12 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Commits by Year"))
         f.write(_FLEX_CONTAINER)
         f.write(
-            '<div class="table-scroll"><table><tr><th>Year</th><th>Commits (% of all)</th><th>Lines added</th><th>Lines removed</th></tr>'
+            '<div class="table-scroll"><table><tr><th>Year</th><th class="num">Commits (% of all)</th><th class="num">Lines added</th><th class="num">Lines removed</th></tr>'
         )
         total = data.get_total_commits()
         for yy in sorted(data.commits_by_year.keys(), reverse=True):
             f.write(
-                "<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d</td><td>%d</td></tr>"
+                '<tr><td>%s</td><td class="num">%d (%.2f%%)</td><td class="num">%d</td><td class="num">%d</td></tr>'
                 % (
                     yy,
                     data.commits_by_year.get(yy, 0),
@@ -708,12 +712,12 @@ class HTMLReportCreator(ReportCreator):
 
         f.write('<div class="table-scroll"><table class="authors sortable" id="authors">')
         f.write(
-            '<tr><th>Author</th><th>Commits (%)</th><th>+ lines</th><th>- lines</th><th>First commit</th><th>Last commit</th><th class="unsortable">Age</th><th>Active days</th><th># by commits</th></tr>'
+            '<tr><th>Author</th><th class="num">Commits (%)</th><th class="num">+ lines</th><th class="num">- lines</th><th>First commit</th><th>Last commit</th><th class="unsortable num">Age</th><th class="num">Active days</th><th class="num"># by commits</th></tr>'
         )
         for author in data.get_authors(load_config()["max_authors"]):
             info = data.get_author_info(author)
             f.write(
-                '<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d</td><td>%d</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap" title="%s days">%s</td><td>%d</td><td>%d</td></tr>'
+                '<tr><td>%s</td><td class="num">%d (%.2f%%)</td><td class="num">%d</td><td class="num">%d</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap num" title="%s days">%s</td><td class="num">%d</td><td class="num">%d</td></tr>'
                 % (
                     html.escape(author),
                     info["commits"],
@@ -789,7 +793,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Author of Month"))
         f.write('<div class="table-scroll"><table class="sortable" id="aom">')
         f.write(
-            '<tr><th>Month</th><th>Author</th><th>Commits (%%)</th><th class="unsortable">Next top %d</th><th>Number of authors</th></tr>'
+            '<tr><th>Month</th><th>Author</th><th class="num">Commits (%%)</th><th class="unsortable">Next top %d</th><th class="num">Number of authors</th></tr>'
             % load_config()["authors_top"]
         )
         for yymm in sorted(data.author_of_month.keys(), reverse=True):
@@ -801,7 +805,7 @@ class HTMLReportCreator(ReportCreator):
                 html.escape(a) for a in authors[1 : load_config()["authors_top"] + 1]
             )
             f.write(
-                "<tr><td>%s</td><td>%s</td><td>%d (%.2f%% of %d)</td><td>%s</td><td>%d</td></tr>"
+                '<tr><td>%s</td><td>%s</td><td class="num">%d (%.2f%% of %d)</td><td>%s</td><td class="num">%d</td></tr>'
                 % (
                     yymm,
                     html.escape(authors[0]),
@@ -817,7 +821,7 @@ class HTMLReportCreator(ReportCreator):
 
         f.write(html_header(2, "Author of Year"))
         f.write(
-            '<div class="table-scroll"><table class="sortable" id="aoy"><tr><th>Year</th><th>Author</th><th>Commits (%%)</th><th class="unsortable">Next top %d</th><th>Number of authors</th></tr>'
+            '<div class="table-scroll"><table class="sortable" id="aoy"><tr><th>Year</th><th>Author</th><th class="num">Commits (%%)</th><th class="unsortable">Next top %d</th><th class="num">Number of authors</th></tr>'
             % load_config()["authors_top"]
         )
         for yy in sorted(data.author_of_year.keys(), reverse=True):
@@ -829,7 +833,7 @@ class HTMLReportCreator(ReportCreator):
                 html.escape(a) for a in authors[1 : load_config()["authors_top"] + 1]
             )
             f.write(
-                "<tr><td>%s</td><td>%s</td><td>%d (%.2f%% of %d)</td><td>%s</td><td>%d</td></tr>"
+                '<tr><td>%s</td><td>%s</td><td class="num">%d (%.2f%% of %d)</td><td>%s</td><td class="num">%d</td></tr>'
                 % (
                     yy,
                     html.escape(authors[0]),
@@ -848,7 +852,7 @@ class HTMLReportCreator(ReportCreator):
         domains_by_commits.reverse()  # most first
         f.write(_FLEX_CONTAINER)
         f.write('<div class="table-scroll"><table>')
-        f.write("<tr><th>Domains</th><th>Total (%)</th></tr>")
+        f.write('<tr><th>Domains</th><th class="num">Total (%)</th></tr>')
         dom_labels = []
         dom_values = []
         n = 0
@@ -860,7 +864,7 @@ class HTMLReportCreator(ReportCreator):
             dom_labels.append(domain)
             dom_values.append(info["commits"])
             f.write(
-                "<tr><th>%s</th><td>%d (%.2f%%)</td></tr>"
+                '<tr><th>%s</th><td class="num">%d (%.2f%%)</td></tr>'
                 % (
                     html.escape(domain),
                     info["commits"],
@@ -957,7 +961,7 @@ class HTMLReportCreator(ReportCreator):
             "<p><em>Note: Files with excluded extensions are not shown. Configure <code>exclude_exts</code> in gitstats.conf.</em></p>"
         )
         f.write(
-            '<div class="table-scroll"><table class="sortable" id="ext"><tr><th>Extension</th><th>Files (%)</th><th>Lines (%)</th><th>Lines/file</th></tr>'
+            '<div class="table-scroll"><table class="sortable" id="ext"><tr><th>Extension</th><th class="num">Files (%)</th><th class="num">Lines (%)</th><th class="num">Lines/file</th></tr>'
         )
 
         for ext in sorted(data.extensions.keys()):
@@ -968,7 +972,7 @@ class HTMLReportCreator(ReportCreator):
             except ZeroDivisionError:
                 loc_percentage = 0
             f.write(
-                "<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d (%.2f%%)</td><td>%d</td></tr>"
+                '<tr><td>%s</td><td class="num">%d (%.2f%%)</td><td class="num">%d (%.2f%%)</td><td class="num">%d</td></tr>'
                 % (
                     html.escape(ext),
                     files,
@@ -993,11 +997,11 @@ class HTMLReportCreator(ReportCreator):
             churn_labels = [item[0] for item in top_churn]
             churn_values = [item[1] for item in top_churn]
             f.write(
-                '<div class="table-scroll"><table class="sortable" id="churn"><tr><th>File</th><th>Times Changed</th></tr>'
+                '<div class="table-scroll"><table class="sortable" id="churn"><tr><th>File</th><th class="num">Times Changed</th></tr>'
             )
             for filepath, count in top_churn:
                 f.write(
-                    '<tr><td class="%s">%s</td><td>%d</td></tr>'
+                    '<tr><td class="%s">%s</td><td class="num">%d</td></tr>'
                     % (
                         self._heat_td_class(count, max_churn),
                         html.escape(filepath),
@@ -1069,7 +1073,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</dl>")
 
         f.write('<div class="table-scroll"><table class="tags">')
-        f.write("<tr><th>Name</th><th>Date</th><th>Commits</th><th>Authors</th></tr>")
+        f.write('<tr><th>Name</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr>')
         # sort the tags by date desc
         tags_sorted_by_date_desc = [
             el[1]
@@ -1091,7 +1095,7 @@ class HTMLReportCreator(ReportCreator):
                 for i in authors_reversed:
                     authorinfo.append("%s (%d)" % (html.escape(i), data.tags[tag]["authors"][i]))
             f.write(
-                '<tr><td class="nowrap">%s</td><td class="nowrap">%s</td><td>%d</td><td>%s</td></tr>'
+                '<tr><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="num">%d</td><td>%s</td></tr>'
                 % (
                     html.escape(tag),
                     data.tags[tag]["date"],
@@ -1174,11 +1178,11 @@ class HTMLReportCreator(ReportCreator):
         if risk_files:
             f.write(
                 '<div class="table-scroll"><table class="sortable" id="ownership-busfactor">'
-                "<tr><th>File</th><th>Sole owner</th><th>Commits</th></tr>"
+                '<tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr>'
             )
             for fs in risk_files[:50]:
                 f.write(
-                    "<tr><td>%s</td><td>%s</td><td>%d</td></tr>"
+                    '<tr><td>%s</td><td>%s</td><td class="num">%d</td></tr>'
                     % (html.escape(fs["path"]), html.escape(fs["owner"]), fs["edits"])
                 )
             f.write("</table></div>")
@@ -1198,12 +1202,12 @@ class HTMLReportCreator(ReportCreator):
         )
         f.write(
             '<div class="table-scroll"><table class="sortable" id="ownership-by-author">'
-            "<tr><th>Author</th><th>Files owned</th><th>Solely owned</th>"
-            "<th>Files touched</th></tr>"
+            '<tr><th>Author</th><th class="num">Files owned</th><th class="num">Solely owned</th>'
+            '<th class="num">Files touched</th></tr>'
         )
         for a in ownership["authors"][:25]:
             f.write(
-                "<tr><td>%s</td><td>%d</td><td>%d</td><td>%d</td></tr>"
+                '<tr><td>%s</td><td class="num">%d</td><td class="num">%d</td><td class="num">%d</td></tr>'
                 % (
                     html.escape(a["author"]),
                     a["files_owned"],
@@ -1232,12 +1236,12 @@ class HTMLReportCreator(ReportCreator):
         if shared:
             f.write(
                 '<div class="table-scroll"><table class="sortable" id="ownership-shared">'
-                "<tr><th>File</th><th>Contributors</th><th>Primary owner</th>"
-                "<th>Owner share</th></tr>"
+                '<tr><th>File</th><th class="num">Contributors</th><th>Primary owner</th>'
+                '<th class="num">Owner share</th></tr>'
             )
             for fs in shared[:20]:
                 f.write(
-                    "<tr><td>%s</td><td>%d</td><td>%s</td><td>%.1f%%</td></tr>"
+                    '<tr><td>%s</td><td class="num">%d</td><td>%s</td><td class="num">%.1f%%</td></tr>'
                     % (
                         html.escape(fs["path"]),
                         fs["contributors"],

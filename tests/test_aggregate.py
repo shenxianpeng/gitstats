@@ -206,7 +206,7 @@ class TestAggregateReportCreator:
         assert "<th>Since</th>" in html
         assert "Age (days)" not in html
         assert "<td>2020</td>" in html
-        assert "<th>Lines of Code</th>" in html
+        assert '<th class="num">Lines of Code</th>' in html
         # Sorted by commits: alpha row before beta row
         assert html.index('href="alpha/index.html"') < html.index('href="beta/index.html"')
 
@@ -245,8 +245,9 @@ class TestAggregateReportCreator:
         assert "<tr><td>Total Commits</td><td>1,234,567</td></tr>" in html
         assert "<tr><td>Commits (last 12 mo)</td><td>78,432</td></tr>" in html
         assert "<tr><td>Lines of Code</td><td>44,025,623</td></tr>" in html
-        assert "<td>1,234,567</td>" in html
-        assert "<td>44,025,623</td>" in html
+        # Repository table: numeric columns are right-aligned
+        assert '<td class="num">1,234,567</td>' in html
+        assert '<td class="num">44,025,623</td>' in html
 
     def test_inactive_repo_counted(self, temp_dir):
         html = self._render(
