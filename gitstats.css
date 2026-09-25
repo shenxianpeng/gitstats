@@ -41,11 +41,9 @@
 	--success-color: #2d6a3f;
 	--danger-color: #8b2323;
 
-	--table-bg: #ffffff;
-	--table-header-bg: #f5f5f4;
 	--table-header-color: #211e1e;
 	--table-hover-bg: #f0efef;
-	--table-border: #cfcecd;
+	--table-border: #e6e5e4;
 
 	--nav-bg: #ffffff;
 	--nav-text: #4b4646;
@@ -88,8 +86,6 @@
 	--success-color: #4ade80;
 	--danger-color: #f87171;
 
-	--table-bg: #2d2929;
-	--table-header-bg: #211e1e;
 	--table-header-color: #cfcecd;
 	--table-hover-bg: #352f2f;
 	--table-border: #3d3838;
@@ -243,7 +239,7 @@ table {
 	border-collapse: collapse;
 	font-size: var(--font-size-sm);
 	margin-bottom: var(--space-4);
-	border: 1px solid var(--border-strong);
+	font-variant-numeric: tabular-nums;
 }
 
 /* Wide tables scroll inside their own box instead of widening the page */
@@ -313,14 +309,13 @@ td.nowrap {
 	white-space: nowrap;
 }
 
+/* Rows are separated by hairlines only: no outer border, no vertical lines */
 td {
-	background-color: var(--table-bg);
 	padding: var(--space-2) var(--space-3);
-	border: 1px solid var(--table-border);
+	border-bottom: 1px solid var(--table-border);
 }
 
 th {
-	background-color: var(--table-header-bg);
 	font-family: var(--font-mono);
 	font-weight: 600;
 	color: var(--table-header-color);
@@ -329,8 +324,19 @@ th {
 	font-size: var(--font-size-xs);
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
-	border: 1px solid var(--border-strong);
+	border-bottom: 1px solid var(--table-border);
 	white-space: nowrap;
+}
+
+/* The header row gets the stronger rule */
+tr:first-child > th {
+	border-bottom-color: var(--border-strong);
+}
+
+/* Numeric columns (counts, percentages, spans) line up on the right */
+th.num,
+td.num {
+	text-align: right;
 }
 
 th a {
@@ -559,24 +565,34 @@ h1 a {
 	text-decoration: none;
 }
 
+/* Section heading: "// Title" followed by a hairline to the right edge */
 h2 {
+	display: flex;
+	/* baseline keeps "//" on the first line when a long title wraps */
+	align-items: baseline;
+	gap: var(--space-3);
 	font-family: var(--font-mono);
 	font-size: var(--font-size-md);
 	font-weight: 600;
 	color: var(--text-color);
 	margin: var(--space-6) 0 var(--space-3);
-	padding: var(--space-2) var(--space-3);
-	border-left: 2px solid var(--text-color);
-	background-color: var(--surface-color);
 	clear: both;
 	letter-spacing: -0.01em;
 }
 
 h2::before {
-	content: '// ';
+	content: '//';
 	color: var(--text-muted);
 	font-weight: 400;
 	letter-spacing: 0;
+}
+
+h2::after {
+	content: '';
+	flex: 1;
+	align-self: center;
+	height: 1px;
+	background-color: var(--border-color);
 }
 
 h2 a {
@@ -663,6 +679,11 @@ table.noborders td:hover .bar {
 	text-align: center;
 	font-size: var(--font-size-xs);
 	font-variant-numeric: tabular-nums;
+}
+
+/* Gaps in the page color keep neighbouring heat cells apart */
+td.heat {
+	border: 2px solid var(--bg-color);
 }
 
 .heat0 { background-color: var(--heat0-bg) !important; color: var(--heat0-color); }
