@@ -1730,3 +1730,17 @@ def test_section_headings_use_sentence_case(mock_data_collector, temp_dir):
         for heading in headings:
             rest = heading.split()[1:]
             assert all(not w[0].isupper() for w in rest), (page, heading)
+
+
+def test_section_descriptions_share_one_style(mock_data_collector, temp_dir):
+    """Every paragraph describing a section uses .section-note, none is italic."""
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    notes = 0
+    for page in ("index", "activity", "authors", "files", "lines", "ownership", "history"):
+        with open(os.path.join(temp_dir, f"{page}.html")) as f:
+            html = f.read()
+        assert "<p><em>" not in html, page
+        notes += html.count('<p class="section-note">')
+    assert notes >= 6

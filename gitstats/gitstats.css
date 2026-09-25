@@ -211,6 +211,13 @@ dd {
 	text-decoration: none;
 }
 
+/* The sentence or two under a section heading saying what the section shows */
+.section-note {
+	max-width: 75ch;
+	margin: 0 0 var(--space-4);
+	color: var(--text-secondary);
+}
+
 .chart-note {
 	margin: 0;
 	font-size: var(--font-size-sm);

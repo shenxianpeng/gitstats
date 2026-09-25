@@ -586,7 +586,8 @@ class HTMLReportCreator(ReportCreator):
             return f"{d:%b} {d.day}"
 
         f.write(
-            f"<p>Last {weeks_count} weeks, from the week of {day(mondays[0])}, {mondays[0].year} "
+            '<p class="section-note">'
+            f"Last {weeks_count} weeks, from the week of {day(mondays[0])}, {mondays[0].year} "
             f"to the week of {day(mondays[-1])}, {mondays[-1].year}.</p>"
         )
         weekly_values = [data.activity_by_year_week.get(w, 0) for w in weeks]
@@ -612,7 +613,8 @@ class HTMLReportCreator(ReportCreator):
         f.write('<span id="hour_of_week"></span>')
         f.write(html_header(2, "Punch card"))
         f.write(
-            "<p>Commits by day of week and hour of day, in each commit's local time. "
+            '<p class="section-note">'
+            "Commits by day of week and hour of day, in each commit's local time. "
             "The bars along the top are the commits per hour; the last column is "
             "the commits per day.</p>"
         )
@@ -911,7 +913,8 @@ class HTMLReportCreator(ReportCreator):
         # year has no year boundary, so label its first and last month instead
         ends = "" if grid else f"<span>{months[0]}</span><span>{months[-1]}</span>"
         return (
-            "<p>One row per author: a square marks each month with commits (bigger means "
+            '<p class="section-note">'
+            "One row per author: a square marks each month with commits (bigger means "
             "more), and the line runs from their first to their last active month. "
             "Bot accounts are grey.</p>"
             '<div class="timeline-scroll"><div class="timeline">'
@@ -1124,8 +1127,9 @@ class HTMLReportCreator(ReportCreator):
         if data.new_contributors_by_month:
             f.write(html_header(2, "Contributor growth"))
             f.write(
-                "<p><em>Number of first-time contributors per month. "
-                "A growing trend indicates a healthy, welcoming project.</em></p>"
+                '<p class="section-note">'
+                "Number of first-time contributors per month. "
+                "A growing trend indicates a healthy, welcoming project.</p>"
             )
             nc_keys = month_range(data.new_contributors_by_month.keys())
             nc_values = [data.new_contributors_by_month.get(k, 0) for k in nc_keys]
@@ -1203,7 +1207,9 @@ class HTMLReportCreator(ReportCreator):
         # Files :: Extensions
         f.write(html_header(2, "Extensions"))
         f.write(
-            "<p><em>Note: Files with excluded extensions are not shown. Configure <code>exclude_exts</code> in gitstats.conf.</em></p>"
+            '<p class="section-note">'
+            "Files with excluded extensions are not shown; "
+            "configure <code>exclude_exts</code> in gitstats.conf.</p>"
         )
         f.write(
             '<div class="table-scroll"><table class="sortable" id="ext"><tr><th>Extension</th><th class="num">Files (%)</th><th class="num">Lines (%)</th><th class="num">Lines/file</th></tr>'
@@ -1233,8 +1239,9 @@ class HTMLReportCreator(ReportCreator):
         if data.file_churn:
             f.write(html_header(2, "Most changed files (code churn)"))
             f.write(
-                "<p><em>Files touched most often across all commits. "
-                "High-churn files are hotspots that may benefit from extra review or refactoring.</em></p>"
+                '<p class="section-note">'
+                "Files touched most often across all commits. "
+                "High-churn files are hotspots that may benefit from extra review or refactoring.</p>"
             )
             churn_sorted = sorted(data.file_churn.items(), key=lambda x: x[1], reverse=True)
             top_churn = churn_sorted[:25]
@@ -1452,8 +1459,9 @@ class HTMLReportCreator(ReportCreator):
         # Bus-factor risk: single-owner files, most-changed first
         f.write(html_header(2, "Bus factor risk — single-owner files"))
         f.write(
-            "<p><em>Files only one author has ever changed. The more a file has "
-            "changed, the more knowledge is at risk if that person leaves.</em></p>"
+            '<p class="section-note">'
+            "Files only one author has ever changed. The more a file has "
+            "changed, the more knowledge is at risk if that person leaves.</p>"
         )
         risk_files = [fs for fs in ownership["files"] if fs["contributors"] == 1]
         if risk_files:
@@ -1478,8 +1486,9 @@ class HTMLReportCreator(ReportCreator):
         # Ownership concentration by author
         f.write(html_header(2, "Ownership by author"))
         f.write(
-            "<p><em>Primary owner = the author with the most commits to a file. "
-            "Solely owned = files only that author has touched.</em></p>"
+            '<p class="section-note">'
+            "Primary owner = the author with the most commits to a file. "
+            "Solely owned = files only that author has touched.</p>"
         )
         f.write(
             '<div class="table-scroll"><table class="sortable" id="ownership-by-author">'
@@ -1506,8 +1515,9 @@ class HTMLReportCreator(ReportCreator):
         # Coordination hotspots: files with the most contributors
         f.write(html_header(2, "Most shared files"))
         f.write(
-            "<p><em>Files touched by the most people — shared code where changes "
-            "are most likely to need coordination.</em></p>"
+            '<p class="section-note">'
+            "Files touched by the most people — shared code where changes "
+            "are most likely to need coordination.</p>"
         )
         shared = sorted(
             (fs for fs in ownership["files"] if fs["contributors"] >= 2),
