@@ -15,6 +15,8 @@ from typing import Any
 from gitstats import WEEKDAYS, get_i18n_text, load_config
 from gitstats.badge import create_badges
 from gitstats.utils import (
+    format_bytes,
+    format_duration,
     format_int,
     get_git_version,
     get_pipe_output,
@@ -231,9 +233,6 @@ class HTMLReportCreator(ReportCreator):
             load_config()["style"],
             "sortable.js",
             "chart.umd.min.js",
-            "arrow-up.gif",
-            "arrow-down.gif",
-            "arrow-none.gif",
         ):
             src = basedir + "/" + file
             if os.path.exists(src):
@@ -640,7 +639,7 @@ class HTMLReportCreator(ReportCreator):
         for i in tz_sorted:
             commits = data.commits_by_timezone[i]
             f.write(
-                '<td class="heat %s">%d</td>'
+                '<td class="%s">%d</td>'
                 % (self._heat_td_class(commits, max_commits_on_tz), commits)
             )
         f.write("</tr></table></div>")
@@ -714,7 +713,7 @@ class HTMLReportCreator(ReportCreator):
         for author in data.get_authors(load_config()["max_authors"]):
             info = data.get_author_info(author)
             f.write(
-                "<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%d</td><td>%d</td></tr>"
+                '<tr><td>%s</td><td>%d (%.2f%%)</td><td>%d</td><td>%d</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap" title="%s days">%s</td><td>%d</td><td>%d</td></tr>'
                 % (
                     html.escape(author),
                     info["commits"],
@@ -723,7 +722,8 @@ class HTMLReportCreator(ReportCreator):
                     info["lines_removed"],
                     info["date_first"],
                     info["date_last"],
-                    info["timedelta"],
+                    format_int(info["timedelta"].days),
+                    format_duration(info["timedelta"]),
                     len(info["active_days"]),
                     info["place_by_commits"],
                 )
@@ -915,12 +915,12 @@ class HTMLReportCreator(ReportCreator):
         f.write("<h1>Files</h1>")
 
         f.write("<dl>\n")
-        f.write("<dt>Total files</dt><dd>%d</dd>" % data.get_total_files())
-        f.write("<dt>Total lines</dt><dd>%d</dd>" % data.get_total_loc())
+        f.write(f"<dt>Total files</dt><dd>{format_int(data.get_total_files())}</dd>")
+        f.write(f"<dt>Total lines</dt><dd>{format_int(data.get_total_loc())}</dd>")
         try:
             f.write(
-                "<dt>Average file size</dt><dd>%.2f bytes</dd>"
-                % (float(data.get_total_size()) / data.get_total_files())
+                "<dt>Average file size</dt><dd>%s</dd>"
+                % format_bytes(float(data.get_total_size()) / data.get_total_files())
             )
         except ZeroDivisionError:
             pass
@@ -1030,7 +1030,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("<h1>Lines</h1>")
 
         f.write("<dl>\n")
-        f.write("<dt>Total lines</dt><dd>%d</dd>" % data.get_total_loc())
+        f.write(f"<dt>Total lines</dt><dd>{format_int(data.get_total_loc())}</dd>")
         f.write("</dl>\n")
 
         f.write(html_header(2, "Lines of Code"))
@@ -1091,7 +1091,7 @@ class HTMLReportCreator(ReportCreator):
                 for i in authors_reversed:
                     authorinfo.append("%s (%d)" % (html.escape(i), data.tags[tag]["authors"][i]))
             f.write(
-                "<tr><td>%s</td><td>%s</td><td>%d</td><td>%s</td></tr>"
+                '<tr><td class="nowrap">%s</td><td class="nowrap">%s</td><td>%d</td><td>%s</td></tr>'
                 % (
                     html.escape(tag),
                     data.tags[tag]["date"],

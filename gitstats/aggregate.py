@@ -210,9 +210,6 @@ class AggregateReportCreator:
         for file in (
             load_config()["style"],
             "sortable.js",
-            "arrow-up.gif",
-            "arrow-down.gif",
-            "arrow-none.gif",
         ):
             src = os.path.join(basedir, file)
             target = os.path.abspath(os.path.join(base, os.path.basename(file)))
