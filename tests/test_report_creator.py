@@ -477,7 +477,7 @@ def test_create_index_html(mock_data_collector, temp_dir):
     assert "</html>" in html
 
     # Headline numbers are stat tiles, with the old table's averages as notes
-    assert '<dl class="stat-tiles">' in html
+    assert '<dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2">' in html
     assert html.count('<div class="stat-tile">') == 6
     assert '<dt>Commits</dt><dd class="stat-value">50</dd>' in html
     assert "12.5 per active day &middot; 0.4 per day" in html
@@ -499,13 +499,71 @@ def test_create_index_html(mock_data_collector, temp_dir):
 def test_stat_tiles_html():
     result = stat_tiles_html([("Streak", "1 day", "consecutive"), ("Files", "25", "3 extensions")])
     assert result == (
-        '<dl class="stat-tiles">'
+        '<dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2">'
         '<div class="stat-tile"><dt>Streak</dt><dd class="stat-value">1 day</dd>'
         '<dd class="stat-note">consecutive</dd></div>'
         '<div class="stat-tile"><dt>Files</dt><dd class="stat-value">25</dd>'
         '<dd class="stat-note">3 extensions</dd></div>'
         "</dl>"
     )
+
+
+@pytest.mark.parametrize(
+    "count,columns",
+    [
+        (6, "--cols: 6; --cols-md: 3; --cols-sm: 2"),
+        (3, "--cols: 3; --cols-md: 3; --cols-sm: 1"),
+        (2, "--cols: 2; --cols-md: 2; --cols-sm: 2"),
+        (1, "--cols: 1; --cols-md: 1; --cols-sm: 1"),
+    ],
+)
+def test_stat_tiles_rows_are_always_full(count, columns):
+    result = stat_tiles_html([("L", "1", "n")] * count)
+    assert f'style="{columns}"' in result
+
+
+def test_stat_tiles_empty_note_is_omitted():
+    result = stat_tiles_html([("Tags", "0", "")])
+    assert 'class="stat-note"' not in result
+
+
+def test_page_summaries_use_stat_tiles(mock_data_collector, temp_dir):
+    """Files, Lines, Tags, Ownership and History open with stat tiles, not a bare <dl>."""
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+
+    def page(name):
+        with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
+            return f.read()
+
+    for name in ("files.html", "lines.html", "tags.html", "ownership.html", "history.html"):
+        content = page(name)
+        assert '<dl class="stat-tiles"' in content, name
+        assert "<dl>" not in content, name
+
+    # Files: 25 files, 3 extensions, 2000 lines -> 80 per file, 50000 bytes in total
+    files = page("files.html")
+    assert "3 extensions" in files
+    assert "80 per file" in files
+    assert "48.8 KB in total" in files
+
+    # Lines: +3000 / -1000 over 50 commits
+    lines = page("lines.html")
+    assert '<dd class="stat-value"><span class="stat-added">+3,000</span></dd>' in lines
+    assert "60 per commit" in lines
+    assert "20 per commit" in lines
+
+    # Tags: v1.1.0 (2023-04-05) is the latest of two; 50 commits / 2 tags
+    tags = page("tags.html")
+    assert "latest v1.1.0 &middot; 2023-04-05" in tags
+    assert '<dt>Commits per Tag</dt><dd class="stat-value">25.0</dd>' in tags
+
+    # Ownership and History keep their intro paragraph above the tiles
+    ownership = page("ownership.html")
+    assert ownership.index("bus-factor risk") < ownership.index('<dl class="stat-tiles"')
+    assert "<dt>Single-Owner Files</dt>" in ownership
+    history = page("history.html")
+    assert "<dt>Peak Year</dt>" in history
+    assert "latest in 2023" in history
 
 
 # ── HTMLReportCreator.create_activity_html ───────────────────────────────
@@ -566,7 +624,7 @@ def test_create_files_html(mock_data_collector, temp_dir):
         html = f.read()
 
     assert "<h1>Files</h1>" in html
-    assert "Total files" in html
+    assert '<dt>Files</dt><dd class="stat-value">25</dd>' in html
     assert "Extensions" in html
     assert "py" in html
     assert "md" in html
@@ -588,7 +646,7 @@ def test_create_lines_html(mock_data_collector, temp_dir):
         html = f.read()
 
     assert "<h1>Lines</h1>" in html
-    assert "Total lines" in html
+    assert '<dt>Lines of Code</dt><dd class="stat-value">2,000</dd>' in html
 
 
 # ── HTMLReportCreator.create_tags_html ───────────────────────────────────
@@ -925,7 +983,7 @@ def test_small_formatting_fixes(mock_data_collector, temp_dir):
     # Author span is compact, with the exact day count on hover (Alice: 150 days)
     assert '<td class="nowrap num" title="150 days">5 mo</td>' in page("authors.html")
     # Average file size in readable units (50000 bytes / 25 files)
-    assert "<dt>Average file size</dt><dd>2.0 KB</dd>" in page("files.html")
+    assert '<dt>Average File Size</dt><dd class="stat-value">2.0 KB</dd>' in page("files.html")
     # Timezone cells carry one "heat" class, not "heat heat heatN"
     activity = page("activity.html")
     assert "heat heat heat" not in activity

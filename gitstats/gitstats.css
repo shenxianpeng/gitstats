@@ -155,12 +155,15 @@ dd {
 }
 
 /* ===== Stat Tiles (KPI cards) ===== */
-/* 6 / 3 / 2 columns so six tiles always fill whole rows; the 1px gap over
-   the border-colored background draws the lines between tiles. */
+/* stat_tiles_html() sets --cols / --cols-md / --cols-sm to divisors of the
+   tile count, so rows are always full; the 1px gap over the border-colored
+   background draws the lines between tiles. On wide screens a tile is at
+   most 260px wide, so a short row of tiles doesn't stretch across the page. */
 .stat-tiles {
 	display: grid;
-	grid-template-columns: repeat(6, minmax(0, 1fr));
+	grid-template-columns: repeat(var(--cols, 6), minmax(0, 1fr));
 	gap: 1px;
+	max-width: calc(var(--cols, 6) * 260px);
 	margin: 0 0 var(--space-6);
 	background-color: var(--border-color);
 	border: 1px solid var(--border-strong);
@@ -216,13 +219,14 @@ dd {
 
 @media (max-width: 1024px) {
 	.stat-tiles {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+		grid-template-columns: repeat(var(--cols-md, 3), minmax(0, 1fr));
+		max-width: none;
 	}
 }
 
 @media (max-width: 560px) {
 	.stat-tiles {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-columns: repeat(var(--cols-sm, 2), minmax(0, 1fr));
 	}
 
 	.stat-tile {
@@ -781,11 +785,10 @@ td.heat {
 }
 
 /* ===== Code Ownership ===== */
+/* Lead paragraph above the stat tiles */
 .ownership-summary {
-	padding: var(--space-4);
+	max-width: 72ch;
 	margin: var(--space-4) 0;
-	background-color: var(--surface-color);
-	border: 1px solid var(--border-strong);
 }
 
 .ownership-summary p:first-child {
@@ -798,11 +801,10 @@ td.heat {
 }
 
 /* ===== History ===== */
+/* Lead paragraph above the stat tiles */
 .history-summary {
-	padding: var(--space-4);
+	max-width: 72ch;
 	margin: var(--space-4) 0;
-	background-color: var(--surface-color);
-	border: 1px solid var(--border-strong);
 }
 
 .history-summary p:first-child {
