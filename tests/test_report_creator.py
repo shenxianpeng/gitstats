@@ -578,7 +578,7 @@ def test_create_index_html(mock_data_collector, temp_dir):
     assert "All 3 authors &rarr;" in html
 
     # Latest releases, newest first, next to the contributors
-    assert '<div class="overview-columns">' in html
+    assert '<div class="two-columns">' in html
     assert html.index(">v1.1.0<") < html.index(">v1.0.0<")
     assert "<td>Alice Smith, Bob Jones</td>" in html
     assert "All 2 tags &rarr;" in html
@@ -609,7 +609,7 @@ def test_index_without_tags_has_no_releases(mock_data_collector, temp_dir):
     mock_data_collector.tags = {}
     html = _render_index(mock_data_collector, temp_dir)
     assert "Latest Releases" not in html
-    assert "overview-columns" not in html
+    assert "two-columns" not in html
     assert "Top Contributors" in html
 
 
@@ -806,6 +806,35 @@ def test_activity_punch_card(mock_data_collector, temp_dir):
     # The bar row sits between the hour labels and the first weekday
     assert html.index('class="punch-hour-bars"') < html.index("<tr><th>Mon</th>")
     assert '<p class="heat-legend">Fewer' in html
+
+
+def test_activity_month_of_year_and_timezones(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_activity_html(mock_data_collector, temp_dir)
+    with open(f"{temp_dir}/activity.html", encoding="utf-8") as f:
+        html = f.read()
+
+    # Month of Year: named months, counts drawn on the bars, share in the tooltip, no table
+    month = html[html.index('id="month_of_year"') : html.index('id="commits_by_timezone"')]
+    assert '"Jan", "Feb", "Mar"' in month
+    assert 'gsAnnotations: {"values": true}' in month
+    assert "commits (' + (100 * item.parsed.y / total).toFixed(1)" in month
+    assert "<table" not in month
+
+    # Timezones west to east as bars: -0500 (15), +0000 (5), +0800 (30) of 50
+    assert (
+        '<tr><td class="nowrap">UTC-05:00</td><td class="num">15</td><td class="num">30.0%</td>'
+        '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+        '<span style="width: 50.0%"></span></span></td></tr>'
+    ) in html
+    assert html.index("UTC-05:00") < html.index("UTC+00:00") < html.index("UTC+08:00")
+    assert '<table class="heat">' not in html
+
+    # The two sections sit side by side
+    assert '<div class="two-columns"><section>' in html
+    assert html.index('<div class="two-columns"><section>') < html.index('id="month_of_year"')
 
 
 def test_activity_monthly_table_is_folded(mock_data_collector, temp_dir):
@@ -1315,10 +1344,9 @@ def test_small_formatting_fixes(mock_data_collector, temp_dir):
     assert '<td class="nowrap num" title="150 days">5 mo</td>' in page("authors.html")
     # Average file size in readable units (50000 bytes / 25 files)
     assert '<dt>Average File Size</dt><dd class="stat-value">2.0 KB</dd>' in page("files.html")
-    # Timezone cells carry one "heat" class, not "heat heat heatN"
+    # No cell carries a doubled "heat heat heatN" class
     activity = page("activity.html")
     assert "heat heat heat" not in activity
-    assert '<td class="heat heat4">30</td>' in activity
     # Tag names and dates don't wrap
     assert '<td class="nowrap">v1.0.0</td>' in page("tags.html")
 

@@ -381,7 +381,7 @@ class HTMLReportCreator(ReportCreator):
         if data.tags:
             sections.append(self._overview_releases_html(data))
         if len(sections) > 1:
-            f.write('<div class="overview-columns">' + "".join(sections) + "</div>")
+            f.write('<div class="two-columns">' + "".join(sections) + "</div>")
         else:
             f.write(sections[0])
 
@@ -438,7 +438,7 @@ class HTMLReportCreator(ReportCreator):
         return (
             "<section>"
             + html_header(2, "Top Contributors")
-            + '<div class="table-scroll"><table class="overview-table">'
+            + '<div class="table-scroll"><table class="share-table">'
             '<tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th>'
             "<th></th></tr>" + "".join(rows) + "</table></div>"
             f'<p class="more-link"><a href="authors.html">All {format_int(total)} '
@@ -466,7 +466,7 @@ class HTMLReportCreator(ReportCreator):
         return (
             "<section>"
             + html_header(2, "Latest Releases")
-            + '<div class="table-scroll"><table class="overview-table">'
+            + '<div class="table-scroll"><table class="share-table">'
             '<tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr>'
             + "".join(rows)
             + "</table></div>"
@@ -490,8 +490,12 @@ class HTMLReportCreator(ReportCreator):
         self._write_commits_by_year_month_section(f, data)
         self._write_weekly_activity_section(f, data)
         self._write_punch_card_section(f, data)
+        # Month of year and timezones side by side (stacked on narrow screens)
+        f.write('<div class="two-columns"><section>')
         self._write_month_of_year_section(f, data)
+        f.write("</section><section>")
         self._write_commits_by_timezone_section(f, data)
+        f.write("</section></div>")
 
         self.print_footer(f)
         f.write("</body></html>")
@@ -621,36 +625,38 @@ class HTMLReportCreator(ReportCreator):
             + "More commits</p>"
         )
 
+    MONTH_NAMES = (
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+    )
+
     def _write_month_of_year_section(self, f, data) -> None:
-        """Write month of year section with table and chart."""
+        """Commits per calendar month, all years combined: counts on the bars, share on hover."""
         f.write(html_header(2, "Month of Year"))
-        f.write(_FLEX_CONTAINER)
-        f.write(
-            '<div class="table-scroll"><table><tr><th>Month</th><th class="num">Commits (%)</th></tr>'
-        )
-        total = data.get_total_commits()
-        for mm in range(1, 13):
-            commits = data.activity_by_month_of_year.get(mm, 0)
-            f.write(
-                '<tr><td>%d</td><td class="num">%d (%.2f %%)</td></tr>'
-                % (mm, commits, (100.0 * commits) / total)
-            )
-        f.write("</table></div>")
-        moy_labels = list(range(1, 13))
-        moy_values = [data.activity_by_month_of_year.get(mm, 0) for mm in moy_labels]
-        f.write(_FLEX_CHILD)
+        values = [data.activity_by_month_of_year.get(mm, 0) for mm in range(1, 13)]
         f.write(
             self._render_chartjs(
                 "chart-month-of-year",
                 "bar",
-                moy_labels,
-                [{"label": "Commits", "data": moy_values}],
+                list(self.MONTH_NAMES),
+                [{"label": "Commits", "data": values}],
                 y_label="Commits",
                 max_bar_thickness=40,
-                aspect_ratio=4,
+                aspect_ratio=2,
+                annotations={"values": True},
+                tooltip_share=True,
             )
         )
-        f.write(_FLEX_CLOSE)
 
     def _write_commits_by_year_month_section(self, f, data) -> None:
         """Write commits by year/month: the chart, with the per-month table folded away."""
@@ -738,21 +744,27 @@ class HTMLReportCreator(ReportCreator):
         f.write(_FLEX_CLOSE)
 
     def _write_commits_by_timezone_section(self, f, data) -> None:
-        """Write commits by timezone section as a heat table."""
+        """Commits per UTC offset, west to east, as horizontal bars."""
         f.write(html_header(2, "Commits by Timezone"))
-        max_commits_on_tz = max(data.commits_by_timezone.values())
-        tz_sorted = sorted(data.commits_by_timezone, key=lambda n: int(n))
-        f.write('<div class="table-scroll"><table class="heat"><tr>')
-        for i in tz_sorted:
-            f.write(f"<th>{i}</th>")
-        f.write("</tr>\n<tr>")
-        for i in tz_sorted:
-            commits = data.commits_by_timezone[i]
-            f.write(
-                '<td class="%s">%d</td>'
-                % (self._heat_td_class(commits, max_commits_on_tz), commits)
+        total = sum(data.commits_by_timezone.values()) or 1
+        busiest = max(data.commits_by_timezone.values(), default=0) or 1
+        rows = []
+        for offset in sorted(data.commits_by_timezone, key=lambda n: int(n)):
+            commits = data.commits_by_timezone[offset]
+            # "+0530" -> "UTC+05:30"
+            label = f"UTC{offset[:3]}:{offset[3:]}" if len(offset) == 5 else html.escape(offset)
+            rows.append(
+                f'<tr><td class="nowrap">{label}</td>'
+                f'<td class="num">{format_int(commits)}</td>'
+                f'<td class="num">{100.0 * commits / total:.1f}%</td>'
+                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                f'<span style="width: {100.0 * commits / busiest:.1f}%"></span></span></td></tr>'
             )
-        f.write("</tr></table></div>")
+        f.write(
+            '<div class="table-scroll"><table class="share-table">'
+            '<tr><th>UTC offset</th><th class="num">Commits</th><th class="num">Share</th>'
+            "<th></th></tr>" + "".join(rows) + "</table></div>"
+        )
 
     def _build_author_time_series(self, data):
         """Build per-author cumulative added-lines time series for Chart.js.
@@ -1789,6 +1801,7 @@ class HTMLReportCreator(ReportCreator):
         time_axis=False,
         highlight=None,
         annotations=None,
+        tooltip_share=False,
     ):
         """Render a Chart.js chart as inline HTML.
 
@@ -1805,6 +1818,9 @@ class HTMLReportCreator(ReportCreator):
         plugin: ``bands`` ``[{"from": i, "to": j, "text", "short"}]`` shade
         category ranges, ``peaks`` ``[{"index": i, "text"}]`` label bars, and
         ``values: True`` labels every non-zero bar. See gap_annotations().
+
+        With ``tooltip_share=True`` (single series), the tooltip also gives the
+        value's share of the series total: "67 commits (12.1%)".
         """
         is_multi = len(datasets) > 1
 
@@ -1877,6 +1893,12 @@ class HTMLReportCreator(ReportCreator):
             )
             x_scale_js = f"{{ ticks: {{ {x_ticks_opts} }} }}"
             tooltip_js = ""
+            if tooltip_share:
+                tooltip_js = """,
+        tooltip: { callbacks: { label: function(item) {
+          const total = item.dataset.data.reduce(function(a, b) { return a + b; }, 0) || 1;
+          return item.parsed.y + ' commits (' + (100 * item.parsed.y / total).toFixed(1) + '%)';
+        } } }"""
 
         # Lines have no point markers, so tooltips follow the nearest point
         # instead of needing the pointer exactly on one

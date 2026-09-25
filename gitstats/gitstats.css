@@ -208,24 +208,25 @@ dd {
 	font-size: var(--font-size-sm);
 }
 
-/* Top contributors and latest releases side by side; stacked when narrow */
-.overview-columns {
+/* Two sections side by side (e.g. top contributors and latest releases);
+   stacked when narrow */
+.two-columns {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	column-gap: var(--space-6);
 }
 
 @media (max-width: 900px) {
-	.overview-columns {
+	.two-columns {
 		grid-template-columns: minmax(0, 1fr);
 	}
 }
 
-.overview-table {
+.share-table {
 	width: 100%;
 }
 
-.overview-table .share-cell {
+.share-table .share-cell {
 	width: 35%;
 }
 
