@@ -17,6 +17,7 @@ from gitstats.report_creator import (
     html_linkify,
     month_range,
     parse_chronicle,
+    stat_tiles_html,
 )
 
 # ── html_linkify ─────────────────────────────────────────────────────────
@@ -473,12 +474,38 @@ def test_create_index_html(mock_data_collector, temp_dir):
 
     assert "<h1>General</h1>" in html
     assert "test-project" in html
-    assert "Total Files" in html
-    assert "Total Commits" in html
-    assert "Authors" in html
     assert "</html>" in html
+
+    # Headline numbers are stat tiles, with the old table's averages as notes
+    assert '<dl class="stat-tiles">' in html
+    assert html.count('<div class="stat-tile">') == 6
+    assert '<dt>Commits</dt><dd class="stat-value">50</dd>' in html
+    assert "12.5 per active day &middot; 0.4 per day" in html
+    assert "16.7 commits per author" in html
     # Large counts use thousands separators (total_lines=2000, added=3000, removed=1000)
-    assert "2,000 (3,000 added, 1,000 removed)" in html
+    assert '<dt>Lines of Code</dt><dd class="stat-value">2,000</dd>' in html
+    assert '<span class="stat-added">+3,000</span> added' in html
+    assert '<span class="stat-removed">−1,000</span> removed' in html
+    assert "3 extensions" in html
+    assert "of 120 days &middot; 3.33%" in html
+    assert '<dt>Longest Streak</dt><dd class="stat-value">4 days</dd>' in html
+
+    # The table keeps only report metadata; its old rows moved into the tiles
+    assert "Report Details" in html
+    assert "Total Commits" not in html
+    assert "Project Age" not in html
+
+
+def test_stat_tiles_html():
+    result = stat_tiles_html([("Streak", "1 day", "consecutive"), ("Files", "25", "3 extensions")])
+    assert result == (
+        '<dl class="stat-tiles">'
+        '<div class="stat-tile"><dt>Streak</dt><dd class="stat-value">1 day</dd>'
+        '<dd class="stat-note">consecutive</dd></div>'
+        '<div class="stat-tile"><dt>Files</dt><dd class="stat-value">25</dd>'
+        '<dd class="stat-note">3 extensions</dd></div>'
+        "</dl>"
+    )
 
 
 # ── HTMLReportCreator.create_activity_html ───────────────────────────────

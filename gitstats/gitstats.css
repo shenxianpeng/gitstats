@@ -158,6 +158,86 @@ dd {
 	margin-bottom: var(--space-1);
 }
 
+/* ===== Stat Tiles (KPI cards) ===== */
+/* 6 / 3 / 2 columns so six tiles always fill whole rows; the 1px gap over
+   the border-colored background draws the lines between tiles. */
+.stat-tiles {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	gap: 1px;
+	margin: 0 0 var(--space-6);
+	background-color: var(--border-color);
+	border: 1px solid var(--border-strong);
+}
+
+.stat-tile {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-1);
+	padding: var(--space-4);
+	background-color: var(--bg-color);
+}
+
+.stat-tiles dt {
+	float: none;
+	margin: 0;
+	font-size: var(--font-size-xs);
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.stat-tiles dt::after {
+	content: none;
+}
+
+.stat-tiles dd {
+	margin: 0;
+}
+
+.stat-value {
+	font-family: var(--font-mono);
+	font-size: 28px;
+	font-weight: 600;
+	line-height: 1.15;
+	font-variant-numeric: tabular-nums;
+	color: var(--text-color);
+}
+
+.stat-note {
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+	text-wrap: balance;
+}
+
+.stat-added {
+	color: var(--success-color);
+}
+
+.stat-removed {
+	color: var(--danger-color);
+}
+
+@media (max-width: 1024px) {
+	.stat-tiles {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 560px) {
+	.stat-tiles {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.stat-tile {
+		padding: var(--space-3);
+	}
+
+	.stat-value {
+		font-size: 22px;
+	}
+}
+
 /* ===== Tables ===== */
 table {
 	border-collapse: collapse;

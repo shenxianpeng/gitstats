@@ -264,7 +264,52 @@ class HTMLReportCreator(ReportCreator):
 
         f.write("<h1>General</h1>")
 
-        f.write(html_header(2, "Git Overview"))
+        total_commits = data.get_total_commits()
+        active_days = len(data.get_active_days())
+        delta_days = data.get_commit_delta_days()
+        extensions = len(data.extensions)
+        streak = data.get_longest_streak()
+        f.write(
+            stat_tiles_html(
+                [
+                    (
+                        "Commits",
+                        format_int(total_commits),
+                        f"{total_commits / active_days:.1f} per active day"
+                        f" &middot; {total_commits / delta_days:.1f} per day",
+                    ),
+                    (
+                        "Authors",
+                        format_int(data.get_total_authors()),
+                        f"{total_commits / data.get_total_authors():.1f} commits per author",
+                    ),
+                    (
+                        "Lines of Code",
+                        format_int(data.get_total_loc()),
+                        f'<span class="stat-added">+{format_int(data.total_lines_added)}</span> added'
+                        f' &middot; <span class="stat-removed">−{format_int(data.total_lines_removed)}</span>'
+                        " removed",
+                    ),
+                    (
+                        "Files",
+                        format_int(data.get_total_files()),
+                        f"{extensions} extension{'' if extensions == 1 else 's'}",
+                    ),
+                    (
+                        "Active Days",
+                        format_int(active_days),
+                        f"of {format_int(delta_days)} days &middot; {100.0 * active_days / delta_days:.2f}%",
+                    ),
+                    (
+                        "Longest Streak",
+                        f"{streak} day{'' if streak == 1 else 's'}",
+                        "consecutive active days",
+                    ),
+                ]
+            )
+        )
+
+        f.write(html_header(2, "Report Details"))
 
         f.write('<div class="table-scroll"><table>')
         f.write(f"<tr><td>Project Name</td><td>{html.escape(data.project_name)}</td></tr>")
@@ -280,32 +325,6 @@ class HTMLReportCreator(ReportCreator):
         )
         f.write(
             f"<tr><td>Report Period</td><td>{data.get_first_commit_date().strftime(format)} to {data.get_last_commit_date().strftime(format)}</td></tr>"
-        )
-        f.write(
-            "<tr><td>Project Age</td><td>%d days, %d active days (%3.2f%%)</td></tr>"
-            % (
-                data.get_commit_delta_days(),
-                len(data.get_active_days()),
-                (100.0 * len(data.get_active_days()) / data.get_commit_delta_days()),
-            )
-        )
-        f.write(
-            f"<tr><td>Longest Streak</td><td>{data.get_longest_streak()} consecutive active days</td></tr>"
-        )
-        f.write(f"<tr><td>Total Files</td><td>{format_int(data.get_total_files())}</td></tr>")
-        f.write(
-            "<tr><td>Total Lines of Code</td><td>%s (%s added, %s removed)</td></tr>"
-            % (
-                format_int(data.get_total_loc()),
-                format_int(data.total_lines_added),
-                format_int(data.total_lines_removed),
-            )
-        )
-        f.write(
-            f"<tr><td>Total Commits</td><td>{format_int(data.get_total_commits())} (average {float(data.get_total_commits()) / len(data.get_active_days()):.1f} commits per active day, {float(data.get_total_commits()) / data.get_commit_delta_days():.1f} per all days)</td></tr>"
-        )
-        f.write(
-            f"<tr><td>Authors</td><td>{format_int(data.get_total_authors())} (average {(1.0 * data.get_total_commits()) / data.get_total_authors():.1f} commits per author)</td></tr>"
         )
         f.write("</table></div>")
 
@@ -1959,6 +1978,23 @@ def month_range(months: Any) -> list[str]:
         result.append(f"{year:04d}-{month:02d}")
         year, month = (year + 1, 1) if month == 12 else (year, month + 1)
     return result
+
+
+def stat_tiles_html(tiles: list[tuple[str, str, str]]) -> str:
+    """Render headline numbers as a grid of stat tiles (KPI cards).
+
+    Each tile is ``(label, value, note)``; ``value`` and ``note`` are inserted
+    as HTML, so callers escape any user-controlled text.
+    """
+    items = "".join(
+        '<div class="stat-tile">'
+        f"<dt>{label}</dt>"
+        f'<dd class="stat-value">{value}</dd>'
+        f'<dd class="stat-note">{note}</dd>'
+        "</div>"
+        for label, value, note in tiles
+    )
+    return f'<dl class="stat-tiles">{items}</dl>'
 
 
 def html_header(level: int, text: str) -> str:
