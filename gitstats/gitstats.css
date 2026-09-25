@@ -52,7 +52,7 @@
 	--img-bg: #f5f5f4;
 	--img-border: #cfcecd;
 
-	--link-color: #4a7ab5;
+	--link-color: #3b6aa3; /* 5.6:1 on --bg-color */
 
 	--bar-color: #4a7ab5;
 
@@ -97,15 +97,15 @@
 	--img-bg: #2d2929;
 	--img-border: #3d3838;
 
-	--link-color: #6b95c8;
+	--link-color: #8db0dc; /* 7.4:1 on --bg-color */
 
 	--bar-color: #6b95c8;
 
 	--chart-text: #b7b1b1;
 	--chart-grid: #3d3838;
 
-	/* Heatmap dark — GitHub dark green */
-	--heat0-bg: #1c2128;
+	/* Heatmap dark — GitHub dark green, empty cells in the page's warm grey */
+	--heat0-bg: #2d2929;
 	--heat0-color: #e6edf3;
 	--heat1-bg: #0e4429;
 	--heat1-color: #e6edf3;
