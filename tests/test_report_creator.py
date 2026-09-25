@@ -894,6 +894,27 @@ def test_create_copies_static_files(mock_data_collector, temp_dir):
     assert b'data-sort="none"' in sortable
 
 
+def test_numeric_columns_are_marked(mock_data_collector, temp_dir):
+    """Counts, percentages and spans carry class="num" so CSS right-aligns them."""
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "authors.html"), encoding="utf-8") as f:
+        authors = f.read()
+    # Alice Smith: 30 commits (60%), +2000 / -500, 12 active days, rank 1
+    assert (
+        '<tr><td>Alice Smith</td><td class="num">30 (60.00%)</td>'
+        '<td class="num">2000</td><td class="num">500</td>'
+    ) in authors
+    assert '<th class="num">Commits (%)</th>' in authors
+    assert '<th class="unsortable num">Age</th>' in authors
+    # Text columns stay left-aligned
+    assert "<th>First commit</th>" in authors
+
+    with open(os.path.join(temp_dir, "files.html"), encoding="utf-8") as f:
+        files = f.read()
+    assert '<th class="num">Files (%)</th>' in files
+    assert '<td class="num">10 (40.00%)</td>' in files  # py: 10 of 25 files
+
+
 def test_small_formatting_fixes(mock_data_collector, temp_dir):
     HTMLReportCreator().create(mock_data_collector, temp_dir)
 
@@ -902,7 +923,7 @@ def test_small_formatting_fixes(mock_data_collector, temp_dir):
             return f.read()
 
     # Author span is compact, with the exact day count on hover (Alice: 150 days)
-    assert '<td class="nowrap" title="150 days">5 mo</td>' in page("authors.html")
+    assert '<td class="nowrap num" title="150 days">5 mo</td>' in page("authors.html")
     # Average file size in readable units (50000 bytes / 25 files)
     assert "<dt>Average file size</dt><dd>2.0 KB</dd>" in page("files.html")
     # Timezone cells carry one "heat" class, not "heat heat heatN"

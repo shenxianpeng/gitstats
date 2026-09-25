@@ -330,8 +330,8 @@ class AggregateReportCreator:
         f.write("<h2>Repositories</h2>")
         f.write('<div class="table-scroll"><table class="sortable" id="portfolio">')
         f.write(
-            "<tr><th>Repository</th><th>Health</th><th>Commits</th><th>Authors</th>"
-            "<th>Active (12 mo)</th><th>Files</th><th>Lines of Code</th>"
+            '<tr><th>Repository</th><th>Health</th><th class="num">Commits</th><th class="num">Authors</th>'
+            '<th class="num">Active (12 mo)</th><th class="num">Files</th><th class="num">Lines of Code</th>'
             "<th>Last Commit</th><th>Since</th></tr>"
         )
         ordered = sorted(summaries, key=lambda s: -s.get("total_commits", 0))
@@ -349,11 +349,11 @@ class AggregateReportCreator:
             f.write(
                 f'<tr><td><a href="{link}">{name}</a></td>'
                 f"<td>{era_html}</td>"
-                f"<td>{format_int(summary.get('total_commits', 0))}</td>"
-                f"<td>{format_int(summary.get('total_authors', 0))}</td>"
-                f"<td>{format_int(summary.get('active_authors_12mo', 0))}</td>"
-                f"<td>{format_int(summary.get('total_files', 0))}</td>"
-                f"<td>{format_int(summary.get('total_lines', 0))}</td>"
+                f'<td class="num">{format_int(summary.get("total_commits", 0))}</td>'
+                f'<td class="num">{format_int(summary.get("total_authors", 0))}</td>'
+                f'<td class="num">{format_int(summary.get("active_authors_12mo", 0))}</td>'
+                f'<td class="num">{format_int(summary.get("total_files", 0))}</td>'
+                f'<td class="num">{format_int(summary.get("total_lines", 0))}</td>'
                 f"<td>{last_commit}</td>"
                 f"<td>{since}</td></tr>"
             )
