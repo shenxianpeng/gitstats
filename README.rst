@@ -262,8 +262,8 @@ Features
 
 Here is a list of some features of ``gitstats``:
 
-* **General**: total files, lines, commits, authors, age.
-* **Activity**: commits by hour of day, day of week, hour of week, month of year, year and month, and year.
+* **General**: headline numbers (commits, authors, lines, files, active days, longest streak), commits per year, top contributors, latest releases.
+* **Activity**: commits by year, year and month, and week; a punch card of day of week by hour of day with daily and hourly totals; month of year; timezone.
 * **Authors**: list of authors (name, commits (%), first commit date, last commit date, age), author of month, author of year.
 * **Files**: file count by date, extensions.
 * **Lines**: line of code by date.

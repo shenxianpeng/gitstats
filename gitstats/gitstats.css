@@ -122,6 +122,11 @@
 	box-sizing: border-box;
 }
 
+/* Anchor jumps stop below the sticky nav (68px on desktop, 90px on phones) */
+html {
+	scroll-padding-top: 96px;
+}
+
 body {
 	font-family: var(--font-sans);
 	font-size: var(--font-size-base);
@@ -750,6 +755,55 @@ td.heat {
 .heat2 { background-color: var(--heat2-bg) !important; color: var(--heat2-color); }
 .heat3 { background-color: var(--heat3-bg) !important; color: var(--heat3-color); }
 .heat4 { background-color: var(--heat4-bg) !important; color: var(--heat4-color); }
+
+/* Punch card: the per-day totals column sits apart from the heat grid */
+.punch-card .punch-total {
+	padding-left: var(--space-4);
+	white-space: nowrap;
+}
+
+.punch-card tr.punch-totals > th {
+	padding-top: var(--space-3);
+}
+
+/* "Fewer ■■■■■ More commits" key under a heat grid */
+.heat-legend {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+	margin: 0 0 var(--space-4);
+	font-size: var(--font-size-xs);
+	color: var(--text-secondary);
+}
+
+.heat-legend span {
+	width: 12px;
+	height: 12px;
+}
+
+.heat-legend span:first-child {
+	margin-left: var(--space-2);
+}
+
+.heat-legend span:last-child {
+	margin-right: var(--space-2);
+}
+
+/* A long table folded away under its chart */
+details.table-details {
+	margin: var(--space-2) 0 var(--space-4);
+}
+
+details.table-details > summary {
+	cursor: pointer;
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+	color: var(--link-color);
+}
+
+details.table-details[open] > summary {
+	margin-bottom: var(--space-3);
+}
 
 /* ===== AI Summary ===== */
 .ai-summary {
