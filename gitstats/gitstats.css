@@ -154,6 +154,61 @@ dd {
 	margin-bottom: var(--space-1);
 }
 
+/* ===== Overview page ===== */
+/* Report period, generation time and tool versions under the repo name */
+.page-meta {
+	margin: calc(-1 * var(--space-2)) 0 var(--space-5);
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+}
+
+.chart-note {
+	margin: 0;
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+}
+
+/* "All 40 authors →" style links closing a section */
+.more-link {
+	margin: var(--space-2) 0 0;
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+}
+
+/* Top contributors and latest releases side by side; stacked when narrow */
+.overview-columns {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	column-gap: var(--space-6);
+}
+
+@media (max-width: 900px) {
+	.overview-columns {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.overview-table {
+	width: 100%;
+}
+
+.overview-table .share-cell {
+	width: 35%;
+}
+
+.share-bar {
+	display: block;
+	height: 6px;
+	background-color: var(--surface-color);
+}
+
+.share-bar > span {
+	display: block;
+	height: 100%;
+	background-color: var(--bar-color);
+}
+
 /* ===== Stat Tiles (KPI cards) ===== */
 /* stat_tiles_html() sets --cols / --cols-md / --cols-sm to divisors of the
    tile count, so rows are always full; the 1px gap over the border-colored

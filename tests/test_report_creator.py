@@ -472,8 +472,9 @@ def test_create_index_html(mock_data_collector, temp_dir):
     with open(f"{temp_dir}/index.html", encoding="utf-8") as f:
         html = f.read()
 
-    assert "<h1>General</h1>" in html
-    assert "test-project" in html
+    # The repository's name heads the page, with report metadata under it
+    assert "<h1>test-project</h1>" in html
+    assert '<p class="page-meta">2022-12-01 &rarr; 2023-04-01 &middot; generated ' in html
     assert "</html>" in html
 
     # Headline numbers are stat tiles, with the old table's averages as notes
@@ -490,10 +491,72 @@ def test_create_index_html(mock_data_collector, temp_dir):
     assert "of 120 days &middot; 3.33%" in html
     assert '<dt>Longest Streak</dt><dd class="stat-value">4 days</dd>' in html
 
-    # The table keeps only report metadata; its old rows moved into the tiles
-    assert "Report Details" in html
+    # The old key/value table is gone: its rows live in the tiles and the meta line
+    assert "Report Details" not in html
     assert "Total Commits" not in html
     assert "Project Age" not in html
+
+    # Commits per year across the whole history
+    assert '<canvas id="chart-overview-yearly">' in html
+    assert 'href="activity.html">Activity in detail &rarr;</a>' in html
+
+    # Top contributors: commits, share, and a bar relative to the top author
+    assert (
+        '<tr><td>Alice Smith</td><td class="num">30</td><td class="num">60.0%</td>'
+        '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+        '<span style="width: 100.0%"></span></span></td></tr>'
+    ) in html
+    assert '<span style="width: 50.0%">' in html  # Bob: 15 of Alice's 30
+    assert "All 3 authors &rarr;" in html
+
+    # Latest releases, newest first, next to the contributors
+    assert '<div class="overview-columns">' in html
+    assert html.index(">v1.1.0<") < html.index(">v1.0.0<")
+    assert "<td>Alice Smith, Bob Jones</td>" in html
+    assert "All 2 tags &rarr;" in html
+
+
+def _render_index(data, temp_dir):
+    creator = HTMLReportCreator()
+    creator.title = data.project_name
+    creator.data = data
+    creator.create_index_html(data, temp_dir)
+    with open(f"{temp_dir}/index.html", encoding="utf-8") as f:
+        return f.read()
+
+
+def test_index_notes_longest_quiet_stretch(mock_data_collector, temp_dir):
+    mock_data_collector.commits_by_year = {2010: 3, 2011: 0, 2014: 2, 2016: 1}
+    html = _render_index(mock_data_collector, temp_dir)
+    # 2012-2013 are missing and 2011 is empty: the longest run is 2011-2013
+    assert '<p class="chart-note">No commits from 2011 to 2013.</p>' in html
+
+
+def test_index_single_empty_year_is_not_noted(mock_data_collector, temp_dir):
+    mock_data_collector.commits_by_year = {2020: 1, 2022: 1}
+    assert "chart-note" not in _render_index(mock_data_collector, temp_dir)
+
+
+def test_index_without_tags_has_no_releases(mock_data_collector, temp_dir):
+    mock_data_collector.tags = {}
+    html = _render_index(mock_data_collector, temp_dir)
+    assert "Latest Releases" not in html
+    assert "overview-columns" not in html
+    assert "Top Contributors" in html
+
+
+def test_index_release_authors_are_capped_and_escaped(mock_data_collector, temp_dir):
+    mock_data_collector.project_name = "R&D <app>"
+    mock_data_collector.tags = {
+        "v2.0.0": {
+            "date": "2023-05-01",
+            "commits": 6,
+            "authors": {"<Eve>": 3, "Bob Jones": 2, "Carol": 1},
+        }
+    }
+    html = _render_index(mock_data_collector, temp_dir)
+    assert "<h1>R&amp;D &lt;app&gt;</h1>" in html
+    assert "<td>&lt;Eve&gt;, Bob Jones +1</td>" in html
 
 
 def test_stat_tiles_html():
