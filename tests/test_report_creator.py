@@ -931,8 +931,7 @@ def test_create_authors_html(mock_data_collector, temp_dir):
     assert "<h1>Authors</h1>" in html
     assert "Alice Smith" in html
     assert "Bob Jones" in html
-    assert "Author of month" in html
-    assert "Author of year" in html
+    assert "Top author per year and month" in html
     assert "Commits by domain" in html
     assert "example.com" in html
     # Domains are data cells (not uppercased header cells) in a bar table
@@ -1380,15 +1379,19 @@ def test_authors_summary_and_folded_tables(mock_data_collector, temp_dir):
         '<h1>Authors</h1><p class="page-meta">3 authors &middot; top 2 wrote 90.0% of commits</p>'
         in html
     )
-    # Author of Month / Year tables are folded away, headings and anchors kept
+    # One section for the top author of each year (shown) and month (folded away);
+    # the old Author of Month / Year anchors still land on it
+    section = html[html.index('id="author_of_month"') : html.index('<h2 id="commits_by_domain"')]
+    assert 'id="author_of_year"' in section
+    assert section.count("<h2") == 1
+    assert section.index('id="aoy"') < section.index("<details")
     months = len(mock_data_collector.author_of_month)
     assert (
         '<details class="table-details"><summary>Table: top author of each month '
         f"({months} months with commits)</summary>"
-    ) in html
-    assert "<summary>Table: top author of each year (" in html
-    assert html.index('id="author_of_month"') < html.index("top author of each month")
-    assert html.count("</table></div></details>") == 2
+    ) in section
+    assert section.index("<details") < section.index('id="aom"')
+    assert html.count("</table></div></details>") == 1
 
 
 def test_authors_summary_counts_bots(mock_data_collector):

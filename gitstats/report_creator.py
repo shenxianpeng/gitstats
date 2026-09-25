@@ -1032,72 +1032,25 @@ class HTMLReportCreator(ReportCreator):
                 % load_config()["max_authors"]
             )
 
-        # Authors :: Author of Month (a long table, folded away by default)
-        f.write(html_header(2, "Author of month"))
+        # Authors :: the top author of each year, then of each month (folded away).
+        # The old "Author of Month/Year" anchors are kept so existing links still land here.
+        f.write('<span id="author_of_month"></span><span id="author_of_year"></span>')
+        f.write(html_header(2, "Top author per year and month"))
+        f.write(
+            '<p class="section-note">'
+            "Who made the most commits in each year and month, the runners-up, "
+            "and how many people committed.</p>"
+        )
+        f.write(self._top_authors_table("aoy", "Year", data.author_of_year, data.commits_by_year))
         months = len(data.author_of_month)
         f.write(
             '<details class="table-details"><summary>Table: top author of each month '
             f"({months} month{'' if months == 1 else 's'} with commits)</summary>"
         )
-        f.write('<div class="table-scroll"><table class="sortable" id="aom">')
         f.write(
-            '<tr><th>Month</th><th>Author</th><th class="num">Commits (%%)</th><th class="unsortable">Next top %d</th><th class="num">Number of authors</th></tr>'
-            % load_config()["authors_top"]
+            self._top_authors_table("aom", "Month", data.author_of_month, data.commits_by_month)
         )
-        for yymm in sorted(data.author_of_month.keys(), reverse=True):
-            author_dict = data.author_of_month[yymm]
-            authors = get_keys_sorted_by_values(author_dict)
-            authors.reverse()
-            commits = data.author_of_month[yymm][authors[0]]
-            authors_str = ", ".join(
-                html.escape(a) for a in authors[1 : load_config()["authors_top"] + 1]
-            )
-            f.write(
-                '<tr><td>%s</td><td>%s</td><td class="num">%d (%.2f%% of %d)</td><td>%s</td><td class="num">%d</td></tr>'
-                % (
-                    yymm,
-                    html.escape(authors[0]),
-                    commits,
-                    (100.0 * commits) / data.commits_by_month[yymm],
-                    data.commits_by_month[yymm],
-                    authors_str,
-                    len(authors),
-                )
-            )
-
-        f.write("</table></div></details>")
-
-        f.write(html_header(2, "Author of year"))
-        years = len(data.author_of_year)
-        f.write(
-            '<details class="table-details"><summary>Table: top author of each year '
-            f"({years} year{'' if years == 1 else 's'} with commits)</summary>"
-        )
-        f.write(
-            '<div class="table-scroll"><table class="sortable" id="aoy"><tr><th>Year</th><th>Author</th><th class="num">Commits (%%)</th><th class="unsortable">Next top %d</th><th class="num">Number of authors</th></tr>'
-            % load_config()["authors_top"]
-        )
-        for yy in sorted(data.author_of_year.keys(), reverse=True):
-            author_dict = data.author_of_year[yy]
-            authors = get_keys_sorted_by_values(author_dict)
-            authors.reverse()
-            commits = data.author_of_year[yy][authors[0]]
-            authors_str = ", ".join(
-                html.escape(a) for a in authors[1 : load_config()["authors_top"] + 1]
-            )
-            f.write(
-                '<tr><td>%s</td><td>%s</td><td class="num">%d (%.2f%% of %d)</td><td>%s</td><td class="num">%d</td></tr>'
-                % (
-                    yy,
-                    html.escape(authors[0]),
-                    commits,
-                    (100.0 * commits) / data.commits_by_year[yy],
-                    data.commits_by_year[yy],
-                    authors_str,
-                    len(authors),
-                )
-            )
-        f.write("</table></div></details>")
+        f.write("</details>")
 
         # Domains: a bar table (the numbers used to be shown twice, as a table and a chart)
         f.write(html_header(2, "Commits by domain"))
@@ -1808,6 +1761,30 @@ class HTMLReportCreator(ReportCreator):
     SERIES_COLORS = 6
     # Series outside the highlighted top N: a neutral grey readable on both themes
     OTHER_SERIES_COLOR = "rgba(128, 128, 128, 0.45)"
+
+    def _top_authors_table(
+        self, table_id: str, period: str, authors_by_period: dict, commits_by_period: dict
+    ) -> str:
+        """A sortable table of each period's top author, newest period first."""
+        top = load_config()["authors_top"]
+        rows = [
+            f'<div class="table-scroll"><table class="sortable" id="{table_id}">'
+            f'<tr><th>{period}</th><th>Author</th><th class="num">Commits (%)</th>'
+            f'<th class="unsortable">Next top {top}</th><th class="num">Authors</th></tr>'
+        ]
+        for key in sorted(authors_by_period, reverse=True):
+            authors = get_keys_sorted_by_values(authors_by_period[key])
+            authors.reverse()
+            commits = authors_by_period[key][authors[0]]
+            total = commits_by_period[key]
+            rows.append(
+                f"<tr><td>{key}</td><td>{html.escape(authors[0])}</td>"
+                f'<td class="num">{commits} ({100.0 * commits / total:.2f}% of {total})</td>'
+                f"<td>{', '.join(html.escape(a) for a in authors[1 : top + 1])}</td>"
+                f'<td class="num">{len(authors)}</td></tr>'
+            )
+        rows.append("</table></div>")
+        return "".join(rows)
 
     def _render_chartjs(
         self,
