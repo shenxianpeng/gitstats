@@ -52,7 +52,7 @@
 	--img-bg: #f5f5f4;
 	--img-border: #cfcecd;
 
-	--link-color: #4a7ab5;
+	--link-color: #3b6aa3; /* 5.6:1 on --bg-color */
 
 	--bar-color: #4a7ab5;
 
@@ -97,15 +97,15 @@
 	--img-bg: #2d2929;
 	--img-border: #3d3838;
 
-	--link-color: #6b95c8;
+	--link-color: #8db0dc; /* 7.4:1 on --bg-color */
 
 	--bar-color: #6b95c8;
 
 	--chart-text: #b7b1b1;
 	--chart-grid: #3d3838;
 
-	/* Heatmap dark — GitHub dark green */
-	--heat0-bg: #1c2128;
+	/* Heatmap dark — GitHub dark green, empty cells in the page's warm grey */
+	--heat0-bg: #2d2929;
 	--heat0-color: #e6edf3;
 	--heat1-bg: #0e4429;
 	--heat1-color: #e6edf3;
@@ -168,6 +168,33 @@ dd {
 	color: var(--text-secondary);
 }
 
+/* "On this page" links to a long page's sections */
+.page-toc {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-2);
+	margin: calc(-1 * var(--space-3)) 0 var(--space-5);
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+}
+
+.page-toc > span {
+	margin-right: var(--space-1);
+	color: var(--text-secondary);
+}
+
+.page-toc a {
+	padding: 2px var(--space-2);
+	border: 1px solid var(--border-color);
+	color: var(--text-color);
+}
+
+.page-toc a:hover {
+	border-color: var(--border-strong);
+	text-decoration: none;
+}
+
 .chart-note {
 	margin: 0;
 	font-size: var(--font-size-sm);
@@ -181,24 +208,25 @@ dd {
 	font-size: var(--font-size-sm);
 }
 
-/* Top contributors and latest releases side by side; stacked when narrow */
-.overview-columns {
+/* Two sections side by side (e.g. top contributors and latest releases);
+   stacked when narrow */
+.two-columns {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	column-gap: var(--space-6);
 }
 
 @media (max-width: 900px) {
-	.overview-columns {
+	.two-columns {
 		grid-template-columns: minmax(0, 1fr);
 	}
 }
 
-.overview-table {
+.share-table {
 	width: 100%;
 }
 
-.overview-table .share-cell {
+.share-table .share-cell {
 	width: 35%;
 }
 
@@ -212,6 +240,12 @@ dd {
 	display: block;
 	height: 100%;
 	background-color: var(--bar-color);
+}
+
+/* The same bar, thinner, under a number inside a table cell */
+.share-bar-inline {
+	height: 3px;
+	margin-top: 3px;
 }
 
 /* ===== Stat Tiles (KPI cards) ===== */
@@ -495,6 +529,31 @@ td.nowrap {
 	white-space: nowrap;
 }
 
+/* Small label next to a name, e.g. BOT for bot accounts */
+.badge {
+	display: inline-block;
+	margin-left: var(--space-1);
+	padding: 0 5px;
+	border: 1px solid var(--border-strong);
+	font-family: var(--font-mono);
+	font-size: 10px;
+	font-weight: 600;
+	line-height: 1.5;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--text-secondary);
+	vertical-align: 1px;
+	white-space: nowrap;
+}
+
+/* File paths: monospace, and allowed to break anywhere so a deep path
+   doesn't force the table wider than the screen */
+td.path {
+	font-family: var(--font-mono);
+	overflow-wrap: anywhere;
+	text-align: left;
+}
+
 /* Rows are separated by hairlines only: no outer border, no vertical lines */
 td {
 	padding: var(--space-2) var(--space-3);
@@ -731,6 +790,29 @@ tr:hover td {
 	.chart-box.has-legend {
 		min-height: 440px;
 	}
+
+	/* Wide tables scroll sideways here: keep the row label (first column)
+	   pinned, with a hairline so scrolled cells visibly pass under it */
+	.table-scroll tr > :first-child {
+		position: sticky;
+		left: 0;
+		z-index: 1;
+		background-color: var(--bg-color);
+		box-shadow: inset -1px 0 0 var(--table-border);
+	}
+
+	.table-scroll tr:hover > td:first-child {
+		background-color: var(--table-hover-bg);
+	}
+
+	/* Same for the contributor timeline: the author name stays in view */
+	.timeline-name {
+		position: sticky;
+		left: 0;
+		z-index: 1;
+		background-color: var(--bg-color);
+		box-shadow: inset -1px 0 0 var(--table-border);
+	}
 }
 
 /* ===== Headings ===== */
@@ -884,8 +966,30 @@ td.heat {
 	white-space: nowrap;
 }
 
-.punch-card tr.punch-totals > th {
-	padding-top: var(--space-3);
+/* Commits per hour: bars (max 40px) along the top of the grid */
+.punch-card tr.punch-hour-bars > * {
+	padding: var(--space-1) 2px 0;
+	border-bottom: none;
+	vertical-align: bottom;
+}
+
+.punch-vbar {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 2px;
+	height: 56px;
+}
+
+.punch-vbar-value {
+	font-size: 10px;
+	color: var(--text-secondary);
+}
+
+.punch-vbar-fill {
+	width: 70%;
+	background-color: var(--bar-color);
 }
 
 /* "Fewer ■■■■■ More commits" key under a heat grid */

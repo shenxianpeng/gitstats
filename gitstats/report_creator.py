@@ -116,6 +116,64 @@ CHART_SCRIPT = """<script>
 		});
 	});
 
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
 	function formatChartDate(ms, unit) {
 		const d = new Date(ms);
 		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
@@ -323,7 +381,7 @@ class HTMLReportCreator(ReportCreator):
         if data.tags:
             sections.append(self._overview_releases_html(data))
         if len(sections) > 1:
-            f.write('<div class="overview-columns">' + "".join(sections) + "</div>")
+            f.write('<div class="two-columns">' + "".join(sections) + "</div>")
         else:
             f.write(sections[0])
 
@@ -339,6 +397,8 @@ class HTMLReportCreator(ReportCreator):
         else:
             years = []
         values = [data.commits_by_year.get(y, 0) for y in years]
+        # Shade the longest run of two or more years without commits
+        annotations = gap_annotations(years, values, min_gap=2)
         f.write(
             self._render_chartjs(
                 "chart-overview-yearly",
@@ -347,22 +407,16 @@ class HTMLReportCreator(ReportCreator):
                 [{"label": "Commits", "data": values}],
                 y_label="Commits",
                 aspect_ratio=5,
+                annotations=annotations,
             )
         )
-
-        # Longest run of years without commits, when it is at least two years
-        gap: tuple[int, int] | None = None
-        run_start: int | None = None
-        for year, commits in zip(years, values):
-            if commits:
-                run_start = None
-                continue
-            if run_start is None:
-                run_start = year
-            if year > run_start and (gap is None or year - run_start > gap[1] - gap[0]):
-                gap = (run_start, year)
-        if gap:
-            f.write(f'<p class="chart-note">No commits from {gap[0]} to {gap[1]}.</p>')
+        if annotations:
+            # the same fact as text, for screen readers and at a glance
+            band = annotations["bands"][0]
+            f.write(
+                f'<p class="chart-note">No commits from {years[band["from"]]} '
+                f"to {years[band['to']]}.</p>"
+            )
         f.write('<p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p>')
 
     def _overview_contributors_html(self, data: Any) -> str:
@@ -374,7 +428,7 @@ class HTMLReportCreator(ReportCreator):
             info = data.get_author_info(author)
             width = 100.0 * info["commits"] / top
             rows.append(
-                f"<tr><td>{html.escape(author)}</td>"
+                f"<tr><td>{author_html(author)}</td>"
                 f'<td class="num">{format_int(info["commits"])}</td>'
                 f'<td class="num">{info["commits_frac"]:.1f}%</td>'
                 f'<td class="share-cell"><span class="share-bar" aria-hidden="true">'
@@ -384,7 +438,7 @@ class HTMLReportCreator(ReportCreator):
         return (
             "<section>"
             + html_header(2, "Top Contributors")
-            + '<div class="table-scroll"><table class="overview-table">'
+            + '<div class="table-scroll"><table class="share-table">'
             '<tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th>'
             "<th></th></tr>" + "".join(rows) + "</table></div>"
             f'<p class="more-link"><a href="authors.html">All {format_int(total)} '
@@ -412,7 +466,7 @@ class HTMLReportCreator(ReportCreator):
         return (
             "<section>"
             + html_header(2, "Latest Releases")
-            + '<div class="table-scroll"><table class="overview-table">'
+            + '<div class="table-scroll"><table class="share-table">'
             '<tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr>'
             + "".join(rows)
             + "</table></div>"
@@ -429,29 +483,58 @@ class HTMLReportCreator(ReportCreator):
         self.print_nav(f, "activity.html")
         f.write("<h1>Activity</h1>")
 
-        # Streak summary
-        self._write_streak_summary(f, data)
+        self._write_activity_intro(f, data)
 
         # From the long view down to the daily rhythm
         self._write_commits_by_year_section(f, data)
         self._write_commits_by_year_month_section(f, data)
         self._write_weekly_activity_section(f, data)
         self._write_punch_card_section(f, data)
+        # Month of year and timezones side by side (stacked on narrow screens)
+        f.write('<div class="two-columns"><section>')
         self._write_month_of_year_section(f, data)
+        f.write("</section><section>")
         self._write_commits_by_timezone_section(f, data)
+        f.write("</section></div>")
 
         self.print_footer(f)
         f.write("</body></html>")
         f.close()
 
-    def _write_streak_summary(self, f, data) -> None:
-        """Write streak summary paragraph."""
-        longest_streak = data.get_longest_streak()
-        if longest_streak > 0:
-            f.write(
-                "<p><strong>Longest Streak:</strong> %d consecutive active days. "
-                "A long streak indicates sustained development momentum.</p>" % longest_streak
-            )
+    # The Activity page's sections, in page order, for its "On this page" links
+    ACTIVITY_SECTIONS = (
+        ("Commits by Year", "By year"),
+        ("Commits by year/month", "By month"),
+        ("Weekly activity", "Last weeks"),
+        ("Punch Card", "Punch card"),
+        ("Month of Year", "Month of year"),
+        ("Commits by Timezone", "Timezones"),
+    )
+
+    def _write_activity_intro(self, f, data) -> None:
+        """A one-line summary of the page's numbers, then links to its sections."""
+        full_days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+        streak = data.get_longest_streak()
+        hours = data.get_activity_by_hour_of_day()
+        days = data.get_activity_by_day_of_week()
+        parts = [
+            f"{format_int(data.get_total_commits())} commits",
+            f"{format_int(len(data.get_active_days()))} active days",
+            f"longest streak {streak} day{'' if streak == 1 else 's'}",
+        ]
+        if hours:
+            parts.append(f"busiest hour {max(hours, key=lambda h: (hours[h], -h)):02d}:00")
+        if days:
+            parts.append(f"busiest day {full_days[max(days, key=lambda d: (days[d], -d))]}")
+        f.write('<p class="page-meta">' + " &middot; ".join(parts) + "</p>")
+        links = "".join(
+            f'<a href="#{html_linkify(title)}">{label}</a>'
+            for title, label in self.ACTIVITY_SECTIONS
+        )
+        f.write(
+            '<nav class="page-toc" aria-label="On this page">'
+            f"<span>On this page</span>{links}</nav>"
+        )
 
     def _write_weekly_activity_section(self, f, data) -> None:
         """Write weekly activity section with chart."""
@@ -481,22 +564,27 @@ class HTMLReportCreator(ReportCreator):
         )
 
     def _write_punch_card_section(self, f, data) -> None:
-        """Commits by day of week x hour of day, with a total for every day and hour.
+        """Commits by day of week x hour of day, with bars for every hour and day.
 
-        One grid replaces the former Hour of Day, Day of Week and Hour of Week
-        sections; their anchors are kept so existing links still land here.
+        A row of bars along the top gives the commits per hour of day, and a bar
+        under each day's total gives the share per weekday. One grid replaces
+        the former Hour of Day, Day of Week and Hour of Week sections; their
+        anchors are kept so existing links still land here.
         """
         f.write('<span id="hour_of_day"></span><span id="day_of_week"></span>')
         f.write('<span id="hour_of_week"></span>')
         f.write(html_header(2, "Punch Card"))
         f.write(
             "<p>Commits by day of week and hour of day, in each commit's local time. "
-            "The last column and row are the totals per day and per hour.</p>"
+            "The bars along the top are the commits per hour; the last column is "
+            "the commits per day.</p>"
         )
-        total = data.get_total_commits()
+        total = data.get_total_commits() or 1
         hour_totals = data.get_activity_by_hour_of_day()
         day_totals = data.get_activity_by_day_of_week()
         busiest_cell = data.activity_by_hour_of_week_busiest
+        busiest_hour = max(hour_totals.values(), default=0) or 1
+        busiest_day = max(day_totals.values(), default=0) or 1
 
         f.write('<div class="table-scroll"><table class="punch-card">')
         f.write(
@@ -504,6 +592,19 @@ class HTMLReportCreator(ReportCreator):
             + "".join(f"<th>{hour}</th>" for hour in range(24))
             + '<th class="num">Total</th></tr>'
         )
+        # Commits per hour of day, as bars above the grid
+        f.write('<tr class="punch-hour-bars"><th>Hour</th>')
+        for hour in range(24):
+            commits = hour_totals.get(hour, 0)
+            height = round(40 * commits / busiest_hour) if commits else 0
+            f.write(
+                f'<td title="{hour:02d}:00 &middot; {commits} commits &middot; '
+                f'{100.0 * commits / total:.1f}%"><div class="punch-vbar">'
+                f'<span class="punch-vbar-value">{commits or ""}</span>'
+                f'<span class="punch-vbar-fill" style="height: {max(height, 1 if commits else 0)}px">'
+                "</span></div></td>"
+            )
+        f.write("<td></td></tr>")
         for weekday in range(7):
             f.write(f"<tr><th>{WEEKDAYS[weekday]}</th>")
             for hour in range(24):
@@ -513,53 +614,49 @@ class HTMLReportCreator(ReportCreator):
                 )
             day = day_totals.get(weekday, 0)
             f.write(
-                f'<td class="num punch-total">{format_int(day)} '
-                f"({100.0 * day / total:.1f}%)</td></tr>"
+                f'<td class="num punch-total">{format_int(day)} ({100.0 * day / total:.1f}%)'
+                '<span class="share-bar share-bar-inline" aria-hidden="true">'
+                f'<span style="width: {100.0 * day / busiest_day:.1f}%"></span></span></td></tr>'
             )
-        f.write('<tr class="punch-totals"><th>Total</th>')
-        for hour in range(24):
-            commits = hour_totals.get(hour, 0)
-            f.write(
-                f'<td class="{self._heat_td_class(commits, data.activity_by_hour_of_day_busiest)}"'
-                f' title="{100.0 * commits / total:.1f}% of commits">{commits}</td>'
-            )
-        f.write(f'<td class="num punch-total">{format_int(total)}</td></tr></table></div>')
+        f.write("</table></div>")
         f.write(
             '<p class="heat-legend">Fewer'
             + "".join(f'<span class="heat{level}"></span>' for level in range(5))
             + "More commits</p>"
         )
 
+    MONTH_NAMES = (
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+    )
+
     def _write_month_of_year_section(self, f, data) -> None:
-        """Write month of year section with table and chart."""
+        """Commits per calendar month, all years combined: counts on the bars, share on hover."""
         f.write(html_header(2, "Month of Year"))
-        f.write(_FLEX_CONTAINER)
-        f.write(
-            '<div class="table-scroll"><table><tr><th>Month</th><th class="num">Commits (%)</th></tr>'
-        )
-        total = data.get_total_commits()
-        for mm in range(1, 13):
-            commits = data.activity_by_month_of_year.get(mm, 0)
-            f.write(
-                '<tr><td>%d</td><td class="num">%d (%.2f %%)</td></tr>'
-                % (mm, commits, (100.0 * commits) / total)
-            )
-        f.write("</table></div>")
-        moy_labels = list(range(1, 13))
-        moy_values = [data.activity_by_month_of_year.get(mm, 0) for mm in moy_labels]
-        f.write(_FLEX_CHILD)
+        values = [data.activity_by_month_of_year.get(mm, 0) for mm in range(1, 13)]
         f.write(
             self._render_chartjs(
                 "chart-month-of-year",
                 "bar",
-                moy_labels,
-                [{"label": "Commits", "data": moy_values}],
+                list(self.MONTH_NAMES),
+                [{"label": "Commits", "data": values}],
                 y_label="Commits",
                 max_bar_thickness=40,
-                aspect_ratio=4,
+                aspect_ratio=2,
+                annotations={"values": True},
+                tooltip_share=True,
             )
         )
-        f.write(_FLEX_CLOSE)
 
     def _write_commits_by_year_month_section(self, f, data) -> None:
         """Write commits by year/month: the chart, with the per-month table folded away."""
@@ -574,6 +671,8 @@ class HTMLReportCreator(ReportCreator):
                 [{"label": "Commits", "data": cbym_values}],
                 y_label="Commits",
                 x_ticks_rotate=True,
+                # a year or more without commits gets shaded, with the peaks around it
+                annotations=gap_annotations(cbym_keys, cbym_values, min_gap=12),
             )
         )
         months = sorted(data.commits_by_month.keys(), reverse=True)
@@ -639,26 +738,33 @@ class HTMLReportCreator(ReportCreator):
                 cby_all_years,
                 [{"label": "Commits", "data": cby_values}],
                 y_label="Commits",
+                annotations=gap_annotations(cby_all_years, cby_values, min_gap=2),
             )
         )
         f.write(_FLEX_CLOSE)
 
     def _write_commits_by_timezone_section(self, f, data) -> None:
-        """Write commits by timezone section as a heat table."""
+        """Commits per UTC offset, west to east, as horizontal bars."""
         f.write(html_header(2, "Commits by Timezone"))
-        max_commits_on_tz = max(data.commits_by_timezone.values())
-        tz_sorted = sorted(data.commits_by_timezone, key=lambda n: int(n))
-        f.write('<div class="table-scroll"><table class="heat"><tr>')
-        for i in tz_sorted:
-            f.write(f"<th>{i}</th>")
-        f.write("</tr>\n<tr>")
-        for i in tz_sorted:
-            commits = data.commits_by_timezone[i]
-            f.write(
-                '<td class="%s">%d</td>'
-                % (self._heat_td_class(commits, max_commits_on_tz), commits)
+        total = sum(data.commits_by_timezone.values()) or 1
+        busiest = max(data.commits_by_timezone.values(), default=0) or 1
+        rows = []
+        for offset in sorted(data.commits_by_timezone, key=lambda n: int(n)):
+            commits = data.commits_by_timezone[offset]
+            # "+0530" -> "UTC+05:30"
+            label = f"UTC{offset[:3]}:{offset[3:]}" if len(offset) == 5 else html.escape(offset)
+            rows.append(
+                f'<tr><td class="nowrap">{label}</td>'
+                f'<td class="num">{format_int(commits)}</td>'
+                f'<td class="num">{100.0 * commits / total:.1f}%</td>'
+                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                f'<span style="width: {100.0 * commits / busiest:.1f}%"></span></span></td></tr>'
             )
-        f.write("</tr></table></div>")
+        f.write(
+            '<div class="table-scroll"><table class="share-table">'
+            '<tr><th>UTC offset</th><th class="num">Commits</th><th class="num">Share</th>'
+            "<th></th></tr>" + "".join(rows) + "</table></div>"
+        )
 
     def _build_author_time_series(self, data):
         """Build per-author cumulative added-lines time series for Chart.js.
@@ -759,7 +865,7 @@ class HTMLReportCreator(ReportCreator):
             else:
                 marks = []
                 label = f"{name}: {commits} commits"
-            bot = " bot" if author.endswith("[bot]") else ""
+            bot = " bot" if is_bot(author) else ""
             rows.append(
                 f'<div class="timeline-row{bot}" role="img" aria-label="{label}">'
                 f'<span class="timeline-name">{name}</span>'
@@ -781,6 +887,20 @@ class HTMLReportCreator(ReportCreator):
             "</div></div>"
         )
 
+    def _authors_summary_html(self, data: Any) -> str:
+        """One line under the Authors heading: how many, how concentrated, how many bots."""
+        everyone = data.get_authors()
+        parts = [f"{format_int(len(everyone))} author{'' if len(everyone) == 1 else 's'}"]
+        top = everyone[:2]
+        if top:
+            share = sum(data.get_author_info(a)["commits_frac"] for a in top)
+            who = "top author" if len(top) == 1 else "top 2"
+            parts.append(f"{who} wrote {share:.1f}% of commits")
+        bots = sum(1 for a in everyone if is_bot(a))
+        if bots:
+            parts.append(f"{bots} bot account{'' if bots == 1 else 's'}")
+        return '<p class="page-meta">' + " &middot; ".join(parts) + "</p>"
+
     def create_authors_html(self, data: Any, path: str) -> None:
         ###
         # Authors
@@ -789,6 +909,7 @@ class HTMLReportCreator(ReportCreator):
 
         self.print_nav(f, "authors.html")
         f.write("<h1>Authors</h1>")
+        f.write(self._authors_summary_html(data))
 
         # Authors :: List of authors
         f.write(html_header(2, "List of Authors"))
@@ -797,16 +918,24 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<tr><th>Author</th><th class="num">Commits (%)</th><th class="num">+ lines</th><th class="num">- lines</th><th>First commit</th><th>Last commit</th><th class="unsortable num">Age</th><th class="num">Active days</th><th class="num"># by commits</th></tr>'
         )
-        for author in data.get_authors(load_config()["max_authors"]):
+        listed = data.get_authors(load_config()["max_authors"])
+        top_commits = max((data.get_author_info(a)["commits"] for a in listed), default=0) or 1
+        for author in listed:
             info = data.get_author_info(author)
+            # A thin bar under the commit count shows the share relative to the top author
+            share_bar = (
+                '<span class="share-bar share-bar-inline" aria-hidden="true">'
+                f'<span style="width: {100.0 * info["commits"] / top_commits:.1f}%"></span></span>'
+            )
             f.write(
-                '<tr><td>%s</td><td class="num">%d (%.2f%%)</td><td class="num">%d</td><td class="num">%d</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap num" title="%s days">%s</td><td class="num">%d</td><td class="num">%d</td></tr>'
+                '<tr><td>%s</td><td class="num">%d (%.2f%%)%s</td><td class="num stat-added">%s</td><td class="num stat-removed">%s</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap num" title="%s days">%s</td><td class="num">%d</td><td class="num">%d</td></tr>'
                 % (
-                    html.escape(author),
+                    author_html(author),
                     info["commits"],
                     info["commits_frac"],
-                    info["lines_added"],
-                    info["lines_removed"],
+                    share_bar,
+                    format_int(info["lines_added"]),
+                    format_int(info["lines_removed"]),
                     info["date_first"],
                     info["date_last"],
                     format_int(info["timedelta"].days),
@@ -867,8 +996,13 @@ class HTMLReportCreator(ReportCreator):
                 % load_config()["max_authors"]
             )
 
-        # Authors :: Author of Month
+        # Authors :: Author of Month (a long table, folded away by default)
         f.write(html_header(2, "Author of Month"))
+        months = len(data.author_of_month)
+        f.write(
+            '<details class="table-details"><summary>Table: top author of each month '
+            f"({months} month{'' if months == 1 else 's'} with commits)</summary>"
+        )
         f.write('<div class="table-scroll"><table class="sortable" id="aom">')
         f.write(
             '<tr><th>Month</th><th>Author</th><th class="num">Commits (%%)</th><th class="unsortable">Next top %d</th><th class="num">Number of authors</th></tr>'
@@ -895,9 +1029,14 @@ class HTMLReportCreator(ReportCreator):
                 )
             )
 
-        f.write("</table></div>")
+        f.write("</table></div></details>")
 
         f.write(html_header(2, "Author of Year"))
+        years = len(data.author_of_year)
+        f.write(
+            '<details class="table-details"><summary>Table: top author of each year '
+            f"({years} year{'' if years == 1 else 's'} with commits)</summary>"
+        )
         f.write(
             '<div class="table-scroll"><table class="sortable" id="aoy"><tr><th>Year</th><th>Author</th><th class="num">Commits (%%)</th><th class="unsortable">Next top %d</th><th class="num">Number of authors</th></tr>'
             % load_config()["authors_top"]
@@ -922,7 +1061,7 @@ class HTMLReportCreator(ReportCreator):
                     len(authors),
                 )
             )
-        f.write("</table></div>")
+        f.write("</table></div></details>")
 
         # Domains
         f.write(html_header(2, "Commits by Domains"))
@@ -1091,7 +1230,7 @@ class HTMLReportCreator(ReportCreator):
             )
             for filepath, count in top_churn:
                 f.write(
-                    '<tr><td class="%s">%s</td><td class="num">%d</td></tr>'
+                    '<tr><td class="%s path">%s</td><td class="num">%d</td></tr>'
                     % (
                         self._heat_td_class(count, max_churn),
                         html.escape(filepath),
@@ -1320,7 +1459,7 @@ class HTMLReportCreator(ReportCreator):
             )
             for fs in risk_files[:50]:
                 f.write(
-                    '<tr><td>%s</td><td>%s</td><td class="num">%d</td></tr>'
+                    '<tr><td class="path">%s</td><td>%s</td><td class="num">%d</td></tr>'
                     % (html.escape(fs["path"]), html.escape(fs["owner"]), fs["edits"])
                 )
             f.write("</table></div>")
@@ -1379,7 +1518,7 @@ class HTMLReportCreator(ReportCreator):
             )
             for fs in shared[:20]:
                 f.write(
-                    '<tr><td>%s</td><td class="num">%d</td><td>%s</td><td class="num">%.1f%%</td></tr>'
+                    '<tr><td class="path">%s</td><td class="num">%d</td><td>%s</td><td class="num">%.1f%%</td></tr>'
                     % (
                         html.escape(fs["path"]),
                         fs["contributors"],
@@ -1661,6 +1800,8 @@ class HTMLReportCreator(ReportCreator):
         max_bar_thickness=None,
         time_axis=False,
         highlight=None,
+        annotations=None,
+        tooltip_share=False,
     ):
         """Render a Chart.js chart as inline HTML.
 
@@ -1672,6 +1813,14 @@ class HTMLReportCreator(ReportCreator):
         With ``highlight=N`` (multi-series charts), only the first N series get
         colors and legend entries; the rest are thin grey lines drawn behind
         them, so colors never repeat.
+
+        ``annotations`` (category bar charts) is a dict for the gsAnnotations
+        plugin: ``bands`` ``[{"from": i, "to": j, "text", "short"}]`` shade
+        category ranges, ``peaks`` ``[{"index": i, "text"}]`` label bars, and
+        ``values: True`` labels every non-zero bar. See gap_annotations().
+
+        With ``tooltip_share=True`` (single series), the tooltip also gives the
+        value's share of the series total: "67 commits (12.1%)".
         """
         is_multi = len(datasets) > 1
 
@@ -1691,7 +1840,8 @@ class HTMLReportCreator(ReportCreator):
                 entry.setdefault("backgroundColor", color + "33")
                 entry.setdefault("fill", False)
                 entry.setdefault("tension", 0.1)
-                entry.setdefault("pointRadius", 2)
+                entry.setdefault("pointRadius", 0)
+                entry.setdefault("pointHoverRadius", 3)
                 entry.setdefault("borderWidth", 1)
                 if highlight is not None:
                     entry.setdefault("order", 0)
@@ -1702,7 +1852,8 @@ class HTMLReportCreator(ReportCreator):
                 entry["themed"] = True
                 if chart_type == "line":
                     entry.setdefault("borderWidth", 1)
-                    entry.setdefault("pointRadius", 2)
+                    entry.setdefault("pointRadius", 0)
+                    entry.setdefault("pointHoverRadius", 3)
             if time_axis and chart_type == "line":
                 entry.setdefault("stepped", True)
             js_datasets.append(entry)
@@ -1742,6 +1893,29 @@ class HTMLReportCreator(ReportCreator):
             )
             x_scale_js = f"{{ ticks: {{ {x_ticks_opts} }} }}"
             tooltip_js = ""
+            if tooltip_share:
+                tooltip_js = """,
+        tooltip: { callbacks: { label: function(item) {
+          const total = item.dataset.data.reduce(function(a, b) { return a + b; }, 0) || 1;
+          return item.parsed.y + ' commits (' + (100 * item.parsed.y / total).toFixed(1) + '%)';
+        } } }"""
+
+        # Lines have no point markers, so tooltips follow the nearest point
+        # instead of needing the pointer exactly on one
+        interaction_js = (
+            "\n      interaction: { mode: 'nearest', intersect: false },"
+            if chart_type == "line"
+            else ""
+        )
+
+        if annotations:
+            annotations_json = json.dumps(annotations).replace("</", "<\\/")
+            plugins_js = f",\n        gsAnnotations: {annotations_json}"
+            register_js = "\n    plugins: [chartAnnotations],"
+            # headroom so labels above the tallest bar stay inside the chart
+            grace_js = ", grace: '10%'"
+        else:
+            plugins_js = register_js = grace_js = ""
 
         # The chart fills a .chart-box that keeps aspect_ratio on wide screens
         # but has a minimum height, so phones don't get a flattened plot.
@@ -1753,19 +1927,19 @@ class HTMLReportCreator(ReportCreator):
   var labels = {labels_json};
   applyChartTheme();
   new Chart(ctx, {{
-    type: '{chart_type}',
+    type: '{chart_type}',{register_js}
     data: {{
       {data_js}
     }},
     options: {{
       responsive: true,
-      maintainAspectRatio: false,
+      maintainAspectRatio: false,{interaction_js}
       plugins: {{
-        legend: {{ display: {legend_display} }}{tooltip_js}
+        legend: {{ display: {legend_display} }}{tooltip_js}{plugins_js}
       }},
       scales: {{
         x: {x_scale_js},
-        y: {{ beginAtZero: true, title: {{ display: true, text: '{y_label}' }} }}
+        y: {{ beginAtZero: true{grace_js}, title: {{ display: true, text: '{y_label}' }} }}
       }}{f", datasets: {{ bar: {{ maxBarThickness: {max_bar_thickness} }} }}" if max_bar_thickness else ""}
     }}
   }});
@@ -1924,7 +2098,7 @@ def compute_code_ownership(author_files: dict[str, dict[str, int]]) -> dict[str,
     # Invert to file -> {author: edits}, dropping bots.
     file_authors: dict[str, dict[str, int]] = {}
     for author, files in author_files.items():
-        if author.endswith("[bot]"):
+        if is_bot(author):
             continue
         for filepath, count in files.items():
             file_authors.setdefault(filepath, {})[author] = count
@@ -2051,7 +2225,7 @@ def compute_project_history(data: Any) -> dict[str, Any]:
     newcomers_by_year: dict[int, list[str]] = {}
     for name, info in (getattr(data, "authors", {}) or {}).items():
         stamp = info.get("first_commit_stamp") if isinstance(info, dict) else None
-        if not stamp or name.endswith("[bot]"):
+        if not stamp or is_bot(name):
             continue
         yy = datetime.datetime.fromtimestamp(stamp).year
         newcomers_by_year.setdefault(yy, []).append(name)
@@ -2135,6 +2309,62 @@ def parse_chronicle(text: str) -> dict[str, Any]:
 
     prologue = " ".join(line for line in prologue_lines if line).strip()
     return {"prologue": prologue, "chapters": chapters}
+
+
+def is_bot(name: str) -> bool:
+    """Bot accounts are named like ``dependabot[bot]``."""
+    return name.endswith("[bot]")
+
+
+def author_html(name: str) -> str:
+    """An author's name, HTML-escaped, with a BOT badge for bot accounts."""
+    badge = ' <span class="badge">bot</span>' if is_bot(name) else ""
+    return html.escape(name) + badge
+
+
+def longest_zero_run(values: list[int]) -> tuple[int, int] | None:
+    """Index range (inclusive) of the longest run of zeros, or None if there is none."""
+    best: tuple[int, int] | None = None
+    start: int | None = None
+    for i, value in enumerate(values):
+        if value:
+            start = None
+            continue
+        if start is None:
+            start = i
+        if best is None or i - start > best[1] - best[0]:
+            best = (start, i)
+    return best
+
+
+def gap_annotations(labels: list[Any], values: list[int], min_gap: int) -> dict[str, Any]:
+    """Chart annotations for the longest stretch without commits.
+
+    When the longest run of empty buckets is at least ``min_gap`` long, it is
+    shaded ("No commits 2016 – 2023") and the busiest bucket on each side of
+    it is labelled ("2007 · 107"). Otherwise there is nothing to annotate.
+    """
+    gap = longest_zero_run(values)
+    if gap is None or gap[1] - gap[0] + 1 < min_gap:
+        return {}
+    start, end = gap
+    peaks = []
+    for lo, hi in ((0, start), (end + 1, len(values))):
+        segment = values[lo:hi]
+        if segment and max(segment) > 0:
+            i = lo + segment.index(max(segment))
+            peaks.append({"index": i, "text": f"{labels[i]} \u00b7 {values[i]}"})
+    return {
+        "bands": [
+            {
+                "from": start,
+                "to": end,
+                "text": f"No commits {labels[start]} \u2013 {labels[end]}",
+                "short": "no commits",
+            }
+        ],
+        "peaks": peaks,
+    }
 
 
 def month_range(months: Any) -> list[str]:

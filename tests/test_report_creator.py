@@ -1,6 +1,7 @@
 """Tests for gitstats.report_creator – HTML generation, helpers, chart rendering."""
 
 import os
+import re
 from io import StringIO
 
 import pytest
@@ -9,12 +10,15 @@ from gitstats.report_creator import (
     HTMLReportCreator,
     ReportCreator,
     _classify_eras,
+    author_html,
     compute_code_ownership,
     compute_project_history,
+    gap_annotations,
     get_keys_sorted_by_value_key,
     get_keys_sorted_by_values,
     html_header,
     html_linkify,
+    longest_zero_run,
     month_range,
     parse_chronicle,
     stat_tiles_html,
@@ -269,6 +273,70 @@ def test_render_chartjs_y_label():
     assert "title: { display: true, text: 'Lines of Code' }" in result
 
 
+@pytest.mark.parametrize(
+    "values,expected",
+    [
+        ([1, 0, 0, 2, 0, 3], (1, 2)),
+        ([0, 0, 0], (0, 2)),
+        ([1, 2, 3], None),
+        ([], None),
+    ],
+)
+def test_longest_zero_run(values, expected):
+    assert longest_zero_run(values) == expected
+
+
+def test_gap_annotations_band_and_peaks():
+    years = list(range(2007, 2027))
+    values = [107, 29, 45, 36, 28, 17, 11, 19, 2] + [0] * 8 + [68, 90, 95]
+    ann = gap_annotations(years, values, min_gap=2)
+    assert ann["bands"] == [
+        {"from": 9, "to": 16, "text": "No commits 2016 – 2023", "short": "no commits"}
+    ]
+    # The busiest year on each side of the gap
+    assert ann["peaks"] == [
+        {"index": 0, "text": "2007 · 107"},
+        {"index": 19, "text": "2026 · 95"},
+    ]
+
+
+def test_gap_annotations_ignores_short_gaps():
+    assert gap_annotations(["2020", "2021", "2022"], [5, 0, 3], min_gap=2) == {}
+
+
+def test_render_chartjs_annotations():
+    creator = HTMLReportCreator()
+    ann = {"bands": [{"from": 1, "to": 1, "text": "gap", "short": ""}], "peaks": []}
+    result = creator._render_chartjs(
+        "c-ann", "bar", ["A", "B", "C"], [{"label": "C", "data": [1, 0, 2]}], annotations=ann
+    )
+    assert "plugins: [chartAnnotations]," in result
+    assert (
+        'gsAnnotations: {"bands": [{"from": 1, "to": 1, "text": "gap", "short": ""}], "peaks": []}'
+        in result
+    )
+    assert "grace: '10%'" in result
+    plain = creator._render_chartjs("c-plain", "bar", ["A"], [{"label": "C", "data": [1]}])
+    assert "chartAnnotations" not in plain
+    assert "grace" not in plain
+
+
+def test_render_chartjs_lines_have_no_point_markers():
+    creator = HTMLReportCreator()
+    single = creator._render_chartjs("c1", "line", ["X", "Y"], [{"label": "L", "data": [1, 2]}])
+    multi = creator._render_chartjs(
+        "c2", "line", ["X"], [{"label": "A", "data": [1]}, {"label": "B", "data": [2]}]
+    )
+    for result in (single, multi):
+        assert '"pointRadius": 0' in result
+        assert '"pointRadius": 2' not in result
+        assert '"pointHoverRadius": 3' in result
+        # Without markers, tooltips pick the nearest point
+        assert "interaction: { mode: 'nearest', intersect: false }" in result
+    bar = creator._render_chartjs("c3", "bar", ["X"], [{"label": "B", "data": [1]}])
+    assert "interaction:" not in bar
+
+
 def test_render_chartjs_category_axis_by_default():
     creator = HTMLReportCreator()
     result = creator._render_chartjs("chart-cat", "line", ["X"], [{"label": "C", "data": [1]}])
@@ -510,7 +578,7 @@ def test_create_index_html(mock_data_collector, temp_dir):
     assert "All 3 authors &rarr;" in html
 
     # Latest releases, newest first, next to the contributors
-    assert '<div class="overview-columns">' in html
+    assert '<div class="two-columns">' in html
     assert html.index(">v1.1.0<") < html.index(">v1.0.0<")
     assert "<td>Alice Smith, Bob Jones</td>" in html
     assert "All 2 tags &rarr;" in html
@@ -541,8 +609,30 @@ def test_index_without_tags_has_no_releases(mock_data_collector, temp_dir):
     mock_data_collector.tags = {}
     html = _render_index(mock_data_collector, temp_dir)
     assert "Latest Releases" not in html
-    assert "overview-columns" not in html
+    assert "two-columns" not in html
     assert "Top Contributors" in html
+
+
+def test_author_html_marks_bots():
+    assert author_html("Alice Smith") == "Alice Smith"
+    assert author_html("dependabot[bot]") == 'dependabot[bot] <span class="badge">bot</span>'
+    assert author_html("<Eve>") == "&lt;Eve&gt;"
+
+
+def test_bot_badges_in_contributor_tables(mock_data_collector, temp_dir):
+    bot = {**mock_data_collector.authors["Charlie Brown"]}
+    mock_data_collector.authors = {**mock_data_collector.authors, "renovate[bot]": bot}
+    mock_data_collector.get_authors.side_effect = lambda limit=None: [
+        "Alice Smith",
+        "Bob Jones",
+        "renovate[bot]",
+    ][:limit]
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    badge = 'renovate[bot] <span class="badge">bot</span>'
+    with open(f"{temp_dir}/index.html", encoding="utf-8") as f:
+        assert f"<tr><td>{badge}</td>" in f.read()  # Top Contributors
+    with open(f"{temp_dir}/authors.html", encoding="utf-8") as f:
+        assert f"<tr><td>{badge}</td>" in f.read()  # List of Authors
 
 
 def test_index_release_authors_are_capped_and_escaped(mock_data_collector, temp_dir):
@@ -663,6 +753,28 @@ def test_create_activity_html(mock_data_collector, temp_dir):
     assert html.index('id="hour_of_week"') < html.index('id="punch_card"')
 
 
+def test_activity_summary_and_section_links(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_activity_html(mock_data_collector, temp_dir)
+    with open(f"{temp_dir}/activity.html", encoding="utf-8") as f:
+        html = f.read()
+
+    # 50 commits, 4 active days, streak 4, busiest hour 14 (15 commits), busiest day Wed (12)
+    assert (
+        '<h1>Activity</h1><p class="page-meta">50 commits &middot; 4 active days &middot; '
+        "longest streak 4 days &middot; busiest hour 14:00 &middot; busiest day Wednesday</p>"
+    ) in html
+    # Every "On this page" link points at a section heading on the page
+    toc = re.search(r'<nav class="page-toc" aria-label="On this page">(.*?)</nav>', html).group(1)
+    targets = re.findall(r'href="#([^"]+)"', toc)
+    assert len(targets) == 6
+    for target in targets:
+        assert f'<h2 id="{target}">' in html, target
+    assert "Longest Streak:" not in html  # folded into the summary line
+
+
 def test_activity_punch_card(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
     creator.title = mock_data_collector.project_name
@@ -674,12 +786,55 @@ def test_activity_punch_card(mock_data_collector, temp_dir):
     # Mon-Fri 9:00-16:00 have one commit each; the busiest cell has 2
     assert '<tr><th>Mon</th><td class="heat heat0"></td>' in html
     assert '<td class="heat heat2">1</td>' in html
-    # Day totals with their share (Mon: 8 of 50)
-    assert '<td class="num punch-total">8 (16.0%)</td>' in html
-    # Hour totals, colored against the busiest hour (14:00, 15 of 50 commits)
-    assert '<td class="heat heat4" title="30.0% of commits">15</td>' in html
-    assert '<td class="num punch-total">50</td>' in html
+    # Day totals with their share (Mon: 8 of 50) and a bar against the busiest day (Wed: 12)
+    assert (
+        '<td class="num punch-total">8 (16.0%)<span class="share-bar share-bar-inline" '
+        'aria-hidden="true"><span style="width: 66.7%"></span></span></td>'
+    ) in html
+    # Commits per hour as bars above the grid: 14:00 is the busiest (15 of 50) -> 40px
+    assert (
+        '<td title="14:00 &middot; 15 commits &middot; 30.0%"><div class="punch-vbar">'
+        '<span class="punch-vbar-value">15</span>'
+        '<span class="punch-vbar-fill" style="height: 40px"></span></div></td>'
+    ) in html
+    # 16:00 has 8 commits -> 21px; an hour without commits has no bar
+    assert '<span class="punch-vbar-fill" style="height: 21px">' in html
+    assert (
+        '<span class="punch-vbar-value"></span><span class="punch-vbar-fill" style="height: 0px">'
+        in html
+    )
+    # The bar row sits between the hour labels and the first weekday
+    assert html.index('class="punch-hour-bars"') < html.index("<tr><th>Mon</th>")
     assert '<p class="heat-legend">Fewer' in html
+
+
+def test_activity_month_of_year_and_timezones(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_activity_html(mock_data_collector, temp_dir)
+    with open(f"{temp_dir}/activity.html", encoding="utf-8") as f:
+        html = f.read()
+
+    # Month of Year: named months, counts drawn on the bars, share in the tooltip, no table
+    month = html[html.index('id="month_of_year"') : html.index('id="commits_by_timezone"')]
+    assert '"Jan", "Feb", "Mar"' in month
+    assert 'gsAnnotations: {"values": true}' in month
+    assert "commits (' + (100 * item.parsed.y / total).toFixed(1)" in month
+    assert "<table" not in month
+
+    # Timezones west to east as bars: -0500 (15), +0000 (5), +0800 (30) of 50
+    assert (
+        '<tr><td class="nowrap">UTC-05:00</td><td class="num">15</td><td class="num">30.0%</td>'
+        '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+        '<span style="width: 50.0%"></span></span></td></tr>'
+    ) in html
+    assert html.index("UTC-05:00") < html.index("UTC+00:00") < html.index("UTC+08:00")
+    assert '<table class="heat">' not in html
+
+    # The two sections sit side by side
+    assert '<div class="two-columns"><section>' in html
+    assert html.index('<div class="two-columns"><section>') < html.index('id="month_of_year"')
 
 
 def test_activity_monthly_table_is_folded(mock_data_collector, temp_dir):
@@ -1124,11 +1279,14 @@ def test_numeric_columns_are_marked(mock_data_collector, temp_dir):
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     with open(os.path.join(temp_dir, "authors.html"), encoding="utf-8") as f:
         authors = f.read()
-    # Alice Smith: 30 commits (60%), +2000 / -500, 12 active days, rank 1
+    # Alice Smith: 30 commits (60%) with a full-width share bar, +2,000 / -500
     assert (
-        '<tr><td>Alice Smith</td><td class="num">30 (60.00%)</td>'
-        '<td class="num">2000</td><td class="num">500</td>'
+        '<tr><td>Alice Smith</td><td class="num">30 (60.00%)'
+        '<span class="share-bar share-bar-inline" aria-hidden="true">'
+        '<span style="width: 100.0%"></span></span></td>'
+        '<td class="num stat-added">2,000</td><td class="num stat-removed">500</td>'
     ) in authors
+    assert '<span style="width: 50.0%">' in authors  # Bob: 15 of Alice's 30
     assert '<th class="num">Commits (%)</th>' in authors
     assert '<th class="unsortable num">Age</th>' in authors
     # Text columns stay left-aligned
@@ -1138,6 +1296,41 @@ def test_numeric_columns_are_marked(mock_data_collector, temp_dir):
         files = f.read()
     assert '<th class="num">Files (%)</th>' in files
     assert '<td class="num">10 (40.00%)</td>' in files  # py: 10 of 25 files
+
+
+def test_authors_summary_and_folded_tables(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_authors_html(mock_data_collector, temp_dir)
+    with open(f"{temp_dir}/authors.html", encoding="utf-8") as f:
+        html = f.read()
+
+    # 3 authors; Alice (60%) and Bob (30%) wrote 90% of commits; no bots
+    assert (
+        '<h1>Authors</h1><p class="page-meta">3 authors &middot; top 2 wrote 90.0% of commits</p>'
+        in html
+    )
+    # Author of Month / Year tables are folded away, headings and anchors kept
+    months = len(mock_data_collector.author_of_month)
+    assert (
+        '<details class="table-details"><summary>Table: top author of each month '
+        f"({months} months with commits)</summary>"
+    ) in html
+    assert "<summary>Table: top author of each year (" in html
+    assert html.index('id="author_of_month"') < html.index("top author of each month")
+    assert html.count("</table></div></details>") == 2
+
+
+def test_authors_summary_counts_bots(mock_data_collector):
+    mock_data_collector.get_authors.side_effect = lambda limit=None: [
+        "Alice Smith",
+        "renovate[bot]",
+        "dependabot[bot]",
+    ][:limit]
+    mock_data_collector.get_author_info.side_effect = lambda a: {"commits_frac": 40.0}
+    summary = HTMLReportCreator()._authors_summary_html(mock_data_collector)
+    assert "3 authors &middot; top 2 wrote 80.0% of commits &middot; 2 bot accounts" in summary
 
 
 def test_small_formatting_fixes(mock_data_collector, temp_dir):
@@ -1151,10 +1344,9 @@ def test_small_formatting_fixes(mock_data_collector, temp_dir):
     assert '<td class="nowrap num" title="150 days">5 mo</td>' in page("authors.html")
     # Average file size in readable units (50000 bytes / 25 files)
     assert '<dt>Average File Size</dt><dd class="stat-value">2.0 KB</dd>' in page("files.html")
-    # Timezone cells carry one "heat" class, not "heat heat heatN"
+    # No cell carries a doubled "heat heat heatN" class
     activity = page("activity.html")
     assert "heat heat heat" not in activity
-    assert '<td class="heat heat4">30</td>' in activity
     # Tag names and dates don't wrap
     assert '<td class="nowrap">v1.0.0</td>' in page("tags.html")
 
@@ -1213,6 +1405,19 @@ def test_ownership_page_renders(mock_data_collector, temp_dir):
     assert "solo_alice.py" in content
     assert "Alice Smith" in content
     assert "</html>" in content
+    # File paths are set in monospace
+    assert '<td class="path">solo_alice.py</td>' in content
+
+
+def test_file_paths_are_monospace_cells(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(f"{temp_dir}/files.html", encoding="utf-8") as f:
+        files = f.read()
+    # Churn table: the heat class stays, plus the path class
+    assert '<td class="heat heat4 path">main.py</td>' in files
+    with open(f"{temp_dir}/ownership.html", encoding="utf-8") as f:
+        ownership = f.read()
+    assert ownership.count('<td class="path">') >= 2  # single-owner and shared tables
 
 
 def test_ownership_page_empty_state(mock_data_collector, temp_dir):
