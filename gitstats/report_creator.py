@@ -78,9 +78,25 @@ THEME_SCRIPT = """<script>
 		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
 	}
 
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
 	document.addEventListener('DOMContentLoaded', function() {
 		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
 		revealCurrentNavItem();
+		watchScrollBoxes();
 	});
 </script>"""
 
@@ -438,10 +454,10 @@ class HTMLReportCreator(ReportCreator):
             )
         )
         if annotations:
-            # the same fact as text, for screen readers and at a glance
+            # the chart's canvas is invisible to screen readers; say the same in text
             band = annotations["bands"][0]
             f.write(
-                f'<p class="chart-note">No commits from {years[band["from"]]} '
+                f'<p class="visually-hidden">No commits from {years[band["from"]]} '
                 f"to {years[band['to']]}.</p>"
             )
         f.write('<p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p>')
@@ -1847,7 +1863,7 @@ class HTMLReportCreator(ReportCreator):
                 entry.setdefault("tension", 0.1)
                 entry.setdefault("pointRadius", 0)
                 entry.setdefault("pointHoverRadius", 3)
-                entry.setdefault("borderWidth", 1)
+                entry.setdefault("borderWidth", 1.5)
                 if highlight is not None:
                     entry.setdefault("order", 0)
             else:
@@ -1856,7 +1872,7 @@ class HTMLReportCreator(ReportCreator):
                 entry["borderColor"] = "__CSS_BAR_COLOR__"
                 entry["themed"] = True
                 if chart_type == "line":
-                    entry.setdefault("borderWidth", 1)
+                    entry.setdefault("borderWidth", 1.5)
                     entry.setdefault("pointRadius", 0)
                     entry.setdefault("pointHoverRadius", 3)
             if time_axis and chart_type == "line":
@@ -2433,11 +2449,18 @@ def stat_tiles_html(tiles: list[tuple[str, str, str]]) -> str:
         n = max(len(tiles), 1)
         return next(c for c in range(min(n, limit), 0, -1) if n % c == 0)
 
+    def phrases(note: str) -> str:
+        # a note wraps after a " · " between its phrases, never inside one ("per active / day")
+        parts = note.split(" &middot; ")
+        if len(parts) == 1:
+            return note
+        return "&nbsp;&middot; ".join(f'<span class="nowrap">{part}</span>' for part in parts)
+
     items = "".join(
         '<div class="stat-tile">'
         f"<dt>{label}</dt>"
         f'<dd class="stat-value">{value}</dd>'
-        + (f'<dd class="stat-note">{note}</dd>' if note else "")
+        + (f'<dd class="stat-note">{phrases(note)}</dd>' if note else "")
         + "</div>"
         for label, value, note in tiles
     )

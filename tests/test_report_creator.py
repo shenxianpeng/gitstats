@@ -585,14 +585,20 @@ def test_create_index_html(mock_data_collector, temp_dir):
     assert '<dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2">' in html
     assert html.count('<div class="stat-tile">') == 6
     assert '<dt>Commits</dt><dd class="stat-value">50</dd>' in html
-    assert "12.5 per active day &middot; 0.4 per day" in html
+    assert (
+        '<span class="nowrap">12.5 per active day</span>&nbsp;&middot; '
+        '<span class="nowrap">0.4 per day</span>'
+    ) in html
     assert "16.7 commits per author" in html
     # Large counts use thousands separators (total_lines=2000, added=3000, removed=1000)
     assert '<dt>Lines of Code</dt><dd class="stat-value">2,000</dd>' in html
     assert '<span class="stat-added">+3,000</span> added' in html
     assert '<span class="stat-removed">−1,000</span> removed' in html
     assert "3 extensions" in html
-    assert "of 120 days &middot; 3.33%" in html
+    assert (
+        '<span class="nowrap">of 120 days</span>&nbsp;&middot; <span class="nowrap">3.33%</span>'
+        in html
+    )
     assert '<dt>Longest Streak</dt><dd class="stat-value">4 days</dd>' in html
 
     # The old key/value table is gone: its rows live in the tiles and the meta line
@@ -633,12 +639,13 @@ def test_index_notes_longest_quiet_stretch(mock_data_collector, temp_dir):
     mock_data_collector.commits_by_year = {2010: 3, 2011: 0, 2014: 2, 2016: 1}
     html = _render_index(mock_data_collector, temp_dir)
     # 2012-2013 are missing and 2011 is empty: the longest run is 2011-2013
-    assert '<p class="chart-note">No commits from 2011 to 2013.</p>' in html
+    # drawn on the chart; the canvas is invisible to screen readers, so also as hidden text
+    assert '<p class="visually-hidden">No commits from 2011 to 2013.</p>' in html
 
 
 def test_index_single_empty_year_is_not_noted(mock_data_collector, temp_dir):
     mock_data_collector.commits_by_year = {2020: 1, 2022: 1}
-    assert "chart-note" not in _render_index(mock_data_collector, temp_dir)
+    assert "No commits from" not in _render_index(mock_data_collector, temp_dir)
 
 
 def test_index_without_tags_has_no_releases(mock_data_collector, temp_dir):
@@ -743,7 +750,9 @@ def test_page_summaries_use_stat_tiles(mock_data_collector, temp_dir):
 
     # Tags: v1.1.0 (2023-04-05) is the latest of two; 50 commits / 2 tags
     tags = page("tags.html")
-    assert "latest v1.1.0 &middot; 2023-04-05" in tags
+    assert (
+        '<span class="nowrap">latest v1.1.0</span>&nbsp;&middot; <span class="nowrap">2023-04-05</span>'
+    ) in tags
     assert '<dt>Commits per Tag</dt><dd class="stat-value">25.0</dd>' in tags
 
     # Ownership and History keep their intro paragraph above the tiles
@@ -1809,3 +1818,34 @@ def test_bot_badges_wherever_authors_are_named(mock_data_collector, temp_dir):
     authors = page("authors.html")
     assert f"<tr><td>2023</td><td>{badge}</td>" in authors  # top author of the year
     assert f'<td>{badge}</td><td class="num">2</td></tr>' in authors  # runner-up
+
+
+def test_chart_lines_are_one_and_a_half_pixels():
+    creator = HTMLReportCreator()
+    single = creator._render_chartjs("c1", "line", ["a"], [{"label": "L", "data": [1]}])
+    assert '"borderWidth": 1.5' in single
+    multi = creator._render_chartjs(
+        "c2",
+        "line",
+        ["a"],
+        [{"label": s, "data": [1]} for s in "ABC"],
+        highlight=2,
+    )
+    # highlighted series 1.5px, the grey rest stay 1px behind them
+    assert multi.count('"borderWidth": 1.5') == 2
+    assert multi.count('"borderWidth": 1,') == 1
+
+
+def test_pinned_column_divider_only_on_scrolling_tables():
+    """JS marks overflowing .table-scroll boxes; only those draw the divider."""
+    creator = HTMLReportCreator()
+    creator.title = "p"
+    f = StringIO()
+    creator.print_header(f)
+    assert "box.classList.toggle('is-scrollable'" in f.getvalue()
+    css_path = os.path.join(os.path.dirname(__file__), "..", "gitstats", "gitstats.css")
+    with open(css_path, encoding="utf-8") as f:
+        css = f.read()
+    rule = css[css.index(".table-scroll tr > :first-child {") :]
+    assert "box-shadow" not in rule[: rule.index("}")]
+    assert ".table-scroll.is-scrollable tr > :first-child," in css
