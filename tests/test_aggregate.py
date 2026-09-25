@@ -273,13 +273,13 @@ class TestAggregateReportCreator:
             failures=[{"name": "bad", "path": "/x", "error": "<script>boom</script>"}],
         )
 
-        assert "Failed Repositories" in html
+        assert "Failed repositories" in html
         assert "&lt;script&gt;boom&lt;/script&gt;" in html
         assert "<script>boom</script>" not in html
 
     def test_no_failures_section_when_empty(self, temp_dir):
         html = self._render(temp_dir, [_summary("alpha", 1, {"A": 1})])
-        assert "Failed Repositories" not in html
+        assert "Failed repositories" not in html
 
     def test_repo_name_escaped(self, temp_dir):
         html = self._render(temp_dir, [_summary("a<b>", 1, {"A": 1})])

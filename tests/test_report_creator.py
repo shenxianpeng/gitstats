@@ -644,9 +644,9 @@ def test_index_single_empty_year_is_not_noted(mock_data_collector, temp_dir):
 def test_index_without_tags_has_no_releases(mock_data_collector, temp_dir):
     mock_data_collector.tags = {}
     html = _render_index(mock_data_collector, temp_dir)
-    assert "Latest Releases" not in html
+    assert "Latest releases" not in html
     assert "two-columns" not in html
-    assert "Top Contributors" in html
+    assert "Top contributors" in html
 
 
 def test_author_html_marks_bots():
@@ -768,11 +768,11 @@ def test_create_activity_html(mock_data_collector, temp_dir):
         html = f.read()
 
     assert "<h1>Activity</h1>" in html
-    assert "Month of Year" in html
+    assert "Month of year" in html
     assert "Commits by year/month" in html
 
     # Coarse to fine: year, month, week, then the daily rhythm
-    order = ["Commits by Year", "Commits by year/month", "Weekly activity", "Punch Card"]
+    order = ["Commits by year", "Commits by year/month", "Weekly activity", "Punch card"]
     positions = [html.index(f">{title}</a></h2>") for title in order]
     assert positions == sorted(positions)
 
@@ -931,9 +931,9 @@ def test_create_authors_html(mock_data_collector, temp_dir):
     assert "<h1>Authors</h1>" in html
     assert "Alice Smith" in html
     assert "Bob Jones" in html
-    assert "Author of Month" in html
-    assert "Author of Year" in html
-    assert "Domains" in html
+    assert "Author of month" in html
+    assert "Author of year" in html
+    assert "Commits by domain" in html
     assert "example.com" in html
     # Domains are data cells (not uppercased header cells) in a bar table
     assert "<tr><td>example.com</td>" in html
@@ -943,7 +943,7 @@ def test_create_authors_html(mock_data_collector, temp_dir):
         in html
     )
     assert "chart-domains" not in html
-    assert "Contributor Growth" in html
+    assert "Contributor growth" in html
 
 
 def test_render_chartjs_highlight_top_series():
@@ -1028,7 +1028,7 @@ def test_create_files_html(mock_data_collector, temp_dir):
     assert "Extensions" in html
     assert "py" in html
     assert "md" in html
-    assert "Most Changed Files" in html
+    assert "Most changed files" in html
     assert "main.py" in html
     assert "utils.py" in html
 
@@ -1469,7 +1469,7 @@ def test_ownership_page_renders(mock_data_collector, temp_dir):
         content = f.read()
 
     assert "Code Ownership" in content
-    assert "Bus Factor Risk" in content
+    assert "Bus factor risk" in content
     # solo_alice.py is only touched by Alice -> appears as a single-owner file
     assert "solo_alice.py" in content
     assert "Alice Smith" in content
@@ -1716,3 +1716,17 @@ def test_history_page_chronicle_fallback_when_unparseable(mock_data_collector, t
 
     # shown whole rather than dropped
     assert "A free-form narrative without markers." in content
+
+
+def test_section_headings_use_sentence_case(mock_data_collector, temp_dir):
+    """Section headings are sentence case; only the first word is capitalized."""
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    for page in ("index", "activity", "authors", "files", "lines", "ownership"):
+        with open(os.path.join(temp_dir, f"{page}.html")) as f:
+            headings = re.findall(r"<h2[^>]*>(?:<a [^>]*>)?([^<]+)", f.read())
+        assert headings, page
+        for heading in headings:
+            rest = heading.split()[1:]
+            assert all(not w[0].isupper() for w in rest), (page, heading)

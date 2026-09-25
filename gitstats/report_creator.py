@@ -419,7 +419,7 @@ class HTMLReportCreator(ReportCreator):
 
     def _write_overview_yearly(self, f: Any, data: Any) -> None:
         """Commits per year across the whole history, noting the longest quiet stretch."""
-        f.write(html_header(2, "Commits per Year"))
+        f.write(html_header(2, "Commits per year"))
         if data.commits_by_year:
             years = list(range(min(data.commits_by_year), max(data.commits_by_year) + 1))
         else:
@@ -464,7 +464,7 @@ class HTMLReportCreator(ReportCreator):
         total = data.get_total_authors()
         return (
             "<section>"
-            + html_header(2, "Top Contributors")
+            + html_header(2, "Top contributors")
             + '<div class="table-scroll"><table class="share-table">'
             '<tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th>'
             "<th></th></tr>" + "".join(rows) + "</table></div>"
@@ -492,7 +492,7 @@ class HTMLReportCreator(ReportCreator):
         total = len(data.tags)
         return (
             "<section>"
-            + html_header(2, "Latest Releases")
+            + html_header(2, "Latest releases")
             + '<div class="table-scroll"><table class="share-table">'
             '<tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr>'
             + "".join(rows)
@@ -530,12 +530,12 @@ class HTMLReportCreator(ReportCreator):
 
     # The Activity page's sections, in page order, for its "On this page" links
     ACTIVITY_SECTIONS = (
-        ("Commits by Year", "By year"),
+        ("Commits by year", "By year"),
         ("Commits by year/month", "By month"),
         ("Weekly activity", "Last weeks"),
-        ("Punch Card", "Punch card"),
-        ("Month of Year", "Month of year"),
-        ("Commits by Timezone", "Timezones"),
+        ("Punch card", "Punch card"),
+        ("Month of year", "Month of year"),
+        ("Commits by timezone", "Timezones"),
     )
 
     def _write_activity_intro(self, f, data) -> None:
@@ -610,7 +610,7 @@ class HTMLReportCreator(ReportCreator):
         """
         f.write('<span id="hour_of_day"></span><span id="day_of_week"></span>')
         f.write('<span id="hour_of_week"></span>')
-        f.write(html_header(2, "Punch Card"))
+        f.write(html_header(2, "Punch card"))
         f.write(
             "<p>Commits by day of week and hour of day, in each commit's local time. "
             "The bars along the top are the commits per hour; the last column is "
@@ -679,7 +679,7 @@ class HTMLReportCreator(ReportCreator):
 
     def _write_month_of_year_section(self, f, data) -> None:
         """Commits per calendar month, all years combined: counts on the bars, share on hover."""
-        f.write(html_header(2, "Month of Year"))
+        f.write(html_header(2, "Month of year"))
         values = [data.activity_by_month_of_year.get(mm, 0) for mm in range(1, 13)]
         f.write(
             self._render_chartjs(
@@ -737,7 +737,7 @@ class HTMLReportCreator(ReportCreator):
         chart showed the same numbers.
         """
         f.write('<span id="yearly_activity"></span>')
-        f.write(html_header(2, "Commits by Year"))
+        f.write(html_header(2, "Commits by year"))
         f.write(_FLEX_CONTAINER)
         f.write(
             '<div class="table-scroll"><table><tr><th>Year</th><th class="num">Commits (% of all)</th><th class="num">Lines added</th><th class="num">Lines removed</th></tr>'
@@ -779,7 +779,7 @@ class HTMLReportCreator(ReportCreator):
 
     def _write_commits_by_timezone_section(self, f, data) -> None:
         """Commits per UTC offset, west to east, as horizontal bars."""
-        f.write(html_header(2, "Commits by Timezone"))
+        f.write(html_header(2, "Commits by timezone"))
         total = sum(data.commits_by_timezone.values()) or 1
         busiest = max(data.commits_by_timezone.values(), default=0) or 1
         rows = []
@@ -946,7 +946,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(self._authors_summary_html(data))
 
         # Authors :: List of authors
-        f.write(html_header(2, "List of Authors"))
+        f.write(html_header(2, "List of authors"))
 
         f.write('<div class="table-scroll"><table class="authors sortable" id="authors">')
         f.write(
@@ -1001,7 +1001,7 @@ class HTMLReportCreator(ReportCreator):
         # Build per-author time series data for Chart.js
         time_labels, loc_datasets = self._build_author_time_series(data)
 
-        f.write(html_header(2, "Cumulated Added Lines of Code per Author"))
+        f.write(html_header(2, "Cumulated added lines of code per author"))
         f.write(
             self._render_chartjs(
                 "chart-loc-by-author",
@@ -1019,7 +1019,7 @@ class HTMLReportCreator(ReportCreator):
 
         # Replaces the former "Commits per Author" line chart; its anchor still lands here
         f.write('<span id="commits_per_author"></span>')
-        f.write(html_header(2, "Contributor Timeline"))
+        f.write(html_header(2, "Contributor timeline"))
         f.write(
             self._contributor_timeline_html(data, data.get_authors(load_config()["max_authors"]))
         )
@@ -1030,7 +1030,7 @@ class HTMLReportCreator(ReportCreator):
             )
 
         # Authors :: Author of Month (a long table, folded away by default)
-        f.write(html_header(2, "Author of Month"))
+        f.write(html_header(2, "Author of month"))
         months = len(data.author_of_month)
         f.write(
             '<details class="table-details"><summary>Table: top author of each month '
@@ -1064,7 +1064,7 @@ class HTMLReportCreator(ReportCreator):
 
         f.write("</table></div></details>")
 
-        f.write(html_header(2, "Author of Year"))
+        f.write(html_header(2, "Author of year"))
         years = len(data.author_of_year)
         f.write(
             '<details class="table-details"><summary>Table: top author of each year '
@@ -1097,7 +1097,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("</table></div></details>")
 
         # Domains: a bar table (the numbers used to be shown twice, as a table and a chart)
-        f.write(html_header(2, "Commits by Domains"))
+        f.write(html_header(2, "Commits by domain"))
         domains_by_commits = get_keys_sorted_by_value_key(data.domains, "commits")
         domains_by_commits.reverse()  # most first
         top_domains = domains_by_commits[: load_config()["max_domains"]]
@@ -1122,7 +1122,7 @@ class HTMLReportCreator(ReportCreator):
 
         # Contributor Growth Over Time
         if data.new_contributors_by_month:
-            f.write(html_header(2, "Contributor Growth"))
+            f.write(html_header(2, "Contributor growth"))
             f.write(
                 "<p><em>Number of first-time contributors per month. "
                 "A growing trend indicates a healthy, welcoming project.</em></p>"
@@ -1231,7 +1231,7 @@ class HTMLReportCreator(ReportCreator):
 
         # Files :: Code Churn (most frequently changed files)
         if data.file_churn:
-            f.write(html_header(2, "Most Changed Files (Code Churn)"))
+            f.write(html_header(2, "Most changed files (code churn)"))
             f.write(
                 "<p><em>Files touched most often across all commits. "
                 "High-churn files are hotspots that may benefit from extra review or refactoring.</em></p>"
@@ -1294,7 +1294,7 @@ class HTMLReportCreator(ReportCreator):
             )
         )
 
-        f.write(html_header(2, "Lines of Code"))
+        f.write(html_header(2, "Lines of code"))
         loc_stamps = sorted(data.changes_by_date.keys())
         loc_values = [data.changes_by_date[s]["lines"] for s in loc_stamps]
         f.write(
@@ -1450,7 +1450,7 @@ class HTMLReportCreator(ReportCreator):
         )
 
         # Bus-factor risk: single-owner files, most-changed first
-        f.write(html_header(2, "Bus Factor Risk — Single-Owner Files"))
+        f.write(html_header(2, "Bus factor risk — single-owner files"))
         f.write(
             "<p><em>Files only one author has ever changed. The more a file has "
             "changed, the more knowledge is at risk if that person leaves.</em></p>"
@@ -1476,7 +1476,7 @@ class HTMLReportCreator(ReportCreator):
             f.write("<p>No single-owner files — every file has multiple contributors.</p>")
 
         # Ownership concentration by author
-        f.write(html_header(2, "Ownership by Author"))
+        f.write(html_header(2, "Ownership by author"))
         f.write(
             "<p><em>Primary owner = the author with the most commits to a file. "
             "Solely owned = files only that author has touched.</em></p>"
@@ -1504,7 +1504,7 @@ class HTMLReportCreator(ReportCreator):
             )
 
         # Coordination hotspots: files with the most contributors
-        f.write(html_header(2, "Most Shared Files"))
+        f.write(html_header(2, "Most shared files"))
         f.write(
             "<p><em>Files touched by the most people — shared code where changes "
             "are most likely to need coordination.</em></p>"

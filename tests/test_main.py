@@ -770,7 +770,7 @@ class TestRunIntegration:
         assert os.path.exists(f"{output}/git_repo/index.html")
         with open(f"{output}/index.html", encoding="utf-8") as f:
             index = f.read()
-        assert "Failed Repositories" in index
+        assert "Failed repositories" in index
         assert "not_a_repo" in index
 
     def test_run_multi_repo_all_failed(self, temp_dir):
