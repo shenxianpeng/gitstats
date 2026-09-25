@@ -1,0 +1,52 @@
+tests/test_aggregate.py
+  s_36d3a463a5505b::t_23a668f7804c86 213-220
+gitstats/aggregate.py
+  s_36d3a463a5505b::t_a05ff66b493ae0 277,281,284-290
+  s_36d3a463a5505b::t_abf617a1b6ac52 23-29
+  s_36d3a463a5505b::t_48bb6ecb7d40d7 300,303
+tests/test_report_creator.py
+  s_36d3a463a5505b::t_a5ce653114a2aa 18
+  s_36d3a463a5505b::t_11c2814b6d752a 400-440
+  s_36d3a463a5505b::t_26387505b34e35 746
+  s_36d3a463a5505b::t_0acf61683db1d1 254-300
+  s_36d3a463a5505b::t_be5708ff95e7bf 320-332
+gitstats/gitstats.css
+  s_36d3a463a5505b::t_2262f8d414f6fb 61-64
+  s_36d3a463a5505b::t_3a95716011c935 279-285
+  s_36d3a463a5505b::t_ffe6d6a7e75087 108-110
+  s_36d3a463a5505b::t_99ce2f0607e22f 334-339,353-365
+  s_36d3a463a5505b::t_d684b433264206 366
+gitstats/report_creator.py
+  s_36d3a463a5505b::t_4815303f07576c 1601,1606-1607,1610-1617
+  s_36d3a463a5505b::t_61a7d7be2c7209 861-862
+  s_36d3a463a5505b::t_f840b0bf05b3ee 28-79,84,93-181
+  s_36d3a463a5505b::t_e36f5f73025083 1652,1657
+  s_36d3a463a5505b::t_64143686a254eb 1933-1950
+  s_36d3a463a5505b::t_0378da9d63ab9b 732
+  s_36d3a463a5505b::t_408c8d8c248db4 1477,1479-1485,1503,1507-1508,1511-1512,1519-1534,1538-1539,1545-1547,1550,1557,1560
+  s_36d3a463a5505b::t_ec29ba1ce223f3 1620,1626,1631-1632
+  s_36d3a463a5505b::t_d4a151c775a1ce 659
+  s_36d3a463a5505b::t_ab943da0f364a3 1535-1537
+  s_36d3a463a5505b::t_cfa0147a88b395 749
+  s_36d3a463a5505b::t_ca7559f2ce840b 544-545
+  s_36d3a463a5505b::t_623cb18eb15f97 252,310,674,884,999,1029,1101,1247,1389
+  s_36d3a463a5505b::t_b29208f7b0e6ca 80-83,85-92
+  s_36d3a463a5505b::t_6b38319d6a9602 902,906,908-910,915,918
+  s_36d3a463a5505b::t_079612439fca13 1013,1016
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "d44516f82d1fff2bc7191ba27f64c9b693e8a86f",
+  "prompts": {},
+  "sessions": {
+    "s_36d3a463a5505b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d57d16d-e8d6-4ee3-bed8-3b835be6549d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
