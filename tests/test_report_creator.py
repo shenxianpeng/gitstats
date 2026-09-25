@@ -1786,3 +1786,26 @@ def test_render_chartjs_integer_y_ticks():
     creator = HTMLReportCreator()
     result = creator._render_chartjs("c", "bar", ["a"], [{"label": "C", "data": [1]}])
     assert "y: { beginAtZero: true, ticks: { precision: 0 } }" in result
+
+
+def test_bot_badges_wherever_authors_are_named(mock_data_collector, temp_dir):
+    """Releases, tags and top-author tables mark bots like the author lists do."""
+    bot = "dependabot[bot]"
+    badge = 'dependabot[bot] <span class="badge">bot</span>'
+    mock_data_collector.tags["v1.1.0"]["authors"] = {bot: 5, "Alice Smith": 3}
+    mock_data_collector.author_of_year = {2023: {bot: 40, "Alice Smith": 30}}
+    mock_data_collector.author_of_month = {
+        **mock_data_collector.author_of_month,
+        "2023-04": {"Alice Smith": 5, bot: 2},
+    }
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+
+    def page(name):
+        with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
+            return f.read()
+
+    assert f"{badge}, Alice Smith" in page("index.html")  # Latest releases
+    assert f"{badge} (5), Alice Smith (3)" in page("tags.html")
+    authors = page("authors.html")
+    assert f"<tr><td>2023</td><td>{badge}</td>" in authors  # top author of the year
+    assert f'<td>{badge}</td><td class="num">2</td></tr>' in authors  # runner-up

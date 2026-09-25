@@ -480,7 +480,7 @@ class HTMLReportCreator(ReportCreator):
         for tag in latest:
             info = data.tags[tag]
             names = sorted(info["authors"], key=lambda a: (-info["authors"][a], a))
-            shown = ", ".join(html.escape(a) for a in names[:2])
+            shown = ", ".join(author_html(a) for a in names[:2])
             if len(names) > 2:
                 shown += f" +{len(names) - 2}"
             rows.append(
@@ -988,7 +988,7 @@ class HTMLReportCreator(ReportCreator):
             rest = allauthors[load_config()["max_authors"] :]
             max_list = load_config()["max_authors_list"]
             if len(rest) > max_list:
-                shown = ", ".join(html.escape(a) for a in rest[:max_list])
+                shown = ", ".join(author_html(a) for a in rest[:max_list])
                 more = len(rest) - max_list
                 f.write(
                     f'<p class="moreauthors">These didn\'t make it to the top:'
@@ -997,7 +997,7 @@ class HTMLReportCreator(ReportCreator):
             else:
                 f.write(
                     '<p class="moreauthors">These didn\'t make it to the top: {}</p>'.format(
-                        ", ".join(html.escape(a) for a in rest)
+                        ", ".join(author_html(a) for a in rest)
                     )
                 )
 
@@ -1322,11 +1322,11 @@ class HTMLReportCreator(ReportCreator):
                 authors_shown = authors_reversed[:max_tags_authors]
                 remaining = len(authors_reversed) - max_tags_authors
                 for i in authors_shown:
-                    authorinfo.append("%s (%d)" % (html.escape(i), data.tags[tag]["authors"][i]))
+                    authorinfo.append("%s (%d)" % (author_html(i), data.tags[tag]["authors"][i]))
                 authorinfo.append("<em>and %d more authors</em>" % remaining)
             else:
                 for i in authors_reversed:
-                    authorinfo.append("%s (%d)" % (html.escape(i), data.tags[tag]["authors"][i]))
+                    authorinfo.append("%s (%d)" % (author_html(i), data.tags[tag]["authors"][i]))
             f.write(
                 '<tr><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="num">%d</td><td>%s</td></tr>'
                 % (
@@ -1430,7 +1430,7 @@ class HTMLReportCreator(ReportCreator):
             for fs in risk_files[:50]:
                 f.write(
                     '<tr><td class="path">%s</td><td>%s</td><td class="num">%d</td></tr>'
-                    % (html.escape(fs["path"]), html.escape(fs["owner"]), fs["edits"])
+                    % (html.escape(fs["path"]), author_html(fs["owner"]), fs["edits"])
                 )
             f.write("</table></div>")
             if len(risk_files) > 50:
@@ -1457,7 +1457,7 @@ class HTMLReportCreator(ReportCreator):
             f.write(
                 '<tr><td>%s</td><td class="num">%d</td><td class="num">%d</td><td class="num">%d</td></tr>'
                 % (
-                    html.escape(a["author"]),
+                    author_html(a["author"]),
                     a["files_owned"],
                     a["files_solely_owned"],
                     a["files_touched"],
@@ -1494,7 +1494,7 @@ class HTMLReportCreator(ReportCreator):
                     % (
                         html.escape(fs["path"]),
                         fs["contributors"],
-                        html.escape(fs["owner"]),
+                        author_html(fs["owner"]),
                         fs["ownership_pct"],
                     )
                 )
@@ -1778,9 +1778,9 @@ class HTMLReportCreator(ReportCreator):
             commits = authors_by_period[key][authors[0]]
             total = commits_by_period[key]
             rows.append(
-                f"<tr><td>{key}</td><td>{html.escape(authors[0])}</td>"
+                f"<tr><td>{key}</td><td>{author_html(authors[0])}</td>"
                 f'<td class="num">{commits} ({100.0 * commits / total:.2f}% of {total})</td>'
-                f"<td>{', '.join(html.escape(a) for a in authors[1 : top + 1])}</td>"
+                f"<td>{', '.join(author_html(a) for a in authors[1 : top + 1])}</td>"
                 f'<td class="num">{len(authors)}</td></tr>'
             )
         rows.append("</table></div>")
