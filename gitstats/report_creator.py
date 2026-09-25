@@ -374,7 +374,7 @@ class HTMLReportCreator(ReportCreator):
             info = data.get_author_info(author)
             width = 100.0 * info["commits"] / top
             rows.append(
-                f"<tr><td>{html.escape(author)}</td>"
+                f"<tr><td>{author_html(author)}</td>"
                 f'<td class="num">{format_int(info["commits"])}</td>'
                 f'<td class="num">{info["commits_frac"]:.1f}%</td>'
                 f'<td class="share-cell"><span class="share-bar" aria-hidden="true">'
@@ -759,7 +759,7 @@ class HTMLReportCreator(ReportCreator):
             else:
                 marks = []
                 label = f"{name}: {commits} commits"
-            bot = " bot" if author.endswith("[bot]") else ""
+            bot = " bot" if is_bot(author) else ""
             rows.append(
                 f'<div class="timeline-row{bot}" role="img" aria-label="{label}">'
                 f'<span class="timeline-name">{name}</span>'
@@ -802,7 +802,7 @@ class HTMLReportCreator(ReportCreator):
             f.write(
                 '<tr><td>%s</td><td class="num">%d (%.2f%%)</td><td class="num">%d</td><td class="num">%d</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap num" title="%s days">%s</td><td class="num">%d</td><td class="num">%d</td></tr>'
                 % (
-                    html.escape(author),
+                    author_html(author),
                     info["commits"],
                     info["commits_frac"],
                     info["lines_added"],
@@ -1934,7 +1934,7 @@ def compute_code_ownership(author_files: dict[str, dict[str, int]]) -> dict[str,
     # Invert to file -> {author: edits}, dropping bots.
     file_authors: dict[str, dict[str, int]] = {}
     for author, files in author_files.items():
-        if author.endswith("[bot]"):
+        if is_bot(author):
             continue
         for filepath, count in files.items():
             file_authors.setdefault(filepath, {})[author] = count
@@ -2061,7 +2061,7 @@ def compute_project_history(data: Any) -> dict[str, Any]:
     newcomers_by_year: dict[int, list[str]] = {}
     for name, info in (getattr(data, "authors", {}) or {}).items():
         stamp = info.get("first_commit_stamp") if isinstance(info, dict) else None
-        if not stamp or name.endswith("[bot]"):
+        if not stamp or is_bot(name):
             continue
         yy = datetime.datetime.fromtimestamp(stamp).year
         newcomers_by_year.setdefault(yy, []).append(name)
@@ -2145,6 +2145,17 @@ def parse_chronicle(text: str) -> dict[str, Any]:
 
     prologue = " ".join(line for line in prologue_lines if line).strip()
     return {"prologue": prologue, "chapters": chapters}
+
+
+def is_bot(name: str) -> bool:
+    """Bot accounts are named like ``dependabot[bot]``."""
+    return name.endswith("[bot]")
+
+
+def author_html(name: str) -> str:
+    """An author's name, HTML-escaped, with a BOT badge for bot accounts."""
+    badge = ' <span class="badge">bot</span>' if is_bot(name) else ""
+    return html.escape(name) + badge
 
 
 def month_range(months: Any) -> list[str]:

@@ -9,6 +9,7 @@ from gitstats.report_creator import (
     HTMLReportCreator,
     ReportCreator,
     _classify_eras,
+    author_html,
     compute_code_ownership,
     compute_project_history,
     get_keys_sorted_by_value_key,
@@ -559,6 +560,28 @@ def test_index_without_tags_has_no_releases(mock_data_collector, temp_dir):
     assert "Latest Releases" not in html
     assert "overview-columns" not in html
     assert "Top Contributors" in html
+
+
+def test_author_html_marks_bots():
+    assert author_html("Alice Smith") == "Alice Smith"
+    assert author_html("dependabot[bot]") == 'dependabot[bot] <span class="badge">bot</span>'
+    assert author_html("<Eve>") == "&lt;Eve&gt;"
+
+
+def test_bot_badges_in_contributor_tables(mock_data_collector, temp_dir):
+    bot = {**mock_data_collector.authors["Charlie Brown"]}
+    mock_data_collector.authors = {**mock_data_collector.authors, "renovate[bot]": bot}
+    mock_data_collector.get_authors.side_effect = lambda limit=None: [
+        "Alice Smith",
+        "Bob Jones",
+        "renovate[bot]",
+    ][:limit]
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    badge = 'renovate[bot] <span class="badge">bot</span>'
+    with open(f"{temp_dir}/index.html", encoding="utf-8") as f:
+        assert f"<tr><td>{badge}</td>" in f.read()  # Top Contributors
+    with open(f"{temp_dir}/authors.html", encoding="utf-8") as f:
+        assert f"<tr><td>{badge}</td>" in f.read()  # List of Authors
 
 
 def test_index_release_authors_are_capped_and_escaped(mock_data_collector, temp_dir):
