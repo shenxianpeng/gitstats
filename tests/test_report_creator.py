@@ -1213,11 +1213,14 @@ def test_numeric_columns_are_marked(mock_data_collector, temp_dir):
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     with open(os.path.join(temp_dir, "authors.html"), encoding="utf-8") as f:
         authors = f.read()
-    # Alice Smith: 30 commits (60%), +2000 / -500, 12 active days, rank 1
+    # Alice Smith: 30 commits (60%) with a full-width share bar, +2,000 / -500
     assert (
-        '<tr><td>Alice Smith</td><td class="num">30 (60.00%)</td>'
-        '<td class="num">2000</td><td class="num">500</td>'
+        '<tr><td>Alice Smith</td><td class="num">30 (60.00%)'
+        '<span class="share-bar share-bar-inline" aria-hidden="true">'
+        '<span style="width: 100.0%"></span></span></td>'
+        '<td class="num stat-added">2,000</td><td class="num stat-removed">500</td>'
     ) in authors
+    assert '<span style="width: 50.0%">' in authors  # Bob: 15 of Alice's 30
     assert '<th class="num">Commits (%)</th>' in authors
     assert '<th class="unsortable num">Age</th>' in authors
     # Text columns stay left-aligned
@@ -1227,6 +1230,41 @@ def test_numeric_columns_are_marked(mock_data_collector, temp_dir):
         files = f.read()
     assert '<th class="num">Files (%)</th>' in files
     assert '<td class="num">10 (40.00%)</td>' in files  # py: 10 of 25 files
+
+
+def test_authors_summary_and_folded_tables(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_authors_html(mock_data_collector, temp_dir)
+    with open(f"{temp_dir}/authors.html", encoding="utf-8") as f:
+        html = f.read()
+
+    # 3 authors; Alice (60%) and Bob (30%) wrote 90% of commits; no bots
+    assert (
+        '<h1>Authors</h1><p class="page-meta">3 authors &middot; top 2 wrote 90.0% of commits</p>'
+        in html
+    )
+    # Author of Month / Year tables are folded away, headings and anchors kept
+    months = len(mock_data_collector.author_of_month)
+    assert (
+        '<details class="table-details"><summary>Table: top author of each month '
+        f"({months} months with commits)</summary>"
+    ) in html
+    assert "<summary>Table: top author of each year (" in html
+    assert html.index('id="author_of_month"') < html.index("top author of each month")
+    assert html.count("</table></div></details>") == 2
+
+
+def test_authors_summary_counts_bots(mock_data_collector):
+    mock_data_collector.get_authors.side_effect = lambda limit=None: [
+        "Alice Smith",
+        "renovate[bot]",
+        "dependabot[bot]",
+    ][:limit]
+    mock_data_collector.get_author_info.side_effect = lambda a: {"commits_frac": 40.0}
+    summary = HTMLReportCreator()._authors_summary_html(mock_data_collector)
+    assert "3 authors &middot; top 2 wrote 80.0% of commits &middot; 2 bot accounts" in summary
 
 
 def test_small_formatting_fixes(mock_data_collector, temp_dir):

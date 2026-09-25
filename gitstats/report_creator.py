@@ -838,6 +838,20 @@ class HTMLReportCreator(ReportCreator):
             "</div></div>"
         )
 
+    def _authors_summary_html(self, data: Any) -> str:
+        """One line under the Authors heading: how many, how concentrated, how many bots."""
+        everyone = data.get_authors()
+        parts = [f"{format_int(len(everyone))} author{'' if len(everyone) == 1 else 's'}"]
+        top = everyone[:2]
+        if top:
+            share = sum(data.get_author_info(a)["commits_frac"] for a in top)
+            who = "top author" if len(top) == 1 else "top 2"
+            parts.append(f"{who} wrote {share:.1f}% of commits")
+        bots = sum(1 for a in everyone if is_bot(a))
+        if bots:
+            parts.append(f"{bots} bot account{'' if bots == 1 else 's'}")
+        return '<p class="page-meta">' + " &middot; ".join(parts) + "</p>"
+
     def create_authors_html(self, data: Any, path: str) -> None:
         ###
         # Authors
@@ -846,6 +860,7 @@ class HTMLReportCreator(ReportCreator):
 
         self.print_nav(f, "authors.html")
         f.write("<h1>Authors</h1>")
+        f.write(self._authors_summary_html(data))
 
         # Authors :: List of authors
         f.write(html_header(2, "List of Authors"))
@@ -854,16 +869,24 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<tr><th>Author</th><th class="num">Commits (%)</th><th class="num">+ lines</th><th class="num">- lines</th><th>First commit</th><th>Last commit</th><th class="unsortable num">Age</th><th class="num">Active days</th><th class="num"># by commits</th></tr>'
         )
-        for author in data.get_authors(load_config()["max_authors"]):
+        listed = data.get_authors(load_config()["max_authors"])
+        top_commits = max((data.get_author_info(a)["commits"] for a in listed), default=0) or 1
+        for author in listed:
             info = data.get_author_info(author)
+            # A thin bar under the commit count shows the share relative to the top author
+            share_bar = (
+                '<span class="share-bar share-bar-inline" aria-hidden="true">'
+                f'<span style="width: {100.0 * info["commits"] / top_commits:.1f}%"></span></span>'
+            )
             f.write(
-                '<tr><td>%s</td><td class="num">%d (%.2f%%)</td><td class="num">%d</td><td class="num">%d</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap num" title="%s days">%s</td><td class="num">%d</td><td class="num">%d</td></tr>'
+                '<tr><td>%s</td><td class="num">%d (%.2f%%)%s</td><td class="num stat-added">%s</td><td class="num stat-removed">%s</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap num" title="%s days">%s</td><td class="num">%d</td><td class="num">%d</td></tr>'
                 % (
                     author_html(author),
                     info["commits"],
                     info["commits_frac"],
-                    info["lines_added"],
-                    info["lines_removed"],
+                    share_bar,
+                    format_int(info["lines_added"]),
+                    format_int(info["lines_removed"]),
                     info["date_first"],
                     info["date_last"],
                     format_int(info["timedelta"].days),
@@ -924,8 +947,13 @@ class HTMLReportCreator(ReportCreator):
                 % load_config()["max_authors"]
             )
 
-        # Authors :: Author of Month
+        # Authors :: Author of Month (a long table, folded away by default)
         f.write(html_header(2, "Author of Month"))
+        months = len(data.author_of_month)
+        f.write(
+            '<details class="table-details"><summary>Table: top author of each month '
+            f"({months} month{'' if months == 1 else 's'} with commits)</summary>"
+        )
         f.write('<div class="table-scroll"><table class="sortable" id="aom">')
         f.write(
             '<tr><th>Month</th><th>Author</th><th class="num">Commits (%%)</th><th class="unsortable">Next top %d</th><th class="num">Number of authors</th></tr>'
@@ -952,9 +980,14 @@ class HTMLReportCreator(ReportCreator):
                 )
             )
 
-        f.write("</table></div>")
+        f.write("</table></div></details>")
 
         f.write(html_header(2, "Author of Year"))
+        years = len(data.author_of_year)
+        f.write(
+            '<details class="table-details"><summary>Table: top author of each year '
+            f"({years} year{'' if years == 1 else 's'} with commits)</summary>"
+        )
         f.write(
             '<div class="table-scroll"><table class="sortable" id="aoy"><tr><th>Year</th><th>Author</th><th class="num">Commits (%%)</th><th class="unsortable">Next top %d</th><th class="num">Number of authors</th></tr>'
             % load_config()["authors_top"]
@@ -979,7 +1012,7 @@ class HTMLReportCreator(ReportCreator):
                     len(authors),
                 )
             )
-        f.write("</table></div>")
+        f.write("</table></div></details>")
 
         # Domains
         f.write(html_header(2, "Commits by Domains"))

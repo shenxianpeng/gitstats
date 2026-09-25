@@ -214,6 +214,12 @@ dd {
 	background-color: var(--bar-color);
 }
 
+/* The same bar, thinner, under a number inside a table cell */
+.share-bar-inline {
+	height: 3px;
+	margin-top: 3px;
+}
+
 /* ===== Stat Tiles (KPI cards) ===== */
 /* stat_tiles_html() sets --cols / --cols-md / --cols-sm to divisors of the
    tile count, so rows are always full; the 1px gap over the border-colored
