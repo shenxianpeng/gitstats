@@ -4,6 +4,47 @@
  * Palette: OpenCode warm grayscale (#211E1E / #F1ECEC)
  */
 
+/* ===== Fonts ===== */
+/* IBM Plex Mono, bundled so the report looks the same on every system
+   (SIL OFL 1.1, see IBMPlexMono-LICENSE.txt). Latin-1 subsets as published
+   in @ibm/plex-mono 2.5.0; characters outside the range fall back to the
+   next font in --font-mono. A locally installed Plex is used first. */
+@font-face {
+	font-family: "IBM Plex Mono";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: local("IBM Plex Mono"), local("IBMPlexMono"), url("IBMPlexMono-Regular-Latin1.woff2") format("woff2");
+	unicode-range: U+0020-007E, U+00A0-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2013-2014, U+2018-201A, U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+2044, U+20AC, U+2122, U+2212, U+FB01-FB02;
+}
+
+@font-face {
+	font-family: "IBM Plex Mono";
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: local("IBM Plex Mono Medm"), local("IBMPlexMono-Medm"), url("IBMPlexMono-Medium-Latin1.woff2") format("woff2");
+	unicode-range: U+0020-007E, U+00A0-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2013-2014, U+2018-201A, U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+2044, U+20AC, U+2122, U+2212, U+FB01-FB02;
+}
+
+@font-face {
+	font-family: "IBM Plex Mono";
+	font-style: normal;
+	font-weight: 600;
+	font-display: swap;
+	src: local("IBM Plex Mono SmBld"), local("IBMPlexMono-SmBld"), url("IBMPlexMono-SemiBold-Latin1.woff2") format("woff2");
+	unicode-range: U+0020-007E, U+00A0-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2013-2014, U+2018-201A, U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+2044, U+20AC, U+2122, U+2212, U+FB01-FB02;
+}
+
+@font-face {
+	font-family: "IBM Plex Mono";
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: local("IBM Plex Mono Bold"), local("IBMPlexMono-Bold"), url("IBMPlexMono-Bold-Latin1.woff2") format("woff2");
+	unicode-range: U+0020-007E, U+00A0-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2013-2014, U+2018-201A, U+201C-201E, U+2020-2022, U+2026, U+2030, U+2039-203A, U+2044, U+20AC, U+2122, U+2212, U+FB01-FB02;
+}
+
 /* ===== CSS Custom Properties ===== */
 :root {
 	/* Typography — OpenCode uses IBM Plex Mono / Inter */

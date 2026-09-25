@@ -21,6 +21,7 @@ from typing import Any
 
 from gitstats import load_config
 from gitstats.report_creator import (
+    FONT_FILES,
     THEME_INIT_SCRIPT,
     THEME_SCRIPT,
     THEME_TOGGLE_BUTTON,
@@ -210,6 +211,7 @@ class AggregateReportCreator:
         for file in (
             load_config()["style"],
             "sortable.js",
+            *FONT_FILES,
         ):
             src = os.path.join(basedir, file)
             target = os.path.abspath(os.path.join(base, os.path.basename(file)))

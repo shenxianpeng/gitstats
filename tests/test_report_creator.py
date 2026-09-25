@@ -1,11 +1,14 @@
 """Tests for gitstats.report_creator – HTML generation, helpers, chart rendering."""
 
 import os
+import re
 from io import StringIO
 
 import pytest
 
+import gitstats.report_creator
 from gitstats.report_creator import (
+    FONT_FILES,
     HTMLReportCreator,
     ReportCreator,
     _classify_eras,
@@ -1111,6 +1114,9 @@ def test_create_copies_static_files(mock_data_collector, temp_dir):
 
     for fname in ("sortable.js", "chart.umd.min.js", "gitstats.css"):
         assert os.path.exists(f"{temp_dir}/{fname}"), f"Missing static file: {fname}"
+    # IBM Plex Mono and its OFL license travel with every report
+    for fname in FONT_FILES:
+        assert os.path.exists(f"{temp_dir}/{fname}"), f"Missing font file: {fname}"
     # Sort arrows are drawn by CSS now; the old GIFs are no longer shipped
     assert not any(name.endswith(".gif") for name in os.listdir(temp_dir))
     with open(f"{temp_dir}/sortable.js", "rb") as f:
@@ -1138,6 +1144,28 @@ def test_numeric_columns_are_marked(mock_data_collector, temp_dir):
         files = f.read()
     assert '<th class="num">Files (%)</th>' in files
     assert '<td class="num">10 (40.00%)</td>' in files  # py: 10 of 25 files
+
+
+def test_bundled_fonts_match_stylesheet():
+    """Every font the stylesheet loads is a real WOFF2 file in the package."""
+    package_dir = os.path.dirname(gitstats.report_creator.__file__)
+    with open(os.path.join(package_dir, "gitstats.css"), encoding="utf-8") as f:
+        css = f.read()
+    referenced = set(re.findall(r'url\("([^"]+\.woff2)"\)', css))
+    bundled = {name for name in FONT_FILES if name.endswith(".woff2")}
+    assert referenced == bundled
+    for name in bundled:
+        with open(os.path.join(package_dir, name), "rb") as f:
+            assert f.read(4) == b"wOF2", name
+    # One @font-face per weight used by the stylesheet
+    assert sorted(re.findall(r"font-weight: (\d+);\n\tfont-display: swap", css)) == [
+        "400",
+        "500",
+        "600",
+        "700",
+    ]
+    with open(os.path.join(package_dir, "IBMPlexMono-LICENSE.txt"), encoding="utf-8") as f:
+        assert "SIL Open Font License, Version 1.1" in f.read()
 
 
 def test_small_formatting_fixes(mock_data_collector, temp_dir):

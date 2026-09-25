@@ -265,6 +265,9 @@ class TestAggregateReportCreator:
         assert os.path.exists(os.path.join(temp_dir, "sortable.js"))
         assert os.path.exists(os.path.join(temp_dir, "gitstats.css"))
         assert not os.path.exists(os.path.join(temp_dir, "chart.umd.min.js"))
+        # The shared stylesheet loads the bundled font, so the portfolio ships it too
+        assert os.path.exists(os.path.join(temp_dir, "IBMPlexMono-Regular-Latin1.woff2"))
+        assert os.path.exists(os.path.join(temp_dir, "IBMPlexMono-LICENSE.txt"))
 
     def test_failures_section_escaped(self, temp_dir):
         html = self._render(

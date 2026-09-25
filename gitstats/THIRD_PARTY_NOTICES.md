@@ -21,3 +21,17 @@ To upgrade: download the UMD build from https://www.jsdelivr.com/package/npm/cha
 - **Usage**: Client-side table sorting in HTML reports
 - **Modifications**: sort indicators are drawn by CSS from a `data-sort` attribute instead of
   `arrow-*.gif` images, and the sorted header cell gets `aria-sort`
+
+## IBMPlexMono-*-Latin1.woff2
+
+- **Name**: IBM Plex Mono (Regular, Medium, SemiBold, Bold; Latin-1 subsets)
+- **Author**: IBM Corp. (Reserved Font Name "Plex")
+- **Version**: @ibm/plex-mono 2.5.0 (`fonts/split/woff2/`)
+- **Source**: https://github.com/IBM/plex, https://www.jsdelivr.com/package/npm/@ibm/plex-mono
+- **License**: SIL Open Font License 1.1, full text in `IBMPlexMono-LICENSE.txt`
+  (copied next to the fonts in every report)
+- **Usage**: Monospace headings, labels and numbers in HTML reports (`@font-face` in `gitstats.css`)
+- **Modifications**: none; files are the upstream subsets, unrenamed
+
+To upgrade: replace the four `.woff2` files and the license from the same package path, and
+update the `unicode-range` in `gitstats.css` from the package's `IBMPlexMono-*.css` if it changed.

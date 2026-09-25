@@ -173,6 +173,16 @@ THEME_TOGGLE_BUTTON = (
     f'aria-label="Switch to dark mode">{_THEME_TOGGLE_ICONS}</button>'
 )
 
+# Bundled IBM Plex Mono (see @font-face in gitstats.css) and its OFL license,
+# which must travel with the font files
+FONT_FILES = (
+    "IBMPlexMono-Regular-Latin1.woff2",
+    "IBMPlexMono-Medium-Latin1.woff2",
+    "IBMPlexMono-SemiBold-Latin1.woff2",
+    "IBMPlexMono-Bold-Latin1.woff2",
+    "IBMPlexMono-LICENSE.txt",
+)
+
 NAV_PAGES = (
     ("index.html", "General"),
     ("activity.html", "Activity"),
@@ -232,6 +242,7 @@ class HTMLReportCreator(ReportCreator):
             load_config()["style"],
             "sortable.js",
             "chart.umd.min.js",
+            *FONT_FILES,
         ):
             src = basedir + "/" + file
             if os.path.exists(src):
