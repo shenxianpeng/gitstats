@@ -201,7 +201,24 @@ def test_render_chartjs_aspect_ratio():
         [{"label": "C", "data": [1]}],
         aspect_ratio=5,
     )
-    assert "aspectRatio: 5" in result
+    # The ratio sizes the CSS box; Chart.js fills it so the box's min-height
+    # can keep charts readable on phones
+    assert '<div class="chart-box" style="--chart-ratio: 5">' in result
+    assert "maintainAspectRatio: false" in result
+    assert "aspectRatio:" not in result
+
+
+def test_render_chartjs_legend_box_class():
+    creator = HTMLReportCreator()
+    multi = creator._render_chartjs(
+        "chart-legend",
+        "line",
+        ["X"],
+        [{"label": "A", "data": [1]}, {"label": "B", "data": [2]}],
+    )
+    single = creator._render_chartjs("chart-single", "bar", ["X"], [{"label": "C", "data": [1]}])
+    assert 'class="chart-box has-legend"' in multi
+    assert "has-legend" not in single
 
 
 def test_render_chartjs_max_bar_thickness():
