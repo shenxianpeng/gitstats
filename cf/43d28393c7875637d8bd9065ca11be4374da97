@@ -1,0 +1,25 @@
+gitstats/report_creator.py
+  s_36d3a463a5505b::t_a26a4ecbf7647b 1921-1922,1924-1925,1938,1940-1941,1944-1945,1947-1948,1950-1954
+  s_36d3a463a5505b::t_2966a28dbde529 1126,1131-1132,1134-1140,1144-1146,1848-1850,1946,1949
+  s_36d3a463a5505b::t_439f77e2b0eae7 1955-1956,1997
+tests/test_report_creator.py
+  s_36d3a463a5505b::t_af5eeff9cc10e5 1783-1785
+  s_36d3a463a5505b::t_74684b18985599 1747-1782
+  s_36d3a463a5505b::t_ba49696f7bab96 274
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "cf43d28393c7875637d8bd9065ca11be4374da97",
+  "prompts": {},
+  "sessions": {
+    "s_36d3a463a5505b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d57d16d-e8d6-4ee3-bed8-3b835be6549d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
