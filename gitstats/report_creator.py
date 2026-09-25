@@ -1076,43 +1076,29 @@ class HTMLReportCreator(ReportCreator):
             )
         f.write("</table></div></details>")
 
-        # Domains
+        # Domains: a bar table (the numbers used to be shown twice, as a table and a chart)
         f.write(html_header(2, "Commits by Domains"))
         domains_by_commits = get_keys_sorted_by_value_key(data.domains, "commits")
         domains_by_commits.reverse()  # most first
-        f.write(_FLEX_CONTAINER)
-        f.write('<div class="table-scroll"><table>')
-        f.write('<tr><th>Domains</th><th class="num">Total (%)</th></tr>')
-        dom_labels = []
-        dom_values = []
-        n = 0
-        for domain in domains_by_commits:
-            if n == load_config()["max_domains"]:
-                break
-            n += 1
-            info = data.get_domain_info(domain)
-            dom_labels.append(domain)
-            dom_values.append(info["commits"])
-            f.write(
-                '<tr><td>%s</td><td class="num">%d (%.2f%%)</td></tr>'
-                % (
-                    html.escape(domain),
-                    info["commits"],
-                    (100.0 * info["commits"] / data.get_total_commits()),
-                )
+        top_domains = domains_by_commits[: load_config()["max_domains"]]
+        busiest = max((data.get_domain_info(d)["commits"] for d in top_domains), default=0) or 1
+        total = data.get_total_commits() or 1
+        rows = []
+        for domain in top_domains:
+            commits = data.get_domain_info(domain)["commits"]
+            rows.append(
+                f"<tr><td>{html.escape(domain)}</td>"
+                f'<td class="num">{format_int(commits)}</td>'
+                f'<td class="num">{100.0 * commits / total:.1f}%</td>'
+                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                f'<span style="width: {100.0 * commits / busiest:.1f}%"></span></span></td></tr>'
             )
-        f.write("</table></div>")
-        f.write(_FLEX_CHILD)
         f.write(
-            self._render_chartjs(
-                "chart-domains",
-                "bar",
-                dom_labels,
-                [{"label": "Commits", "data": dom_values}],
-                x_ticks_rotate=True,
-            )
+            '<div class="table-scroll"><table class="share-table">'
+            '<tr><th>Domain</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr>'
+            + "".join(rows)
+            + "</table></div>"
         )
-        f.write(_FLEX_CLOSE)
 
         # Contributor Growth Over Time
         if data.new_contributors_by_month:
@@ -1233,30 +1219,20 @@ class HTMLReportCreator(ReportCreator):
             churn_sorted = sorted(data.file_churn.items(), key=lambda x: x[1], reverse=True)
             top_churn = churn_sorted[:25]
             max_churn = max(1, top_churn[0][1]) if top_churn else 1
-            churn_labels = [item[0] for item in top_churn]
-            churn_values = [item[1] for item in top_churn]
+            # A bar table: the counts used to be shown twice, in a heat-colored
+            # table and a bar chart whose rotated path labels were unreadable
+            rows = [
+                f'<tr><td class="path">{html.escape(filepath)}</td>'
+                f'<td class="num">{format_int(count)}</td>'
+                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                f'<span style="width: {100.0 * count / max_churn:.1f}%"></span></span></td></tr>'
+                for filepath, count in top_churn
+            ]
             f.write(
-                '<div class="table-scroll"><table class="sortable" id="churn"><tr><th>File</th><th class="num">Times Changed</th></tr>'
-            )
-            for filepath, count in top_churn:
-                f.write(
-                    '<tr><td class="%s path">%s</td><td class="num">%d</td></tr>'
-                    % (
-                        self._heat_td_class(count, max_churn),
-                        html.escape(filepath),
-                        count,
-                    )
-                )
-            f.write("</table></div>")
-            f.write(
-                self._render_chartjs(
-                    "chart-file-churn",
-                    "bar",
-                    churn_labels,
-                    [{"label": "Commits", "data": churn_values}],
-                    x_ticks_rotate=True,
-                    aspect_ratio=3,
-                )
+                '<div class="table-scroll"><table class="sortable share-table" id="churn">'
+                '<tr><th>File</th><th class="num">Times Changed</th><th class="unsortable"></th></tr>'
+                + "".join(rows)
+                + "</table></div>"
             )
 
         self.print_footer(f)

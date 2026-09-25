@@ -909,9 +909,14 @@ def test_create_authors_html(mock_data_collector, temp_dir):
     assert "Author of Year" in html
     assert "Domains" in html
     assert "example.com" in html
-    # Domains are data cells, not uppercased header cells
+    # Domains are data cells (not uppercased header cells) in a bar table
     assert "<tr><td>example.com</td>" in html
     assert "<th>example.com</th>" not in html
+    assert (
+        '<tr><th>Domain</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr>'
+        in html
+    )
+    assert "chart-domains" not in html
     assert "Contributor Growth" in html
 
 
@@ -1451,8 +1456,14 @@ def test_file_paths_are_monospace_cells(mock_data_collector, temp_dir):
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     with open(f"{temp_dir}/files.html", encoding="utf-8") as f:
         files = f.read()
-    # Churn table: the heat class stays, plus the path class
-    assert '<td class="heat heat4 path">main.py</td>' in files
+    # Churn: a bar table of paths; no heat-colored cells, no duplicate chart
+    assert (
+        '<tr><td class="path">main.py</td><td class="num">15</td>'
+        '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+        '<span style="width: 100.0%"></span></span></td></tr>'
+    ) in files
+    assert '<span style="width: 66.7%">' in files  # utils.py: 10 of 15
+    assert "chart-file-churn" not in files
     with open(f"{temp_dir}/ownership.html", encoding="utf-8") as f:
         ownership = f.read()
     assert ownership.count('<td class="path">') >= 2  # single-owner and shared tables
