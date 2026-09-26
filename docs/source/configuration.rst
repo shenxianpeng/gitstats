@@ -4,7 +4,7 @@ Configuration
 
 You can create a ``gitstats.conf`` file in the current directory to customize the configuration.
 
-* ``max_domains`` - Maximum number of domains to display in "Domains by Commits". Default: ``10``.
+* ``max_domains`` - Maximum number of domains to display in "Commits by domain". Default: ``10``.
 * ``max_ext_length`` - Maximum length of file extensions shown in statistics. Default: ``10``.
 * ``style`` - CSS stylesheet for the generated report. Default: ``gitstats.css``.
 * ``max_authors`` - Maximum number of authors to list in "Authors". Default: ``20``.
