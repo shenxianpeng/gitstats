@@ -733,7 +733,7 @@ class TestRunIntegration:
             index = f.read()
         assert 'href="git_repo/index.html"' in index
         assert 'href="git_repo_minimal/index.html"' in index
-        assert "Totals" in index
+        assert '<dl class="stat-tiles"' in index
         # Per-repo pages must not leak into the output root
         assert not os.path.exists(f"{output}/activity.html")
 

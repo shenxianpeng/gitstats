@@ -191,17 +191,18 @@ class TestAggregateReportCreator:
         assert 'href="beta/index.html"' in html
         assert "history-era-steady" in html
         assert "history-era-dormant" in html
-        # Distinct authors = union, not the naive per-repo sum
-        assert "<tr><td>Distinct Authors</td><td>2</td></tr>" in html
-        assert "<tr><td>Total Commits</td><td>150</td></tr>" in html
-        # Activity insight rows
-        assert "<tr><td>Commits (last 12 mo)</td><td>20</td></tr>" in html
-        assert "<tr><td>Active Repositories (12 mo)</td><td>2 / 2</td></tr>" in html
-        assert "<tr><td>Lines of Code</td><td>2,000</td></tr>" in html
-        # Low-insight totals rows are gone (Last Commit remains a table column)
-        assert "<tr><td>Total Tags</td>" not in html
-        assert "<tr><td>Last Commit</td>" not in html
-        assert "<tr><td>Total Lines of Code</td>" not in html
+        # Totals as stat tiles; distinct authors = union, not the naive per-repo sum
+        assert (
+            '<dt>Repositories</dt><dd class="stat-value">2</dd>'
+            '<dd class="stat-note">2 active in the last 12 months</dd>'
+        ) in html
+        assert (
+            '<dt>Commits</dt><dd class="stat-value">150</dd>'
+            '<dd class="stat-note">20 in the last 12 months</dd>'
+        ) in html
+        assert '<dt>Authors</dt><dd class="stat-value">2</dd>' in html
+        assert '<dt>Lines of Code</dt><dd class="stat-value">2,000</dd>' in html
+        assert "<h2>Totals</h2>" not in html
         # Repo table: Since column (first-commit year) replaces Age (days)
         assert "<th>Since</th>" in html
         assert "Age (days)" not in html
@@ -224,9 +225,10 @@ class TestAggregateReportCreator:
             [_summary("alpha", 10, {"Alice": 10})],
             failures=[{"name": "bad", "path": "/x", "error": "boom"}],
         )
-        assert html.count("<table") == 3
-        assert html.count('<div class="table-scroll"><table') == 3
-        assert html.count("</table></div>") == 3
+        # the repository and failure tables (totals are stat tiles)
+        assert html.count("<table") == 2
+        assert html.count('<div class="table-scroll"><table') == 2
+        assert html.count("</table></div>") == 2
 
     def test_thousands_separators(self, temp_dir):
         html = self._render(
@@ -242,9 +244,9 @@ class TestAggregateReportCreator:
             ],
         )
 
-        assert "<tr><td>Total Commits</td><td>1,234,567</td></tr>" in html
-        assert "<tr><td>Commits (last 12 mo)</td><td>78,432</td></tr>" in html
-        assert "<tr><td>Lines of Code</td><td>44,025,623</td></tr>" in html
+        assert '<dt>Commits</dt><dd class="stat-value">1,234,567</dd>' in html
+        assert '<dd class="stat-note">78,432 in the last 12 months</dd>' in html
+        assert '<dt>Lines of Code</dt><dd class="stat-value">44,025,623</dd>' in html
         # Repository table: numeric columns are right-aligned
         assert '<td class="num">1,234,567</td>' in html
         assert '<td class="num">44,025,623</td>' in html
@@ -258,7 +260,7 @@ class TestAggregateReportCreator:
             ],
         )
 
-        assert "<tr><td>Active Repositories (12 mo)</td><td>1 / 2</td></tr>" in html
+        assert '<dd class="stat-note">1 active in the last 12 months</dd>' in html
 
     def test_assets_copied(self, temp_dir):
         self._render(temp_dir, [_summary("alpha", 1, {"A": 1})])
