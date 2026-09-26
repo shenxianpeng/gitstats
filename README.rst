@@ -61,7 +61,17 @@
 Example
 -------
 
-``gitstats .`` generates this `gitstats report <https://shenxianpeng.dev/gitstats/index.html>`_.
+``gitstats .`` generates this `gitstats report <https://shenxianpeng.dev/gitstats/index.html>`_:
+
+.. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/report-dark.png#gh-dark-mode-only
+   :alt: The overview page of a gitstats report
+   :width: 100%
+   :target: https://shenxianpeng.dev/gitstats/index.html
+
+.. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/report-light.png#gh-light-mode-only
+   :alt: The overview page of a gitstats report
+   :width: 100%
+   :target: https://shenxianpeng.dev/gitstats/index.html
 
 Check out the `GitStats Gallery <https://shenxianpeng.dev/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly.
 
