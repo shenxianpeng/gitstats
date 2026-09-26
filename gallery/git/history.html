@@ -5,34 +5,233 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Git</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.2.post1.dev1">
+	<meta name="generator" content="GitStats 2.7.0">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -46,13 +245,13 @@
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
             <li><a href="ownership.html">Code Ownership</a></li>
-            <li><a href="history.html">History</a></li>
+            <li><a href="history.html" class="active" aria-current="page">History</a></li>
             
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>History</h1><div class="history-summary"><p>The project's life, one year at a time, told from the commit record: how activity rose and fell against the project's own baseline, who arrived when, and what was released.</p><dl><dt>Span</dt><dd>2005 – 2026 (22 years)</dd><dt>Peak year</dt><dd>2007</dd><dt>Releases</dt><dd>0</dd></dl></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2005</span><span class="history-era history-era-birth">BIRTH</span><span class="history-era-desc">first commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:58.3%"></div></div><p class="history-facts">3137 commits (3.8%) &middot; +116655 / &minus;40057 lines &middot; 118 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1285 commits)</p><p class="history-people">First commits: Junio C Hamano, Linus Torvalds, Kay Sievers, Johannes Schindelin, Paul Mackerras, Petr Baudis (+112 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2006</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:84.6%"></div></div><p class="history-facts">4551 commits (5.5%) &middot; +123108 / &minus;51723 lines &middot; 150 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (2110 commits)</p><p class="history-people">First commits: Shawn O. Pearce, Jakub Narębski, Alexandre Julliard, Matthias Lederhofer, Jeff King, Dennis Stosberg (+89 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2007</span><span class="history-era history-era-peak">PEAK</span><span class="history-era-desc">busiest year</span></div><div class="history-bar-track"><div class="history-bar" style="width:100.0%"></div></div><p class="history-facts">5381 commits (6.5%) &middot; +157425 / &minus;58477 lines &middot; 265 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1499 commits)</p><p class="history-people">First commits: Simon Hausmann, Frank Lichtenheld, Steffen Prohaska, Greg Hurrell, Mike Hommey, Kristian Høgsberg (+166 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2008</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:74.2%"></div></div><p class="history-facts">3992 commits (4.9%) &middot; +117180 / &minus;42761 lines &middot; 299 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1260 commits)</p><p class="history-people">First commits: Alexander Gavrilov, Thomas Rast, Stephan Beyer, SZEDER Gábor, Jonathan Nieder, Lee Marlow (+170 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2009</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:68.6%"></div></div><p class="history-facts">3689 commits (4.5%) &middot; +86256 / &minus;23012 lines &middot; 292 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1291 commits)</p><p class="history-people">First commits: Stephen Boyd, Tay Ray Chuan, Felipe Contreras, Björn Gustavsson, Kjetil Barvik, Erik Faye-Lund (+144 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2010</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:69.1%"></div></div><p class="history-facts">3716 commits (4.5%) &middot; +99004 / &minus;30115 lines &middot; 254 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1302 commits)</p><p class="history-people">First commits: Ævar Arnfjörð Bjarmason, Ramkumar Ramachandra, David Barr, Gary V. Vaughan, Bo Yang, Jakub Suder (+110 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2011</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:61.7%"></div></div><p class="history-facts">3318 commits (4.0%) &middot; +68092 / &minus;27711 lines &middot; 195 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1439 commits)</p><p class="history-people">First commits: Dmitry Ivankov, Carlos Martín Nieto, Vitor Antunes, Valentin Haenel, Conrad Irwin, Vincent van Ravesteijn (+90 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2012</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:67.3%"></div></div><p class="history-facts">3622 commits (4.4%) &middot; +158179 / &minus;50699 lines &middot; 210 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1572 commits)</p><p class="history-people">First commits: Michael G. Schwern, Adam Spiers, Stefano Lattarini, Florian Achleitner, Trần Ngọc Quân, Thomas Ackermann (+103 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2013</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:77.5%"></div></div><p class="history-facts">4169 commits (5.1%) &middot; +127615 / &minus;65814 lines &middot; 230 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1651 commits)</p><p class="history-people">First commits: Stefan Beller, Célestin Matte, Kevin Bracey, Richard Hansen, Vicent Marti, Yann Droneaud (+114 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2014</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:55.2%"></div></div><p class="history-facts">2969 commits (3.6%) &middot; +121892 / &minus;70362 lines &middot; 204 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1124 commits)</p><p class="history-people">First commits: Ronnie Sahlberg, Tanay Abhra, Brian Gesiak, Dmitry S. Dolzhenko, Alexander Shopov, David Turner (+107 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2015</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:59.4%"></div></div><p class="history-facts">3198 commits (3.9%) &middot; +146659 / &minus;88483 lines &middot; 183 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1351 commits)</p><p class="history-people">First commits: Paul Tan, Karthik Nayak, Lars Schneider, YOKOTA Hiroshi, Patrick Steinhardt, Remi Lespinet (+83 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2016</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:69.3%"></div></div><p class="history-facts">3731 commits (4.5%) &middot; +204543 / &minus;121056 lines &middot; 196 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1459 commits)</p><p class="history-people">First commits: Vasco Almeida, Brandon Williams, Jonathan Tan, Pranit Bauva, Mehul Jain, Kazuki Yamaguchi (+92 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2017</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:83.1%"></div></div><p class="history-facts">4469 commits (5.4%) &middot; +217830 / &minus;132303 lines &middot; 201 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1624 commits)</p><p class="history-people">First commits: Martin Ågren, Kaartic Sivaraam, Phillip Wood, Jeff Smith, Ben Peart, Cornelius Weig (+91 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2018</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:82.7%"></div></div><p class="history-facts">4451 commits (5.4%) &middot; +267001 / &minus;167996 lines &middot; 192 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1169 commits)</p><p class="history-people">First commits: Pratik Karki, Alban Gruin, Matthew DeVore, Carlo Marcelo Arenas Belón, Henning Schild, Wink Saville (+87 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2019</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:69.2%"></div></div><p class="history-facts">3725 commits (4.5%) &middot; +279050 / &minus;159254 lines &middot; 207 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1027 commits)</p><p class="history-people">First commits: Pratyush Yadav, Heba Waly, Alexandr Miloslavskiy, Rohit Ashiwal, James Coglan, Emily Shaffer (+95 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2020</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:66.0%"></div></div><p class="history-facts">3549 commits (4.3%) &middot; +368167 / &minus;222530 lines &middot; 203 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1062 commits)</p><p class="history-people">First commits: Nipunn Koorapati, Shourya Shukla, Emir Sarı, Aaron Lipman, Sibi Siddharthan, Sean Barag (+91 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2021</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:72.8%"></div></div><p class="history-facts">3919 commits (4.8%) &middot; +334889 / &minus;238273 lines &middot; 181 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1111 commits)</p><p class="history-people">First commits: Andrzej Hunt, Luke Shumaker, Fabian Stelzer, Bagas Sanjaya, ZheNing Hu, Atharva Raykar (+86 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2022</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:65.4%"></div></div><p class="history-facts">3519 commits (4.3%) &middot; +367108 / &minus;376383 lines &middot; 164 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1070 commits)</p><p class="history-people">First commits: Shaoxuan Yuan, Abhradeep Chakraborty, Robert Coup, Emir SARI, Siddharth Asthana, Eric DeCosta (+66 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2023</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:52.7%"></div></div><p class="history-facts">2835 commits (3.4%) &middot; +96642 / &minus;44766 lines &middot; 151 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (921 commits)</p><p class="history-people">First commits: Jacob Abel, Andy Koppe, Shuqi Liang, Jan Alexander Steffens (heftig), Arkadii Yakovets, Michael Strawbridge (+57 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2024</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:73.7%"></div></div><p class="history-facts">3967 commits (4.8%) &middot; +117920 / &minus;52535 lines &middot; 168 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1287 commits)</p><p class="history-people">First commits: Andrew Kreimer, shejialuo, Ghanshyam Thakkar, Justin Tobler, Bence Ferdinandy, Brian Lyles (+83 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2025</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:64.9%"></div></div><p class="history-facts">3491 commits (4.2%) &middot; +146069 / &minus;86289 lines &middot; 176 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1111 commits)</p><p class="history-people">First commits: Aditya Garg, Julia Evans, Lidong Yan, Ezekiel Newren, Lucas Seiki Oshiro, Ayush Chandekar (+78 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2026</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:54.0%"></div></div><p class="history-facts">2907 commits (3.5%) &middot; +110338 / &minus;52723 lines &middot; 192 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (864 commits)</p><p class="history-people">First commits: Pablo Sabater, Kristofer Karlsson, Tian Yuchen, Michael Montalbo, Mirko Faina, Siddharth Shrimali (+105 more)</p></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+            <h1>History</h1><p class="section-note">The project's life, one year at a time, told from the commit record: how activity rose and fell against the project's own baseline, who arrived when, and what was released.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Span</dt><dd class="stat-value">2005 – 2026</dd><dd class="stat-note">22 years</dd></div><div class="stat-tile"><dt>Peak Year</dt><dd class="stat-value">2007</dd><dd class="stat-note">5,381 commits</dd></div><div class="stat-tile"><dt>Releases</dt><dd class="stat-value">1,009</dd><dd class="stat-note">latest in 2026</dd></div></dl><div class="history-year"><div class="history-year-head"><span class="history-year-num">2005</span><span class="history-era history-era-birth">BIRTH</span><span class="history-era-desc">first commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:58.3%"></div></div><p class="history-facts">3,137 commits (3.8%) &middot; +116,655 / &minus;40,057 lines &middot; 118 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,285 commits)</p><p class="history-people">First commits: Junio C Hamano, Linus Torvalds, Kay Sievers, Johannes Schindelin, Paul Mackerras, Petr Baudis (+112 more)</p><p class="history-people">Released: v0.99, v0.99.1, v0.99.2, v0.99.3, v0.99.4 (+45 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2006</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:84.6%"></div></div><p class="history-facts">4,551 commits (5.5%) &middot; +123,108 / &minus;51,723 lines &middot; 150 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (2,110 commits)</p><p class="history-people">First commits: Shawn O. Pearce, Jakub Narębski, Alexandre Julliard, Matthias Lederhofer, Jeff King, Dennis Stosberg (+89 more)</p><p class="history-people">Released: v1.0.7, v1.0.8, v1.1.0, v1.0.9, v1.1.1 (+56 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2007</span><span class="history-era history-era-peak">PEAK</span><span class="history-era-desc">busiest year</span></div><div class="history-bar-track"><div class="history-bar" style="width:100.0%"></div></div><p class="history-facts">5,381 commits (6.5%) &middot; +157,425 / &minus;58,477 lines &middot; 265 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,499 commits)</p><p class="history-people">First commits: Simon Hausmann, Frank Lichtenheld, Steffen Prohaska, Greg Hurrell, Mike Hommey, Kristian Høgsberg (+166 more)</p><p class="history-people">Released: v1.4.4.4, v1.5.0-rc1, v1.5.0-rc2, v1.5.0-rc3, v1.5.0-rc4 (+67 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2008</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:74.2%"></div></div><p class="history-facts">3,992 commits (4.9%) &middot; +117,180 / &minus;42,761 lines &middot; 299 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,260 commits)</p><p class="history-people">First commits: Alexander Gavrilov, Thomas Rast, Stephan Beyer, SZEDER Gábor, Jonathan Nieder, Lee Marlow (+170 more)</p><p class="history-people">Released: v1.5.3.8, v1.5.4-rc3, v1.5.4-rc4, gitgui-0.9.2, v1.5.4-rc5 (+52 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2009</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:68.6%"></div></div><p class="history-facts">3,689 commits (4.5%) &middot; +86,256 / &minus;23,012 lines &middot; 292 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,291 commits)</p><p class="history-people">First commits: Stephen Boyd, Tay Ray Chuan, Felipe Contreras, Björn Gustavsson, Kjetil Barvik, Erik Faye-Lund (+144 more)</p><p class="history-people">Released: v1.6.1.1, v1.6.1.2, v1.6.1.3, v1.6.2-rc0, v1.6.2-rc1 (+45 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2010</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:69.1%"></div></div><p class="history-facts">3,716 commits (4.5%) &middot; +99,004 / &minus;30,115 lines &middot; 254 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,302 commits)</p><p class="history-people">First commits: Ævar Arnfjörð Bjarmason, Ramkumar Ramachandra, David Barr, Gary V. Vaughan, Bo Yang, Jakub Suder (+110 more)</p><p class="history-people">Released: v1.6.5.8, v1.6.6.1, v1.7.0-rc0, v1.7.0-rc1, v1.7.0-rc2 (+42 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2011</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:61.7%"></div></div><p class="history-facts">3,318 commits (4.0%) &middot; +68,092 / &minus;27,711 lines &middot; 195 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,439 commits)</p><p class="history-people">First commits: Dmitry Ivankov, Carlos Martín Nieto, Vitor Antunes, Valentin Haenel, Conrad Irwin, Vincent van Ravesteijn (+90 more)</p><p class="history-people">Released: v1.7.3.5, v1.7.4-rc1, v1.7.4-rc2, v1.7.4-rc3, v1.7.4 (+45 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2012</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:67.3%"></div></div><p class="history-facts">3,622 commits (4.4%) &middot; +158,179 / &minus;50,699 lines &middot; 210 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,572 commits)</p><p class="history-people">First commits: Michael G. Schwern, Adam Spiers, Stefano Lattarini, Florian Achleitner, Trần Ngọc Quân, Thomas Ackermann (+103 more)</p><p class="history-people">Released: v1.7.8.3, v1.7.9-rc0, v1.7.9-rc1, v1.7.7.6, v1.7.8.4 (+59 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2013</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:77.5%"></div></div><p class="history-facts">4,169 commits (5.1%) &middot; +127,615 / &minus;65,814 lines &middot; 230 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,651 commits)</p><p class="history-people">First commits: Stefan Beller, Célestin Matte, Kevin Bracey, Richard Hansen, Vicent Marti, Yann Droneaud (+114 more)</p><p class="history-people">Released: v1.8.1.1, v1.8.1.2, v1.8.1.3, v1.8.2-rc0, v1.8.1.4 (+37 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2014</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:55.2%"></div></div><p class="history-facts">2,969 commits (3.6%) &middot; +121,892 / &minus;70,362 lines &middot; 204 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,124 commits)</p><p class="history-people">First commits: Ronnie Sahlberg, Tanay Abhra, Brian Gesiak, Dmitry S. Dolzhenko, Alexander Shopov, David Turner (+107 more)</p><p class="history-people">Released: v1.8.5.3, v1.9-rc0, gitgui-0.19.0, v1.9-rc1, v1.9-rc2 (+35 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2015</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:59.4%"></div></div><p class="history-facts">3,198 commits (3.9%) &middot; +146,659 / &minus;88,483 lines &middot; 183 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,351 commits)</p><p class="history-people">First commits: Paul Tan, Karthik Nayak, Lars Schneider, YOKOTA Hiroshi, Patrick Steinhardt, Remi Lespinet (+83 more)</p><p class="history-people">Released: v2.2.2, v2.3.0-rc0, v2.3.0-rc1, v2.3.0-rc2, v2.3.0 (+49 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2016</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:69.3%"></div></div><p class="history-facts">3,731 commits (4.5%) &middot; +204,543 / &minus;121,056 lines &middot; 196 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,459 commits)</p><p class="history-people">First commits: Vasco Almeida, Brandon Williams, Jonathan Tan, Pranit Bauva, Mehul Jain, Kazuki Yamaguchi (+92 more)</p><p class="history-people">Released: v2.6.5, v2.7.0, v2.7.1, v2.7.2, v2.8.0-rc0 (+33 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2017</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:83.1%"></div></div><p class="history-facts">4,469 commits (5.4%) &middot; +217,830 / &minus;132,303 lines &middot; 201 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,624 commits)</p><p class="history-people">First commits: Martin Ågren, Kaartic Sivaraam, Phillip Wood, Jeff Smith, Ben Peart, Cornelius Weig (+91 more)</p><p class="history-people">Released: v2.11.1, v2.12.0-rc0, v2.12.0-rc1, v2.12.0-rc2, v2.12.0 (+42 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2018</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:82.7%"></div></div><p class="history-facts">4,451 commits (5.4%) &middot; +267,001 / &minus;167,996 lines &middot; 192 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,169 commits)</p><p class="history-people">First commits: Pratik Karki, Alban Gruin, Matthew DeVore, Carlo Marcelo Arenas Belón, Henning Schild, Wink Saville (+87 more)</p><p class="history-people">Released: v2.16.0-rc1, v2.16.0-rc2, v2.16.0, v2.16.1, v2.16.2 (+30 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2019</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:69.2%"></div></div><p class="history-facts">3,725 commits (4.5%) &middot; +279,050 / &minus;159,254 lines &middot; 207 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,027 commits)</p><p class="history-people">First commits: Pratyush Yadav, Heba Waly, Alexandr Miloslavskiy, Rohit Ashiwal, James Coglan, Emily Shaffer (+95 more)</p><p class="history-people">Released: v2.21.0-rc0, v2.21.0-rc1, v2.21.0-rc2, v2.21.0, v2.22.0-rc0 (+25 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2020</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:66.0%"></div></div><p class="history-facts">3,549 commits (4.3%) &middot; +368,167 / &minus;222,530 lines &middot; 203 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,062 commits)</p><p class="history-people">First commits: Nipunn Koorapati, Shourya Shukla, Emir Sarı, Aaron Lipman, Sibi Siddharthan, Sean Barag (+91 more)</p><p class="history-people">Released: v2.25.0-rc1, v2.25.0-rc2, v2.25.0, v2.25.1, v2.26.0-rc0 (+42 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2021</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:72.8%"></div></div><p class="history-facts">3,919 commits (4.8%) &middot; +334,889 / &minus;238,273 lines &middot; 181 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,111 commits)</p><p class="history-people">First commits: Andrzej Hunt, Luke Shumaker, Fabian Stelzer, Bagas Sanjaya, ZheNing Hu, Atharva Raykar (+86 more)</p><p class="history-people">Released: v2.17.6, v2.30.1, v2.18.5, v2.19.6, v2.20.5 (+30 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2022</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:65.4%"></div></div><p class="history-facts">3,519 commits (4.3%) &middot; +367,108 / &minus;376,383 lines &middot; 164 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,070 commits)</p><p class="history-people">First commits: Shaoxuan Yuan, Abhradeep Chakraborty, Robert Coup, Emir SARI, Siddharth Asthana, Eric DeCosta (+66 more)</p><p class="history-people">Released: v2.35.0-rc0, v2.35.0-rc1, v2.35.0-rc2, v2.35.0, v2.35.1 (+59 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2023</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:52.7%"></div></div><p class="history-facts">2,835 commits (3.4%) &middot; +96,642 / &minus;44,766 lines &middot; 151 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (921 commits)</p><p class="history-people">First commits: Jacob Abel, Andy Koppe, Shuqi Liang, Jan Alexander Steffens (heftig), Arkadii Yakovets, Michael Strawbridge (+57 more)</p><p class="history-people">Released: v2.30.8, v2.31.7, v2.32.6, v2.33.7, v2.34.7 (+33 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2024</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:73.7%"></div></div><p class="history-facts">3,967 commits (4.8%) &middot; +117,920 / &minus;52,535 lines &middot; 168 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,287 commits)</p><p class="history-people">First commits: Andrew Kreimer, shejialuo, Ghanshyam Thakkar, Justin Tobler, Bence Ferdinandy, Brian Lyles (+83 more)</p><p class="history-people">Released: v2.43.1, v2.44.0-rc0, v2.43.2, v2.44.0-rc1, v2.44.0-rc2 (+39 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2025</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:64.9%"></div></div><p class="history-facts">3,491 commits (4.2%) &middot; +146,069 / &minus;86,289 lines &middot; 176 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (1,111 commits)</p><p class="history-people">First commits: Aditya Garg, Julia Evans, Lidong Yan, Ezekiel Newren, Lucas Seiki Oshiro, Ayush Chandekar (+78 more)</p><p class="history-people">Released: v2.48.0-rc2, v2.48.0, v2.48.1, v2.49.0-rc0, v2.49.0-rc1 (+24 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2026</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:54.1%"></div></div><p class="history-facts">2,909 commits (3.5%) &middot; +110,368 / &minus;53,030 lines &middot; 192 authors</p><p class="history-people">Led by <strong>Junio C Hamano</strong> (866 commits)</p><p class="history-people">First commits: Pablo Sabater, Kristofer Karlsson, Tian Yuchen, Michael Montalbo, Mirko Faina, Siddharth Shrimali (+105 more)</p><p class="history-people">Released: v2.53.0-rc0, v2.53.0-rc1, v2.53.0-rc2, v2.53.0, v2.54.0-rc0 (+10 more)</p></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body></html>

@@ -5,34 +5,233 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Django</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.2.post1.dev1">
+	<meta name="generator" content="GitStats 2.7.0">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -45,23 +244,23 @@
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
-            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="ownership.html" class="active" aria-current="page">Code Ownership</a></li>
             <li><a href="history.html">History</a></li>
             
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Code Ownership</h1><div class="ownership-summary"><p>Ownership is measured by how many commits each author made to each file. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl><dt>Files tracked</dt><dd>11760</dd><dt>Single-owner files</dt><dd>3376 (28.7%)</dd><dt>Contributors</dt><dd>3172</dd></dl></div>
-<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus Factor Risk — Single-Owner Files</a></h2>
+            <h1>Code Ownership</h1><p class="section-note">Ownership is measured by how many commits each author made to each file in the current tree. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Files Tracked</dt><dd class="stat-value">7,089</dd><dd class="stat-note">in the current tree</dd></div><div class="stat-tile"><dt>Single-Owner Files</dt><dd class="stat-value">1,830</dd><dd class="stat-note">25.8% of tracked files</dd></div><div class="stat-tile"><dt>Contributors</dt><dd class="stat-value">3,129</dd><dd class="stat-note">authors who changed files</dd></div></dl>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus factor risk — single-owner files</a></h2>
 
-<p><em>Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</em></p><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th>Commits</th></tr><tr><td>django/apps/cache.py</td><td>Aymeric Augustin</td><td>29</td></tr><tr><td>tests/modeltests/schema/tests.py</td><td>Andrew Godwin</td><td>23</td></tr><tr><td>django/utils/httpwrappers.py</td><td>Adrian Holovaty</td><td>22</td></tr><tr><td>django/core/apps/cache.py</td><td>Aymeric Augustin</td><td>16</td></tr><tr><td>tests/testapp/models/__init__.py</td><td>Adrian Holovaty</td><td>13</td></tr><tr><td>django/core/template/loader.py</td><td>Adrian Holovaty</td><td>12</td></tr><tr><td>django/views/auth/login.py</td><td>Adrian Holovaty</td><td>11</td></tr><tr><td>django/middleware/sessions.py</td><td>Adrian Holovaty</td><td>11</td></tr><tr><td>tests/testapp/models/lookup.py</td><td>Adrian Holovaty</td><td>10</td></tr><tr><td>django/contrib/admindocs/locale/zh_Hans/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>9</td></tr><tr><td>django/contrib/admindocs/locale/zh_Hans/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>9</td></tr><tr><td>tests/modeltests/schema/models.py</td><td>Andrew Godwin</td><td>9</td></tr><tr><td>django/models/__init__.py</td><td>Adrian Holovaty</td><td>9</td></tr><tr><td>django/middleware/admin.py</td><td>Adrian Holovaty</td><td>9</td></tr><tr><td>django/contrib/redirects/locale/zh_Hans/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>8</td></tr><tr><td>django/contrib/redirects/locale/zh_Hans/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>8</td></tr><tr><td>django/contrib/postgres/locale/eo/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>8</td></tr><tr><td>django/contrib/postgres/locale/eo/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>8</td></tr><tr><td>django/contrib/admin/locale/br/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>8</td></tr><tr><td>ez_setup.py</td><td>Adrian Holovaty</td><td>8</td></tr><tr><td>django/contrib/comments/models/comments.py</td><td>Adrian Holovaty</td><td>8</td></tr><tr><td>tests/testapp/models/custom_pk.py</td><td>Adrian Holovaty</td><td>8</td></tr><tr><td>django/contrib/postgres/locale/et/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/postgres/locale/et/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/postgres/locale/gd/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/postgres/locale/gd/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/postgres/locale/lt/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/postgres/locale/lt/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/postgres/locale/mk/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/postgres/locale/mk/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/postgres/locale/mn/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/postgres/locale/mn/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/postgres/locale/nb/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/postgres/locale/nb/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/flatpages/locale/zh_Hans/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/flatpages/locale/zh_Hans/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/admin/locale/br/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/admin/locale/br/LC_MESSAGES/djangojs.mo</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/admin/locale/br/LC_MESSAGES/djangojs.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/admindocs/locale/br/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/admindocs/locale/br/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/auth/locale/br/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/auth/locale/br/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/humanize/locale/br/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/humanize/locale/br/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/admin/locale/es_VE/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/admin/locale/ia/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/admin/locale/lb/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/admin/locale/my/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr><tr><td>django/contrib/admin/locale/os/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td>7</td></tr></table><p class="moreauthors">Showing top 50 of 3376 single-owner files.</p>
-<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by Author</a></h2>
+<p class="section-note">Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</p><div class="table-scroll"><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">django/contrib/admindocs/locale/zh_Hans/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">9</td></tr><tr><td class="path">django/contrib/admindocs/locale/zh_Hans/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">9</td></tr><tr><td class="path">django/contrib/redirects/locale/zh_Hans/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">8</td></tr><tr><td class="path">django/contrib/redirects/locale/zh_Hans/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">8</td></tr><tr><td class="path">django/contrib/postgres/locale/eo/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">8</td></tr><tr><td class="path">django/contrib/postgres/locale/eo/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">8</td></tr><tr><td class="path">django/contrib/admin/locale/br/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">8</td></tr><tr><td class="path">django/contrib/postgres/locale/et/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/postgres/locale/et/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/postgres/locale/gd/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">7</td></tr></table></div><details class="table-details"><summary>Table: the 100 most-changed of 1,830 single-owner files</summary><div class="table-scroll"><table class="sortable" id="ownership-busfactor-all"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">django/contrib/admindocs/locale/zh_Hans/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">9</td></tr><tr><td class="path">django/contrib/admindocs/locale/zh_Hans/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">9</td></tr><tr><td class="path">django/contrib/redirects/locale/zh_Hans/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">8</td></tr><tr><td class="path">django/contrib/redirects/locale/zh_Hans/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">8</td></tr><tr><td class="path">django/contrib/postgres/locale/eo/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">8</td></tr><tr><td class="path">django/contrib/postgres/locale/eo/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">8</td></tr><tr><td class="path">django/contrib/admin/locale/br/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">8</td></tr><tr><td class="path">django/contrib/postgres/locale/et/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/postgres/locale/et/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/postgres/locale/gd/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/postgres/locale/gd/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/postgres/locale/lt/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/postgres/locale/lt/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/postgres/locale/mk/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/postgres/locale/mk/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/postgres/locale/mn/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/postgres/locale/mn/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/postgres/locale/nb/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/postgres/locale/nb/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/flatpages/locale/zh_Hans/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/flatpages/locale/zh_Hans/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/admin/locale/br/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/admin/locale/br/LC_MESSAGES/djangojs.mo</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/admin/locale/br/LC_MESSAGES/djangojs.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/admindocs/locale/br/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/admindocs/locale/br/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/auth/locale/br/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/auth/locale/br/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/humanize/locale/br/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/humanize/locale/br/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/admin/locale/es_VE/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/admin/locale/ia/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/admin/locale/lb/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/admin/locale/my/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">django/contrib/admin/locale/os/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">7</td></tr><tr><td class="path">scripts/do_django_release.py</td><td>Natalia</td><td class="num">6</td></tr><tr><td class="path">django/contrib/postgres/locale/pt/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/postgres/locale/pt/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/contenttypes/locale/zh_Hans/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/contenttypes/locale/zh_Hans/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/postgres/locale/fa/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/postgres/locale/fa/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/flatpages/locale/br/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/flatpages/locale/br/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/redirects/locale/br/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/redirects/locale/br/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/sessions/locale/br/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/sessions/locale/br/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/sites/locale/br/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/sites/locale/br/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/ast/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/es_VE/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/es_VE/LC_MESSAGES/djangojs.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/es_VE/LC_MESSAGES/djangojs.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/ia/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/ia/LC_MESSAGES/djangojs.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/ia/LC_MESSAGES/djangojs.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/io/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/lb/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/my/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/my/LC_MESSAGES/djangojs.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/my/LC_MESSAGES/djangojs.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/os/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/os/LC_MESSAGES/djangojs.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admin/locale/os/LC_MESSAGES/djangojs.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admindocs/locale/es_VE/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admindocs/locale/es_VE/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admindocs/locale/ia/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admindocs/locale/ia/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admindocs/locale/my/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admindocs/locale/my/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admindocs/locale/os/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/admindocs/locale/os/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/auth/locale/es_VE/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/auth/locale/es_VE/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/auth/locale/my/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/auth/locale/my/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/auth/locale/os/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/auth/locale/os/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/flatpages/locale/es_VE/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/flatpages/locale/es_VE/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/humanize/locale/ia/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/humanize/locale/ia/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">django/contrib/sessions/locale/be/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">6</td></tr><tr><td class="path">docs/releases/1.4.22.txt</td><td>Tim Graham</td><td class="num">5</td></tr><tr><td class="path">django/contrib/admindocs/locale/dsb/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/postgres/locale/eu/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/postgres/locale/eu/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/redirects/locale/dsb/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/flatpages/locale/dsb/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/flatpages/locale/hsb/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/postgres/locale/ro/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/postgres/locale/ro/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/admin/locale/ast/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/admin/locale/ast/LC_MESSAGES/djangojs.mo</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/admin/locale/ast/LC_MESSAGES/djangojs.po</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/admin/locale/io/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/admindocs/locale/ast/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/admindocs/locale/ast/LC_MESSAGES/django.po</td><td>Claude Paroz</td><td class="num">5</td></tr><tr><td class="path">django/contrib/auth/locale/ast/LC_MESSAGES/django.mo</td><td>Claude Paroz</td><td class="num">5</td></tr></table></div></details>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by author</a></h2>
 
-<p><em>Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</em></p><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th>Files owned</th><th>Solely owned</th><th>Files touched</th></tr><tr><td>Claude Paroz</td><td>2382</td><td>530</td><td>5498</td></tr><tr><td>Jannis Leidel</td><td>1501</td><td>228</td><td>3724</td></tr><tr><td>Tim Graham</td><td>1356</td><td>153</td><td>2937</td></tr><tr><td>Florian Apolloner</td><td>645</td><td>540</td><td>1649</td></tr><tr><td>Russell Keith-Magee</td><td>642</td><td>182</td><td>1685</td></tr><tr><td>Adrian Holovaty</td><td>571</td><td>346</td><td>1380</td></tr><tr><td>django-bot</td><td>486</td><td>0</td><td>2196</td></tr><tr><td>Mariusz Felisiak</td><td>439</td><td>85</td><td>2454</td></tr><tr><td>Malcolm Tredinnick</td><td>293</td><td>45</td><td>991</td></tr><tr><td>Aymeric Augustin</td><td>289</td><td>93</td><td>1984</td></tr><tr><td>Jacob Kaplan-Moss</td><td>196</td><td>67</td><td>1011</td></tr><tr><td>Preston Timmons</td><td>170</td><td>84</td><td>462</td></tr><tr><td>Justin Bronn</td><td>144</td><td>80</td><td>388</td></tr><tr><td>Ramiro Morales</td><td>124</td><td>44</td><td>750</td></tr><tr><td>Simon Charette</td><td>119</td><td>12</td><td>998</td></tr><tr><td>Natalia</td><td>113</td><td>41</td><td>1012</td></tr><tr><td>Julien Phalip</td><td>111</td><td>4</td><td>405</td></tr><tr><td>elky</td><td>89</td><td>25</td><td>130</td></tr><tr><td>Luke Plant</td><td>81</td><td>26</td><td>597</td></tr><tr><td>David Smith</td><td>69</td><td>41</td><td>817</td></tr><tr><td>Wilson Miner</td><td>65</td><td>43</td><td>83</td></tr><tr><td>Andrew Godwin</td><td>62</td><td>38</td><td>310</td></tr><tr><td>Nick Pope</td><td>60</td><td>24</td><td>715</td></tr><tr><td>Johannes Maron</td><td>60</td><td>4</td><td>179</td></tr><tr><td>Trey Hunner</td><td>60</td><td>0</td><td>118</td></tr></table><p class="moreauthors">Showing top 25 of 3172 contributors.</p>
-<h2 id="most_shared_files"><a href="#most_shared_files">Most Shared Files</a></h2>
+<p class="section-note">Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</p><div class="table-scroll"><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th class="num">Files owned</th><th class="num">Solely owned</th><th class="num">Files touched</th></tr><tr><td>Claude Paroz</td><td class="num">2,192</td><td class="num">482</td><td class="num">4,181</td></tr><tr><td>Tim Graham</td><td class="num">993</td><td class="num">132</td><td class="num">2,012</td></tr><tr><td>Jannis Leidel</td><td class="num">553</td><td class="num">60</td><td class="num">2,129</td></tr><tr><td>django-bot</td><td class="num">471</td><td class="num">0</td><td class="num">2,160</td></tr><tr><td>Mariusz Felisiak</td><td class="num">393</td><td class="num">81</td><td class="num">2,363</td></tr><tr><td>Florian Apolloner</td><td class="num">327</td><td class="num">290</td><td class="num">1,089</td></tr><tr><td>Preston Timmons</td><td class="num">143</td><td class="num">79</td><td class="num">356</td></tr><tr><td>Aymeric Augustin</td><td class="num">136</td><td class="num">41</td><td class="num">923</td></tr><tr><td>Natalia</td><td class="num">108</td><td class="num">37</td><td class="num">1,002</td></tr><tr><td>Simon Charette</td><td class="num">103</td><td class="num">11</td><td class="num">895</td></tr><tr><td>David Smith</td><td class="num">67</td><td class="num">39</td><td class="num">802</td></tr><tr><td>Russell Keith-Magee</td><td class="num">65</td><td class="num">13</td><td class="num">555</td></tr><tr><td>Adrian Holovaty</td><td class="num">63</td><td class="num">17</td><td class="num">412</td></tr><tr><td>Johannes Maron</td><td class="num">58</td><td class="num">2</td><td class="num">172</td></tr><tr><td>Nick Pope</td><td class="num">57</td><td class="num">22</td><td class="num">689</td></tr><tr><td>Jon Dufresne</td><td class="num">53</td><td class="num">2</td><td class="num">936</td></tr><tr><td>Carlton Gibson</td><td class="num">52</td><td class="num">21</td><td class="num">1,085</td></tr><tr><td>Jacob Walls</td><td class="num">52</td><td class="num">15</td><td class="num">767</td></tr><tr><td>Trey Hunner</td><td class="num">46</td><td class="num">0</td><td class="num">92</td></tr><tr><td>Andrew Godwin</td><td class="num">44</td><td class="num">25</td><td class="num">244</td></tr><tr><td>Tom Carrick</td><td class="num">37</td><td class="num">0</td><td class="num">210</td></tr><tr><td>Markus Holtermann</td><td class="num">34</td><td class="num">19</td><td class="num">257</td></tr><tr><td>Sarah Boyce</td><td class="num">31</td><td class="num">8</td><td class="num">692</td></tr><tr><td>Georg Bauer</td><td class="num">30</td><td class="num">0</td><td class="num">77</td></tr><tr><td>Jacob Kaplan-Moss</td><td class="num">27</td><td class="num">1</td><td class="num">387</td></tr></table></div><p class="moreauthors">Showing top 25 of 3129 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most shared files</a></h2>
 
-<p><em>Files touched by the most people — shared code where changes are most likely to need coordination.</em></p><table class="sortable" id="ownership-shared"><tr><th>File</th><th>Contributors</th><th>Primary owner</th><th>Owner share</th></tr><tr><td>AUTHORS</td><td>584</td><td>Malcolm Tredinnick</td><td>19.4%</td></tr><tr><td>tests/admin_views/tests.py</td><td>201</td><td>Tim Graham</td><td>15.8%</td></tr><tr><td>docs/ref/models/querysets.txt</td><td>189</td><td>Tim Graham</td><td>13.7%</td></tr><tr><td>docs/ref/contrib/admin/index.txt</td><td>189</td><td>Tim Graham</td><td>17.6%</td></tr><tr><td>django/db/models/query.py</td><td>174</td><td>Malcolm Tredinnick</td><td>7.1%</td></tr><tr><td>django/contrib/admin/options.py</td><td>167</td><td>Tim Graham</td><td>8.4%</td></tr><tr><td>docs/ref/settings.txt</td><td>162</td><td>Tim Graham</td><td>18.3%</td></tr><tr><td>docs/ref/django-admin.txt</td><td>150</td><td>Tim Graham</td><td>17.1%</td></tr><tr><td>docs/ref/models/fields.txt</td><td>143</td><td>Tim Graham</td><td>14.7%</td></tr><tr><td>django/db/models/fields/__init__.py</td><td>141</td><td>Malcolm Tredinnick</td><td>8.5%</td></tr><tr><td>docs/internals/deprecation.txt</td><td>133</td><td>Tim Graham</td><td>15.7%</td></tr><tr><td>django/db/models/base.py</td><td>130</td><td>Malcolm Tredinnick</td><td>10.3%</td></tr><tr><td>django/db/models/sql/query.py</td><td>127</td><td>Anssi Kääriäinen</td><td>15.0%</td></tr><tr><td>docs/ref/checks.txt</td><td>124</td><td>Tim Graham</td><td>14.1%</td></tr><tr><td>docs/ref/templates/builtins.txt</td><td>119</td><td>Tim Graham</td><td>17.0%</td></tr><tr><td>django/db/models/fields/related.py</td><td>114</td><td>Russell Keith-Magee</td><td>11.0%</td></tr><tr><td>docs/releases/1.8.txt</td><td>110</td><td>Tim Graham</td><td>24.2%</td></tr><tr><td>django/forms/models.py</td><td>109</td><td>Claude Paroz</td><td>9.1%</td></tr><tr><td>docs/releases/1.7.txt</td><td>107</td><td>Tim Graham</td><td>22.7%</td></tr><tr><td>docs/ref/request-response.txt</td><td>106</td><td>Tim Graham</td><td>13.5%</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+<p class="section-note">Files touched by the most people — shared code where changes are most likely to need coordination.</p><div class="table-scroll"><table class="sortable" id="ownership-shared"><tr><th>File</th><th class="num">Contributors</th><th>Primary owner</th><th class="num">Owner share</th></tr><tr><td class="path">AUTHORS</td><td class="num">584</td><td>Malcolm Tredinnick</td><td class="num">19.4%</td></tr><tr><td class="path">tests/admin_views/tests.py</td><td class="num">201</td><td>Tim Graham</td><td class="num">15.8%</td></tr><tr><td class="path">docs/ref/models/querysets.txt</td><td class="num">189</td><td>Tim Graham</td><td class="num">13.7%</td></tr><tr><td class="path">docs/ref/contrib/admin/index.txt</td><td class="num">189</td><td>Tim Graham</td><td class="num">17.6%</td></tr><tr><td class="path">django/db/models/query.py</td><td class="num">174</td><td>Malcolm Tredinnick</td><td class="num">7.1%</td></tr><tr><td class="path">django/contrib/admin/options.py</td><td class="num">167</td><td>Tim Graham</td><td class="num">8.4%</td></tr><tr><td class="path">docs/ref/settings.txt</td><td class="num">162</td><td>Tim Graham</td><td class="num">18.3%</td></tr><tr><td class="path">docs/ref/django-admin.txt</td><td class="num">150</td><td>Tim Graham</td><td class="num">17.1%</td></tr><tr><td class="path">docs/ref/models/fields.txt</td><td class="num">143</td><td>Tim Graham</td><td class="num">14.7%</td></tr><tr><td class="path">django/db/models/fields/__init__.py</td><td class="num">141</td><td>Malcolm Tredinnick</td><td class="num">8.5%</td></tr><tr><td class="path">docs/internals/deprecation.txt</td><td class="num">133</td><td>Tim Graham</td><td class="num">15.7%</td></tr><tr><td class="path">django/db/models/base.py</td><td class="num">130</td><td>Malcolm Tredinnick</td><td class="num">10.3%</td></tr><tr><td class="path">django/db/models/sql/query.py</td><td class="num">127</td><td>Anssi Kääriäinen</td><td class="num">15.0%</td></tr><tr><td class="path">docs/ref/checks.txt</td><td class="num">124</td><td>Tim Graham</td><td class="num">14.1%</td></tr><tr><td class="path">docs/ref/templates/builtins.txt</td><td class="num">119</td><td>Tim Graham</td><td class="num">17.0%</td></tr><tr><td class="path">django/db/models/fields/related.py</td><td class="num">114</td><td>Russell Keith-Magee</td><td class="num">11.0%</td></tr><tr><td class="path">docs/releases/1.8.txt</td><td class="num">110</td><td>Tim Graham</td><td class="num">24.2%</td></tr><tr><td class="path">django/forms/models.py</td><td class="num">109</td><td>Claude Paroz</td><td class="num">9.1%</td></tr><tr><td class="path">docs/releases/1.7.txt</td><td class="num">107</td><td>Tim Graham</td><td class="num">22.7%</td></tr><tr><td class="path">docs/ref/request-response.txt</td><td class="num">106</td><td>Tim Graham</td><td class="num">13.5%</td></tr></table></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body></html>

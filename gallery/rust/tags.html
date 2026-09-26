@@ -5,34 +5,233 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Rust</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.2.post1.dev1">
+	<meta name="generator" content="GitStats 2.7.0">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -44,15 +243,18 @@
             <li><a href="authors.html">Authors</a></li>
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
-            <li><a href="tags.html">Tags</a></li>
+            <li><a href="tags.html" class="active" aria-current="page">Tags</a></li>
             <li><a href="ownership.html">Code Ownership</a></li>
             <li><a href="history.html">History</a></li>
             
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Tags</h1><dl><dt>Total tags</dt><dd>0</dd></dl><table class="tags"><tr><th>Name</th><th>Date</th><th>Commits</th><th>Authors</th></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+            <h1>Tags</h1><dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">23</dd><dd class="stat-note"><span class="nowrap">latest 1.0.0-beta</span>&nbsp;&middot; <span class="nowrap">2015-04-02</span></dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">14849.4</dd><dd class="stat-note">341,536 commits in total</dd></div></dl>
+<h2 id="all_tags"><a href="#all_tags">All tags</a></h2>
+
+<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th>Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">1.0.0-beta</td><td class="nowrap">2015-04-02</td><td class="num">1,870</td><td>Manish Goregaokar (407), Alex Crichton (256), bors (191), Niko Matsakis (106), Felix S. Klock II (94), Steve Klabnik (81), Eduard-Mihai Burtescu (39), Flaper Fesp (32), Dave Huseby (27), Richo Healey (23), Jorge Aparicio (23), Nick Cameron (21), Björn Steinbrink (21), Tshepang Mbambo (20), Tamir Duberstein (20), Steven Fackler (19), Kang Seonghoon (19), Huon Wilson (18), Brian Anderson (18), Aaron Turon (18), Keegan McAllister (16), Simonas Kazlauskas (15), Ryan Prichard (11), Ms2ger (11), Vadim Petrochenkov (10), Tobias Bucher (10), Sébastien Marie (10), Marvin Löbel (9), Valerii Hiora (8), Michael Woerister (8), Ivan Petkov (8), Guillaume Gomez (8), FuGangqiang (8), Erick Tryzelaar (8), Andrew Paseltiner (8), emberian (7), James Miller (7), Jake Goulding (7), Seo Sanghyeon (6), Alexander Bliskovsky (6), York Xiang (5), Ulrik Sverdrup (5), Oliver Scherer (5), Kevin Yap (5), Junseok Lee (5), Edward Wang (5), Corey Farwell (5), Alexis Beingessner (5), bcoopers (4), Stepan Koltsov (4), <em>and 117 more authors</em></td></tr><tr><td class="nowrap">1.0.0-alpha.2</td><td class="nowrap">2015-02-19</td><td class="num">2,066</td><td>Alex Crichton (335), bors (260), Manish Goregaokar (183), Niko Matsakis (148), Steve Klabnik (105), Brian Anderson (81), Felix S. Klock II (60), Jorge Aparicio (59), Richo Healey (51), Eduard-Mihai Burtescu (47), Flaper Fesp (41), Huon Wilson (38), Barosl Lee (33), Simonas Kazlauskas (26), Björn Steinbrink (26), Keegan McAllister (22), Nick Cameron (21), Guillaume Gomez (20), Alexis Beingessner (19), Sébastien Marie (16), Tom Jakubowski (15), Aaron Turon (15), Kevin Yap (12), Steven Fackler (11), Alfie John (11), Valerii Hiora (10), Ahmed Charles (10), Eunji Jeong (9), Adolfo Ochagavía (9), Oliver Scherer (8), Ms2ger (8), Michael Woerister (8), Florian Hahn (8), Vojtech Kral (7), Vadim Petrochenkov (7), P1start (7), James Miller (7), Edward Wang (7), Tshepang Mbambo (6), Seo Sanghyeon (6), mdinger (5), Ulrik Sverdrup (5), Tobias Bucher (5), Thiago Carvalho (5), Sebastian Gesemann (5), Paul Collier (5), Liigo Zhuang (5), Kevin Butler (5), Brian Leibig (5), Peter Atashian (4), <em>and 151 more authors</em></td></tr><tr><td class="nowrap">1.0.0-alpha</td><td class="nowrap">2015-01-09</td><td class="num">3,757</td><td>Alex Crichton (631), bors (588), Jorge Aparicio (365), Niko Matsakis (328), Jakub Adam Wieczorek (110), Nick Cameron (109), Aaron Turon (99), Brian Anderson (89), Huon Wilson (72), Steve Klabnik (69), Brian Koropoff (58), emberian (54), Luqman Aden (44), Felix S. Klock II (44), Brendan Zabarauskas (43), Eduard-Mihai Burtescu (41), Keegan McAllister (30), Michael Woerister (26), Erick Tryzelaar (26), Steven Fackler (25), Barosl Lee (25), Chase Southwood (24), Alexis Beingessner (23), Flaper Fesp (22), Daniel Micay (22), P1start (18), Corey Farwell (17), Ariel Ben-Yehuda (17), Adolfo Ochagavía (17), Tom Jakubowski (16), Tobias Bucher (15), Simon Sapin (15), Daniel Hofstetter (15), jbranchaud (14), Tamir Duberstein (14), Piotr Czarnecki (14), NODA Kai (13), Joseph Crail (12), ville-h (11), Valerii Hiora (11), Vadim Chugunov (11), Seo Sanghyeon (11), Manish Goregaokar (11), Kang Seonghoon (11), John Gallagher (11), Cody P Schafer (11), gamazeps (10), Piotr Szotkowski (10), Julian Orth (10), Murarth (9), <em>and 207 more authors</em></td></tr><tr><td class="nowrap">0.12.0</td><td class="nowrap">2014-10-07</td><td class="num">2,902</td><td>bors (873), Alex Crichton (249), Brian Anderson (149), Steve Klabnik (115), Patrick Walton (65), Jonas Hietala (65), John Clements (65), Luqman Aden (64), nham (60), Nick Cameron (49), Eduard-Mihai Burtescu (46), emberian (43), Brian Koropoff (43), Jakub Adam Wieczorek (39), Steven Fackler (38), Aaron Turon (37), Vadim Chugunov (36), Niko Matsakis (34), P1start (33), Adolfo Ochagavía (33), Erick Tryzelaar (32), Huon Wilson (31), Daniel Micay (28), Stuart Pernsteiner (23), Felix S. Klock II (23), Alexis Beingessner (23), Keegan McAllister (22), Lily Ballard (21), Björn Steinbrink (21), Simon Sapin (17), Tshepang Mbambo (16), Andrew Poelstra (16), Piotr Czarnecki (15), Tobias Bucher (14), OGINO Masanori (14), Michael Woerister (14), Ruud van Asseldonk (12), Ben Gamari (12), root (11), Valerii Hiora (11), Eduardo Bautista (11), Tom Jakubowski (10), Kevin Butler (10), Piotr Jawniak (9), Joseph Crail (9), Guillaume Pinot (9), Rahul Horé (8), NODA Kai (8), Florian Hahn (8), klutzy (7), <em>and 160 more authors</em></td></tr><tr><td class="nowrap">0.11.0</td><td class="nowrap">2014-06-27</td><td class="num">2,472</td><td>bors (730), Alex Crichton (427), emberian (86), Huon Wilson (63), Brian Anderson (61), Lily Ballard (59), Patrick Walton (56), Felix S. Klock II (47), Cameron Zwarich (43), Keegan McAllister (42), Eduard-Mihai Burtescu (39), Daniel Micay (37), Kevin Butler (33), Adolfo Ochagavía (30), Steven Fackler (29), Steve Klabnik (28), Niko Matsakis (26), klutzy (24), Piotr Jawniak (24), Jakub Adam Wieczorek (24), Luqman Aden (20), Brendan Zabarauskas (20), Richo Healey (19), Aaron Turon (19), Kang Seonghoon (18), Flaper Fesp (17), John Clements (15), Guillaume Pinot (15), Edward Wang (15), Simon Sapin (14), Nick Cameron (14), Erick Tryzelaar (14), Adrien Tétar (14), Michael Woerister (13), Valerii Hiora (11), Tom Jakubowski (11), mdinger (8), Tobias Bucher (8), Jonathan Reem (8), Chris Morgan (8), Andrew Gallant (8), OGINO Masanori (7), Yuri Kunde Schlesner (6), Phil Ruffwind (6), Joseph Crail (6), Jonathan S (6), Björn Steinbrink (6), Benjamin Herr (6), Stepan Koltsov (5), P1start (5), <em>and 124 more authors</em></td></tr><tr><td class="nowrap">0.10</td><td class="nowrap">2014-04-02</td><td class="num">2,302</td><td>bors (759), Alex Crichton (310), Brian Anderson (132), Huon Wilson (131), Eduard-Mihai Burtescu (62), Patrick Walton (58), Niko Matsakis (58), Flaper Fesp (56), Daniel Micay (45), Steven Fackler (37), Brendan Zabarauskas (36), Lily Ballard (35), emberian (23), Felix S. Klock II (20), Erick Tryzelaar (20), Bruno de Oliveira Abinader (20), OGINO Masanori (19), Adrien Tétar (16), Simon Sapin (14), Nick Cameron (14), klutzy (13), Edward Wang (13), Virgile Andreani (12), Seo Sanghyeon (12), Scott Lawrence (12), Michael Woerister (11), Luqman Aden (11), Palmer Cox (10), Jacob Greenfield (9), Ben Noordhuis (9), chromatic (8), Chris Morgan (8), Luca Bruno (7), Lennart Kudling (7), Florian Hahn (7), Derek Guenther (7), Michael Darakananda (6), Micah Chalmer (6), Liigo Zhuang (6), Eduard Bopp (6), Derek Chiang (6), Carl-Anton Ingmarsson (6), SiegeLord (5), Piotr Czarnecki (5), Marvin Löbel (5), Kiet Tran (5), David Manescu (5), Andrew Chin (5), Alex Lyon (5), Nathaniel Herman (4), <em>and 111 more authors</em></td></tr><tr><td class="nowrap">0.9</td><td class="nowrap">2014-01-09</td><td class="num">2,652</td><td>bors (810), Alex Crichton (385), Patrick Walton (354), Huon Wilson (126), Brian Anderson (76), Daniel Micay (69), emberian (59), Steven Fackler (53), klutzy (47), Lily Ballard (42), Erick Tryzelaar (32), Niko Matsakis (30), Luqman Aden (25), Tim Chevalier (23), Jed Davis (21), Felix S. Klock II (21), Chris Morgan (20), Michael Woerister (18), Marvin Löbel (18), Seo Sanghyeon (17), Adrien Tétar (16), reedlepee (14), blake2-ppc (14), Young-il Choi (14), Kiet Tran (13), Guillaume Pinot (13), Florian Hahn (13), Palmer Cox (12), Vadim Chugunov (11), Jason Toffaletti (10), Luis de Bethencourt (9), Jan Niklas Hasse (9), Jack Moffitt (9), Benjamin Herr (9), Lennart Kudling (7), Eduard-Mihai Burtescu (7), Andrei Formiga (7), Ziad Hatahet (6), Léo Testard (6), Lindsey Kuper (6), Leah Hanson (6), Carl-Anton Ingmarsson (6), Alan Andrade (6), Steve Klabnik (5), Seonghyun Kim (5), Philipp Brüschweiler (5), Nif Ward (5), g3xzh (4), SiegeLord (4), Noufal Ibrahim (4), <em>and 90 more authors</em></td></tr><tr><td class="nowrap">0.8</td><td class="nowrap">2013-09-26</td><td class="num">3,105</td><td>bors (808), Brian Anderson (224), blake2-ppc (183), Alex Crichton (170), Daniel Micay (165), Erick Tryzelaar (114), Felix S. Klock II (93), John Clements (85), Ben Blum (80), Michael Woerister (74), Niko Matsakis (64), Huon Wilson (64), Graydon Hoare (60), Tim Chevalier (57), Jeff Olson (54), Eric Reed (52), Patrick Walton (50), Michael Sullivan (50), Lily Ballard (43), Steven Fackler (40), Luqman Aden (32), emberian (29), Chris Morgan (26), Björn Steinbrink (24), Aaron Todd (23), klutzy (20), Vadim Chugunov (20), Seo Sanghyeon (19), Dmitry Ermolov (17), NAKASHIMA, Makoto (15), OGINO Masanori (14), James Miller (14), Palmer Cox (13), Micah Chalmer (13), Marvin Löbel (13), Flaper Fesp (11), David Creswick (11), Stepan Koltsov (10), Lindsey Kuper (9), Gareth Daniel Smith (9), Steven Stewart-Gallus (8), Steve Klabnik (8), Birunthan Mohanathas (8), Jordi Boggiano (7), Gary Linscott (7), Florian Hahn (7), Brendan Zabarauskas (7), Andreas Martens (7), SiegeLord (6), Keegan McAllister (6), <em>and 73 more authors</em></td></tr><tr><td class="nowrap">release-0.7</td><td class="nowrap">2013-07-02</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">0.7</td><td class="nowrap">2013-07-02</td><td class="num">2,854</td><td>bors (750), Brian Anderson (256), Huon Wilson (175), Daniel Micay (170), Patrick Walton (127), Alex Crichton (113), Niko Matsakis (109), Tim Chevalier (100), John Clements (89), Brendan Zabarauskas (79), James Miller (75), emberian (61), Ben Blum (44), Young-il Choi (42), Erick Tryzelaar (41), Philipp Brüschweiler (40), Björn Steinbrink (31), Seo Sanghyeon (28), NAKASHIMA, Makoto (27), Luqman Aden (26), Steve Klabnik (24), Michael Woerister (24), Marvin Löbel (23), Michael Sullivan (22), Matthijs Hofstra (20), Felix S. Klock II (20), Gareth Daniel Smith (19), Lily Ballard (18), Graydon Hoare (17), Ramkumar Ramachandra (14), Jed Davis (14), Tom Lee (12), Dan Luu (12), Vadim Chugunov (11), Youngmin Yoo (10), Olivier Saut (10), Lennart Kudling (10), Jyun-Yan You (10), Ilyong Cho (10), Samuel Chase (9), Steven Stewart-Gallus (8), Sangeun Kim (8), blake2-ppc (7), Youngsoo Son (7), Brian Leibig (7), Ron Dahlgren (6), Leah Hanson (6), Jihyun Yu (5), Gábor Horváth (5), klutzy (4), <em>and 50 more authors</em></td></tr><tr><td class="nowrap">release-0.6</td><td class="nowrap">2013-04-02</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">0.6</td><td class="nowrap">2013-04-02</td><td class="num">2,398</td><td>bors (400), Tim Chevalier (283), Patrick Walton (265), Daniel Micay (231), Brian Anderson (180), Erick Tryzelaar (170), Jed Davis (85), Luqman Aden (83), Niko Matsakis (78), Graydon Hoare (63), John Clements (58), Andrew Paseltiner (49), Alex Crichton (46), Marvin Löbel (43), Ben Striegel (41), Zack Corr (30), Seo Sanghyeon (29), Ilyong Cho (21), Chris Peterson (19), Jeff Olson (17), Young-il Choi (16), Huon Wilson (10), Felix S. Klock II (10), Nick Desaulniers (8), Ted Horst (7), NAKASHIMA, Makoto (7), Josh Matthews (7), Gareth Daniel Smith (7), Tyler Bindon (6), Jyun-Yan You (6), Jeong YunWon (6), Brian Leibig (6), William Ting (5), Seth Pink (5), Michael Neumann (5), Kang Seonghoon (5), Cody Schroeder (5), Brendan Zabarauskas (5), Peter Williams (4), Matthijs Hofstra (4), Matthew McPherrin (4), Eric Holmes (4), Benjamin Herr (4), Ashok Gautham (4), Armin Ronacher (4), Olivier Saut (3), Mikko Perttunen (3), Jihyun Yu (3), Jens Nockert (3), Ben Kelly (3), <em>and 31 more authors</em></td></tr><tr><td class="nowrap">release-0.5</td><td class="nowrap">2012-12-21</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">0.5</td><td class="nowrap">2012-12-21</td><td class="num">972</td><td>Brian Anderson (317), Tim Chevalier (166), Patrick Walton (141), Graydon Hoare (83), Jesse Jones (43), Erick Tryzelaar (37), Simon Barber-Dueck (31), Paul Stansifer (26), Daniel Micay (13), Zack Corr (12), Niko Matsakis (12), Mahmut Bulut (11), Luqman Aden (10), Ben Striegel (10), Gareth Daniel Smith (8), Kevin Cantu (5), Jakub Adam Wieczorek (5), Michael Arntzenius (4), Daniel Patterson (4), Viktor Dahl (3), Philipp Brüschweiler (3), Damien Schoof (3), Tycho Sci (2), Luca Bruno (2), Jyun-Yan You (2), Brian Leibig (2), Brian J. Burg (2), Andrew Dunham (2), Tony Young (1), Tim Taubert (1), Lindsey Kuper (1), Josh Matthews (1), Jimmy Lu (1), Isaac Aggrey (1), Huon Wilson (1), Gabriel de Perthuis (1), Eric Holk (1), Damien Grassart (1), Chris Pressey (1), Bilal Husain (1), Arkaitz Jimenez (1)</td></tr><tr><td class="nowrap">release-0.4</td><td class="nowrap">2012-10-12</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">0.4</td><td class="nowrap">2012-10-12</td><td class="num">2,226</td><td>Brian Anderson (458), Patrick Walton (303), Graydon Hoare (264), Tim Chevalier (260), Ben Blum (202), Niko Matsakis (160), Eric Holk (119), Erick Tryzelaar (81), Michael Sullivan (74), Paul Stansifer (53), Lindsey Kuper (49), Elliott Slaughter (41), Kevin Cantu (33), Daniel Patterson (24), Zack Corr (17), Jeff Olson (14), Max Penet (9), Gareth Daniel Smith (8), Damian Gryski (6), Vincent Belliard (5), Jed Davis (5), Philipp Brüschweiler (4), Andrew Paseltiner (4), Alex Rønne Petersen (4), auREAX (3), Francisco Souza (3), Ryan Scheel (2), Jim Blandy (2), Glenn Willen (2), Chris Peterson (2), tav (1), Yasuhiro Fujii (1), Ted Horst (1), Patrik Kårlin (1), Orphée Lafond-Lummis (1), Luca Bruno (1), Jyun-Yan You (1), Joshua Wise (1), Jesse Ruderman (1), Jacob Harris Cryer Kragh (1), Gonçalo Cabrita (1), Drew Willcoxon (1), Brian J. Burg (1), Benjamin Peterson (1), Ben Striegel (1)</td></tr><tr><td class="nowrap">release-0.3.1</td><td class="nowrap">2012-07-21</td><td class="num">3</td><td>Graydon Hoare (3)</td></tr><tr><td class="nowrap">release-0.3</td><td class="nowrap">2012-07-12</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">0.3</td><td class="nowrap">2012-07-12</td><td class="num">1,955</td><td>Brian Anderson (585), Tim Chevalier (245), Niko Matsakis (221), Jeff Olson (136), Eric Holk (131), Michael Sullivan (120), Graydon Hoare (112), Patrick Walton (86), Lindsey Kuper (68), Paul Stansifer (44), Erick Tryzelaar (40), Ben Blum (29), Marijn Haverbeke (28), Haitao Li (18), Kevin Cantu (12), Jon Morton (11), Ben Striegel (9), Gareth Daniel Smith (7), Benjamin Herr (7), Zack Corr (6), Tycho Sci (5), Margaret Meyerhofer (5), Ryan Scheel (4), Grahame Bowland (4), Ted Horst (3), Jyun-Yan You (3), Benjamin Kircher (3), Josh Matthews (2), Glenn Willen (2), Armin Ronacher (2), Arkaitz Jimenez (2), Joshua Wise (1), Jonathan Sternberg (1), Jesse Ruderman (1), Evan McClanahan (1), Alexander Stavonin (1)</td></tr><tr><td class="nowrap">release-0.2</td><td class="nowrap">2012-03-28</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">0.2</td><td class="nowrap">2012-03-28</td><td class="num">1,556</td><td>Brian Anderson (679), Marijn Haverbeke (201), Patrick Walton (109), Niko Matsakis (109), Graydon Hoare (93), Tim Chevalier (90), Kevin Cantu (84), Kevin Atkinson (49), Erick Tryzelaar (28), Jeff Olson (12), Tycho Sci (9), Chris Peterson (9), Ted Horst (8), Tomoki Aonuma (7), Jyun-Yan You (7), Josh Matthews (5), Jesse Ruderman (5), startling (4), Paul Woolcock (4), Daniel Brooks (4), Magnus Auvinen (3), Joe Pletcher (3), Haitao Li (3), Graham Fawcett (3), Donovan Preston (3), Tom Lee (2), Lindsey Kuper (2), Jacob Parker (2), Grahame Bowland (2), Elly Fong-Jones (2), Daniel Luz (2), Damien Grassart (2), Austin Seipp (2), unknown (1), Taras Shpot (1), Roland Tanglao (1), Rick Waldron (1), Matthew O&#x27;Connor (1), Matt Brubeck (1), Joshua Clark (1), Ian D. Bollinger (1), Aleksander Balicki (1)</td></tr><tr><td class="nowrap">release-0.1</td><td class="nowrap">2012-01-20</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">0.1</td><td class="nowrap">2012-01-20</td><td class="num">7,578</td><td>Brian Anderson (1,958), Graydon Hoare (1,526), Patrick Walton (1,197), Marijn Haverbeke (778), Niko Matsakis (321), Tim Chevalier (299), Rafael Ávila de Espíndola (227), Eric Holk (172), Michael Sullivan (166), Lindsey Kuper (149), Roy Frostig (110), Michael Bebenita (81), Haitao Li (64), Erick Tryzelaar (61), Jesse Ruderman (52), Paul Stansifer (50), Elly Fong-Jones (50), Stefan Plantikow (46), Josh Matthews (46), Matt Brubeck (36), Jeffrey Yasskin (31), David Rajchenbach-Teller (24), Rob Arnold (17), Lennart Kudling (15), Ralph Giles (12), Austin Seipp (10), Or Brostovski (8), Kevin Atkinson (8), Joshua Wise (8), Roland Tanglao (6), Kelly Wilson (6), Jyun-Yan You (6), Dave Herman (6), Grahame Bowland (5), Tohava (4), Graham Fawcett (3), unknown (2), Reuben Morais (2), Jason Orendorff (2), Adam Bozanich (2), Wade Mealing (1), User Jyyou (1), Tycho Sci (1), Sean Stangl (1), Peter Hull (1), Kevin Cantu (1), Jeff Balogh (1), Erik Rose (1), Chris Double (1), Benjamin Jackman (1), <em>and 2 more authors</em></td></tr></table></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body></html>

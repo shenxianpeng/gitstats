@@ -5,34 +5,233 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Kubernetes</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.2.post1.dev1">
+	<meta name="generator" content="GitStats 2.7.0">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -40,7 +239,7 @@
             <a href="index.html" class="nav-brand">GitStats</a>
             <ul>
             <li><a href="index.html">General</a></li>
-            <li><a href="activity.html">Activity</a></li>
+            <li><a href="activity.html" class="active" aria-current="page">Activity</a></li>
             <li><a href="authors.html">Authors</a></li>
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
@@ -51,220 +250,136 @@
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Activity</h1><p><strong>Longest Streak:</strong> 1304 consecutive active days. A long streak indicates sustained development momentum.</p>
-<h2 id="yearly_activity"><a href="#yearly_activity">Yearly activity</a></h2>
+            <h1>Activity</h1><dl class="stat-tiles" style="--cols: 4; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">141,530</dd><dd class="stat-note">on 4,452 active days</dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">1304 days</dd><dd class="stat-note">consecutive active days</dd></div><div class="stat-tile"><dt>Busiest Hour</dt><dd class="stat-value">18:00</dd><dd class="stat-note">8,310 commits</dd></div><div class="stat-tile"><dt>Busiest Day</dt><dd class="stat-value">Wednesday</dd><dd class="stat-note">27,807 commits</dd></div></dl><nav class="page-toc" aria-label="On this page"><span>On this page</span><a href="#commits_by_year">By year</a><a href="#commits_by_year/month">By month</a><a href="#weekly_activity">Last weeks</a><a href="#punch_card">Punch card</a><a href="#month_of_year">Month of year</a><a href="#commits_by_timezone">Timezones</a></nav><span id="yearly_activity"></span>
+<h2 id="commits_by_year"><a href="#commits_by_year">Commits by year</a></h2>
 
-<p>Last 20 years</p><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-yearly-activity"></canvas></div>
-<script>
-(function() {
-  var ctx = document.getElementById('chart-yearly-activity').getContext('2d');
-  var chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ["2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026"],
-      datasets: [{"label": "Commits", "data": [0, 0, 0, 0, 0, 0, 0, 4577, 18247, 18787, 18378, 13447, 13865, 9638, 8968, 7239, 7533, 7043, 7148, 6440], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      aspectRatio: 4,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        x: { ticks: { maxRotation: 0 } },
-        y: { beginAtZero: true, title: { display: true, text: 'Commits' } }
-      }
-    }
-  });
-  document.addEventListener('themechange', function() { chart.update(); });
-})();
-</script>
-
-<h2 id="weekly_activity"><a href="#weekly_activity">Weekly activity</a></h2>
-
-<p>Last 32 weeks</p><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-weekly-activity"></canvas></div>
-<script>
-(function() {
-  var ctx = document.getElementById('chart-weekly-activity').getContext('2d');
-  var chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ["2026-07", "2026-08", "2026-09", "2026-10", "2026-11", "2026-12", "2026-13", "2026-14", "2026-15", "2026-16", "2026-17", "2026-18", "2026-19", "2026-20", "2026-21", "2026-22", "2026-23", "2026-24", "2026-25", "2026-26", "2026-27", "2026-28", "2026-29", "2026-30", "2026-31", "2026-32", "2026-33", "2026-34", "2026-35", "2026-36", "2026-37", "2026-38"],
-      datasets: [{"label": "Commits", "data": [183, 187, 258, 291, 295, 62, 55, 84, 82, 217, 175, 230, 203, 171, 136, 121, 234, 195, 225, 232, 291, 291, 286, 73, 54, 46, 58, 171, 154, 195, 117, 0], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      aspectRatio: 5,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        x: { ticks: { maxRotation: 45, minRotation: 45 } },
-        y: { beginAtZero: true, title: { display: true, text: 'Commits' } }
-      }
-    }
-  });
-  document.addEventListener('themechange', function() { chart.update(); });
-})();
-</script>
-
-<h2 id="hour_of_day"><a href="#hour_of_day">Hour of Day</a></h2>
-
-<table><tr><th>Hour</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th></tr>
-<tr><th>Commits</th><td class="heat heat4">6568</td><td class="heat heat3">5599</td><td class="heat heat3">4988</td><td class="heat heat3">4725</td><td class="heat heat2">3928</td><td class="heat heat2">4035</td><td class="heat heat3">4289</td><td class="heat heat3">4648</td><td class="heat heat3">4958</td><td class="heat heat3">4911</td><td class="heat heat3">4333</td><td class="heat heat3">4413</td><td class="heat heat3">4786</td><td class="heat heat3">5373</td><td class="heat heat3">5977</td><td class="heat heat4">6602</td><td class="heat heat4">6654</td><td class="heat heat4">7536</td><td class="heat heat4">8296</td><td class="heat heat4">7736</td><td class="heat heat4">7796</td><td class="heat heat4">8269</td><td class="heat heat4">7718</td><td class="heat heat4">7172</td></tr>
-<tr><th>%</th><td class="heat heat4">4.65</td><td class="heat heat3">3.96</td><td class="heat heat3">3.53</td><td class="heat heat3">3.34</td><td class="heat heat2">2.78</td><td class="heat heat2">2.86</td><td class="heat heat3">3.04</td><td class="heat heat3">3.29</td><td class="heat heat3">3.51</td><td class="heat heat3">3.48</td><td class="heat heat3">3.07</td><td class="heat heat3">3.12</td><td class="heat heat3">3.39</td><td class="heat heat3">3.80</td><td class="heat heat3">4.23</td><td class="heat heat4">4.67</td><td class="heat heat4">4.71</td><td class="heat heat4">5.33</td><td class="heat heat4">5.87</td><td class="heat heat4">5.47</td><td class="heat heat4">5.52</td><td class="heat heat4">5.85</td><td class="heat heat4">5.46</td><td class="heat heat4">5.08</td></tr></table><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-hour-of-day"></canvas></div>
-<script>
-(function() {
-  var ctx = document.getElementById('chart-hour-of-day').getContext('2d');
-  var chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23],
-      datasets: [{"label": "Commits", "data": [6568, 5599, 4988, 4725, 3928, 4035, 4289, 4648, 4958, 4911, 4333, 4413, 4786, 5373, 5977, 6602, 6654, 7536, 8296, 7736, 7796, 8269, 7718, 7172], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      aspectRatio: 3,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        x: { ticks: { maxRotation: 0 } },
-        y: { beginAtZero: true, title: { display: true, text: 'Commits' } }
-      }
-    }
-  });
-  document.addEventListener('themechange', function() { chart.update(); });
-})();
-</script>
-
-<h2 id="day_of_week"><a href="#day_of_week">Day of Week</a></h2>
-
-<div style="display:flex;gap:24px;align-items:flex-start"><table><tr><th>Day</th><th>Total (%)</th></tr><tr><th>Mon</th><td>20245 (14.33%)</td></tr><tr><th>Tue</th><td>26260 (18.58%)</td></tr><tr><th>Wed</th><td>27764 (19.65%)</td></tr><tr><th>Thu</th><td>27273 (19.30%)</td></tr><tr><th>Fri</th><td>25034 (17.72%)</td></tr><tr><th>Sat</th><td>9362 (6.63%)</td></tr><tr><th>Sun</th><td>5372 (3.80%)</td></tr></table><div style="flex:1;min-width:0"><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-day-of-week"></canvas></div>
-<script>
-(function() {
-  var ctx = document.getElementById('chart-day-of-week').getContext('2d');
-  var chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-      datasets: [{"label": "Commits", "data": [20245, 26260, 27764, 27273, 25034, 9362, 5372], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      aspectRatio: 4,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        x: { ticks: { maxRotation: 0 } },
-        y: { beginAtZero: true, title: { display: true, text: 'Commits' } }
-      }, datasets: { bar: { maxBarThickness: 40 } }
-    }
-  });
-  document.addEventListener('themechange', function() { chart.update(); });
-})();
-</script>
-</div></div>
-<h2 id="hour_of_week"><a href="#hour_of_week">Hour of Week</a></h2>
-
-<table><tr><th>Weekday</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th></tr><tr><th>Mon</th><td class="heat heat1">213</td><td class="heat heat1">309</td><td class="heat heat1">392</td><td class="heat heat2">426</td><td class="heat heat1">302</td><td class="heat heat1">347</td><td class="heat heat2">461</td><td class="heat heat2">604</td><td class="heat heat2">676</td><td class="heat heat2">707</td><td class="heat heat2">624</td><td class="heat heat2">677</td><td class="heat heat2">744</td><td class="heat heat3">908</td><td class="heat heat3">1039</td><td class="heat heat3">1039</td><td class="heat heat3">1155</td><td class="heat heat4">1321</td><td class="heat heat4">1441</td><td class="heat heat4">1408</td><td class="heat heat4">1422</td><td class="heat heat4">1452</td><td class="heat heat4">1363</td><td class="heat heat3">1215</td></tr><tr><th>Tue</th><td class="heat heat3">1112</td><td class="heat heat3">968</td><td class="heat heat2">783</td><td class="heat heat3">827</td><td class="heat heat2">686</td><td class="heat heat2">654</td><td class="heat heat2">692</td><td class="heat heat3">837</td><td class="heat heat3">933</td><td class="heat heat3">933</td><td class="heat heat2">797</td><td class="heat heat3">822</td><td class="heat heat3">968</td><td class="heat heat3">992</td><td class="heat heat3">1092</td><td class="heat heat4">1297</td><td class="heat heat4">1251</td><td class="heat heat4">1478</td><td class="heat heat4">1636</td><td class="heat heat4">1481</td><td class="heat heat4">1473</td><td class="heat heat4">1600</td><td class="heat heat4">1515</td><td class="heat heat4">1433</td></tr><tr><th>Wed</th><td class="heat heat4">1392</td><td class="heat heat3">1173</td><td class="heat heat3">1112</td><td class="heat heat3">949</td><td class="heat heat2">777</td><td class="heat heat2">783</td><td class="heat heat3">890</td><td class="heat heat3">908</td><td class="heat heat3">951</td><td class="heat heat3">945</td><td class="heat heat2">809</td><td class="heat heat2">813</td><td class="heat heat3">940</td><td class="heat heat3">1045</td><td class="heat heat3">1175</td><td class="heat heat4">1257</td><td class="heat heat4">1259</td><td class="heat heat4">1452</td><td class="heat heat4">1588</td><td class="heat heat4">1447</td><td class="heat heat4">1572</td><td class="heat heat4">1614</td><td class="heat heat4">1476</td><td class="heat heat4">1437</td></tr><tr><th>Thu</th><td class="heat heat4">1295</td><td class="heat heat3">1107</td><td class="heat heat3">909</td><td class="heat heat3">844</td><td class="heat heat2">738</td><td class="heat heat3">868</td><td class="heat heat3">880</td><td class="heat heat3">909</td><td class="heat heat3">1069</td><td class="heat heat3">920</td><td class="heat heat3">894</td><td class="heat heat3">916</td><td class="heat heat3">889</td><td class="heat heat3">1034</td><td class="heat heat3">1084</td><td class="heat heat3">1211</td><td class="heat heat4">1228</td><td class="heat heat4">1458</td><td class="heat heat4">1630</td><td class="heat heat4">1490</td><td class="heat heat4">1467</td><td class="heat heat4">1637</td><td class="heat heat4">1454</td><td class="heat heat4">1342</td></tr><tr><th>Fri</th><td class="heat heat4">1289</td><td class="heat heat3">1012</td><td class="heat heat3">922</td><td class="heat heat3">837</td><td class="heat heat2">675</td><td class="heat heat2">771</td><td class="heat heat2">758</td><td class="heat heat3">838</td><td class="heat heat3">860</td><td class="heat heat3">897</td><td class="heat heat2">793</td><td class="heat heat2">779</td><td class="heat heat2">795</td><td class="heat heat3">927</td><td class="heat heat3">1010</td><td class="heat heat3">1185</td><td class="heat heat3">1211</td><td class="heat heat4">1343</td><td class="heat heat4">1398</td><td class="heat heat4">1303</td><td class="heat heat4">1325</td><td class="heat heat4">1460</td><td class="heat heat4">1419</td><td class="heat heat3">1227</td></tr><tr><th>Sat</th><td class="heat heat3">1007</td><td class="heat heat2">788</td><td class="heat heat2">623</td><td class="heat heat2">540</td><td class="heat heat2">487</td><td class="heat heat1">402</td><td class="heat heat1">405</td><td class="heat heat1">339</td><td class="heat heat1">290</td><td class="heat heat1">339</td><td class="heat heat1">267</td><td class="heat heat1">238</td><td class="heat heat1">250</td><td class="heat heat1">239</td><td class="heat heat1">353</td><td class="heat heat1">356</td><td class="heat heat1">356</td><td class="heat heat1">261</td><td class="heat heat1">369</td><td class="heat heat1">337</td><td class="heat heat1">282</td><td class="heat heat1">268</td><td class="heat heat1">265</td><td class="heat heat1">301</td></tr><tr><th>Sun</th><td class="heat heat1">260</td><td class="heat heat1">242</td><td class="heat heat1">247</td><td class="heat heat1">302</td><td class="heat heat1">263</td><td class="heat heat1">210</td><td class="heat heat1">203</td><td class="heat heat1">213</td><td class="heat heat1">179</td><td class="heat heat1">170</td><td class="heat heat1">149</td><td class="heat heat1">168</td><td class="heat heat1">200</td><td class="heat heat1">228</td><td class="heat heat1">224</td><td class="heat heat1">257</td><td class="heat heat1">194</td><td class="heat heat1">223</td><td class="heat heat1">234</td><td class="heat heat1">270</td><td class="heat heat1">255</td><td class="heat heat1">238</td><td class="heat heat1">226</td><td class="heat heat1">217</td></tr></table>
-<h2 id="month_of_year"><a href="#month_of_year">Month of Year</a></h2>
-
-<div style="display:flex;gap:24px;align-items:flex-start"><table><tr><th>Month</th><th>Commits (%)</th></tr><tr><td>1</td><td>11126 (7.87 %)</td></tr><tr><td>2</td><td>12835 (9.08 %)</td></tr><tr><td>3</td><td>12833 (9.08 %)</td></tr><tr><td>4</td><td>10475 (7.41 %)</td></tr><tr><td>5</td><td>12736 (9.01 %)</td></tr><tr><td>6</td><td>12542 (8.88 %)</td></tr><tr><td>7</td><td>12841 (9.09 %)</td></tr><tr><td>8</td><td>12272 (8.68 %)</td></tr><tr><td>9</td><td>11374 (8.05 %)</td></tr><tr><td>10</td><td>12885 (9.12 %)</td></tr><tr><td>11</td><td>11149 (7.89 %)</td></tr><tr><td>12</td><td>8242 (5.83 %)</td></tr></table><div style="flex:1;min-width:0"><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-month-of-year"></canvas></div>
-<script>
-(function() {
-  var ctx = document.getElementById('chart-month-of-year').getContext('2d');
-  var chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-      datasets: [{"label": "Commits", "data": [11126, 12835, 12833, 10475, 12736, 12542, 12841, 12272, 11374, 12885, 11149, 8242], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      aspectRatio: 4,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        x: { ticks: { maxRotation: 0 } },
-        y: { beginAtZero: true, title: { display: true, text: 'Commits' } }
-      }, datasets: { bar: { maxBarThickness: 40 } }
-    }
-  });
-  document.addEventListener('themechange', function() { chart.update(); });
-})();
-</script>
-</div></div>
-<h2 id="commits_by_year/month"><a href="#commits_by_year/month">Commits by year/month</a></h2>
-
-<div style="display:flex;gap:24px;align-items:flex-start"><table><tr><th>Month</th><th>Commits</th><th>Lines added</th><th>Lines removed</th></tr><tr><td>2026-09</td><td>442</td><td>88471</td><td>79827</td></tr><tr><td>2026-08</td><td>360</td><td>29773</td><td>27719</td></tr><tr><td>2026-07</td><td>1085</td><td>401752</td><td>74781</td></tr><tr><td>2026-06</td><td>856</td><td>86613</td><td>99698</td></tr><tr><td>2026-05</td><td>764</td><td>123911</td><td>89100</td></tr><tr><td>2026-04</td><td>561</td><td>181057</td><td>100847</td></tr><tr><td>2026-03</td><td>942</td><td>329632</td><td>64111</td></tr><tr><td>2026-02</td><td>723</td><td>94555</td><td>37795</td></tr><tr><td>2026-01</td><td>707</td><td>56470</td><td>53145</td></tr><tr><td>2025-12</td><td>400</td><td>53309</td><td>50571</td></tr><tr><td>2025-11</td><td>477</td><td>104814</td><td>24206</td></tr><tr><td>2025-10</td><td>860</td><td>61617</td><td>67450</td></tr><tr><td>2025-09</td><td>629</td><td>99796</td><td>47288</td></tr><tr><td>2025-08</td><td>391</td><td>33770</td><td>28197</td></tr><tr><td>2025-07</td><td>1015</td><td>261916</td><td>139155</td></tr><tr><td>2025-06</td><td>612</td><td>55394</td><td>75296</td></tr><tr><td>2025-05</td><td>520</td><td>81370</td><td>53524</td></tr><tr><td>2025-04</td><td>366</td><td>23925</td><td>9324</td></tr><tr><td>2025-03</td><td>815</td><td>222156</td><td>74282</td></tr><tr><td>2025-02</td><td>605</td><td>38708</td><td>12959</td></tr><tr><td>2025-01</td><td>458</td><td>30443</td><td>15884</td></tr><tr><td>2024-12</td><td>339</td><td>19996</td><td>67226</td></tr><tr><td>2024-11</td><td>605</td><td>169506</td><td>117278</td></tr><tr><td>2024-10</td><td>899</td><td>64156</td><td>119697</td></tr><tr><td>2024-09</td><td>746</td><td>82901</td><td>72472</td></tr><tr><td>2024-08</td><td>437</td><td>26876</td><td>75078</td></tr><tr><td>2024-07</td><td>701</td><td>138387</td><td>70575</td></tr><tr><td>2024-06</td><td>615</td><td>232212</td><td>99782</td></tr><tr><td>2024-05</td><td>577</td><td>61800</td><td>1121338</td></tr><tr><td>2024-04</td><td>505</td><td>81556</td><td>89339</td></tr><tr><td>2024-03</td><td>459</td><td>135749</td><td>40931</td></tr><tr><td>2024-02</td><td>599</td><td>48185</td><td>13157</td></tr><tr><td>2024-01</td><td>561</td><td>19966</td><td>481816</td></tr><tr><td>2023-12</td><td>402</td><td>97989</td><td>144524</td></tr><tr><td>2023-11</td><td>348</td><td>49099</td><td>18560</td></tr><tr><td>2023-10</td><td>867</td><td>213025</td><td>75211</td></tr><tr><td>2023-09</td><td>537</td><td>25207</td><td>27033</td></tr><tr><td>2023-08</td><td>503</td><td>210263</td><td>116618</td></tr><tr><td>2023-07</td><td>648</td><td>227459</td><td>57572</td></tr><tr><td>2023-06</td><td>586</td><td>54057</td><td>21314</td></tr><tr><td>2023-05</td><td>705</td><td>344408</td><td>216235</td></tr><tr><td>2023-04</td><td>508</td><td>99361</td><td>87692</td></tr><tr><td>2023-03</td><td>1008</td><td>196600</td><td>437405</td></tr><tr><td>2023-02</td><td>644</td><td>121334</td><td>22373</td></tr><tr><td>2023-01</td><td>777</td><td>74448</td><td>68501</td></tr><tr><td>2022-12</td><td>571</td><td>123920</td><td>110496</td></tr><tr><td>2022-11</td><td>709</td><td>149643</td><td>69413</td></tr><tr><td>2022-10</td><td>726</td><td>205181</td><td>57436</td></tr><tr><td>2022-09</td><td>582</td><td>49370</td><td>133176</td></tr><tr><td>2022-08</td><td>573</td><td>203423</td><td>268160</td></tr><tr><td>2022-07</td><td>678</td><td>70881</td><td>33532</td></tr><tr><td>2022-06</td><td>516</td><td>183234</td><td>129603</td></tr><tr><td>2022-05</td><td>652</td><td>117038</td><td>163314</td></tr><tr><td>2022-04</td><td>285</td><td>4704</td><td>10373</td></tr><tr><td>2022-03</td><td>867</td><td>217529</td><td>123551</td></tr><tr><td>2022-02</td><td>495</td><td>64844</td><td>71844</td></tr><tr><td>2022-01</td><td>585</td><td>21599</td><td>16403</td></tr><tr><td>2021-12</td><td>395</td><td>67082</td><td>121121</td></tr><tr><td>2021-11</td><td>711</td><td>455268</td><td>171772</td></tr><tr><td>2021-10</td><td>630</td><td>48368</td><td>27437</td></tr><tr><td>2021-09</td><td>588</td><td>57673</td><td>17803</td></tr><tr><td>2021-08</td><td>661</td><td>383691</td><td>275465</td></tr><tr><td>2021-07</td><td>619</td><td>147300</td><td>116031</td></tr><tr><td>2021-06</td><td>896</td><td>216488</td><td>169201</td></tr><tr><td>2021-05</td><td>702</td><td>129418</td><td>171226</td></tr><tr><td>2021-04</td><td>793</td><td>80789</td><td>53559</td></tr><tr><td>2021-03</td><td>1181</td><td>542340</td><td>356609</td></tr><tr><td>2021-02</td><td>938</td><td>42705</td><td>32337</td></tr><tr><td>2021-01</td><td>854</td><td>66437</td><td>54744</td></tr><tr><td>2020-12</td><td>509</td><td>26189</td><td>9483</td></tr><tr><td>2020-11</td><td>835</td><td>250765</td><td>84414</td></tr><tr><td>2020-10</td><td>748</td><td>66866</td><td>76446</td></tr><tr><td>2020-09</td><td>731</td><td>31112</td><td>20844</td></tr><tr><td>2020-08</td><td>559</td><td>46191</td><td>39299</td></tr><tr><td>2020-07</td><td>768</td><td>99374</td><td>56115</td></tr><tr><td>2020-06</td><td>950</td><td>154153</td><td>125695</td></tr><tr><td>2020-05</td><td>861</td><td>253579</td><td>137310</td></tr><tr><td>2020-04</td><td>850</td><td>42886</td><td>140384</td></tr><tr><td>2020-03</td><td>912</td><td>76483</td><td>31236</td></tr><tr><td>2020-02</td><td>931</td><td>114181</td><td>40851</td></tr><tr><td>2020-01</td><td>984</td><td>234008</td><td>60555</td></tr><tr><td>2019-12</td><td>860</td><td>135422</td><td>183606</td></tr><tr><td>2019-11</td><td>1144</td><td>201911</td><td>125957</td></tr><tr><td>2019-10</td><td>1255</td><td>95215</td><td>54991</td></tr><tr><td>2019-09</td><td>880</td><td>99110</td><td>112028</td></tr><tr><td>2019-08</td><td>1488</td><td>576656</td><td>232981</td></tr><tr><td>2019-07</td><td>1186</td><td>377536</td><td>94467</td></tr><tr><td>2019-06</td><td>986</td><td>204058</td><td>123558</td></tr><tr><td>2019-05</td><td>1351</td><td>102217</td><td>101368</td></tr><tr><td>2019-04</td><td>1300</td><td>219888</td><td>712604</td></tr><tr><td>2019-03</td><td>1042</td><td>289806</td><td>27192</td></tr><tr><td>2019-02</td><td>1350</td><td>282420</td><td>165801</td></tr><tr><td>2019-01</td><td>1023</td><td>193675</td><td>607709</td></tr><tr><td>2018-12</td><td>598</td><td>57623</td><td>21504</td></tr><tr><td>2018-11</td><td>1038</td><td>136300</td><td>55329</td></tr><tr><td>2018-10</td><td>1098</td><td>139619</td><td>106055</td></tr><tr><td>2018-09</td><td>889</td><td>249421</td><td>33375</td></tr><tr><td>2018-08</td><td>1366</td><td>369648</td><td>57057</td></tr><tr><td>2018-07</td><td>911</td><td>165844</td><td>48630</td></tr><tr><td>2018-06</td><td>998</td><td>265047</td><td>163775</td></tr><tr><td>2018-05</td><td>1341</td><td>90377</td><td>41610</td></tr><tr><td>2018-04</td><td>1208</td><td>123388</td><td>123231</td></tr><tr><td>2018-03</td><td>1048</td><td>68334</td><td>39444</td></tr><tr><td>2018-02</td><td>1611</td><td>314093</td><td>186426</td></tr><tr><td>2018-01</td><td>1341</td><td>163003</td><td>69803</td></tr><tr><td>2017-12</td><td>874</td><td>194363</td><td>136419</td></tr><tr><td>2017-11</td><td>1710</td><td>324338</td><td>123863</td></tr><tr><td>2017-10</td><td>1536</td><td>110410</td><td>180626</td></tr><tr><td>2017-09</td><td>1403</td><td>338412</td><td>331114</td></tr><tr><td>2017-08</td><td>1904</td><td>383962</td><td>172459</td></tr><tr><td>2017-07</td><td>1479</td><td>330900</td><td>202859</td></tr><tr><td>2017-06</td><td>1534</td><td>159634</td><td>390498</td></tr><tr><td>2017-05</td><td>1858</td><td>409756</td><td>256925</td></tr><tr><td>2017-04</td><td>1213</td><td>324224</td><td>127493</td></tr><tr><td>2017-03</td><td>1441</td><td>192436</td><td>350363</td></tr><tr><td>2017-02</td><td>1841</td><td>304842</td><td>181134</td></tr><tr><td>2017-01</td><td>1585</td><td>514996</td><td>371448</td></tr><tr><td>2016-12</td><td>1456</td><td>270211</td><td>498479</td></tr><tr><td>2016-11</td><td>1592</td><td>275770</td><td>227471</td></tr><tr><td>2016-10</td><td>1736</td><td>482456</td><td>377501</td></tr><tr><td>2016-09</td><td>1807</td><td>543034</td><td>220035</td></tr><tr><td>2016-08</td><td>2018</td><td>1412323</td><td>638226</td></tr><tr><td>2016-07</td><td>1347</td><td>199337</td><td>196209</td></tr><tr><td>2016-06</td><td>1591</td><td>108764</td><td>67852</td></tr><tr><td>2016-05</td><td>1635</td><td>409829</td><td>370463</td></tr><tr><td>2016-04</td><td>1113</td><td>191930</td><td>57646</td></tr><tr><td>2016-03</td><td>1384</td><td>135223</td><td>58916</td></tr><tr><td>2016-02</td><td>1877</td><td>442283</td><td>306186</td></tr><tr><td>2016-01</td><td>1231</td><td>587123</td><td>277018</td></tr><tr><td>2015-12</td><td>1210</td><td>245602</td><td>215339</td></tr><tr><td>2015-11</td><td>1252</td><td>150417</td><td>96395</td></tr><tr><td>2015-10</td><td>1715</td><td>475164</td><td>362741</td></tr><tr><td>2015-09</td><td>1575</td><td>167702</td><td>88524</td></tr><tr><td>2015-08</td><td>1396</td><td>155643</td><td>360280</td></tr><tr><td>2015-07</td><td>1758</td><td>235952</td><td>230649</td></tr><tr><td>2015-06</td><td>1823</td><td>397165</td><td>149770</td></tr><tr><td>2015-05</td><td>1770</td><td>257908</td><td>227462</td></tr><tr><td>2015-04</td><td>1773</td><td>469967</td><td>49169</td></tr><tr><td>2015-03</td><td>1734</td><td>223469</td><td>116535</td></tr><tr><td>2015-02</td><td>1221</td><td>171415</td><td>51333</td></tr><tr><td>2015-01</td><td>1020</td><td>158822</td><td>57412</td></tr><tr><td>2014-12</td><td>628</td><td>98611</td><td>15102</td></tr><tr><td>2014-11</td><td>728</td><td>58680</td><td>11905</td></tr><tr><td>2014-10</td><td>815</td><td>59790</td><td>14887</td></tr><tr><td>2014-09</td><td>565</td><td>35769</td><td>8868</td></tr><tr><td>2014-08</td><td>616</td><td>27346</td><td>391344</td></tr><tr><td>2014-07</td><td>646</td><td>61997</td><td>9557</td></tr><tr><td>2014-06</td><td>579</td><td>463690</td><td>6533</td></tr></table><div style="flex:1;min-width:0"><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-commits-by-year-month"></canvas></div>
-<script>
-(function() {
-  var ctx = document.getElementById('chart-commits-by-year-month').getContext('2d');
-  var chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: ["2014-06", "2014-07", "2014-08", "2014-09", "2014-10", "2014-11", "2014-12", "2015-01", "2015-02", "2015-03", "2015-04", "2015-05", "2015-06", "2015-07", "2015-08", "2015-09", "2015-10", "2015-11", "2015-12", "2016-01", "2016-02", "2016-03", "2016-04", "2016-05", "2016-06", "2016-07", "2016-08", "2016-09", "2016-10", "2016-11", "2016-12", "2017-01", "2017-02", "2017-03", "2017-04", "2017-05", "2017-06", "2017-07", "2017-08", "2017-09", "2017-10", "2017-11", "2017-12", "2018-01", "2018-02", "2018-03", "2018-04", "2018-05", "2018-06", "2018-07", "2018-08", "2018-09", "2018-10", "2018-11", "2018-12", "2019-01", "2019-02", "2019-03", "2019-04", "2019-05", "2019-06", "2019-07", "2019-08", "2019-09", "2019-10", "2019-11", "2019-12", "2020-01", "2020-02", "2020-03", "2020-04", "2020-05", "2020-06", "2020-07", "2020-08", "2020-09", "2020-10", "2020-11", "2020-12", "2021-01", "2021-02", "2021-03", "2021-04", "2021-05", "2021-06", "2021-07", "2021-08", "2021-09", "2021-10", "2021-11", "2021-12", "2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12", "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08", "2026-09"],
-      datasets: [{"label": "Commits", "data": [579, 646, 616, 565, 815, 728, 628, 1020, 1221, 1734, 1773, 1770, 1823, 1758, 1396, 1575, 1715, 1252, 1210, 1231, 1877, 1384, 1113, 1635, 1591, 1347, 2018, 1807, 1736, 1592, 1456, 1585, 1841, 1441, 1213, 1858, 1534, 1479, 1904, 1403, 1536, 1710, 874, 1341, 1611, 1048, 1208, 1341, 998, 911, 1366, 889, 1098, 1038, 598, 1023, 1350, 1042, 1300, 1351, 986, 1186, 1488, 880, 1255, 1144, 860, 984, 931, 912, 850, 861, 950, 768, 559, 731, 748, 835, 509, 854, 938, 1181, 793, 702, 896, 619, 661, 588, 630, 711, 395, 585, 495, 867, 285, 652, 516, 678, 573, 582, 726, 709, 571, 777, 644, 1008, 508, 705, 586, 648, 503, 537, 867, 348, 402, 561, 599, 459, 505, 577, 615, 701, 437, 746, 899, 605, 339, 458, 605, 815, 366, 520, 612, 1015, 391, 629, 860, 477, 400, 707, 723, 942, 561, 764, 856, 1085, 360, 442], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      aspectRatio: 3,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        x: { ticks: { maxRotation: 45, minRotation: 45 } },
-        y: { beginAtZero: true, title: { display: true, text: 'Commits' } }
-      }
-    }
-  });
-  document.addEventListener('themechange', function() { chart.update(); });
-})();
-</script>
-</div></div>
-<h2 id="commits_by_year"><a href="#commits_by_year">Commits by Year</a></h2>
-
-<div style="display:flex;gap:24px;align-items:flex-start"><table><tr><th>Year</th><th>Commits (% of all)</th><th>Lines added</th><th>Lines removed</th></tr><tr><td>2026</td><td>6440 (4.56%)</td><td>1392234</td><td>627023</td></tr><tr><td>2025</td><td>7148 (5.06%)</td><td>1067218</td><td>598136</td></tr><tr><td>2024</td><td>7043 (4.98%)</td><td>1081290</td><td>2368689</td></tr><tr><td>2023</td><td>7533 (5.33%)</td><td>1713250</td><td>1293038</td></tr><tr><td>2022</td><td>7239 (5.12%)</td><td>1411366</td><td>1187301</td></tr><tr><td>2021</td><td>8968 (6.35%)</td><td>2237559</td><td>1567305</td></tr><tr><td>2020</td><td>9638 (6.82%)</td><td>1395787</td><td>822632</td></tr><tr><td>2019</td><td>13865 (9.81%)</td><td>2777914</td><td>2542262</td></tr><tr><td>2018</td><td>13447 (9.52%)</td><td>2142697</td><td>946239</td></tr><tr><td>2017</td><td>18378 (13.01%)</td><td>3588273</td><td>2825201</td></tr><tr><td>2016</td><td>18787 (13.29%)</td><td>5058283</td><td>3296002</td></tr><tr><td>2015</td><td>18247 (12.91%)</td><td>3109226</td><td>2005609</td></tr><tr><td>2014</td><td>4577 (3.24%)</td><td>805883</td><td>458196</td></tr></table><div style="flex:1;min-width:0"><div style="max-width:100%;margin-bottom:8px"><canvas id="chart-commits-by-year"></canvas></div>
+<div class="chart-box" style="--chart-ratio: 4"><canvas id="chart-commits-by-year"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-commits-by-year').getContext('2d');
-  var chart = new Chart(ctx, {
+  var labels = [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
+  applyChartTheme();
+  new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026],
-      datasets: [{"label": "Commits", "data": [4577, 18247, 18787, 18378, 13447, 13865, 9638, 8968, 7239, 7533, 7043, 7148, 6440], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color')}]
+      labels: labels,
+      datasets: [{"label": "Commits", "data": [4577, 18247, 18787, 18378, 13447, 13865, 9638, 8968, 7239, 7533, 7043, 7148, 6660], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
-      aspectRatio: 3,
+      maintainAspectRatio: false,
       plugins: {
         legend: { display: false }
       },
       scales: {
-        x: { ticks: { maxRotation: 0 } },
-        y: { beginAtZero: true, title: { display: true, text: 'Commits' } }
+        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { precision: 0 } }
       }
     }
   });
-  document.addEventListener('themechange', function() { chart.update(); });
 })();
 </script>
-</div></div>
-<h2 id="commits_by_timezone"><a href="#commits_by_timezone">Commits by Timezone</a></h2>
+<details class="table-details"><summary>Table: commits and lines per year (13 years with commits)</summary><div class="table-scroll"><table><tr><th>Year</th><th class="num">Commits (% of all)</th><th class="num">Lines added</th><th class="num">Lines removed</th></tr><tr><td>2026</td><td class="num">6,660 (4.7%)</td><td class="num">1,453,673</td><td class="num">640,874</td></tr><tr><td>2025</td><td class="num">7,148 (5.1%)</td><td class="num">1,067,218</td><td class="num">598,136</td></tr><tr><td>2024</td><td class="num">7,043 (5.0%)</td><td class="num">1,081,290</td><td class="num">2,368,689</td></tr><tr><td>2023</td><td class="num">7,533 (5.3%)</td><td class="num">1,713,250</td><td class="num">1,293,038</td></tr><tr><td>2022</td><td class="num">7,239 (5.1%)</td><td class="num">1,411,366</td><td class="num">1,187,301</td></tr><tr><td>2021</td><td class="num">8,968 (6.3%)</td><td class="num">2,237,559</td><td class="num">1,567,305</td></tr><tr><td>2020</td><td class="num">9,638 (6.8%)</td><td class="num">1,395,787</td><td class="num">822,632</td></tr><tr><td>2019</td><td class="num">13,865 (9.8%)</td><td class="num">2,777,914</td><td class="num">2,542,262</td></tr><tr><td>2018</td><td class="num">13,447 (9.5%)</td><td class="num">2,142,697</td><td class="num">946,239</td></tr><tr><td>2017</td><td class="num">18,378 (13.0%)</td><td class="num">3,588,273</td><td class="num">2,825,201</td></tr><tr><td>2016</td><td class="num">18,787 (13.3%)</td><td class="num">5,058,283</td><td class="num">3,296,002</td></tr><tr><td>2015</td><td class="num">18,247 (12.9%)</td><td class="num">3,109,226</td><td class="num">2,005,609</td></tr><tr><td>2014</td><td class="num">4,577 (3.2%)</td><td class="num">805,883</td><td class="num">458,196</td></tr></table></div></details>
+<h2 id="commits_by_year/month"><a href="#commits_by_year/month">Commits by year/month</a></h2>
 
-<table class="heat"><tr><th>-1000</th><th>-0800</th><th>-0700</th><th>-0600</th><th>-0500</th><th>-0400</th><th>-0300</th><th>-0200</th><th>+0000</th><th>+0100</th><th>+0200</th><th>+0300</th><th>+0330</th><th>+0400</th><th>+0430</th><th>+0500</th><th>+0530</th><th>+0545</th><th>+0600</th><th>+0700</th><th>+0800</th><th>+0900</th><th>+1000</th><th>+1100</th><th>+1200</th><th>+1300</th></tr>
-<tr><td class="heat heat heat1">3</td><td class="heat heat heat2">25773</td><td class="heat heat heat4">51714</td><td class="heat heat heat1">568</td><td class="heat heat heat1">6269</td><td class="heat heat heat1">10424</td><td class="heat heat heat1">251</td><td class="heat heat heat1">42</td><td class="heat heat heat1">8327</td><td class="heat heat heat1">8162</td><td class="heat heat heat1">10627</td><td class="heat heat heat1">1603</td><td class="heat heat heat1">23</td><td class="heat heat heat1">35</td><td class="heat heat heat1">8</td><td class="heat heat heat1">5</td><td class="heat heat heat1">3580</td><td class="heat heat heat1">6</td><td class="heat heat heat1">12</td><td class="heat heat heat1">50</td><td class="heat heat heat1">12031</td><td class="heat heat heat1">1218</td><td class="heat heat heat1">191</td><td class="heat heat heat1">83</td><td class="heat heat heat1">151</td><td class="heat heat heat1">154</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+<div class="chart-box" style="--chart-ratio: 3"><canvas id="chart-commits-by-year-month"></canvas></div>
+<script>
+(function() {
+  var ctx = document.getElementById('chart-commits-by-year-month').getContext('2d');
+  var labels = ["2014-06", "2014-07", "2014-08", "2014-09", "2014-10", "2014-11", "2014-12", "2015-01", "2015-02", "2015-03", "2015-04", "2015-05", "2015-06", "2015-07", "2015-08", "2015-09", "2015-10", "2015-11", "2015-12", "2016-01", "2016-02", "2016-03", "2016-04", "2016-05", "2016-06", "2016-07", "2016-08", "2016-09", "2016-10", "2016-11", "2016-12", "2017-01", "2017-02", "2017-03", "2017-04", "2017-05", "2017-06", "2017-07", "2017-08", "2017-09", "2017-10", "2017-11", "2017-12", "2018-01", "2018-02", "2018-03", "2018-04", "2018-05", "2018-06", "2018-07", "2018-08", "2018-09", "2018-10", "2018-11", "2018-12", "2019-01", "2019-02", "2019-03", "2019-04", "2019-05", "2019-06", "2019-07", "2019-08", "2019-09", "2019-10", "2019-11", "2019-12", "2020-01", "2020-02", "2020-03", "2020-04", "2020-05", "2020-06", "2020-07", "2020-08", "2020-09", "2020-10", "2020-11", "2020-12", "2021-01", "2021-02", "2021-03", "2021-04", "2021-05", "2021-06", "2021-07", "2021-08", "2021-09", "2021-10", "2021-11", "2021-12", "2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12", "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08", "2026-09"];
+  applyChartTheme();
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{"label": "Commits", "data": [579, 646, 616, 565, 815, 728, 628, 1020, 1221, 1734, 1773, 1770, 1823, 1758, 1396, 1575, 1715, 1252, 1210, 1231, 1877, 1384, 1113, 1635, 1591, 1347, 2018, 1807, 1736, 1592, 1456, 1585, 1841, 1441, 1213, 1858, 1534, 1479, 1904, 1403, 1536, 1710, 874, 1341, 1611, 1048, 1208, 1341, 998, 911, 1366, 889, 1098, 1038, 598, 1023, 1350, 1042, 1300, 1351, 986, 1186, 1488, 880, 1255, 1144, 860, 984, 931, 912, 850, 861, 950, 768, 559, 731, 748, 835, 509, 854, 938, 1181, 793, 702, 896, 619, 661, 588, 630, 711, 395, 585, 495, 867, 285, 652, 516, 678, 573, 582, 726, 709, 571, 777, 644, 1008, 508, 705, 586, 648, 503, 537, 867, 348, 402, 561, 599, 459, 505, 577, 615, 701, 437, 746, 899, 605, 339, 458, 605, 815, 366, 520, 612, 1015, 391, 629, 860, 477, 400, 707, 723, 945, 561, 764, 857, 1096, 368, 639], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: { ticks: { autoSkip: false, maxRotation: 0, callback: monthAxisTick }, grid: { color: monthAxisGrid } },
+        y: { beginAtZero: true, ticks: { precision: 0 } }
+      }
+    }
+  });
+})();
+</script>
+<details class="table-details"><summary>Table: commits and lines per month (148 months with commits)</summary><div class="table-scroll"><table><tr><th>Month</th><th class="num">Commits</th><th class="num">Lines added</th><th class="num">Lines removed</th></tr><tr><td>2026-09</td><td class="num">639</td><td class="num">149,910</td><td class="num">93,678</td></tr><tr><td>2026-08</td><td class="num">368</td><td class="num">29,773</td><td class="num">27,719</td></tr><tr><td>2026-07</td><td class="num">1,096</td><td class="num">401,752</td><td class="num">74,781</td></tr><tr><td>2026-06</td><td class="num">857</td><td class="num">86,613</td><td class="num">99,698</td></tr><tr><td>2026-05</td><td class="num">764</td><td class="num">123,911</td><td class="num">89,100</td></tr><tr><td>2026-04</td><td class="num">561</td><td class="num">181,057</td><td class="num">100,847</td></tr><tr><td>2026-03</td><td class="num">945</td><td class="num">329,632</td><td class="num">64,111</td></tr><tr><td>2026-02</td><td class="num">723</td><td class="num">94,555</td><td class="num">37,795</td></tr><tr><td>2026-01</td><td class="num">707</td><td class="num">56,470</td><td class="num">53,145</td></tr><tr><td>2025-12</td><td class="num">400</td><td class="num">53,309</td><td class="num">50,571</td></tr><tr><td>2025-11</td><td class="num">477</td><td class="num">104,814</td><td class="num">24,206</td></tr><tr><td>2025-10</td><td class="num">860</td><td class="num">61,617</td><td class="num">67,450</td></tr><tr><td>2025-09</td><td class="num">629</td><td class="num">99,796</td><td class="num">47,288</td></tr><tr><td>2025-08</td><td class="num">391</td><td class="num">33,770</td><td class="num">28,197</td></tr><tr><td>2025-07</td><td class="num">1,015</td><td class="num">261,916</td><td class="num">139,155</td></tr><tr><td>2025-06</td><td class="num">612</td><td class="num">55,394</td><td class="num">75,296</td></tr><tr><td>2025-05</td><td class="num">520</td><td class="num">81,370</td><td class="num">53,524</td></tr><tr><td>2025-04</td><td class="num">366</td><td class="num">23,925</td><td class="num">9,324</td></tr><tr><td>2025-03</td><td class="num">815</td><td class="num">222,156</td><td class="num">74,282</td></tr><tr><td>2025-02</td><td class="num">605</td><td class="num">38,708</td><td class="num">12,959</td></tr><tr><td>2025-01</td><td class="num">458</td><td class="num">30,443</td><td class="num">15,884</td></tr><tr><td>2024-12</td><td class="num">339</td><td class="num">19,996</td><td class="num">67,226</td></tr><tr><td>2024-11</td><td class="num">605</td><td class="num">169,506</td><td class="num">117,278</td></tr><tr><td>2024-10</td><td class="num">899</td><td class="num">64,156</td><td class="num">119,697</td></tr><tr><td>2024-09</td><td class="num">746</td><td class="num">82,901</td><td class="num">72,472</td></tr><tr><td>2024-08</td><td class="num">437</td><td class="num">26,876</td><td class="num">75,078</td></tr><tr><td>2024-07</td><td class="num">701</td><td class="num">138,387</td><td class="num">70,575</td></tr><tr><td>2024-06</td><td class="num">615</td><td class="num">232,212</td><td class="num">99,782</td></tr><tr><td>2024-05</td><td class="num">577</td><td class="num">61,800</td><td class="num">1,121,338</td></tr><tr><td>2024-04</td><td class="num">505</td><td class="num">81,556</td><td class="num">89,339</td></tr><tr><td>2024-03</td><td class="num">459</td><td class="num">135,749</td><td class="num">40,931</td></tr><tr><td>2024-02</td><td class="num">599</td><td class="num">48,185</td><td class="num">13,157</td></tr><tr><td>2024-01</td><td class="num">561</td><td class="num">19,966</td><td class="num">481,816</td></tr><tr><td>2023-12</td><td class="num">402</td><td class="num">97,989</td><td class="num">144,524</td></tr><tr><td>2023-11</td><td class="num">348</td><td class="num">49,099</td><td class="num">18,560</td></tr><tr><td>2023-10</td><td class="num">867</td><td class="num">213,025</td><td class="num">75,211</td></tr><tr><td>2023-09</td><td class="num">537</td><td class="num">25,207</td><td class="num">27,033</td></tr><tr><td>2023-08</td><td class="num">503</td><td class="num">210,263</td><td class="num">116,618</td></tr><tr><td>2023-07</td><td class="num">648</td><td class="num">227,459</td><td class="num">57,572</td></tr><tr><td>2023-06</td><td class="num">586</td><td class="num">54,057</td><td class="num">21,314</td></tr><tr><td>2023-05</td><td class="num">705</td><td class="num">344,408</td><td class="num">216,235</td></tr><tr><td>2023-04</td><td class="num">508</td><td class="num">99,361</td><td class="num">87,692</td></tr><tr><td>2023-03</td><td class="num">1,008</td><td class="num">196,600</td><td class="num">437,405</td></tr><tr><td>2023-02</td><td class="num">644</td><td class="num">121,334</td><td class="num">22,373</td></tr><tr><td>2023-01</td><td class="num">777</td><td class="num">74,448</td><td class="num">68,501</td></tr><tr><td>2022-12</td><td class="num">571</td><td class="num">123,920</td><td class="num">110,496</td></tr><tr><td>2022-11</td><td class="num">709</td><td class="num">149,643</td><td class="num">69,413</td></tr><tr><td>2022-10</td><td class="num">726</td><td class="num">205,181</td><td class="num">57,436</td></tr><tr><td>2022-09</td><td class="num">582</td><td class="num">49,370</td><td class="num">133,176</td></tr><tr><td>2022-08</td><td class="num">573</td><td class="num">203,423</td><td class="num">268,160</td></tr><tr><td>2022-07</td><td class="num">678</td><td class="num">70,881</td><td class="num">33,532</td></tr><tr><td>2022-06</td><td class="num">516</td><td class="num">183,234</td><td class="num">129,603</td></tr><tr><td>2022-05</td><td class="num">652</td><td class="num">117,038</td><td class="num">163,314</td></tr><tr><td>2022-04</td><td class="num">285</td><td class="num">4,704</td><td class="num">10,373</td></tr><tr><td>2022-03</td><td class="num">867</td><td class="num">217,529</td><td class="num">123,551</td></tr><tr><td>2022-02</td><td class="num">495</td><td class="num">64,844</td><td class="num">71,844</td></tr><tr><td>2022-01</td><td class="num">585</td><td class="num">21,599</td><td class="num">16,403</td></tr><tr><td>2021-12</td><td class="num">395</td><td class="num">67,082</td><td class="num">121,121</td></tr><tr><td>2021-11</td><td class="num">711</td><td class="num">455,268</td><td class="num">171,772</td></tr><tr><td>2021-10</td><td class="num">630</td><td class="num">48,368</td><td class="num">27,437</td></tr><tr><td>2021-09</td><td class="num">588</td><td class="num">57,673</td><td class="num">17,803</td></tr><tr><td>2021-08</td><td class="num">661</td><td class="num">383,691</td><td class="num">275,465</td></tr><tr><td>2021-07</td><td class="num">619</td><td class="num">147,300</td><td class="num">116,031</td></tr><tr><td>2021-06</td><td class="num">896</td><td class="num">216,488</td><td class="num">169,201</td></tr><tr><td>2021-05</td><td class="num">702</td><td class="num">129,418</td><td class="num">171,226</td></tr><tr><td>2021-04</td><td class="num">793</td><td class="num">80,789</td><td class="num">53,559</td></tr><tr><td>2021-03</td><td class="num">1,181</td><td class="num">542,340</td><td class="num">356,609</td></tr><tr><td>2021-02</td><td class="num">938</td><td class="num">42,705</td><td class="num">32,337</td></tr><tr><td>2021-01</td><td class="num">854</td><td class="num">66,437</td><td class="num">54,744</td></tr><tr><td>2020-12</td><td class="num">509</td><td class="num">26,189</td><td class="num">9,483</td></tr><tr><td>2020-11</td><td class="num">835</td><td class="num">250,765</td><td class="num">84,414</td></tr><tr><td>2020-10</td><td class="num">748</td><td class="num">66,866</td><td class="num">76,446</td></tr><tr><td>2020-09</td><td class="num">731</td><td class="num">31,112</td><td class="num">20,844</td></tr><tr><td>2020-08</td><td class="num">559</td><td class="num">46,191</td><td class="num">39,299</td></tr><tr><td>2020-07</td><td class="num">768</td><td class="num">99,374</td><td class="num">56,115</td></tr><tr><td>2020-06</td><td class="num">950</td><td class="num">154,153</td><td class="num">125,695</td></tr><tr><td>2020-05</td><td class="num">861</td><td class="num">253,579</td><td class="num">137,310</td></tr><tr><td>2020-04</td><td class="num">850</td><td class="num">42,886</td><td class="num">140,384</td></tr><tr><td>2020-03</td><td class="num">912</td><td class="num">76,483</td><td class="num">31,236</td></tr><tr><td>2020-02</td><td class="num">931</td><td class="num">114,181</td><td class="num">40,851</td></tr><tr><td>2020-01</td><td class="num">984</td><td class="num">234,008</td><td class="num">60,555</td></tr><tr><td>2019-12</td><td class="num">860</td><td class="num">135,422</td><td class="num">183,606</td></tr><tr><td>2019-11</td><td class="num">1,144</td><td class="num">201,911</td><td class="num">125,957</td></tr><tr><td>2019-10</td><td class="num">1,255</td><td class="num">95,215</td><td class="num">54,991</td></tr><tr><td>2019-09</td><td class="num">880</td><td class="num">99,110</td><td class="num">112,028</td></tr><tr><td>2019-08</td><td class="num">1,488</td><td class="num">576,656</td><td class="num">232,981</td></tr><tr><td>2019-07</td><td class="num">1,186</td><td class="num">377,536</td><td class="num">94,467</td></tr><tr><td>2019-06</td><td class="num">986</td><td class="num">204,058</td><td class="num">123,558</td></tr><tr><td>2019-05</td><td class="num">1,351</td><td class="num">102,217</td><td class="num">101,368</td></tr><tr><td>2019-04</td><td class="num">1,300</td><td class="num">219,888</td><td class="num">712,604</td></tr><tr><td>2019-03</td><td class="num">1,042</td><td class="num">289,806</td><td class="num">27,192</td></tr><tr><td>2019-02</td><td class="num">1,350</td><td class="num">282,420</td><td class="num">165,801</td></tr><tr><td>2019-01</td><td class="num">1,023</td><td class="num">193,675</td><td class="num">607,709</td></tr><tr><td>2018-12</td><td class="num">598</td><td class="num">57,623</td><td class="num">21,504</td></tr><tr><td>2018-11</td><td class="num">1,038</td><td class="num">136,300</td><td class="num">55,329</td></tr><tr><td>2018-10</td><td class="num">1,098</td><td class="num">139,619</td><td class="num">106,055</td></tr><tr><td>2018-09</td><td class="num">889</td><td class="num">249,421</td><td class="num">33,375</td></tr><tr><td>2018-08</td><td class="num">1,366</td><td class="num">369,648</td><td class="num">57,057</td></tr><tr><td>2018-07</td><td class="num">911</td><td class="num">165,844</td><td class="num">48,630</td></tr><tr><td>2018-06</td><td class="num">998</td><td class="num">265,047</td><td class="num">163,775</td></tr><tr><td>2018-05</td><td class="num">1,341</td><td class="num">90,377</td><td class="num">41,610</td></tr><tr><td>2018-04</td><td class="num">1,208</td><td class="num">123,388</td><td class="num">123,231</td></tr><tr><td>2018-03</td><td class="num">1,048</td><td class="num">68,334</td><td class="num">39,444</td></tr><tr><td>2018-02</td><td class="num">1,611</td><td class="num">314,093</td><td class="num">186,426</td></tr><tr><td>2018-01</td><td class="num">1,341</td><td class="num">163,003</td><td class="num">69,803</td></tr><tr><td>2017-12</td><td class="num">874</td><td class="num">194,363</td><td class="num">136,419</td></tr><tr><td>2017-11</td><td class="num">1,710</td><td class="num">324,338</td><td class="num">123,863</td></tr><tr><td>2017-10</td><td class="num">1,536</td><td class="num">110,410</td><td class="num">180,626</td></tr><tr><td>2017-09</td><td class="num">1,403</td><td class="num">338,412</td><td class="num">331,114</td></tr><tr><td>2017-08</td><td class="num">1,904</td><td class="num">383,962</td><td class="num">172,459</td></tr><tr><td>2017-07</td><td class="num">1,479</td><td class="num">330,900</td><td class="num">202,859</td></tr><tr><td>2017-06</td><td class="num">1,534</td><td class="num">159,634</td><td class="num">390,498</td></tr><tr><td>2017-05</td><td class="num">1,858</td><td class="num">409,756</td><td class="num">256,925</td></tr><tr><td>2017-04</td><td class="num">1,213</td><td class="num">324,224</td><td class="num">127,493</td></tr><tr><td>2017-03</td><td class="num">1,441</td><td class="num">192,436</td><td class="num">350,363</td></tr><tr><td>2017-02</td><td class="num">1,841</td><td class="num">304,842</td><td class="num">181,134</td></tr><tr><td>2017-01</td><td class="num">1,585</td><td class="num">514,996</td><td class="num">371,448</td></tr><tr><td>2016-12</td><td class="num">1,456</td><td class="num">270,211</td><td class="num">498,479</td></tr><tr><td>2016-11</td><td class="num">1,592</td><td class="num">275,770</td><td class="num">227,471</td></tr><tr><td>2016-10</td><td class="num">1,736</td><td class="num">482,456</td><td class="num">377,501</td></tr><tr><td>2016-09</td><td class="num">1,807</td><td class="num">543,034</td><td class="num">220,035</td></tr><tr><td>2016-08</td><td class="num">2,018</td><td class="num">1,412,323</td><td class="num">638,226</td></tr><tr><td>2016-07</td><td class="num">1,347</td><td class="num">199,337</td><td class="num">196,209</td></tr><tr><td>2016-06</td><td class="num">1,591</td><td class="num">108,764</td><td class="num">67,852</td></tr><tr><td>2016-05</td><td class="num">1,635</td><td class="num">409,829</td><td class="num">370,463</td></tr><tr><td>2016-04</td><td class="num">1,113</td><td class="num">191,930</td><td class="num">57,646</td></tr><tr><td>2016-03</td><td class="num">1,384</td><td class="num">135,223</td><td class="num">58,916</td></tr><tr><td>2016-02</td><td class="num">1,877</td><td class="num">442,283</td><td class="num">306,186</td></tr><tr><td>2016-01</td><td class="num">1,231</td><td class="num">587,123</td><td class="num">277,018</td></tr><tr><td>2015-12</td><td class="num">1,210</td><td class="num">245,602</td><td class="num">215,339</td></tr><tr><td>2015-11</td><td class="num">1,252</td><td class="num">150,417</td><td class="num">96,395</td></tr><tr><td>2015-10</td><td class="num">1,715</td><td class="num">475,164</td><td class="num">362,741</td></tr><tr><td>2015-09</td><td class="num">1,575</td><td class="num">167,702</td><td class="num">88,524</td></tr><tr><td>2015-08</td><td class="num">1,396</td><td class="num">155,643</td><td class="num">360,280</td></tr><tr><td>2015-07</td><td class="num">1,758</td><td class="num">235,952</td><td class="num">230,649</td></tr><tr><td>2015-06</td><td class="num">1,823</td><td class="num">397,165</td><td class="num">149,770</td></tr><tr><td>2015-05</td><td class="num">1,770</td><td class="num">257,908</td><td class="num">227,462</td></tr><tr><td>2015-04</td><td class="num">1,773</td><td class="num">469,967</td><td class="num">49,169</td></tr><tr><td>2015-03</td><td class="num">1,734</td><td class="num">223,469</td><td class="num">116,535</td></tr><tr><td>2015-02</td><td class="num">1,221</td><td class="num">171,415</td><td class="num">51,333</td></tr><tr><td>2015-01</td><td class="num">1,020</td><td class="num">158,822</td><td class="num">57,412</td></tr><tr><td>2014-12</td><td class="num">628</td><td class="num">98,611</td><td class="num">15,102</td></tr><tr><td>2014-11</td><td class="num">728</td><td class="num">58,680</td><td class="num">11,905</td></tr><tr><td>2014-10</td><td class="num">815</td><td class="num">59,790</td><td class="num">14,887</td></tr><tr><td>2014-09</td><td class="num">565</td><td class="num">35,769</td><td class="num">8,868</td></tr><tr><td>2014-08</td><td class="num">616</td><td class="num">27,346</td><td class="num">391,344</td></tr><tr><td>2014-07</td><td class="num">646</td><td class="num">61,997</td><td class="num">9,557</td></tr><tr><td>2014-06</td><td class="num">579</td><td class="num">463,690</td><td class="num">6,533</td></tr></table></div></details>
+<h2 id="weekly_activity"><a href="#weekly_activity">Weekly activity</a></h2>
+
+<p class="section-note">Last 32 weeks, from the week of Feb 16, 2026 to the week of Sep 21, 2026.</p><div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-weekly-activity"></canvas></div>
+<script>
+(function() {
+  var ctx = document.getElementById('chart-weekly-activity').getContext('2d');
+  var labels = ["Feb 16", "Feb 23", "Mar 2", "Mar 9", "Mar 16", "Mar 23", "Mar 30", "Apr 6", "Apr 13", "Apr 20", "Apr 27", "May 4", "May 11", "May 18", "May 25", "Jun 1", "Jun 8", "Jun 15", "Jun 22", "Jun 29", "Jul 6", "Jul 13", "Jul 20", "Jul 27", "Aug 3", "Aug 10", "Aug 17", "Aug 24", "Aug 31", "Sep 7", "Sep 14", "Sep 21"];
+  applyChartTheme();
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{"label": "Commits", "data": [183, 187, 259, 292, 295, 62, 56, 84, 82, 217, 175, 230, 203, 171, 136, 122, 234, 195, 225, 234, 292, 294, 288, 76, 57, 47, 60, 173, 164, 200, 149, 150], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { precision: 0 } }
+      }
+    }
+  });
+})();
+</script>
+<span id="hour_of_day"></span><span id="day_of_week"></span><span id="hour_of_week"></span>
+<h2 id="punch_card"><a href="#punch_card">Punch card</a></h2>
+
+<p class="section-note">Commits by day of week and hour of day, in each commit's local time. The bars along the top are the commits per hour; the last column is the commits per day.</p><div class="table-scroll"><table class="punch-card"><tr><th>Day</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th><th class="num">Total</th></tr><tr class="punch-hour-bars"><th>Hour</th><td title="00:00 &middot; 6,569 commits &middot; 4.6%"><div class="punch-vbar"><span class="punch-vbar-value">6,569</span><span class="punch-vbar-fill" style="height: 32px"></span></div></td><td title="01:00 &middot; 5,601 commits &middot; 4.0%"><div class="punch-vbar"><span class="punch-vbar-value">5,601</span><span class="punch-vbar-fill" style="height: 27px"></span></div></td><td title="02:00 &middot; 4,995 commits &middot; 3.5%"><div class="punch-vbar"><span class="punch-vbar-value">4,995</span><span class="punch-vbar-fill" style="height: 24px"></span></div></td><td title="03:00 &middot; 4,735 commits &middot; 3.3%"><div class="punch-vbar"><span class="punch-vbar-value">4,735</span><span class="punch-vbar-fill" style="height: 23px"></span></div></td><td title="04:00 &middot; 3,928 commits &middot; 2.8%"><div class="punch-vbar"><span class="punch-vbar-value">3,928</span><span class="punch-vbar-fill" style="height: 19px"></span></div></td><td title="05:00 &middot; 4,035 commits &middot; 2.9%"><div class="punch-vbar"><span class="punch-vbar-value">4,035</span><span class="punch-vbar-fill" style="height: 19px"></span></div></td><td title="06:00 &middot; 4,292 commits &middot; 3.0%"><div class="punch-vbar"><span class="punch-vbar-value">4,292</span><span class="punch-vbar-fill" style="height: 21px"></span></div></td><td title="07:00 &middot; 4,657 commits &middot; 3.3%"><div class="punch-vbar"><span class="punch-vbar-value">4,657</span><span class="punch-vbar-fill" style="height: 22px"></span></div></td><td title="08:00 &middot; 4,971 commits &middot; 3.5%"><div class="punch-vbar"><span class="punch-vbar-value">4,971</span><span class="punch-vbar-fill" style="height: 24px"></span></div></td><td title="09:00 &middot; 4,922 commits &middot; 3.5%"><div class="punch-vbar"><span class="punch-vbar-value">4,922</span><span class="punch-vbar-fill" style="height: 24px"></span></div></td><td title="10:00 &middot; 4,345 commits &middot; 3.1%"><div class="punch-vbar"><span class="punch-vbar-value">4,345</span><span class="punch-vbar-fill" style="height: 21px"></span></div></td><td title="11:00 &middot; 4,424 commits &middot; 3.1%"><div class="punch-vbar"><span class="punch-vbar-value">4,424</span><span class="punch-vbar-fill" style="height: 21px"></span></div></td><td title="12:00 &middot; 4,793 commits &middot; 3.4%"><div class="punch-vbar"><span class="punch-vbar-value">4,793</span><span class="punch-vbar-fill" style="height: 23px"></span></div></td><td title="13:00 &middot; 5,385 commits &middot; 3.8%"><div class="punch-vbar"><span class="punch-vbar-value">5,385</span><span class="punch-vbar-fill" style="height: 26px"></span></div></td><td title="14:00 &middot; 5,991 commits &middot; 4.2%"><div class="punch-vbar"><span class="punch-vbar-value">5,991</span><span class="punch-vbar-fill" style="height: 29px"></span></div></td><td title="15:00 &middot; 6,609 commits &middot; 4.7%"><div class="punch-vbar"><span class="punch-vbar-value">6,609</span><span class="punch-vbar-fill" style="height: 32px"></span></div></td><td title="16:00 &middot; 6,674 commits &middot; 4.7%"><div class="punch-vbar"><span class="punch-vbar-value">6,674</span><span class="punch-vbar-fill" style="height: 32px"></span></div></td><td title="17:00 &middot; 7,553 commits &middot; 5.3%"><div class="punch-vbar"><span class="punch-vbar-value">7,553</span><span class="punch-vbar-fill" style="height: 36px"></span></div></td><td title="18:00 &middot; 8,310 commits &middot; 5.9%"><div class="punch-vbar"><span class="punch-vbar-value">8,310</span><span class="punch-vbar-fill" style="height: 40px"></span></div></td><td title="19:00 &middot; 7,752 commits &middot; 5.5%"><div class="punch-vbar"><span class="punch-vbar-value">7,752</span><span class="punch-vbar-fill" style="height: 37px"></span></div></td><td title="20:00 &middot; 7,808 commits &middot; 5.5%"><div class="punch-vbar"><span class="punch-vbar-value">7,808</span><span class="punch-vbar-fill" style="height: 38px"></span></div></td><td title="21:00 &middot; 8,280 commits &middot; 5.9%"><div class="punch-vbar"><span class="punch-vbar-value">8,280</span><span class="punch-vbar-fill" style="height: 40px"></span></div></td><td title="22:00 &middot; 7,722 commits &middot; 5.5%"><div class="punch-vbar"><span class="punch-vbar-value">7,722</span><span class="punch-vbar-fill" style="height: 37px"></span></div></td><td title="23:00 &middot; 7,179 commits &middot; 5.1%"><div class="punch-vbar"><span class="punch-vbar-value">7,179</span><span class="punch-vbar-fill" style="height: 35px"></span></div></td><td></td></tr><tr><th>Mon</th><td class="heat heat1">213</td><td class="heat heat1">310</td><td class="heat heat1">395</td><td class="heat heat2">428</td><td class="heat heat1">302</td><td class="heat heat1">347</td><td class="heat heat2">462</td><td class="heat heat2">604</td><td class="heat heat2">677</td><td class="heat heat2">708</td><td class="heat heat2">626</td><td class="heat heat2">678</td><td class="heat heat2">746</td><td class="heat heat3">911</td><td class="heat heat3">1,042</td><td class="heat heat3">1,041</td><td class="heat heat3">1,159</td><td class="heat heat4">1,323</td><td class="heat heat4">1,443</td><td class="heat heat4">1,411</td><td class="heat heat4">1,424</td><td class="heat heat4">1,453</td><td class="heat heat4">1,364</td><td class="heat heat3">1,215</td><td class="num punch-total">20,282 (14.3%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 72.9%"></span></span></td></tr><tr><th>Tue</th><td class="heat heat3">1,112</td><td class="heat heat3">968</td><td class="heat heat2">783</td><td class="heat heat3">829</td><td class="heat heat2">686</td><td class="heat heat2">654</td><td class="heat heat2">692</td><td class="heat heat3">841</td><td class="heat heat3">935</td><td class="heat heat3">936</td><td class="heat heat2">799</td><td class="heat heat3">824</td><td class="heat heat3">969</td><td class="heat heat3">995</td><td class="heat heat3">1,095</td><td class="heat heat4">1,300</td><td class="heat heat4">1,253</td><td class="heat heat4">1,478</td><td class="heat heat4">1,638</td><td class="heat heat4">1,489</td><td class="heat heat4">1,476</td><td class="heat heat4">1,601</td><td class="heat heat4">1,516</td><td class="heat heat4">1,434</td><td class="num punch-total">26,303 (18.6%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 94.6%"></span></span></td></tr><tr><th>Wed</th><td class="heat heat4">1,392</td><td class="heat heat3">1,173</td><td class="heat heat3">1,112</td><td class="heat heat3">949</td><td class="heat heat2">777</td><td class="heat heat2">783</td><td class="heat heat3">891</td><td class="heat heat3">910</td><td class="heat heat3">955</td><td class="heat heat3">948</td><td class="heat heat2">811</td><td class="heat heat2">815</td><td class="heat heat3">941</td><td class="heat heat3">1,047</td><td class="heat heat3">1,176</td><td class="heat heat4">1,259</td><td class="heat heat4">1,265</td><td class="heat heat4">1,458</td><td class="heat heat4">1,590</td><td class="heat heat4">1,447</td><td class="heat heat4">1,575</td><td class="heat heat4">1,615</td><td class="heat heat4">1,477</td><td class="heat heat4">1,441</td><td class="num punch-total">27,807 (19.6%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><th>Thu</th><td class="heat heat4">1,295</td><td class="heat heat3">1,108</td><td class="heat heat3">909</td><td class="heat heat3">844</td><td class="heat heat2">738</td><td class="heat heat3">868</td><td class="heat heat3">880</td><td class="heat heat3">911</td><td class="heat heat3">1,072</td><td class="heat heat3">922</td><td class="heat heat3">899</td><td class="heat heat3">918</td><td class="heat heat3">889</td><td class="heat heat3">1,036</td><td class="heat heat3">1,087</td><td class="heat heat3">1,211</td><td class="heat heat3">1,229</td><td class="heat heat4">1,459</td><td class="heat heat4">1,633</td><td class="heat heat4">1,491</td><td class="heat heat4">1,470</td><td class="heat heat4">1,642</td><td class="heat heat4">1,454</td><td class="heat heat4">1,343</td><td class="num punch-total">27,308 (19.3%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 98.2%"></span></span></td></tr><tr><th>Fri</th><td class="heat heat4">1,290</td><td class="heat heat3">1,012</td><td class="heat heat3">923</td><td class="heat heat3">842</td><td class="heat heat2">675</td><td class="heat heat2">771</td><td class="heat heat2">759</td><td class="heat heat3">839</td><td class="heat heat3">862</td><td class="heat heat3">899</td><td class="heat heat2">794</td><td class="heat heat2">782</td><td class="heat heat2">797</td><td class="heat heat3">929</td><td class="heat heat3">1,013</td><td class="heat heat3">1,185</td><td class="heat heat3">1,217</td><td class="heat heat4">1,351</td><td class="heat heat4">1,403</td><td class="heat heat4">1,307</td><td class="heat heat4">1,326</td><td class="heat heat4">1,462</td><td class="heat heat4">1,420</td><td class="heat heat3">1,228</td><td class="num punch-total">25,086 (17.7%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 90.2%"></span></span></td></tr><tr><th>Sat</th><td class="heat heat3">1,007</td><td class="heat heat2">788</td><td class="heat heat2">624</td><td class="heat heat2">541</td><td class="heat heat2">487</td><td class="heat heat1">402</td><td class="heat heat1">405</td><td class="heat heat1">339</td><td class="heat heat1">290</td><td class="heat heat1">339</td><td class="heat heat1">267</td><td class="heat heat1">239</td><td class="heat heat1">250</td><td class="heat heat1">239</td><td class="heat heat1">354</td><td class="heat heat1">356</td><td class="heat heat1">357</td><td class="heat heat1">261</td><td class="heat heat1">369</td><td class="heat heat1">337</td><td class="heat heat1">282</td><td class="heat heat1">268</td><td class="heat heat1">265</td><td class="heat heat1">301</td><td class="num punch-total">9,367 (6.6%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 33.7%"></span></span></td></tr><tr><th>Sun</th><td class="heat heat1">260</td><td class="heat heat1">242</td><td class="heat heat1">249</td><td class="heat heat1">302</td><td class="heat heat1">263</td><td class="heat heat1">210</td><td class="heat heat1">203</td><td class="heat heat1">213</td><td class="heat heat1">180</td><td class="heat heat1">170</td><td class="heat heat1">149</td><td class="heat heat1">168</td><td class="heat heat1">201</td><td class="heat heat1">228</td><td class="heat heat1">224</td><td class="heat heat1">257</td><td class="heat heat1">194</td><td class="heat heat1">223</td><td class="heat heat1">234</td><td class="heat heat1">270</td><td class="heat heat1">255</td><td class="heat heat1">239</td><td class="heat heat1">226</td><td class="heat heat1">217</td><td class="num punch-total">5,377 (3.8%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 19.3%"></span></span></td></tr></table></div><p class="heat-legend">Fewer<span class="heat0"></span><span class="heat1"></span><span class="heat2"></span><span class="heat3"></span><span class="heat4"></span>More commits</p><div class="two-columns"><section>
+<h2 id="month_of_year"><a href="#month_of_year">Month of year</a></h2>
+
+<div class="chart-box" style="--chart-ratio: 2"><canvas id="chart-month-of-year"></canvas></div>
+<script>
+(function() {
+  var ctx = document.getElementById('chart-month-of-year').getContext('2d');
+  var labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  applyChartTheme();
+  new Chart(ctx, {
+    type: 'bar',
+    plugins: [chartAnnotations],
+    data: {
+      labels: labels,
+      datasets: [{"label": "Commits", "data": [11126, 12835, 12836, 10475, 12736, 12543, 12852, 12280, 11571, 12885, 11149, 8242], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: function(item) {
+          const total = item.dataset.data.reduce(function(a, b) { return a + b; }, 0) || 1;
+          return item.parsed.y + ' commits (' + (100 * item.parsed.y / total).toFixed(1) + '%)';
+        } } },
+        gsAnnotations: {"values": true}
+      },
+      scales: {
+        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
+        y: { display: false, beginAtZero: true, grace: '10%' }
+      }, datasets: { bar: { maxBarThickness: 40 } }
+    }
+  });
+})();
+</script>
+</section><section>
+<h2 id="commits_by_timezone"><a href="#commits_by_timezone">Commits by timezone</a></h2>
+
+<div class="table-scroll"><table class="share-table"><tr><th>UTC offset</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td class="nowrap">UTC-10:00</td><td class="num">3</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.0%"></span></span></td></tr><tr><td class="nowrap">UTC-08:00</td><td class="num">25,773</td><td class="num">18.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 49.8%"></span></span></td></tr><tr><td class="nowrap">UTC-07:00</td><td class="num">51,724</td><td class="num">36.5%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td class="nowrap">UTC-06:00</td><td class="num">568</td><td class="num">0.4%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.1%"></span></span></td></tr><tr><td class="nowrap">UTC-05:00</td><td class="num">6,272</td><td class="num">4.4%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 12.1%"></span></span></td></tr><tr><td class="nowrap">UTC-04:00</td><td class="num">10,447</td><td class="num">7.4%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 20.2%"></span></span></td></tr><tr><td class="nowrap">UTC-03:00</td><td class="num">251</td><td class="num">0.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.5%"></span></span></td></tr><tr><td class="nowrap">UTC-02:00</td><td class="num">42</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.1%"></span></span></td></tr><tr><td class="nowrap">UTC+00:00</td><td class="num">8,452</td><td class="num">6.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 16.3%"></span></span></td></tr><tr><td class="nowrap">UTC+01:00</td><td class="num">8,162</td><td class="num">5.8%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 15.8%"></span></span></td></tr><tr><td class="nowrap">UTC+02:00</td><td class="num">10,658</td><td class="num">7.5%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 20.6%"></span></span></td></tr><tr><td class="nowrap">UTC+03:00</td><td class="num">1,603</td><td class="num">1.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.1%"></span></span></td></tr><tr><td class="nowrap">UTC+03:30</td><td class="num">23</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.0%"></span></span></td></tr><tr><td class="nowrap">UTC+04:00</td><td class="num">37</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.1%"></span></span></td></tr><tr><td class="nowrap">UTC+04:30</td><td class="num">8</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.0%"></span></span></td></tr><tr><td class="nowrap">UTC+05:00</td><td class="num">5</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.0%"></span></span></td></tr><tr><td class="nowrap">UTC+05:30</td><td class="num">3,590</td><td class="num">2.5%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 6.9%"></span></span></td></tr><tr><td class="nowrap">UTC+05:45</td><td class="num">6</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.0%"></span></span></td></tr><tr><td class="nowrap">UTC+06:00</td><td class="num">13</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.0%"></span></span></td></tr><tr><td class="nowrap">UTC+07:00</td><td class="num">50</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.1%"></span></span></td></tr><tr><td class="nowrap">UTC+08:00</td><td class="num">12,038</td><td class="num">8.5%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 23.3%"></span></span></td></tr><tr><td class="nowrap">UTC+09:00</td><td class="num">1,226</td><td class="num">0.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.4%"></span></span></td></tr><tr><td class="nowrap">UTC+10:00</td><td class="num">191</td><td class="num">0.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="nowrap">UTC+11:00</td><td class="num">83</td><td class="num">0.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="nowrap">UTC+12:00</td><td class="num">151</td><td class="num">0.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.3%"></span></span></td></tr><tr><td class="nowrap">UTC+13:00</td><td class="num">154</td><td class="num">0.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.3%"></span></span></td></tr></table></div></section></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body></html>

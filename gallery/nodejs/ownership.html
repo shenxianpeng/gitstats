@@ -5,34 +5,233 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Node.js</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.2.post1.dev1">
+	<meta name="generator" content="GitStats 2.7.0">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -45,23 +244,23 @@
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
-            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="ownership.html" class="active" aria-current="page">Code Ownership</a></li>
             <li><a href="history.html">History</a></li>
             
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Code Ownership</h1><div class="ownership-summary"><p>Ownership is measured by how many commits each author made to each file. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl><dt>Files tracked</dt><dd>126648</dd><dt>Single-owner files</dt><dd>54663 (43.2%)</dd><dt>Contributors</dt><dd>4349</dd></dl></div>
-<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus Factor Risk — Single-Owner Files</a></h2>
+            <h1>Code Ownership</h1><p class="section-note">Ownership is measured by how many commits each author made to each file in the current tree. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Files Tracked</dt><dd class="stat-value">51,912</dd><dd class="stat-note">in the current tree</dd></div><div class="stat-tile"><dt>Single-Owner Files</dt><dd class="stat-value">30,309</dd><dd class="stat-note">58.4% of tracked files</dd></div><div class="stat-tile"><dt>Contributors</dt><dd class="stat-value">3,846</dd><dd class="stat-note">authors who changed files</dd></div></dl>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus factor risk — single-owner files</a></h2>
 
-<p><em>Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</em></p><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th>Commits</th></tr><tr><td>src/net.cc</td><td>Ryan Dahl</td><td>115</td></tr><tr><td>deps/npm/html/doc/changelog.html</td><td>Isaac Z. Schlueter</td><td>84</td></tr><tr><td>deps/npm/html/api/bin.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/bugs.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/commands.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/config.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/deprecate.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/docs.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/edit.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/explore.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/help-search.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/init.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/install.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/link.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/load.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/ls.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/npm.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/outdated.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/owner.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/pack.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/prefix.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/prune.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/publish.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/rebuild.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/restart.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/root.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/run-script.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/search.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/start.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/stop.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/submodule.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/tag.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/test.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/uninstall.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/unpublish.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/update.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/version.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/view.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/api/whoami.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/adduser.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/bin.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/bugs.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/build.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/bundle.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/cache.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/coding-style.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/completion.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/config.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/deprecate.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr><tr><td>deps/npm/html/doc/developers.html</td><td>Isaac Z. Schlueter</td><td>82</td></tr></table><p class="moreauthors">Showing top 50 of 54663 single-owner files.</p>
-<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by Author</a></h2>
+<p class="section-note">Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</p><div class="table-scroll"><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">deps/npm/man/man1/npm-pkg.1</td><td>npm team</td><td class="num">69</td></tr><tr><td class="path">deps/npm/man/man7/logging.7</td><td>npm team</td><td class="num">61</td></tr><tr><td class="path">deps/npm/man/man7/dependency-selectors.7</td><td>npm team</td><td class="num">54</td></tr><tr><td class="path">deps/npm/man/man7/package-spec.7</td><td>npm team</td><td class="num">54</td></tr><tr><td class="path">deps/npm/man/man1/npm-query.1</td><td>npm team</td><td class="num">52</td></tr><tr><td class="path">deps/npm/man/man1/npm-login.1</td><td>npm team</td><td class="num">49</td></tr><tr><td class="path">deps/npm/docs/output/commands/npm-pkg.html</td><td>npm team</td><td class="num">45</td></tr><tr><td class="path">deps/npm/tap-snapshots/test/lib/docs.js.test.cjs</td><td>npm team</td><td class="num">45</td></tr><tr><td class="path">deps/npm/docs/output/commands/npm-query.html</td><td>npm team</td><td class="num">39</td></tr><tr><td class="path">deps/npm/docs/output/using-npm/dependency-selectors.html</td><td>npm team</td><td class="num">39</td></tr></table></div><details class="table-details"><summary>Table: the 100 most-changed of 30,309 single-owner files</summary><div class="table-scroll"><table class="sortable" id="ownership-busfactor-all"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">deps/npm/man/man1/npm-pkg.1</td><td>npm team</td><td class="num">69</td></tr><tr><td class="path">deps/npm/man/man7/logging.7</td><td>npm team</td><td class="num">61</td></tr><tr><td class="path">deps/npm/man/man7/dependency-selectors.7</td><td>npm team</td><td class="num">54</td></tr><tr><td class="path">deps/npm/man/man7/package-spec.7</td><td>npm team</td><td class="num">54</td></tr><tr><td class="path">deps/npm/man/man1/npm-query.1</td><td>npm team</td><td class="num">52</td></tr><tr><td class="path">deps/npm/man/man1/npm-login.1</td><td>npm team</td><td class="num">49</td></tr><tr><td class="path">deps/npm/docs/output/commands/npm-pkg.html</td><td>npm team</td><td class="num">45</td></tr><tr><td class="path">deps/npm/tap-snapshots/test/lib/docs.js.test.cjs</td><td>npm team</td><td class="num">45</td></tr><tr><td class="path">deps/npm/docs/output/commands/npm-query.html</td><td>npm team</td><td class="num">39</td></tr><tr><td class="path">deps/npm/docs/output/using-npm/dependency-selectors.html</td><td>npm team</td><td class="num">39</td></tr><tr><td class="path">deps/npm/lib/commands/publish.js</td><td>npm team</td><td class="num">39</td></tr><tr><td class="path">deps/npm/man/man1/npm-sbom.1</td><td>npm team</td><td class="num">38</td></tr><tr><td class="path">deps/npm/docs/output/using-npm/logging.html</td><td>npm team</td><td class="num">36</td></tr><tr><td class="path">deps/npm/docs/output/commands/npm-login.html</td><td>npm team</td><td class="num">35</td></tr><tr><td class="path">deps/npm/docs/output/commands/npm-sbom.html</td><td>npm team</td><td class="num">35</td></tr><tr><td class="path">deps/npm/docs/output/using-npm/package-spec.html</td><td>npm team</td><td class="num">35</td></tr><tr><td class="path">deps/npm/docs/output/configuring-npm/npm-global.html</td><td>npm team</td><td class="num">33</td></tr><tr><td class="path">deps/npm/docs/output/configuring-npm/npm-json.html</td><td>npm team</td><td class="num">33</td></tr><tr><td class="path">deps/npm/test/lib/commands/publish.js</td><td>npm team</td><td class="num">33</td></tr><tr><td class="path">deps/npm/tap-snapshots/test/lib/commands/config.js.test.cjs</td><td>npm team</td><td class="num">32</td></tr><tr><td class="path">deps/corepack/dist/lib/corepack.cjs</td><td>Node.js GitHub Bot</td><td class="num">30</td></tr><tr><td class="path">deps/npm/lib/commands/install.js</td><td>npm team</td><td class="num">28</td></tr><tr><td class="path">deps/npm/node_modules/@npmcli/config/lib/definitions/definitions.js</td><td>npm team</td><td class="num">28</td></tr><tr><td class="path">deps/v8/src/codegen/reloc-info.cc</td><td>Michaël Zasso</td><td class="num">28</td></tr><tr><td class="path">deps/v8/src/baseline/baseline-compiler.cc</td><td>Michaël Zasso</td><td class="num">27</td></tr><tr><td class="path">deps/v8/src/objects/js-function-inl.h</td><td>Michaël Zasso</td><td class="num">27</td></tr><tr><td class="path">deps/v8/src/objects/js-function.h</td><td>Michaël Zasso</td><td class="num">27</td></tr><tr><td class="path">deps/npm/lib/commands/view.js</td><td>npm team</td><td class="num">26</td></tr><tr><td class="path">deps/v8/src/heap/cppgc/sweeper.cc</td><td>Michaël Zasso</td><td class="num">26</td></tr><tr><td class="path">deps/npm/docs/output/commands/npm-undeprecate.html</td><td>npm team</td><td class="num">25</td></tr><tr><td class="path">deps/npm/man/man1/npm-undeprecate.1</td><td>npm team</td><td class="num">25</td></tr><tr><td class="path">deps/npm/tap-snapshots/test/lib/commands/publish.js.test.cjs</td><td>npm team</td><td class="num">25</td></tr><tr><td class="path">deps/npm/test/lib/commands/audit.js</td><td>npm team</td><td class="num">25</td></tr><tr><td class="path">deps/v8/src/heap/memory-allocator.cc</td><td>Michaël Zasso</td><td class="num">25</td></tr><tr><td class="path">deps/npm/lib/commands/unpublish.js</td><td>npm team</td><td class="num">24</td></tr><tr><td class="path">deps/v8/src/codegen/mips64/assembler-mips64.cc</td><td>Michaël Zasso</td><td class="num">24</td></tr><tr><td class="path">deps/npm/lib/commands/outdated.js</td><td>npm team</td><td class="num">23</td></tr><tr><td class="path">deps/npm/lib/commands/init.js</td><td>npm team</td><td class="num">23</td></tr><tr><td class="path">deps/v8/src/execution/local-isolate.h</td><td>Michaël Zasso</td><td class="num">23</td></tr><tr><td class="path">deps/v8/src/heap/heap-write-barrier.cc</td><td>Michaël Zasso</td><td class="num">23</td></tr><tr><td class="path">deps/v8/src/heap/read-only-spaces.cc</td><td>Michaël Zasso</td><td class="num">23</td></tr><tr><td class="path">deps/v8/src/objects/transitions-inl.h</td><td>Michaël Zasso</td><td class="num">23</td></tr><tr><td class="path">deps/v8/src/heap/local-heap-inl.h</td><td>Michaël Zasso</td><td class="num">23</td></tr><tr><td class="path">deps/npm/docs/output/commands/npm-run.html</td><td>npm team</td><td class="num">22</td></tr><tr><td class="path">deps/npm/lib/commands/audit.js</td><td>npm team</td><td class="num">22</td></tr><tr><td class="path">deps/npm/lib/commands/ci.js</td><td>npm team</td><td class="num">22</td></tr><tr><td class="path">deps/npm/lib/commands/link.js</td><td>npm team</td><td class="num">22</td></tr><tr><td class="path">deps/npm/lib/commands/ls.js</td><td>npm team</td><td class="num">22</td></tr><tr><td class="path">deps/npm/man/man1/npm-run.1</td><td>npm team</td><td class="num">22</td></tr><tr><td class="path">deps/undici/src/docs/docs/api/Dispatcher.md</td><td>Node.js GitHub Bot</td><td class="num">22</td></tr><tr><td class="path">deps/v8/src/heap/cppgc-js/cpp-snapshot.cc</td><td>Michaël Zasso</td><td class="num">22</td></tr><tr><td class="path">deps/v8/src/runtime/runtime-test-wasm.cc</td><td>Michaël Zasso</td><td class="num">22</td></tr><tr><td class="path">deps/v8/src/numbers/conversions.cc</td><td>Michaël Zasso</td><td class="num">22</td></tr><tr><td class="path">deps/v8/src/compiler/typed-optimization.h</td><td>Michaël Zasso</td><td class="num">22</td></tr><tr><td class="path">deps/npm/lib/commands/completion.js</td><td>npm team</td><td class="num">21</td></tr><tr><td class="path">deps/npm/lib/commands/token.js</td><td>npm team</td><td class="num">21</td></tr><tr><td class="path">deps/npm/lib/commands/update.js</td><td>npm team</td><td class="num">21</td></tr><tr><td class="path">deps/npm/node_modules/@npmcli/package-json/package.json</td><td>npm team</td><td class="num">21</td></tr><tr><td class="path">deps/npm/test/lib/commands/exec.js</td><td>npm team</td><td class="num">21</td></tr><tr><td class="path">deps/npm/lib/commands/cache.js</td><td>npm team</td><td class="num">21</td></tr><tr><td class="path">deps/undici/src/lib/dispatcher/client-h1.js</td><td>Node.js GitHub Bot</td><td class="num">21</td></tr><tr><td class="path">deps/v8/src/debug/debug-wasm-objects.cc</td><td>Michaël Zasso</td><td class="num">21</td></tr><tr><td class="path">deps/v8/src/handles/handles.cc</td><td>Michaël Zasso</td><td class="num">21</td></tr><tr><td class="path">deps/npm/test/lib/commands/view.js</td><td>npm team</td><td class="num">20</td></tr><tr><td class="path">deps/npm/lib/commands/owner.js</td><td>npm team</td><td class="num">20</td></tr><tr><td class="path">deps/npm/lib/commands/config.js</td><td>npm team</td><td class="num">20</td></tr><tr><td class="path">deps/npm/lib/commands/diff.js</td><td>npm team</td><td class="num">20</td></tr><tr><td class="path">deps/v8/src/heap/cppgc/object-allocator.cc</td><td>Michaël Zasso</td><td class="num">20</td></tr><tr><td class="path">deps/v8/src/heap/large-spaces.h</td><td>Michaël Zasso</td><td class="num">20</td></tr><tr><td class="path">deps/v8/src/heap/new-spaces-inl.h</td><td>Michaël Zasso</td><td class="num">20</td></tr><tr><td class="path">deps/v8/src/regexp/loong64/regexp-macro-assembler-loong64.cc</td><td>Michaël Zasso</td><td class="num">20</td></tr><tr><td class="path">deps/v8/src/codegen/compilation-cache.cc</td><td>Michaël Zasso</td><td class="num">20</td></tr><tr><td class="path">deps/npm/lib/commands/doctor.js</td><td>npm team</td><td class="num">19</td></tr><tr><td class="path">deps/npm/tap-snapshots/test/lib/npm.js.test.cjs</td><td>npm team</td><td class="num">19</td></tr><tr><td class="path">deps/npm/lib/commands/exec.js</td><td>npm team</td><td class="num">19</td></tr><tr><td class="path">deps/cares/RELEASE-NOTES.md</td><td>Node.js GitHub Bot</td><td class="num">19</td></tr><tr><td class="path">deps/v8/include/v8-metrics.h</td><td>Michaël Zasso</td><td class="num">19</td></tr><tr><td class="path">deps/v8/src/heap/code-range.cc</td><td>Michaël Zasso</td><td class="num">19</td></tr><tr><td class="path">deps/v8/src/heap/memory-allocator.h</td><td>Michaël Zasso</td><td class="num">19</td></tr><tr><td class="path">deps/v8/src/objects/synthetic-module.cc</td><td>Michaël Zasso</td><td class="num">19</td></tr><tr><td class="path">deps/v8/src/strings/string-stream.cc</td><td>Michaël Zasso</td><td class="num">19</td></tr><tr><td class="path">deps/v8/test/cctest/test-shared-strings.cc</td><td>Michaël Zasso</td><td class="num">19</td></tr><tr><td class="path">deps/v8/src/codegen/ppc/assembler-ppc-inl.h</td><td>Michaël Zasso</td><td class="num">19</td></tr><tr><td class="path">deps/v8/src/objects/maybe-object.h</td><td>Michaël Zasso</td><td class="num">19</td></tr><tr><td class="path">deps/v8/src/objects/compressed-slots-inl.h</td><td>Michaël Zasso</td><td class="num">19</td></tr><tr><td class="path">deps/v8/src/heap/cppgc/marking-state.h</td><td>Michaël Zasso</td><td class="num">19</td></tr><tr><td class="path">deps/npm/node_modules/libnpmpublish/lib/publish.js</td><td>npm team</td><td class="num">18</td></tr><tr><td class="path">deps/npm/lib/commands/dist-tag.js</td><td>npm team</td><td class="num">18</td></tr><tr><td class="path">deps/undici/src/lib/dispatcher/proxy-agent.js</td><td>Node.js GitHub Bot</td><td class="num">18</td></tr><tr><td class="path">deps/v8/src/baseline/baseline-assembler.h</td><td>Michaël Zasso</td><td class="num">18</td></tr><tr><td class="path">deps/v8/src/diagnostics/ppc/disasm-ppc.cc</td><td>Michaël Zasso</td><td class="num">18</td></tr><tr><td class="path">deps/v8/src/heap/cppgc/stats-collector.h</td><td>Michaël Zasso</td><td class="num">18</td></tr><tr><td class="path">deps/v8/test/cctest/wasm/test-wasm-metrics.cc</td><td>Michaël Zasso</td><td class="num">18</td></tr><tr><td class="path">deps/v8/src/heap/cppgc/marker.h</td><td>Michaël Zasso</td><td class="num">18</td></tr><tr><td class="path">deps/v8/src/regexp/experimental/experimental.cc</td><td>Michaël Zasso</td><td class="num">18</td></tr><tr><td class="path">deps/npm/lib/commands/pack.js</td><td>npm team</td><td class="num">17</td></tr><tr><td class="path">deps/npm/lib/commands/profile.js</td><td>npm team</td><td class="num">17</td></tr><tr><td class="path">deps/npm/node_modules/sigstore/package.json</td><td>npm team</td><td class="num">17</td></tr><tr><td class="path">deps/v8/src/compiler/backend/riscv/code-generator-riscv.cc</td><td>Michaël Zasso</td><td class="num">17</td></tr><tr><td class="path">deps/v8/src/heap/cppgc/heap-object-header.h</td><td>Michaël Zasso</td><td class="num">17</td></tr></table></div></details>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by author</a></h2>
 
-<p><em>Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</em></p><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th>Files owned</th><th>Solely owned</th><th>Files touched</th></tr><tr><td>Michaël Zasso</td><td>27646</td><td>17302</td><td>41349</td></tr><tr><td>Node.js GitHub Bot</td><td>10756</td><td>2816</td><td>15332</td></tr><tr><td>Rich Trott</td><td>9192</td><td>1476</td><td>17310</td></tr><tr><td>Rebecca Turner</td><td>6391</td><td>1064</td><td>9135</td></tr><tr><td>Ruben Bridgewater</td><td>5763</td><td>72</td><td>7812</td></tr><tr><td>npm team</td><td>5494</td><td>3515</td><td>6149</td></tr><tr><td>Shigeki Ohtsu</td><td>5162</td><td>1320</td><td>6363</td></tr><tr><td>Ryan Dahl</td><td>4184</td><td>2159</td><td>6606</td></tr><tr><td>Isaac Z. Schlueter</td><td>3759</td><td>2324</td><td>7813</td></tr><tr><td>Joyee Cheung</td><td>3176</td><td>2662</td><td>4537</td></tr><tr><td>Chengzhong Wu</td><td>3031</td><td>2238</td><td>3965</td></tr><tr><td>Yosuke Furukawa</td><td>2773</td><td>641</td><td>3077</td></tr><tr><td>Kat Marchán</td><td>2484</td><td>1143</td><td>7975</td></tr><tr><td>Ben Noordhuis</td><td>2315</td><td>1260</td><td>8698</td></tr><tr><td>Myles Borins</td><td>2311</td><td>987</td><td>10202</td></tr><tr><td>René</td><td>1992</td><td>1796</td><td>2184</td></tr><tr><td>Roman Reiss</td><td>1891</td><td>351</td><td>4004</td></tr><tr><td>Sam Roberts</td><td>1825</td><td>132</td><td>4258</td></tr><tr><td>Colin Ihrig</td><td>1602</td><td>602</td><td>9037</td></tr><tr><td>James M Snell</td><td>1503</td><td>599</td><td>4629</td></tr><tr><td>Aviv Keller</td><td>1439</td><td>1421</td><td>5070</td></tr><tr><td>Steven R. Loomis</td><td>1065</td><td>124</td><td>1234</td></tr><tr><td>Ali Ijaz Sheikh</td><td>1022</td><td>842</td><td>3854</td></tr><tr><td>Rafael Gonzaga</td><td>994</td><td>183</td><td>3147</td></tr><tr><td>Timothy J Fontaine</td><td>985</td><td>117</td><td>2680</td></tr></table><p class="moreauthors">Showing top 25 of 4349 contributors.</p>
-<h2 id="most_shared_files"><a href="#most_shared_files">Most Shared Files</a></h2>
+<p class="section-note">Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</p><div class="table-scroll"><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th class="num">Files owned</th><th class="num">Solely owned</th><th class="num">Files touched</th></tr><tr><td>Michaël Zasso</td><td class="num">17,187</td><td class="num">12,760</td><td class="num">20,217</td></tr><tr><td>Node.js GitHub Bot</td><td class="num">6,792</td><td class="num">2,052</td><td class="num">9,790</td></tr><tr><td>Joyee Cheung</td><td class="num">2,992</td><td class="num">2,598</td><td class="num">4,117</td></tr><tr><td>npm team</td><td class="num">1,872</td><td class="num">1,247</td><td class="num">1,927</td></tr><tr><td>René</td><td class="num">1,813</td><td class="num">1,795</td><td class="num">1,999</td></tr><tr><td>Aviv Keller</td><td class="num">1,429</td><td class="num">1,416</td><td class="num">1,826</td></tr><tr><td>Ben Noordhuis</td><td class="num">1,315</td><td class="num">992</td><td class="num">3,629</td></tr><tr><td>James M Snell</td><td class="num">1,180</td><td class="num">411</td><td class="num">3,665</td></tr><tr><td>Shigeki Ohtsu</td><td class="num">1,016</td><td class="num">32</td><td class="num">1,661</td></tr><tr><td>Steven R. Loomis</td><td class="num">907</td><td class="num">2</td><td class="num">1,071</td></tr><tr><td>Ryan Dahl</td><td class="num">869</td><td class="num">419</td><td class="num">1,791</td></tr><tr><td>Chengzhong Wu</td><td class="num">839</td><td class="num">696</td><td class="num">1,595</td></tr><tr><td>Rich Trott</td><td class="num">730</td><td class="num">89</td><td class="num">2,112</td></tr><tr><td>Ruben Bridgewater</td><td class="num">660</td><td class="num">26</td><td class="num">1,481</td></tr><tr><td>Colin Ihrig</td><td class="num">644</td><td class="num">319</td><td class="num">2,067</td></tr><tr><td>Filip Skokan</td><td class="num">568</td><td class="num">375</td><td class="num">1,068</td></tr><tr><td>Sam Roberts</td><td class="num">552</td><td class="num">69</td><td class="num">2,180</td></tr><tr><td>Myles Borins</td><td class="num">433</td><td class="num">209</td><td class="num">3,205</td></tr><tr><td>Rafael Gonzaga</td><td class="num">423</td><td class="num">155</td><td class="num">1,987</td></tr><tr><td>Ujjwal Sharma</td><td class="num">405</td><td class="num">41</td><td class="num">2,164</td></tr><tr><td>Yagiz Nizipli</td><td class="num">376</td><td class="num">184</td><td class="num">1,597</td></tr><tr><td>Daniel Bevenius</td><td class="num">375</td><td class="num">254</td><td class="num">5,899</td></tr><tr><td>Tobias Nießen</td><td class="num">357</td><td class="num">184</td><td class="num">1,022</td></tr><tr><td>Antoine du Hamel</td><td class="num">349</td><td class="num">89</td><td class="num">2,926</td></tr><tr><td>Fedor Indutny</td><td class="num">339</td><td class="num">80</td><td class="num">2,224</td></tr></table></div><p class="moreauthors">Showing top 25 of 3846 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most shared files</a></h2>
 
-<p><em>Files touched by the most people — shared code where changes are most likely to need coordination.</em></p><table class="sortable" id="ownership-shared"><tr><th>File</th><th>Contributors</th><th>Primary owner</th><th>Owner share</th></tr><tr><td>README.md</td><td>302</td><td>Rich Trott</td><td>16.5%</td></tr><tr><td>doc/api/fs.md</td><td>242</td><td>Antoine du Hamel</td><td>7.8%</td></tr><tr><td>src/node.cc</td><td>229</td><td>Ryan Dahl</td><td>20.3%</td></tr><tr><td>lib/fs.js</td><td>197</td><td>Joyee Cheung</td><td>6.5%</td></tr><tr><td>doc/api/http.md</td><td>187</td><td>Luigi Pinca</td><td>6.8%</td></tr><tr><td>lib/net.js</td><td>174</td><td>Ryan Dahl</td><td>21.2%</td></tr><tr><td>doc/api/cli.md</td><td>169</td><td>Rafael Gonzaga</td><td>6.3%</td></tr><tr><td>doc/api/stream.md</td><td>168</td><td>Robert Nagy</td><td>10.8%</td></tr><tr><td>node.gyp</td><td>166</td><td>Joyee Cheung</td><td>9.8%</td></tr><tr><td>doc/api/process.md</td><td>160</td><td>Rich Trott</td><td>7.9%</td></tr><tr><td>Makefile</td><td>157</td><td>Ryan Dahl</td><td>13.6%</td></tr><tr><td>doc/api/errors.md</td><td>152</td><td>James M Snell</td><td>8.5%</td></tr><tr><td>src/node_crypto.cc</td><td>144</td><td>Ben Noordhuis</td><td>21.8%</td></tr><tr><td>doc/api/crypto.md</td><td>143</td><td>Tobias Nießen</td><td>22.5%</td></tr><tr><td>common.gypi</td><td>140</td><td>Michaël Zasso</td><td>31.2%</td></tr><tr><td>lib/internal/errors.js</td><td>140</td><td>Ruben Bridgewater</td><td>10.5%</td></tr><tr><td>lib/repl.js</td><td>133</td><td>Ruben Bridgewater</td><td>11.6%</td></tr><tr><td>lib/util.js</td><td>126</td><td>Ruben Bridgewater</td><td>13.9%</td></tr><tr><td>doc/api/http2.md</td><td>119</td><td>James M Snell</td><td>11.6%</td></tr><tr><td>src/node_file.cc</td><td>118</td><td>Joyee Cheung</td><td>11.5%</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+<p class="section-note">Files touched by the most people — shared code where changes are most likely to need coordination.</p><div class="table-scroll"><table class="sortable" id="ownership-shared"><tr><th>File</th><th class="num">Contributors</th><th>Primary owner</th><th class="num">Owner share</th></tr><tr><td class="path">README.md</td><td class="num">302</td><td>Rich Trott</td><td class="num">16.5%</td></tr><tr><td class="path">doc/api/fs.md</td><td class="num">243</td><td>Antoine du Hamel</td><td class="num">7.8%</td></tr><tr><td class="path">src/node.cc</td><td class="num">230</td><td>Ryan Dahl</td><td class="num">20.3%</td></tr><tr><td class="path">lib/fs.js</td><td class="num">198</td><td>Joyee Cheung</td><td class="num">6.5%</td></tr><tr><td class="path">doc/api/http.md</td><td class="num">187</td><td>Luigi Pinca</td><td class="num">6.8%</td></tr><tr><td class="path">lib/net.js</td><td class="num">174</td><td>Ryan Dahl</td><td class="num">21.2%</td></tr><tr><td class="path">doc/api/cli.md</td><td class="num">169</td><td>Rafael Gonzaga</td><td class="num">6.3%</td></tr><tr><td class="path">doc/api/stream.md</td><td class="num">168</td><td>Robert Nagy</td><td class="num">10.8%</td></tr><tr><td class="path">node.gyp</td><td class="num">166</td><td>Joyee Cheung</td><td class="num">9.8%</td></tr><tr><td class="path">doc/api/process.md</td><td class="num">160</td><td>Rich Trott</td><td class="num">7.9%</td></tr><tr><td class="path">Makefile</td><td class="num">158</td><td>Ryan Dahl</td><td class="num">13.5%</td></tr><tr><td class="path">doc/api/errors.md</td><td class="num">152</td><td>James M Snell</td><td class="num">8.5%</td></tr><tr><td class="path">src/node_crypto.cc</td><td class="num">144</td><td>Ben Noordhuis</td><td class="num">21.8%</td></tr><tr><td class="path">doc/api/crypto.md</td><td class="num">143</td><td>Tobias Nießen</td><td class="num">22.5%</td></tr><tr><td class="path">common.gypi</td><td class="num">141</td><td>Michaël Zasso</td><td class="num">31.2%</td></tr><tr><td class="path">lib/internal/errors.js</td><td class="num">141</td><td>Ruben Bridgewater</td><td class="num">10.5%</td></tr><tr><td class="path">lib/repl.js</td><td class="num">133</td><td>Ruben Bridgewater</td><td class="num">11.6%</td></tr><tr><td class="path">lib/util.js</td><td class="num">127</td><td>Ruben Bridgewater</td><td class="num">13.9%</td></tr><tr><td class="path">src/node_file.cc</td><td class="num">119</td><td>Joyee Cheung</td><td class="num">11.4%</td></tr><tr><td class="path">doc/api/http2.md</td><td class="num">119</td><td>James M Snell</td><td class="num">11.6%</td></tr></table></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body></html>

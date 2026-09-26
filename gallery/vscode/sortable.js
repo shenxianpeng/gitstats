@@ -9,10 +9,8 @@ Version 1.5.7
 */
 
 /* You can change these values */
-var image_path = "";
-var image_up = "arrow-up.gif";
-var image_down = "arrow-down.gif";
-var image_none = "arrow-none.gif";
+/* gitstats: sort arrows are drawn by CSS from span.sortarrow[data-sort] (none/asc/desc)
+   instead of arrow-*.gif images, so they follow the light/dark theme. */
 var europeandate = true;
 var alternate_row_colors = true;
 
@@ -50,7 +48,7 @@ function ts_makeSortable(t) {
 		var cell = firstRow.cells[i];
 		var txt = ts_getInnerText(cell);
 		if (cell.className != "unsortable" && cell.className.indexOf("unsortable") == -1) {
-			cell.innerHTML = '<a href="#" class="sortheader" onclick="ts_resortTable(this, '+i+');return false;">'+txt+'<span class="sortarrow">&nbsp;&nbsp;<img src="'+ image_path + image_none + '" alt="&darr;"/></span></a>';
+			cell.innerHTML = '<a href="#" class="sortheader" onclick="ts_resortTable(this, '+i+');return false;">'+txt+'<span class="sortarrow" data-sort="none" aria-hidden="true"></span></a>';
 		}
 	}
 	if (alternate_row_colors) {
@@ -130,11 +128,11 @@ function ts_resortTable(lnk, clid) {
 	}
 	newRows.sort(sortfn);
 	if (span.getAttribute("sortdir") == 'down') {
-			ARROW = '&nbsp;&nbsp;<img src="'+ image_path + image_down + '" alt="&darr;"/>';
+			ARROW = 'desc';
 			newRows.reverse();
 			span.setAttribute('sortdir','up');
 	} else {
-			ARROW = '&nbsp;&nbsp;<img src="'+ image_path + image_up + '" alt="&uarr;"/>';
+			ARROW = 'asc';
 			span.setAttribute('sortdir','down');
 	}
     // We appendChild rows that already exist to the tbody, so it moves them rather than creating new ones
@@ -154,11 +152,13 @@ function ts_resortTable(lnk, clid) {
 	for (var ci=0;ci<allspans.length;ci++) {
 		if (allspans[ci].className == 'sortarrow') {
 			if (getParent(allspans[ci],"table") == getParent(lnk,"table")) { // in the same table as us?
-				allspans[ci].innerHTML = '&nbsp;&nbsp;<img src="'+ image_path + image_none + '" alt="&darr;"/>';
+				allspans[ci].setAttribute('data-sort', 'none');
+				allspans[ci].parentNode.parentNode.removeAttribute('aria-sort');
 			}
 		}
 	}
-	span.innerHTML = ARROW;
+	span.setAttribute('data-sort', ARROW);
+	td.setAttribute('aria-sort', ARROW == 'asc' ? 'ascending' : 'descending');
 	alternate(t);
 }
 

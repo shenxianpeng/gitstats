@@ -5,34 +5,233 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - nginx</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.2.post1.dev1">
+	<meta name="generator" content="GitStats 2.7.0">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -45,23 +244,23 @@
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
-            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="ownership.html" class="active" aria-current="page">Code Ownership</a></li>
             <li><a href="history.html">History</a></li>
             
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Code Ownership</h1><div class="ownership-summary"><p>Ownership is measured by how many commits each author made to each file. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl><dt>Files tracked</dt><dd>803</dd><dt>Single-owner files</dt><dd>252 (31.4%)</dd><dt>Contributors</dt><dd>137</dd></dl></div>
-<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus Factor Risk — Single-Owner Files</a></h2>
+            <h1>Code Ownership</h1><p class="section-note">Ownership is measured by how many commits each author made to each file in the current tree. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Files Tracked</dt><dd class="stat-value">544</dd><dd class="stat-note">in the current tree</dd></div><div class="stat-tile"><dt>Single-Owner Files</dt><dd class="stat-value">60</dd><dd class="stat-note">11.0% of tracked files</dd></div><div class="stat-tile"><dt>Contributors</dt><dd class="stat-value">135</dd><dd class="stat-note">authors who changed files</dd></div></dl>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus factor risk — single-owner files</a></h2>
 
-<p><em>Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</em></p><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th>Commits</th></tr><tr><td>src/http/modules/proxy/ngx_http_proxy_handler.c</td><td>Igor Sysoev</td><td>93</td></tr><tr><td>src/http/ngx_http_write_filter.c</td><td>Igor Sysoev</td><td>73</td></tr><tr><td>src/http/ngx_http_header_filter.c</td><td>Igor Sysoev</td><td>67</td></tr><tr><td>src/http/ngx_http_event.c</td><td>Igor Sysoev</td><td>66</td></tr><tr><td>src/http/modules/ngx_http_index_handler.c</td><td>Igor Sysoev</td><td>62</td></tr><tr><td>src/http/modules/ngx_http_static_handler.c</td><td>Igor Sysoev</td><td>61</td></tr><tr><td>src/http/modules/ngx_http_gzip_filter.c</td><td>Igor Sysoev</td><td>61</td></tr><tr><td>src/http/modules/proxy/ngx_http_proxy_upstream.c</td><td>Igor Sysoev</td><td>58</td></tr><tr><td>src/http/modules/proxy/ngx_http_proxy_handler.h</td><td>Igor Sysoev</td><td>54</td></tr><tr><td>src/http/ngx_http_output_filter.c</td><td>Igor Sysoev</td><td>54</td></tr><tr><td>src/imap/ngx_imap_handler.c</td><td>Igor Sysoev</td><td>39</td></tr><tr><td>src/http/modules/ngx_http_range_filter.c</td><td>Igor Sysoev</td><td>34</td></tr><tr><td>src/core/ngx_hunk.h</td><td>Igor Sysoev</td><td>34</td></tr><tr><td>src/http/ngx_http_log_handler.c</td><td>Igor Sysoev</td><td>32</td></tr><tr><td>auto/cc</td><td>Igor Sysoev</td><td>31</td></tr><tr><td>src/http/ngx_http_cache.c</td><td>Igor Sysoev</td><td>30</td></tr><tr><td>src/core/ngx_modules.c</td><td>Igor Sysoev</td><td>27</td></tr><tr><td>src/core/ngx_hunk.c</td><td>Igor Sysoev</td><td>27</td></tr><tr><td>src/imap/ngx_imap_auth_http_module.c</td><td>Igor Sysoev</td><td>25</td></tr><tr><td>src/imap/ngx_imap.h</td><td>Igor Sysoev</td><td>24</td></tr><tr><td>src/http/modules/ngx_http_charset_filter.c</td><td>Igor Sysoev</td><td>23</td></tr><tr><td>auto/os/features</td><td>Igor Sysoev</td><td>22</td></tr><tr><td>src/http/modules/ngx_http_ssi_filter.c</td><td>Igor Sysoev</td><td>22</td></tr><tr><td>src/http/modules/ngx_http_chunked_filter.c</td><td>Igor Sysoev</td><td>22</td></tr><tr><td>src/os/win32/ngx_types.h</td><td>Igor Sysoev</td><td>21</td></tr><tr><td>src/http/modules/proxy/ngx_http_proxy_cache.c</td><td>Igor Sysoev</td><td>20</td></tr><tr><td>src/event/ngx_event_proxy.c</td><td>Igor Sysoev</td><td>19</td></tr><tr><td>src/core/ngx_alloc.c</td><td>Igor Sysoev</td><td>18</td></tr><tr><td>src/imap/ngx_imap_core_module.c</td><td>Igor Sysoev</td><td>17</td></tr><tr><td>src/imap/ngx_imap_proxy_module.c</td><td>Igor Sysoev</td><td>16</td></tr><tr><td>src/http/modules/proxy/ngx_http_proxy_header.c</td><td>Igor Sysoev</td><td>16</td></tr><tr><td>src/core/ngx_garbage_collector.c</td><td>Igor Sysoev</td><td>15</td></tr><tr><td>src/imap/ngx_imap_parse.c</td><td>Igor Sysoev</td><td>15</td></tr><tr><td>src/http/modules/ngx_http_rewrite_handler.c</td><td>Igor Sysoev</td><td>15</td></tr><tr><td>src/http/modules/proxy/ngx_http_event_proxy_handler.c</td><td>Igor Sysoev</td><td>15</td></tr><tr><td>src/http/modules/ngx_http_event_proxy_handler.c</td><td>Igor Sysoev</td><td>15</td></tr><tr><td>src/http/modules/ngx_http_userid_filter.c</td><td>Igor Sysoev</td><td>14</td></tr><tr><td>src/core/ngx_atomic.h</td><td>Igor Sysoev</td><td>14</td></tr><tr><td>src/event/modules/ngx_kqueue_module.h</td><td>Igor Sysoev</td><td>13</td></tr><tr><td>src/os/unix/ngx_types.h</td><td>Igor Sysoev</td><td>13</td></tr><tr><td>src/http/ngx_http_core.c</td><td>Igor Sysoev</td><td>13</td></tr><tr><td>src/imap/ngx_imap_proxy.c</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>src/http/modules/ngx_http_headers_filter.c</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>auto/func</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>src/http/modules/ngx_http_not_modified_filter.c</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>src/http/ngx_http_headers.c</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>src/http/modules/ngx_http_log_handler.c</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>src/event/ngx_event_proxy.h</td><td>Igor Sysoev</td><td>12</td></tr><tr><td>src/http/ngx_http_config.c</td><td>Igor Sysoev</td><td>11</td></tr><tr><td>auto/fmt/fmt</td><td>Igor Sysoev</td><td>11</td></tr></table><p class="moreauthors">Showing top 50 of 252 single-owner files.</p>
-<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by Author</a></h2>
+<p class="section-note">Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</p><div class="table-scroll"><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">.github/workflows/check-whitespace.yaml</td><td>Andrew Clayton</td><td class="num">5</td></tr><tr><td class="path">src/event/quic/ngx_event_quic_socket.h</td><td>Vladimir Homutov</td><td class="num">5</td></tr><tr><td class="path">docs/xml/change_log_conf.xml</td><td>Igor Sysoev</td><td class="num">4</td></tr><tr><td class="path">conf/koi-win</td><td>Igor Sysoev</td><td class="num">4</td></tr><tr><td class="path">src/http/v3/ngx_http_v3_table.h</td><td>Roman Arutyunyan</td><td class="num">3</td></tr><tr><td class="path">src/http/v3/ngx_http_v3_uni.h</td><td>Roman Arutyunyan</td><td class="num">3</td></tr><tr><td class="path">src/stream/ngx_stream_pass_module.c</td><td>Roman Arutyunyan</td><td class="num">3</td></tr><tr><td class="path">src/os/win32/nginx.ico</td><td>Igor Sysoev</td><td class="num">3</td></tr><tr><td class="path">src/event/modules/ngx_win32_poll_module.c</td><td>Maxim Dounin</td><td class="num">2</td></tr><tr><td class="path">src/core/ngx_sha1.c</td><td>Maxim Dounin</td><td class="num">2</td></tr></table></div><details class="table-details"><summary>Table: all 60 single-owner files</summary><div class="table-scroll"><table class="sortable" id="ownership-busfactor-all"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">.github/workflows/check-whitespace.yaml</td><td>Andrew Clayton</td><td class="num">5</td></tr><tr><td class="path">src/event/quic/ngx_event_quic_socket.h</td><td>Vladimir Homutov</td><td class="num">5</td></tr><tr><td class="path">docs/xml/change_log_conf.xml</td><td>Igor Sysoev</td><td class="num">4</td></tr><tr><td class="path">conf/koi-win</td><td>Igor Sysoev</td><td class="num">4</td></tr><tr><td class="path">src/http/v3/ngx_http_v3_table.h</td><td>Roman Arutyunyan</td><td class="num">3</td></tr><tr><td class="path">src/http/v3/ngx_http_v3_uni.h</td><td>Roman Arutyunyan</td><td class="num">3</td></tr><tr><td class="path">src/stream/ngx_stream_pass_module.c</td><td>Roman Arutyunyan</td><td class="num">3</td></tr><tr><td class="path">src/os/win32/nginx.ico</td><td>Igor Sysoev</td><td class="num">3</td></tr><tr><td class="path">src/event/modules/ngx_win32_poll_module.c</td><td>Maxim Dounin</td><td class="num">2</td></tr><tr><td class="path">src/core/ngx_sha1.c</td><td>Maxim Dounin</td><td class="num">2</td></tr><tr><td class="path">src/http/modules/ngx_http_mirror_module.c</td><td>Roman Arutyunyan</td><td class="num">2</td></tr><tr><td class="path">src/core/ngx_json_parse.c</td><td>Roman Semenov</td><td class="num">2</td></tr><tr><td class="path">.github/workflows/check-commit-message.yaml</td><td>Andrew Clayton</td><td class="num">2</td></tr><tr><td class="path">.github/workflows/check-version-bump.yaml</td><td>Andrew Clayton</td><td class="num">2</td></tr><tr><td class="path">src/core/ngx_bpf.c</td><td>Vladimir Homutov</td><td class="num">2</td></tr><tr><td class="path">src/core/ngx_rwlock.h</td><td>Ruslan Ermilov</td><td class="num">2</td></tr><tr><td class="path">src/os/win32/nginx_icon16.xpm</td><td>Igor Sysoev</td><td class="num">2</td></tr><tr><td class="path">conf/koi-utf</td><td>Igor Sysoev</td><td class="num">2</td></tr><tr><td class="path">src/core/ngx_siphash.c</td><td>Eugene Grebenschikov</td><td class="num">1</td></tr><tr><td class="path">src/core/ngx_siphash.h</td><td>Eugene Grebenschikov</td><td class="num">1</td></tr><tr><td class="path">src/mail/ngx_mail_realip_module.c</td><td>Maxim Dounin</td><td class="num">1</td></tr><tr><td class="path">src/os/unix/ngx_dlopen.c</td><td>Maxim Dounin</td><td class="num">1</td></tr><tr><td class="path">src/os/unix/ngx_dlopen.h</td><td>Maxim Dounin</td><td class="num">1</td></tr><tr><td class="path">src/os/win32/ngx_dlopen.c</td><td>Maxim Dounin</td><td class="num">1</td></tr><tr><td class="path">src/os/win32/ngx_dlopen.h</td><td>Maxim Dounin</td><td class="num">1</td></tr><tr><td class="path">src/core/ngx_parse_time.h</td><td>Maxim Dounin</td><td class="num">1</td></tr><tr><td class="path">src/os/unix/ngx_udp_send.c</td><td>Roman Arutyunyan</td><td class="num">1</td></tr><tr><td class="path">src/http/modules/ngx_http_json_module.c</td><td>Roman Semenov</td><td class="num">1</td></tr><tr><td class="path">src/core/ngx_json_parse.h</td><td>Roman Semenov</td><td class="num">1</td></tr><tr><td class="path">src/core/ngx_json_unescape.c</td><td>Roman Semenov</td><td class="num">1</td></tr><tr><td class="path">src/core/ngx_json_unescape.h</td><td>Roman Semenov</td><td class="num">1</td></tr><tr><td class="path">src/core/ngx_data.c</td><td>Henry Yuan</td><td class="num">1</td></tr><tr><td class="path">src/core/ngx_data.h</td><td>Henry Yuan</td><td class="num">1</td></tr><tr><td class="path">src/core/ngx_json.h</td><td>Henry Yuan</td><td class="num">1</td></tr><tr><td class="path">src/stream/ngx_stream_set_module.c</td><td>Pavel Pautov</td><td class="num">1</td></tr><tr><td class="path">.github/scripts/commit-msg-check.pl</td><td>Andrew Clayton</td><td class="num">1</td></tr><tr><td class="path">.github/workflows/new-issue-welcome.yaml</td><td>Andrew Clayton</td><td class="num">1</td></tr><tr><td class="path">src/event/quic/bpf/bpfgen.sh</td><td>Vladimir Homutov</td><td class="num">1</td></tr><tr><td class="path">src/core/ngx_bpf.h</td><td>Vladimir Homutov</td><td class="num">1</td></tr><tr><td class="path">.github/DISCUSSION_TEMPLATE/general.yml</td><td>Alessandro Fael Garcia</td><td class="num">1</td></tr><tr><td class="path">.github/DISCUSSION_TEMPLATE/ideas.yml</td><td>Alessandro Fael Garcia</td><td class="num">1</td></tr><tr><td class="path">.github/DISCUSSION_TEMPLATE/q-a.yml</td><td>Alessandro Fael Garcia</td><td class="num">1</td></tr><tr><td class="path">.github/ISSUE_TEMPLATE/config.yml</td><td>Alessandro Fael Garcia</td><td class="num">1</td></tr><tr><td class="path">.github/ISSUE_TEMPLATE/feature_request.yml</td><td>Alessandro Fael Garcia</td><td class="num">1</td></tr><tr><td class="path">SUPPORT.md</td><td>Alessandro Fael Garcia</td><td class="num">1</td></tr><tr><td class="path">.gitignore</td><td>Orgad Shaneh</td><td class="num">1</td></tr><tr><td class="path">src/http/ngx_http_huff_encode.c</td><td>Ruslan Ermilov</td><td class="num">1</td></tr><tr><td class="path">CODE_OF_CONDUCT.md</td><td>Maryna Herasimovich</td><td class="num">1</td></tr><tr><td class="path">src/core/ngx_thread_pool.h</td><td>Valentin Bartenev</td><td class="num">1</td></tr><tr><td class="path">src/os/unix/ngx_thread_id.c</td><td>Valentin Bartenev</td><td class="num">1</td></tr><tr><td class="path">src/os/win32/nginx_icon48.xpm</td><td>Igor Sysoev</td><td class="num">1</td></tr><tr><td class="path">src/os/win32/nginx_icon32.xpm</td><td>Igor Sysoev</td><td class="num">1</td></tr><tr><td class="path">contrib/unicode2nginx/koi-utf</td><td>Igor Sysoev</td><td class="num">1</td></tr><tr><td class="path">contrib/unicode2nginx/win-utf</td><td>Igor Sysoev</td><td class="num">1</td></tr><tr><td class="path">src/http/modules/perl/typemap</td><td>Igor Sysoev</td><td class="num">1</td></tr><tr><td class="path">contrib/geo2nginx.pl</td><td>Igor Sysoev</td><td class="num">1</td></tr><tr><td class="path">docs/dtd/change_log_conf.dtd</td><td>Igor Sysoev</td><td class="num">1</td></tr><tr><td class="path">contrib/vim/ftplugin/nginx.vim</td><td>Armin Grodon</td><td class="num">1</td></tr><tr><td class="path">contrib/vim/ftdetect/nginx.vim</td><td>Evan Miller</td><td class="num">1</td></tr><tr><td class="path">contrib/vim/indent/nginx.vim</td><td>Evan Miller</td><td class="num">1</td></tr></table></div></details>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by author</a></h2>
 
-<p><em>Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</em></p><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th>Files owned</th><th>Solely owned</th><th>Files touched</th></tr><tr><td>Igor Sysoev</td><td>542</td><td>194</td><td>593</td></tr><tr><td>Vladimir Homutov</td><td>47</td><td>4</td><td>164</td></tr><tr><td>Roman Arutyunyan</td><td>45</td><td>6</td><td>212</td></tr><tr><td>Maxim Dounin</td><td>38</td><td>8</td><td>336</td></tr><tr><td>Ruslan Ermilov</td><td>36</td><td>6</td><td>309</td></tr><tr><td>Valentin Bartenev</td><td>20</td><td>5</td><td>179</td></tr><tr><td>Sergey Kandaurov</td><td>19</td><td>0</td><td>252</td></tr><tr><td>Maxim Konovalov</td><td>9</td><td>0</td><td>366</td></tr><tr><td>Andrew Clayton</td><td>8</td><td>7</td><td>37</td></tr><tr><td>Alessandro Fael Garcia</td><td>7</td><td>6</td><td>13</td></tr><tr><td>Roman Semenov</td><td>5</td><td>5</td><td>12</td></tr><tr><td>Henry Yuan</td><td>4</td><td>3</td><td>7</td></tr><tr><td>Maryna Herasimovich</td><td>4</td><td>1</td><td>6</td></tr><tr><td>Piotr Sikora</td><td>2</td><td>0</td><td>84</td></tr><tr><td>Eugene Grebenschikov</td><td>2</td><td>2</td><td>9</td></tr><tr><td>Konstantin Pavlov</td><td>2</td><td>0</td><td>7</td></tr><tr><td>Evan Miller</td><td>2</td><td>2</td><td>3</td></tr><tr><td>Ava Hahn</td><td>1</td><td>0</td><td>9</td></tr><tr><td>Zhidao HONG</td><td>1</td><td>0</td><td>9</td></tr><tr><td>Pavel Pautov</td><td>1</td><td>1</td><td>8</td></tr><tr><td>Orgad Shaneh</td><td>1</td><td>1</td><td>6</td></tr><tr><td>Michael Vernik</td><td>1</td><td>0</td><td>3</td></tr><tr><td>Gena Makhomed</td><td>1</td><td>0</td><td>3</td></tr><tr><td>jzebor-at-f5</td><td>1</td><td>0</td><td>1</td></tr><tr><td>xuruidong</td><td>1</td><td>0</td><td>1</td></tr></table><p class="moreauthors">Showing top 25 of 137 contributors.</p>
-<h2 id="most_shared_files"><a href="#most_shared_files">Most Shared Files</a></h2>
+<p class="section-note">Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</p><div class="table-scroll"><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th class="num">Files owned</th><th class="num">Solely owned</th><th class="num">Files touched</th></tr><tr><td>Igor Sysoev</td><td class="num">325</td><td class="num">12</td><td class="num">364</td></tr><tr><td>Vladimir Homutov</td><td class="num">42</td><td class="num">4</td><td class="num">154</td></tr><tr><td>Maxim Dounin</td><td class="num">38</td><td class="num">8</td><td class="num">320</td></tr><tr><td>Roman Arutyunyan</td><td class="num">37</td><td class="num">5</td><td class="num">194</td></tr><tr><td>Ruslan Ermilov</td><td class="num">21</td><td class="num">2</td><td class="num">270</td></tr><tr><td>Sergey Kandaurov</td><td class="num">17</td><td class="num">0</td><td class="num">231</td></tr><tr><td>Valentin Bartenev</td><td class="num">13</td><td class="num">2</td><td class="num">167</td></tr><tr><td>Maxim Konovalov</td><td class="num">9</td><td class="num">0</td><td class="num">334</td></tr><tr><td>Alessandro Fael Garcia</td><td class="num">7</td><td class="num">6</td><td class="num">11</td></tr><tr><td>Andrew Clayton</td><td class="num">6</td><td class="num">5</td><td class="num">35</td></tr><tr><td>Roman Semenov</td><td class="num">5</td><td class="num">5</td><td class="num">12</td></tr><tr><td>Henry Yuan</td><td class="num">4</td><td class="num">3</td><td class="num">7</td></tr><tr><td>Eugene Grebenschikov</td><td class="num">2</td><td class="num">2</td><td class="num">10</td></tr><tr><td>Konstantin Pavlov</td><td class="num">2</td><td class="num">0</td><td class="num">7</td></tr><tr><td>Maryna Herasimovich</td><td class="num">2</td><td class="num">1</td><td class="num">4</td></tr><tr><td>Evan Miller</td><td class="num">2</td><td class="num">2</td><td class="num">3</td></tr><tr><td>Piotr Sikora</td><td class="num">1</td><td class="num">0</td><td class="num">79</td></tr><tr><td>Ava Hahn</td><td class="num">1</td><td class="num">0</td><td class="num">9</td></tr><tr><td>Zhidao HONG</td><td class="num">1</td><td class="num">0</td><td class="num">9</td></tr><tr><td>Pavel Pautov</td><td class="num">1</td><td class="num">1</td><td class="num">8</td></tr><tr><td>Orgad Shaneh</td><td class="num">1</td><td class="num">1</td><td class="num">6</td></tr><tr><td>Gena Makhomed</td><td class="num">1</td><td class="num">0</td><td class="num">3</td></tr><tr><td>Michael Vernik</td><td class="num">1</td><td class="num">0</td><td class="num">2</td></tr><tr><td>jzebor-at-f5</td><td class="num">1</td><td class="num">0</td><td class="num">1</td></tr><tr><td>xuruidong</td><td class="num">1</td><td class="num">0</td><td class="num">1</td></tr></table></div><p class="moreauthors">Showing top 25 of 135 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most shared files</a></h2>
 
-<p><em>Files touched by the most people — shared code where changes are most likely to need coordination.</em></p><table class="sortable" id="ownership-shared"><tr><th>File</th><th>Contributors</th><th>Primary owner</th><th>Owner share</th></tr><tr><td>src/http/ngx_http_upstream.c</td><td>25</td><td>Igor Sysoev</td><td>43.6%</td></tr><tr><td>src/event/ngx_event_openssl.c</td><td>22</td><td>Maxim Dounin</td><td>33.4%</td></tr><tr><td>src/http/modules/ngx_http_proxy_module.c</td><td>21</td><td>Igor Sysoev</td><td>47.8%</td></tr><tr><td>src/http/modules/ngx_http_ssl_module.c</td><td>17</td><td>Igor Sysoev</td><td>35.8%</td></tr><tr><td>src/http/modules/ngx_http_uwsgi_module.c</td><td>17</td><td>Maxim Dounin</td><td>34.3%</td></tr><tr><td>src/http/ngx_http_core_module.c</td><td>16</td><td>Igor Sysoev</td><td>71.2%</td></tr><tr><td>src/http/modules/ngx_http_fastcgi_module.c</td><td>15</td><td>Igor Sysoev</td><td>59.1%</td></tr><tr><td>src/event/ngx_event_openssl.h</td><td>15</td><td>Igor Sysoev</td><td>30.0%</td></tr><tr><td>src/http/ngx_http_upstream.h</td><td>15</td><td>Igor Sysoev</td><td>42.7%</td></tr><tr><td>auto/options</td><td>14</td><td>Igor Sysoev</td><td>61.3%</td></tr><tr><td>src/http/ngx_http_variables.c</td><td>14</td><td>Igor Sysoev</td><td>59.2%</td></tr><tr><td>src/core/ngx_resolver.c</td><td>14</td><td>Igor Sysoev</td><td>33.6%</td></tr><tr><td>src/http/modules/ngx_http_ssi_filter_module.c</td><td>14</td><td>Igor Sysoev</td><td>73.3%</td></tr><tr><td>src/http/ngx_http_request.c</td><td>13</td><td>Igor Sysoev</td><td>59.0%</td></tr><tr><td>src/http/ngx_http.c</td><td>13</td><td>Igor Sysoev</td><td>75.8%</td></tr><tr><td>auto/modules</td><td>13</td><td>Igor Sysoev</td><td>46.5%</td></tr><tr><td>src/core/ngx_core.h</td><td>13</td><td>Igor Sysoev</td><td>71.2%</td></tr><tr><td>src/http/modules/ngx_http_scgi_module.c</td><td>13</td><td>Maxim Dounin</td><td>39.3%</td></tr><tr><td>src/mail/ngx_mail_ssl_module.c</td><td>13</td><td>Maxim Dounin</td><td>30.9%</td></tr><tr><td>src/http/modules/ngx_http_grpc_module.c</td><td>13</td><td>Maxim Dounin</td><td>40.7%</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+<p class="section-note">Files touched by the most people — shared code where changes are most likely to need coordination.</p><div class="table-scroll"><table class="sortable" id="ownership-shared"><tr><th>File</th><th class="num">Contributors</th><th>Primary owner</th><th class="num">Owner share</th></tr><tr><td class="path">src/http/ngx_http_upstream.c</td><td class="num">25</td><td>Igor Sysoev</td><td class="num">43.6%</td></tr><tr><td class="path">src/event/ngx_event_openssl.c</td><td class="num">23</td><td>Maxim Dounin</td><td class="num">33.7%</td></tr><tr><td class="path">src/http/modules/ngx_http_proxy_module.c</td><td class="num">22</td><td>Igor Sysoev</td><td class="num">47.6%</td></tr><tr><td class="path">src/http/modules/ngx_http_ssl_module.c</td><td class="num">18</td><td>Igor Sysoev</td><td class="num">35.6%</td></tr><tr><td class="path">src/http/modules/ngx_http_uwsgi_module.c</td><td class="num">18</td><td>Maxim Dounin</td><td class="num">34.0%</td></tr><tr><td class="path">src/http/ngx_http_core_module.c</td><td class="num">17</td><td>Igor Sysoev</td><td class="num">71.0%</td></tr><tr><td class="path">src/http/modules/ngx_http_fastcgi_module.c</td><td class="num">16</td><td>Igor Sysoev</td><td class="num">58.8%</td></tr><tr><td class="path">src/event/ngx_event_openssl.h</td><td class="num">15</td><td>Igor Sysoev</td><td class="num">30.0%</td></tr><tr><td class="path">src/http/ngx_http_upstream.h</td><td class="num">15</td><td>Igor Sysoev</td><td class="num">42.7%</td></tr><tr><td class="path">auto/options</td><td class="num">14</td><td>Igor Sysoev</td><td class="num">61.3%</td></tr><tr><td class="path">src/http/ngx_http_variables.c</td><td class="num">14</td><td>Igor Sysoev</td><td class="num">59.2%</td></tr><tr><td class="path">src/core/ngx_resolver.c</td><td class="num">14</td><td>Igor Sysoev</td><td class="num">33.6%</td></tr><tr><td class="path">src/http/modules/ngx_http_ssi_filter_module.c</td><td class="num">14</td><td>Igor Sysoev</td><td class="num">73.3%</td></tr><tr><td class="path">src/http/modules/ngx_http_scgi_module.c</td><td class="num">14</td><td>Maxim Dounin</td><td class="num">38.9%</td></tr><tr><td class="path">src/http/modules/ngx_http_grpc_module.c</td><td class="num">14</td><td>Maxim Dounin</td><td class="num">40.0%</td></tr><tr><td class="path">src/http/ngx_http_request.c</td><td class="num">13</td><td>Igor Sysoev</td><td class="num">59.0%</td></tr><tr><td class="path">src/http/ngx_http.c</td><td class="num">13</td><td>Igor Sysoev</td><td class="num">75.8%</td></tr><tr><td class="path">auto/modules</td><td class="num">13</td><td>Igor Sysoev</td><td class="num">46.5%</td></tr><tr><td class="path">src/core/ngx_core.h</td><td class="num">13</td><td>Igor Sysoev</td><td class="num">71.2%</td></tr><tr><td class="path">src/mail/ngx_mail_ssl_module.c</td><td class="num">13</td><td>Maxim Dounin</td><td class="num">30.9%</td></tr></table></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body></html>

@@ -5,34 +5,233 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - React</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.2.post1.dev1">
+	<meta name="generator" content="GitStats 2.7.0">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -45,23 +244,23 @@
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
-            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="ownership.html" class="active" aria-current="page">Code Ownership</a></li>
             <li><a href="history.html">History</a></li>
             
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Code Ownership</h1><div class="ownership-summary"><p>Ownership is measured by how many commits each author made to each file. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl><dt>Files tracked</dt><dd>26644</dd><dt>Single-owner files</dt><dd>13631 (51.2%)</dd><dt>Contributors</dt><dd>1928</dd></dl></div>
-<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus Factor Risk — Single-Owner Files</a></h2>
+            <h1>Code Ownership</h1><p class="section-note">Ownership is measured by how many commits each author made to each file in the current tree. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Files Tracked</dt><dd class="stat-value">7,252</dd><dd class="stat-note">in the current tree</dd></div><div class="stat-tile"><dt>Single-Owner Files</dt><dd class="stat-value">2,508</dd><dd class="stat-note">34.6% of tracked files</dd></div><div class="stat-tile"><dt>Contributors</dt><dd class="stat-value">802</dd><dd class="stat-note">authors who changed files</dd></div></dl>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus factor risk — single-owner files</a></h2>
 
-<p><em>Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</em></p><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th>Commits</th></tr><tr><td>compiler/forget/Cargo.lock</td><td>Joe Savona</td><td>31</td></tr><tr><td>shells/browser/chrome/manifest.json</td><td>Brian Vaughn</td><td>26</td></tr><tr><td>compiler/forget/packages/eslint-plugin-react-forget/src/rules/ReactForgetDiagnostics.ts</td><td>lauren</td><td>25</td></tr><tr><td>src/devtools/views/Tree.js</td><td>Brian Vaughn</td><td>23</td></tr><tr><td>src/devtools/views/SelectedElement.js</td><td>Brian Vaughn</td><td>22</td></tr><tr><td>compiler/forget/crates/build-hir/src/build.rs</td><td>Joe Savona</td><td>21</td></tr><tr><td>compiler/forget/crates/forget_semantic_analysis/src/analyzer.rs</td><td>Joe Savona</td><td>20</td></tr><tr><td>src/devtools/views/Settings/Settings.js</td><td>Brian Vaughn</td><td>19</td></tr><tr><td>src/devtools/views/InspectedElementTree.js</td><td>Brian Vaughn</td><td>19</td></tr><tr><td>compiler/forget/crates/forget_estree/src/generated.rs</td><td>Joe Savona</td><td>18</td></tr><tr><td>compiler/forget/crates/build-hir/src/builder.rs</td><td>Joe Savona</td><td>18</td></tr><tr><td>src/devtools/views/Profiler/Profiler.css</td><td>Brian Vaughn</td><td>16</td></tr><tr><td>src/devtools/types.js</td><td>Brian Vaughn</td><td>16</td></tr><tr><td>src/devtools/views/Element.css</td><td>Brian Vaughn</td><td>16</td></tr><tr><td>compiler/scripts/release/publish.js</td><td>lauren</td><td>15</td></tr><tr><td>compiler/forget/Cargo.toml</td><td>Joe Savona</td><td>15</td></tr><tr><td>src/devtools/views/TabBar.css</td><td>Brian Vaughn</td><td>15</td></tr><tr><td>docs/docs/refactor/00-table-of-contents.md</td><td>Pete Hunt</td><td>15</td></tr><tr><td>compiler/forget/crates/forget_build_hir/src/build.rs</td><td>Joe Savona</td><td>14</td></tr><tr><td>compiler/forget/crates/forget_estree_codegen/src/codegen.rs</td><td>Joe Savona</td><td>14</td></tr><tr><td>compiler/forget/crates/forget_semantic_analysis/src/scope_manager.rs</td><td>Joe Savona</td><td>14</td></tr><tr><td>src/hydration.js</td><td>Brian Vaughn</td><td>14</td></tr><tr><td>src/devtools/views/Elements.js</td><td>Brian Vaughn</td><td>14</td></tr><tr><td>compiler/forget/crates/fixtures/tests/fixtures_test.rs</td><td>Joe Savona</td><td>13</td></tr><tr><td>compiler/forget/crates/hir/src/print.rs</td><td>Joe Savona</td><td>13</td></tr><tr><td>compiler/forget/crates/hir/src/instruction.rs</td><td>Joe Savona</td><td>13</td></tr><tr><td>src/devtools/ProfilerStore.js</td><td>Brian Vaughn</td><td>13</td></tr><tr><td>src/devtools/views/Profiler/SidebarCommitInfo.css</td><td>Brian Vaughn</td><td>13</td></tr><tr><td>compiler/forget/crates/forget_hir/src/instruction.rs</td><td>Joe Savona</td><td>12</td></tr><tr><td>compiler/forget/crates/forget_fixtures/tests/fixtures_test.rs</td><td>Joe Savona</td><td>12</td></tr><tr><td>compiler/forget/crates/estree-swc/src/lib.rs</td><td>Joe Savona</td><td>12</td></tr><tr><td>src/devtools/views/HooksTree.js</td><td>Brian Vaughn</td><td>12</td></tr><tr><td>src/devtools/views/InspectedElementTree.css</td><td>Brian Vaughn</td><td>12</td></tr><tr><td>docs/docs/refactor/02-displaying-data.md</td><td>Pete Hunt</td><td>12</td></tr><tr><td>compiler/forget/crates/forget_estree_swc/src/lib.rs</td><td>Joe Savona</td><td>11</td></tr><tr><td>compiler/forget/crates/estree/src/lib.rs</td><td>Joe Savona</td><td>11</td></tr><tr><td>shells/dev/app/InspectableElements/InspectableElements.js</td><td>Brian Vaughn</td><td>11</td></tr><tr><td>src/hook.js</td><td>Brian Vaughn</td><td>11</td></tr><tr><td>src/devtools/cache.js</td><td>Brian Vaughn</td><td>11</td></tr><tr><td>src/devtools/views/Profiler/SnapshotSelector.css</td><td>Brian Vaughn</td><td>11</td></tr><tr><td>shells/browser/shared/src/panel.js</td><td>Brian Vaughn</td><td>11</td></tr><tr><td>src/devtools/views/TreeContext.js</td><td>Brian Vaughn</td><td>11</td></tr><tr><td>src/devtools/views/HooksTree.css</td><td>Brian Vaughn</td><td>11</td></tr><tr><td>compiler/forget/packages/babel-plugin-react-forget/src/CompilerError.ts</td><td>lauren</td><td>10</td></tr><tr><td>compiler/fault-tolerance-overview.md</td><td>Joseph Savona</td><td>10</td></tr><tr><td>compiler/forget/crates/forget_estree/src/visit.rs</td><td>Joe Savona</td><td>10</td></tr><tr><td>compiler/forget/crates/forget_ssa/src/enter.rs</td><td>Joe Savona</td><td>10</td></tr><tr><td>compiler/forget/crates/forget_estree_codegen/src/ecmascript.json</td><td>Joe Savona</td><td>10</td></tr><tr><td>src/devtools/views/Settings/Settings.css</td><td>Brian Vaughn</td><td>10</td></tr><tr><td>src/devtools/views/Profiler/SnapshotCommitList.js</td><td>Brian Vaughn</td><td>10</td></tr></table><p class="moreauthors">Showing top 50 of 13631 single-owner files.</p>
-<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by Author</a></h2>
+<p class="section-note">Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</p><div class="table-scroll"><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">compiler/scripts/release/publish.js</td><td>lauren</td><td class="num">15</td></tr><tr><td class="path">packages/react-devtools-facade/src/__tests__/DevToolsFacade-test.js</td><td>Ruslan Lesiutin</td><td class="num">9</td></tr><tr><td class="path">packages/react-server/src/ReactFlightAsyncSequence.js</td><td>Sebastian Markbåge</td><td class="num">9</td></tr><tr><td class="path">packages/react-devtools-cdt-mcp/package.json</td><td>Ruslan Lesiutin</td><td class="num">8</td></tr><tr><td class="path">fixtures/dom/src/components/fixtures/fragment-refs/index.js</td><td>Jack Pope</td><td class="num">8</td></tr><tr><td class="path">fixtures/view-transition/src/components/SwipeRecognizer.js</td><td>Sebastian Markbåge</td><td class="num">8</td></tr><tr><td class="path">.github/workflows/shared_check_maintainer.yml</td><td>lauren</td><td class="num">7</td></tr><tr><td class="path">packages/react-devtools-cdt-mcp/src/__tests__/DevToolsCdtMcp-test.js</td><td>Ruslan Lesiutin</td><td class="num">7</td></tr><tr><td class="path">packages/react-devtools-facade/src/DevToolsFacadeTools.js</td><td>Ruslan Lesiutin</td><td class="num">7</td></tr><tr><td class="path">compiler/apps/playground/components/AccordionWindow.tsx</td><td>Eugene Choi</td><td class="num">7</td></tr></table></div><details class="table-details"><summary>Table: the 100 most-changed of 2,508 single-owner files</summary><div class="table-scroll"><table class="sortable" id="ownership-busfactor-all"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">compiler/scripts/release/publish.js</td><td>lauren</td><td class="num">15</td></tr><tr><td class="path">packages/react-devtools-facade/src/__tests__/DevToolsFacade-test.js</td><td>Ruslan Lesiutin</td><td class="num">9</td></tr><tr><td class="path">packages/react-server/src/ReactFlightAsyncSequence.js</td><td>Sebastian Markbåge</td><td class="num">9</td></tr><tr><td class="path">packages/react-devtools-cdt-mcp/package.json</td><td>Ruslan Lesiutin</td><td class="num">8</td></tr><tr><td class="path">fixtures/dom/src/components/fixtures/fragment-refs/index.js</td><td>Jack Pope</td><td class="num">8</td></tr><tr><td class="path">fixtures/view-transition/src/components/SwipeRecognizer.js</td><td>Sebastian Markbåge</td><td class="num">8</td></tr><tr><td class="path">.github/workflows/shared_check_maintainer.yml</td><td>lauren</td><td class="num">7</td></tr><tr><td class="path">packages/react-devtools-cdt-mcp/src/__tests__/DevToolsCdtMcp-test.js</td><td>Ruslan Lesiutin</td><td class="num">7</td></tr><tr><td class="path">packages/react-devtools-facade/src/DevToolsFacadeTools.js</td><td>Ruslan Lesiutin</td><td class="num">7</td></tr><tr><td class="path">compiler/apps/playground/components/AccordionWindow.tsx</td><td>Eugene Choi</td><td class="num">7</td></tr><tr><td class="path">packages/react-dom/src/__tests__/ReactDOMFizzSuspenseList-test.js</td><td>Sebastian Markbåge</td><td class="num">7</td></tr><tr><td class="path">packages/react-devtools-extensions/firefox/build.js</td><td>Brian Vaughn</td><td class="num">7</td></tr><tr><td class="path">packages/react-devtools-extensions/chrome/build.js</td><td>Brian Vaughn</td><td class="num">7</td></tr><tr><td class="path">packages/react-devtools-facade/src/DevToolsFacadeTreeTools.js</td><td>Ruslan Lesiutin</td><td class="num">6</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/error.invalid-reassign-local-variable-in-jsx-callback.expect.md</td><td>Joseph Savona</td><td class="num">6</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/error.invalid-referencing-frozen-hoisted-storecontext-const.expect.md</td><td>Joseph Savona</td><td class="num">6</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/error.invalid-uncalled-function-capturing-mutable-values-memoizes-with-captures-values.expect.md</td><td>Joseph Savona</td><td class="num">6</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/error.invalid-useCallback-captures-reassigned-context.expect.md</td><td>Joseph Savona</td><td class="num">6</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/Inference/AliasingEffects.ts</td><td>Joseph Savona</td><td class="num">6</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/error.invalid-hoisting-setstate.expect.md</td><td>Joseph Savona</td><td class="num">6</td></tr><tr><td class="path">.github/ISSUE_TEMPLATE/devtools_bug_report.yml</td><td>Brian Vaughn</td><td class="num">6</td></tr><tr><td class="path">packages/react-devtools-shared/src/devtools/views/Profiler/SidebarCommitInfo.css</td><td>Brian Vaughn</td><td class="num">6</td></tr><tr><td class="path">.github/workflows/shared_close_direct_sync_branch_prs.yml</td><td>lauren</td><td class="num">5</td></tr><tr><td class="path">.github/workflows/shared_stale.yml</td><td>lauren</td><td class="num">5</td></tr><tr><td class="path">.github/workflows/runtime_fuzz_tests.yml</td><td>lauren</td><td class="num">5</td></tr><tr><td class="path">packages/react-devtools-shared/src/devtools/views/SuspenseTab/SuspenseBreadcrumbs.css</td><td>Sebastian &quot;Sebbie&quot; Silbermann</td><td class="num">5</td></tr><tr><td class="path">packages/react-devtools-cdt-mcp/README.md</td><td>Ruslan Lesiutin</td><td class="num">5</td></tr><tr><td class="path">packages/react-devtools-cdt-mcp/src/DevToolsCdtMcp.js</td><td>Ruslan Lesiutin</td><td class="num">5</td></tr><tr><td class="path">compiler/packages/snap/src/minimize.ts</td><td>Joseph Savona</td><td class="num">5</td></tr><tr><td class="path">compiler/packages/eslint-plugin-react-compiler/__tests__/PluginTest-test.ts</td><td>Joseph Savona</td><td class="num">5</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/todo-control-flow-sensitive-mutation.expect.md</td><td>Joseph Savona</td><td class="num">5</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/transitivity-add-captured-array-to-itself.expect.md</td><td>Joseph Savona</td><td class="num">5</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/transitivity-capture-createfrom-lambda.expect.md</td><td>Joseph Savona</td><td class="num">5</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/transitivity-capture-createfrom.expect.md</td><td>Joseph Savona</td><td class="num">5</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/transitivity-phi-assign-or-capture.expect.md</td><td>Joseph Savona</td><td class="num">5</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/useCallback-reordering-depslist-assignment.expect.md</td><td>Joseph Savona</td><td class="num">5</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/useMemo-reordering-depslist-assignment.expect.md</td><td>Joseph Savona</td><td class="num">5</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/error.mutate-frozen-value.expect.md</td><td>Joseph Savona</td><td class="num">5</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/error.mutate-hook-argument.expect.md</td><td>Joseph Savona</td><td class="num">5</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/error.not-useEffect-external-mutate.expect.md</td><td>Joseph Savona</td><td class="num">5</td></tr><tr><td class="path">packages/react-devtools-shared/src/devtools/views/SuspenseTab/SuspenseScrubber.css</td><td>Sebastian Markbåge</td><td class="num">5</td></tr><tr><td class="path">fixtures/ssr/src/components/LargeContent.js</td><td>Sebastian Markbåge</td><td class="num">5</td></tr><tr><td class="path">packages/react/src/ReactTransitionType.js</td><td>Sebastian Markbåge</td><td class="num">5</td></tr><tr><td class="path">packages/react-devtools-shared/src/devtools/views/TabBar.css</td><td>Brian Vaughn</td><td class="num">5</td></tr><tr><td class="path">packages/react-devtools-shared/src/devtools/views/Profiler/SnapshotCommitListItem.css</td><td>Brian Vaughn</td><td class="num">5</td></tr><tr><td class="path">packages/react-devtools-extensions/chrome/deploy.js</td><td>Brian Vaughn</td><td class="num">5</td></tr><tr><td class="path">packages/react-devtools-extensions/firefox/deploy.js</td><td>Brian Vaughn</td><td class="num">5</td></tr><tr><td class="path">compiler/packages/react-forgive/server/src/compiler/index.ts</td><td>lauren</td><td class="num">4</td></tr><tr><td class="path">compiler/scripts/release/shared/packages.js</td><td>lauren</td><td class="num">4</td></tr><tr><td class="path">compiler/scripts/release/shared/build-packages.js</td><td>lauren</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-cdt-mcp/e2e/run.flow.js</td><td>Ruslan Lesiutin</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-facade/src/DevToolsFacade.js</td><td>Ruslan Lesiutin</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-cdt-mcp/src/index.js</td><td>Ruslan Lesiutin</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/src/background/tabsManager.js</td><td>Ruslan Lesiutin</td><td class="num">4</td></tr><tr><td class="path">packages/react-dom/src/__tests__/utils/IntersectionMocks.js</td><td>Jack Pope</td><td class="num">4</td></tr><tr><td class="path">fixtures/dom/src/components/fixtures/fragment-refs/FocusCase.js</td><td>Jack Pope</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/exhaustive-deps/error.invalid-exhaustive-deps.expect.md</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/exhaustive-deps/error.invalid-missing-nonreactive-dep-unmemoized.expect.md</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/docs/passes/README.md</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/mutate-through-identity-function-expression.expect.md</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/mutate-through-identity.expect.md</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/todo-control-flow-sensitive-mutation.tsx</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/transitivity-add-captured-array-to-itself.tsx</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/transitivity-capture-createfrom-lambda.tsx</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/transitivity-capture-createfrom.tsx</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/transitivity-phi-assign-or-capture.tsx</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/useCallback-reordering-deplist-controlflow.tsx</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/useCallback-reordering-depslist-assignment.tsx</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/useMemo-reordering-depslist-assignment.ts</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/new-mutability/todo-transitivity-createfrom-capture-lambda.expect.md</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">compiler/packages/babel-plugin-react-compiler/src/__tests__/fixtures/compiler/error.invalid-jsx-captures-context-variable.expect.md</td><td>Joseph Savona</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-shared/src/devtools/views/Components/OwnerView.js</td><td>Sebastian Markbåge</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-shared/src/devtools/views/Settings/CodeEditorOptions.js</td><td>Sebastian Markbåge</td><td class="num">4</td></tr><tr><td class="path">packages/react-server/src/ReactFlightServerConfigDebugNoop.js</td><td>Sebastian Markbåge</td><td class="num">4</td></tr><tr><td class="path">packages/react-dom/src/server/react-dom-server.node.js</td><td>Sebastian Markbåge</td><td class="num">4</td></tr><tr><td class="path">fixtures/flight/server/package.json</td><td>Sebastian Markbåge</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-shared/src/devtools/views/ErrorBoundary/shared.css</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/128-deadcode.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/128-development.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/128-disabled.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/128-outdated.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/128-production.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/128-unminified.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/16-deadcode.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/16-development.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/16-disabled.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/16-outdated.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/16-production.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/16-unminified.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/32-deadcode.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/32-development.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/32-disabled.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/32-outdated.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/32-production.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/32-unminified.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/48-deadcode.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/48-development.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/48-disabled.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/48-outdated.png</td><td>Brian Vaughn</td><td class="num">4</td></tr><tr><td class="path">packages/react-devtools-extensions/icons/48-production.png</td><td>Brian Vaughn</td><td class="num">4</td></tr></table></div></details>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by author</a></h2>
 
-<p><em>Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</em></p><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th>Files owned</th><th>Solely owned</th><th>Files touched</th></tr><tr><td>Joe Savona</td><td>6369</td><td>4096</td><td>8533</td></tr><tr><td>lauren</td><td>4775</td><td>3058</td><td>5856</td></tr><tr><td>Brian Vaughn</td><td>2262</td><td>1416</td><td>3819</td></tr><tr><td>Sebastian Markbåge</td><td>1781</td><td>481</td><td>3508</td></tr><tr><td>Mofei Zhang</td><td>1418</td><td>859</td><td>2565</td></tr><tr><td>Joseph Savona</td><td>1383</td><td>734</td><td>2350</td></tr><tr><td>Dan Abramov</td><td>1168</td><td>531</td><td>2731</td></tr><tr><td>Paul O’Shannessy</td><td>888</td><td>237</td><td>1701</td></tr><tr><td>mofeiZ</td><td>576</td><td>251</td><td>1044</td></tr><tr><td>Andrew Clark</td><td>566</td><td>117</td><td>2390</td></tr><tr><td>Sathya Gunasekaran</td><td>534</td><td>366</td><td>1039</td></tr><tr><td>Sophie Alpert</td><td>499</td><td>30</td><td>1412</td></tr><tr><td>Dominic Gannaway</td><td>368</td><td>158</td><td>881</td></tr><tr><td>Xuan Huang (黄玄)</td><td>265</td><td>123</td><td>319</td></tr><tr><td>Jan Kassens</td><td>239</td><td>35</td><td>4286</td></tr><tr><td>Pete Hunt</td><td>237</td><td>42</td><td>479</td></tr><tr><td>Josh Story</td><td>226</td><td>85</td><td>788</td></tr><tr><td>jstejada</td><td>213</td><td>103</td><td>260</td></tr><tr><td>Sebastian &quot;Sebbie&quot; Silbermann</td><td>187</td><td>94</td><td>920</td></tr><tr><td>Michael Vitousek</td><td>185</td><td>63</td><td>382</td></tr><tr><td>Nathan</td><td>183</td><td>7</td><td>410</td></tr><tr><td>Ruslan Lesiutin</td><td>162</td><td>69</td><td>517</td></tr><tr><td>Vjeux</td><td>130</td><td>2</td><td>328</td></tr><tr><td>Nathan Hunzaker</td><td>109</td><td>25</td><td>244</td></tr><tr><td>Rick Hanlon</td><td>91</td><td>19</td><td>733</td></tr></table><p class="moreauthors">Showing top 25 of 1928 contributors.</p>
-<h2 id="most_shared_files"><a href="#most_shared_files">Most Shared Files</a></h2>
+<p class="section-note">Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</p><div class="table-scroll"><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th class="num">Files owned</th><th class="num">Solely owned</th><th class="num">Files touched</th></tr><tr><td>Joe Savona</td><td class="num">1,755</td><td class="num">373</td><td class="num">2,498</td></tr><tr><td>Joseph Savona</td><td class="num">1,122</td><td class="num">646</td><td class="num">1,718</td></tr><tr><td>Sebastian Markbåge</td><td class="num">693</td><td class="num">141</td><td class="num">1,455</td></tr><tr><td>Brian Vaughn</td><td class="num">622</td><td class="num">187</td><td class="num">1,039</td></tr><tr><td>mofeiZ</td><td class="num">432</td><td class="num">207</td><td class="num">759</td></tr><tr><td>lauren</td><td class="num">325</td><td class="num">121</td><td class="num">639</td></tr><tr><td>Andrew Clark</td><td class="num">257</td><td class="num">42</td><td class="num">1,369</td></tr><tr><td>Dan Abramov</td><td class="num">222</td><td class="num">61</td><td class="num">660</td></tr><tr><td>Nathan</td><td class="num">180</td><td class="num">7</td><td class="num">385</td></tr><tr><td>Sebastian &quot;Sebbie&quot; Silbermann</td><td class="num">175</td><td class="num">91</td><td class="num">791</td></tr><tr><td>Mofei Zhang</td><td class="num">160</td><td class="num">93</td><td class="num">283</td></tr><tr><td>Jan Kassens</td><td class="num">145</td><td class="num">20</td><td class="num">2,758</td></tr><tr><td>Josh Story</td><td class="num">136</td><td class="num">53</td><td class="num">529</td></tr><tr><td>Michael Vitousek</td><td class="num">125</td><td class="num">47</td><td class="num">289</td></tr><tr><td>Ruslan Lesiutin</td><td class="num">112</td><td class="num">63</td><td class="num">383</td></tr><tr><td>Rick Hanlon</td><td class="num">76</td><td class="num">13</td><td class="num">560</td></tr><tr><td>Dominic Gannaway</td><td class="num">58</td><td class="num">30</td><td class="num">240</td></tr><tr><td>Jorge Cabiedes</td><td class="num">45</td><td class="num">30</td><td class="num">104</td></tr><tr><td>Hendrik Liebau</td><td class="num">42</td><td class="num">35</td><td class="num">141</td></tr><tr><td>Jack Pope</td><td class="num">37</td><td class="num">31</td><td class="num">251</td></tr><tr><td>Nathan Hunzaker</td><td class="num">34</td><td class="num">10</td><td class="num">74</td></tr><tr><td>Devon Govett</td><td class="num">33</td><td class="num">30</td><td class="num">78</td></tr><tr><td>michael faith</td><td class="num">33</td><td class="num">13</td><td class="num">62</td></tr><tr><td>Sathya Gunasekaran</td><td class="num">24</td><td class="num">14</td><td class="num">60</td></tr><tr><td>Pieter De Baets</td><td class="num">23</td><td class="num">10</td><td class="num">86</td></tr></table></div><p class="moreauthors">Showing top 25 of 802 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most shared files</a></h2>
 
-<p><em>Files touched by the most people — shared code where changes are most likely to need coordination.</em></p><table class="sortable" id="ownership-shared"><tr><th>File</th><th>Contributors</th><th>Primary owner</th><th>Owner share</th></tr><tr><td>package.json</td><td>108</td><td>Brian Vaughn</td><td>16.6%</td></tr><tr><td>docs/docs/tutorial.md</td><td>73</td><td>Sophie Alpert</td><td>14.0%</td></tr><tr><td>yarn.lock</td><td>69</td><td>Brian Vaughn</td><td>23.7%</td></tr><tr><td>README.md</td><td>63</td><td>Paul O’Shannessy</td><td>30.6%</td></tr><tr><td>src/renderers/dom/shared/__tests__/ReactDOMComponent-test.js</td><td>53</td><td>Sophie Alpert</td><td>22.1%</td></tr><tr><td>CHANGELOG.md</td><td>47</td><td>Dan Abramov</td><td>35.9%</td></tr><tr><td>packages/shared/ReactFeatureFlags.js</td><td>46</td><td>Andrew Clark</td><td>16.1%</td></tr><tr><td>packages/shared/forks/ReactFeatureFlags.www.js</td><td>45</td><td>Andrew Clark</td><td>15.6%</td></tr><tr><td>scripts/rollup/bundles.js</td><td>45</td><td>Sebastian Markbåge</td><td>23.9%</td></tr><tr><td>packages/shared/forks/ReactFeatureFlags.native-fb.js</td><td>44</td><td>Andrew Clark</td><td>14.5%</td></tr><tr><td>packages/shared/forks/ReactFeatureFlags.test-renderer.js</td><td>43</td><td>Andrew Clark</td><td>16.0%</td></tr><tr><td>packages/shared/forks/ReactFeatureFlags.native-oss.js</td><td>43</td><td>Andrew Clark</td><td>15.5%</td></tr><tr><td>packages/shared/forks/ReactFeatureFlags.test-renderer.www.js</td><td>42</td><td>Andrew Clark</td><td>15.6%</td></tr><tr><td>scripts/rollup/build.js</td><td>42</td><td>Dan Abramov</td><td>23.7%</td></tr><tr><td>docs/docs/05-reusable-components.md</td><td>40</td><td>Sophie Alpert</td><td>11.5%</td></tr><tr><td>packages/react-reconciler/src/ReactFiberBeginWork.js</td><td>39</td><td>Sebastian Markbåge</td><td>26.9%</td></tr><tr><td>packages/eslint-plugin-react-hooks/__tests__/ESLintRuleExhaustiveDeps-test.js</td><td>39</td><td>Dan Abramov</td><td>34.6%</td></tr><tr><td>packages/react-reconciler/src/ReactFiberHooks.js</td><td>38</td><td>Andrew Clark</td><td>30.8%</td></tr><tr><td>.eslintrc.js</td><td>38</td><td>Sebastian Markbåge</td><td>22.1%</td></tr><tr><td>packages/eslint-plugin-react-hooks/src/ExhaustiveDeps.js</td><td>38</td><td>Dan Abramov</td><td>36.7%</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+<p class="section-note">Files touched by the most people — shared code where changes are most likely to need coordination.</p><div class="table-scroll"><table class="sortable" id="ownership-shared"><tr><th>File</th><th class="num">Contributors</th><th>Primary owner</th><th class="num">Owner share</th></tr><tr><td class="path">package.json</td><td class="num">108</td><td>Brian Vaughn</td><td class="num">16.6%</td></tr><tr><td class="path">yarn.lock</td><td class="num">69</td><td>Brian Vaughn</td><td class="num">23.7%</td></tr><tr><td class="path">README.md</td><td class="num">63</td><td>Paul O’Shannessy</td><td class="num">30.6%</td></tr><tr><td class="path">CHANGELOG.md</td><td class="num">47</td><td>Dan Abramov</td><td class="num">35.9%</td></tr><tr><td class="path">packages/shared/ReactFeatureFlags.js</td><td class="num">46</td><td>Andrew Clark</td><td class="num">16.1%</td></tr><tr><td class="path">packages/shared/forks/ReactFeatureFlags.www.js</td><td class="num">45</td><td>Andrew Clark</td><td class="num">15.6%</td></tr><tr><td class="path">scripts/rollup/bundles.js</td><td class="num">45</td><td>Sebastian Markbåge</td><td class="num">23.9%</td></tr><tr><td class="path">packages/shared/forks/ReactFeatureFlags.native-fb.js</td><td class="num">44</td><td>Andrew Clark</td><td class="num">14.5%</td></tr><tr><td class="path">packages/shared/forks/ReactFeatureFlags.test-renderer.js</td><td class="num">43</td><td>Andrew Clark</td><td class="num">16.0%</td></tr><tr><td class="path">packages/shared/forks/ReactFeatureFlags.native-oss.js</td><td class="num">43</td><td>Andrew Clark</td><td class="num">15.5%</td></tr><tr><td class="path">packages/shared/forks/ReactFeatureFlags.test-renderer.www.js</td><td class="num">42</td><td>Andrew Clark</td><td class="num">15.6%</td></tr><tr><td class="path">scripts/rollup/build.js</td><td class="num">42</td><td>Dan Abramov</td><td class="num">23.7%</td></tr><tr><td class="path">packages/react-reconciler/src/ReactFiberBeginWork.js</td><td class="num">39</td><td>Sebastian Markbåge</td><td class="num">26.9%</td></tr><tr><td class="path">packages/eslint-plugin-react-hooks/__tests__/ESLintRuleExhaustiveDeps-test.js</td><td class="num">39</td><td>Dan Abramov</td><td class="num">34.6%</td></tr><tr><td class="path">packages/react-reconciler/src/ReactFiberHooks.js</td><td class="num">38</td><td>Andrew Clark</td><td class="num">30.8%</td></tr><tr><td class="path">.eslintrc.js</td><td class="num">38</td><td>Sebastian Markbåge</td><td class="num">22.1%</td></tr><tr><td class="path">packages/react-reconciler/src/ReactFiberCommitWork.js</td><td class="num">32</td><td>Sebastian Markbåge</td><td class="num">29.2%</td></tr><tr><td class="path">packages/react-dom/src/__tests__/ReactDOMComponent-test.js</td><td class="num">31</td><td>Dan Abramov</td><td class="num">22.2%</td></tr><tr><td class="path">packages/react-dom/src/__tests__/ReactDOMInput-test.js</td><td class="num">31</td><td>Dan Abramov</td><td class="num">18.3%</td></tr><tr><td class="path">packages/react-reconciler/src/ReactFiberWorkLoop.js</td><td class="num">30</td><td>Sebastian Markbåge</td><td class="num">34.9%</td></tr></table></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body></html>

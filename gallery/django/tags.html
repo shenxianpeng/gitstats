@@ -5,34 +5,233 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Django</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.2.post1.dev1">
+	<meta name="generator" content="GitStats 2.7.0">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -44,15 +243,18 @@
             <li><a href="authors.html">Authors</a></li>
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
-            <li><a href="tags.html">Tags</a></li>
+            <li><a href="tags.html" class="active" aria-current="page">Tags</a></li>
             <li><a href="ownership.html">Code Ownership</a></li>
             <li><a href="history.html">History</a></li>
             
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Tags</h1><dl><dt>Total tags</dt><dd>0</dd></dl><table class="tags"><tr><th>Name</th><th>Date</th><th>Commits</th><th>Authors</th></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+            <h1>Tags</h1><dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">8</dd><dd class="stat-note"><span class="nowrap">latest 1.7a2</span>&nbsp;&middot; <span class="nowrap">2014-02-06</span></dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">4369.1</dd><dd class="stat-note">34,953 commits in total</dd></div></dl>
+<h2 id="all_tags"><a href="#all_tags">All tags</a></h2>
+
+<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th>Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">1.7a2</td><td class="nowrap">2014-02-06</td><td class="num">101</td><td>Aymeric Augustin (18), Tim Graham (13), Claude Paroz (7), Carl Meyer (7), Andrew Godwin (6), Alex Gaynor (6), Marc Tamlyn (5), Anssi Kääriäinen (5), Michael Manfre (4), Baptiste Mispelon (4), Simon Charette (3), Loïc Bistuer (3), Vajrasky Kok (2), Shai Berger (2), Jacob Kaplan-Moss (2), Arne Brodowski (2), Wojciech Banaś (1), Tom Atkins (1), Thomas Grainger (1), Mark Sandstrom (1), Lily Foote (1), Jannis Leidel (1), James Turley (1), Florian Apolloner (1), David Fischer (1), Christopher Medrela (1), Chris Jerdonek (1), Chris Barna (1)</td></tr><tr><td class="nowrap">1.7a1</td><td class="nowrap">2014-01-23</td><td class="num">5,178</td><td>Aymeric Augustin (835), Claude Paroz (794), Tim Graham (641), Anssi Kääriäinen (289), Andrew Godwin (247), Alex Gaynor (221), Florian Apolloner (172), Ramiro Morales (169), Baptiste Mispelon (100), Loïc Bistuer (84), Preston Holmes (73), Marc Tamlyn (71), Simon Charette (67), Julien Phalip (65), Adrian Holovaty (57), Russell Keith-Magee (54), Carl Meyer (46), Luke Plant (33), Jannis Leidel (33), Jacob Kaplan-Moss (32), Bouke Haarsma (24), Preston Timmons (22), Justin Bronn (20), James Bennett (20), Shai Berger (18), Donald Stufft (17), Daniele Procida (17), Alasdair Nicol (17), Łukasz Langa (15), Michael Manfre (15), Honza Král (14), Erik Romijn (14), Curtis Maloney (14), Unai Zalakain (13), Vajrasky Kok (12), Karen Tracey (12), Ian Clelland (12), Kevin Christopher Henry (11), Honza Kral (11), Susan Tan (10), Simon Meers (10), Tai Lee (8), Roberto Aguilar (8), Juan Catalano (8), Ray Ashman (7), Daniel Greenfeld (7), Christopher Medrela (7), Chris Beaven (7), Travis Swicegood (6), Senko Rasic (6), <em>and 449 more authors</em></td></tr><tr><td class="nowrap">1.4</td><td class="nowrap">2012-03-23</td><td class="num">1,689</td><td>Jannis Leidel (405), Aymeric Augustin (206), Ramiro Morales (161), Luke Plant (136), Julien Phalip (127), Adrian Holovaty (105), Alex Gaynor (71), Carl Meyer (70), Russell Keith-Magee (62), Tim Graham (59), Paul McMillan (50), Chris Beaven (44), Malcolm Tredinnick (32), Karen Tracey (27), Justin Bronn (25), Gabriel Hurley (21), James Bennett (19), Claude Paroz (19), Simon Meers (17), Jacob Kaplan-Moss (12), Andrew Godwin (9), Idan Gazit (4), Honza Král (4), Erin Kelly (3), Brian Rosner (1)</td></tr><tr><td class="nowrap">1.3</td><td class="nowrap">2011-03-23</td><td class="num">1,575</td><td>Russell Keith-Magee (463), Jannis Leidel (235), Alex Gaynor (166), Luke Plant (115), Gabriel Hurley (101), Ramiro Morales (100), Tim Graham (84), Carl Meyer (45), Justin Bronn (40), Chris Beaven (34), Adrian Holovaty (28), Karen Tracey (25), Malcolm Tredinnick (23), Jacob Kaplan-Moss (21), Erin Kelly (21), Honza Král (20), James Bennett (19), Simon Meers (14), Andrew Godwin (13), Jarek Zgoda (4), Idan Gazit (2), Graham Dumpleton (1), Brian Rosner (1)</td></tr><tr><td class="nowrap">1.2.1</td><td class="nowrap">2010-05-24</td><td class="num">15</td><td>Jannis Leidel (4), James Bennett (4), Jacob Kaplan-Moss (3), Russell Keith-Magee (2), Luke Plant (1), Karen Tracey (1)</td></tr><tr><td class="nowrap">1.2</td><td class="nowrap">2010-05-17</td><td class="num">1,165</td><td>Russell Keith-Magee (386), Jannis Leidel (192), Luke Plant (113), Karen Tracey (103), Justin Bronn (83), Adrian Holovaty (58), Joseph Kocherhans (54), James Bennett (48), Jacob Kaplan-Moss (46), Brian Rosner (21), Gary Wilson Jr (18), Jarek Zgoda (10), Erin Kelly (7), Ramiro Morales (6), Nicola Larosa (6), Marc Fargas (4), Malcolm Tredinnick (4), Matt Boersma (2), Aljosa Mohorovic (2), Simon Willison (1), James Tauber (1)</td></tr><tr><td class="nowrap">1.1</td><td class="nowrap">2009-07-29</td><td class="num">1,291</td><td>Malcolm Tredinnick (297), Russell Keith-Magee (270), Jacob Kaplan-Moss (181), Karen Tracey (106), Justin Bronn (90), Adrian Holovaty (73), Gary Wilson Jr (56), James Bennett (44), Erin Kelly (30), Luke Plant (23), Brian Rosner (21), Marc Fargas (17), Simon Willison (16), Matt Boersma (13), Jarek Zgoda (13), Wilson Miner (10), Nicola Larosa (9), Jannis Leidel (8), Joseph Kocherhans (7), Ramiro Morales (4), Aljosa Mohorovic (2), Ludvig Ericson (1)</td></tr><tr><td class="nowrap">1.0</td><td class="nowrap">2008-09-03</td><td class="num">6,037</td><td>Adrian Holovaty (2,481), Malcolm Tredinnick (1,513), Jacob Kaplan-Moss (594), Russell Keith-Magee (484), Gary Wilson Jr (261), Georg Bauer (202), Brian Rosner (105), James Bennett (100), Luke Plant (53), Marc Fargas (52), Wilson Miner (34), Erin Kelly (32), Nicola Larosa (21), Matt Boersma (19), Jarek Zgoda (17), Justin Bronn (14), Ludvig Ericson (13), Jannis Leidel (13), Simon Willison (8), Joseph Kocherhans (6), Ramiro Morales (5), Marc Garcia (5), Aljosa Mohorovic (5)</td></tr></table></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body></html>

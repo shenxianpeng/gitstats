@@ -5,34 +5,233 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Homebrew</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.2.post1.dev1">
+	<meta name="generator" content="GitStats 2.7.0">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -45,23 +244,23 @@
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
-            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="ownership.html" class="active" aria-current="page">Code Ownership</a></li>
             <li><a href="history.html">History</a></li>
             
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Code Ownership</h1><div class="ownership-summary"><p>Ownership is measured by how many commits each author made to each file. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl><dt>Files tracked</dt><dd>60757</dd><dt>Single-owner files</dt><dd>54488 (89.7%)</dd><dt>Contributors</dt><dd>1309</dd></dl></div>
-<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus Factor Risk — Single-Owner Files</a></h2>
+            <h1>Code Ownership</h1><p class="section-note">Ownership is measured by how many commits each author made to each file in the current tree. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Files Tracked</dt><dd class="stat-value">2,992</dd><dd class="stat-note">in the current tree</dd></div><div class="stat-tile"><dt>Single-Owner Files</dt><dd class="stat-value">854</dd><dd class="stat-note">28.5% of tracked files</dd></div><div class="stat-tile"><dt>Contributors</dt><dd class="stat-value">1,059</dd><dd class="stat-note">authors who changed files</dd></div></dl>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus factor risk — single-owner files</a></h2>
 
-<p><em>Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</em></p><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th>Commits</th></tr><tr><td>Library/Homebrew/brew_doctor.rb</td><td>Adam Vandenberg</td><td>48</td></tr><tr><td>Cellar/homebrew/brewkit.rb</td><td>Max Howell</td><td>33</td></tr><tr><td>Library/Contributions/examples/brew-audit.rb</td><td>Adam Vandenberg</td><td>29</td></tr><tr><td>Library/Homebrew/json_api_postinstall_preflight_postflight_plan.md</td><td>Mike McQuaid</td><td>24</td></tr><tr><td>Library/Homebrew/rubocops/install_steps.rb</td><td>Mike McQuaid</td><td>14</td></tr><tr><td>Library/Homebrew/test/rubocops/no_fileutils_rmrf_spec.rb</td><td>Issy Long</td><td>14</td></tr><tr><td>Cellar/homebrew/brew</td><td>Max Howell</td><td>14</td></tr><tr><td>Library/Homebrew/test/test_language_module_dependency.rb</td><td>Jack Nagel</td><td>13</td></tr><tr><td>Library/Homebrew/rubocops/cask/install_steps.rb</td><td>Mike McQuaid</td><td>12</td></tr><tr><td>Library/Homebrew/rubocops/no_fileutils_rmrf.rb</td><td>Issy Long</td><td>11</td></tr><tr><td>Library/Homebrew/utils/cp.rb</td><td>Daiki Mizukami</td><td>11</td></tr><tr><td>Library/Homebrew/extend/os/linux/sandbox/landlock.rb</td><td>Mike McQuaid</td><td>10</td></tr><tr><td>Library/Homebrew/test/sandbox_landlock_spec.rb</td><td>Mike McQuaid</td><td>10</td></tr><tr><td>Library/Homebrew/utils/update.rb</td><td>Elizabeth Tackett</td><td>10</td></tr><tr><td>Library/Homebrew/test/test_x11_dependency.rb</td><td>Jack Nagel</td><td>10</td></tr><tr><td>Library/Contributions/cmd/brew-test-bot.xml.erb</td><td>Mike McQuaid</td><td>8</td></tr><tr><td>Library/Homebrew/extend/os/linux/dev-cmd/determine-test-runners.rb</td><td>Carlo Cabrera</td><td>8</td></tr><tr><td>Library/Homebrew/test/cask/artifact/nested_container_spec.rb</td><td>Markus Reiter</td><td>8</td></tr><tr><td>Formula/dmd.rb</td><td>Max Howell</td><td>8</td></tr><tr><td>Formula/grc.rb</td><td>Max Howell</td><td>8</td></tr><tr><td>Library/Homebrew/test/formula_versions_spec.rb</td><td>Patrick Linnane</td><td>7</td></tr><tr><td>Library/Homebrew/bottle_api.rb</td><td>Rylan Polster</td><td>7</td></tr><tr><td>share/zsh/site-functions/_brew_cask</td><td>Josh McKinney</td><td>7</td></tr><tr><td>Library/Homebrew/test/cask/container/naked_spec.rb</td><td>Markus Reiter</td><td>7</td></tr><tr><td>scripts/helpers/brew_commands.rb</td><td>Elizabeth Tackett</td><td>7</td></tr><tr><td>docs/Advisory-Matching.md</td><td>Patrick Linnane</td><td>6</td></tr><tr><td>Library/Homebrew/cask/artifact/command_wrapper.rb</td><td>Mike McQuaid</td><td>6</td></tr><tr><td>Library/Homebrew/cmd/exec.sh</td><td>Mike McQuaid</td><td>6</td></tr><tr><td>Library/Homebrew/attrable.rb</td><td>Douglas Eichelberger</td><td>6</td></tr><tr><td>Library/Homebrew/test/cask/verify/checksum_spec.rb</td><td>Markus Reiter</td><td>6</td></tr><tr><td>Library/Homebrew/test/cask/container/dmg_spec.rb</td><td>Markus Reiter</td><td>6</td></tr><tr><td>scripts/helpers/parsed_file.rb</td><td>Elizabeth Tackett</td><td>6</td></tr><tr><td>Library/Homebrew/bundle/subcommand/dump.rb</td><td>Mike McQuaid</td><td>5</td></tr><tr><td>Library/Homebrew/extend/ENV/sensitive.rb</td><td>Mike McQuaid</td><td>5</td></tr><tr><td>Library/Homebrew/rust/brew-rs/AGENTS.md</td><td>Mike McQuaid</td><td>5</td></tr><tr><td>Library/Homebrew/bundle/mac_app_store_checker.rb</td><td>Mike McQuaid</td><td>5</td></tr><tr><td>Library/Homebrew/compat/software_spec.rb</td><td>Mike McQuaid</td><td>5</td></tr><tr><td>Library/Homebrew/utils/inflection.rb</td><td>Douglas Eichelberger</td><td>5</td></tr><tr><td>Library/Homebrew/test/vulns/cpan_sec_spec.rb</td><td>Andrew Nesbitt</td><td>5</td></tr><tr><td>Library/Homebrew/test/support/fixtures/internal_tap_json/homebrew-core.json</td><td>apainintheneck</td><td>5</td></tr><tr><td>Library/Homebrew/cask/lib/hbc/cli/--version.rb</td><td>Markus Reiter</td><td>5</td></tr><tr><td>Library/Homebrew/cask/spec/cask/cli/uninstall_spec.rb</td><td>Markus Reiter</td><td>5</td></tr><tr><td>Library/Homebrew/test/os/dependency_collector_spec.rb</td><td>Maxim Belkin</td><td>5</td></tr><tr><td>Dockerfile.test.yml</td><td>Shaun Jackman</td><td>5</td></tr><tr><td>Library/Homebrew/core_formula_repository.rb</td><td>Cheng XU</td><td>5</td></tr><tr><td>Library/Homebrew/sorbet/rbi/hidden-definitions/errors.txt</td><td>Vidushee Amoli</td><td>5</td></tr><tr><td>scripts/bumpFormulae.rb</td><td>Elizabeth Tackett</td><td>5</td></tr><tr><td>scripts/helpers/homebrew_formula.rb</td><td>Elizabeth Tackett</td><td>5</td></tr><tr><td>scripts/printPackageUpdates.rb</td><td>Elizabeth Tackett</td><td>5</td></tr><tr><td>Library/Homebrew/test/test_compiler_queue.rb</td><td>Jack Nagel</td><td>5</td></tr></table><p class="moreauthors">Showing top 50 of 54488 single-owner files.</p>
-<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by Author</a></h2>
+<p class="section-note">Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</p><div class="table-scroll"><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">Library/Homebrew/rubocops/install_steps.rb</td><td>Mike McQuaid</td><td class="num">14</td></tr><tr><td class="path">Library/Homebrew/test/rubocops/no_fileutils_rmrf_spec.rb</td><td>Issy Long</td><td class="num">14</td></tr><tr><td class="path">Library/Homebrew/test/sandbox_landlock_spec.rb</td><td>Mike McQuaid</td><td class="num">13</td></tr><tr><td class="path">Library/Homebrew/extend/os/linux/sandbox/landlock.rb</td><td>Mike McQuaid</td><td class="num">12</td></tr><tr><td class="path">Library/Homebrew/rubocops/cask/install_steps.rb</td><td>Mike McQuaid</td><td class="num">12</td></tr><tr><td class="path">Library/Homebrew/rubocops/no_fileutils_rmrf.rb</td><td>Issy Long</td><td class="num">11</td></tr><tr><td class="path">docs/Advisory-Matching.md</td><td>Patrick Linnane</td><td class="num">7</td></tr><tr><td class="path">Library/Homebrew/test/formula_versions_spec.rb</td><td>Patrick Linnane</td><td class="num">7</td></tr><tr><td class="path">Library/Homebrew/cmd/exec.sh</td><td>Mike McQuaid</td><td class="num">6</td></tr><tr><td class="path">Library/Homebrew/download_strategy/cvs_download_strategy.rb</td><td>Mike McQuaid</td><td class="num">5</td></tr></table></div><details class="table-details"><summary>Table: the 100 most-changed of 854 single-owner files</summary><div class="table-scroll"><table class="sortable" id="ownership-busfactor-all"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">Library/Homebrew/rubocops/install_steps.rb</td><td>Mike McQuaid</td><td class="num">14</td></tr><tr><td class="path">Library/Homebrew/test/rubocops/no_fileutils_rmrf_spec.rb</td><td>Issy Long</td><td class="num">14</td></tr><tr><td class="path">Library/Homebrew/test/sandbox_landlock_spec.rb</td><td>Mike McQuaid</td><td class="num">13</td></tr><tr><td class="path">Library/Homebrew/extend/os/linux/sandbox/landlock.rb</td><td>Mike McQuaid</td><td class="num">12</td></tr><tr><td class="path">Library/Homebrew/rubocops/cask/install_steps.rb</td><td>Mike McQuaid</td><td class="num">12</td></tr><tr><td class="path">Library/Homebrew/rubocops/no_fileutils_rmrf.rb</td><td>Issy Long</td><td class="num">11</td></tr><tr><td class="path">docs/Advisory-Matching.md</td><td>Patrick Linnane</td><td class="num">7</td></tr><tr><td class="path">Library/Homebrew/test/formula_versions_spec.rb</td><td>Patrick Linnane</td><td class="num">7</td></tr><tr><td class="path">Library/Homebrew/cmd/exec.sh</td><td>Mike McQuaid</td><td class="num">6</td></tr><tr><td class="path">Library/Homebrew/download_strategy/cvs_download_strategy.rb</td><td>Mike McQuaid</td><td class="num">5</td></tr><tr><td class="path">Library/Homebrew/download_strategy/fossil_download_strategy.rb</td><td>Mike McQuaid</td><td class="num">5</td></tr><tr><td class="path">Library/Homebrew/bundle/subcommand/dump.rb</td><td>Mike McQuaid</td><td class="num">5</td></tr><tr><td class="path">Library/Homebrew/extend/ENV/sensitive.rb</td><td>Mike McQuaid</td><td class="num">5</td></tr><tr><td class="path">Library/Homebrew/test/vulns/cpan_sec_spec.rb</td><td>Andrew Nesbitt</td><td class="num">5</td></tr><tr><td class="path">Library/Homebrew/cmd/as-console-user.sh</td><td>Mike McQuaid</td><td class="num">4</td></tr><tr><td class="path">Library/Homebrew/download_strategy/bazaar_download_strategy.rb</td><td>Mike McQuaid</td><td class="num">4</td></tr><tr><td class="path">CODEOWNERS</td><td>Mike McQuaid</td><td class="num">4</td></tr><tr><td class="path">Library/Homebrew/bundle/subcommand/add.rb</td><td>Mike McQuaid</td><td class="num">4</td></tr><tr><td class="path">Library/Homebrew/utils/phase_timings.rb</td><td>Mike McQuaid</td><td class="num">4</td></tr><tr><td class="path">Library/Homebrew/cmd/exec.rb</td><td>Mike McQuaid</td><td class="num">4</td></tr><tr><td class="path">Library/Homebrew/bundle/extensions.rb</td><td>Mike McQuaid</td><td class="num">4</td></tr><tr><td class="path">.github/workflows/tap-new-autobump.yml</td><td>Sean Molenaar</td><td class="num">4</td></tr><tr><td class="path">Library/Homebrew/test/vulns/history_spec.rb</td><td>Patrick Linnane</td><td class="num">4</td></tr><tr><td class="path">Library/Homebrew/vulns/history.rb</td><td>Patrick Linnane</td><td class="num">4</td></tr><tr><td class="path">.github/workflows/licenses.yml</td><td>BrewTestBot</td><td class="num">4</td></tr><tr><td class="path">Library/Homebrew/sorbet/rbi/dsl/rubo_cop/cop/homebrew/no_fileutils_rmrf.rbi</td><td>Issy Long</td><td class="num">4</td></tr><tr><td class="path">Library/Homebrew/test/vulns/repology_spec.rb</td><td>Andrew Nesbitt</td><td class="num">4</td></tr><tr><td class="path">Library/Homebrew/os/mac/pkgconfig/14/libcurl.pc</td><td>Bo Anderson</td><td class="num">4</td></tr><tr><td class="path">Library/Homebrew/os/mac/pkgconfig/13/libcurl.pc</td><td>Bo Anderson</td><td class="num">4</td></tr><tr><td class="path">Library/Homebrew/tap.sh</td><td>Ruoyu Zhong</td><td class="num">4</td></tr><tr><td class="path">Library/Homebrew/extend/array.rbi</td><td>Douglas Eichelberger</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/download_strategy/vcs_download_strategy.rb</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/cmd/as-console-user.rb</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/test/pkg_postinstall_spec.rb</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/utils/macos_user.sh</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/bundle/subcommand/edit.rb</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/bundle/subcommand/remove.rb</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/extend/pathname/observer_pathname_extension.rb</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/tap/abstract_core_tap.rb</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">package/resources/WELCOME.rtf</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/download_strategy/mercurial_download_strategy.rb</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/test/test_bot/formulae_detect_spec.rb</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/test/support/fixtures/cask/Casks/with-install-steps.rb</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/bundle/subcommand/check.rb</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">.codex/hooks.json</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/test/support/fixtures/cask/Casks/invalid/invalid-depends-on-macos-bare-and-version.rb</td><td>Mike McQuaid</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/vulns/advisory_overrides.rb</td><td>Patrick Linnane</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/sorbet/rbi/dsl/homebrew/dev_cmd/update_portable_ruby.rbi</td><td>Patrick Linnane</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/sorbet/tapioca/compilers/cask/dsl.rb</td><td>Issy Long</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/vulns/repology.rb</td><td>Andrew Nesbitt</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/test/vulns/purl_spec.rb</td><td>Andrew Nesbitt</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/standalone.rb</td><td>Bo Anderson</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/os/mac/pkgconfig/13/expat.pc</td><td>Bo Anderson</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/os/mac/pkgconfig/13/sqlite3.pc</td><td>Bo Anderson</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/sorbet/rbi/dsl/homebrew/api/formula_struct.rbi</td><td>Rylan Polster</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/rubocops/disable_comment.rb</td><td>Kristján Oddsson</td><td class="num">3</td></tr><tr><td class="path">Library/Homebrew/sorbet/rbi/shims/portable_formula.rbi</td><td>Douglas Eichelberger</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/rubocops/unreferenced_let.rb</td><td>Douglas Eichelberger</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/test/rubocops/unreferenced_let_spec.rb</td><td>Douglas Eichelberger</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/keg.rbi</td><td>Douglas Eichelberger</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/pkg_version.rbi</td><td>Douglas Eichelberger</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/extend/enumerable.rbi</td><td>Douglas Eichelberger</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/test/shims/shared/git_spec.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/extend/os/linux/sandbox/backend.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/test/support/helper/spec/shared_context/integration_test_spec.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/dev-cmd/benchmark.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/install/check.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/analytics/subcommand.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/api/packages_index.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/completions/subcommand.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/developer/subcommand.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/download_strategy/curl_apache_mirror_download_strategy.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/extend/blank/string.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/extend/enumerable/hash.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/extend/object/deep_dup/array.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/extend/object/deep_dup/hash.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/livecheck/strategy/ruby_gems.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/os/mac/ffi/native_library.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/tap/core_cask_tap.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/utils/data.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/utils/text.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/test/downloadable_spec.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/test/os/linux/keg_spec.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">.github/workflows/commit-style.yml</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">.gitattributes</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">docs/Responsible-AI-Usage.md</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/sorbet/rbi/dsl/homebrew/dev_cmd/formula_analytics.rbi</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/extend/os/mac/cask/utils/trash.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/cask/utils/trash.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/extend/os/cask/utils/trash.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/dependency/uses_from_macos_dependency.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/download_strategy/homebrew_curl_download_strategy.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/prof/vernier_fork_guard.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/download_strategy/curl_post_download_strategy.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/utils/github/artifacts/github_artifact_download_strategy.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/bundle/subcommand/env.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/bundle/subcommand/list.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/bundle/subcommand/sh.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/utils/executables.sh</td><td>Mike McQuaid</td><td class="num">2</td></tr><tr><td class="path">Library/Homebrew/rubocops/public_api_documentation.rb</td><td>Mike McQuaid</td><td class="num">2</td></tr></table></div></details>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by author</a></h2>
 
-<p><em>Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</em></p><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th>Files owned</th><th>Solely owned</th><th>Files touched</th></tr><tr><td>BrewTestBot</td><td>43780</td><td>42371</td><td>44963</td></tr><tr><td>Mike McQuaid</td><td>9317</td><td>7882</td><td>10778</td></tr><tr><td>Markus Reiter</td><td>2458</td><td>1443</td><td>3580</td></tr><tr><td>Douglas Eichelberger</td><td>879</td><td>132</td><td>2138</td></tr><tr><td>Patrick Linnane</td><td>843</td><td>695</td><td>1534</td></tr><tr><td>Bo Anderson</td><td>808</td><td>693</td><td>3001</td></tr><tr><td>Issy Long</td><td>378</td><td>18</td><td>1625</td></tr><tr><td>Jack Nagel</td><td>193</td><td>52</td><td>352</td></tr><tr><td>Jonathan Chang</td><td>171</td><td>169</td><td>419</td></tr><tr><td>Michael Cho</td><td>135</td><td>122</td><td>579</td></tr><tr><td>Baffour Adu Boampong</td><td>134</td><td>133</td><td>147</td></tr><tr><td>Rylan Polster</td><td>133</td><td>36</td><td>727</td></tr><tr><td>Shaun Jackman</td><td>109</td><td>49</td><td>316</td></tr><tr><td>Vidushee Amoli</td><td>90</td><td>35</td><td>155</td></tr><tr><td>Mohammad Zain Abbas</td><td>87</td><td>85</td><td>102</td></tr><tr><td>Sam Ford</td><td>78</td><td>10</td><td>258</td></tr><tr><td>Max Howell</td><td>65</td><td>48</td><td>156</td></tr><tr><td>Nanda H Krishna</td><td>61</td><td>25</td><td>254</td></tr><tr><td>Carlo Cabrera</td><td>50</td><td>15</td><td>350</td></tr><tr><td>AnastasiaSulyagina</td><td>48</td><td>47</td><td>484</td></tr><tr><td>Francois-Xavier Coudert</td><td>42</td><td>39</td><td>72</td></tr><tr><td>Bevan Kay</td><td>37</td><td>28</td><td>227</td></tr><tr><td>apainintheneck</td><td>36</td><td>14</td><td>248</td></tr><tr><td>Dominyk Tiller</td><td>36</td><td>22</td><td>191</td></tr><tr><td>Adam Vandenberg</td><td>36</td><td>19</td><td>180</td></tr></table><p class="moreauthors">Showing top 25 of 1309 contributors.</p>
-<h2 id="most_shared_files"><a href="#most_shared_files">Most Shared Files</a></h2>
+<p class="section-note">Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</p><div class="table-scroll"><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th class="num">Files owned</th><th class="num">Solely owned</th><th class="num">Files touched</th></tr><tr><td>Mike McQuaid</td><td class="num">1,046</td><td class="num">238</td><td class="num">1,929</td></tr><tr><td>Markus Reiter</td><td class="num">324</td><td class="num">61</td><td class="num">1,089</td></tr><tr><td>Issy Long</td><td class="num">320</td><td class="num">10</td><td class="num">1,383</td></tr><tr><td>Douglas Eichelberger</td><td class="num">277</td><td class="num">83</td><td class="num">1,397</td></tr><tr><td>BrewTestBot</td><td class="num">137</td><td class="num">37</td><td class="num">453</td></tr><tr><td>Michael Cho</td><td class="num">120</td><td class="num">115</td><td class="num">517</td></tr><tr><td>Patrick Linnane</td><td class="num">113</td><td class="num">64</td><td class="num">732</td></tr><tr><td>Bo Anderson</td><td class="num">104</td><td class="num">88</td><td class="num">692</td></tr><tr><td>Rylan Polster</td><td class="num">69</td><td class="num">8</td><td class="num">602</td></tr><tr><td>Sam Ford</td><td class="num">66</td><td class="num">2</td><td class="num">239</td></tr><tr><td>Bevan Kay</td><td class="num">35</td><td class="num">24</td><td class="num">211</td></tr><tr><td>Carlo Cabrera</td><td class="num">30</td><td class="num">5</td><td class="num">264</td></tr><tr><td>Andrew Nesbitt</td><td class="num">29</td><td class="num">12</td><td class="num">80</td></tr><tr><td>Sean Molenaar</td><td class="num">26</td><td class="num">3</td><td class="num">160</td></tr><tr><td>Jack Nagel</td><td class="num">25</td><td class="num">0</td><td class="num">96</td></tr><tr><td>Francois-Xavier Coudert</td><td class="num">22</td><td class="num">19</td><td class="num">49</td></tr><tr><td>Eric Knibbe</td><td class="num">19</td><td class="num">3</td><td class="num">492</td></tr><tr><td>Ruoyu Zhong</td><td class="num">14</td><td class="num">3</td><td class="num">199</td></tr><tr><td>hyuraku</td><td class="num">10</td><td class="num">3</td><td class="num">183</td></tr><tr><td>AltCode</td><td class="num">10</td><td class="num">7</td><td class="num">70</td></tr><tr><td>apainintheneck</td><td class="num">9</td><td class="num">3</td><td class="num">203</td></tr><tr><td>JBYoshi</td><td class="num">9</td><td class="num">6</td><td class="num">16</td></tr><tr><td>Justin Krehel</td><td class="num">8</td><td class="num">7</td><td class="num">46</td></tr><tr><td>Anton Melnikov</td><td class="num">7</td><td class="num">3</td><td class="num">233</td></tr><tr><td>William Woodruff</td><td class="num">7</td><td class="num">1</td><td class="num">75</td></tr></table></div><p class="moreauthors">Showing top 25 of 1059 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most shared files</a></h2>
 
-<p><em>Files touched by the most people — shared code where changes are most likely to need coordination.</em></p><table class="sortable" id="ownership-shared"><tr><th>File</th><th>Contributors</th><th>Primary owner</th><th>Owner share</th></tr><tr><td>Library/Homebrew/formula.rb</td><td>147</td><td>Mike McQuaid</td><td>18.9%</td></tr><tr><td>Library/Homebrew/download_strategy.rb</td><td>122</td><td>Jack Nagel</td><td>24.0%</td></tr><tr><td>manpages/brew.1</td><td>110</td><td>BrewTestBot</td><td>28.7%</td></tr><tr><td>docs/Manpage.md</td><td>106</td><td>BrewTestBot</td><td>29.1%</td></tr><tr><td>Library/Homebrew/utils.rb</td><td>90</td><td>Mike McQuaid</td><td>21.8%</td></tr><tr><td>Library/Homebrew/formula_installer.rb</td><td>87</td><td>Mike McQuaid</td><td>30.0%</td></tr><tr><td>bin/brew</td><td>78</td><td>Max Howell</td><td>31.8%</td></tr><tr><td>Library/Homebrew/cmd/install.rb</td><td>72</td><td>Mike McQuaid</td><td>26.1%</td></tr><tr><td>Library/Homebrew/brew.sh</td><td>69</td><td>Mike McQuaid</td><td>41.4%</td></tr><tr><td>Library/Homebrew/cmd/upgrade.rb</td><td>68</td><td>Mike McQuaid</td><td>31.8%</td></tr><tr><td>docs/Formula-Cookbook.md</td><td>67</td><td>Mike McQuaid</td><td>28.6%</td></tr><tr><td>Library/Homebrew/diagnostic.rb</td><td>66</td><td>Mike McQuaid</td><td>33.8%</td></tr><tr><td>Library/Homebrew/dev-cmd/audit.rb</td><td>63</td><td>Mike McQuaid</td><td>27.8%</td></tr><tr><td>completions/zsh/_brew</td><td>63</td><td>BrewTestBot</td><td>39.5%</td></tr><tr><td>Library/Homebrew/cmd/info.rb</td><td>61</td><td>Mike McQuaid</td><td>22.8%</td></tr><tr><td>Library/Homebrew/cmd/doctor.rb</td><td>60</td><td>Jack Nagel</td><td>35.1%</td></tr><tr><td>Library/Homebrew/tap.rb</td><td>60</td><td>Mike McQuaid</td><td>23.7%</td></tr><tr><td>Library/Homebrew/keg.rb</td><td>60</td><td>Mike McQuaid</td><td>23.3%</td></tr><tr><td>README.md</td><td>60</td><td>BrewTestBot</td><td>37.7%</td></tr><tr><td>Library/Homebrew/extend/pathname.rb</td><td>60</td><td>Jack Nagel</td><td>21.7%</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+<p class="section-note">Files touched by the most people — shared code where changes are most likely to need coordination.</p><div class="table-scroll"><table class="sortable" id="ownership-shared"><tr><th>File</th><th class="num">Contributors</th><th>Primary owner</th><th class="num">Owner share</th></tr><tr><td class="path">Library/Homebrew/formula.rb</td><td class="num">147</td><td>Mike McQuaid</td><td class="num">18.8%</td></tr><tr><td class="path">Library/Homebrew/download_strategy.rb</td><td class="num">122</td><td>Jack Nagel</td><td class="num">24.0%</td></tr><tr><td class="path">manpages/brew.1</td><td class="num">110</td><td>Mike McQuaid</td><td class="num">28.7%</td></tr><tr><td class="path">docs/Manpage.md</td><td class="num">106</td><td>BrewTestBot</td><td class="num">29.1%</td></tr><tr><td class="path">Library/Homebrew/utils.rb</td><td class="num">90</td><td>Mike McQuaid</td><td class="num">21.8%</td></tr><tr><td class="path">Library/Homebrew/formula_installer.rb</td><td class="num">87</td><td>Mike McQuaid</td><td class="num">30.1%</td></tr><tr><td class="path">bin/brew</td><td class="num">78</td><td>Max Howell</td><td class="num">31.8%</td></tr><tr><td class="path">Library/Homebrew/cmd/install.rb</td><td class="num">72</td><td>Mike McQuaid</td><td class="num">26.1%</td></tr><tr><td class="path">Library/Homebrew/brew.sh</td><td class="num">69</td><td>Mike McQuaid</td><td class="num">41.8%</td></tr><tr><td class="path">Library/Homebrew/cmd/upgrade.rb</td><td class="num">68</td><td>Mike McQuaid</td><td class="num">31.8%</td></tr><tr><td class="path">docs/Formula-Cookbook.md</td><td class="num">67</td><td>Mike McQuaid</td><td class="num">28.5%</td></tr><tr><td class="path">Library/Homebrew/diagnostic.rb</td><td class="num">66</td><td>Mike McQuaid</td><td class="num">33.8%</td></tr><tr><td class="path">Library/Homebrew/dev-cmd/audit.rb</td><td class="num">63</td><td>Mike McQuaid</td><td class="num">27.8%</td></tr><tr><td class="path">completions/zsh/_brew</td><td class="num">63</td><td>BrewTestBot</td><td class="num">39.4%</td></tr><tr><td class="path">Library/Homebrew/cmd/info.rb</td><td class="num">61</td><td>Mike McQuaid</td><td class="num">22.8%</td></tr><tr><td class="path">Library/Homebrew/cmd/doctor.rb</td><td class="num">60</td><td>Jack Nagel</td><td class="num">35.1%</td></tr><tr><td class="path">Library/Homebrew/tap.rb</td><td class="num">60</td><td>Mike McQuaid</td><td class="num">23.7%</td></tr><tr><td class="path">Library/Homebrew/keg.rb</td><td class="num">60</td><td>Mike McQuaid</td><td class="num">23.3%</td></tr><tr><td class="path">README.md</td><td class="num">60</td><td>BrewTestBot</td><td class="num">37.7%</td></tr><tr><td class="path">Library/Homebrew/extend/pathname.rb</td><td class="num">60</td><td>Jack Nagel</td><td class="num">21.7%</td></tr></table></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body></html>

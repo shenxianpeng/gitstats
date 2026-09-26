@@ -5,34 +5,233 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - CPython</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.2.post1.dev1">
+	<meta name="generator" content="GitStats 2.7.0">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -45,23 +244,23 @@
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
-            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="ownership.html" class="active" aria-current="page">Code Ownership</a></li>
             <li><a href="history.html">History</a></li>
             
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Code Ownership</h1><div class="ownership-summary"><p>Ownership is measured by how many commits each author made to each file. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl><dt>Files tracked</dt><dd>27921</dd><dt>Single-owner files</dt><dd>5744 (20.6%)</dd><dt>Contributors</dt><dd>3672</dd></dl></div>
-<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus Factor Risk — Single-Owner Files</a></h2>
+            <h1>Code Ownership</h1><p class="section-note">Ownership is measured by how many commits each author made to each file in the current tree. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Files Tracked</dt><dd class="stat-value">6,414</dd><dd class="stat-note">in the current tree</dd></div><div class="stat-tile"><dt>Single-Owner Files</dt><dd class="stat-value">2,335</dd><dd class="stat-note">36.4% of tracked files</dd></div><div class="stat-tile"><dt>Contributors</dt><dd class="stat-value">3,554</dd><dd class="stat-note">authors who changed files</dd></div></dl>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus factor risk — single-owner files</a></h2>
 
-<p><em>Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</em></p><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th>Commits</th></tr><tr><td>ChangeLog</td><td>Guido van Rossum</td><td>70</td></tr><tr><td>Lib/importlib/NOTES</td><td>Brett Cannon</td><td>50</td></tr><tr><td>Mac/Build/PythonCore.mcp</td><td>Jack Jansen</td><td>45</td></tr><tr><td>Doc/tools/mkhowto.sh</td><td>Fred Drake</td><td>38</td></tr><tr><td>Mac/Demo/building.html</td><td>Jack Jansen</td><td>35</td></tr><tr><td>Mac/mwerks/projects/build.macppc.shared/PythonCorePPC.mu.hqx</td><td>Jack Jansen</td><td>34</td></tr><tr><td>Include/internal/pycore_coreconfig.h</td><td>Victor Stinner</td><td>33</td></tr><tr><td>Mac/mwerks/projects/build.macppc.shared/PythonPPC.mu.hqx</td><td>Jack Jansen</td><td>33</td></tr><tr><td>Mac/mwerks/projects/PlugIns/toolboxmodules.ppc.mu.hqx</td><td>Jack Jansen</td><td>32</td></tr><tr><td>Mac/mwerks/projects/build.mac68k.stand/Python68K.mu.hqx</td><td>Jack Jansen</td><td>32</td></tr><tr><td>Mac/mwerks/projects/build.macppc.shared/PythonAppletPPC.mu.hqx</td><td>Jack Jansen</td><td>32</td></tr><tr><td>Mac/Relnotes</td><td>Jack Jansen</td><td>31</td></tr><tr><td>Mac/Build/PythonStandSmall.prj</td><td>Jack Jansen</td><td>31</td></tr><tr><td>Mac/mwerks/projects/PlugIns/ctb.ppc.mu.hqx</td><td>Jack Jansen</td><td>31</td></tr><tr><td>Mac/mwerks/projects/PlugIns/imgmodules.ppc.mu.hqx</td><td>Jack Jansen</td><td>31</td></tr><tr><td>Mac/mwerks/projects/PlugIns/macspeech.ppc.mu.hqx</td><td>Jack Jansen</td><td>31</td></tr><tr><td>Mac/Include/pythonresources.h</td><td>Jack Jansen</td><td>30</td></tr><tr><td>Mac/scripts/EditPythonPrefs.py</td><td>Jack Jansen</td><td>30</td></tr><tr><td>Mac/Include/macbuildno.h</td><td>Jack Jansen</td><td>28</td></tr><tr><td>Mac/mwerks/mwerks_nonshared_config.h</td><td>Jack Jansen</td><td>28</td></tr><tr><td>Mac/Build/PythonCore.prj</td><td>Jack Jansen</td><td>27</td></tr><tr><td>Mac/Resources/bundle.rsrc.hqx</td><td>Jack Jansen</td><td>27</td></tr><tr><td>Mac/Build/PythonCorePPC.prj</td><td>Jack Jansen</td><td>26</td></tr><tr><td>Mac/Resources/dialogs.rsrc.hqx</td><td>Jack Jansen</td><td>26</td></tr><tr><td>Misc/RPM/python-3.3.spec</td><td>Georg Brandl</td><td>25</td></tr><tr><td>Mac/Build/PythonStandalone.mcp</td><td>Jack Jansen</td><td>25</td></tr><tr><td>Mac/Modules/qt/Qtmodule.c</td><td>Jack Jansen</td><td>25</td></tr><tr><td>PCbuild9/pythoncore.vcproj</td><td>Christian Heimes</td><td>24</td></tr><tr><td>Mac/Build/PythonInterpreter.mcp</td><td>Jack Jansen</td><td>24</td></tr><tr><td>Mac/Distributions/binary.include</td><td>Jack Jansen</td><td>24</td></tr><tr><td>Mac/Resources/pythonpath.rsrc.hqx</td><td>Jack Jansen</td><td>24</td></tr><tr><td>Mac/mwerks/projects/PlugIns/_tkinter.ppc.mu.hqx</td><td>Jack Jansen</td><td>24</td></tr><tr><td>Tools/msi/bundle/Default.thm</td><td>Steve Dower</td><td>23</td></tr><tr><td>Misc/python-mode-old.el</td><td>Guido van Rossum</td><td>23</td></tr><tr><td>Mac/mwerks/mwerks_shared_config.h</td><td>Jack Jansen</td><td>23</td></tr><tr><td>Mac/Build/PythonCore.exp</td><td>Jack Jansen</td><td>23</td></tr><tr><td>Mac/Build/PythonCoreCarbon.exp</td><td>Jack Jansen</td><td>23</td></tr><tr><td>Tools/faqwiz/faqmain.py</td><td>Guido van Rossum</td><td>22</td></tr><tr><td>Include/errors.h</td><td>Guido van Rossum</td><td>22</td></tr><tr><td>Mac/scripts/EditPythonPrefs.rsrc.hqx</td><td>Jack Jansen</td><td>22</td></tr><tr><td>Mac/mwerks/projects/PlugIns/waste.ppc.mu.hqx</td><td>Jack Jansen</td><td>21</td></tr><tr><td>Demo/sgi/video/README</td><td>Guido van Rossum</td><td>20</td></tr><tr><td>Lib/pathlib/_os.py</td><td>Barney Gale</td><td>20</td></tr><tr><td>Mac/Build/Printing.prj</td><td>Jack Jansen</td><td>20</td></tr><tr><td>Mac/Build/calldll.ppc.prj</td><td>Jack Jansen</td><td>20</td></tr><tr><td>Mac/Build/icglue.prj</td><td>Jack Jansen</td><td>20</td></tr><tr><td>Mac/mwerks/projects/build.macppc.stand/PythonStandalone.mu.hqx</td><td>Jack Jansen</td><td>20</td></tr><tr><td>Tools/msi/common.wxs</td><td>Steve Dower</td><td>19</td></tr><tr><td>Tools/compiler/compiler/ast.py</td><td>Jeremy Hylton</td><td>19</td></tr><tr><td>PCbuild9/pyproject.vsprops</td><td>Christian Heimes</td><td>19</td></tr></table><p class="moreauthors">Showing top 50 of 5744 single-owner files.</p>
-<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by Author</a></h2>
+<p class="section-note">Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</p><div class="table-scroll"><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">Lib/pathlib/_os.py</td><td>Barney Gale</td><td class="num">20</td></tr><tr><td class="path">Modules/_interpreters_common.h</td><td>Eric Snow</td><td class="num">12</td></tr><tr><td class="path">Lib/test/test_importlib/metadata/test_main.py</td><td>Jason R. Coombs</td><td class="num">10</td></tr><tr><td class="path">Lib/test/libregrtest/__init__.py</td><td>Victor Stinner</td><td class="num">9</td></tr><tr><td class="path">Tools/cases_generator/cwriter.py</td><td>Mark Shannon</td><td class="num">9</td></tr><tr><td class="path">Lib/importlib/metadata/_adapters.py</td><td>Jason R. Coombs</td><td class="num">9</td></tr><tr><td class="path">Lib/test/test_importlib/metadata/fixtures.py</td><td>Jason R. Coombs</td><td class="num">9</td></tr><tr><td class="path">Lib/importlib/metadata/_meta.py</td><td>Jason R. Coombs</td><td class="num">9</td></tr><tr><td class="path">Lib/test/subprocessdata/sigchild_ignore.py</td><td>Gregory P. Smith</td><td class="num">8</td></tr><tr><td class="path">Lib/importlib/readers.py</td><td>Jason R. Coombs</td><td class="num">8</td></tr></table></div><details class="table-details"><summary>Table: the 100 most-changed of 2,335 single-owner files</summary><div class="table-scroll"><table class="sortable" id="ownership-busfactor-all"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">Lib/pathlib/_os.py</td><td>Barney Gale</td><td class="num">20</td></tr><tr><td class="path">Modules/_interpreters_common.h</td><td>Eric Snow</td><td class="num">12</td></tr><tr><td class="path">Lib/test/test_importlib/metadata/test_main.py</td><td>Jason R. Coombs</td><td class="num">10</td></tr><tr><td class="path">Lib/test/libregrtest/__init__.py</td><td>Victor Stinner</td><td class="num">9</td></tr><tr><td class="path">Tools/cases_generator/cwriter.py</td><td>Mark Shannon</td><td class="num">9</td></tr><tr><td class="path">Lib/importlib/metadata/_adapters.py</td><td>Jason R. Coombs</td><td class="num">9</td></tr><tr><td class="path">Lib/test/test_importlib/metadata/fixtures.py</td><td>Jason R. Coombs</td><td class="num">9</td></tr><tr><td class="path">Lib/importlib/metadata/_meta.py</td><td>Jason R. Coombs</td><td class="num">9</td></tr><tr><td class="path">Lib/test/subprocessdata/sigchild_ignore.py</td><td>Gregory P. Smith</td><td class="num">8</td></tr><tr><td class="path">Lib/importlib/readers.py</td><td>Jason R. Coombs</td><td class="num">8</td></tr><tr><td class="path">Parser/lexer/string.c</td><td>Pablo Galindo Salgado</td><td class="num">7</td></tr><tr><td class="path">Lib/test/test_importlib/resources/test_reader.py</td><td>Jason R. Coombs</td><td class="num">7</td></tr><tr><td class="path">Lib/test/test_importlib/resources/test_resource.py</td><td>Jason R. Coombs</td><td class="num">7</td></tr><tr><td class="path">Lib/importlib/resources/readers.py</td><td>Jason R. Coombs</td><td class="num">7</td></tr><tr><td class="path">Lib/test/test_pathlib/support/zip_path.py</td><td>Barney Gale</td><td class="num">7</td></tr><tr><td class="path">Modules/_decimal/tests/runall-memorydebugger.sh</td><td>Stefan Krah</td><td class="num">7</td></tr><tr><td class="path">Lib/test/test_tkinter/test_filedialog.py</td><td>Serhiy Storchaka</td><td class="num">6</td></tr><tr><td class="path">Lib/test/test_ctypes/test_strings.py</td><td>Victor Stinner</td><td class="num">6</td></tr><tr><td class="path">Include/internal/pycore_asdl.h</td><td>Victor Stinner</td><td class="num">6</td></tr><tr><td class="path">Include/internal/pycore_getopt.h</td><td>Victor Stinner</td><td class="num">6</td></tr><tr><td class="path">Parser/tokenizer/reader.c</td><td>Pablo Galindo Salgado</td><td class="num">6</td></tr><tr><td class="path">Modules/_remote_debugging/frame_cache.c</td><td>Pablo Galindo Salgado</td><td class="num">6</td></tr><tr><td class="path">Lib/idlelib/idle_test/test_search.py</td><td>Terry Jan Reedy</td><td class="num">6</td></tr><tr><td class="path">Lib/importlib/resources/abc.py</td><td>Jason R. Coombs</td><td class="num">6</td></tr><tr><td class="path">Lib/test/test_importlib/resources/test_open.py</td><td>Jason R. Coombs</td><td class="num">6</td></tr><tr><td class="path">Lib/test/test_importlib/resources/test_read.py</td><td>Jason R. Coombs</td><td class="num">6</td></tr><tr><td class="path">Lib/importlib/metadata/_functools.py</td><td>Jason R. Coombs</td><td class="num">6</td></tr><tr><td class="path">Lib/test/test_pathlib/support/local_path.py</td><td>Barney Gale</td><td class="num">6</td></tr><tr><td class="path">Lib/test/tracedmodules/testmod.py</td><td>Alexander Belopolsky</td><td class="num">6</td></tr><tr><td class="path">Lib/unittest/signals.py</td><td>Michael Foord</td><td class="num">6</td></tr><tr><td class="path">Parser/tokenizer/decoder.c</td><td>Pablo Galindo Salgado</td><td class="num">5</td></tr><tr><td class="path">Lib/test/test_capi/test_module.py</td><td>Petr Viktorin</td><td class="num">5</td></tr><tr><td class="path">Lib/idlelib/idle_test/test_delegator.py</td><td>Terry Jan Reedy</td><td class="num">5</td></tr><tr><td class="path">Lib/idlelib/idle_test/test_undo.py</td><td>Terry Jan Reedy</td><td class="num">5</td></tr><tr><td class="path">Lib/idlelib/idle_test/test_warning.py</td><td>Terry Jan Reedy</td><td class="num">5</td></tr><tr><td class="path">PC/layout/support/nuspec.py</td><td>Steve Dower</td><td class="num">5</td></tr><tr><td class="path">Include/internal/pycore_typevarobject.h</td><td>Jelle Zijlstra</td><td class="num">5</td></tr><tr><td class="path">Lib/test/test_importlib/resources/_path.py</td><td>Jason R. Coombs</td><td class="num">5</td></tr><tr><td class="path">Lib/test/test_importlib/metadata/_path.py</td><td>Jason R. Coombs</td><td class="num">5</td></tr><tr><td class="path">Lib/test/test_zipfile/_path/test_complexity.py</td><td>Jason R. Coombs</td><td class="num">5</td></tr><tr><td class="path">Lib/test/test_pathlib/support/lexical_path.py</td><td>Barney Gale</td><td class="num">5</td></tr><tr><td class="path">Include/internal/pycore_crossinterp_data_registry.h</td><td>Eric Snow</td><td class="num">5</td></tr><tr><td class="path">Lib/test/_isolated_sample.py</td><td>Serhiy Storchaka</td><td class="num">4</td></tr><tr><td class="path">Lib/test/support/isolation.py</td><td>Serhiy Storchaka</td><td class="num">4</td></tr><tr><td class="path">Modules/_testlimitedcapi/unicode.c</td><td>Victor Stinner</td><td class="num">4</td></tr><tr><td class="path">Modules/_testlimitedcapi/list.c</td><td>Victor Stinner</td><td class="num">4</td></tr><tr><td class="path">Include/internal/pycore_pyarena.h</td><td>Victor Stinner</td><td class="num">4</td></tr><tr><td class="path">Lib/test/test_ctypes/test_buffers.py</td><td>Victor Stinner</td><td class="num">4</td></tr><tr><td class="path">Lib/test/test_ctypes/test_cast.py</td><td>Victor Stinner</td><td class="num">4</td></tr><tr><td class="path">Lib/test/test_ctypes/test_errno.py</td><td>Victor Stinner</td><td class="num">4</td></tr><tr><td class="path">Include/cpython/classobject.h</td><td>Victor Stinner</td><td class="num">4</td></tr><tr><td class="path">Include/pyframe.h</td><td>Victor Stinner</td><td class="num">4</td></tr><tr><td class="path">InternalDocs/profiling_binary_format.md</td><td>Pablo Galindo Salgado</td><td class="num">4</td></tr><tr><td class="path">Parser/lexer/lexer_internal.h</td><td>Pablo Galindo Salgado</td><td class="num">4</td></tr><tr><td class="path">Parser/tokenizer/source.h</td><td>Pablo Galindo Salgado</td><td class="num">4</td></tr><tr><td class="path">Lib/test/test_profiling/test_sampling_profiler/test_live_collector_core.py</td><td>Pablo Galindo Salgado</td><td class="num">4</td></tr><tr><td class="path">Doc/includes/capi-extension/spammodule-01.c</td><td>Petr Viktorin</td><td class="num">4</td></tr><tr><td class="path">Lib/idlelib/idle_test/test_history.py</td><td>Terry Jan Reedy</td><td class="num">4</td></tr><tr><td class="path">Lib/idlelib/idle_test/test_redirector.py</td><td>Terry Jan Reedy</td><td class="num">4</td></tr><tr><td class="path">Lib/idlelib/idle_test/test_percolator.py</td><td>Terry Jan Reedy</td><td class="num">4</td></tr><tr><td class="path">.azure-pipelines/windows-layout-steps.yml</td><td>Steve Dower</td><td class="num">4</td></tr><tr><td class="path">PCbuild/pyproject-clangcl.props</td><td>Chris Eibl</td><td class="num">4</td></tr><tr><td class="path">Python/uniqueid.c</td><td>Sam Gross</td><td class="num">4</td></tr><tr><td class="path">Lib/test/test_importlib/resources/test_compatibilty_files.py</td><td>Jason R. Coombs</td><td class="num">4</td></tr><tr><td class="path">Lib/test/test_importlib/resources/test_contents.py</td><td>Jason R. Coombs</td><td class="num">4</td></tr><tr><td class="path">Lib/importlib/metadata/_collections.py</td><td>Jason R. Coombs</td><td class="num">4</td></tr><tr><td class="path">Tools/freeze/hello.py</td><td>Guido van Rossum</td><td class="num">4</td></tr><tr><td class="path">Modules/_hacl/include/krml/lowstar_endianness.h</td><td>Jonathan Protzenko</td><td class="num">4</td></tr><tr><td class="path">Tools/c-analyzer/c_parser/__init__.py</td><td>Eric Snow</td><td class="num">4</td></tr><tr><td class="path">Tools/buildbot/remoteDeploy.bat</td><td>Paul Monson</td><td class="num">4</td></tr><tr><td class="path">Lib/test/test_tkinter/test_dnd.py</td><td>Serhiy Storchaka</td><td class="num">3</td></tr><tr><td class="path">Misc/NEWS.d/next/Library/2026-06-20-02-14-55.gh-issue-151757.TP9A2x.rst</td><td>Serhiy Storchaka</td><td class="num">3</td></tr><tr><td class="path">Tools/build/check_capi_macros_ignored.txt</td><td>Victor Stinner</td><td class="num">3</td></tr><tr><td class="path">Modules/_testlimitedcapi/object.c</td><td>Victor Stinner</td><td class="num">3</td></tr><tr><td class="path">Include/internal/pycore_namespace.h</td><td>Victor Stinner</td><td class="num">3</td></tr><tr><td class="path">Include/cpython/descrobject.h</td><td>Victor Stinner</td><td class="num">3</td></tr><tr><td class="path">Lib/test/test_ctypes/test_array_in_pointer.py</td><td>Victor Stinner</td><td class="num">3</td></tr><tr><td class="path">Lib/test/test_ctypes/test_frombuffer.py</td><td>Victor Stinner</td><td class="num">3</td></tr><tr><td class="path">Lib/test/test_ctypes/test_varsize_struct.py</td><td>Victor Stinner</td><td class="num">3</td></tr><tr><td class="path">Include/cpython/floatobject.h</td><td>Victor Stinner</td><td class="num">3</td></tr><tr><td class="path">Programs/test_frozenmain.py</td><td>Victor Stinner</td><td class="num">3</td></tr><tr><td class="path">Lib/test/test_capi/test_tokenizer.py</td><td>Pablo Galindo Salgado</td><td class="num">3</td></tr><tr><td class="path">Modules/_testinternalcapi/tokenizer.c</td><td>Pablo Galindo Salgado</td><td class="num">3</td></tr><tr><td class="path">Parser/tokenizer/reader_internal.h</td><td>Pablo Galindo Salgado</td><td class="num">3</td></tr><tr><td class="path">Parser/tokenizer/source.c</td><td>Pablo Galindo Salgado</td><td class="num">3</td></tr><tr><td class="path">Misc/NEWS.d/next/Core_and_Builtins/2026-06-09-10-28-30.gh-issue-151126.DKa6Sl.rst</td><td>sobolevn</td><td class="num">3</td></tr><tr><td class="path">Lib/tomllib/mypy.ini</td><td>sobolevn</td><td class="num">3</td></tr><tr><td class="path">Lib/test/test_ctypes/test_structunion.py</td><td>Petr Viktorin</td><td class="num">3</td></tr><tr><td class="path">Platforms/emscripten/browser_test/package-lock.json</td><td>Hood Chatham</td><td class="num">3</td></tr><tr><td class="path">Platforms/emscripten/browser_test/package.json</td><td>Hood Chatham</td><td class="num">3</td></tr><tr><td class="path">Platforms/emscripten/browser_test/run_test.sh</td><td>Hood Chatham</td><td class="num">3</td></tr><tr><td class="path">PC/pythonw_exe.rc</td><td>Steve Dower</td><td class="num">3</td></tr><tr><td class="path">PC/sqlite3.rc</td><td>Steve Dower</td><td class="num">3</td></tr><tr><td class="path">Mac/BuildScript/tk868_on_10_8_10_9.patch</td><td>Ned Deily</td><td class="num">3</td></tr><tr><td class="path">Lib/test/test_free_threading/test_slots.py</td><td>Daniele Parmeggiani</td><td class="num">3</td></tr><tr><td class="path">Lib/test/test_importlib/resources/test_custom.py</td><td>Jason R. Coombs</td><td class="num">3</td></tr><tr><td class="path">Lib/importlib/metadata/_typing.py</td><td>Jason R. Coombs</td><td class="num">3</td></tr><tr><td class="path">Lib/importlib/metadata/_itertools.py</td><td>Jason R. Coombs</td><td class="num">3</td></tr><tr><td class="path">Lib/test/test_tools/i18n_data/messages.pot</td><td>Tomas R.</td><td class="num">3</td></tr><tr><td class="path">Lib/test/test_tools/i18n_data/messages.py</td><td>Tomas R.</td><td class="num">3</td></tr></table></div></details>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by author</a></h2>
 
-<p><em>Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</em></p><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th>Files owned</th><th>Solely owned</th><th>Files touched</th></tr><tr><td>Łukasz Langa</td><td>2595</td><td>25</td><td>2869</td></tr><tr><td>T. Wouters</td><td>2359</td><td>4</td><td>5094</td></tr><tr><td>Guido van Rossum</td><td>1960</td><td>709</td><td>4296</td></tr><tr><td>Victor Stinner</td><td>1694</td><td>231</td><td>4143</td></tr><tr><td>Jack Jansen</td><td>1538</td><td>1041</td><td>1929</td></tr><tr><td>Pablo Galindo</td><td>1417</td><td>72</td><td>2942</td></tr><tr><td>Serhiy Storchaka</td><td>1298</td><td>340</td><td>3907</td></tr><tr><td>Hugo van Kemenade</td><td>962</td><td>65</td><td>4172</td></tr><tr><td>Georg Brandl</td><td>776</td><td>46</td><td>3039</td></tr><tr><td>Fred Drake</td><td>589</td><td>106</td><td>1648</td></tr><tr><td>Steve Dower</td><td>572</td><td>214</td><td>1268</td></tr><tr><td>larryhastings</td><td>532</td><td>7</td><td>859</td></tr><tr><td>Martin v. Löwis</td><td>490</td><td>188</td><td>1923</td></tr><tr><td>sobolevn</td><td>455</td><td>125</td><td>1225</td></tr><tr><td>Ned Deily</td><td>398</td><td>28</td><td>1659</td></tr><tr><td>Pablo Galindo Salgado</td><td>380</td><td>102</td><td>871</td></tr><tr><td>Benjamin Peterson</td><td>268</td><td>26</td><td>2704</td></tr><tr><td>Terry Jan Reedy</td><td>267</td><td>30</td><td>782</td></tr><tr><td>Eric Snow</td><td>264</td><td>161</td><td>975</td></tr><tr><td>Éric</td><td>253</td><td>28</td><td>651</td></tr><tr><td>Christian Heimes</td><td>208</td><td>72</td><td>2350</td></tr><tr><td>Mark Dickinson</td><td>186</td><td>1</td><td>681</td></tr><tr><td>Russell Keith-Magee</td><td>181</td><td>118</td><td>327</td></tr><tr><td>Tim Peters</td><td>176</td><td>6</td><td>1858</td></tr><tr><td>Stan Ulbrych</td><td>176</td><td>43</td><td>626</td></tr></table><p class="moreauthors">Showing top 25 of 3672 contributors.</p>
-<h2 id="most_shared_files"><a href="#most_shared_files">Most Shared Files</a></h2>
+<p class="section-note">Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</p><div class="table-scroll"><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th class="num">Files owned</th><th class="num">Solely owned</th><th class="num">Files touched</th></tr><tr><td>Victor Stinner</td><td class="num">836</td><td class="num">171</td><td class="num">2,295</td></tr><tr><td>Serhiy Storchaka</td><td class="num">731</td><td class="num">336</td><td class="num">2,435</td></tr><tr><td>Georg Brandl</td><td class="num">311</td><td class="num">9</td><td class="num">1,189</td></tr><tr><td>Guido van Rossum</td><td class="num">196</td><td class="num">7</td><td class="num">1,125</td></tr><tr><td>sobolevn</td><td class="num">193</td><td class="num">111</td><td class="num">896</td></tr><tr><td>Pablo Galindo Salgado</td><td class="num">193</td><td class="num">80</td><td class="num">571</td></tr><tr><td>Mark Dickinson</td><td class="num">169</td><td class="num">0</td><td class="num">484</td></tr><tr><td>Steve Dower</td><td class="num">157</td><td class="num">52</td><td class="num">560</td></tr><tr><td>Terry Jan Reedy</td><td class="num">133</td><td class="num">15</td><td class="num">503</td></tr><tr><td>Eric Snow</td><td class="num">126</td><td class="num">56</td><td class="num">702</td></tr><tr><td>R. David Murray</td><td class="num">100</td><td class="num">40</td><td class="num">527</td></tr><tr><td>Taneli Hukkinen</td><td class="num">88</td><td class="num">85</td><td class="num">98</td></tr><tr><td>Hugo van Kemenade</td><td class="num">85</td><td class="num">10</td><td class="num">824</td></tr><tr><td>Stan Ulbrych</td><td class="num">83</td><td class="num">42</td><td class="num">513</td></tr><tr><td>Mark Shannon</td><td class="num">81</td><td class="num">8</td><td class="num">413</td></tr><tr><td>Petr Viktorin</td><td class="num">75</td><td class="num">33</td><td class="num">675</td></tr><tr><td>Benjamin Peterson</td><td class="num">73</td><td class="num">8</td><td class="num">1,230</td></tr><tr><td>Antoine Pitrou</td><td class="num">71</td><td class="num">13</td><td class="num">873</td></tr><tr><td>Russell Keith-Magee</td><td class="num">70</td><td class="num">56</td><td class="num">197</td></tr><tr><td>Brett Cannon</td><td class="num">66</td><td class="num">9</td><td class="num">681</td></tr><tr><td>Jason R. Coombs</td><td class="num">66</td><td class="num">47</td><td class="num">154</td></tr><tr><td>Brad Larsen</td><td class="num">63</td><td class="num">63</td><td class="num">69</td></tr><tr><td>Sam Gross</td><td class="num">62</td><td class="num">9</td><td class="num">470</td></tr><tr><td>scoder</td><td class="num">59</td><td class="num">57</td><td class="num">109</td></tr><tr><td>Marc-Andre Lemburg</td><td class="num">58</td><td class="num">3</td><td class="num">240</td></tr></table></div><p class="moreauthors">Showing top 25 of 3554 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most shared files</a></h2>
 
-<p><em>Files touched by the most people — shared code where changes are most likely to need coordination.</em></p><table class="sortable" id="ownership-shared"><tr><th>File</th><th>Contributors</th><th>Primary owner</th><th>Owner share</th></tr><tr><td>Misc/ACKS</td><td>486</td><td>Antoine Pitrou</td><td>11.1%</td></tr><tr><td>configure</td><td>223</td><td>Martin v. Löwis</td><td>11.1%</td></tr><tr><td>Misc/NEWS</td><td>197</td><td>Antoine Pitrou</td><td>9.1%</td></tr><tr><td>Modules/posixmodule.c</td><td>194</td><td>Victor Stinner</td><td>14.3%</td></tr><tr><td>configure.ac</td><td>193</td><td>Christian Heimes</td><td>13.4%</td></tr><tr><td>Makefile.pre.in</td><td>180</td><td>Victor Stinner</td><td>13.4%</td></tr><tr><td>Python/ceval.c</td><td>167</td><td>Guido van Rossum</td><td>15.1%</td></tr><tr><td>Modules/socketmodule.c</td><td>166</td><td>Guido van Rossum</td><td>17.1%</td></tr><tr><td>Doc/library/stdtypes.rst</td><td>161</td><td>Georg Brandl</td><td>20.1%</td></tr><tr><td>Objects/typeobject.c</td><td>150</td><td>Guido van Rossum</td><td>15.1%</td></tr><tr><td>Doc/library/os.rst</td><td>140</td><td>Georg Brandl</td><td>19.1%</td></tr><tr><td>Doc/library/functions.rst</td><td>138</td><td>Georg Brandl</td><td>21.8%</td></tr><tr><td>Objects/unicodeobject.c</td><td>137</td><td>Victor Stinner</td><td>31.6%</td></tr><tr><td>Lib/test/test_socket.py</td><td>128</td><td>Guido van Rossum</td><td>10.1%</td></tr><tr><td>Doc/reference/datamodel.rst</td><td>127</td><td>Georg Brandl</td><td>19.9%</td></tr><tr><td>pyconfig.h.in</td><td>124</td><td>Martin v. Löwis</td><td>16.2%</td></tr><tr><td>Doc/library/typing.rst</td><td>124</td><td>Jelle Zijlstra</td><td>12.0%</td></tr><tr><td>Lib/inspect.py</td><td>123</td><td>Yury Selivanov</td><td>15.8%</td></tr><tr><td>Doc/library/sys.rst</td><td>123</td><td>Georg Brandl</td><td>17.6%</td></tr><tr><td>Python/sysmodule.c</td><td>119</td><td>Victor Stinner</td><td>21.2%</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+<p class="section-note">Files touched by the most people — shared code where changes are most likely to need coordination.</p><div class="table-scroll"><table class="sortable" id="ownership-shared"><tr><th>File</th><th class="num">Contributors</th><th>Primary owner</th><th class="num">Owner share</th></tr><tr><td class="path">Misc/ACKS</td><td class="num">486</td><td>Antoine Pitrou</td><td class="num">11.1%</td></tr><tr><td class="path">configure</td><td class="num">223</td><td>Martin v. Löwis</td><td class="num">11.1%</td></tr><tr><td class="path">Modules/posixmodule.c</td><td class="num">194</td><td>Victor Stinner</td><td class="num">14.3%</td></tr><tr><td class="path">configure.ac</td><td class="num">193</td><td>Christian Heimes</td><td class="num">13.3%</td></tr><tr><td class="path">Makefile.pre.in</td><td class="num">180</td><td>Victor Stinner</td><td class="num">13.4%</td></tr><tr><td class="path">Python/ceval.c</td><td class="num">167</td><td>Guido van Rossum</td><td class="num">15.1%</td></tr><tr><td class="path">Modules/socketmodule.c</td><td class="num">166</td><td>Guido van Rossum</td><td class="num">17.1%</td></tr><tr><td class="path">Objects/typeobject.c</td><td class="num">150</td><td>Guido van Rossum</td><td class="num">15.1%</td></tr><tr><td class="path">Doc/library/os.rst</td><td class="num">140</td><td>Georg Brandl</td><td class="num">19.1%</td></tr><tr><td class="path">Objects/unicodeobject.c</td><td class="num">137</td><td>Victor Stinner</td><td class="num">31.6%</td></tr><tr><td class="path">Lib/test/test_socket.py</td><td class="num">128</td><td>Guido van Rossum</td><td class="num">10.1%</td></tr><tr><td class="path">Doc/reference/datamodel.rst</td><td class="num">128</td><td>Georg Brandl</td><td class="num">19.9%</td></tr><tr><td class="path">pyconfig.h.in</td><td class="num">124</td><td>Martin v. Löwis</td><td class="num">16.1%</td></tr><tr><td class="path">Doc/library/typing.rst</td><td class="num">124</td><td>Jelle Zijlstra</td><td class="num">12.0%</td></tr><tr><td class="path">Lib/inspect.py</td><td class="num">123</td><td>Yury Selivanov</td><td class="num">15.8%</td></tr><tr><td class="path">Doc/library/sys.rst</td><td class="num">123</td><td>Georg Brandl</td><td class="num">17.6%</td></tr><tr><td class="path">Python/sysmodule.c</td><td class="num">119</td><td>Victor Stinner</td><td class="num">21.4%</td></tr><tr><td class="path">Python/bltinmodule.c</td><td class="num">117</td><td>Guido van Rossum</td><td class="num">23.8%</td></tr><tr><td class="path">Python/compile.c</td><td class="num">116</td><td>Guido van Rossum</td><td class="num">13.2%</td></tr><tr><td class="path">Python/import.c</td><td class="num">115</td><td>Victor Stinner</td><td class="num">17.7%</td></tr></table></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body></html>

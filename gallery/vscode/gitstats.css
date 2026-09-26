@@ -34,18 +34,16 @@
 	--surface-color: #f5f5f4;
 	--text-color: #211e1e;
 	--text-secondary: #656363;
-	--text-muted: #b7b1b1;
+	--text-muted: #716b6b; /* >= 4.5:1 on --bg-color and --surface-color */
 	--border-color: #cfcecd;
 	--border-strong: #9e9a9a;
 	--accent-color: #211e1e;
 	--success-color: #2d6a3f;
 	--danger-color: #8b2323;
 
-	--table-bg: #ffffff;
-	--table-header-bg: #f5f5f4;
 	--table-header-color: #211e1e;
 	--table-hover-bg: #f0efef;
-	--table-border: #cfcecd;
+	--table-border: #e6e5e4;
 
 	--nav-bg: #ffffff;
 	--nav-text: #4b4646;
@@ -54,9 +52,21 @@
 	--img-bg: #f5f5f4;
 	--img-border: #cfcecd;
 
-	--link-color: #4a7ab5;
+	--link-color: #3b6aa3; /* 5.6:1 on --bg-color */
 
 	--bar-color: #4a7ab5;
+
+	/* Chart.js axes — read by applyChartTheme() on load and on theme switch */
+	--chart-text: #656363;
+	--chart-grid: #e6e5e4;
+
+	/* Multi-series charts (e.g. the top authors) — at least 3:1 on --bg-color */
+	--series-1: #5b8dee;
+	--series-2: #1a7f37;
+	--series-3: #cf222e;
+	--series-4: #8250df;
+	--series-5: #e16f24;
+	--series-6: #0550ae;
 
 	/* Heatmap — GitHub green scale (user preference) */
 	--heat0-bg: #ebedf0;
@@ -77,15 +87,13 @@
 	--surface-color: #2d2929;
 	--text-color: #f1ecec;
 	--text-secondary: #b7b1b1;
-	--text-muted: #656363;
+	--text-muted: #9a9393; /* >= 4.5:1 on --bg-color and --surface-color */
 	--border-color: #3d3838;
 	--border-strong: #656363;
 	--accent-color: #f1ecec;
 	--success-color: #4ade80;
 	--danger-color: #f87171;
 
-	--table-bg: #2d2929;
-	--table-header-bg: #211e1e;
 	--table-header-color: #cfcecd;
 	--table-hover-bg: #352f2f;
 	--table-border: #3d3838;
@@ -97,12 +105,23 @@
 	--img-bg: #2d2929;
 	--img-border: #3d3838;
 
-	--link-color: #6b95c8;
+	--link-color: #8db0dc; /* 7.4:1 on --bg-color */
 
 	--bar-color: #6b95c8;
 
-	/* Heatmap dark — GitHub dark green */
-	--heat0-bg: #1c2128;
+	--chart-text: #b7b1b1;
+	--chart-grid: #3d3838;
+
+	/* Brighter series colors for the dark background (4.9:1 and up) */
+	--series-1: #6ca4f8;
+	--series-2: #3fb950;
+	--series-3: #f85149;
+	--series-4: #a371f7;
+	--series-5: #f0883e;
+	--series-6: #79c0ff;
+
+	/* Heatmap dark — GitHub dark green, empty cells in the page's warm grey */
+	--heat0-bg: #2d2929;
 	--heat0-color: #e6edf3;
 	--heat1-bg: #0e4429;
 	--heat1-color: #e6edf3;
@@ -117,6 +136,11 @@
 /* ===== Base ===== */
 *, *::before, *::after {
 	box-sizing: border-box;
+}
+
+/* Anchor jumps stop below the sticky nav (68px on desktop, 90px on phones) */
+html {
+	scroll-padding-top: 96px;
 }
 
 body {
@@ -151,12 +175,373 @@ dd {
 	margin-bottom: var(--space-1);
 }
 
+/* ===== Overview page ===== */
+/* Report period, generation time and tool versions under the repo name */
+.page-meta {
+	margin: calc(-1 * var(--space-2)) 0 var(--space-5);
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+}
+
+/* "On this page" links to a long page's sections */
+.page-toc {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-2);
+	margin: calc(-1 * var(--space-3)) 0 var(--space-5);
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+}
+
+.page-toc > span {
+	margin-right: var(--space-1);
+	color: var(--text-secondary);
+}
+
+.page-toc a {
+	padding: 2px var(--space-2);
+	border: 1px solid var(--border-color);
+	color: var(--text-color);
+}
+
+.page-toc a:hover {
+	border-color: var(--border-strong);
+	text-decoration: none;
+}
+
+/* Text for screen readers only, e.g. what a canvas chart shows */
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* The sentence or two under a section heading saying what the section shows */
+.section-note {
+	max-width: 75ch;
+	margin: 0 0 var(--space-4);
+	color: var(--text-secondary);
+}
+
+/* "All 40 authors →" style links closing a section */
+.more-link {
+	margin: var(--space-2) 0 0;
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+}
+
+/* Two sections side by side (e.g. top contributors and latest releases);
+   stacked when narrow */
+.two-columns {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	column-gap: var(--space-6);
+}
+
+@media (max-width: 900px) {
+	.two-columns {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.share-table {
+	width: 100%;
+}
+
+.share-table .share-cell {
+	width: 35%;
+}
+
+.share-bar {
+	display: block;
+	height: 6px;
+	background-color: var(--surface-color);
+}
+
+.share-bar > span {
+	display: block;
+	height: 100%;
+	background-color: var(--bar-color);
+}
+
+/* The same bar, thinner, under a number inside a table cell */
+.share-bar-inline {
+	height: 3px;
+	margin-top: 3px;
+}
+
+/* ===== Stat Tiles (KPI cards) ===== */
+/* stat_tiles_html() sets the columns per screen size (--cols / --cols-md /
+   --cols-sm) and how many columns the last tile spans (--span*), so the grid
+   always ends in a full row, spanning the content width like the tables and
+   charts. The 1px gap over the border-colored background draws the lines
+   between tiles. */
+.stat-tiles {
+	display: grid;
+	grid-template-columns: repeat(var(--cols, 6), minmax(0, 1fr));
+	gap: 1px;
+	margin: 0 0 var(--space-6);
+	background-color: var(--border-color);
+	border: 1px solid var(--border-strong);
+}
+
+.stat-tile {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-1);
+	padding: var(--space-4);
+	background-color: var(--bg-color);
+}
+
+.stat-tiles dt {
+	float: none;
+	margin: 0;
+	font-size: var(--font-size-xs);
+	font-weight: 500;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.stat-tiles dt::after {
+	content: none;
+}
+
+.stat-tiles dd {
+	margin: 0;
+}
+
+.stat-value {
+	font-family: var(--font-mono);
+	font-size: 28px;
+	font-weight: 600;
+	line-height: 1.15;
+	font-variant-numeric: tabular-nums;
+	color: var(--text-color);
+}
+
+.stat-note {
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+	text-wrap: balance;
+}
+
+.stat-added {
+	color: var(--success-color);
+}
+
+.stat-removed {
+	color: var(--danger-color);
+}
+
+.stat-tile:last-child {
+	grid-column: span var(--span, 1);
+}
+
+@media (max-width: 1024px) {
+	.stat-tiles {
+		grid-template-columns: repeat(var(--cols-md, 3), minmax(0, 1fr));
+	}
+
+	.stat-tile:last-child {
+		grid-column: span var(--span-md, 1);
+	}
+}
+
+@media (max-width: 560px) {
+	.stat-tiles {
+		grid-template-columns: repeat(var(--cols-sm, 2), minmax(0, 1fr));
+	}
+
+	.stat-tile:last-child {
+		grid-column: span var(--span-sm, 1);
+	}
+
+	.stat-tile {
+		padding: var(--space-3);
+	}
+
+	.stat-value {
+		font-size: 22px;
+	}
+}
+
 /* ===== Tables ===== */
 table {
 	border-collapse: collapse;
 	font-size: var(--font-size-sm);
 	margin-bottom: var(--space-4);
-	border: 1px solid var(--border-strong);
+	font-variant-numeric: tabular-nums;
+}
+
+/* Wide tables scroll inside their own box instead of widening the page */
+.table-scroll {
+	max-width: 100%;
+	overflow-x: auto;
+	margin-bottom: var(--space-4);
+}
+
+/* Data tables span the content width, like the bar tables, so the tables on
+   a page line up instead of stopping wherever their content ends */
+.table-scroll > table {
+	width: 100%;
+	margin-bottom: 0;
+}
+
+/* ===== Contributor timeline (Authors page) ===== */
+/* Rows share one grid: name | commits | track. The year gridlines sit in an
+   overlay that starts where the track column does. */
+.timeline-scroll {
+	overflow-x: auto;
+	margin-bottom: var(--space-2);
+}
+
+.timeline {
+	--name-w: 180px;
+	--count-w: 56px;
+	--col-gap: var(--space-3);
+	/* room for half of the largest mark at the track's right end */
+	--edge: 10px;
+	position: relative;
+	/* its own stacking context, so the grid (z-index -1) sits behind the rows */
+	z-index: 0;
+	min-width: 640px;
+	padding-right: var(--edge);
+	font-size: var(--font-size-sm);
+}
+
+.timeline-row,
+.timeline-axis {
+	display: grid;
+	grid-template-columns: var(--name-w) var(--count-w) minmax(0, 1fr);
+	column-gap: var(--col-gap);
+	align-items: center;
+}
+
+.timeline-row {
+	min-height: 30px;
+	border-bottom: 1px solid var(--table-border);
+}
+
+.timeline-name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.timeline-count {
+	text-align: right;
+	font-family: var(--font-mono);
+	font-variant-numeric: tabular-nums;
+	color: var(--text-secondary);
+}
+
+.timeline-track {
+	position: relative;
+	height: 30px;
+}
+
+.timeline-span {
+	position: absolute;
+	top: 50%;
+	height: 1px;
+	background-color: var(--bar-color);
+}
+
+.timeline-mark {
+	position: absolute;
+	top: 50%;
+	width: var(--size);
+	height: var(--size);
+	transform: translate(-50%, -50%);
+	background-color: var(--bar-color);
+	opacity: 0.6;
+}
+
+.timeline-row.bot .timeline-span,
+.timeline-row.bot .timeline-mark {
+	background-color: var(--text-muted);
+}
+
+.timeline-grid {
+	position: absolute;
+	/* behind the rows (see .timeline's z-index), so row lines stay visible */
+	z-index: -1;
+	top: 0;
+	bottom: 0;
+	left: calc(var(--name-w) + var(--count-w) + 2 * var(--col-gap));
+	right: var(--edge);
+	pointer-events: none;
+}
+
+/* The longest stretch without commits, shaded like the charts' gap bands */
+.timeline-gap {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	background-color: var(--surface-color);
+	border-left: 1px dashed var(--border-strong);
+	border-right: 1px dashed var(--border-strong);
+}
+
+.timeline-year {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	border-left: 1px solid var(--chart-grid);
+	padding-left: 3px;
+	display: flex;
+	align-items: flex-end;
+	font-family: var(--font-mono);
+	font-size: var(--font-size-xs);
+	color: var(--text-secondary);
+}
+
+/* The axis row holds the first/last month at the track's ends; year labels
+   from the overlay land in the same row */
+.timeline-axis {
+	min-height: 24px;
+	font-family: var(--font-mono);
+	font-size: var(--font-size-xs);
+	color: var(--text-secondary);
+}
+
+.timeline-axis > span:first-child {
+	grid-column: 3;
+	grid-row: 1;
+}
+
+.timeline-axis > span:last-child {
+	grid-column: 3;
+	grid-row: 1;
+	justify-self: end;
+}
+
+@media (max-width: 768px) {
+	.timeline {
+		--name-w: 130px;
+		--count-w: 44px;
+	}
+}
+
+/* ===== Charts ===== */
+/* Chart.js fills this box (maintainAspectRatio: false). It keeps each chart's
+   proportions on wide screens but never gets flatter than min-height, so the
+   plot stays readable on phones. width: 100% stops min-height from being
+   transferred through aspect-ratio into a minimum width. */
+.chart-box {
+	position: relative;
+	width: 100%;
+	aspect-ratio: var(--chart-ratio, 3);
+	min-height: 240px;
+	margin-bottom: var(--space-2);
 }
 
 table.noborders {
@@ -184,14 +569,43 @@ table.tags td {
 	vertical-align: top;
 }
 
+/* Dates, tag names and short phrases read badly when wrapped */
+.nowrap {
+	white-space: nowrap;
+}
+
+/* Small label next to a name, e.g. BOT for bot accounts */
+.badge {
+	display: inline-block;
+	margin-left: var(--space-1);
+	padding: 0 5px;
+	border: 1px solid var(--border-strong);
+	font-family: var(--font-mono);
+	font-size: 10px;
+	font-weight: 600;
+	line-height: 1.5;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--text-secondary);
+	vertical-align: 1px;
+	white-space: nowrap;
+}
+
+/* File paths: monospace, and allowed to break anywhere so a deep path
+   doesn't force the table wider than the screen */
+td.path {
+	font-family: var(--font-mono);
+	overflow-wrap: anywhere;
+	text-align: left;
+}
+
+/* Rows are separated by hairlines only: no outer border, no vertical lines */
 td {
-	background-color: var(--table-bg);
 	padding: var(--space-2) var(--space-3);
-	border: 1px solid var(--table-border);
+	border-bottom: 1px solid var(--table-border);
 }
 
 th {
-	background-color: var(--table-header-bg);
 	font-family: var(--font-mono);
 	font-weight: 600;
 	color: var(--table-header-color);
@@ -200,8 +614,19 @@ th {
 	font-size: var(--font-size-xs);
 	text-transform: uppercase;
 	letter-spacing: 0.08em;
-	border: 1px solid var(--border-strong);
+	border-bottom: 1px solid var(--table-border);
 	white-space: nowrap;
+}
+
+/* The header row gets the stronger rule */
+tr:first-child > th {
+	border-bottom-color: var(--border-strong);
+}
+
+/* Numeric columns (counts, percentages, spans) line up on the right */
+th.num,
+td.num {
+	text-align: right;
 }
 
 th a {
@@ -231,13 +656,17 @@ tr:hover td {
 	z-index: 100;
 }
 
+/* One row that scrolls sideways when it does not fit, rather than wrapping */
 .nav ul {
 	list-style: none;
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	gap: 0;
 	margin: 0;
 	padding: 0;
+	min-width: 0;
+	overflow-x: auto;
+	scrollbar-width: thin;
 }
 
 .nav li {
@@ -267,6 +696,13 @@ tr:hover td {
 	color: var(--nav-hover-color);
 	background-color: var(--surface-color);
 	text-decoration: none;
+}
+
+/* Current page — inverted block */
+.nav li a.active,
+.nav li a.active:hover {
+	color: var(--bg-color);
+	background-color: var(--text-color);
 }
 
 /* ===== Nav Brand ===== */
@@ -317,13 +753,16 @@ tr:hover td {
 
 /* ===== Theme Toggle ===== */
 .theme-toggle {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	padding: 0;
 	background: transparent;
 	border: 1px solid var(--border-color);
 	cursor: pointer;
-	padding: var(--space-1) var(--space-2);
-	font-size: var(--font-size-base);
 	color: var(--text-secondary);
-	line-height: 1.4;
 	transition: border-color 0.12s ease, color 0.12s ease;
 	flex-shrink: 0;
 }
@@ -331,6 +770,112 @@ tr:hover td {
 .theme-toggle:hover {
 	border-color: var(--border-strong);
 	color: var(--text-color);
+}
+
+/* The icon shows the theme the button switches to */
+.theme-toggle svg {
+	display: block;
+}
+
+.theme-toggle .icon-sun,
+[data-theme="dark"] .theme-toggle .icon-moon {
+	display: none;
+}
+
+[data-theme="dark"] .theme-toggle .icon-sun {
+	display: block;
+}
+
+/* ===== Below 1024px: brand + icons on top, page links in their own row =====
+   One row needs about 860px (970px with the AI Insights link); switching
+   earlier keeps the links from scrolling inside a squeezed row. */
+@media (max-width: 1024px) {
+	.nav {
+		flex-wrap: wrap;
+		padding: 0;
+		margin-bottom: var(--space-4);
+	}
+
+	.nav ul {
+		order: 3;
+		flex: 0 0 100%;
+		border-top: 1px solid var(--border-color);
+	}
+
+	.nav li a {
+		min-height: 44px;
+	}
+
+	.nav-right {
+		margin-left: auto;
+		border-left: none;
+		padding-left: 0;
+		gap: 0;
+	}
+
+	.nav-github,
+	.theme-toggle {
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+	}
+
+	.theme-toggle {
+		border-color: transparent;
+	}
+}
+
+/* ===== Phones ===== */
+@media (max-width: 768px) {
+	body {
+		padding: 0 var(--space-4);
+	}
+
+	/* "On this page" stays one row that scrolls sideways, like the nav, instead
+	   of wrapping into a block of buttons */
+	.page-toc {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		scrollbar-width: thin;
+		padding-bottom: var(--space-1);
+	}
+
+	.page-toc > * {
+		flex: none;
+		white-space: nowrap;
+	}
+
+	/* A legend with many series wraps onto several lines; leave room for the plot too */
+	.chart-box.has-legend {
+		min-height: 440px;
+	}
+
+	/* Wide tables scroll sideways here: keep the row label (first column)
+	   pinned, with a hairline so scrolled cells visibly pass under it. The
+	   hairline only shows on tables that do scroll (.is-scrollable, set by JS). */
+	.table-scroll tr > :first-child {
+		position: sticky;
+		left: 0;
+		z-index: 1;
+		background-color: var(--bg-color);
+	}
+
+	.table-scroll.is-scrollable tr > :first-child,
+	.timeline-scroll.is-scrollable .timeline-name {
+		box-shadow: inset -1px 0 0 var(--table-border);
+	}
+
+	.table-scroll tr:hover > td:first-child {
+		background-color: var(--table-hover-bg);
+	}
+
+	/* Same for the contributor timeline: the author name stays in view */
+	.timeline-name {
+		position: sticky;
+		left: 0;
+		z-index: 1;
+		background-color: var(--bg-color);
+	}
 }
 
 /* ===== Headings ===== */
@@ -351,24 +896,34 @@ h1 a {
 	text-decoration: none;
 }
 
+/* Section heading: "// Title" followed by a hairline to the right edge */
 h2 {
+	display: flex;
+	/* baseline keeps "//" on the first line when a long title wraps */
+	align-items: baseline;
+	gap: var(--space-3);
 	font-family: var(--font-mono);
 	font-size: var(--font-size-md);
 	font-weight: 600;
 	color: var(--text-color);
 	margin: var(--space-6) 0 var(--space-3);
-	padding: var(--space-2) var(--space-3);
-	border-left: 2px solid var(--text-color);
-	background-color: var(--surface-color);
 	clear: both;
 	letter-spacing: -0.01em;
 }
 
 h2::before {
-	content: '// ';
+	content: '//';
 	color: var(--text-muted);
 	font-weight: 400;
 	letter-spacing: 0;
+}
+
+h2::after {
+	content: '';
+	flex: 1;
+	align-self: center;
+	height: 1px;
+	background-color: var(--border-color);
 }
 
 h2 a {
@@ -394,12 +949,30 @@ img {
 	margin: var(--space-3) 0;
 }
 
-th img {
-	border: none;
-	padding: 0;
-	background-color: transparent;
-	margin: 0;
-	display: inline;
+/* Sort indicator added by sortable.js; the SVG is used as a mask over
+   currentColor so it follows the theme. */
+.sortarrow {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	margin-left: var(--space-1);
+	vertical-align: -1px;
+	background-color: currentColor;
+	opacity: 0.4;
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 4l3-3 3 3M2 6l3 3 3-3' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E") center / contain no-repeat;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 4l3-3 3 3M2 6l3 3 3-3' fill='none' stroke='black' stroke-width='1.5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.sortarrow[data-sort="asc"] {
+	opacity: 1;
+	-webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 6.5l3-3 3 3' fill='none' stroke='black' stroke-width='1.8'/%3E%3C/svg%3E");
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 6.5l3-3 3 3' fill='none' stroke='black' stroke-width='1.8'/%3E%3C/svg%3E");
+}
+
+.sortarrow[data-sort="desc"] {
+	opacity: 1;
+	-webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 3.5l3 3 3-3' fill='none' stroke='black' stroke-width='1.8'/%3E%3C/svg%3E");
+	mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 3.5l3 3 3-3' fill='none' stroke='black' stroke-width='1.8'/%3E%3C/svg%3E");
 }
 
 /* ===== Links ===== */
@@ -439,11 +1012,87 @@ table.noborders td:hover .bar {
 	font-variant-numeric: tabular-nums;
 }
 
+/* Gaps in the page color keep neighbouring heat cells apart */
+td.heat {
+	border: 2px solid var(--bg-color);
+}
+
 .heat0 { background-color: var(--heat0-bg) !important; color: var(--heat0-color); }
 .heat1 { background-color: var(--heat1-bg) !important; color: var(--heat1-color); }
 .heat2 { background-color: var(--heat2-bg) !important; color: var(--heat2-color); }
 .heat3 { background-color: var(--heat3-bg) !important; color: var(--heat3-color); }
 .heat4 { background-color: var(--heat4-bg) !important; color: var(--heat4-color); }
+
+/* Punch card: the per-day totals column sits apart from the heat grid */
+.punch-card .punch-total {
+	padding-left: var(--space-4);
+	white-space: nowrap;
+}
+
+/* Commits per hour: bars (max 40px) along the top of the grid */
+.punch-card tr.punch-hour-bars > * {
+	padding: var(--space-1) 2px 0;
+	border-bottom: none;
+	vertical-align: bottom;
+}
+
+.punch-vbar {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	align-items: center;
+	gap: 2px;
+	height: 56px;
+}
+
+.punch-vbar-value {
+	font-size: 10px;
+	color: var(--text-secondary);
+}
+
+.punch-vbar-fill {
+	width: 70%;
+	background-color: var(--bar-color);
+}
+
+/* "Fewer ■■■■■ More commits" key under a heat grid */
+.heat-legend {
+	display: flex;
+	align-items: center;
+	gap: 3px;
+	margin: 0 0 var(--space-4);
+	font-size: var(--font-size-xs);
+	color: var(--text-secondary);
+}
+
+.heat-legend span {
+	width: 12px;
+	height: 12px;
+}
+
+.heat-legend span:first-child {
+	margin-left: var(--space-2);
+}
+
+.heat-legend span:last-child {
+	margin-right: var(--space-2);
+}
+
+/* A long table folded away under its chart */
+details.table-details {
+	margin: var(--space-2) 0 var(--space-4);
+}
+
+details.table-details > summary {
+	cursor: pointer;
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+	color: var(--link-color);
+}
+
+details.table-details[open] > summary {
+	margin-bottom: var(--space-3);
+}
 
 /* ===== AI Summary ===== */
 .ai-summary {
@@ -534,58 +1183,56 @@ table.noborders td:hover .bar {
 }
 
 /* ===== Code Ownership ===== */
-.ownership-summary {
-	padding: var(--space-4);
-	margin: var(--space-4) 0;
-	background-color: var(--surface-color);
-	border: 1px solid var(--border-strong);
-}
-
-.ownership-summary p:first-child {
-	margin-top: 0;
-}
-
-.ownership-summary p {
-	color: var(--text-secondary);
-	line-height: 1.6;
-}
-
+/* Lead paragraph above the stat tiles */
 /* ===== History ===== */
-.history-summary {
-	padding: var(--space-4);
-	margin: var(--space-4) 0;
-	background-color: var(--surface-color);
-	border: 1px solid var(--border-strong);
-}
-
-.history-summary p:first-child {
-	margin-top: 0;
-}
-
-.history-summary p {
-	color: var(--text-secondary);
-	line-height: 1.6;
-}
-
+/* One row per year, like the rest of the report: hairline separators, no
+   boxes. The year and its era sit in a left column, the facts on the right. */
 .history-year {
-	padding: var(--space-3) var(--space-4);
-	margin-bottom: var(--space-3);
-	border: 1px solid var(--border-color);
-	border-left: 3px solid var(--border-strong);
+	display: grid;
+	grid-template-columns: 10rem minmax(0, 1fr);
+	column-gap: var(--space-5);
+	padding: var(--space-4) 0;
+	border-top: 1px solid var(--table-border);
+}
+
+.history-year > :not(.history-year-head) {
+	grid-column: 2;
 }
 
 .history-year-head {
+	grid-column: 1;
+	grid-row: 1 / span 8;
 	display: flex;
-	align-items: baseline;
-	gap: var(--space-3);
-	margin-bottom: var(--space-2);
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--space-1);
 }
 
 .history-year-num {
 	font-family: var(--font-mono);
-	font-size: var(--font-size-lg);
+	font-size: var(--font-size-xl);
 	font-weight: 700;
+	line-height: 1.1;
 	color: var(--text-color);
+}
+
+@media (max-width: 560px) {
+	.history-year {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.history-year > :not(.history-year-head) {
+		grid-column: 1;
+	}
+
+	.history-year-head {
+		grid-row: auto;
+		flex-direction: row;
+		align-items: baseline;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+		margin-bottom: var(--space-2);
+	}
 }
 
 .history-era {
@@ -623,9 +1270,8 @@ table.noborders td:hover .bar {
 
 .history-bar-track {
 	height: 6px;
-	margin-bottom: var(--space-2);
+	margin: var(--space-1) 0 var(--space-2);
 	background-color: var(--surface-color);
-	border: 1px solid var(--border-color);
 }
 
 .history-bar {
@@ -633,11 +1279,11 @@ table.noborders td:hover .bar {
 	background-color: var(--bar-color);
 }
 
+/* AI narration above the timeline: a quiet panel, no accent bar */
 .history-prologue {
 	padding: var(--space-4);
 	margin: var(--space-4) 0;
-	border: 1px solid var(--border-color);
-	border-left: 3px solid var(--link-color);
+	background-color: var(--surface-color);
 }
 
 .history-prologue p {

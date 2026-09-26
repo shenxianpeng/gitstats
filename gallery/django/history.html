@@ -5,34 +5,233 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Django</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.2.post1.dev1">
+	<meta name="generator" content="GitStats 2.7.0">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -46,13 +245,13 @@
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
             <li><a href="ownership.html">Code Ownership</a></li>
-            <li><a href="history.html">History</a></li>
+            <li><a href="history.html" class="active" aria-current="page">History</a></li>
             
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>History</h1><div class="history-summary"><p>The project's life, one year at a time, told from the commit record: how activity rose and fell against the project's own baseline, who arrived when, and what was released.</p><dl><dt>Span</dt><dd>2005 – 2026 (22 years)</dd><dt>Peak year</dt><dd>2013</dd><dt>Releases</dt><dd>0</dd></dl></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2005</span><span class="history-era history-era-birth">BIRTH</span><span class="history-era-desc">first commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:40.1%"></div></div><p class="history-facts">1277 commits (3.7%) &middot; +141505 / &minus;57180 lines &middot; 4 authors</p><p class="history-people">Led by <strong>Adrian Holovaty</strong> (1015 commits)</p><p class="history-people">First commits: Adrian Holovaty, Jacob Kaplan-Moss, Georg Bauer, Wilson Miner</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2006</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:41.4%"></div></div><p class="history-facts">1320 commits (3.8%) &middot; +116771 / &minus;64841 lines &middot; 7 authors</p><p class="history-people">Led by <strong>Adrian Holovaty</strong> (854 commits)</p><p class="history-people">First commits: Malcolm Tredinnick, Russell Keith-Magee, Luke Plant</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2007</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:58.9%"></div></div><p class="history-facts">1877 commits (5.4%) &middot; +207800 / &minus;106323 lines &middot; 12 authors</p><p class="history-people">Led by <strong>Malcolm Tredinnick</strong> (810 commits)</p><p class="history-people">First commits: Gary Wilson Jr, James Bennett, Erin Kelly, Matt Boersma, Joseph Kocherhans, Simon Willison</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2008</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:62.5%"></div></div><p class="history-facts">1992 commits (5.7%) &middot; +291769 / &minus;161979 lines &middot; 23 authors</p><p class="history-people">Led by <strong>Malcolm Tredinnick</strong> (666 commits)</p><p class="history-people">First commits: Brian Rosner, Marc Fargas, Karen Tracey, Justin Bronn, Nicola Larosa, Jarek Zgoda (+5 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2009</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:36.6%"></div></div><p class="history-facts">1167 commits (3.3%) &middot; +103848 / &minus;48109 lines &middot; 23 authors</p><p class="history-people">Led by <strong>Russell Keith-Magee</strong> (322 commits)</p><p class="history-people">First commits: James Tauber</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2010</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:60.4%"></div></div><p class="history-facts">1926 commits (5.5%) &middot; +228604 / &minus;87188 lines &middot; 26 authors</p><p class="history-people">Led by <strong>Russell Keith-Magee</strong> (619 commits)</p><p class="history-people">First commits: Alex Gaynor, Gabriel Hurley, Tim Graham, Chris Beaven, Honza Král, Carl Meyer (+2 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2011</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:55.7%"></div></div><p class="history-facts">1774 commits (5.1%) &middot; +499122 / &minus;379831 lines &middot; 25 authors</p><p class="history-people">Led by <strong>Jannis Leidel</strong> (403 commits)</p><p class="history-people">First commits: Aymeric Augustin, Julien Phalip, Paul McMillan, Idan Gazit, Graham Dumpleton</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2012</span><span class="history-era history-era-surge">SURGE</span><span class="history-era-desc">well above the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:72.4%"></div></div><p class="history-facts">2307 commits (6.6%) &middot; +316647 / &minus;420504 lines &middot; 188 authors</p><p class="history-people">Led by <strong>Claude Paroz</strong> (464 commits)</p><p class="history-people">First commits: Claude Paroz, Anssi Kääriäinen, Florian Apolloner, Preston Holmes, Ian Clelland, Marc Tamlyn (+161 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2013</span><span class="history-era history-era-peak">PEAK</span><span class="history-era-desc">busiest year</span></div><div class="history-bar-track"><div class="history-bar" style="width:100.0%"></div></div><p class="history-facts">3187 commits (9.1%) &middot; +208991 / &minus;120116 lines &middot; 368 authors</p><p class="history-people">Led by <strong>Aymeric Augustin</strong> (467 commits)</p><p class="history-people">First commits: Loïc Bistuer, Bouke Haarsma, Preston Timmons, Unai Zalakain, Shai Berger, Donald Stufft (+304 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2014</span><span class="history-era history-era-surge">SURGE</span><span class="history-era-desc">well above the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:87.6%"></div></div><p class="history-facts">2792 commits (8.0%) &middot; +268126 / &minus;196385 lines &middot; 415 authors</p><p class="history-people">Led by <strong>Tim Graham</strong> (621 commits)</p><p class="history-people">First commits: Thomas Chaumeny, Moayad Mardini, wrwrwr, areski, Greg Chapple, Diego Guimarães (+295 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2015</span><span class="history-era history-era-surge">SURGE</span><span class="history-era-desc">well above the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:73.6%"></div></div><p class="history-facts">2346 commits (6.7%) &middot; +171391 / &minus;174475 lines &middot; 482 authors</p><p class="history-people">Led by <strong>Tim Graham</strong> (743 commits)</p><p class="history-people">First commits: Marten Kenbeek, I am Clinton, Adam Johnson, elky, Ville Skyttä, AK (+343 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2016</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:57.5%"></div></div><p class="history-facts">1833 commits (5.2%) &middot; +119168 / &minus;86254 lines &middot; 444 authors</p><p class="history-people">Led by <strong>Tim Graham</strong> (541 commits)</p><p class="history-people">First commits: Ed Morley, François Freitag, Andrew Nester, eltronix, Jarek Glowacki, Vytis Banaitis (+298 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2017</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:49.0%"></div></div><p class="history-facts">1563 commits (4.5%) &middot; +79671 / &minus;49626 lines &middot; 316 authors</p><p class="history-people">Led by <strong>Tim Graham</strong> (393 commits)</p><p class="history-people">First commits: Srinivas  Thatiparthy (శ్రీనివాస్  తాటిపర్తి), Chillar Anand, Дилян Палаузов, shanghui, Ran Benita, Ingo Klöcker (+201 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2018</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:36.2%"></div></div><p class="history-facts">1154 commits (3.3%) &middot; +46312 / &minus;21850 lines &middot; 316 authors</p><p class="history-people">Led by <strong>Tim Graham</strong> (267 commits)</p><p class="history-people">First commits: oliver, Rodrigo, Sanyam Khurana, priyanshsaxena, ovalseven8, jtiai (+197 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2019</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:41.1%"></div></div><p class="history-facts">1309 commits (3.7%) &middot; +68652 / &minus;35434 lines &middot; 281 authors</p><p class="history-people">Led by <strong>Mariusz Felisiak</strong> (203 commits)</p><p class="history-people">First commits: can, Min ho Kim, daniel a rios, Hannes Ljungberg, Zeynel Özdemir, Nasir Hussain (+181 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2020</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:41.6%"></div></div><p class="history-facts">1327 commits (3.8%) &middot; +71415 / &minus;30246 lines &middot; 266 authors</p><p class="history-people">Led by <strong>Mariusz Felisiak</strong> (254 commits)</p><p class="history-people">First commits: manav014, 007gzs, Valz, Tim Park, Thibaud Colas, Kevin Michel (+181 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2021</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:39.7%"></div></div><p class="history-facts">1264 commits (3.6%) &middot; +58771 / &minus;30879 lines &middot; 257 authors</p><p class="history-people">Led by <strong>Mariusz Felisiak</strong> (282 commits)</p><p class="history-people">First commits: Abhyudai, Mateo Radman, Marcelo Galigniana, Timothy McCurrach, tim-mccurrach, saeedblanchette (+160 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2022</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:30.2%"></div></div><p class="history-facts">962 commits (2.8%) &middot; +187064 / &minus;117657 lines &middot; 264 authors</p><p class="history-people">Led by <strong>Mariusz Felisiak</strong> (234 commits)</p><p class="history-people">First commits: Hrushikesh, sarahboyce, DevilsAutumn, Francesco Panico, Alokik Vijay, nabil-rady (+177 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2023</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:29.9%"></div></div><p class="history-facts">952 commits (2.7%) &middot; +70635 / &minus;35556 lines &middot; 248 authors</p><p class="history-people">Led by <strong>Mariusz Felisiak</strong> (286 commits)</p><p class="history-people">First commits: Natalia, Akash Kumar Sen, Bakdolot, Nina Menezes, Nicolas Lupien, Alexerson (+163 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2024</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:29.5%"></div></div><p class="history-facts">939 commits (2.7%) &middot; +48462 / &minus;20085 lines &middot; 234 authors</p><p class="history-people">Led by <strong>Mariusz Felisiak</strong> (121 commits)</p><p class="history-people">First commits: Bendeguz Csirmaz, SiHyunLee, Clifford Gama, Alexander Lazarević, Marijke Luttekes, Jake Howard (+158 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2025</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:29.9%"></div></div><p class="history-facts">954 commits (2.7%) &middot; +59126 / &minus;26691 lines &middot; 195 authors</p><p class="history-people">Led by <strong>Jacob Walls</strong> (109 commits)</p><p class="history-people">First commits: Ahmed Nassar, Varun Kasyap, VIZZARD-X, Kasyap Pentamaraju, hesham942, Skyiesac (+121 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2026</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:22.8%"></div></div><p class="history-facts">726 commits (2.1%) &middot; +48152 / &minus;22425 lines &middot; 167 authors</p><p class="history-people">Led by <strong>Jacob Walls</strong> (202 commits)</p><p class="history-people">First commits: SnippyCodes, Amar, Yassin Bahri, Vishy, Rodrigo Vieira, afenoum (+104 more)</p></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+            <h1>History</h1><p class="section-note">The project's life, one year at a time, told from the commit record: how activity rose and fell against the project's own baseline, who arrived when, and what was released.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Span</dt><dd class="stat-value">2005 – 2026</dd><dd class="stat-note">22 years</dd></div><div class="stat-tile"><dt>Peak Year</dt><dd class="stat-value">2013</dd><dd class="stat-note">3,187 commits</dd></div><div class="stat-tile"><dt>Releases</dt><dd class="stat-value">8</dd><dd class="stat-note">latest in 2014</dd></div></dl><div class="history-year"><div class="history-year-head"><span class="history-year-num">2005</span><span class="history-era history-era-birth">BIRTH</span><span class="history-era-desc">first commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:40.1%"></div></div><p class="history-facts">1,277 commits (3.7%) &middot; +141,505 / &minus;57,180 lines &middot; 4 authors</p><p class="history-people">Led by <strong>Adrian Holovaty</strong> (1,015 commits)</p><p class="history-people">First commits: Adrian Holovaty, Jacob Kaplan-Moss, Georg Bauer, Wilson Miner</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2006</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:41.4%"></div></div><p class="history-facts">1,320 commits (3.8%) &middot; +116,771 / &minus;64,841 lines &middot; 7 authors</p><p class="history-people">Led by <strong>Adrian Holovaty</strong> (854 commits)</p><p class="history-people">First commits: Malcolm Tredinnick, Russell Keith-Magee, Luke Plant</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2007</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:58.9%"></div></div><p class="history-facts">1,877 commits (5.4%) &middot; +207,800 / &minus;106,323 lines &middot; 12 authors</p><p class="history-people">Led by <strong>Malcolm Tredinnick</strong> (810 commits)</p><p class="history-people">First commits: Gary Wilson Jr, James Bennett, Erin Kelly, Matt Boersma, Joseph Kocherhans, Simon Willison</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2008</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:62.5%"></div></div><p class="history-facts">1,992 commits (5.7%) &middot; +291,769 / &minus;161,979 lines &middot; 23 authors</p><p class="history-people">Led by <strong>Malcolm Tredinnick</strong> (666 commits)</p><p class="history-people">First commits: Brian Rosner, Marc Fargas, Karen Tracey, Justin Bronn, Nicola Larosa, Jarek Zgoda (+5 more)</p><p class="history-people">Released: 1.0</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2009</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:36.6%"></div></div><p class="history-facts">1,167 commits (3.3%) &middot; +103,848 / &minus;48,109 lines &middot; 23 authors</p><p class="history-people">Led by <strong>Russell Keith-Magee</strong> (322 commits)</p><p class="history-people">First commits: James Tauber</p><p class="history-people">Released: 1.1</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2010</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:60.4%"></div></div><p class="history-facts">1,926 commits (5.5%) &middot; +228,604 / &minus;87,188 lines &middot; 26 authors</p><p class="history-people">Led by <strong>Russell Keith-Magee</strong> (619 commits)</p><p class="history-people">First commits: Alex Gaynor, Gabriel Hurley, Tim Graham, Chris Beaven, Honza Král, Carl Meyer (+2 more)</p><p class="history-people">Released: 1.2, 1.2.1</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2011</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:55.7%"></div></div><p class="history-facts">1,774 commits (5.1%) &middot; +499,122 / &minus;379,831 lines &middot; 25 authors</p><p class="history-people">Led by <strong>Jannis Leidel</strong> (403 commits)</p><p class="history-people">First commits: Aymeric Augustin, Julien Phalip, Paul McMillan, Idan Gazit, Graham Dumpleton</p><p class="history-people">Released: 1.3</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2012</span><span class="history-era history-era-surge">SURGE</span><span class="history-era-desc">well above the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:72.4%"></div></div><p class="history-facts">2,307 commits (6.6%) &middot; +316,647 / &minus;420,504 lines &middot; 188 authors</p><p class="history-people">Led by <strong>Claude Paroz</strong> (464 commits)</p><p class="history-people">First commits: Claude Paroz, Anssi Kääriäinen, Florian Apolloner, Preston Holmes, Ian Clelland, Marc Tamlyn (+161 more)</p><p class="history-people">Released: 1.4</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2013</span><span class="history-era history-era-peak">PEAK</span><span class="history-era-desc">busiest year</span></div><div class="history-bar-track"><div class="history-bar" style="width:100.0%"></div></div><p class="history-facts">3,187 commits (9.1%) &middot; +208,991 / &minus;120,116 lines &middot; 368 authors</p><p class="history-people">Led by <strong>Aymeric Augustin</strong> (467 commits)</p><p class="history-people">First commits: Loïc Bistuer, Bouke Haarsma, Preston Timmons, Unai Zalakain, Shai Berger, Donald Stufft (+304 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2014</span><span class="history-era history-era-surge">SURGE</span><span class="history-era-desc">well above the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:87.6%"></div></div><p class="history-facts">2,792 commits (8.0%) &middot; +268,126 / &minus;196,385 lines &middot; 415 authors</p><p class="history-people">Led by <strong>Tim Graham</strong> (621 commits)</p><p class="history-people">First commits: Thomas Chaumeny, Moayad Mardini, wrwrwr, areski, Greg Chapple, Diego Guimarães (+295 more)</p><p class="history-people">Released: 1.7a1, 1.7a2</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2015</span><span class="history-era history-era-surge">SURGE</span><span class="history-era-desc">well above the usual pace</span></div><div class="history-bar-track"><div class="history-bar" style="width:73.6%"></div></div><p class="history-facts">2,346 commits (6.7%) &middot; +171,391 / &minus;174,475 lines &middot; 482 authors</p><p class="history-people">Led by <strong>Tim Graham</strong> (743 commits)</p><p class="history-people">First commits: Marten Kenbeek, I am Clinton, Adam Johnson, elky, Ville Skyttä, AK (+343 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2016</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:57.5%"></div></div><p class="history-facts">1,833 commits (5.2%) &middot; +119,168 / &minus;86,254 lines &middot; 444 authors</p><p class="history-people">Led by <strong>Tim Graham</strong> (541 commits)</p><p class="history-people">First commits: Ed Morley, François Freitag, Andrew Nester, eltronix, Jarek Glowacki, Vytis Banaitis (+298 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2017</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:49.0%"></div></div><p class="history-facts">1,563 commits (4.5%) &middot; +79,671 / &minus;49,626 lines &middot; 316 authors</p><p class="history-people">Led by <strong>Tim Graham</strong> (393 commits)</p><p class="history-people">First commits: Srinivas  Thatiparthy (శ్రీనివాస్  తాటిపర్తి), Chillar Anand, Дилян Палаузов, shanghui, Ran Benita, Ingo Klöcker (+201 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2018</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:36.2%"></div></div><p class="history-facts">1,154 commits (3.3%) &middot; +46,312 / &minus;21,850 lines &middot; 316 authors</p><p class="history-people">Led by <strong>Tim Graham</strong> (267 commits)</p><p class="history-people">First commits: oliver, Rodrigo, Sanyam Khurana, priyanshsaxena, ovalseven8, jtiai (+197 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2019</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:41.1%"></div></div><p class="history-facts">1,309 commits (3.7%) &middot; +68,652 / &minus;35,434 lines &middot; 281 authors</p><p class="history-people">Led by <strong>Mariusz Felisiak</strong> (203 commits)</p><p class="history-people">First commits: can, Min ho Kim, daniel a rios, Hannes Ljungberg, Zeynel Özdemir, Nasir Hussain (+181 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2020</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:41.6%"></div></div><p class="history-facts">1,327 commits (3.8%) &middot; +71,415 / &minus;30,246 lines &middot; 266 authors</p><p class="history-people">Led by <strong>Mariusz Felisiak</strong> (254 commits)</p><p class="history-people">First commits: manav014, 007gzs, Valz, Tim Park, Thibaud Colas, Kevin Michel (+181 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2021</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:39.7%"></div></div><p class="history-facts">1,264 commits (3.6%) &middot; +58,771 / &minus;30,879 lines &middot; 257 authors</p><p class="history-people">Led by <strong>Mariusz Felisiak</strong> (282 commits)</p><p class="history-people">First commits: Abhyudai, Mateo Radman, Marcelo Galigniana, Timothy McCurrach, tim-mccurrach, saeedblanchette (+160 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2022</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:30.2%"></div></div><p class="history-facts">962 commits (2.8%) &middot; +187,064 / &minus;117,657 lines &middot; 264 authors</p><p class="history-people">Led by <strong>Mariusz Felisiak</strong> (234 commits)</p><p class="history-people">First commits: Hrushikesh, sarahboyce, DevilsAutumn, Francesco Panico, Alokik Vijay, nabil-rady (+177 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2023</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:29.9%"></div></div><p class="history-facts">952 commits (2.7%) &middot; +70,635 / &minus;35,556 lines &middot; 248 authors</p><p class="history-people">Led by <strong>Mariusz Felisiak</strong> (286 commits)</p><p class="history-people">First commits: Natalia, Akash Kumar Sen, Bakdolot, Nina Menezes, Nicolas Lupien, Alexerson (+163 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2024</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:29.5%"></div></div><p class="history-facts">939 commits (2.7%) &middot; +48,462 / &minus;20,085 lines &middot; 234 authors</p><p class="history-people">Led by <strong>Mariusz Felisiak</strong> (121 commits)</p><p class="history-people">First commits: Bendeguz Csirmaz, SiHyunLee, Clifford Gama, Alexander Lazarević, Marijke Luttekes, Jake Howard (+158 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2025</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:29.9%"></div></div><p class="history-facts">954 commits (2.7%) &middot; +59,126 / &minus;26,691 lines &middot; 195 authors</p><p class="history-people">Led by <strong>Jacob Walls</strong> (109 commits)</p><p class="history-people">First commits: Ahmed Nassar, Varun Kasyap, VIZZARD-X, Kasyap Pentamaraju, hesham942, Skyiesac (+121 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2026</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:22.9%"></div></div><p class="history-facts">731 commits (2.1%) &middot; +48,546 / &minus;22,683 lines &middot; 168 authors</p><p class="history-people">Led by <strong>Jacob Walls</strong> (204 commits)</p><p class="history-people">First commits: SnippyCodes, Amar, Yassin Bahri, Vishy, Rodrigo Vieira, afenoum (+104 more)</p></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body></html>

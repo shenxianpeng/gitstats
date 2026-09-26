@@ -5,34 +5,233 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Kubernetes</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.2.post1.dev1">
+	<meta name="generator" content="GitStats 2.7.0">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
-		function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
 		}
+	}
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
-
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
 </head>
 <body>
 
@@ -45,23 +244,23 @@
             <li><a href="files.html">Files</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
-            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="ownership.html" class="active" aria-current="page">Code Ownership</a></li>
             <li><a href="history.html">History</a></li>
             
             </ul>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Code Ownership</h1><div class="ownership-summary"><p>Ownership is measured by how many commits each author made to each file. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl><dt>Files tracked</dt><dd>101992</dd><dt>Single-owner files</dt><dd>35914 (35.2%)</dd><dt>Contributors</dt><dd>4850</dd></dl></div>
-<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus Factor Risk — Single-Owner Files</a></h2>
+            <h1>Code Ownership</h1><p class="section-note">Ownership is measured by how many commits each author made to each file in the current tree. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Files Tracked</dt><dd class="stat-value">31,412</dd><dd class="stat-note">in the current tree</dd></div><div class="stat-tile"><dt>Single-Owner Files</dt><dd class="stat-value">12,385</dd><dd class="stat-note">39.4% of tracked files</dd></div><div class="stat-tile"><dt>Contributors</dt><dd class="stat-value">3,837</dd><dd class="stat-note">authors who changed files</dd></div></dl>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus factor risk — single-owner files</a></h2>
 
-<p><em>Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</em></p><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th>Commits</th></tr><tr><td>pkg/controller/persistentvolume/persistentvolume_controller.go</td><td>Jan Safranek</td><td>19</td></tr><tr><td>CHANGELOG/CHANGELOG-1.34.md</td><td>Kubernetes Release Robot</td><td>19</td></tr><tr><td>staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/evaluator.go</td><td>Jaydip Gabani</td><td>17</td></tr><tr><td>cmd/libs/go2idl/client-gen/generators/client-generator.go</td><td>Chao Xu</td><td>16</td></tr><tr><td>CHANGELOG/CHANGELOG-1.35.md</td><td>Kubernetes Release Robot</td><td>15</td></tr><tr><td>test/utils/ktesting/assert.go</td><td>Patrick Ohly</td><td>13</td></tr><tr><td>test/utils/ktesting/withcontext.go</td><td>Patrick Ohly</td><td>13</td></tr><tr><td>staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/parse.go</td><td>Jaydip Gabani</td><td>13</td></tr><tr><td>staging/src/k8s.io/apiextensions-apiserver/pkg/apiserver/validation/ratcheting.go</td><td>Alexander Zielenski</td><td>13</td></tr><tr><td>test/utils/ktesting/errorcontext.go</td><td>Patrick Ohly</td><td>12</td></tr><tr><td>pkg/controller/persistentvolume/persistentvolume_framework_test.go</td><td>Jan Safranek</td><td>12</td></tr><tr><td>contrib/mesos/pkg/scheduler/mesos_scheduler.go</td><td>Dr. Stefan Schimanski</td><td>12</td></tr><tr><td>staging/src/k8s.io/component-base/logs/api/v1/options_test.go</td><td>Patrick Ohly</td><td>11</td></tr><tr><td>pkg/util/validation/errors.go</td><td>Tim Hockin</td><td>11</td></tr><tr><td>staging/src/k8s.io/apiserver/pkg/authorization/authorizer/conditions.go</td><td>Lucas Käldström</td><td>11</td></tr><tr><td>test/instrumentation/testdata/test-stable-metrics-list.yaml</td><td>Han Kang</td><td>11</td></tr><tr><td>pkg/util/validation/errors_test.go</td><td>Tim Hockin</td><td>10</td></tr><tr><td>staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/evaluator_test.go</td><td>Jaydip Gabani</td><td>10</td></tr><tr><td>staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/helpers.go</td><td>Jaydip Gabani</td><td>10</td></tr><tr><td>staging/src/k8s.io/apiserver/pkg/util/flowcontrol/metrics/sample_and_watermark.go</td><td>Mike Spreitzer</td><td>10</td></tr><tr><td>staging/src/k8s.io/apiserver/pkg/util/flowcontrol/metrics/sample_and_watermark_test.go</td><td>Mike Spreitzer</td><td>10</td></tr><tr><td>contrib/mesos/pkg/scheduler/integration_test.go</td><td>Dr. Stefan Schimanski</td><td>10</td></tr><tr><td>staging/src/k8s.io/apiserver/pkg/cel/common/equality.go</td><td>Alexander Zielenski</td><td>10</td></tr><tr><td>pkg/volume/aws_pd/aws_pd.go</td><td>justinsb</td><td>10</td></tr><tr><td>federation/build.sh</td><td>Madhusudan.C.S</td><td>10</td></tr><tr><td>cluster/saltbase/salt/fluentd-gcp/fluentd-gcp.manifest</td><td>Satnam Singh</td><td>10</td></tr><tr><td>test/utils/ktesting/signals.go</td><td>Patrick Ohly</td><td>9</td></tr><tr><td>staging/src/k8s.io/apiserver/pkg/authorization/authorizer/conditions_test.go</td><td>Lucas Käldström</td><td>9</td></tr><tr><td>pkg/printers/internalversion/additional_printers_test.go</td><td>Sean Sullivan</td><td>9</td></tr><tr><td>build/make-binaries.sh</td><td>Joe Beda</td><td>9</td></tr><tr><td>contrib/logging/fluentd-es-image/td-agent.conf</td><td>Satnam Singh</td><td>9</td></tr><tr><td>test/utils/ktesting/clientcontext.go</td><td>Patrick Ohly</td><td>8</td></tr><tr><td>vendor/k8s.io/klog/v2/test/output.go</td><td>Patrick Ohly</td><td>8</td></tr><tr><td>staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/helpers_test.go</td><td>Jaydip Gabani</td><td>8</td></tr><tr><td>staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/parse_test.go</td><td>Jaydip Gabani</td><td>8</td></tr><tr><td>cmd/kube-aggregator/pkg/apiserver/apiservice_controller.go</td><td>David Eads</td><td>8</td></tr><tr><td>plugin/pkg/auth/authenticator/request/headerrequest/requestheader.go</td><td>David Eads</td><td>8</td></tr><tr><td>pkg/volume/aws_pd/aws_util.go</td><td>justinsb</td><td>8</td></tr><tr><td>test/e2e_node/gcloud/gcloud.go</td><td>Phillip Wittrock</td><td>8</td></tr><tr><td>docs/getting-started-guides/coreos/azure/package.json</td><td>Ilya Dmitrichenko</td><td>8</td></tr><tr><td>build/run-tests.sh</td><td>Joe Beda</td><td>8</td></tr><tr><td>build/make-cross.sh</td><td>Joe Beda</td><td>8</td></tr><tr><td>build/run-integration.sh</td><td>Joe Beda</td><td>8</td></tr><tr><td>test/utils/ktesting/contexthelper.go</td><td>Patrick Ohly</td><td>7</td></tr><tr><td>vendor/k8s.io/klog/v2/internal/serialize/keyvalues.go</td><td>Patrick Ohly</td><td>7</td></tr><tr><td>vendor/k8s.io/klog/v2/ktesting/testinglogger.go</td><td>Patrick Ohly</td><td>7</td></tr><tr><td>vendor/k8s.io/klog/v2/test/zapr.go</td><td>Patrick Ohly</td><td>7</td></tr><tr><td>staging/src/k8s.io/component-base/logs/api/v1/registry.go</td><td>Patrick Ohly</td><td>7</td></tr><tr><td>test/integration/logs/benchmark/common_test.go</td><td>Patrick Ohly</td><td>7</td></tr><tr><td>staging/src/k8s.io/apimachinery/pkg/util/validation/ip_test.go</td><td>Dan Winship</td><td>7</td></tr></table><p class="moreauthors">Showing top 50 of 35914 single-owner files.</p>
-<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by Author</a></h2>
+<p class="section-note">Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</p><div class="table-scroll"><table class="sortable" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">CHANGELOG/CHANGELOG-1.34.md</td><td>Kubernetes Release Robot</td><td class="num">20</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/evaluator.go</td><td>Jaydip Gabani</td><td class="num">17</td></tr><tr><td class="path">CHANGELOG/CHANGELOG-1.35.md</td><td>Kubernetes Release Robot</td><td class="num">16</td></tr><tr><td class="path">test/utils/ktesting/assert.go</td><td>Patrick Ohly</td><td class="num">13</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/parse.go</td><td>Jaydip Gabani</td><td class="num">13</td></tr><tr><td class="path">staging/src/k8s.io/apiextensions-apiserver/pkg/apiserver/validation/ratcheting.go</td><td>Alexander Zielenski</td><td class="num">13</td></tr><tr><td class="path">staging/src/k8s.io/component-base/logs/api/v1/options_test.go</td><td>Patrick Ohly</td><td class="num">11</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/authorization/authorizer/conditions.go</td><td>Lucas Käldström</td><td class="num">11</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/evaluator_test.go</td><td>Jaydip Gabani</td><td class="num">10</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/helpers.go</td><td>Jaydip Gabani</td><td class="num">10</td></tr></table></div><details class="table-details"><summary>Table: the 100 most-changed of 12,385 single-owner files</summary><div class="table-scroll"><table class="sortable" id="ownership-busfactor-all"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">CHANGELOG/CHANGELOG-1.34.md</td><td>Kubernetes Release Robot</td><td class="num">20</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/evaluator.go</td><td>Jaydip Gabani</td><td class="num">17</td></tr><tr><td class="path">CHANGELOG/CHANGELOG-1.35.md</td><td>Kubernetes Release Robot</td><td class="num">16</td></tr><tr><td class="path">test/utils/ktesting/assert.go</td><td>Patrick Ohly</td><td class="num">13</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/parse.go</td><td>Jaydip Gabani</td><td class="num">13</td></tr><tr><td class="path">staging/src/k8s.io/apiextensions-apiserver/pkg/apiserver/validation/ratcheting.go</td><td>Alexander Zielenski</td><td class="num">13</td></tr><tr><td class="path">staging/src/k8s.io/component-base/logs/api/v1/options_test.go</td><td>Patrick Ohly</td><td class="num">11</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/authorization/authorizer/conditions.go</td><td>Lucas Käldström</td><td class="num">11</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/evaluator_test.go</td><td>Jaydip Gabani</td><td class="num">10</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/helpers.go</td><td>Jaydip Gabani</td><td class="num">10</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/cel/common/equality.go</td><td>Alexander Zielenski</td><td class="num">10</td></tr><tr><td class="path">test/utils/ktesting/signals.go</td><td>Patrick Ohly</td><td class="num">9</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/authorization/authorizer/conditions_test.go</td><td>Lucas Käldström</td><td class="num">9</td></tr><tr><td class="path">vendor/k8s.io/klog/v2/test/output.go</td><td>Patrick Ohly</td><td class="num">8</td></tr><tr><td class="path">CHANGELOG/CHANGELOG-1.37.md</td><td>Kubernetes Release Robot</td><td class="num">8</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/helpers_test.go</td><td>Jaydip Gabani</td><td class="num">8</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/parse_test.go</td><td>Jaydip Gabani</td><td class="num">8</td></tr><tr><td class="path">test/utils/ktesting/contexthelper.go</td><td>Patrick Ohly</td><td class="num">7</td></tr><tr><td class="path">vendor/k8s.io/klog/v2/internal/serialize/keyvalues.go</td><td>Patrick Ohly</td><td class="num">7</td></tr><tr><td class="path">vendor/k8s.io/klog/v2/ktesting/testinglogger.go</td><td>Patrick Ohly</td><td class="num">7</td></tr><tr><td class="path">vendor/k8s.io/klog/v2/test/zapr.go</td><td>Patrick Ohly</td><td class="num">7</td></tr><tr><td class="path">staging/src/k8s.io/component-base/logs/api/v1/registry.go</td><td>Patrick Ohly</td><td class="num">7</td></tr><tr><td class="path">test/integration/logs/benchmark/common_test.go</td><td>Patrick Ohly</td><td class="num">7</td></tr><tr><td class="path">staging/src/k8s.io/apimachinery/pkg/util/validation/ip_test.go</td><td>Dan Winship</td><td class="num">7</td></tr><tr><td class="path">pkg/controlplane/reconcilers/instancecount_test.go</td><td>Dan Winship</td><td class="num">7</td></tr><tr><td class="path">cmd/kubeadm/app/apis/kubeadm/timeoututils.go</td><td>Lubomir I. Ivanov</td><td class="num">7</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/util/peerproxy/gv_exclusion_manager.go</td><td>Richa Banker</td><td class="num">7</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/util/peerproxy/peerproxy.go</td><td>Richa Banker</td><td class="num">7</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/admission_test.go</td><td>Jaydip Gabani</td><td class="num">7</td></tr><tr><td class="path">staging/src/k8s.io/cloud-provider/controllers/route/metrics.go</td><td>lukasmetzner</td><td class="num">7</td></tr><tr><td class="path">test/e2e_node/pods_api_test.go</td><td>Brian Sonnenberg</td><td class="num">7</td></tr><tr><td class="path">staging/src/k8s.io/apimachinery/pkg/runtime/serializer/cbor/internal/modes/encode_test.go</td><td>Ben Luddy</td><td class="num">7</td></tr><tr><td class="path">staging/src/k8s.io/apimachinery/pkg/runtime/serializer/cbor/internal/modes/roundtrip_test.go</td><td>Ben Luddy</td><td class="num">7</td></tr><tr><td class="path">staging/src/k8s.io/apimachinery/pkg/runtime/serializer/cbor/internal/modes/appendixa_test.go</td><td>Ben Luddy</td><td class="num">7</td></tr><tr><td class="path">test/utils/ktesting/doc.go</td><td>Patrick Ohly</td><td class="num">6</td></tr><tr><td class="path">test/e2e_dra/resourceclaimstatus_test.go</td><td>Patrick Ohly</td><td class="num">6</td></tr><tr><td class="path">test/e2e/dra/test-driver/deploy/example/resourceclaim.yaml</td><td>Patrick Ohly</td><td class="num">6</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/storage/etcd3/stats.go</td><td>Marek Siarkowicz</td><td class="num">6</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/util/peerproxy/gv_exclusion_manager_test.go</td><td>Richa Banker</td><td class="num">6</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/auditannotations_test.go</td><td>Jaydip Gabani</td><td class="num">6</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/integration_test.go</td><td>Jaydip Gabani</td><td class="num">6</td></tr><tr><td class="path">pkg/scheduler/framework/plugins/nodevolumelimits/csi_manager.go</td><td>Hemant Kumar</td><td class="num">6</td></tr><tr><td class="path">staging/src/k8s.io/apimachinery/pkg/runtime/serializer/cbor/collections.go</td><td>chenk008</td><td class="num">6</td></tr><tr><td class="path">test/integration/framework/cbor.go</td><td>Ben Luddy</td><td class="num">6</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/util/flowcontrol/fairqueuing/integrator.go</td><td>Mike Spreitzer</td><td class="num">6</td></tr><tr><td class="path">plugin/pkg/admission/podtopologylabels/admission.go</td><td>James Munnelly</td><td class="num">6</td></tr><tr><td class="path">test/utils/ktesting/examples/with_ktesting/example_test.go</td><td>Patrick Ohly</td><td class="num">5</td></tr><tr><td class="path">vendor/k8s.io/klog/v2/klogr.go</td><td>Patrick Ohly</td><td class="num">5</td></tr><tr><td class="path">test/e2e/framework/internal/junit/junit.go</td><td>Patrick Ohly</td><td class="num">5</td></tr><tr><td class="path">test/e2e/framework/skipper/skipper_test.go</td><td>Patrick Ohly</td><td class="num">5</td></tr><tr><td class="path">test/e2e/framework/debug/init/init.go</td><td>Patrick Ohly</td><td class="num">5</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/storage/testing/correctness/correctness.go</td><td>Marek Siarkowicz</td><td class="num">5</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/storage/testing/correctness/model.go</td><td>Marek Siarkowicz</td><td class="num">5</td></tr><tr><td class="path">test/e2e_node/remote/gce/gce_runner_test.go</td><td>thc1006</td><td class="num">5</td></tr><tr><td class="path">test/e2e/dra/dra_node_allocatable_resources.go</td><td>Praveen Krishna</td><td class="num">5</td></tr><tr><td class="path">test/e2e/apimachinery/crd_selectable_fields.go</td><td>Joe Betz</td><td class="num">5</td></tr><tr><td class="path">cmd/kubeadm/app/util/apiclient/wait_test.go</td><td>Lubomir I. Ivanov</td><td class="num">5</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/util/peerproxy/peer_discovery_test.go</td><td>Richa Banker</td><td class="num">5</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/authorization/authorizer/evaluate.go</td><td>Lucas Käldström</td><td class="num">5</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/admission/testing/celtest/matchconditions_test.go</td><td>Jaydip Gabani</td><td class="num">5</td></tr><tr><td class="path">test/e2e/storage/volumeattributesclass.go</td><td>carlory</td><td class="num">5</td></tr><tr><td class="path">pkg/api/servicecidr/servicecidr.go</td><td>Antonio Ojea</td><td class="num">5</td></tr><tr><td class="path">pkg/api/servicecidr/servicecidr_test.go</td><td>Antonio Ojea</td><td class="num">5</td></tr><tr><td class="path">staging/src/k8s.io/apimachinery/pkg/runtime/serializer/cbor/collections_test.go</td><td>chenk008</td><td class="num">5</td></tr><tr><td class="path">staging/src/k8s.io/dynamic-resource-allocation/deviceattribute/numa_linux.go</td><td>John Hull</td><td class="num">5</td></tr><tr><td class="path">pkg/kubelet/cm/container_manager_test.go</td><td>Rohit Chaudhari</td><td class="num">5</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/util/flowcontrol/fairqueuing/integrator_test.go</td><td>Mike Spreitzer</td><td class="num">5</td></tr><tr><td class="path">staging/src/k8s.io/component-base/metrics/prometheus/feature/metrics_test.go</td><td>Han Kang</td><td class="num">5</td></tr><tr><td class="path">staging/src/k8s.io/component-base/metrics/prometheus/feature/metrics.go</td><td>Han Kang</td><td class="num">5</td></tr><tr><td class="path">vendor/github.com/opencontainers/cgroups/fs/fs.go</td><td>Davanum Srinivas</td><td class="num">4</td></tr><tr><td class="path">vendor/github.com/opencontainers/cgroups/fs2/fs2.go</td><td>Davanum Srinivas</td><td class="num">4</td></tr><tr><td class="path">vendor/go.opentelemetry.io/otel/sdk/internal/x/x.go</td><td>Davanum Srinivas</td><td class="num">4</td></tr><tr><td class="path">vendor/golang.org/x/net/dns/dnsmessage/svcb.go</td><td>Davanum Srinivas</td><td class="num">4</td></tr><tr><td class="path">vendor/golang.org/x/net/http2/transport_wrap.go</td><td>Davanum Srinivas</td><td class="num">4</td></tr><tr><td class="path">vendor/golang.org/x/tools/internal/typesinternal/zerovalue.go</td><td>Davanum Srinivas</td><td class="num">4</td></tr><tr><td class="path">cmd/kubelet/app/options/globalflags_linux_test.go</td><td>Davanum Srinivas</td><td class="num">4</td></tr><tr><td class="path">staging/src/k8s.io/kubelet/pkg/apis/deviceplugin/OWNERS</td><td>Davanum Srinivas</td><td class="num">4</td></tr><tr><td class="path">staging/src/k8s.io/client-go/testing/internal/listandwatch_test.go</td><td>Patrick Ohly</td><td class="num">4</td></tr><tr><td class="path">test/utils/ktesting/.import-restrictions</td><td>Patrick Ohly</td><td class="num">4</td></tr><tr><td class="path">vendor/k8s.io/klog/v2/textlogger/options.go</td><td>Patrick Ohly</td><td class="num">4</td></tr><tr><td class="path">test/e2e_dra/README.md</td><td>Patrick Ohly</td><td class="num">4</td></tr><tr><td class="path">vendor/github.com/onsi/ginkgo/v2/internal/progress_report.go</td><td>Patrick Ohly</td><td class="num">4</td></tr><tr><td class="path">vendor/github.com/onsi/ginkgo/v2/internal/spec_context.go</td><td>Patrick Ohly</td><td class="num">4</td></tr><tr><td class="path">vendor/github.com/onsi/gomega/gcustom/make_matcher.go</td><td>Patrick Ohly</td><td class="num">4</td></tr><tr><td class="path">pkg/apis/resource/install/install_test.go</td><td>Patrick Ohly</td><td class="num">4</td></tr><tr><td class="path">staging/src/k8s.io/kubelet/pkg/apis/dra/v1beta1/types.go</td><td>Patrick Ohly</td><td class="num">4</td></tr><tr><td class="path">vendor/github.com/go-logr/zapr/zapr.go</td><td>Patrick Ohly</td><td class="num">4</td></tr><tr><td class="path">vendor/k8s.io/klog/v2/ktesting/options.go</td><td>Patrick Ohly</td><td class="num">4</td></tr><tr><td class="path">vendor/k8s.io/klog/v2/k8s_references.go</td><td>Patrick Ohly</td><td class="num">4</td></tr><tr><td class="path">vendor/k8s.io/klog/v2/contextual.go</td><td>Patrick Ohly</td><td class="num">4</td></tr><tr><td class="path">api/discovery/apis__coordination.k8s.io__v1alpha2.json</td><td>Jefftree</td><td class="num">4</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/storage/cacher/store/store_test.go</td><td>Marek Siarkowicz</td><td class="num">4</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/storage/testing/correctness/types.go</td><td>Marek Siarkowicz</td><td class="num">4</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/storage/cacher/watch_cache_history.go</td><td>Marek Siarkowicz</td><td class="num">4</td></tr><tr><td class="path">staging/src/k8s.io/apiserver/pkg/storage/etcd3/stats_test.go</td><td>Marek Siarkowicz</td><td class="num">4</td></tr><tr><td class="path">test/declarative_validation/apps/scale/declarative_validation_test.go</td><td>Yongrui Lin</td><td class="num">4</td></tr><tr><td class="path">test/declarative_validation/autoscaling/scale/declarative_validation_test.go</td><td>Yongrui Lin</td><td class="num">4</td></tr><tr><td class="path">vendor/sigs.k8s.io/kustomize/api/internal/utils/makeResIds.go</td><td>Natasha Sarkar</td><td class="num">4</td></tr><tr><td class="path">vendor/sigs.k8s.io/kustomize/kyaml/filesys/fsondisk.go</td><td>Natasha Sarkar</td><td class="num">4</td></tr><tr><td class="path">vendor/sigs.k8s.io/kustomize/kyaml/filesys/util.go</td><td>Natasha Sarkar</td><td class="num">4</td></tr></table></div></details>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by author</a></h2>
 
-<p><em>Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</em></p><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th>Files owned</th><th>Solely owned</th><th>Files touched</th></tr><tr><td>Jordan Liggitt</td><td>10462</td><td>6276</td><td>22633</td></tr><tr><td>Tim Hockin</td><td>5126</td><td>970</td><td>11182</td></tr><tr><td>Chao Xu</td><td>4710</td><td>3035</td><td>10834</td></tr><tr><td>SataQiu</td><td>3618</td><td>1424</td><td>4864</td></tr><tr><td>Paco Xu</td><td>3076</td><td>413</td><td>5846</td></tr><tr><td>Davanum Srinivas</td><td>2971</td><td>1127</td><td>12227</td></tr><tr><td>Patrick Ohly</td><td>2965</td><td>789</td><td>6038</td></tr><tr><td>David Eads</td><td>2730</td><td>591</td><td>9688</td></tr><tr><td>Jeff Grafton</td><td>2538</td><td>48</td><td>4440</td></tr><tr><td>saad-ali</td><td>2235</td><td>16</td><td>2826</td></tr><tr><td>Mike Danese</td><td>2156</td><td>250</td><td>7822</td></tr><tr><td>Dr. Stefan Schimanski</td><td>1916</td><td>734</td><td>6955</td></tr><tr><td>Ben Luddy</td><td>1557</td><td>1529</td><td>1903</td></tr><tr><td>Benjamin Elder</td><td>1407</td><td>1256</td><td>6224</td></tr><tr><td>Mengjiao Liu</td><td>1394</td><td>1</td><td>3360</td></tr><tr><td>Joe Betz</td><td>1313</td><td>435</td><td>4699</td></tr><tr><td>Samuel Roth</td><td>1208</td><td>121</td><td>1383</td></tr><tr><td>Jefftree</td><td>1004</td><td>779</td><td>2128</td></tr><tr><td>Clayton Coleman</td><td>897</td><td>146</td><td>5436</td></tr><tr><td>Patrick Reilly</td><td>897</td><td>106</td><td>950</td></tr><tr><td>Sean Sullivan</td><td>861</td><td>410</td><td>1411</td></tr><tr><td>Eric Paris</td><td>857</td><td>363</td><td>3302</td></tr><tr><td>Wojciech Tyczyński</td><td>856</td><td>53</td><td>4088</td></tr><tr><td>Trevor Pounds</td><td>795</td><td>743</td><td>817</td></tr><tr><td>Yifan Gu</td><td>732</td><td>443</td><td>865</td></tr></table><p class="moreauthors">Showing top 25 of 4850 contributors.</p>
-<h2 id="most_shared_files"><a href="#most_shared_files">Most Shared Files</a></h2>
+<p class="section-note">Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</p><div class="table-scroll"><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th class="num">Files owned</th><th class="num">Solely owned</th><th class="num">Files touched</th></tr><tr><td>Jordan Liggitt</td><td class="num">2,097</td><td class="num">670</td><td class="num">7,481</td></tr><tr><td>Patrick Ohly</td><td class="num">2,055</td><td class="num">460</td><td class="num">4,595</td></tr><tr><td>Davanum Srinivas</td><td class="num">1,604</td><td class="num">760</td><td class="num">4,819</td></tr><tr><td>Ben Luddy</td><td class="num">1,550</td><td class="num">1,524</td><td class="num">1,873</td></tr><tr><td>Mengjiao Liu</td><td class="num">1,392</td><td class="num">1</td><td class="num">3,277</td></tr><tr><td>Benjamin Elder</td><td class="num">1,291</td><td class="num">1,240</td><td class="num">1,875</td></tr><tr><td>Tim Hockin</td><td class="num">1,184</td><td class="num">338</td><td class="num">2,836</td></tr><tr><td>Jefftree</td><td class="num">858</td><td class="num">690</td><td class="num">1,763</td></tr><tr><td>Joe Betz</td><td class="num">793</td><td class="num">288</td><td class="num">3,419</td></tr><tr><td>Samuel Roth</td><td class="num">718</td><td class="num">5</td><td class="num">751</td></tr><tr><td>Peter Hunt</td><td class="num">562</td><td class="num">408</td><td class="num">714</td></tr><tr><td>Keisuke Ishigami</td><td class="num">537</td><td class="num">537</td><td class="num">565</td></tr><tr><td>Alvaro Aleman</td><td class="num">510</td><td class="num">3</td><td class="num">1,122</td></tr><tr><td>Dr. Stefan Schimanski</td><td class="num">501</td><td class="num">113</td><td class="num">2,257</td></tr><tr><td>Paco Xu</td><td class="num">479</td><td class="num">401</td><td class="num">1,490</td></tr><tr><td>Sean Sullivan</td><td class="num">435</td><td class="num">286</td><td class="num">765</td></tr><tr><td>David Eads</td><td class="num">431</td><td class="num">76</td><td class="num">2,230</td></tr><tr><td>Stephen Kitt</td><td class="num">412</td><td class="num">77</td><td class="num">2,273</td></tr><tr><td>Lalit Chauhan</td><td class="num">368</td><td class="num">117</td><td class="num">882</td></tr><tr><td>Mike Danese</td><td class="num">299</td><td class="num">30</td><td class="num">1,461</td></tr><tr><td>Graham Heffern</td><td class="num">296</td><td class="num">296</td><td class="num">303</td></tr><tr><td>ravisantoshgudimetla</td><td class="num">279</td><td class="num">3</td><td class="num">540</td></tr><tr><td>Surya Seetharaman</td><td class="num">274</td><td class="num">272</td><td class="num">293</td></tr><tr><td>David Ashpole</td><td class="num">263</td><td class="num">51</td><td class="num">1,186</td></tr><tr><td>cyclinder</td><td class="num">256</td><td class="num">240</td><td class="num">383</td></tr></table></div><p class="moreauthors">Showing top 25 of 3837 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most shared files</a></h2>
 
-<p><em>Files touched by the most people — shared code where changes are most likely to need coordination.</em></p><table class="sortable" id="ownership-shared"><tr><th>File</th><th>Contributors</th><th>Primary owner</th><th>Owner share</th></tr><tr><td>api/openapi-spec/swagger.json</td><td>422</td><td>Jordan Liggitt</td><td>4.6%</td></tr><tr><td>pkg/kubelet/kubelet.go</td><td>405</td><td>Yu-Ju Hong</td><td>6.2%</td></tr><tr><td>pkg/features/kube_features.go</td><td>365</td><td>carlory</td><td>3.3%</td></tr><tr><td>pkg/generated/openapi/zz_generated.openapi.go</td><td>329</td><td>Patrick Ohly</td><td>5.0%</td></tr><tr><td>vendor/modules.txt</td><td>310</td><td>Davanum Srinivas</td><td>16.3%</td></tr><tr><td>cmd/kubelet/app/server.go</td><td>263</td><td>Michael Taufen</td><td>5.2%</td></tr><tr><td>pkg/kubelet/kubelet_test.go</td><td>253</td><td>Yu-Ju Hong</td><td>6.3%</td></tr><tr><td>staging/src/k8s.io/api/core/v1/types.go</td><td>251</td><td>Tim Hockin</td><td>4.9%</td></tr><tr><td>go.mod</td><td>246</td><td>Davanum Srinivas</td><td>21.5%</td></tr><tr><td>Godeps/Godeps.json</td><td>234</td><td>Eric Paris</td><td>4.0%</td></tr><tr><td>staging/src/k8s.io/api/core/v1/generated.proto</td><td>226</td><td>Tim Hockin</td><td>5.3%</td></tr><tr><td>go.sum</td><td>225</td><td>Davanum Srinivas</td><td>23.1%</td></tr><tr><td>hack/.golint_failures</td><td>224</td><td>SataQiu</td><td>9.6%</td></tr><tr><td>pkg/apis/core/validation/validation.go</td><td>209</td><td>Tim Hockin</td><td>4.6%</td></tr><tr><td>test/e2e/framework/util.go</td><td>203</td><td>Wojciech Tyczyński</td><td>4.9%</td></tr><tr><td>staging/src/k8s.io/api/core/v1/types_swagger_doc_generated.go</td><td>200</td><td>Tim Hockin</td><td>3.9%</td></tr><tr><td>pkg/apis/core/types.go</td><td>193</td><td>Hemant Kumar</td><td>4.1%</td></tr><tr><td>pkg/apis/core/validation/validation_test.go</td><td>191</td><td>Tim Hockin</td><td>4.3%</td></tr><tr><td>cluster/gce/util.sh</td><td>189</td><td>Brendan Burns</td><td>4.5%</td></tr><tr><td>cluster/gce/gci/configure-helper.sh</td><td>187</td><td>Mike Danese</td><td>6.2%</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+<p class="section-note">Files touched by the most people — shared code where changes are most likely to need coordination.</p><div class="table-scroll"><table class="sortable" id="ownership-shared"><tr><th>File</th><th class="num">Contributors</th><th>Primary owner</th><th class="num">Owner share</th></tr><tr><td class="path">api/openapi-spec/swagger.json</td><td class="num">423</td><td>Jordan Liggitt</td><td class="num">4.6%</td></tr><tr><td class="path">pkg/kubelet/kubelet.go</td><td class="num">406</td><td>Yu-Ju Hong</td><td class="num">6.2%</td></tr><tr><td class="path">pkg/features/kube_features.go</td><td class="num">367</td><td>carlory</td><td class="num">3.2%</td></tr><tr><td class="path">pkg/generated/openapi/zz_generated.openapi.go</td><td class="num">331</td><td>Patrick Ohly</td><td class="num">4.9%</td></tr><tr><td class="path">vendor/modules.txt</td><td class="num">311</td><td>Davanum Srinivas</td><td class="num">16.6%</td></tr><tr><td class="path">cmd/kubelet/app/server.go</td><td class="num">264</td><td>Michael Taufen</td><td class="num">5.2%</td></tr><tr><td class="path">pkg/kubelet/kubelet_test.go</td><td class="num">254</td><td>Yu-Ju Hong</td><td class="num">6.2%</td></tr><tr><td class="path">staging/src/k8s.io/api/core/v1/types.go</td><td class="num">254</td><td>Tim Hockin</td><td class="num">4.9%</td></tr><tr><td class="path">go.mod</td><td class="num">247</td><td>Davanum Srinivas</td><td class="num">22.0%</td></tr><tr><td class="path">staging/src/k8s.io/api/core/v1/generated.proto</td><td class="num">228</td><td>Tim Hockin</td><td class="num">5.3%</td></tr><tr><td class="path">go.sum</td><td class="num">226</td><td>Davanum Srinivas</td><td class="num">23.6%</td></tr><tr><td class="path">pkg/apis/core/validation/validation.go</td><td class="num">211</td><td>Tim Hockin</td><td class="num">4.6%</td></tr><tr><td class="path">test/e2e/framework/util.go</td><td class="num">203</td><td>Wojciech Tyczyński</td><td class="num">4.9%</td></tr><tr><td class="path">staging/src/k8s.io/api/core/v1/types_swagger_doc_generated.go</td><td class="num">201</td><td>Tim Hockin</td><td class="num">3.9%</td></tr><tr><td class="path">pkg/apis/core/types.go</td><td class="num">194</td><td>Hemant Kumar</td><td class="num">4.1%</td></tr><tr><td class="path">pkg/apis/core/validation/validation_test.go</td><td class="num">191</td><td>Tim Hockin</td><td class="num">4.3%</td></tr><tr><td class="path">cluster/gce/util.sh</td><td class="num">189</td><td>Brendan Burns</td><td class="num">4.5%</td></tr><tr><td class="path">cluster/gce/gci/configure-helper.sh</td><td class="num">187</td><td>Mike Danese</td><td class="num">6.2%</td></tr><tr><td class="path">hack/local-up-cluster.sh</td><td class="num">187</td><td>Davanum Srinivas</td><td class="num">9.9%</td></tr><tr><td class="path">cluster/gce/config-test.sh</td><td class="num">177</td><td>Zach Loafman</td><td class="num">4.6%</td></tr></table></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body></html>

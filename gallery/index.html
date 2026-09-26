@@ -5,43 +5,85 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - GitStats Gallery</title>
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
-	<script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
 	<meta name="generator" content="GitStats dev">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script>
-		function toggleTheme() {
-			const currentTheme = document.documentElement.getAttribute('data-theme');
-			const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-			document.documentElement.setAttribute('data-theme', newTheme);
-			localStorage.setItem('theme', newTheme);
-			updateThemeIcon(newTheme);
-		}
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 
-		function updateThemeIcon(theme) {
-			const button = document.getElementById('theme-toggle');
-			if (button) {
-				button.innerHTML = theme === 'dark' ? '☀️' : '🌙';
-				button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-			}
-		}
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
 
-		document.addEventListener('DOMContentLoaded', function() {
-			updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
 		});
-	</script>
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
 </head>
 <body>
 
             <div class="nav">
             <a href="index.html" class="nav-brand">GitStats</a>
             <ul>
-            <li><a href="index.html">GitStats Gallery</a></li>
+            <li><a href="index.html" class="active" aria-current="page">GitStats Gallery</a></li>
             </ul>
             <div class="nav-right">
-            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode">🌙</button>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>GitStats Gallery</h1><p class="portfolio-subtitle">10 repositories &middot; generated by gitstats dev on 2026-09-21 05:05:30</p><h2>Totals</h2><table border='1' cellspacing='0' cellpadding='4'><tr><td>Repositories</td><td>10</td></tr><tr><td>Total Commits</td><td>1,029,962</td></tr><tr><td>Commits (last 12 mo)</td><td>86,097</td></tr><tr><td>Distinct Authors</td><td>30,463</td></tr><tr><td>Active Repositories (12 mo)</td><td>10 / 10</td></tr><tr><td>Lines of Code</td><td>44,687,660</td></tr></table><h2>Repositories</h2><table class="sortable" id="portfolio"><tr><th>Repository</th><th>Health</th><th>Commits</th><th>Authors</th><th>Active (12 mo)</th><th>Files</th><th>Lines of Code</th><th>Last Commit</th><th>Since</th></tr><tr><td><a href="rust/index.html">Rust</a></td><td><span class="history-era history-era-steady">steady</span></td><td>340,655</td><td>7,705</td><td>1,292</td><td>62,938</td><td>6,110,605</td><td>2026-09-20</td><td>2010</td></tr><tr><td><a href="vscode/index.html">VS Code</a></td><td><span class="history-era history-era-peak">peak</span></td><td>165,649</td><td>2,867</td><td>457</td><td>19,021</td><td>5,986,996</td><td>2026-09-21</td><td>2015</td></tr><tr><td><a href="kubernetes/index.html">Kubernetes</a></td><td><span class="history-era history-era-steady">steady</span></td><td>141,310</td><td>4,859</td><td>595</td><td>31,379</td><td>7,243,347</td><td>2026-09-20</td><td>2014</td></tr><tr><td><a href="cpython/index.html">CPython</a></td><td><span class="history-era history-era-steady">steady</span></td><td>133,264</td><td>3,676</td><td>750</td><td>6,350</td><td>3,207,607</td><td>2026-09-21</td><td>1990</td></tr><tr><td><a href="git/index.html">Git</a></td><td><span class="history-era history-era-steady">steady</span></td><td>82,305</td><td>2,351</td><td>212</td><td>4,851</td><td>1,628,300</td><td>2026-09-17</td><td>2005</td></tr><tr><td><a href="homebrew/index.html">Homebrew</a></td><td><span class="history-era history-era-surge">surge</span></td><td>52,828</td><td>1,309</td><td>187</td><td>3,391</td><td>513,739</td><td>2026-09-21</td><td>2009</td></tr><tr><td><a href="nodejs/index.html">Node.js</a></td><td><span class="history-era history-era-steady">steady</span></td><td>48,577</td><td>4,349</td><td>428</td><td>51,838</td><td>17,402,651</td><td>2026-09-21</td><td>2009</td></tr><tr><td><a href="django/index.html">Django</a></td><td><span class="history-era history-era-steady">steady</span></td><td>34,948</td><td>3,172</td><td>216</td><td>7,091</td><td>1,118,368</td><td>2026-09-20</td><td>2005</td></tr><tr><td><a href="react/index.html">React</a></td><td><span class="history-era history-era-quiet">quiet</span></td><td>21,705</td><td>1,931</td><td>99</td><td>7,245</td><td>1,171,440</td><td>2026-09-18</td><td>2013</td></tr><tr><td><a href="nginx/index.html">nginx</a></td><td><span class="history-era history-era-steady">steady</span></td><td>8,721</td><td>137</td><td>38</td><td>544</td><td>304,607</td><td>2026-09-16</td><td>2002</td></tr></table><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+            <h1>GitStats Gallery</h1><p class="portfolio-subtitle">10 repositories &middot; generated by gitstats dev on 2026-09-26 08:07:31</p><dl class="stat-tiles" style="--cols: 4; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Repositories</dt><dd class="stat-value">10</dd><dd class="stat-note">10 active in the last 12 months</dd></div><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">1,031,960</dd><dd class="stat-note">88,089 in the last 12 months</dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">30,500</dd><dd class="stat-note">distinct, across all repositories</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">44,925,012</dd><dd class="stat-note">all repositories at HEAD</dd></div></dl><h2>Repositories</h2><div class="table-scroll"><table class="sortable" id="portfolio"><tr><th>Repository</th><th>Health</th><th class="num">Commits</th><th class="num">Authors</th><th class="num">Active (12 mo)</th><th class="num">Files</th><th class="num">Lines of Code</th><th>Last Commit</th><th>Since</th></tr><tr><td><a href="rust/index.html">Rust</a></td><td><span class="history-era history-era-steady">steady</span></td><td class="num">341,536</td><td class="num">7,713</td><td class="num">1,292</td><td class="num">63,195</td><td class="num">6,125,860</td><td>2026-09-26</td><td>2010</td></tr><tr><td><a href="vscode/index.html">VS Code</a></td><td><span class="history-era history-era-peak">peak</span></td><td class="num">166,238</td><td class="num">2,873</td><td class="num">456</td><td class="num">19,416</td><td class="num">6,137,425</td><td>2026-09-26</td><td>2015</td></tr><tr><td><a href="kubernetes/index.html">Kubernetes</a></td><td><span class="history-era history-era-steady">steady</span></td><td class="num">141,530</td><td class="num">4,871</td><td class="num">604</td><td class="num">31,412</td><td class="num">7,290,935</td><td>2026-09-26</td><td>2014</td></tr><tr><td><a href="cpython/index.html">CPython</a></td><td><span class="history-era history-era-steady">steady</span></td><td class="num">133,356</td><td class="num">3,684</td><td class="num">757</td><td class="num">6,414</td><td class="num">3,210,256</td><td>2026-09-26</td><td>1990</td></tr><tr><td><a href="git/index.html">Git</a></td><td><span class="history-era history-era-steady">steady</span></td><td class="num">82,307</td><td class="num">2,351</td><td class="num">212</td><td class="num">4,851</td><td class="num">1,628,023</td><td>2026-09-23</td><td>2005</td></tr><tr><td><a href="homebrew/index.html">Homebrew</a></td><td><span class="history-era history-era-surge">surge</span></td><td class="num">52,894</td><td class="num">1,311</td><td class="num">188</td><td class="num">3,406</td><td class="num">518,443</td><td>2026-09-26</td><td>2009</td></tr><tr><td><a href="nodejs/index.html">Node.js</a></td><td><span class="history-era history-era-steady">steady</span></td><td class="num">48,710</td><td class="num">4,355</td><td class="num">433</td><td class="num">51,916</td><td class="num">17,418,732</td><td>2026-09-26</td><td>2009</td></tr><tr><td><a href="django/index.html">Django</a></td><td><span class="history-era history-era-steady">steady</span></td><td class="num">34,953</td><td class="num">3,172</td><td class="num">216</td><td class="num">7,091</td><td class="num">1,118,504</td><td>2026-09-25</td><td>2005</td></tr><tr><td><a href="react/index.html">React</a></td><td><span class="history-era history-era-quiet">quiet</span></td><td class="num">21,708</td><td class="num">1,931</td><td class="num">99</td><td class="num">7,252</td><td class="num">1,172,056</td><td>2026-09-22</td><td>2013</td></tr><tr><td><a href="nginx/index.html">nginx</a></td><td><span class="history-era history-era-steady">steady</span></td><td class="num">8,728</td><td class="num">137</td><td class="num">37</td><td class="num">544</td><td class="num">304,778</td><td>2026-09-23</td><td>2002</td></tr></table></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
 </body>
 </html>
