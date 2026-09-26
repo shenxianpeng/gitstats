@@ -658,7 +658,10 @@ def test_index_without_tags_has_no_releases(mock_data_collector, temp_dir):
 
 def test_author_html_marks_bots():
     assert author_html("Alice Smith") == "Alice Smith"
-    assert author_html("dependabot[bot]") == 'dependabot[bot] <span class="badge">bot</span>'
+    # the badge replaces the "[bot]" suffix instead of repeating it
+    assert author_html("dependabot[bot]") == (
+        'dependabot <span class="badge" title="dependabot[bot]">bot</span>'
+    )
     assert author_html("<Eve>") == "&lt;Eve&gt;"
 
 
@@ -671,7 +674,7 @@ def test_bot_badges_in_contributor_tables(mock_data_collector, temp_dir):
         "renovate[bot]",
     ][:limit]
     HTMLReportCreator().create(mock_data_collector, temp_dir)
-    badge = 'renovate[bot] <span class="badge">bot</span>'
+    badge = 'renovate <span class="badge" title="renovate[bot]">bot</span>'
     with open(f"{temp_dir}/index.html", encoding="utf-8") as f:
         assert f"<tr><td>{badge}</td>" in f.read()  # Top Contributors
     with open(f"{temp_dir}/authors.html", encoding="utf-8") as f:
@@ -1800,7 +1803,7 @@ def test_render_chartjs_integer_y_ticks():
 def test_bot_badges_wherever_authors_are_named(mock_data_collector, temp_dir):
     """Releases, tags and top-author tables mark bots like the author lists do."""
     bot = "dependabot[bot]"
-    badge = 'dependabot[bot] <span class="badge">bot</span>'
+    badge = 'dependabot <span class="badge" title="dependabot[bot]">bot</span>'
     mock_data_collector.tags["v1.1.0"]["authors"] = {bot: 5, "Alice Smith": 3}
     mock_data_collector.author_of_year = {2023: {bot: 40, "Alice Smith": 30}}
     mock_data_collector.author_of_month = {
@@ -1878,3 +1881,20 @@ def test_percentages_have_one_decimal(mock_data_collector, temp_dir):
         with open(os.path.join(temp_dir, f"{page}.html"), encoding="utf-8") as f:
             text = re.sub(r"<script>.*?</script>", "", f.read(), flags=re.S)
         assert not re.search(r"\d\.\d\d%", text), page
+
+
+def test_timeline_names_bots_with_the_badge(mock_data_collector, temp_dir):
+    bot = {**mock_data_collector.authors["Charlie Brown"]}
+    mock_data_collector.authors = {**mock_data_collector.authors, "renovate[bot]": bot}
+    mock_data_collector.get_authors.side_effect = lambda limit=None: [
+        "Alice Smith",
+        "renovate[bot]",
+    ][:limit]
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "authors.html"), encoding="utf-8") as f:
+        html = f.read()
+    assert (
+        '<span class="timeline-name">renovate '
+        '<span class="badge" title="renovate[bot]">bot</span></span>'
+    ) in html
+    assert 'aria-label="renovate[bot]:' in html  # screen readers still get the full name

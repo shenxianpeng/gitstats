@@ -921,7 +921,7 @@ class HTMLReportCreator(ReportCreator):
             bot = " bot" if is_bot(author) else ""
             rows.append(
                 f'<div class="timeline-row{bot}" role="img" aria-label="{label}">'
-                f'<span class="timeline-name">{name}</span>'
+                f'<span class="timeline-name">{author_html(author)}</span>'
                 f'<span class="timeline-count">{format_int(commits)}</span>'
                 f'<span class="timeline-track">{"".join(marks)}</span></div>'
             )
@@ -2373,9 +2373,14 @@ def is_bot(name: str) -> bool:
 
 
 def author_html(name: str) -> str:
-    """An author's name, HTML-escaped, with a BOT badge for bot accounts."""
-    badge = ' <span class="badge">bot</span>' if is_bot(name) else ""
-    return html.escape(name) + badge
+    """An author's name, HTML-escaped; a bot account shows a BOT badge in place
+    of its "[bot]" suffix, with the full name kept as the badge's tooltip."""
+    if not is_bot(name):
+        return html.escape(name)
+    return (
+        f"{html.escape(name[: -len('[bot]')])} "
+        f'<span class="badge" title="{html.escape(name)}">bot</span>'
+    )
 
 
 def longest_zero_run(values: list[int]) -> tuple[int, int] | None:
