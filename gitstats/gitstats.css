@@ -279,15 +279,15 @@ dd {
 }
 
 /* ===== Stat Tiles (KPI cards) ===== */
-/* stat_tiles_html() sets --cols / --cols-md / --cols-sm to divisors of the
-   tile count, so rows are always full; the 1px gap over the border-colored
-   background draws the lines between tiles. On wide screens a tile is at
-   most 260px wide, so a short row of tiles doesn't stretch across the page. */
+/* stat_tiles_html() sets the columns per screen size (--cols / --cols-md /
+   --cols-sm) and how many columns the last tile spans (--span*), so the grid
+   always ends in a full row, spanning the content width like the tables and
+   charts. The 1px gap over the border-colored background draws the lines
+   between tiles. */
 .stat-tiles {
 	display: grid;
 	grid-template-columns: repeat(var(--cols, 6), minmax(0, 1fr));
 	gap: 1px;
-	max-width: calc(var(--cols, 6) * 260px);
 	margin: 0 0 var(--space-6);
 	background-color: var(--border-color);
 	border: 1px solid var(--border-strong);
@@ -341,16 +341,27 @@ dd {
 	color: var(--danger-color);
 }
 
+.stat-tile:last-child {
+	grid-column: span var(--span, 1);
+}
+
 @media (max-width: 1024px) {
 	.stat-tiles {
 		grid-template-columns: repeat(var(--cols-md, 3), minmax(0, 1fr));
-		max-width: none;
+	}
+
+	.stat-tile:last-child {
+		grid-column: span var(--span-md, 1);
 	}
 }
 
 @media (max-width: 560px) {
 	.stat-tiles {
 		grid-template-columns: repeat(var(--cols-sm, 2), minmax(0, 1fr));
+	}
+
+	.stat-tile:last-child {
+		grid-column: span var(--span-sm, 1);
 	}
 
 	.stat-tile {
@@ -377,21 +388,11 @@ table {
 	margin-bottom: var(--space-4);
 }
 
+/* Data tables span the content width, like the bar tables, so the tables on
+   a page line up instead of stopping wherever their content ends */
 .table-scroll > table {
+	width: 100%;
 	margin-bottom: 0;
-}
-
-/* A table with its chart beside it; the chart wraps below when space runs out */
-.table-with-chart {
-	display: flex;
-	flex-wrap: wrap;
-	gap: var(--space-5);
-	align-items: flex-start;
-}
-
-.chart-pane {
-	flex: 1 1 320px;
-	min-width: 0;
 }
 
 /* ===== Contributor timeline (Authors page) ===== */
@@ -409,6 +410,8 @@ table {
 	/* room for half of the largest mark at the track's right end */
 	--edge: 10px;
 	position: relative;
+	/* its own stacking context, so the grid (z-index -1) sits behind the rows */
+	z-index: 0;
 	min-width: 640px;
 	padding-right: var(--edge);
 	font-size: var(--font-size-sm);
@@ -469,11 +472,23 @@ table {
 
 .timeline-grid {
 	position: absolute;
+	/* behind the rows (see .timeline's z-index), so row lines stay visible */
+	z-index: -1;
 	top: 0;
 	bottom: 0;
 	left: calc(var(--name-w) + var(--count-w) + 2 * var(--col-gap));
 	right: var(--edge);
 	pointer-events: none;
+}
+
+/* The longest stretch without commits, shaded like the charts' gap bands */
+.timeline-gap {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	background-color: var(--surface-color);
+	border-left: 1px dashed var(--border-strong);
+	border-right: 1px dashed var(--border-strong);
 }
 
 .timeline-year {
@@ -816,6 +831,20 @@ tr:hover td {
 		padding: 0 var(--space-4);
 	}
 
+	/* "On this page" stays one row that scrolls sideways, like the nav, instead
+	   of wrapping into a block of buttons */
+	.page-toc {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		scrollbar-width: thin;
+		padding-bottom: var(--space-1);
+	}
+
+	.page-toc > * {
+		flex: none;
+		white-space: nowrap;
+	}
+
 	/* A legend with many series wraps onto several lines; leave room for the plot too */
 	.chart-box.has-legend {
 		min-height: 440px;
@@ -1155,36 +1184,7 @@ details.table-details[open] > summary {
 
 /* ===== Code Ownership ===== */
 /* Lead paragraph above the stat tiles */
-.ownership-summary {
-	max-width: 72ch;
-	margin: var(--space-4) 0;
-}
-
-.ownership-summary p:first-child {
-	margin-top: 0;
-}
-
-.ownership-summary p {
-	color: var(--text-secondary);
-	line-height: 1.6;
-}
-
 /* ===== History ===== */
-/* Lead paragraph above the stat tiles */
-.history-summary {
-	max-width: 72ch;
-	margin: var(--space-4) 0;
-}
-
-.history-summary p:first-child {
-	margin-top: 0;
-}
-
-.history-summary p {
-	color: var(--text-secondary);
-	line-height: 1.6;
-}
-
 /* One row per year, like the rest of the report: hairline separators, no
    boxes. The year and its era sit in a left column, the facts on the right. */
 .history-year {

@@ -138,6 +138,9 @@ class TestGitDataCollectorIntegration:
 
         assert dc.project_name == os.path.basename(os.path.abspath(git_repo))
         assert dc.total_commits > 0
+        # every file at HEAD, for ownership and churn to skip deleted ones
+        assert "utils.py" in dc.head_files
+        assert len(dc.head_files) == dc.total_files
 
     def test_collect_authors(self, git_repo):
         dc = GitDataCollector()
@@ -730,7 +733,7 @@ class TestRunIntegration:
             index = f.read()
         assert 'href="git_repo/index.html"' in index
         assert 'href="git_repo_minimal/index.html"' in index
-        assert "Totals" in index
+        assert '<dl class="stat-tiles"' in index
         # Per-repo pages must not leak into the output root
         assert not os.path.exists(f"{output}/activity.html")
 

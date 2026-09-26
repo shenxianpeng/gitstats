@@ -26,6 +26,7 @@ from gitstats.report_creator import (
     THEME_TOGGLE_BUTTON,
     _classify_eras,
     nav_link,
+    stat_tiles_html,
 )
 from gitstats.utils import format_int, get_version
 
@@ -313,17 +314,29 @@ class AggregateReportCreator:
         active_repos = sum(1 for s in summaries if s.get("commits_last_12mo", 0) > 0)
         total_lines = sum(s.get("total_lines", 0) for s in summaries)
 
-        f.write("<h2>Totals</h2>")
-        f.write('<div class="table-scroll"><table>')
-        f.write(f"<tr><td>Repositories</td><td>{len(summaries)}</td></tr>")
-        f.write(f"<tr><td>Total Commits</td><td>{format_int(total_commits)}</td></tr>")
-        f.write(f"<tr><td>Commits (last 12 mo)</td><td>{format_int(commits_12mo)}</td></tr>")
-        f.write(f"<tr><td>Distinct Authors</td><td>{format_int(len(distinct_authors))}</td></tr>")
+        # Stat tiles, like the top of every repository report
         f.write(
-            f"<tr><td>Active Repositories (12 mo)</td><td>{active_repos} / {len(summaries)}</td></tr>"
+            stat_tiles_html(
+                [
+                    (
+                        "Repositories",
+                        format_int(len(summaries)),
+                        f"{format_int(active_repos)} active in the last 12 months",
+                    ),
+                    (
+                        "Commits",
+                        format_int(total_commits),
+                        f"{format_int(commits_12mo)} in the last 12 months",
+                    ),
+                    (
+                        "Authors",
+                        format_int(len(distinct_authors)),
+                        "distinct, across all repositories",
+                    ),
+                    ("Lines of Code", format_int(total_lines), "all repositories at HEAD"),
+                ]
+            )
         )
-        f.write(f"<tr><td>Lines of Code</td><td>{format_int(total_lines)}</td></tr>")
-        f.write("</table></div>")
 
     @staticmethod
     def _write_repo_table(f: Any, summaries: list[dict[str, Any]]) -> None:

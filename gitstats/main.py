@@ -173,6 +173,9 @@ class DataCollector:
         # code ownership: author -> file path -> number of commits touching it
         self.author_files: dict[str, dict[str, int]] = {}
 
+        # paths of the files at HEAD (ownership and churn skip deleted files)
+        self.head_files: list[str] = []
+
         # evenly sampled commit subjects per year (collected only when AI
         # features are enabled; they ground the AI chronicle narration)
         self.commit_subjects_by_year: dict[int, list[str]] = {}
@@ -615,6 +618,7 @@ class GitDataCollector(DataCollector):
 
             self.total_size += size
             self.total_files += 1
+            self.head_files.append(fullpath)
 
             filename = fullpath.split("/")[-1]  # strip directories
             if filename.find(".") == -1 or filename.rfind(".") == 0:
