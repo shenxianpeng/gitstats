@@ -410,6 +410,8 @@ table {
 	/* room for half of the largest mark at the track's right end */
 	--edge: 10px;
 	position: relative;
+	/* its own stacking context, so the grid (z-index -1) sits behind the rows */
+	z-index: 0;
 	min-width: 640px;
 	padding-right: var(--edge);
 	font-size: var(--font-size-sm);
@@ -470,11 +472,23 @@ table {
 
 .timeline-grid {
 	position: absolute;
+	/* behind the rows (see .timeline's z-index), so row lines stay visible */
+	z-index: -1;
 	top: 0;
 	bottom: 0;
 	left: calc(var(--name-w) + var(--count-w) + 2 * var(--col-gap));
 	right: var(--edge);
 	pointer-events: none;
+}
+
+/* The longest stretch without commits, shaded like the charts' gap bands */
+.timeline-gap {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	background-color: var(--surface-color);
+	border-left: 1px dashed var(--border-strong);
+	border-right: 1px dashed var(--border-strong);
 }
 
 .timeline-year {

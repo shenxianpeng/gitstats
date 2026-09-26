@@ -904,6 +904,16 @@ class HTMLReportCreator(ReportCreator):
             label = str(year) if year % every == 0 else ""
             grid.append(f'<span class="timeline-year" style="left: {pos}">{label}</span>')
 
+        # The longest stretch without commits, shaded like the charts' gap bands
+        quiet = quiet_months(data)
+        if quiet and quiet[0] in index and quiet[1] in index:
+            a, b = index[quiet[0]], index[quiet[1]] + 1
+            grid.insert(
+                0,
+                f'<span class="timeline-gap" style="left: {left(a)}; width: {left(b - a)}" '
+                f'title="No commits {quiet[0]} \u2013 {quiet[1]}"></span>',
+            )
+
         rows = []
         for author in authors:
             active = sorted(per_author[author])
@@ -1054,6 +1064,7 @@ class HTMLReportCreator(ReportCreator):
                 loc_datasets,
                 time_axis=True,
                 highlight=5,
+                annotations=time_gap_annotations(data),
             )
         )
         note = "The top 5 authors are in color, the others in grey."
@@ -1132,6 +1143,13 @@ class HTMLReportCreator(ReportCreator):
                 total += new.get(month, 0)
                 totals.append(total)
                 notes.append(f"+{new[month]} new" if new.get(month) else "")
+            quiet = quiet_months(data)
+            growth_gap = {}
+            if quiet and quiet[0] in growth_months and quiet[1] in growth_months:
+                band = quiet_band(
+                    *quiet, growth_months.index(quiet[0]), growth_months.index(quiet[1])
+                )
+                growth_gap = {"bands": [band]}
             f.write(
                 self._render_chartjs(
                     "chart-contributor-growth",
@@ -1140,6 +1158,7 @@ class HTMLReportCreator(ReportCreator):
                     [{"label": "Contributors", "data": totals, "stepped": True, "notes": notes}],
                     month_axis=True,
                     aspect_ratio=4,
+                    annotations=growth_gap,
                 )
             )
 
@@ -1198,6 +1217,7 @@ class HTMLReportCreator(ReportCreator):
                 fbd_stamps,
                 [{"label": "Files", "data": fbd_values}],
                 time_axis=True,
+                annotations=time_gap_annotations(data),
             )
         )
 
@@ -1329,6 +1349,7 @@ class HTMLReportCreator(ReportCreator):
                 loc_stamps,
                 [{"label": "Lines", "data": loc_values}],
                 time_axis=True,
+                annotations=time_gap_annotations(data),
             )
         )
 
@@ -2061,7 +2082,8 @@ class HTMLReportCreator(ReportCreator):
             plugins_js = f",\n        gsAnnotations: {annotations_json}"
             register_js = "\n    plugins: [chartAnnotations],"
             # headroom so labels above the tallest bar stay inside the chart
-            grace_js = ", grace: '10%'"
+            labels_above = annotations.get("peaks") or annotations.get("values")
+            grace_js = ", grace: '10%'" if labels_above else ""
         else:
             plugins_js = register_js = grace_js = ""
 
@@ -2525,6 +2547,48 @@ def gap_annotations(labels: list[Any], values: list[int], min_gap: int) -> dict[
             }
         ],
         "peaks": peaks,
+    }
+
+
+def quiet_months(data: Any, min_months: int = 12) -> tuple[str, str] | None:
+    """First and last "YYYY-MM" of the longest stretch without commits, when it
+    lasts at least ``min_months`` (the monthly chart's threshold), else None."""
+    by_month = getattr(data, "commits_by_month", None)
+    if not isinstance(by_month, dict) or not by_month:
+        return None
+    months = month_range(by_month)
+    gap = longest_zero_run([by_month.get(m, 0) for m in months])
+    if gap is None or gap[1] - gap[0] + 1 < min_months:
+        return None
+    return months[gap[0]], months[gap[1]]
+
+
+def quiet_band(first: str, last: str, start: Any, end: Any) -> dict[str, Any]:
+    """A gsAnnotations band from ``start`` to ``end`` captioned with the quiet months."""
+    return {
+        "from": start,
+        "to": end,
+        "text": f"No commits {first} \u2013 {last}",
+        "short": "no commits",
+    }
+
+
+def time_gap_annotations(data: Any) -> dict[str, Any]:
+    """Annotations for a time-axis chart: the longest stretch without commits,
+    shaded from its first month's first day to the day after its last month
+    (timestamps in milliseconds, like the chart's x values)."""
+    quiet = quiet_months(data)
+    if quiet is None:
+        return {}
+    first, last = quiet
+    year, month = map(int, first.split("-"))
+    start = datetime.datetime(year, month, 1)
+    year, month = map(int, last.split("-"))
+    end = datetime.datetime(year + month // 12, month % 12 + 1, 1)
+    return {
+        "bands": [
+            quiet_band(first, last, int(start.timestamp() * 1000), int(end.timestamp() * 1000))
+        ]
     }
 
 

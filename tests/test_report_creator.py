@@ -1,5 +1,6 @@
 """Tests for gitstats.report_creator – HTML generation, helpers, chart rendering."""
 
+import datetime
 import os
 import re
 from io import StringIO
@@ -21,6 +22,7 @@ from gitstats.report_creator import (
     longest_zero_run,
     month_range,
     parse_chronicle,
+    quiet_months,
     stat_tiles_html,
 )
 
@@ -325,7 +327,13 @@ def test_render_chartjs_annotations():
         'gsAnnotations: {"bands": [{"from": 1, "to": 1, "text": "gap", "short": ""}], "peaks": []}'
         in result
     )
-    assert "grace: '10%'" in result
+    # a band alone needs no headroom; labels above the bars do
+    assert "grace" not in result
+    peaks = {**ann, "peaks": [{"index": 2, "text": "C · 2"}]}
+    labelled = creator._render_chartjs(
+        "c-peaks", "bar", ["A", "B", "C"], [{"label": "C", "data": [1, 0, 2]}], annotations=peaks
+    )
+    assert "grace: '10%'" in labelled
     plain = creator._render_chartjs("c-plain", "bar", ["A"], [{"label": "C", "data": [1]}])
     assert "chartAnnotations" not in plain
     assert "grace" not in plain
@@ -2056,3 +2064,42 @@ def test_stat_tiles_span_the_content_width():
     rule = css[css.index(".stat-tiles {") :]
     assert "max-width" not in rule[: rule.index("}")]
     assert "grid-column: span var(--span-sm, 1);" in css
+
+
+def test_quiet_stretch_is_shaded_on_line_charts_and_timeline(mock_data_collector, temp_dir):
+    """The longest year+ without commits is shaded on every time chart, not just the bars."""
+    months = {f"2010-{m:02d}": 2 for m in range(1, 13)}
+    months.update({f"2013-{m:02d}": 3 for m in range(1, 13)})
+    mock_data_collector.commits_by_month = months
+    mock_data_collector.author_of_month = {m: {"Alice Smith": n} for m, n in months.items()}
+    mock_data_collector.new_contributors_by_month = {"2010-01": 1, "2013-06": 1}
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+
+    def page(name):
+        with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
+            return f.read()
+
+    start = int(datetime.datetime(2011, 1, 1).timestamp() * 1000)
+    end = int(datetime.datetime(2013, 1, 1).timestamp() * 1000)
+    band = f'"bands": [{{"from": {start}, "to": {end}, "text": "No commits 2011-01 \\u2013 2012-12"'
+    for name, chart in (
+        ("files.html", "chart-files-by-date"),
+        ("lines.html", "chart-lines-of-code"),
+        ("authors.html", "chart-loc-by-author"),
+    ):
+        html = page(name)
+        script = html[html.index(f'id="{chart}"') :]
+        assert band in script[: script.index("</script>")], chart
+    authors = page("authors.html")
+    growth = authors[authors.index('id="chart-contributor-growth"') :]
+    growth = growth[: growth.index("</script>")]
+    # 2010-01 .. 2013-12 by month: the quiet stretch is indexes 12..35
+    assert '"bands": [{"from": 12, "to": 35, "text": "No commits 2011-01' in growth
+    assert '<span class="timeline-gap" style="left: 25.000%; width: 50.000%" ' in authors
+
+
+def test_quiet_months_needs_a_year():
+    class Data:
+        commits_by_month = {"2020-01": 1, "2020-06": 1}  # five empty months only
+
+    assert quiet_months(Data()) is None
