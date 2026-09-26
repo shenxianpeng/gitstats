@@ -7,7 +7,7 @@
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.6.5.post1.dev12">
+	<meta name="generator" content="GitStats 2.6.5.post1.dev13">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -97,6 +97,7 @@
 		const bar = getCSSVar('--bar-color');
 		chart.data.datasets.forEach(function(ds) {
 			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
 			if (ds.series) {
 				const color = getCSSVar('--series-' + ds.series);
 				ds.borderColor = color;
@@ -252,7 +253,7 @@
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>gitstats</h1><p class="page-meta">2007-07-30 &rarr; 2026-09-26 &middot; generated 2026-09-26 05:18:40 in 1 s &middot; gitstats 2.6.5.post1.dev12, git version 2.55.0</p><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">559</dd><dd class="stat-note"><span class="nowrap">2.4 per active day</span>&nbsp;&middot; <span class="nowrap">0.1 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">40</dd><dd class="stat-note">14.0 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">17,807</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+27,882</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−10,075</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">62</dd><dd class="stat-note">13 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">229</dd><dd class="stat-note"><span class="nowrap">of 6,998 days</span>&nbsp;&middot; <span class="nowrap">3.27%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">6 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
+            <h1>gitstats</h1><p class="page-meta">2007-07-30 &rarr; 2026-09-26 &middot; generated 2026-09-26 06:43:22 in 1 s &middot; gitstats 2.6.5.post1.dev13, git version 2.55.0</p><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">560</dd><dd class="stat-note"><span class="nowrap">2.4 per active day</span>&nbsp;&middot; <span class="nowrap">0.1 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">40</dd><dd class="stat-note">14.0 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">18,458</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+28,835</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−10,377</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">62</dd><dd class="stat-note">13 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">229</dd><dd class="stat-note"><span class="nowrap">of 6,998 days</span>&nbsp;&middot; <span class="nowrap">3.3%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">6 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
 <h2 id="commits_per_year"><a href="#commits_per_year">Commits per year</a></h2>
 
 <div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly"></canvas></div>
@@ -266,17 +267,17 @@
     plugins: [chartAnnotations],
     data: {
       labels: labels,
-      datasets: [{"label": "Commits", "data": [107, 29, 45, 36, 28, 17, 11, 19, 2, 0, 0, 0, 0, 0, 0, 0, 0, 68, 90, 107], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+      datasets: [{"label": "Commits", "data": [107, 29, 45, 36, 28, 17, 11, 19, 2, 0, 0, 0, 0, 0, 0, 0, 0, 68, 90, 108], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        gsAnnotations: {"bands": [{"from": 9, "to": 16, "text": "No commits 2016 \u2013 2023", "short": "no commits"}], "peaks": [{"index": 0, "text": "2007 \u00b7 107"}, {"index": 19, "text": "2026 \u00b7 107"}]}
+        gsAnnotations: {"bands": [{"from": 9, "to": 16, "text": "No commits 2016 \u2013 2023", "short": "no commits"}], "peaks": [{"index": 0, "text": "2007 \u00b7 107"}, {"index": 19, "text": "2026 \u00b7 108"}]}
       },
       scales: {
-        x: { ticks: { maxRotation: 0 } },
+        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
         y: { beginAtZero: true, grace: '10%', ticks: { precision: 0 } }
       }
     }
@@ -286,7 +287,7 @@
 <p class="visually-hidden">No commits from 2016 to 2023.</p><p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p><div class="two-columns"><section>
 <h2 id="top_contributors"><a href="#top_contributors">Top contributors</a></h2>
 
-<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>Heikki Hokkanen</td><td class="num">241</td><td class="num">43.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>Xianpeng Shen</td><td class="num">211</td><td class="num">37.7%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 87.6%"></span></span></td></tr><tr><td>dependabot[bot] <span class="badge">bot</span></td><td class="num">27</td><td class="num">4.8%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 11.2%"></span></span></td></tr><tr><td>Copilot</td><td class="num">9</td><td class="num">1.6%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.7%"></span></span></td></tr><tr><td>Devraj Pal</td><td class="num">8</td><td class="num">1.4%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.3%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 40 authors &rarr;</a></p></section><section>
+<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>Heikki Hokkanen</td><td class="num">241</td><td class="num">43.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>Xianpeng Shen</td><td class="num">212</td><td class="num">37.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 88.0%"></span></span></td></tr><tr><td>dependabot <span class="badge" title="dependabot[bot]">bot</span></td><td class="num">27</td><td class="num">4.8%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 11.2%"></span></span></td></tr><tr><td>Copilot</td><td class="num">9</td><td class="num">1.6%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.7%"></span></span></td></tr><tr><td>Devraj Pal</td><td class="num">8</td><td class="num">1.4%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.3%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 40 authors &rarr;</a></p></section><section>
 <h2 id="latest_releases"><a href="#latest_releases">Latest releases</a></h2>
 
 <div class="table-scroll"><table class="share-table"><tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr><tr><td class="nowrap">v2.6.5</td><td class="nowrap">2026-09-22</td><td class="num">1</td><td>Devraj Pal</td></tr><tr><td class="nowrap">v2.6.4</td><td class="nowrap">2026-09-22</td><td class="num">2</td><td>Devraj Pal</td></tr><tr><td class="nowrap">v2.6.3</td><td class="nowrap">2026-09-21</td><td class="num">5</td><td>Xianpeng Shen, Devraj Pal</td></tr><tr><td class="nowrap">v2.6.2</td><td class="nowrap">2026-09-18</td><td class="num">4</td><td>Devraj Pal, Xianpeng Shen</td></tr><tr><td class="nowrap">v2.6.1</td><td class="nowrap">2026-09-15</td><td class="num">3</td><td>Xianpeng Shen, Devraj Pal</td></tr></table></div><p class="more-link"><a href="tags.html">All 45 tags &rarr;</a></p></section></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
