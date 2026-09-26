@@ -2166,3 +2166,14 @@ def test_bar_charts_drop_redundant_lines():
         "v", "bar", ["a", "b"], [{"label": "C", "data": [1, 2]}], annotations={"values": True}
     )
     assert "y: { display: false, beginAtZero: true, grace: '10%' }" in valued
+
+
+def test_on_this_page_scrolls_sideways_on_phones():
+    css_path = os.path.join(os.path.dirname(__file__), "..", "gitstats", "gitstats.css")
+    with open(css_path, encoding="utf-8") as f:
+        css = f.read()
+    phones = css[css.index("@media (max-width: 768px) {") :]
+    rule = phones[phones.index(".page-toc {") :]
+    rule = rule[: rule.index("}")]
+    assert "flex-wrap: nowrap;" in rule
+    assert "overflow-x: auto;" in rule

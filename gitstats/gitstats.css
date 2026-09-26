@@ -831,6 +831,20 @@ tr:hover td {
 		padding: 0 var(--space-4);
 	}
 
+	/* "On this page" stays one row that scrolls sideways, like the nav, instead
+	   of wrapping into a block of buttons */
+	.page-toc {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		scrollbar-width: thin;
+		padding-bottom: var(--space-1);
+	}
+
+	.page-toc > * {
+		flex: none;
+		white-space: nowrap;
+	}
+
 	/* A legend with many series wraps onto several lines; leave room for the plot too */
 	.chart-box.has-legend {
 		min-height: 440px;
