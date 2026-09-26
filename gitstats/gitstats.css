@@ -1145,36 +1145,7 @@ details.table-details[open] > summary {
 
 /* ===== Code Ownership ===== */
 /* Lead paragraph above the stat tiles */
-.ownership-summary {
-	max-width: 72ch;
-	margin: var(--space-4) 0;
-}
-
-.ownership-summary p:first-child {
-	margin-top: 0;
-}
-
-.ownership-summary p {
-	color: var(--text-secondary);
-	line-height: 1.6;
-}
-
 /* ===== History ===== */
-/* Lead paragraph above the stat tiles */
-.history-summary {
-	max-width: 72ch;
-	margin: var(--space-4) 0;
-}
-
-.history-summary p:first-child {
-	margin-top: 0;
-}
-
-.history-summary p {
-	color: var(--text-secondary);
-	line-height: 1.6;
-}
-
 /* One row per year, like the rest of the report: hairline separators, no
    boxes. The year and its era sit in a left column, the facts on the right. */
 .history-year {

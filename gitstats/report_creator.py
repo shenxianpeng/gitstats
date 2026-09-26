@@ -552,21 +552,31 @@ class HTMLReportCreator(ReportCreator):
     )
 
     def _write_activity_intro(self, f, data) -> None:
-        """A one-line summary of the page's numbers, then links to its sections."""
+        """The page's headline numbers as stat tiles, then links to its sections."""
         full_days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
         streak = data.get_longest_streak()
         hours = data.get_activity_by_hour_of_day()
         days = data.get_activity_by_day_of_week()
-        parts = [
-            f"{format_int(data.get_total_commits())} commits",
-            f"{format_int(len(data.get_active_days()))} active days",
-            f"longest streak {streak} day{'' if streak == 1 else 's'}",
+        active = len(data.get_active_days())
+        tiles = [
+            (
+                "Commits",
+                format_int(data.get_total_commits()),
+                f"on {format_int(active)} active day{'' if active == 1 else 's'}",
+            ),
+            (
+                "Longest Streak",
+                f"{streak} day{'' if streak == 1 else 's'}",
+                "consecutive active days",
+            ),
         ]
         if hours:
-            parts.append(f"busiest hour {max(hours, key=lambda h: (hours[h], -h)):02d}:00")
+            hour = max(hours, key=lambda h: (hours[h], -h))
+            tiles.append(("Busiest Hour", f"{hour:02d}:00", f"{format_int(hours[hour])} commits"))
         if days:
-            parts.append(f"busiest day {full_days[max(days, key=lambda d: (days[d], -d))]}")
-        f.write('<p class="page-meta">' + " &middot; ".join(parts) + "</p>")
+            day = max(days, key=lambda d: (days[d], -d))
+            tiles.append(("Busiest Day", full_days[day], f"{format_int(days[day])} commits"))
+        f.write(stat_tiles_html(tiles))
         links = "".join(
             f'<a href="#{html_linkify(title)}">{label}</a>'
             for title, label in self.ACTIVITY_SECTIONS
@@ -941,18 +951,33 @@ class HTMLReportCreator(ReportCreator):
         )
 
     def _authors_summary_html(self, data: Any) -> str:
-        """One line under the Authors heading: how many, how concentrated, how many bots."""
+        """Stat tiles under the Authors heading: how many, how many are still active or
+        new (in the 12 months up to the last commit), and how concentrated the work is."""
         everyone = data.get_authors()
-        parts = [f"{format_int(len(everyone))} author{'' if len(everyone) == 1 else 's'}"]
+        bots = sum(1 for a in everyone if is_bot(a))
+        tiles = [
+            (
+                "Authors",
+                format_int(len(everyone)),
+                f"incl. {bots} bot account{'' if bots == 1 else 's'}"
+                if bots
+                else "no bot accounts",
+            )
+        ]
+        last = data.get_last_commit_date()
+        if isinstance(last, datetime.datetime):
+            cutoff = (last - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
+            infos = [data.get_author_info(a) for a in everyone]
+            active = sum(1 for i in infos if str(i.get("date_last", "")) >= cutoff)
+            new = sum(1 for i in infos if str(i.get("date_first", "")) >= cutoff)
+            tiles.append(("Active Authors", format_int(active), "committed in the last 12 months"))
+            tiles.append(("New Authors", format_int(new), "first commit in the last 12 months"))
         top = everyone[:2]
         if top:
             share = sum(data.get_author_info(a)["commits_frac"] for a in top)
-            who = "top author" if len(top) == 1 else "top 2"
-            parts.append(f"{who} wrote {share:.1f}% of commits")
-        bots = sum(1 for a in everyone if is_bot(a))
-        if bots:
-            parts.append(f"{bots} bot account{'' if bots == 1 else 's'}")
-        return '<p class="page-meta">' + " &middot; ".join(parts) + "</p>"
+            label = "Top Author" if len(top) == 1 else "Top 2 Authors"
+            tiles.append((label, f"{share:.1f}%", "of all commits"))
+        return stat_tiles_html(tiles)
 
     def create_authors_html(self, data: Any, path: str) -> None:
         ###
@@ -1421,9 +1446,9 @@ class HTMLReportCreator(ReportCreator):
 
         if not ownership["files"]:
             f.write(
-                '<div class="ownership-summary"><p>No ownership data available. '
+                '<p class="section-note">No ownership data available. '
                 "Ownership is derived from which files each author changes; try "
-                "analyzing a repository with commit history.</p></div>"
+                "analyzing a repository with commit history.</p>"
             )
             self.print_footer(f)
             f.write("</body></html>")
@@ -1436,11 +1461,10 @@ class HTMLReportCreator(ReportCreator):
 
         # Summary
         f.write(
-            '<div class="ownership-summary">'
-            "<p>Ownership is measured by how many commits each author made to each "
-            "file in the current tree. It highlights <strong>bus-factor risk</strong> (files only one "
-            "person has ever touched) and where knowledge is concentrated.</p>"
-            "</div>"
+            '<p class="section-note">'
+            "Ownership is measured by how many commits each author made to each "
+            "file in the current tree. It highlights <strong>bus-factor risk</strong> "
+            "(files only one person has ever touched) and where knowledge is concentrated.</p>"
         )
         f.write(
             stat_tiles_html(
@@ -1596,8 +1620,8 @@ class HTMLReportCreator(ReportCreator):
 
         if not years:
             f.write(
-                '<div class="history-summary"><p>No history to tell yet — '
-                "this repository has no commits in the analyzed range.</p></div>"
+                '<p class="section-note">No history to tell yet — '
+                "this repository has no commits in the analyzed range.</p>"
             )
             self.print_footer(f)
             f.write("</body></html>")
@@ -1608,11 +1632,10 @@ class HTMLReportCreator(ReportCreator):
         peak_commits = next(y["commits"] for y in years if y["year"] == history["peak_year"])
         release_years = [y["year"] for y in years if y["releases"]]
         f.write(
-            '<div class="history-summary">'
-            "<p>The project's life, one year at a time, told from the commit "
+            '<p class="section-note">'
+            "The project's life, one year at a time, told from the commit "
             "record: how activity rose and fell against the project's own "
             "baseline, who arrived when, and what was released.</p>"
-            "</div>"
         )
         f.write(
             stat_tiles_html(

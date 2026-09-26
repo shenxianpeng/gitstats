@@ -834,11 +834,17 @@ def test_activity_summary_and_section_links(mock_data_collector, temp_dir):
     with open(f"{temp_dir}/activity.html", encoding="utf-8") as f:
         html = f.read()
 
-    # 50 commits, 4 active days, streak 4, busiest hour 14 (15 commits), busiest day Wed (12)
-    assert (
-        '<h1>Activity</h1><p class="page-meta">50 commits &middot; 4 active days &middot; '
-        "longest streak 4 days &middot; busiest hour 14:00 &middot; busiest day Wednesday</p>"
-    ) in html
+    # 50 commits, 4 active days, streak 4, busiest hour 14 (15 commits), busiest day Wed (12),
+    # as stat tiles right under the heading like every other page
+    assert '<h1>Activity</h1><dl class="stat-tiles"' in html
+    for tile in (
+        '<dt>Commits</dt><dd class="stat-value">50</dd><dd class="stat-note">on 4 active days</dd>',
+        '<dt>Longest Streak</dt><dd class="stat-value">4 days</dd>',
+        '<dt>Busiest Hour</dt><dd class="stat-value">14:00</dd><dd class="stat-note">15 commits</dd>',
+        '<dt>Busiest Day</dt><dd class="stat-value">Wednesday</dd>',
+    ):
+        assert tile in html, tile
+    assert 'class="page-meta"' not in html
     # Every "On this page" link points at a section heading on the page
     toc = re.search(r'<nav class="page-toc" aria-label="On this page">(.*?)</nav>', html).group(1)
     targets = re.findall(r'href="#([^"]+)"', toc)
@@ -1392,11 +1398,16 @@ def test_authors_summary_and_folded_tables(mock_data_collector, temp_dir):
     with open(f"{temp_dir}/authors.html", encoding="utf-8") as f:
         html = f.read()
 
-    # 3 authors; Alice (60%) and Bob (30%) wrote 90% of commits; no bots
-    assert (
-        '<h1>Authors</h1><p class="page-meta">3 authors &middot; top 2 wrote 90.0% of commits</p>'
-        in html
-    )
+    # 3 authors, all active and new in the 12 months to 2023-04-01; Alice (60%) and
+    # Bob (30%) wrote 90% of commits; no bots
+    assert '<h1>Authors</h1><dl class="stat-tiles"' in html
+    for tile in (
+        '<dt>Authors</dt><dd class="stat-value">3</dd><dd class="stat-note">no bot accounts</dd>',
+        '<dt>Active Authors</dt><dd class="stat-value">3</dd>',
+        '<dt>New Authors</dt><dd class="stat-value">3</dd>',
+        '<dt>Top 2 Authors</dt><dd class="stat-value">90.0%</dd>',
+    ):
+        assert tile in html, tile
     # One section for the top author of each year (shown) and month (folded away);
     # the old Author of Month / Year anchors still land on it
     section = html[html.index('id="author_of_month"') : html.index('<h2 id="commits_by_domain"')]
@@ -1418,9 +1429,17 @@ def test_authors_summary_counts_bots(mock_data_collector):
         "renovate[bot]",
         "dependabot[bot]",
     ][:limit]
-    mock_data_collector.get_author_info.side_effect = lambda a: {"commits_frac": 40.0}
+    mock_data_collector.get_author_info.side_effect = lambda a: {
+        "commits_frac": 40.0,
+        "date_first": "2021-01-01",
+        "date_last": "2023-03-01",
+    }
     summary = HTMLReportCreator()._authors_summary_html(mock_data_collector)
-    assert "3 authors &middot; top 2 wrote 80.0% of commits &middot; 2 bot accounts" in summary
+    assert '<dd class="stat-value">3</dd><dd class="stat-note">incl. 2 bot accounts</dd>' in summary
+    # active since 2022-04-01 (a year before the last commit), none new
+    assert '<dt>Active Authors</dt><dd class="stat-value">3</dd>' in summary
+    assert '<dt>New Authors</dt><dd class="stat-value">0</dd>' in summary
+    assert '<dt>Top 2 Authors</dt><dd class="stat-value">80.0%</dd>' in summary
 
 
 def test_small_formatting_fixes(mock_data_collector, temp_dir):
@@ -2012,3 +2031,15 @@ def test_bus_factor_shows_ten_and_folds_the_rest(mock_data_collector, temp_dir):
         '<details class="table-details"><summary>Table: all 15 single-owner files</summary>'
         '<div class="table-scroll"><table class="sortable" id="ownership-busfactor-all">'
     ) in html
+
+
+def test_every_page_opens_the_same_way(mock_data_collector, temp_dir):
+    """h1, then an optional one-paragraph note, then stat tiles; no page-meta line
+    except the overview's report period."""
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    for page in ("activity", "authors", "files", "lines", "tags", "ownership", "history"):
+        with open(os.path.join(temp_dir, f"{page}.html"), encoding="utf-8") as f:
+            html = f.read()
+        after_h1 = html[html.index("</h1>") + len("</h1>") :]
+        assert re.match(r'(<p class="section-note">.*?</p>)?<dl class="stat-tiles"', after_h1), page
+        assert 'class="page-meta"' not in html, page
