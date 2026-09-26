@@ -2151,3 +2151,18 @@ def test_lines_per_author_heading_keeps_its_old_anchor(mock_data_collector, temp
     old = html.index('<span id="cumulated_added_lines_of_code_per_author"></span>')
     assert html.index('<h2 id="cumulative_lines_added_per_author">') > old
     assert "Cumulated" not in html
+
+
+def test_bar_charts_drop_redundant_lines():
+    creator = HTMLReportCreator()
+    bars = creator._render_chartjs("b", "bar", ["a", "b"], [{"label": "C", "data": [1, 2]}])
+    # no gridline per category bar; the y gridlines stay
+    assert "x: { ticks: { maxRotation: 0 }, grid: { display: false } }" in bars
+    assert "y: { beginAtZero: true, ticks: { precision: 0 } }" in bars
+    line = creator._render_chartjs("l", "line", ["a", "b"], [{"label": "C", "data": [1, 2]}])
+    assert "grid: { display: false }" not in line
+    # a bar chart labelled with every value hides the y-axis that would repeat them
+    valued = creator._render_chartjs(
+        "v", "bar", ["a", "b"], [{"label": "C", "data": [1, 2]}], annotations={"values": True}
+    )
+    assert "y: { display: false, beginAtZero: true, grace: '10%' }" in valued

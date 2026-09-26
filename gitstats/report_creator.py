@@ -2055,10 +2055,11 @@ class HTMLReportCreator(ReportCreator):
                     "{ ticks: { autoSkip: false, maxRotation: 0, callback: monthAxisTick }, "
                     "grid: { color: monthAxisGrid } }"
                 )
-            elif x_ticks_rotate:
-                x_scale_js = "{ ticks: { maxRotation: 45, minRotation: 45 } }"
             else:
-                x_scale_js = "{ ticks: { maxRotation: 0 } }"
+                x_ticks = "maxRotation: 45, minRotation: 45" if x_ticks_rotate else "maxRotation: 0"
+                # each bar is its own category: a gridline per bar is only noise
+                x_grid = ", grid: { display: false }" if chart_type == "bar" else ""
+                x_scale_js = f"{{ ticks: {{ {x_ticks} }}{x_grid} }}"
             tooltip_callbacks = []
             if tooltip_share:
                 tooltip_callbacks.append(
@@ -2097,6 +2098,11 @@ class HTMLReportCreator(ReportCreator):
         else:
             plugins_js = register_js = grace_js = ""
 
+        y_scale_js = f"{{ beginAtZero: true{grace_js}, ticks: {{ precision: 0 }} }}"
+        if annotations and annotations.get("values"):
+            # every bar is labelled with its value, so the y-axis would only repeat them
+            y_scale_js = f"{{ display: false, beginAtZero: true{grace_js} }}"
+
         # The chart fills a .chart-box that keeps aspect_ratio on wide screens
         # but has a minimum height, so phones don't get a flattened plot.
         box_class = "chart-box has-legend" if is_multi else "chart-box"
@@ -2119,7 +2125,7 @@ class HTMLReportCreator(ReportCreator):
       }},
       scales: {{
         x: {x_scale_js},
-        y: {{ beginAtZero: true{grace_js}, ticks: {{ precision: 0 }} }}
+        y: {y_scale_js}
       }}{f", datasets: {{ bar: {{ maxBarThickness: {max_bar_thickness} }} }}" if max_bar_thickness else ""}
     }}
   }});
