@@ -279,15 +279,15 @@ dd {
 }
 
 /* ===== Stat Tiles (KPI cards) ===== */
-/* stat_tiles_html() sets --cols / --cols-md / --cols-sm to divisors of the
-   tile count, so rows are always full; the 1px gap over the border-colored
-   background draws the lines between tiles. On wide screens a tile is at
-   most 260px wide, so a short row of tiles doesn't stretch across the page. */
+/* stat_tiles_html() sets the columns per screen size (--cols / --cols-md /
+   --cols-sm) and how many columns the last tile spans (--span*), so the grid
+   always ends in a full row, spanning the content width like the tables and
+   charts. The 1px gap over the border-colored background draws the lines
+   between tiles. */
 .stat-tiles {
 	display: grid;
 	grid-template-columns: repeat(var(--cols, 6), minmax(0, 1fr));
 	gap: 1px;
-	max-width: calc(var(--cols, 6) * 260px);
 	margin: 0 0 var(--space-6);
 	background-color: var(--border-color);
 	border: 1px solid var(--border-strong);
@@ -341,16 +341,27 @@ dd {
 	color: var(--danger-color);
 }
 
+.stat-tile:last-child {
+	grid-column: span var(--span, 1);
+}
+
 @media (max-width: 1024px) {
 	.stat-tiles {
 		grid-template-columns: repeat(var(--cols-md, 3), minmax(0, 1fr));
-		max-width: none;
+	}
+
+	.stat-tile:last-child {
+		grid-column: span var(--span-md, 1);
 	}
 }
 
 @media (max-width: 560px) {
 	.stat-tiles {
 		grid-template-columns: repeat(var(--cols-sm, 2), minmax(0, 1fr));
+	}
+
+	.stat-tile:last-child {
+		grid-column: span var(--span-sm, 1);
 	}
 
 	.stat-tile {

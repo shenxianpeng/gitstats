@@ -2553,14 +2553,21 @@ def stat_tiles_html(tiles: list[tuple[str, str, str]]) -> str:
     as HTML, so callers escape any user-controlled text. An empty note is
     left out.
 
-    Column counts for wide, medium (<=1024px) and narrow (<=560px) screens
-    are the largest divisors of the tile count up to 6, 3 and 2, so every
-    row is full: 6 tiles -> 6/3/2, 3 -> 3/3/1, 2 -> 2/2/2.
+    Wide, medium (<=1024px) and narrow (<=560px) screens get up to 6, 3 and
+    2 columns: the largest divisor of the tile count when that gives at least
+    two columns (6 tiles -> 6/3/2, 4 -> 4/2/2), otherwise as many columns as
+    fit with the last tile spanning the rest of its row (3 tiles on a phone:
+    two, then one full width) instead of stacking one per row.
     """
 
-    def columns(limit: int) -> int:
+    def columns(limit: int) -> tuple[int, int]:
+        """(columns, span of the last tile) for up to ``limit`` columns."""
         n = max(len(tiles), 1)
-        return next(c for c in range(min(n, limit), 0, -1) if n % c == 0)
+        cols = next(c for c in range(min(n, limit), 0, -1) if n % c == 0)
+        if cols > 1 or n == 1:
+            return cols, 1
+        cols = min(n, limit)
+        return cols, cols - n % cols + 1 if n % cols else 1
 
     def phrases(note: str) -> str:
         # a note wraps after a " · " between its phrases, never inside one ("per active / day")
@@ -2577,7 +2584,10 @@ def stat_tiles_html(tiles: list[tuple[str, str, str]]) -> str:
         + "</div>"
         for label, value, note in tiles
     )
-    style = f"--cols: {columns(6)}; --cols-md: {columns(3)}; --cols-sm: {columns(2)}"
+    style = "; ".join(
+        f"--cols{suffix}: {cols}" + (f"; --span{suffix}: {span}" if span > 1 else "")
+        for suffix, (cols, span) in (("", columns(6)), ("-md", columns(3)), ("-sm", columns(2)))
+    )
     return f'<dl class="stat-tiles" style="{style}">{items}</dl>'
 
 

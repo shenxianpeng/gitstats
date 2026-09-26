@@ -711,7 +711,11 @@ def test_stat_tiles_html():
     "count,columns",
     [
         (6, "--cols: 6; --cols-md: 3; --cols-sm: 2"),
-        (3, "--cols: 3; --cols-md: 3; --cols-sm: 1"),
+        (4, "--cols: 4; --cols-md: 2; --cols-sm: 2"),
+        # three on a phone: two, then the last one full width (not one per row)
+        (3, "--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"),
+        # five on a tablet: three, then two with the last spanning two columns
+        (5, "--cols: 5; --cols-md: 3; --span-md: 2; --cols-sm: 2; --span-sm: 2"),
         (2, "--cols: 2; --cols-md: 2; --cols-sm: 2"),
         (1, "--cols: 1; --cols-md: 1; --cols-sm: 1"),
     ],
@@ -2043,3 +2047,12 @@ def test_every_page_opens_the_same_way(mock_data_collector, temp_dir):
         after_h1 = html[html.index("</h1>") + len("</h1>") :]
         assert re.match(r'(<p class="section-note">.*?</p>)?<dl class="stat-tiles"', after_h1), page
         assert 'class="page-meta"' not in html, page
+
+
+def test_stat_tiles_span_the_content_width():
+    css_path = os.path.join(os.path.dirname(__file__), "..", "gitstats", "gitstats.css")
+    with open(css_path, encoding="utf-8") as f:
+        css = f.read()
+    rule = css[css.index(".stat-tiles {") :]
+    assert "max-width" not in rule[: rule.index("}")]
+    assert "grid-column: span var(--span-sm, 1);" in css
