@@ -1374,8 +1374,8 @@ def test_numeric_columns_are_marked(mock_data_collector, temp_dir):
 
     with open(os.path.join(temp_dir, "files.html"), encoding="utf-8") as f:
         files = f.read()
-    assert '<th class="num">Files (%)</th>' in files
-    assert '<td class="num">10 (40.0%)</td>' in files  # py: 10 of 25 files
+    assert '<th class="num">Files</th><th class="num">Lines</th>' in files
+    assert '<tr><td>py</td><td class="num">10</td>' in files
 
 
 def test_authors_summary_and_folded_tables(mock_data_collector, temp_dir):
@@ -1933,3 +1933,37 @@ def test_data_tables_span_the_content_width():
         css = f.read()
     rule = css[css.index(".table-scroll > table {") :]
     assert "width: 100%;" in rule[: rule.index("}")]
+
+
+def test_extensions_bar_table_ranked_by_lines(mock_data_collector, temp_dir):
+    mock_data_collector.extensions = {
+        "css": {"files": 1, "lines": 100},
+        "py": {"files": 4, "lines": 800},
+        "png": {"files": 3, "lines": 0},
+        "": {"files": 1, "lines": 10},
+    }
+    mock_data_collector.get_total_loc.return_value = 910
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "files.html"), encoding="utf-8") as f:
+        html = f.read()
+    table = html[html.index('id="ext"') :]
+    table = table[: table.index("</table>")]
+    # most lines first; binary files last with dashes and an empty bar
+    assert (
+        table.index(">py<")
+        < table.index(">css<")
+        < table.index("no extension")
+        < table.index(">png<")
+    )
+    assert (
+        '<tr><td>py</td><td class="num">4</td><td class="num">800</td>'
+        '<td class="num">87.9%</td><td class="num">200</td>'
+        '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+        '<span style="width: 100.0%"></span></span></td></tr>'
+    ) in table
+    assert (
+        '<tr><td>png</td><td class="num">3</td><td class="num">—</td><td class="num">—</td>'
+        '<td class="num">—</td><td class="share-cell"><span class="share-bar" '
+        'aria-hidden="true"></span></td></tr>'
+    ) in table
+    assert "<td><em>no extension</em></td>" in table

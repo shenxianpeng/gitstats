@@ -1186,29 +1186,38 @@ class HTMLReportCreator(ReportCreator):
             "Files with excluded extensions are not shown; "
             "configure <code>exclude_exts</code> in gitstats.conf.</p>"
         )
-        f.write(
-            '<div class="table-scroll"><table class="sortable" id="ext"><tr><th>Extension</th><th class="num">Files (%)</th><th class="num">Lines (%)</th><th class="num">Lines/file</th></tr>'
+        # A bar table ranked by lines, like the churn and domain tables; binary
+        # files (no lines) show a dash instead of "0 (0.0%)"
+        total_loc = data.get_total_loc()
+        exts = sorted(
+            data.extensions.items(), key=lambda kv: (-kv[1]["lines"], -kv[1]["files"], kv[0])
         )
-
-        for ext in sorted(data.extensions.keys()):
-            files = data.extensions[ext]["files"]
-            lines = data.extensions[ext]["lines"]
-            try:
-                loc_percentage = (100.0 * lines) / data.get_total_loc()
-            except ZeroDivisionError:
-                loc_percentage = 0
-            f.write(
-                '<tr><td>%s</td><td class="num">%s (%.1f%%)</td><td class="num">%s (%.1f%%)</td><td class="num">%s</td></tr>'
-                % (
-                    html.escape(ext),
-                    format_int(files),
-                    (100.0 * files) / data.get_total_files(),
-                    format_int(lines),
-                    loc_percentage,
-                    format_int(lines // files),
+        max_lines = max((info["lines"] for _, info in exts), default=0) or 1
+        rows = []
+        for ext, info in exts:
+            files, lines = info["files"], info["lines"]
+            name = html.escape(ext) if ext else "<em>no extension</em>"
+            if lines:
+                share = f"{100.0 * lines / total_loc:.1f}%" if total_loc else "—"
+                cells = (
+                    f'<td class="num">{format_int(lines)}</td><td class="num">{share}</td>'
+                    f'<td class="num">{format_int(lines // files) if files else "—"}</td>'
                 )
+                bar = f'<span style="width: {100.0 * lines / max_lines:.1f}%"></span>'
+            else:
+                cells = '<td class="num">—</td><td class="num">—</td><td class="num">—</td>'
+                bar = ""
+            rows.append(
+                f'<tr><td>{name}</td><td class="num">{format_int(files)}</td>{cells}'
+                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                f"{bar}</span></td></tr>"
             )
-        f.write("</table></div>")
+        f.write(
+            '<div class="table-scroll"><table class="sortable share-table" id="ext">'
+            '<tr><th>Extension</th><th class="num">Files</th><th class="num">Lines</th>'
+            '<th class="num">Share</th><th class="num">Lines/file</th>'
+            '<th class="unsortable"></th></tr>' + "".join(rows) + "</table></div>"
+        )
 
         # Files :: Code Churn (most frequently changed files)
         if data.file_churn:
