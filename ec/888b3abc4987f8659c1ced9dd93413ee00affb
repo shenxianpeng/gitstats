@@ -1,0 +1,22 @@
+tests/test_report_creator.py
+  s_36d3a463a5505b::t_a9d053ba161c90 2180-2214
+gitstats/report_creator.py
+  s_36d3a463a5505b::t_b236fba3cdea1e 1363-1364
+  s_36d3a463a5505b::t_bb3ea2262826a5 125,1358-1362,1365-1396,1990,2015-2021,2029-2030,2041-2042,2069,2128-2133,2162-2167
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "ec888b3abc4987f8659c1ced9dd93413ee00affb",
+  "prompts": {},
+  "sessions": {
+    "s_36d3a463a5505b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d57d16d-e8d6-4ee3-bed8-3b835be6549d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
