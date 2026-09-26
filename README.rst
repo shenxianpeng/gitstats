@@ -61,7 +61,17 @@
 Example
 -------
 
-``gitstats .`` generates this `gitstats report <https://shenxianpeng.dev/gitstats/index.html>`_.
+``gitstats .`` generates this `gitstats report <https://shenxianpeng.dev/gitstats/index.html>`_:
+
+.. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/report-dark.png#gh-dark-mode-only
+   :alt: The overview page of a gitstats report
+   :width: 100%
+   :target: https://shenxianpeng.dev/gitstats/index.html
+
+.. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/report-light.png#gh-light-mode-only
+   :alt: The overview page of a gitstats report
+   :width: 100%
+   :target: https://shenxianpeng.dev/gitstats/index.html
 
 Check out the `GitStats Gallery <https://shenxianpeng.dev/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly.
 
@@ -263,11 +273,15 @@ Features
 Here is a list of some features of ``gitstats``:
 
 * **General**: headline numbers (commits, authors, lines, files, active days, longest streak), commits per year, top contributors, latest releases.
-* **Activity**: commits by year, year and month, and week; a punch card of day of week by hour of day with daily and hourly totals; month of year; timezone.
-* **Authors**: list of authors (name, commits (%), first commit date, last commit date, age), author of month, author of year.
-* **Files**: file count by date, extensions.
-* **Lines**: line of code by date.
-* **Tags**: tags by date and author.
+* **Activity**: commits by year, month and week; a punch card of day of week by hour of day; month of year; timezones.
+* **Authors**: every author's commits, lines and active span; a contributor timeline; cumulative lines added per author; the top author per year and month; commits by email domain; contributor growth.
+* **Files**: file count over time, extensions ranked by lines, and the most-changed files.
+* **Lines**: lines of code over time, and lines added and removed per month.
+* **Tags**: every tag with its commits and authors.
+* **Code Ownership**: bus-factor risk (files only one person has changed), ownership by author, and the files shared by the most people.
+* **History**: the project's life one year at a time — its peaks, quiet years and revivals, newcomers and releases — with optional AI narration.
+* **Portfolio**: analyze several repositories at once for an aggregate overview.
+* **Readable anywhere**: interactive charts, light and dark themes, and layouts that work on phones; long quiet periods are shaded on every timeline.
 * **Customizable**: config values through ``gitstats.conf``.
 * **Cross-platform**: works on Linux, Windows, and macOS.
 

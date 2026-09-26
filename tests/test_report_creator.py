@@ -2212,3 +2212,11 @@ def test_lines_page_charts_lines_added_and_removed_per_month(mock_data_collector
     # fixture: +300/-100, +600/-200, +900/-300 in 2023-01..03
     assert '"label": "Added", "data": [300, 600, 900]' in chart
     assert '"label": "Removed", "data": [-100, -200, -300]' in chart
+
+
+def test_domain_section_keeps_its_old_anchor(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "authors.html"), encoding="utf-8") as f:
+        html = f.read()
+    old = html.index('<span id="commits_by_domains"></span>')
+    assert html.index('<h2 id="commits_by_domain">') > old
