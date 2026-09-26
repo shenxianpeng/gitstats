@@ -1967,3 +1967,42 @@ def test_extensions_bar_table_ranked_by_lines(mock_data_collector, temp_dir):
         'aria-hidden="true"></span></td></tr>'
     ) in table
     assert "<td><em>no extension</em></td>" in table
+
+
+def test_ownership_and_churn_skip_deleted_files(mock_data_collector, temp_dir):
+    mock_data_collector.head_files = ["main.py", "utils.py", "README.md"]
+    mock_data_collector.author_files = {
+        "Alice Smith": {"main.py": 10, "old_script": 40},
+        "Bob Jones": {"main.py": 5, "utils.py": 8, "README.md": 8},
+    }
+    mock_data_collector.file_churn = {"old_script": 40, "main.py": 15, "utils.py": 8}
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+
+    def page(name):
+        with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
+            return f.read()
+
+    ownership = page("ownership.html")
+    assert "old_script" not in ownership
+    assert '<dd class="stat-value">3</dd><dd class="stat-note">in the current tree</dd>' in (
+        ownership
+    )
+    files = page("files.html")
+    churn = files[files.index('id="churn"') :]
+    assert "old_script" not in churn
+    assert '<td class="path">main.py</td>' in churn
+
+
+def test_bus_factor_shows_ten_and_folds_the_rest(mock_data_collector, temp_dir):
+    mock_data_collector.author_files = {"Alice Smith": {f"f{i:02d}.py": 30 - i for i in range(15)}}
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "ownership.html"), encoding="utf-8") as f:
+        html = f.read()
+    shown = html[html.index('id="ownership-busfactor"') :]
+    shown = shown[: shown.index("</table>")]
+    assert shown.count("<tr>") == 11  # header + the ten most-changed
+    assert "f09.py" in shown and "f10.py" not in shown
+    assert (
+        '<details class="table-details"><summary>Table: all 15 single-owner files</summary>'
+        '<div class="table-scroll"><table class="sortable" id="ownership-busfactor-all">'
+    ) in html

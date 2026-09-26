@@ -138,6 +138,9 @@ class TestGitDataCollectorIntegration:
 
         assert dc.project_name == os.path.basename(os.path.abspath(git_repo))
         assert dc.total_commits > 0
+        # every file at HEAD, for ownership and churn to skip deleted ones
+        assert "utils.py" in dc.head_files
+        assert len(dc.head_files) == dc.total_files
 
     def test_collect_authors(self, git_repo):
         dc = GitDataCollector()

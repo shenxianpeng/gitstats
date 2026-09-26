@@ -1224,10 +1224,20 @@ class HTMLReportCreator(ReportCreator):
             f.write(html_header(2, "Most changed files (code churn)"))
             f.write(
                 '<p class="section-note">'
-                "Files touched most often across all commits. "
+                "Files in the current tree touched most often across all commits. "
                 "High-churn files are hotspots that may benefit from extra review or refactoring.</p>"
             )
-            churn_sorted = sorted(data.file_churn.items(), key=lambda x: x[1], reverse=True)
+            # Only files that still exist: a deleted file is no hotspot to review
+            current = head_files(data)
+            churn_sorted = sorted(
+                (
+                    (path, count)
+                    for path, count in data.file_churn.items()
+                    if current is None or path in current
+                ),
+                key=lambda x: x[1],
+                reverse=True,
+            )
             top_churn = churn_sorted[:25]
             max_churn = max(1, top_churn[0][1]) if top_churn else 1
             # A bar table: the counts used to be shown twice, in a heat-colored
@@ -1401,6 +1411,13 @@ class HTMLReportCreator(ReportCreator):
         author_files = getattr(data, "author_files", {})
         if not isinstance(author_files, dict):
             author_files = {}
+        # Only files that still exist: a deleted file carries no bus-factor risk
+        current = head_files(data)
+        if current is not None:
+            author_files = {
+                author: {p: n for p, n in files.items() if p in current}
+                for author, files in author_files.items()
+            }
         ownership = compute_code_ownership(author_files)
 
         if not ownership["files"]:
@@ -1422,14 +1439,18 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<div class="ownership-summary">'
             "<p>Ownership is measured by how many commits each author made to each "
-            "file. It highlights <strong>bus-factor risk</strong> (files only one "
+            "file in the current tree. It highlights <strong>bus-factor risk</strong> (files only one "
             "person has ever touched) and where knowledge is concentrated.</p>"
             "</div>"
         )
         f.write(
             stat_tiles_html(
                 [
-                    ("Files Tracked", format_int(total), "every file changed in history"),
+                    (
+                        "Files Tracked",
+                        format_int(total),
+                        "in the current tree" if current is not None else "every file changed",
+                    ),
                     (
                         "Single-Owner Files",
                         format_int(single),
@@ -1453,21 +1474,32 @@ class HTMLReportCreator(ReportCreator):
         )
         risk_files = [fs for fs in ownership["files"] if fs["contributors"] == 1]
         if risk_files:
-            f.write(
-                '<div class="table-scroll"><table class="sortable" id="ownership-busfactor">'
-                '<tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr>'
-            )
-            for fs in risk_files[:50]:
-                f.write(
-                    '<tr><td class="path">%s</td><td>%s</td><td class="num">%s</td></tr>'
-                    % (html.escape(fs["path"]), author_html(fs["owner"]), format_int(fs["edits"]))
+
+            def risk_table(table_id: str, rows: list[dict]) -> str:
+                return (
+                    f'<div class="table-scroll"><table class="sortable" id="{table_id}">'
+                    '<tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr>'
+                    + "".join(
+                        f'<tr><td class="path">{html.escape(fs["path"])}</td>'
+                        f"<td>{author_html(fs['owner'])}</td>"
+                        f'<td class="num">{format_int(fs["edits"])}</td></tr>'
+                        for fs in rows
+                    )
+                    + "</table></div>"
                 )
-            f.write("</table></div>")
-            if len(risk_files) > 50:
-                f.write(
-                    '<p class="moreauthors">Showing top 50 of %d single-owner files.</p>'
-                    % len(risk_files)
+
+            # The ten most-changed are shown; the full list (up to 100) is folded away
+            f.write(risk_table("ownership-busfactor", risk_files[:10]))
+            if len(risk_files) > 10:
+                count = len(risk_files)
+                what = (
+                    f"all {format_int(count)} single-owner files"
+                    if count <= 100
+                    else f"the 100 most-changed of {format_int(count)} single-owner files"
                 )
+                f.write(f'<details class="table-details"><summary>Table: {what}</summary>')
+                f.write(risk_table("ownership-busfactor-all", risk_files[:100]))
+                f.write("</details>")
         else:
             f.write("<p>No single-owner files — every file has multiple contributors.</p>")
 
@@ -2408,6 +2440,14 @@ def parse_chronicle(text: str) -> dict[str, Any]:
 def is_bot(name: str) -> bool:
     """Bot accounts are named like ``dependabot[bot]``."""
     return name.endswith("[bot]")
+
+
+def head_files(data: Any) -> set[str] | None:
+    """Paths of the files at HEAD, or None when the data predates head_files."""
+    paths = getattr(data, "head_files", None)
+    if isinstance(paths, (list, tuple, set)) and paths:
+        return set(paths)
+    return None
 
 
 def author_html(name: str) -> str:
