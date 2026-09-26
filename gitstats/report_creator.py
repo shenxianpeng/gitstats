@@ -1617,8 +1617,36 @@ class HTMLReportCreator(ReportCreator):
                 % html.escape(chronicle_text)
             )
 
-        max_commits = max(y["commits"] for y in years)
+        # Runs of dormant years read as one stretch ("2016–2023, 8 years without
+        # commits") instead of a row per empty year; a year the AI narration wrote
+        # a chapter for keeps its own row.
+        def own_row(entry: dict) -> bool:
+            has_chapter = bool(chronicle and chronicle["chapters"].get(entry["year"]))
+            return entry["era"] != "dormant" or entry["commits"] > 0 or has_chapter
+
+        rows: list[list[dict]] = []
         for entry in years:
+            if not own_row(entry) and rows and not own_row(rows[-1][-1]):
+                rows[-1].append(entry)
+            else:
+                rows.append([entry])
+
+        max_commits = max(y["commits"] for y in years)
+        for row in rows:
+            if len(row) > 1:
+                first, last = row[0]["year"], row[-1]["year"]
+                f.write(
+                    '<div class="history-year history-gap">'
+                    '<div class="history-year-head">'
+                    f'<span class="history-year-num">{first}–{last}</span>'
+                    '<span class="history-era history-era-dormant">DORMANT</span>'
+                    f'<span class="history-era-desc">{len(row)} years without commits</span>'
+                    "</div>"
+                    f'<p class="history-facts">No commits from {first} to {last}.</p>'
+                    "</div>"
+                )
+                continue
+            entry = row[0]
             era = entry["era"]
             desc = self._ERA_DESCRIPTIONS.get(era, "")
             bar_pct = round(100.0 * entry["commits"] / max_commits, 1) if max_commits else 0.0
@@ -1661,10 +1689,11 @@ class HTMLReportCreator(ReportCreator):
                 f.write(f'<p class="history-facts">{facts}</p>')
                 if entry["top_author"]:
                     f.write(
-                        '<p class="history-people">Led by <strong>%s</strong> (%s commits)</p>'
+                        '<p class="history-people">Led by <strong>%s</strong> (%s commit%s)</p>'
                         % (
                             html.escape(entry["top_author"]),
                             format_int(entry["top_author_commits"]),
+                            "" if entry["top_author_commits"] == 1 else "s",
                         )
                     )
                 if entry["newcomers"]:

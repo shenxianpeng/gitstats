@@ -1898,3 +1898,30 @@ def test_timeline_names_bots_with_the_badge(mock_data_collector, temp_dir):
         '<span class="badge" title="renovate[bot]">bot</span></span>'
     ) in html
     assert 'aria-label="renovate[bot]:' in html  # screen readers still get the full name
+
+
+def _history_html(data, temp_dir):
+    creator = HTMLReportCreator()
+    creator.data = data
+    creator.title = "t"
+    creator.create_history_html(data, temp_dir)
+    with open(f"{temp_dir}/history.html", encoding="utf-8") as f:
+        return f.read()
+
+
+def test_history_merges_a_run_of_dormant_years(mock_data_collector, temp_dir):
+    mock_data_collector.commits_by_year = {2010: 5, 2014: 1, 2015: 0, 2016: 4}
+    mock_data_collector.author_of_year = {
+        2010: {"Alice Smith": 5},
+        2014: {"Alice Smith": 1},
+        2016: {"Alice Smith": 4},
+    }
+    html = _history_html(mock_data_collector, temp_dir)
+    # 2011-2013 is one row; the single empty 2015 keeps its own
+    assert '<span class="history-year-num">2011–2013</span>' in html
+    assert "3 years without commits" in html
+    assert '<span class="history-year-num">2012</span>' not in html
+    assert '<span class="history-year-num">2015</span>' in html
+    assert html.count("history-gap") == 1
+    # one commit reads "1 commit"
+    assert "(1 commit)</p>" in html
