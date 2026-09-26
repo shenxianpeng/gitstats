@@ -596,7 +596,7 @@ def test_create_index_html(mock_data_collector, temp_dir):
     assert '<span class="stat-removed">−1,000</span> removed' in html
     assert "3 extensions" in html
     assert (
-        '<span class="nowrap">of 120 days</span>&nbsp;&middot; <span class="nowrap">3.33%</span>'
+        '<span class="nowrap">of 120 days</span>&nbsp;&middot; <span class="nowrap">3.3%</span>'
         in html
     )
     assert '<dt>Longest Streak</dt><dd class="stat-value">4 days</dd>' in html
@@ -1358,7 +1358,7 @@ def test_numeric_columns_are_marked(mock_data_collector, temp_dir):
         authors = f.read()
     # Alice Smith: 30 commits (60%) with a full-width share bar, +2,000 / -500
     assert (
-        '<tr><td>Alice Smith</td><td class="num">30 (60.00%)'
+        '<tr><td>Alice Smith</td><td class="num">30 (60.0%)'
         '<span class="share-bar share-bar-inline" aria-hidden="true">'
         '<span style="width: 100.0%"></span></span></td>'
         '<td class="num stat-added">2,000</td><td class="num stat-removed">500</td>'
@@ -1372,7 +1372,7 @@ def test_numeric_columns_are_marked(mock_data_collector, temp_dir):
     with open(os.path.join(temp_dir, "files.html"), encoding="utf-8") as f:
         files = f.read()
     assert '<th class="num">Files (%)</th>' in files
-    assert '<td class="num">10 (40.00%)</td>' in files  # py: 10 of 25 files
+    assert '<td class="num">10 (40.0%)</td>' in files  # py: 10 of 25 files
 
 
 def test_authors_summary_and_folded_tables(mock_data_collector, temp_dir):
@@ -1869,3 +1869,12 @@ def test_numbers_have_thousands_separators_everywhere(mock_data_collector, temp_
     assert "34,567" in page("files.html")  # extensions
     assert "3,456" in page("files.html")  # lines per file
     assert "+12,345 / &minus;" in page("history.html")
+
+
+def test_percentages_have_one_decimal(mock_data_collector, temp_dir):
+    """Shares read the same on every page: 43.1%, never 43.11%."""
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    for page in ("index", "activity", "authors", "files", "ownership", "history", "tags"):
+        with open(os.path.join(temp_dir, f"{page}.html"), encoding="utf-8") as f:
+            text = re.sub(r"<script>.*?</script>", "", f.read(), flags=re.S)
+        assert not re.search(r"\d\.\d\d%", text), page

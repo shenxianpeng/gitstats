@@ -408,7 +408,7 @@ class HTMLReportCreator(ReportCreator):
                     (
                         "Active Days",
                         format_int(active_days),
-                        f"of {format_int(delta_days)} days &middot; {100.0 * active_days / delta_days:.2f}%",
+                        f"of {format_int(delta_days)} days &middot; {100.0 * active_days / delta_days:.1f}%",
                     ),
                     (
                         "Longest Streak",
@@ -764,7 +764,7 @@ class HTMLReportCreator(ReportCreator):
         total = data.get_total_commits()
         for yy in sorted(data.commits_by_year.keys(), reverse=True):
             f.write(
-                '<tr><td>%s</td><td class="num">%s (%.2f%%)</td><td class="num">%s</td><td class="num">%s</td></tr>'
+                '<tr><td>%s</td><td class="num">%s (%.1f%%)</td><td class="num">%s</td><td class="num">%s</td></tr>'
                 % (
                     yy,
                     format_int(data.commits_by_year.get(yy, 0)),
@@ -982,7 +982,7 @@ class HTMLReportCreator(ReportCreator):
                 f'<span style="width: {100.0 * info["commits"] / top_commits:.1f}%"></span></span>'
             )
             f.write(
-                '<tr><td>%s</td><td class="num">%s (%.2f%%)%s</td><td class="num stat-added">%s</td><td class="num stat-removed">%s</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap num" title="%s days">%s</td><td class="num">%s</td><td class="num">%d</td></tr>'
+                '<tr><td>%s</td><td class="num">%s (%.1f%%)%s</td><td class="num stat-added">%s</td><td class="num stat-removed">%s</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap num" title="%s days">%s</td><td class="num">%s</td><td class="num">%d</td></tr>'
                 % (
                     author_html(author),
                     format_int(info["commits"]),
@@ -1198,7 +1198,7 @@ class HTMLReportCreator(ReportCreator):
             except ZeroDivisionError:
                 loc_percentage = 0
             f.write(
-                '<tr><td>%s</td><td class="num">%s (%.2f%%)</td><td class="num">%s (%.2f%%)</td><td class="num">%s</td></tr>'
+                '<tr><td>%s</td><td class="num">%s (%.1f%%)</td><td class="num">%s (%.1f%%)</td><td class="num">%s</td></tr>'
                 % (
                     html.escape(ext),
                     format_int(files),
@@ -1803,7 +1803,7 @@ class HTMLReportCreator(ReportCreator):
             total = commits_by_period[key]
             rows.append(
                 f"<tr><td>{key}</td><td>{author_html(authors[0])}</td>"
-                f'<td class="num">{format_int(commits)} ({100.0 * commits / total:.2f}% of {format_int(total)})</td>'
+                f'<td class="num">{format_int(commits)} ({100.0 * commits / total:.1f}% of {format_int(total)})</td>'
                 f"<td>{', '.join(author_html(a) for a in authors[1 : top + 1])}</td>"
                 f'<td class="num">{len(authors)}</td></tr>'
             )
