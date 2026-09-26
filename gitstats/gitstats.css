@@ -384,19 +384,6 @@ table {
 	margin-bottom: 0;
 }
 
-/* A table with its chart beside it; the chart wraps below when space runs out */
-.table-with-chart {
-	display: flex;
-	flex-wrap: wrap;
-	gap: var(--space-5);
-	align-items: flex-start;
-}
-
-.chart-pane {
-	flex: 1 1 320px;
-	min-width: 0;
-}
-
 /* ===== Contributor timeline (Authors page) ===== */
 /* Rows share one grid: name | commits | track. The year gridlines sit in an
    overlay that starts where the track column does. */

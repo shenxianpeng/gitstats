@@ -23,9 +23,6 @@ from gitstats.utils import (
 )
 
 # A table with its chart beside it; the chart wraps below on narrow screens.
-_FLEX_CONTAINER = '<div class="table-with-chart">'
-_FLEX_CHILD = '<div class="chart-pane">'
-_FLEX_CLOSE = "</div></div>"
 
 # Runs before the stylesheet loads so the page never flashes the wrong theme.
 # An explicit choice from the toggle wins; otherwise follow the OS setting.
@@ -750,19 +747,42 @@ class HTMLReportCreator(ReportCreator):
         f.write("</table></div></details>")
 
     def _write_commits_by_year_section(self, f, data) -> None:
-        """Write commits by year section with table and chart.
+        """Commits by year: the chart, with the per-year table folded away below it
+        (like the monthly section).
 
         It also carries the anchor of the former Yearly activity section, whose
         chart showed the same numbers.
         """
         f.write('<span id="yearly_activity"></span>')
         f.write(html_header(2, "Commits by year"))
-        f.write(_FLEX_CONTAINER)
+        if data.commits_by_year:
+            cby_all_years = list(
+                range(min(data.commits_by_year.keys()), max(data.commits_by_year.keys()) + 1)
+            )
+        else:
+            cby_all_years = []
+        cby_values = [data.commits_by_year.get(y, 0) for y in cby_all_years]
         f.write(
-            '<div class="table-scroll"><table><tr><th>Year</th><th class="num">Commits (% of all)</th><th class="num">Lines added</th><th class="num">Lines removed</th></tr>'
+            self._render_chartjs(
+                "chart-commits-by-year",
+                "bar",
+                cby_all_years,
+                [{"label": "Commits", "data": cby_values}],
+                aspect_ratio=4,
+                annotations=gap_annotations(cby_all_years, cby_values, min_gap=2),
+            )
         )
-        total = data.get_total_commits()
-        for yy in sorted(data.commits_by_year.keys(), reverse=True):
+        years = sorted(data.commits_by_year.keys(), reverse=True)
+        f.write(
+            '<details class="table-details"><summary>Table: commits and lines per year '
+            f"({len(years)} year{'' if len(years) == 1 else 's'} with commits)</summary>"
+        )
+        f.write(
+            '<div class="table-scroll"><table><tr><th>Year</th><th class="num">Commits (% of all)</th>'
+            '<th class="num">Lines added</th><th class="num">Lines removed</th></tr>'
+        )
+        total = data.get_total_commits() or 1
+        for yy in years:
             f.write(
                 '<tr><td>%s</td><td class="num">%s (%.1f%%)</td><td class="num">%s</td><td class="num">%s</td></tr>'
                 % (
@@ -773,28 +793,7 @@ class HTMLReportCreator(ReportCreator):
                     format_int(data.lines_removed_by_year.get(yy, 0)),
                 )
             )
-        f.write("</table></div>")
-        if data.commits_by_year:
-            cby_all_years = list(
-                range(
-                    min(data.commits_by_year.keys()),
-                    max(data.commits_by_year.keys()) + 1,
-                )
-            )
-        else:
-            cby_all_years = []
-        cby_values = [data.commits_by_year.get(y, 0) for y in cby_all_years]
-        f.write(_FLEX_CHILD)
-        f.write(
-            self._render_chartjs(
-                "chart-commits-by-year",
-                "bar",
-                cby_all_years,
-                [{"label": "Commits", "data": cby_values}],
-                annotations=gap_annotations(cby_all_years, cby_values, min_gap=2),
-            )
-        )
-        f.write(_FLEX_CLOSE)
+        f.write("</table></div></details>")
 
     def _write_commits_by_timezone_section(self, f, data) -> None:
         """Commits per UTC offset, west to east, as horizontal bars."""

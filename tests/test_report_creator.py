@@ -1323,14 +1323,20 @@ def test_every_table_scrolls_in_its_own_box(mock_data_collector, temp_dir):
         assert content.count("</table>") == content.count("</table></div>"), fname
 
 
-def test_table_with_chart_layout_uses_css_class(mock_data_collector, temp_dir):
-    # A class (not inline flex styles) so the chart can wrap below the table on phones
+def test_commits_by_year_chart_first_table_folded(mock_data_collector, temp_dir):
+    """Like the monthly section: the chart leads, the yearly table is folded below it."""
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     with open(os.path.join(temp_dir, "activity.html"), encoding="utf-8") as f:
         content = f.read()
-    assert '<div class="table-with-chart">' in content
-    assert '<div class="chart-pane">' in content
-    assert "display:flex" not in content
+    section = content[
+        content.index('id="commits_by_year"') : content.index('<h2 id="commits_by_year/month"')
+    ]
+    assert section.index('id="chart-commits-by-year"') < section.index("<details")
+    assert (
+        '<details class="table-details"><summary>Table: commits and lines per year '
+        "(1 year with commits)</summary>"
+    ) in section
+    assert "table-with-chart" not in content
 
 
 def test_create_all_pages_with_ai(mock_data_collector_with_ai, temp_dir):
