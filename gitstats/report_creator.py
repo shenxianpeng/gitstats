@@ -1060,7 +1060,9 @@ class HTMLReportCreator(ReportCreator):
         # Build per-author time series data for Chart.js
         time_labels, loc_datasets = self._build_author_time_series(data)
 
-        f.write(html_header(2, "Cumulated added lines of code per author"))
+        # The former heading's anchor still lands here
+        f.write('<span id="cumulated_added_lines_of_code_per_author"></span>')
+        f.write(html_header(2, "Cumulative lines added per author"))
         f.write(
             '<p class="section-note">'
             f"Lines added over time by {top_of or 'each author'}; "

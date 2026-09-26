@@ -2142,3 +2142,12 @@ def test_authors_page_states_the_top_n_once_per_section(mock_data_collector, tem
     assert "One row for each of the top 2 of 3 authors:" in html
     assert "Only top" not in html
     assert "didn't make it" not in html
+
+
+def test_lines_per_author_heading_keeps_its_old_anchor(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "authors.html"), encoding="utf-8") as f:
+        html = f.read()
+    old = html.index('<span id="cumulated_added_lines_of_code_per_author"></span>')
+    assert html.index('<h2 id="cumulative_lines_added_per_author">') > old
+    assert "Cumulated" not in html
