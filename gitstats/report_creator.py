@@ -871,13 +871,14 @@ class HTMLReportCreator(ReportCreator):
         loc_datasets = [{"label": a, "data": per_author_lines[a]} for a in authors_to_plot]
         return time_labels, loc_datasets
 
-    def _contributor_timeline_html(self, data: Any, authors: list[str]) -> str:
+    def _contributor_timeline_html(self, data: Any, authors: list[str], top_of: str = "") -> str:
         """One row per author on a shared, real time axis.
 
         A square marks each month with commits (bigger = more commits) and a thin
         line runs from the author's first to last active month, so who was
         active when, and for how long, reads at a glance. Plain HTML/CSS: it
-        follows the theme without any script.
+        follows the theme without any script. ``top_of`` ("the top 20 of 40
+        authors") goes in the note when not every author has a row.
         """
         months = month_range(data.author_of_month.keys())
         if not months or not authors:
@@ -950,7 +951,8 @@ class HTMLReportCreator(ReportCreator):
         ends = "" if grid else f"<span>{months[0]}</span><span>{months[-1]}</span>"
         return (
             '<p class="section-note">'
-            "One row per author: a square marks each month with commits (bigger means "
+            + (f"One row for each of {top_of}" if top_of else "One row per author")
+            + ": a square marks each month with commits (bigger means "
             "more), and the line runs from their first to their last active month. "
             "Bot accounts are grey.</p>"
             '<div class="timeline-scroll"><div class="timeline">'
@@ -1001,6 +1003,16 @@ class HTMLReportCreator(ReportCreator):
 
         # Authors :: List of authors
         f.write(html_header(2, "List of authors"))
+        # When only the top authors are listed, each section says so once, in its note
+        max_authors = load_config()["max_authors"]
+        allauthors = data.get_authors()
+        top_of = (
+            f"the top {max_authors} of {format_int(len(allauthors))} authors"
+            if len(allauthors) > max_authors
+            else ""
+        )
+        if top_of:
+            f.write(f'<p class="section-note">{top_of[0].upper()}{top_of[1:]}, by commits.</p>')
 
         f.write('<div class="table-scroll"><table class="authors sortable" id="authors">')
         f.write(
@@ -1034,28 +1046,26 @@ class HTMLReportCreator(ReportCreator):
             )
         f.write("</table></div>")
 
-        allauthors = data.get_authors()
-        if len(allauthors) > load_config()["max_authors"]:
-            rest = allauthors[load_config()["max_authors"] :]
+        if top_of:
+            rest = allauthors[max_authors:]
             max_list = load_config()["max_authors_list"]
-            if len(rest) > max_list:
-                shown = ", ".join(author_html(a) for a in rest[:max_list])
-                more = len(rest) - max_list
-                f.write(
-                    f'<p class="moreauthors">These didn\'t make it to the top:'
-                    f" {shown}<em>, and {more} more authors</em></p>"
-                )
-            else:
-                f.write(
-                    '<p class="moreauthors">These didn\'t make it to the top: {}</p>'.format(
-                        ", ".join(author_html(a) for a in rest)
-                    )
-                )
+            shown = ", ".join(author_html(a) for a in rest[:max_list])
+            more = len(rest) - max_list
+            f.write(
+                f'<p class="moreauthors">The other {format_int(len(rest))}: {shown}'
+                + (f", and {format_int(more)} more" if more > 0 else "")
+                + ".</p>"
+            )
 
         # Build per-author time series data for Chart.js
         time_labels, loc_datasets = self._build_author_time_series(data)
 
         f.write(html_header(2, "Cumulated added lines of code per author"))
+        f.write(
+            '<p class="section-note">'
+            f"Lines added over time by {top_of or 'each author'}; "
+            "the top 5 are in color, the rest in grey.</p>"
+        )
         f.write(
             self._render_chartjs(
                 "chart-loc-by-author",
@@ -1067,22 +1077,11 @@ class HTMLReportCreator(ReportCreator):
                 annotations=time_gap_annotations(data),
             )
         )
-        note = "The top 5 authors are in color, the others in grey."
-        if len(allauthors) > load_config()["max_authors"]:
-            note += " Only the top %d authors are shown." % load_config()["max_authors"]
-        f.write(f'<p class="moreauthors">{note}</p>')
 
         # Replaces the former "Commits per Author" line chart; its anchor still lands here
         f.write('<span id="commits_per_author"></span>')
         f.write(html_header(2, "Contributor timeline"))
-        f.write(
-            self._contributor_timeline_html(data, data.get_authors(load_config()["max_authors"]))
-        )
-        if len(allauthors) > load_config()["max_authors"]:
-            f.write(
-                '<p class="moreauthors">Only top %d authors shown</p>'
-                % load_config()["max_authors"]
-            )
+        f.write(self._contributor_timeline_html(data, data.get_authors(max_authors), top_of))
 
         # Authors :: the top author of each year, then of each month (folded away).
         # The old "Author of Month/Year" anchors are kept so existing links still land here.

@@ -7,6 +7,7 @@ from io import StringIO
 
 import pytest
 
+from gitstats import load_config
 from gitstats.report_creator import (
     HTMLReportCreator,
     ReportCreator,
@@ -1015,7 +1016,10 @@ def test_authors_contributor_timeline(mock_data_collector, temp_dir):
     )
 
     # The lines chart keeps five colors and greys the rest
-    assert "The top 5 authors are in color, the others in grey." in html
+    assert (
+        '<p class="section-note">Lines added over time by each author; '
+        "the top 5 are in color, the rest in grey.</p>"
+    ) in html
 
 
 def test_contributor_timeline_years_and_bots(mock_data_collector):
@@ -2121,3 +2125,20 @@ def test_tags_page_without_tags_has_no_empty_table(mock_data_collector, temp_dir
         html = f.read()
     assert "no tags yet" in html
     assert "<table" not in html
+
+
+def test_authors_page_states_the_top_n_once_per_section(mock_data_collector, temp_dir):
+    """When only the top authors are listed, each section's note says so, in one wording."""
+    from unittest.mock import patch
+
+    config = {**load_config(), "max_authors": 2, "max_authors_list": 10}
+    with patch("gitstats.report_creator.load_config", return_value=config):
+        HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "authors.html"), encoding="utf-8") as f:
+        html = f.read()
+    assert '<p class="section-note">The top 2 of 3 authors, by commits.</p>' in html
+    assert '<p class="moreauthors">The other 1: Charlie Brown.</p>' in html
+    assert "Lines added over time by the top 2 of 3 authors;" in html
+    assert "One row for each of the top 2 of 3 authors:" in html
+    assert "Only top" not in html
+    assert "didn't make it" not in html
