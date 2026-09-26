@@ -122,6 +122,7 @@ CHART_SCRIPT = """<script>
 		const bar = getCSSVar('--bar-color');
 		chart.data.datasets.forEach(function(ds) {
 			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
 			if (ds.series) {
 				const color = getCSSVar('--series-' + ds.series);
 				ds.borderColor = color;
@@ -1354,6 +1355,45 @@ class HTMLReportCreator(ReportCreator):
             )
         )
 
+        # Lines :: added (up) and removed (down) in each month
+        months = month_range([*data.lines_added_by_month, *data.lines_removed_by_month])
+        if months:
+            f.write(html_header(2, "Lines added and removed per month"))
+            f.write(
+                '<p class="section-note">Lines added (green, up) and removed (red, down) '
+                "by each month's commits.</p>"
+            )
+            quiet = quiet_months(data)
+            churn_gap = {}
+            if quiet and quiet[0] in months and quiet[1] in months:
+                band = quiet_band(*quiet, months.index(quiet[0]), months.index(quiet[1]))
+                churn_gap = {"bands": [band]}
+            f.write(
+                self._render_chartjs(
+                    "chart-lines-by-month",
+                    "bar",
+                    months,
+                    [
+                        {
+                            "label": "Added",
+                            "data": [data.lines_added_by_month.get(m, 0) for m in months],
+                            "colorVar": "--success-color",
+                            "borderWidth": 0,
+                        },
+                        {
+                            "label": "Removed",
+                            "data": [-data.lines_removed_by_month.get(m, 0) for m in months],
+                            "colorVar": "--danger-color",
+                            "borderWidth": 0,
+                        },
+                    ],
+                    month_axis=True,
+                    diverging=True,
+                    aspect_ratio=4,
+                    annotations=churn_gap,
+                )
+            )
+
         self.print_footer(f)
         f.write("</body></html>")
         f.close()
@@ -1947,6 +1987,7 @@ class HTMLReportCreator(ReportCreator):
         annotations=None,
         tooltip_share=False,
         month_axis=False,
+        diverging=False,
     ):
         """Render a Chart.js chart as inline HTML.
 
@@ -1971,7 +2012,13 @@ class HTMLReportCreator(ReportCreator):
         labels only the years (at each January), horizontally.
 
         A dataset may carry ``notes``, one string per point, shown as an extra
-        tooltip line (e.g. "+2 new"); empty strings add nothing.
+        tooltip line (e.g. "+2 new"); empty strings add nothing. A dataset with
+        ``colorVar`` (e.g. "--success-color") takes its color from that CSS
+        variable, following the theme.
+
+        With ``diverging=True`` (bars), datasets stack around zero: positive
+        values above it, negative ones below, and the y-axis and tooltips show
+        magnitudes, e.g. lines added up and lines removed down.
         """
         is_multi = len(datasets) > 1
 
@@ -1979,6 +2026,8 @@ class HTMLReportCreator(ReportCreator):
         for i, ds in enumerate(datasets):
             series = i % self.SERIES_COLORS + 1
             entry = dict(ds)
+            if "colorVar" in entry:
+                entry["backgroundColor"] = entry["borderColor"] = f"__CSSVAR:{entry['colorVar']}__"
             if is_multi and highlight is not None and i >= highlight:
                 entry.setdefault("borderColor", self.OTHER_SERIES_COLOR)
                 entry.setdefault("backgroundColor", self.OTHER_SERIES_COLOR)
@@ -1989,7 +2038,8 @@ class HTMLReportCreator(ReportCreator):
             elif is_multi:
                 entry.setdefault("borderColor", f"__CSS_SERIES_{series}__")
                 entry.setdefault("backgroundColor", f"__CSS_SERIES_{series}_FILL__")
-                entry["series"] = series
+                if "colorVar" not in entry:
+                    entry["series"] = series
                 entry.setdefault("fill", False)
                 entry.setdefault("tension", 0.1)
                 entry.setdefault("pointRadius", 0)
@@ -2016,6 +2066,7 @@ class HTMLReportCreator(ReportCreator):
         datasets_json = json.dumps(js_datasets).replace("</", "<\\/")
         # Replace quoted placeholders with JS expressions
         datasets_json = datasets_json.replace('"__CSS_BAR_COLOR__"', "getCSSVar('--bar-color')")
+        datasets_json = re.sub(r'"__CSSVAR:(--[a-z0-9-]+)__"', r"getCSSVar('\1')", datasets_json)
         for n in range(1, self.SERIES_COLORS + 1):
             datasets_json = datasets_json.replace(
                 f'"__CSS_SERIES_{n}__"', f"getCSSVar('--series-{n}')"
@@ -2074,6 +2125,12 @@ class HTMLReportCreator(ReportCreator):
           return (item.dataset.notes || [])[item.dataIndex] || '';
         }"""
             )
+        if diverging:
+            tooltip_callbacks.append(
+                """label: function(item) {
+          return item.dataset.label + ': ' + Math.abs(item.parsed.y).toLocaleString();
+        }"""
+            )
         tooltip_js = ""
         if tooltip_callbacks:
             tooltip_js = (
@@ -2102,6 +2159,12 @@ class HTMLReportCreator(ReportCreator):
         if annotations and annotations.get("values"):
             # every bar is labelled with its value, so the y-axis would only repeat them
             y_scale_js = f"{{ display: false, beginAtZero: true{grace_js} }}"
+        if diverging:
+            x_scale_js = x_scale_js.replace("{ ", "{ stacked: true, ", 1)
+            y_scale_js = (
+                f"{{ stacked: true, beginAtZero: true{grace_js}, ticks: {{ precision: 0, "
+                "callback: function(v) { return Math.abs(v).toLocaleString(); } } }"
+            )
 
         # The chart fills a .chart-box that keeps aspect_ratio on wide screens
         # but has a minimum height, so phones don't get a flattened plot.

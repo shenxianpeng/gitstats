@@ -2177,3 +2177,38 @@ def test_on_this_page_scrolls_sideways_on_phones():
     rule = rule[: rule.index("}")]
     assert "flex-wrap: nowrap;" in rule
     assert "overflow-x: auto;" in rule
+
+
+def test_render_chartjs_diverging_with_theme_colors():
+    creator = HTMLReportCreator()
+    result = creator._render_chartjs(
+        "d",
+        "bar",
+        ["2024-01", "2024-02"],
+        [
+            {"label": "Added", "data": [5, 3], "colorVar": "--success-color"},
+            {"label": "Removed", "data": [-2, -1], "colorVar": "--danger-color"},
+        ],
+        month_axis=True,
+        diverging=True,
+    )
+    # colors come from CSS variables (re-read on theme change), not the series palette
+    assert "\"backgroundColor\": getCSSVar('--success-color')" in result
+    assert "\"borderColor\": getCSSVar('--danger-color')" in result
+    assert '"series"' not in result
+    # stacked around zero, magnitudes on the axis and in the tooltip
+    assert "x: { stacked: true, ticks: { autoSkip: false" in result
+    assert "y: { stacked: true, beginAtZero: true, ticks: { precision: 0, callback:" in result
+    assert "Math.abs(item.parsed.y).toLocaleString()" in result
+
+
+def test_lines_page_charts_lines_added_and_removed_per_month(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "lines.html"), encoding="utf-8") as f:
+        html = f.read()
+    assert '<h2 id="lines_added_and_removed_per_month">' in html
+    chart = html[html.index('id="chart-lines-by-month"') :]
+    chart = chart[: chart.index("</script>")]
+    # fixture: +300/-100, +600/-200, +900/-300 in 2023-01..03
+    assert '"label": "Added", "data": [300, 600, 900]' in chart
+    assert '"label": "Removed", "data": [-100, -200, -300]' in chart
