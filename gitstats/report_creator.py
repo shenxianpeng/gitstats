@@ -1106,7 +1106,9 @@ class HTMLReportCreator(ReportCreator):
         )
         f.write("</details>")
 
-        # Domains: a bar table (the numbers used to be shown twice, as a table and a chart)
+        # Domains: a bar table (the numbers used to be shown twice, as a table and a chart).
+        # The former "Commits by Domains" anchor still lands here.
+        f.write('<span id="commits_by_domains"></span>')
         f.write(html_header(2, "Commits by domain"))
         domains_by_commits = get_keys_sorted_by_value_key(data.domains, "commits")
         domains_by_commits.reverse()  # most first
