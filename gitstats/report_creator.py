@@ -1386,42 +1386,51 @@ class HTMLReportCreator(ReportCreator):
         else:
             f.write(stat_tiles_html([("Tags", "0", "no tags yet")]))
 
-        f.write('<div class="table-scroll"><table class="tags">')
-        f.write('<tr><th>Name</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr>')
-        # sort the tags by date desc
-        tags_sorted_by_date_desc = [
-            el[1]
-            for el in sorted([(el[1]["date"], el[0]) for el in data.tags.items()], reverse=True)
-        ]
-        max_tags_authors = load_config()["max_tags_authors"]
-        for tag in tags_sorted_by_date_desc:
-            authorinfo = []
-            self.authors_by_commits = get_keys_sorted_by_values(data.tags[tag]["authors"])
-            authors_reversed = list(reversed(self.authors_by_commits))
-            # max_tags_authors < 0 (e.g., -1) means no limit
-            if max_tags_authors >= 0 and len(authors_reversed) > max_tags_authors:
-                authors_shown = authors_reversed[:max_tags_authors]
-                remaining = len(authors_reversed) - max_tags_authors
-                for i in authors_shown:
-                    authorinfo.append(
-                        f"{author_html(i)} ({format_int(data.tags[tag]['authors'][i])})"
-                    )
-                authorinfo.append("<em>and %d more authors</em>" % remaining)
-            else:
-                for i in authors_reversed:
-                    authorinfo.append(
-                        f"{author_html(i)} ({format_int(data.tags[tag]['authors'][i])})"
-                    )
+        if data.tags:
+            f.write(html_header(2, "All tags"))
             f.write(
-                '<tr><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="num">%s</td><td>%s</td></tr>'
-                % (
-                    html.escape(tag),
-                    data.tags[tag]["date"],
-                    format_int(data.tags[tag]["commits"]),
-                    ", ".join(authorinfo),
-                )
+                '<p class="section-note">Newest first. Commits are those since the '
+                "previous tag, and the authors who made them.</p>"
             )
-        f.write("</table></div>")
+            f.write('<div class="table-scroll"><table class="tags sortable" id="tags">')
+            f.write(
+                '<tr><th>Name</th><th>Date</th><th class="num">Commits</th>'
+                '<th class="unsortable">Authors</th></tr>'
+            )
+            # sort the tags by date desc
+            tags_sorted_by_date_desc = [
+                el[1]
+                for el in sorted([(el[1]["date"], el[0]) for el in data.tags.items()], reverse=True)
+            ]
+            max_tags_authors = load_config()["max_tags_authors"]
+            for tag in tags_sorted_by_date_desc:
+                authorinfo = []
+                self.authors_by_commits = get_keys_sorted_by_values(data.tags[tag]["authors"])
+                authors_reversed = list(reversed(self.authors_by_commits))
+                # max_tags_authors < 0 (e.g., -1) means no limit
+                if max_tags_authors >= 0 and len(authors_reversed) > max_tags_authors:
+                    authors_shown = authors_reversed[:max_tags_authors]
+                    remaining = len(authors_reversed) - max_tags_authors
+                    for i in authors_shown:
+                        authorinfo.append(
+                            f"{author_html(i)} ({format_int(data.tags[tag]['authors'][i])})"
+                        )
+                    authorinfo.append("<em>and %d more authors</em>" % remaining)
+                else:
+                    for i in authors_reversed:
+                        authorinfo.append(
+                            f"{author_html(i)} ({format_int(data.tags[tag]['authors'][i])})"
+                        )
+                f.write(
+                    '<tr><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="num">%s</td><td>%s</td></tr>'
+                    % (
+                        html.escape(tag),
+                        data.tags[tag]["date"],
+                        format_int(data.tags[tag]["commits"]),
+                        ", ".join(authorinfo),
+                    )
+                )
+            f.write("</table></div>")
 
         self.print_footer(f)
         f.write("</body></html>")

@@ -2103,3 +2103,21 @@ def test_quiet_months_needs_a_year():
         commits_by_month = {"2020-01": 1, "2020-06": 1}  # five empty months only
 
     assert quiet_months(Data()) is None
+
+
+def test_tags_table_is_a_sortable_section(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "tags.html"), encoding="utf-8") as f:
+        html = f.read()
+    assert '<h2 id="all_tags">' in html
+    assert '<table class="tags sortable" id="tags">' in html
+    assert '<th class="unsortable">Authors</th>' in html
+
+
+def test_tags_page_without_tags_has_no_empty_table(mock_data_collector, temp_dir):
+    mock_data_collector.tags = {}
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "tags.html"), encoding="utf-8") as f:
+        html = f.read()
+    assert "no tags yet" in html
+    assert "<table" not in html
