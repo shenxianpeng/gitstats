@@ -1849,3 +1849,23 @@ def test_pinned_column_divider_only_on_scrolling_tables():
     rule = css[css.index(".table-scroll tr > :first-child {") :]
     assert "box-shadow" not in rule[: rule.index("}")]
     assert ".table-scroll.is-scrollable tr > :first-child," in css
+
+
+def test_numbers_have_thousands_separators_everywhere(mock_data_collector, temp_dir):
+    """Tables and the History page format numbers like the KPI tiles: 12,345."""
+    mock_data_collector.lines_added_by_year = {2023: 12345}
+    mock_data_collector.lines_added_by_month = {**mock_data_collector.lines_added_by_month}
+    mock_data_collector.lines_added_by_month["2023-01"] = 23456
+    mock_data_collector.extensions = {"py": {"files": 10, "lines": 34567}}
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+
+    def page(name):
+        with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
+            return f.read()
+
+    activity = page("activity.html")
+    assert '<td class="num">12,345</td>' in activity  # commits by year
+    assert '<td class="num">23,456</td>' in activity  # commits by month
+    assert "34,567" in page("files.html")  # extensions
+    assert "3,456" in page("files.html")  # lines per file
+    assert "+12,345 / &minus;" in page("history.html")

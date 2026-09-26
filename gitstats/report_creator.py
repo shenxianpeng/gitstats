@@ -653,9 +653,9 @@ class HTMLReportCreator(ReportCreator):
             commits = hour_totals.get(hour, 0)
             height = round(40 * commits / busiest_hour) if commits else 0
             f.write(
-                f'<td title="{hour:02d}:00 &middot; {commits} commits &middot; '
+                f'<td title="{hour:02d}:00 &middot; {format_int(commits)} commits &middot; '
                 f'{100.0 * commits / total:.1f}%"><div class="punch-vbar">'
-                f'<span class="punch-vbar-value">{commits or ""}</span>'
+                f'<span class="punch-vbar-value">{format_int(commits) if commits else ""}</span>'
                 f'<span class="punch-vbar-fill" style="height: {max(height, 1 if commits else 0)}px">'
                 "</span></div></td>"
             )
@@ -665,7 +665,8 @@ class HTMLReportCreator(ReportCreator):
             for hour in range(24):
                 commits = data.activity_by_hour_of_week.get(weekday, {}).get(hour, 0)
                 f.write(
-                    f'<td class="{self._heat_td_class(commits, busiest_cell)}">{commits or ""}</td>'
+                    f'<td class="{self._heat_td_class(commits, busiest_cell)}">'
+                    f"{format_int(commits) if commits else ''}</td>"
                 )
             day = day_totals.get(weekday, 0)
             f.write(
@@ -738,12 +739,12 @@ class HTMLReportCreator(ReportCreator):
         )
         for yymm in months:
             f.write(
-                '<tr><td>%s</td><td class="num">%d</td><td class="num">%d</td><td class="num">%d</td></tr>'
+                '<tr><td>%s</td><td class="num">%s</td><td class="num">%s</td><td class="num">%s</td></tr>'
                 % (
                     yymm,
-                    data.commits_by_month.get(yymm, 0),
-                    data.lines_added_by_month.get(yymm, 0),
-                    data.lines_removed_by_month.get(yymm, 0),
+                    format_int(data.commits_by_month.get(yymm, 0)),
+                    format_int(data.lines_added_by_month.get(yymm, 0)),
+                    format_int(data.lines_removed_by_month.get(yymm, 0)),
                 )
             )
         f.write("</table></div></details>")
@@ -763,13 +764,13 @@ class HTMLReportCreator(ReportCreator):
         total = data.get_total_commits()
         for yy in sorted(data.commits_by_year.keys(), reverse=True):
             f.write(
-                '<tr><td>%s</td><td class="num">%d (%.2f%%)</td><td class="num">%d</td><td class="num">%d</td></tr>'
+                '<tr><td>%s</td><td class="num">%s (%.2f%%)</td><td class="num">%s</td><td class="num">%s</td></tr>'
                 % (
                     yy,
-                    data.commits_by_year.get(yy, 0),
+                    format_int(data.commits_by_year.get(yy, 0)),
                     (100.0 * data.commits_by_year.get(yy, 0)) / total,
-                    data.lines_added_by_year.get(yy, 0),
-                    data.lines_removed_by_year.get(yy, 0),
+                    format_int(data.lines_added_by_year.get(yy, 0)),
+                    format_int(data.lines_removed_by_year.get(yy, 0)),
                 )
             )
         f.write("</table></div>")
@@ -910,13 +911,13 @@ class HTMLReportCreator(ReportCreator):
                     size = min(18.0, 4 + 2.2 * math.sqrt(count))
                     marks.append(
                         f'<span class="timeline-mark" style="left: {left(index[month] + 0.5)}; '
-                        f'--size: {size:.1f}px" title="{month}: {count} '
+                        f'--size: {size:.1f}px" title="{month}: {format_int(count)} '
                         f'commit{"" if count == 1 else "s"}"></span>'
                     )
-                label = f"{name}: {commits} commits, {active[0]} to {active[-1]}"
+                label = f"{name}: {format_int(commits)} commits, {active[0]} to {active[-1]}"
             else:
                 marks = []
-                label = f"{name}: {commits} commits"
+                label = f"{name}: {format_int(commits)} commits"
             bot = " bot" if is_bot(author) else ""
             rows.append(
                 f'<div class="timeline-row{bot}" role="img" aria-label="{label}">'
@@ -981,10 +982,10 @@ class HTMLReportCreator(ReportCreator):
                 f'<span style="width: {100.0 * info["commits"] / top_commits:.1f}%"></span></span>'
             )
             f.write(
-                '<tr><td>%s</td><td class="num">%d (%.2f%%)%s</td><td class="num stat-added">%s</td><td class="num stat-removed">%s</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap num" title="%s days">%s</td><td class="num">%d</td><td class="num">%d</td></tr>'
+                '<tr><td>%s</td><td class="num">%s (%.2f%%)%s</td><td class="num stat-added">%s</td><td class="num stat-removed">%s</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap num" title="%s days">%s</td><td class="num">%s</td><td class="num">%d</td></tr>'
                 % (
                     author_html(author),
-                    info["commits"],
+                    format_int(info["commits"]),
                     info["commits_frac"],
                     share_bar,
                     format_int(info["lines_added"]),
@@ -993,7 +994,7 @@ class HTMLReportCreator(ReportCreator):
                     info["date_last"],
                     format_int(info["timedelta"].days),
                     format_duration(info["timedelta"]),
-                    len(info["active_days"]),
+                    format_int(len(info["active_days"])),
                     info["place_by_commits"],
                 )
             )
@@ -1197,14 +1198,14 @@ class HTMLReportCreator(ReportCreator):
             except ZeroDivisionError:
                 loc_percentage = 0
             f.write(
-                '<tr><td>%s</td><td class="num">%d (%.2f%%)</td><td class="num">%d (%.2f%%)</td><td class="num">%d</td></tr>'
+                '<tr><td>%s</td><td class="num">%s (%.2f%%)</td><td class="num">%s (%.2f%%)</td><td class="num">%s</td></tr>'
                 % (
                     html.escape(ext),
-                    files,
+                    format_int(files),
                     (100.0 * files) / data.get_total_files(),
-                    lines,
+                    format_int(lines),
                     loc_percentage,
-                    lines / files,
+                    format_int(lines // files),
                 )
             )
         f.write("</table></div>")
@@ -1338,17 +1339,21 @@ class HTMLReportCreator(ReportCreator):
                 authors_shown = authors_reversed[:max_tags_authors]
                 remaining = len(authors_reversed) - max_tags_authors
                 for i in authors_shown:
-                    authorinfo.append("%s (%d)" % (author_html(i), data.tags[tag]["authors"][i]))
+                    authorinfo.append(
+                        f"{author_html(i)} ({format_int(data.tags[tag]['authors'][i])})"
+                    )
                 authorinfo.append("<em>and %d more authors</em>" % remaining)
             else:
                 for i in authors_reversed:
-                    authorinfo.append("%s (%d)" % (author_html(i), data.tags[tag]["authors"][i]))
+                    authorinfo.append(
+                        f"{author_html(i)} ({format_int(data.tags[tag]['authors'][i])})"
+                    )
             f.write(
-                '<tr><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="num">%d</td><td>%s</td></tr>'
+                '<tr><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="num">%s</td><td>%s</td></tr>'
                 % (
                     html.escape(tag),
                     data.tags[tag]["date"],
-                    data.tags[tag]["commits"],
+                    format_int(data.tags[tag]["commits"]),
                     ", ".join(authorinfo),
                 )
             )
@@ -1445,8 +1450,8 @@ class HTMLReportCreator(ReportCreator):
             )
             for fs in risk_files[:50]:
                 f.write(
-                    '<tr><td class="path">%s</td><td>%s</td><td class="num">%d</td></tr>'
-                    % (html.escape(fs["path"]), author_html(fs["owner"]), fs["edits"])
+                    '<tr><td class="path">%s</td><td>%s</td><td class="num">%s</td></tr>'
+                    % (html.escape(fs["path"]), author_html(fs["owner"]), format_int(fs["edits"]))
                 )
             f.write("</table></div>")
             if len(risk_files) > 50:
@@ -1471,12 +1476,12 @@ class HTMLReportCreator(ReportCreator):
         )
         for a in ownership["authors"][:25]:
             f.write(
-                '<tr><td>%s</td><td class="num">%d</td><td class="num">%d</td><td class="num">%d</td></tr>'
+                '<tr><td>%s</td><td class="num">%s</td><td class="num">%s</td><td class="num">%s</td></tr>'
                 % (
                     author_html(a["author"]),
-                    a["files_owned"],
-                    a["files_solely_owned"],
-                    a["files_touched"],
+                    format_int(a["files_owned"]),
+                    format_int(a["files_solely_owned"]),
+                    format_int(a["files_touched"]),
                 )
             )
         f.write("</table></div>")
@@ -1506,10 +1511,10 @@ class HTMLReportCreator(ReportCreator):
             )
             for fs in shared[:20]:
                 f.write(
-                    '<tr><td class="path">%s</td><td class="num">%d</td><td>%s</td><td class="num">%.1f%%</td></tr>'
+                    '<tr><td class="path">%s</td><td class="num">%s</td><td>%s</td><td class="num">%.1f%%</td></tr>'
                     % (
                         html.escape(fs["path"]),
-                        fs["contributors"],
+                        format_int(fs["contributors"]),
                         author_html(fs["owner"]),
                         fs["ownership_pct"],
                     )
@@ -1645,19 +1650,22 @@ class HTMLReportCreator(ReportCreator):
             )
 
             if entry["commits"]:
-                facts = "%d commits (%s%%) &middot; +%d / &minus;%d lines &middot; %d author%s" % (
-                    entry["commits"],
+                facts = "%s commits (%s%%) &middot; +%s / &minus;%s lines &middot; %s author%s" % (
+                    format_int(entry["commits"]),
                     entry["commits_pct"],
-                    entry["lines_added"],
-                    entry["lines_removed"],
-                    entry["active_authors"],
+                    format_int(entry["lines_added"]),
+                    format_int(entry["lines_removed"]),
+                    format_int(entry["active_authors"]),
                     "s" if entry["active_authors"] != 1 else "",
                 )
                 f.write(f'<p class="history-facts">{facts}</p>')
                 if entry["top_author"]:
                     f.write(
-                        '<p class="history-people">Led by <strong>%s</strong> (%d commits)</p>'
-                        % (html.escape(entry["top_author"]), entry["top_author_commits"])
+                        '<p class="history-people">Led by <strong>%s</strong> (%s commits)</p>'
+                        % (
+                            html.escape(entry["top_author"]),
+                            format_int(entry["top_author_commits"]),
+                        )
                     )
                 if entry["newcomers"]:
                     f.write(
@@ -1795,7 +1803,7 @@ class HTMLReportCreator(ReportCreator):
             total = commits_by_period[key]
             rows.append(
                 f"<tr><td>{key}</td><td>{author_html(authors[0])}</td>"
-                f'<td class="num">{commits} ({100.0 * commits / total:.2f}% of {total})</td>'
+                f'<td class="num">{format_int(commits)} ({100.0 * commits / total:.2f}% of {format_int(total)})</td>'
                 f"<td>{', '.join(author_html(a) for a in authors[1 : top + 1])}</td>"
                 f'<td class="num">{len(authors)}</td></tr>'
             )
