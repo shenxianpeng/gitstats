@@ -159,8 +159,8 @@ def test_render_chartjs_single_dataset():
     assert "getCSSVar('--bar-color')" in result
     # Single dataset: no legend, no borderColor in JS
     assert "legend: { display: false }" in result
-    # Y-axis title
-    assert "'Commits'" in result
+    # No y-axis title: the section heading names the unit
+    assert "title: { display: true" not in result
 
 
 def test_render_chartjs_multi_dataset():
@@ -175,10 +175,16 @@ def test_render_chartjs_multi_dataset():
         ],
     )
     # Multiple datasets: legend displayed
-    assert "legend: { display: true }" in result
-    # Colors should be assigned
-    assert "#5b8dee" in result
-    assert "#1a7f37" in result
+    assert "legend: { display: true, labels: {" in result
+    # Series colors come from CSS variables, so they follow the theme
+    assert (
+        "\"borderColor\": getCSSVar('--series-1'), \"backgroundColor\": getCSSVar('--series-1') + '33'"
+        in result
+    )
+    assert "getCSSVar('--series-2')" in result
+    assert '"series": 2' in result
+    # Line charts show a line sample in the legend
+    assert "usePointStyle: true, pointStyle: 'line'" in result
     # Line-specific properties
     assert "borderWidth" in result
     assert "pointRadius" in result
@@ -261,16 +267,20 @@ def test_render_chartjs_xss_protection():
     assert "</script>" not in result.replace("</script>", "")
 
 
-def test_render_chartjs_y_label():
+def test_render_chartjs_no_y_axis_title():
+    """Section headings name what a chart counts, so the y-axis carries no title."""
     creator = HTMLReportCreator()
-    result = creator._render_chartjs(
-        "chart-yl",
-        "bar",
-        ["X"],
-        [{"label": "C", "data": [1]}],
-        y_label="Lines of Code",
-    )
-    assert "title: { display: true, text: 'Lines of Code' }" in result
+    result = creator._render_chartjs("chart-yl", "bar", ["X"], [{"label": "C", "data": [1]}])
+    assert "y: { beginAtZero: true, ticks: { precision: 0 } }" in result
+    assert "title: { display: true" not in result
+
+
+def test_chart_fonts_are_monospace():
+    creator = HTMLReportCreator()
+    creator.title = "p"
+    f = StringIO()
+    creator.print_header(f)
+    assert "Chart.defaults.font.family = getCSSVar('--font-mono');" in f.getvalue()
 
 
 @pytest.mark.parametrize(
@@ -319,6 +329,32 @@ def test_render_chartjs_annotations():
     plain = creator._render_chartjs("c-plain", "bar", ["A"], [{"label": "C", "data": [1]}])
     assert "chartAnnotations" not in plain
     assert "grace" not in plain
+
+
+def test_render_chartjs_month_axis():
+    creator = HTMLReportCreator()
+    months = month_range(["2020-01", "2023-12"])
+    result = creator._render_chartjs(
+        "c-months", "bar", months, [{"label": "C", "data": [1] * len(months)}], month_axis=True
+    )
+    # Years at each January, horizontal, thinned by monthAxisTick instead of rotated
+    assert "ticks: { autoSkip: false, maxRotation: 0, callback: monthAxisTick }" in result
+    # gridlines only at the labelled years, not at every month
+    assert "grid: { color: monthAxisGrid }" in result
+    assert "minRotation: 45" not in result
+
+
+def test_monthly_charts_use_the_month_axis(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    for page, chart in (
+        ("activity.html", "chart-commits-by-year-month"),
+        ("authors.html", "chart-contributor-growth"),
+    ):
+        with open(os.path.join(temp_dir, page), encoding="utf-8") as f:
+            html = f.read()
+        script = html[html.index(f'<canvas id="{chart}">') :]
+        script = script[: script.index("</script>")]
+        assert "callback: monthAxisTick" in script, chart
 
 
 def test_render_chartjs_lines_have_no_point_markers():
@@ -549,14 +585,20 @@ def test_create_index_html(mock_data_collector, temp_dir):
     assert '<dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2">' in html
     assert html.count('<div class="stat-tile">') == 6
     assert '<dt>Commits</dt><dd class="stat-value">50</dd>' in html
-    assert "12.5 per active day &middot; 0.4 per day" in html
+    assert (
+        '<span class="nowrap">12.5 per active day</span>&nbsp;&middot; '
+        '<span class="nowrap">0.4 per day</span>'
+    ) in html
     assert "16.7 commits per author" in html
     # Large counts use thousands separators (total_lines=2000, added=3000, removed=1000)
     assert '<dt>Lines of Code</dt><dd class="stat-value">2,000</dd>' in html
     assert '<span class="stat-added">+3,000</span> added' in html
     assert '<span class="stat-removed">−1,000</span> removed' in html
     assert "3 extensions" in html
-    assert "of 120 days &middot; 3.33%" in html
+    assert (
+        '<span class="nowrap">of 120 days</span>&nbsp;&middot; <span class="nowrap">3.33%</span>'
+        in html
+    )
     assert '<dt>Longest Streak</dt><dd class="stat-value">4 days</dd>' in html
 
     # The old key/value table is gone: its rows live in the tiles and the meta line
@@ -597,20 +639,21 @@ def test_index_notes_longest_quiet_stretch(mock_data_collector, temp_dir):
     mock_data_collector.commits_by_year = {2010: 3, 2011: 0, 2014: 2, 2016: 1}
     html = _render_index(mock_data_collector, temp_dir)
     # 2012-2013 are missing and 2011 is empty: the longest run is 2011-2013
-    assert '<p class="chart-note">No commits from 2011 to 2013.</p>' in html
+    # drawn on the chart; the canvas is invisible to screen readers, so also as hidden text
+    assert '<p class="visually-hidden">No commits from 2011 to 2013.</p>' in html
 
 
 def test_index_single_empty_year_is_not_noted(mock_data_collector, temp_dir):
     mock_data_collector.commits_by_year = {2020: 1, 2022: 1}
-    assert "chart-note" not in _render_index(mock_data_collector, temp_dir)
+    assert "No commits from" not in _render_index(mock_data_collector, temp_dir)
 
 
 def test_index_without_tags_has_no_releases(mock_data_collector, temp_dir):
     mock_data_collector.tags = {}
     html = _render_index(mock_data_collector, temp_dir)
-    assert "Latest Releases" not in html
+    assert "Latest releases" not in html
     assert "two-columns" not in html
-    assert "Top Contributors" in html
+    assert "Top contributors" in html
 
 
 def test_author_html_marks_bots():
@@ -707,7 +750,9 @@ def test_page_summaries_use_stat_tiles(mock_data_collector, temp_dir):
 
     # Tags: v1.1.0 (2023-04-05) is the latest of two; 50 commits / 2 tags
     tags = page("tags.html")
-    assert "latest v1.1.0 &middot; 2023-04-05" in tags
+    assert (
+        '<span class="nowrap">latest v1.1.0</span>&nbsp;&middot; <span class="nowrap">2023-04-05</span>'
+    ) in tags
     assert '<dt>Commits per Tag</dt><dd class="stat-value">25.0</dd>' in tags
 
     # Ownership and History keep their intro paragraph above the tiles
@@ -732,11 +777,11 @@ def test_create_activity_html(mock_data_collector, temp_dir):
         html = f.read()
 
     assert "<h1>Activity</h1>" in html
-    assert "Month of Year" in html
+    assert "Month of year" in html
     assert "Commits by year/month" in html
 
     # Coarse to fine: year, month, week, then the daily rhythm
-    order = ["Commits by Year", "Commits by year/month", "Weekly activity", "Punch Card"]
+    order = ["Commits by year", "Commits by year/month", "Weekly activity", "Punch card"]
     positions = [html.index(f">{title}</a></h2>") for title in order]
     assert positions == sorted(positions)
 
@@ -751,6 +796,31 @@ def test_create_activity_html(mock_data_collector, temp_dir):
         assert f'<span id="{anchor}"></span>' in html
     assert html.index('id="yearly_activity"') < html.index('id="commits_by_year"')
     assert html.index('id="hour_of_week"') < html.index('id="punch_card"')
+
+
+def test_weekly_activity_labels_weeks_by_monday(mock_data_collector, monkeypatch):
+    import datetime as real_datetime
+
+    class FixedDatetime(real_datetime.datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls(2026, 9, 25, 12, 0)  # a Friday; its week starts on Mon 21 Sep
+
+    monkeypatch.setattr("gitstats.report_creator.datetime.datetime", FixedDatetime)
+    mock_data_collector.activity_by_year_week = {"2026-38": 7}  # "%Y-%W" of 2026-09-21
+    f = StringIO()
+    HTMLReportCreator()._write_weekly_activity_section(f, mock_data_collector)
+    html = f.getvalue()
+
+    # Labels are the weeks' Mondays, not "2026-38" (which reads like a month)
+    assert "Feb 16" in html and "Sep 21" in html
+    assert '"2026-38"' not in html
+    assert "from the week of Feb 16, 2026 to the week of Sep 21, 2026" in html
+    # The value for the current week is still found under its "%Y-%W" key
+    assert (
+        '"data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7]'
+        in html
+    )
 
 
 def test_activity_summary_and_section_links(mock_data_collector, temp_dir):
@@ -870,11 +940,18 @@ def test_create_authors_html(mock_data_collector, temp_dir):
     assert "<h1>Authors</h1>" in html
     assert "Alice Smith" in html
     assert "Bob Jones" in html
-    assert "Author of Month" in html
-    assert "Author of Year" in html
-    assert "Domains" in html
+    assert "Top author per year and month" in html
+    assert "Commits by domain" in html
     assert "example.com" in html
-    assert "Contributor Growth" in html
+    # Domains are data cells (not uppercased header cells) in a bar table
+    assert "<tr><td>example.com</td>" in html
+    assert "<th>example.com</th>" not in html
+    assert (
+        '<tr><th>Domain</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr>'
+        in html
+    )
+    assert "chart-domains" not in html
+    assert "Contributor growth" in html
 
 
 def test_render_chartjs_highlight_top_series():
@@ -883,7 +960,7 @@ def test_render_chartjs_highlight_top_series():
     result = creator._render_chartjs("chart-hl", "line", ["X"], datasets, highlight=5)
     # The first 5 keep distinct colors; the rest are grey and drawn behind
     assert result.count(HTMLReportCreator.OTHER_SERIES_COLOR) == 4  # border + background x 2
-    assert '"label": "A4", "data": [4], "borderColor": "#e16f24"' in result
+    assert '"label": "A4", "data": [4], "borderColor": getCSSVar(\'--series-5\')' in result
     assert '"label": "A5", "data": [5], "borderColor": "rgba(128, 128, 128, 0.45)"' in result
     # Only the highlighted series are listed in the legend
     assert "filter: function(item) { return item.datasetIndex < 5; }" in result
@@ -959,7 +1036,7 @@ def test_create_files_html(mock_data_collector, temp_dir):
     assert "Extensions" in html
     assert "py" in html
     assert "md" in html
-    assert "Most Changed Files" in html
+    assert "Most changed files" in html
     assert "main.py" in html
     assert "utils.py" in html
 
@@ -1311,15 +1388,19 @@ def test_authors_summary_and_folded_tables(mock_data_collector, temp_dir):
         '<h1>Authors</h1><p class="page-meta">3 authors &middot; top 2 wrote 90.0% of commits</p>'
         in html
     )
-    # Author of Month / Year tables are folded away, headings and anchors kept
+    # One section for the top author of each year (shown) and month (folded away);
+    # the old Author of Month / Year anchors still land on it
+    section = html[html.index('id="author_of_month"') : html.index('<h2 id="commits_by_domain"')]
+    assert 'id="author_of_year"' in section
+    assert section.count("<h2") == 1
+    assert section.index('id="aoy"') < section.index("<details")
     months = len(mock_data_collector.author_of_month)
     assert (
         '<details class="table-details"><summary>Table: top author of each month '
         f"({months} months with commits)</summary>"
-    ) in html
-    assert "<summary>Table: top author of each year (" in html
-    assert html.index('id="author_of_month"') < html.index("top author of each month")
-    assert html.count("</table></div></details>") == 2
+    ) in section
+    assert section.index("<details") < section.index('id="aom"')
+    assert html.count("</table></div></details>") == 1
 
 
 def test_authors_summary_counts_bots(mock_data_collector):
@@ -1400,7 +1481,7 @@ def test_ownership_page_renders(mock_data_collector, temp_dir):
         content = f.read()
 
     assert "Code Ownership" in content
-    assert "Bus Factor Risk" in content
+    assert "Bus factor risk" in content
     # solo_alice.py is only touched by Alice -> appears as a single-owner file
     assert "solo_alice.py" in content
     assert "Alice Smith" in content
@@ -1413,8 +1494,14 @@ def test_file_paths_are_monospace_cells(mock_data_collector, temp_dir):
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     with open(f"{temp_dir}/files.html", encoding="utf-8") as f:
         files = f.read()
-    # Churn table: the heat class stays, plus the path class
-    assert '<td class="heat heat4 path">main.py</td>' in files
+    # Churn: a bar table of paths; no heat-colored cells, no duplicate chart
+    assert (
+        '<tr><td class="path">main.py</td><td class="num">15</td>'
+        '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+        '<span style="width: 100.0%"></span></span></td></tr>'
+    ) in files
+    assert '<span style="width: 66.7%">' in files  # utils.py: 10 of 15
+    assert "chart-file-churn" not in files
     with open(f"{temp_dir}/ownership.html", encoding="utf-8") as f:
         ownership = f.read()
     assert ownership.count('<td class="path">') >= 2  # single-owner and shared tables
@@ -1641,3 +1728,124 @@ def test_history_page_chronicle_fallback_when_unparseable(mock_data_collector, t
 
     # shown whole rather than dropped
     assert "A free-form narrative without markers." in content
+
+
+def test_section_headings_use_sentence_case(mock_data_collector, temp_dir):
+    """Section headings are sentence case; only the first word is capitalized."""
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    for page in ("index", "activity", "authors", "files", "lines", "ownership"):
+        with open(os.path.join(temp_dir, f"{page}.html")) as f:
+            headings = re.findall(r"<h2[^>]*>(?:<a [^>]*>)?([^<]+)", f.read())
+        assert headings, page
+        for heading in headings:
+            rest = heading.split()[1:]
+            assert all(not w[0].isupper() for w in rest), (page, heading)
+
+
+def test_section_descriptions_share_one_style(mock_data_collector, temp_dir):
+    """Every paragraph describing a section uses .section-note, none is italic."""
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+
+    notes = 0
+    for page in ("index", "activity", "authors", "files", "lines", "ownership", "history"):
+        with open(os.path.join(temp_dir, f"{page}.html")) as f:
+            html = f.read()
+        assert "<p><em>" not in html, page
+        notes += html.count('<p class="section-note">')
+    assert notes >= 6
+
+
+def test_contributor_growth_is_cumulative(mock_data_collector, temp_dir):
+    """Contributors so far, as a step line up to the last month with commits."""
+    creator = HTMLReportCreator()
+    creator.create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "authors.html")) as f:
+        html = f.read()
+
+    chart = html[html.index('id="chart-contributor-growth"') :]
+    chart = chart[: chart.index("</script>")]
+    assert "type: 'line'" in chart
+    # one new contributor in each of Jan-Mar 2023, then none through June
+    assert '"2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06"' in chart
+    assert '"data": [1, 2, 3, 3, 3, 3], "stepped": true' in chart
+    assert '"notes": ["+1 new", "+1 new", "+1 new", "", "", ""]' in chart
+    assert "afterLabel: function(item)" in chart
+
+
+def test_render_chartjs_merges_tooltip_callbacks():
+    """Notes add an afterLabel line without dropping the chart's other callbacks."""
+    creator = HTMLReportCreator()
+    result = creator._render_chartjs(
+        "c",
+        "bar",
+        ["a", "b"],
+        [{"label": "C", "data": [1, 2], "notes": ["x", ""]}],
+        tooltip_share=True,
+    )
+    assert result.count("tooltip:") == 1
+    assert "label: function(item)" in result
+    assert "afterLabel: function(item)" in result
+
+
+def test_render_chartjs_integer_y_ticks():
+    """Every chart counts whole things, so the y-axis never shows 0.2 steps."""
+    creator = HTMLReportCreator()
+    result = creator._render_chartjs("c", "bar", ["a"], [{"label": "C", "data": [1]}])
+    assert "y: { beginAtZero: true, ticks: { precision: 0 } }" in result
+
+
+def test_bot_badges_wherever_authors_are_named(mock_data_collector, temp_dir):
+    """Releases, tags and top-author tables mark bots like the author lists do."""
+    bot = "dependabot[bot]"
+    badge = 'dependabot[bot] <span class="badge">bot</span>'
+    mock_data_collector.tags["v1.1.0"]["authors"] = {bot: 5, "Alice Smith": 3}
+    mock_data_collector.author_of_year = {2023: {bot: 40, "Alice Smith": 30}}
+    mock_data_collector.author_of_month = {
+        **mock_data_collector.author_of_month,
+        "2023-04": {"Alice Smith": 5, bot: 2},
+    }
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+
+    def page(name):
+        with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
+            return f.read()
+
+    assert f"{badge}, Alice Smith" in page("index.html")  # Latest releases
+    assert f"{badge} (5), Alice Smith (3)" in page("tags.html")
+    authors = page("authors.html")
+    assert f"<tr><td>2023</td><td>{badge}</td>" in authors  # top author of the year
+    assert f'<td>{badge}</td><td class="num">2</td></tr>' in authors  # runner-up
+
+
+def test_chart_lines_are_one_and_a_half_pixels():
+    creator = HTMLReportCreator()
+    single = creator._render_chartjs("c1", "line", ["a"], [{"label": "L", "data": [1]}])
+    assert '"borderWidth": 1.5' in single
+    multi = creator._render_chartjs(
+        "c2",
+        "line",
+        ["a"],
+        [{"label": s, "data": [1]} for s in "ABC"],
+        highlight=2,
+    )
+    # highlighted series 1.5px, the grey rest stay 1px behind them
+    assert multi.count('"borderWidth": 1.5') == 2
+    assert multi.count('"borderWidth": 1,') == 1
+
+
+def test_pinned_column_divider_only_on_scrolling_tables():
+    """JS marks overflowing .table-scroll boxes; only those draw the divider."""
+    creator = HTMLReportCreator()
+    creator.title = "p"
+    f = StringIO()
+    creator.print_header(f)
+    assert "box.classList.toggle('is-scrollable'" in f.getvalue()
+    css_path = os.path.join(os.path.dirname(__file__), "..", "gitstats", "gitstats.css")
+    with open(css_path, encoding="utf-8") as f:
+        css = f.read()
+    rule = css[css.index(".table-scroll tr > :first-child {") :]
+    assert "box-shadow" not in rule[: rule.index("}")]
+    assert ".table-scroll.is-scrollable tr > :first-child," in css

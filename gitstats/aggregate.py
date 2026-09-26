@@ -363,7 +363,7 @@ class AggregateReportCreator:
     def _write_failures(f: Any, failures: list[dict[str, str]]) -> None:
         if not failures:
             return
-        f.write("<h2>Failed Repositories</h2>")
+        f.write("<h2>Failed repositories</h2>")
         f.write('<div class="table-scroll"><table>')
         f.write("<tr><th>Repository</th><th>Error</th></tr>")
         for failure in failures:

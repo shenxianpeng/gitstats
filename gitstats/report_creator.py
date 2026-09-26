@@ -78,9 +78,25 @@ THEME_SCRIPT = """<script>
 		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
 	}
 
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
 	document.addEventListener('DOMContentLoaded', function() {
 		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
 		revealCurrentNavItem();
+		watchScrollBoxes();
 	});
 </script>"""
 
@@ -93,18 +109,27 @@ CHART_SCRIPT = """<script>
 		const grid = getCSSVar('--chart-grid');
 		Chart.defaults.color = text;
 		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
 		if (!chart) return;
 		// Built charts keep the defaults they resolved, so set colors on each one.
 		Object.values(chart.options.scales).forEach(function(scale) {
 			scale.ticks.color = text;
 			scale.title.color = text;
-			scale.grid.color = grid;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
 			scale.border.color = grid;
 		});
 		chart.options.plugins.legend.labels.color = text;
 		const bar = getCSSVar('--bar-color');
 		chart.data.datasets.forEach(function(ds) {
 			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
 		});
 	}
 
@@ -173,6 +198,25 @@ CHART_SCRIPT = """<script>
 			});
 		}
 	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
 
 	function formatChartDate(ms, unit) {
 		const d = new Date(ms);
@@ -391,7 +435,7 @@ class HTMLReportCreator(ReportCreator):
 
     def _write_overview_yearly(self, f: Any, data: Any) -> None:
         """Commits per year across the whole history, noting the longest quiet stretch."""
-        f.write(html_header(2, "Commits per Year"))
+        f.write(html_header(2, "Commits per year"))
         if data.commits_by_year:
             years = list(range(min(data.commits_by_year), max(data.commits_by_year) + 1))
         else:
@@ -405,16 +449,15 @@ class HTMLReportCreator(ReportCreator):
                 "bar",
                 years,
                 [{"label": "Commits", "data": values}],
-                y_label="Commits",
                 aspect_ratio=5,
                 annotations=annotations,
             )
         )
         if annotations:
-            # the same fact as text, for screen readers and at a glance
+            # the chart's canvas is invisible to screen readers; say the same in text
             band = annotations["bands"][0]
             f.write(
-                f'<p class="chart-note">No commits from {years[band["from"]]} '
+                f'<p class="visually-hidden">No commits from {years[band["from"]]} '
                 f"to {years[band['to']]}.</p>"
             )
         f.write('<p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p>')
@@ -437,7 +480,7 @@ class HTMLReportCreator(ReportCreator):
         total = data.get_total_authors()
         return (
             "<section>"
-            + html_header(2, "Top Contributors")
+            + html_header(2, "Top contributors")
             + '<div class="table-scroll"><table class="share-table">'
             '<tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th>'
             "<th></th></tr>" + "".join(rows) + "</table></div>"
@@ -453,7 +496,7 @@ class HTMLReportCreator(ReportCreator):
         for tag in latest:
             info = data.tags[tag]
             names = sorted(info["authors"], key=lambda a: (-info["authors"][a], a))
-            shown = ", ".join(html.escape(a) for a in names[:2])
+            shown = ", ".join(author_html(a) for a in names[:2])
             if len(names) > 2:
                 shown += f" +{len(names) - 2}"
             rows.append(
@@ -465,7 +508,7 @@ class HTMLReportCreator(ReportCreator):
         total = len(data.tags)
         return (
             "<section>"
-            + html_header(2, "Latest Releases")
+            + html_header(2, "Latest releases")
             + '<div class="table-scroll"><table class="share-table">'
             '<tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr>'
             + "".join(rows)
@@ -503,12 +546,12 @@ class HTMLReportCreator(ReportCreator):
 
     # The Activity page's sections, in page order, for its "On this page" links
     ACTIVITY_SECTIONS = (
-        ("Commits by Year", "By year"),
+        ("Commits by year", "By year"),
         ("Commits by year/month", "By month"),
         ("Weekly activity", "Last weeks"),
-        ("Punch Card", "Punch card"),
-        ("Month of Year", "Month of year"),
-        ("Commits by Timezone", "Timezones"),
+        ("Punch card", "Punch card"),
+        ("Month of year", "Month of year"),
+        ("Commits by timezone", "Timezones"),
     )
 
     def _write_activity_intro(self, f, data) -> None:
@@ -537,28 +580,39 @@ class HTMLReportCreator(ReportCreator):
         )
 
     def _write_weekly_activity_section(self, f, data) -> None:
-        """Write weekly activity section with chart."""
+        """Commits per week for the last 32 weeks.
+
+        Weeks are labelled by the Monday they start on ("Feb 16"); the "%Y-%W"
+        keys the data is stored under read like months ("2026-07").
+        """
         weeks_count = 32
         f.write(html_header(2, "Weekly activity"))
-        f.write("<p>Last %d weeks</p>" % weeks_count)
 
         now = datetime.datetime.now()
         deltaweek = datetime.timedelta(7)
         weeks: list[str] = []
+        mondays: list[datetime.date] = []
         stampcur = now
         for _ in range(weeks_count):
             weeks.insert(0, stampcur.strftime("%Y-%W"))
+            mondays.insert(0, (stampcur - datetime.timedelta(days=stampcur.weekday())).date())
             stampcur -= deltaweek
 
+        def day(d: datetime.date) -> str:
+            return f"{d:%b} {d.day}"
+
+        f.write(
+            '<p class="section-note">'
+            f"Last {weeks_count} weeks, from the week of {day(mondays[0])}, {mondays[0].year} "
+            f"to the week of {day(mondays[-1])}, {mondays[-1].year}.</p>"
+        )
         weekly_values = [data.activity_by_year_week.get(w, 0) for w in weeks]
         f.write(
             self._render_chartjs(
                 "chart-weekly-activity",
                 "bar",
-                weeks,
+                [day(m) for m in mondays],
                 [{"label": "Commits", "data": weekly_values}],
-                y_label="Commits",
-                x_ticks_rotate=True,
                 aspect_ratio=5,
             )
         )
@@ -573,9 +627,10 @@ class HTMLReportCreator(ReportCreator):
         """
         f.write('<span id="hour_of_day"></span><span id="day_of_week"></span>')
         f.write('<span id="hour_of_week"></span>')
-        f.write(html_header(2, "Punch Card"))
+        f.write(html_header(2, "Punch card"))
         f.write(
-            "<p>Commits by day of week and hour of day, in each commit's local time. "
+            '<p class="section-note">'
+            "Commits by day of week and hour of day, in each commit's local time. "
             "The bars along the top are the commits per hour; the last column is "
             "the commits per day.</p>"
         )
@@ -642,7 +697,7 @@ class HTMLReportCreator(ReportCreator):
 
     def _write_month_of_year_section(self, f, data) -> None:
         """Commits per calendar month, all years combined: counts on the bars, share on hover."""
-        f.write(html_header(2, "Month of Year"))
+        f.write(html_header(2, "Month of year"))
         values = [data.activity_by_month_of_year.get(mm, 0) for mm in range(1, 13)]
         f.write(
             self._render_chartjs(
@@ -650,7 +705,6 @@ class HTMLReportCreator(ReportCreator):
                 "bar",
                 list(self.MONTH_NAMES),
                 [{"label": "Commits", "data": values}],
-                y_label="Commits",
                 max_bar_thickness=40,
                 aspect_ratio=2,
                 annotations={"values": True},
@@ -669,8 +723,7 @@ class HTMLReportCreator(ReportCreator):
                 "bar",
                 cbym_keys,
                 [{"label": "Commits", "data": cbym_values}],
-                y_label="Commits",
-                x_ticks_rotate=True,
+                month_axis=True,
                 # a year or more without commits gets shaded, with the peaks around it
                 annotations=gap_annotations(cbym_keys, cbym_values, min_gap=12),
             )
@@ -702,7 +755,7 @@ class HTMLReportCreator(ReportCreator):
         chart showed the same numbers.
         """
         f.write('<span id="yearly_activity"></span>')
-        f.write(html_header(2, "Commits by Year"))
+        f.write(html_header(2, "Commits by year"))
         f.write(_FLEX_CONTAINER)
         f.write(
             '<div class="table-scroll"><table><tr><th>Year</th><th class="num">Commits (% of all)</th><th class="num">Lines added</th><th class="num">Lines removed</th></tr>'
@@ -737,7 +790,6 @@ class HTMLReportCreator(ReportCreator):
                 "bar",
                 cby_all_years,
                 [{"label": "Commits", "data": cby_values}],
-                y_label="Commits",
                 annotations=gap_annotations(cby_all_years, cby_values, min_gap=2),
             )
         )
@@ -745,7 +797,7 @@ class HTMLReportCreator(ReportCreator):
 
     def _write_commits_by_timezone_section(self, f, data) -> None:
         """Commits per UTC offset, west to east, as horizontal bars."""
-        f.write(html_header(2, "Commits by Timezone"))
+        f.write(html_header(2, "Commits by timezone"))
         total = sum(data.commits_by_timezone.values()) or 1
         busiest = max(data.commits_by_timezone.values(), default=0) or 1
         rows = []
@@ -877,7 +929,8 @@ class HTMLReportCreator(ReportCreator):
         # year has no year boundary, so label its first and last month instead
         ends = "" if grid else f"<span>{months[0]}</span><span>{months[-1]}</span>"
         return (
-            "<p>One row per author: a square marks each month with commits (bigger means "
+            '<p class="section-note">'
+            "One row per author: a square marks each month with commits (bigger means "
             "more), and the line runs from their first to their last active month. "
             "Bot accounts are grey.</p>"
             '<div class="timeline-scroll"><div class="timeline">'
@@ -912,7 +965,7 @@ class HTMLReportCreator(ReportCreator):
         f.write(self._authors_summary_html(data))
 
         # Authors :: List of authors
-        f.write(html_header(2, "List of Authors"))
+        f.write(html_header(2, "List of authors"))
 
         f.write('<div class="table-scroll"><table class="authors sortable" id="authors">')
         f.write(
@@ -951,7 +1004,7 @@ class HTMLReportCreator(ReportCreator):
             rest = allauthors[load_config()["max_authors"] :]
             max_list = load_config()["max_authors_list"]
             if len(rest) > max_list:
-                shown = ", ".join(html.escape(a) for a in rest[:max_list])
+                shown = ", ".join(author_html(a) for a in rest[:max_list])
                 more = len(rest) - max_list
                 f.write(
                     f'<p class="moreauthors">These didn\'t make it to the top:'
@@ -960,21 +1013,20 @@ class HTMLReportCreator(ReportCreator):
             else:
                 f.write(
                     '<p class="moreauthors">These didn\'t make it to the top: {}</p>'.format(
-                        ", ".join(html.escape(a) for a in rest)
+                        ", ".join(author_html(a) for a in rest)
                     )
                 )
 
         # Build per-author time series data for Chart.js
         time_labels, loc_datasets = self._build_author_time_series(data)
 
-        f.write(html_header(2, "Cumulated Added Lines of Code per Author"))
+        f.write(html_header(2, "Cumulated added lines of code per author"))
         f.write(
             self._render_chartjs(
                 "chart-loc-by-author",
                 "line",
                 time_labels,
                 loc_datasets,
-                y_label="Lines",
                 time_axis=True,
                 highlight=5,
             )
@@ -986,7 +1038,7 @@ class HTMLReportCreator(ReportCreator):
 
         # Replaces the former "Commits per Author" line chart; its anchor still lands here
         f.write('<span id="commits_per_author"></span>')
-        f.write(html_header(2, "Contributor Timeline"))
+        f.write(html_header(2, "Contributor timeline"))
         f.write(
             self._contributor_timeline_html(data, data.get_authors(load_config()["max_authors"]))
         )
@@ -996,129 +1048,72 @@ class HTMLReportCreator(ReportCreator):
                 % load_config()["max_authors"]
             )
 
-        # Authors :: Author of Month (a long table, folded away by default)
-        f.write(html_header(2, "Author of Month"))
+        # Authors :: the top author of each year, then of each month (folded away).
+        # The old "Author of Month/Year" anchors are kept so existing links still land here.
+        f.write('<span id="author_of_month"></span><span id="author_of_year"></span>')
+        f.write(html_header(2, "Top author per year and month"))
+        f.write(
+            '<p class="section-note">'
+            "Who made the most commits in each year and month, the runners-up, "
+            "and how many people committed.</p>"
+        )
+        f.write(self._top_authors_table("aoy", "Year", data.author_of_year, data.commits_by_year))
         months = len(data.author_of_month)
         f.write(
             '<details class="table-details"><summary>Table: top author of each month '
             f"({months} month{'' if months == 1 else 's'} with commits)</summary>"
         )
-        f.write('<div class="table-scroll"><table class="sortable" id="aom">')
         f.write(
-            '<tr><th>Month</th><th>Author</th><th class="num">Commits (%%)</th><th class="unsortable">Next top %d</th><th class="num">Number of authors</th></tr>'
-            % load_config()["authors_top"]
+            self._top_authors_table("aom", "Month", data.author_of_month, data.commits_by_month)
         )
-        for yymm in sorted(data.author_of_month.keys(), reverse=True):
-            author_dict = data.author_of_month[yymm]
-            authors = get_keys_sorted_by_values(author_dict)
-            authors.reverse()
-            commits = data.author_of_month[yymm][authors[0]]
-            authors_str = ", ".join(
-                html.escape(a) for a in authors[1 : load_config()["authors_top"] + 1]
-            )
-            f.write(
-                '<tr><td>%s</td><td>%s</td><td class="num">%d (%.2f%% of %d)</td><td>%s</td><td class="num">%d</td></tr>'
-                % (
-                    yymm,
-                    html.escape(authors[0]),
-                    commits,
-                    (100.0 * commits) / data.commits_by_month[yymm],
-                    data.commits_by_month[yymm],
-                    authors_str,
-                    len(authors),
-                )
-            )
+        f.write("</details>")
 
-        f.write("</table></div></details>")
-
-        f.write(html_header(2, "Author of Year"))
-        years = len(data.author_of_year)
-        f.write(
-            '<details class="table-details"><summary>Table: top author of each year '
-            f"({years} year{'' if years == 1 else 's'} with commits)</summary>"
-        )
-        f.write(
-            '<div class="table-scroll"><table class="sortable" id="aoy"><tr><th>Year</th><th>Author</th><th class="num">Commits (%%)</th><th class="unsortable">Next top %d</th><th class="num">Number of authors</th></tr>'
-            % load_config()["authors_top"]
-        )
-        for yy in sorted(data.author_of_year.keys(), reverse=True):
-            author_dict = data.author_of_year[yy]
-            authors = get_keys_sorted_by_values(author_dict)
-            authors.reverse()
-            commits = data.author_of_year[yy][authors[0]]
-            authors_str = ", ".join(
-                html.escape(a) for a in authors[1 : load_config()["authors_top"] + 1]
-            )
-            f.write(
-                '<tr><td>%s</td><td>%s</td><td class="num">%d (%.2f%% of %d)</td><td>%s</td><td class="num">%d</td></tr>'
-                % (
-                    yy,
-                    html.escape(authors[0]),
-                    commits,
-                    (100.0 * commits) / data.commits_by_year[yy],
-                    data.commits_by_year[yy],
-                    authors_str,
-                    len(authors),
-                )
-            )
-        f.write("</table></div></details>")
-
-        # Domains
-        f.write(html_header(2, "Commits by Domains"))
+        # Domains: a bar table (the numbers used to be shown twice, as a table and a chart)
+        f.write(html_header(2, "Commits by domain"))
         domains_by_commits = get_keys_sorted_by_value_key(data.domains, "commits")
         domains_by_commits.reverse()  # most first
-        f.write(_FLEX_CONTAINER)
-        f.write('<div class="table-scroll"><table>')
-        f.write('<tr><th>Domains</th><th class="num">Total (%)</th></tr>')
-        dom_labels = []
-        dom_values = []
-        n = 0
-        for domain in domains_by_commits:
-            if n == load_config()["max_domains"]:
-                break
-            n += 1
-            info = data.get_domain_info(domain)
-            dom_labels.append(domain)
-            dom_values.append(info["commits"])
-            f.write(
-                '<tr><th>%s</th><td class="num">%d (%.2f%%)</td></tr>'
-                % (
-                    html.escape(domain),
-                    info["commits"],
-                    (100.0 * info["commits"] / data.get_total_commits()),
-                )
+        top_domains = domains_by_commits[: load_config()["max_domains"]]
+        busiest = max((data.get_domain_info(d)["commits"] for d in top_domains), default=0) or 1
+        total = data.get_total_commits() or 1
+        rows = []
+        for domain in top_domains:
+            commits = data.get_domain_info(domain)["commits"]
+            rows.append(
+                f"<tr><td>{html.escape(domain)}</td>"
+                f'<td class="num">{format_int(commits)}</td>'
+                f'<td class="num">{100.0 * commits / total:.1f}%</td>'
+                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                f'<span style="width: {100.0 * commits / busiest:.1f}%"></span></span></td></tr>'
             )
-        f.write("</table></div>")
-        f.write(_FLEX_CHILD)
         f.write(
-            self._render_chartjs(
-                "chart-domains",
-                "bar",
-                dom_labels,
-                [{"label": "Commits", "data": dom_values}],
-                y_label="Commits",
-                x_ticks_rotate=True,
-            )
+            '<div class="table-scroll"><table class="share-table">'
+            '<tr><th>Domain</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr>'
+            + "".join(rows)
+            + "</table></div>"
         )
-        f.write(_FLEX_CLOSE)
 
-        # Contributor Growth Over Time
+        # Contributor growth: everyone who has contributed so far, month by month
         if data.new_contributors_by_month:
-            f.write(html_header(2, "Contributor Growth"))
+            f.write(html_header(2, "Contributor growth"))
             f.write(
-                "<p><em>Number of first-time contributors per month. "
-                "A growing trend indicates a healthy, welcoming project.</em></p>"
+                '<p class="section-note">'
+                "Contributors so far, month by month: each step up is a month in "
+                "which someone made their first commit.</p>"
             )
-            nc_keys = month_range(data.new_contributors_by_month.keys())
-            nc_values = [data.new_contributors_by_month.get(k, 0) for k in nc_keys]
+            new = data.new_contributors_by_month
+            growth_months = month_range([*new, *data.commits_by_month])
+            total, totals, notes = 0, [], []
+            for month in growth_months:
+                total += new.get(month, 0)
+                totals.append(total)
+                notes.append(f"+{new[month]} new" if new.get(month) else "")
             f.write(
                 self._render_chartjs(
                     "chart-contributor-growth",
-                    "bar",
-                    nc_keys,
-                    [{"label": "New contributors", "data": nc_values}],
-                    y_label="New contributors",
-                    x_ticks_rotate=True,
+                    "line",
+                    growth_months,
+                    [{"label": "Contributors", "data": totals, "stepped": True, "notes": notes}],
+                    month_axis=True,
                     aspect_ratio=4,
                 )
             )
@@ -1177,7 +1172,6 @@ class HTMLReportCreator(ReportCreator):
                 "line",
                 fbd_stamps,
                 [{"label": "Files", "data": fbd_values}],
-                y_label="Files",
                 time_axis=True,
             )
         )
@@ -1187,7 +1181,9 @@ class HTMLReportCreator(ReportCreator):
         # Files :: Extensions
         f.write(html_header(2, "Extensions"))
         f.write(
-            "<p><em>Note: Files with excluded extensions are not shown. Configure <code>exclude_exts</code> in gitstats.conf.</em></p>"
+            '<p class="section-note">'
+            "Files with excluded extensions are not shown; "
+            "configure <code>exclude_exts</code> in gitstats.conf.</p>"
         )
         f.write(
             '<div class="table-scroll"><table class="sortable" id="ext"><tr><th>Extension</th><th class="num">Files (%)</th><th class="num">Lines (%)</th><th class="num">Lines/file</th></tr>'
@@ -1215,39 +1211,29 @@ class HTMLReportCreator(ReportCreator):
 
         # Files :: Code Churn (most frequently changed files)
         if data.file_churn:
-            f.write(html_header(2, "Most Changed Files (Code Churn)"))
+            f.write(html_header(2, "Most changed files (code churn)"))
             f.write(
-                "<p><em>Files touched most often across all commits. "
-                "High-churn files are hotspots that may benefit from extra review or refactoring.</em></p>"
+                '<p class="section-note">'
+                "Files touched most often across all commits. "
+                "High-churn files are hotspots that may benefit from extra review or refactoring.</p>"
             )
             churn_sorted = sorted(data.file_churn.items(), key=lambda x: x[1], reverse=True)
             top_churn = churn_sorted[:25]
             max_churn = max(1, top_churn[0][1]) if top_churn else 1
-            churn_labels = [item[0] for item in top_churn]
-            churn_values = [item[1] for item in top_churn]
+            # A bar table: the counts used to be shown twice, in a heat-colored
+            # table and a bar chart whose rotated path labels were unreadable
+            rows = [
+                f'<tr><td class="path">{html.escape(filepath)}</td>'
+                f'<td class="num">{format_int(count)}</td>'
+                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                f'<span style="width: {100.0 * count / max_churn:.1f}%"></span></span></td></tr>'
+                for filepath, count in top_churn
+            ]
             f.write(
-                '<div class="table-scroll"><table class="sortable" id="churn"><tr><th>File</th><th class="num">Times Changed</th></tr>'
-            )
-            for filepath, count in top_churn:
-                f.write(
-                    '<tr><td class="%s path">%s</td><td class="num">%d</td></tr>'
-                    % (
-                        self._heat_td_class(count, max_churn),
-                        html.escape(filepath),
-                        count,
-                    )
-                )
-            f.write("</table></div>")
-            f.write(
-                self._render_chartjs(
-                    "chart-file-churn",
-                    "bar",
-                    churn_labels,
-                    [{"label": "Commits", "data": churn_values}],
-                    y_label="Times Changed",
-                    x_ticks_rotate=True,
-                    aspect_ratio=3,
-                )
+                '<div class="table-scroll"><table class="sortable share-table" id="churn">'
+                '<tr><th>File</th><th class="num">Times Changed</th><th class="unsortable"></th></tr>'
+                + "".join(rows)
+                + "</table></div>"
             )
 
         self.print_footer(f)
@@ -1289,7 +1275,7 @@ class HTMLReportCreator(ReportCreator):
             )
         )
 
-        f.write(html_header(2, "Lines of Code"))
+        f.write(html_header(2, "Lines of code"))
         loc_stamps = sorted(data.changes_by_date.keys())
         loc_values = [data.changes_by_date[s]["lines"] for s in loc_stamps]
         f.write(
@@ -1298,7 +1284,6 @@ class HTMLReportCreator(ReportCreator):
                 "line",
                 loc_stamps,
                 [{"label": "Lines", "data": loc_values}],
-                y_label="Lines",
                 time_axis=True,
             )
         )
@@ -1353,11 +1338,11 @@ class HTMLReportCreator(ReportCreator):
                 authors_shown = authors_reversed[:max_tags_authors]
                 remaining = len(authors_reversed) - max_tags_authors
                 for i in authors_shown:
-                    authorinfo.append("%s (%d)" % (html.escape(i), data.tags[tag]["authors"][i]))
+                    authorinfo.append("%s (%d)" % (author_html(i), data.tags[tag]["authors"][i]))
                 authorinfo.append("<em>and %d more authors</em>" % remaining)
             else:
                 for i in authors_reversed:
-                    authorinfo.append("%s (%d)" % (html.escape(i), data.tags[tag]["authors"][i]))
+                    authorinfo.append("%s (%d)" % (author_html(i), data.tags[tag]["authors"][i]))
             f.write(
                 '<tr><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="num">%d</td><td>%s</td></tr>'
                 % (
@@ -1446,10 +1431,11 @@ class HTMLReportCreator(ReportCreator):
         )
 
         # Bus-factor risk: single-owner files, most-changed first
-        f.write(html_header(2, "Bus Factor Risk — Single-Owner Files"))
+        f.write(html_header(2, "Bus factor risk — single-owner files"))
         f.write(
-            "<p><em>Files only one author has ever changed. The more a file has "
-            "changed, the more knowledge is at risk if that person leaves.</em></p>"
+            '<p class="section-note">'
+            "Files only one author has ever changed. The more a file has "
+            "changed, the more knowledge is at risk if that person leaves.</p>"
         )
         risk_files = [fs for fs in ownership["files"] if fs["contributors"] == 1]
         if risk_files:
@@ -1460,7 +1446,7 @@ class HTMLReportCreator(ReportCreator):
             for fs in risk_files[:50]:
                 f.write(
                     '<tr><td class="path">%s</td><td>%s</td><td class="num">%d</td></tr>'
-                    % (html.escape(fs["path"]), html.escape(fs["owner"]), fs["edits"])
+                    % (html.escape(fs["path"]), author_html(fs["owner"]), fs["edits"])
                 )
             f.write("</table></div>")
             if len(risk_files) > 50:
@@ -1472,10 +1458,11 @@ class HTMLReportCreator(ReportCreator):
             f.write("<p>No single-owner files — every file has multiple contributors.</p>")
 
         # Ownership concentration by author
-        f.write(html_header(2, "Ownership by Author"))
+        f.write(html_header(2, "Ownership by author"))
         f.write(
-            "<p><em>Primary owner = the author with the most commits to a file. "
-            "Solely owned = files only that author has touched.</em></p>"
+            '<p class="section-note">'
+            "Primary owner = the author with the most commits to a file. "
+            "Solely owned = files only that author has touched.</p>"
         )
         f.write(
             '<div class="table-scroll"><table class="sortable" id="ownership-by-author">'
@@ -1486,7 +1473,7 @@ class HTMLReportCreator(ReportCreator):
             f.write(
                 '<tr><td>%s</td><td class="num">%d</td><td class="num">%d</td><td class="num">%d</td></tr>'
                 % (
-                    html.escape(a["author"]),
+                    author_html(a["author"]),
                     a["files_owned"],
                     a["files_solely_owned"],
                     a["files_touched"],
@@ -1500,10 +1487,11 @@ class HTMLReportCreator(ReportCreator):
             )
 
         # Coordination hotspots: files with the most contributors
-        f.write(html_header(2, "Most Shared Files"))
+        f.write(html_header(2, "Most shared files"))
         f.write(
-            "<p><em>Files touched by the most people — shared code where changes "
-            "are most likely to need coordination.</em></p>"
+            '<p class="section-note">'
+            "Files touched by the most people — shared code where changes "
+            "are most likely to need coordination.</p>"
         )
         shared = sorted(
             (fs for fs in ownership["files"] if fs["contributors"] >= 2),
@@ -1522,7 +1510,7 @@ class HTMLReportCreator(ReportCreator):
                     % (
                         html.escape(fs["path"]),
                         fs["contributors"],
-                        html.escape(fs["owner"]),
+                        author_html(fs["owner"]),
                         fs["ownership_pct"],
                     )
                 )
@@ -1784,9 +1772,35 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
-    CHART_COLORS = ["#5b8dee", "#1a7f37", "#cf222e", "#8250df", "#e16f24", "#0550ae"]
+    # Multi-series colors are the CSS variables --series-1 .. --series-6, so
+    # they switch with the theme (see applyChartTheme)
+    SERIES_COLORS = 6
     # Series outside the highlighted top N: a neutral grey readable on both themes
     OTHER_SERIES_COLOR = "rgba(128, 128, 128, 0.45)"
+
+    def _top_authors_table(
+        self, table_id: str, period: str, authors_by_period: dict, commits_by_period: dict
+    ) -> str:
+        """A sortable table of each period's top author, newest period first."""
+        top = load_config()["authors_top"]
+        rows = [
+            f'<div class="table-scroll"><table class="sortable" id="{table_id}">'
+            f'<tr><th>{period}</th><th>Author</th><th class="num">Commits (%)</th>'
+            f'<th class="unsortable">Next top {top}</th><th class="num">Authors</th></tr>'
+        ]
+        for key in sorted(authors_by_period, reverse=True):
+            authors = get_keys_sorted_by_values(authors_by_period[key])
+            authors.reverse()
+            commits = authors_by_period[key][authors[0]]
+            total = commits_by_period[key]
+            rows.append(
+                f"<tr><td>{key}</td><td>{author_html(authors[0])}</td>"
+                f'<td class="num">{commits} ({100.0 * commits / total:.2f}% of {total})</td>'
+                f"<td>{', '.join(author_html(a) for a in authors[1 : top + 1])}</td>"
+                f'<td class="num">{len(authors)}</td></tr>'
+            )
+        rows.append("</table></div>")
+        return "".join(rows)
 
     def _render_chartjs(
         self,
@@ -1794,7 +1808,6 @@ class HTMLReportCreator(ReportCreator):
         chart_type,
         labels,
         datasets,
-        y_label="Commits",
         x_ticks_rotate=False,
         aspect_ratio=3,
         max_bar_thickness=None,
@@ -1802,6 +1815,7 @@ class HTMLReportCreator(ReportCreator):
         highlight=None,
         annotations=None,
         tooltip_share=False,
+        month_axis=False,
     ):
         """Render a Chart.js chart as inline HTML.
 
@@ -1821,12 +1835,18 @@ class HTMLReportCreator(ReportCreator):
 
         With ``tooltip_share=True`` (single series), the tooltip also gives the
         value's share of the series total: "67 commits (12.1%)".
+
+        With ``month_axis=True``, ``labels`` are "YYYY-MM" months and the x-axis
+        labels only the years (at each January), horizontally.
+
+        A dataset may carry ``notes``, one string per point, shown as an extra
+        tooltip line (e.g. "+2 new"); empty strings add nothing.
         """
         is_multi = len(datasets) > 1
 
         js_datasets = []
         for i, ds in enumerate(datasets):
-            color = self.CHART_COLORS[i % len(self.CHART_COLORS)]
+            series = i % self.SERIES_COLORS + 1
             entry = dict(ds)
             if is_multi and highlight is not None and i >= highlight:
                 entry.setdefault("borderColor", self.OTHER_SERIES_COLOR)
@@ -1836,13 +1856,14 @@ class HTMLReportCreator(ReportCreator):
                 entry.setdefault("borderWidth", 1)
                 entry.setdefault("order", 1)  # higher order is drawn first, i.e. behind
             elif is_multi:
-                entry.setdefault("borderColor", color)
-                entry.setdefault("backgroundColor", color + "33")
+                entry.setdefault("borderColor", f"__CSS_SERIES_{series}__")
+                entry.setdefault("backgroundColor", f"__CSS_SERIES_{series}_FILL__")
+                entry["series"] = series
                 entry.setdefault("fill", False)
                 entry.setdefault("tension", 0.1)
                 entry.setdefault("pointRadius", 0)
                 entry.setdefault("pointHoverRadius", 3)
-                entry.setdefault("borderWidth", 1)
+                entry.setdefault("borderWidth", 1.5)
                 if highlight is not None:
                     entry.setdefault("order", 0)
             else:
@@ -1851,7 +1872,7 @@ class HTMLReportCreator(ReportCreator):
                 entry["borderColor"] = "__CSS_BAR_COLOR__"
                 entry["themed"] = True
                 if chart_type == "line":
-                    entry.setdefault("borderWidth", 1)
+                    entry.setdefault("borderWidth", 1.5)
                     entry.setdefault("pointRadius", 0)
                     entry.setdefault("pointHoverRadius", 3)
             if time_axis and chart_type == "line":
@@ -1862,16 +1883,25 @@ class HTMLReportCreator(ReportCreator):
             labels = [int(stamp) * 1000 for stamp in labels]
         labels_json = json.dumps(labels).replace("</", "<\\/")
         datasets_json = json.dumps(js_datasets).replace("</", "<\\/")
-        # Replace quoted placeholder with JS expression
+        # Replace quoted placeholders with JS expressions
         datasets_json = datasets_json.replace('"__CSS_BAR_COLOR__"', "getCSSVar('--bar-color')")
+        for n in range(1, self.SERIES_COLORS + 1):
+            datasets_json = datasets_json.replace(
+                f'"__CSS_SERIES_{n}__"', f"getCSSVar('--series-{n}')"
+            ).replace(f'"__CSS_SERIES_{n}_FILL__"', f"getCSSVar('--series-{n}') + '33'")
 
         legend_display = "true" if is_multi else "false"
+        legend_labels = []
+        if is_multi and chart_type == "line":
+            # a short line in the series color, clearer than a faint filled box
+            legend_labels.append("usePointStyle: true, pointStyle: 'line'")
         if is_multi and highlight is not None:
             # Legend lists only the highlighted series
-            legend_display += (
-                ", labels: { filter: function(item) { return item.datasetIndex < %d; } }"
-                % highlight
+            legend_labels.append(
+                "filter: function(item) { return item.datasetIndex < %d; }" % highlight
             )
+        if legend_labels:
+            legend_display += ", labels: { " + ", ".join(legend_labels) + " }"
         if time_axis:
             # pair each value with its timestamp: {x, y} points on a linear axis
             data_js = f"""datasets: (function(xs, sets) {{
@@ -1881,24 +1911,42 @@ class HTMLReportCreator(ReportCreator):
         return sets;
       }})(labels, {datasets_json})"""
             x_scale_js = "timeAxis(labels)"
-            tooltip_js = """,
-        tooltip: { callbacks: { title: function(items) {
+            tooltip_callbacks = [
+                """title: function(items) {
           return items.length ? formatChartDate(items[0].parsed.x) : '';
-        } } }"""
+        }"""
+            ]
         else:
             data_js = f"""labels: labels,
       datasets: {datasets_json}"""
-            x_ticks_opts = (
-                "maxRotation: 45, minRotation: 45" if x_ticks_rotate else "maxRotation: 0"
-            )
-            x_scale_js = f"{{ ticks: {{ {x_ticks_opts} }} }}"
-            tooltip_js = ""
+            if month_axis:
+                x_scale_js = (
+                    "{ ticks: { autoSkip: false, maxRotation: 0, callback: monthAxisTick }, "
+                    "grid: { color: monthAxisGrid } }"
+                )
+            elif x_ticks_rotate:
+                x_scale_js = "{ ticks: { maxRotation: 45, minRotation: 45 } }"
+            else:
+                x_scale_js = "{ ticks: { maxRotation: 0 } }"
+            tooltip_callbacks = []
             if tooltip_share:
-                tooltip_js = """,
-        tooltip: { callbacks: { label: function(item) {
+                tooltip_callbacks.append(
+                    """label: function(item) {
           const total = item.dataset.data.reduce(function(a, b) { return a + b; }, 0) || 1;
           return item.parsed.y + ' commits (' + (100 * item.parsed.y / total).toFixed(1) + '%)';
-        } } }"""
+        }"""
+                )
+        if any("notes" in ds for ds in datasets):
+            tooltip_callbacks.append(
+                """afterLabel: function(item) {
+          return (item.dataset.notes || [])[item.dataIndex] || '';
+        }"""
+            )
+        tooltip_js = ""
+        if tooltip_callbacks:
+            tooltip_js = (
+                ",\n        tooltip: { callbacks: { " + ", ".join(tooltip_callbacks) + " } }"
+            )
 
         # Lines have no point markers, so tooltips follow the nearest point
         # instead of needing the pointer exactly on one
@@ -1939,7 +1987,7 @@ class HTMLReportCreator(ReportCreator):
       }},
       scales: {{
         x: {x_scale_js},
-        y: {{ beginAtZero: true{grace_js}, title: {{ display: true, text: '{y_label}' }} }}
+        y: {{ beginAtZero: true{grace_js}, ticks: {{ precision: 0 }} }}
       }}{f", datasets: {{ bar: {{ maxBarThickness: {max_bar_thickness} }} }}" if max_bar_thickness else ""}
     }}
   }});
@@ -2401,11 +2449,18 @@ def stat_tiles_html(tiles: list[tuple[str, str, str]]) -> str:
         n = max(len(tiles), 1)
         return next(c for c in range(min(n, limit), 0, -1) if n % c == 0)
 
+    def phrases(note: str) -> str:
+        # a note wraps after a " · " between its phrases, never inside one ("per active / day")
+        parts = note.split(" &middot; ")
+        if len(parts) == 1:
+            return note
+        return "&nbsp;&middot; ".join(f'<span class="nowrap">{part}</span>' for part in parts)
+
     items = "".join(
         '<div class="stat-tile">'
         f"<dt>{label}</dt>"
         f'<dd class="stat-value">{value}</dd>'
-        + (f'<dd class="stat-note">{note}</dd>' if note else "")
+        + (f'<dd class="stat-note">{phrases(note)}</dd>' if note else "")
         + "</div>"
         for label, value, note in tiles
     )

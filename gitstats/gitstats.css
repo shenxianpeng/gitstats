@@ -60,6 +60,14 @@
 	--chart-text: #656363;
 	--chart-grid: #e6e5e4;
 
+	/* Multi-series charts (e.g. the top authors) — at least 3:1 on --bg-color */
+	--series-1: #5b8dee;
+	--series-2: #1a7f37;
+	--series-3: #cf222e;
+	--series-4: #8250df;
+	--series-5: #e16f24;
+	--series-6: #0550ae;
+
 	/* Heatmap — GitHub green scale (user preference) */
 	--heat0-bg: #ebedf0;
 	--heat0-color: #1f2328;
@@ -103,6 +111,14 @@
 
 	--chart-text: #b7b1b1;
 	--chart-grid: #3d3838;
+
+	/* Brighter series colors for the dark background (4.9:1 and up) */
+	--series-1: #6ca4f8;
+	--series-2: #3fb950;
+	--series-3: #f85149;
+	--series-4: #a371f7;
+	--series-5: #f0883e;
+	--series-6: #79c0ff;
 
 	/* Heatmap dark — GitHub dark green, empty cells in the page's warm grey */
 	--heat0-bg: #2d2929;
@@ -195,9 +211,23 @@ dd {
 	text-decoration: none;
 }
 
-.chart-note {
-	margin: 0;
-	font-size: var(--font-size-sm);
+/* Text for screen readers only, e.g. what a canvas chart shows */
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* The sentence or two under a section heading saying what the section shows */
+.section-note {
+	max-width: 75ch;
+	margin: 0 0 var(--space-4);
 	color: var(--text-secondary);
 }
 
@@ -524,8 +554,8 @@ table.tags td {
 	vertical-align: top;
 }
 
-/* Dates, tag names and spans read badly when wrapped */
-td.nowrap {
+/* Dates, tag names and short phrases read badly when wrapped */
+.nowrap {
 	white-space: nowrap;
 }
 
@@ -792,12 +822,17 @@ tr:hover td {
 	}
 
 	/* Wide tables scroll sideways here: keep the row label (first column)
-	   pinned, with a hairline so scrolled cells visibly pass under it */
+	   pinned, with a hairline so scrolled cells visibly pass under it. The
+	   hairline only shows on tables that do scroll (.is-scrollable, set by JS). */
 	.table-scroll tr > :first-child {
 		position: sticky;
 		left: 0;
 		z-index: 1;
 		background-color: var(--bg-color);
+	}
+
+	.table-scroll.is-scrollable tr > :first-child,
+	.timeline-scroll.is-scrollable .timeline-name {
 		box-shadow: inset -1px 0 0 var(--table-border);
 	}
 
@@ -811,7 +846,6 @@ tr:hover td {
 		left: 0;
 		z-index: 1;
 		background-color: var(--bg-color);
-		box-shadow: inset -1px 0 0 var(--table-border);
 	}
 }
 
@@ -1151,25 +1185,54 @@ details.table-details[open] > summary {
 	line-height: 1.6;
 }
 
+/* One row per year, like the rest of the report: hairline separators, no
+   boxes. The year and its era sit in a left column, the facts on the right. */
 .history-year {
-	padding: var(--space-3) var(--space-4);
-	margin-bottom: var(--space-3);
-	border: 1px solid var(--border-color);
-	border-left: 3px solid var(--border-strong);
+	display: grid;
+	grid-template-columns: 10rem minmax(0, 1fr);
+	column-gap: var(--space-5);
+	padding: var(--space-4) 0;
+	border-top: 1px solid var(--table-border);
+}
+
+.history-year > :not(.history-year-head) {
+	grid-column: 2;
 }
 
 .history-year-head {
+	grid-column: 1;
+	grid-row: 1 / span 8;
 	display: flex;
-	align-items: baseline;
-	gap: var(--space-3);
-	margin-bottom: var(--space-2);
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--space-1);
 }
 
 .history-year-num {
 	font-family: var(--font-mono);
-	font-size: var(--font-size-lg);
+	font-size: var(--font-size-xl);
 	font-weight: 700;
+	line-height: 1.1;
 	color: var(--text-color);
+}
+
+@media (max-width: 560px) {
+	.history-year {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	.history-year > :not(.history-year-head) {
+		grid-column: 1;
+	}
+
+	.history-year-head {
+		grid-row: auto;
+		flex-direction: row;
+		align-items: baseline;
+		flex-wrap: wrap;
+		gap: var(--space-2);
+		margin-bottom: var(--space-2);
+	}
 }
 
 .history-era {
@@ -1207,9 +1270,8 @@ details.table-details[open] > summary {
 
 .history-bar-track {
 	height: 6px;
-	margin-bottom: var(--space-2);
+	margin: var(--space-1) 0 var(--space-2);
 	background-color: var(--surface-color);
-	border: 1px solid var(--border-color);
 }
 
 .history-bar {
@@ -1217,11 +1279,11 @@ details.table-details[open] > summary {
 	background-color: var(--bar-color);
 }
 
+/* AI narration above the timeline: a quiet panel, no accent bar */
 .history-prologue {
 	padding: var(--space-4);
 	margin: var(--space-4) 0;
-	border: 1px solid var(--border-color);
-	border-left: 3px solid var(--link-color);
+	background-color: var(--surface-color);
 }
 
 .history-prologue p {
