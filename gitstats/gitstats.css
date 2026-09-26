@@ -377,7 +377,10 @@ table {
 	margin-bottom: var(--space-4);
 }
 
+/* Data tables span the content width, like the bar tables, so the tables on
+   a page line up instead of stopping wherever their content ends */
 .table-scroll > table {
+	width: 100%;
 	margin-bottom: 0;
 }
 

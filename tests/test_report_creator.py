@@ -1925,3 +1925,11 @@ def test_history_merges_a_run_of_dormant_years(mock_data_collector, temp_dir):
     assert html.count("history-gap") == 1
     # one commit reads "1 commit"
     assert "(1 commit)</p>" in html
+
+
+def test_data_tables_span_the_content_width():
+    css_path = os.path.join(os.path.dirname(__file__), "..", "gitstats", "gitstats.css")
+    with open(css_path, encoding="utf-8") as f:
+        css = f.read()
+    rule = css[css.index(".table-scroll > table {") :]
+    assert "width: 100%;" in rule[: rule.index("}")]
