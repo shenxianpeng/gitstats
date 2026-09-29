@@ -201,6 +201,51 @@ class TestGitDataCollectorIntegration:
         assert dc.tags["v1.0.0"]["commits"] == 2
         assert dc.tags["v1.1.0"]["commits"] == 2
 
+    def test_collect_tags_same_day_are_ordered_by_history(self, temp_dir):
+        # Two tags whose commits carry the same timestamp: the ordering has to
+        # come from the history. Sorting on the "%Y-%m-%d" date broke the tie by
+        # tag name, so "b-later" sorted first and took "a-first"'s commit,
+        # leaving the older tag with none.
+        repo = os.path.join(temp_dir, "same_day_tags")
+        os.makedirs(repo)
+        env = {
+            **os.environ,
+            "LC_ALL": "C",
+            "GIT_AUTHOR_NAME": "Tag Dev",
+            "GIT_AUTHOR_EMAIL": "tag@example.com",
+            "GIT_COMMITTER_NAME": "Tag Dev",
+            "GIT_COMMITTER_EMAIL": "tag@example.com",
+            "GIT_AUTHOR_DATE": "2024-01-01T00:00:00+0000",
+            "GIT_COMMITTER_DATE": "2024-01-01T00:00:00+0000",
+        }
+
+        def run(*args):
+            subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True, env=env)
+
+        run("init")
+        with open(os.path.join(repo, "one.txt"), "w") as handle:
+            handle.write("one")
+        run("add", ".")
+        run("commit", "-m", "first")
+        run("tag", "b-later")
+        with open(os.path.join(repo, "two.txt"), "w") as handle:
+            handle.write("two")
+        run("add", ".")
+        run("commit", "-m", "second")
+        run("tag", "a-first")
+
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(repo)
+            dc.collect(repo)
+        finally:
+            os.chdir(prevdir)
+
+        # one commit each: the tag on the older commit keeps its own
+        assert dc.tags["b-later"]["commits"] == 1
+        assert dc.tags["a-first"]["commits"] == 1
+
     def test_collect_annotated_tags(self, git_repo):
         subprocess.run(
             ["git", "tag", "-a", "v2.0.0", "-m", "release 2.0.0"],
