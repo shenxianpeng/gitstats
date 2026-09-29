@@ -298,14 +298,21 @@ class GitDataCollector(DataCollector):
                     "authors": {},
                 }
 
-        # collect info on tags, starting from latest
-        # Only collect statistics for commits within our range
-        tags_sorted_by_date_desc = [
-            el[1]
-            for el in sorted([(el[1]["date"], el[0]) for el in self.tags.items()], reverse=True)
+        # Walk the tags oldest first, so each one is credited with the commits
+        # added since the previous tag. The order comes from the history itself:
+        # rev-list is newest first, so a larger index is an older commit. Sorting
+        # on the "%Y-%m-%d" date instead broke the tie between two tags of the
+        # same day by tag name, and a newer tag sorted first took the older
+        # tag's commits, leaving the older one with none.
+        commit_order = {commit: index for index, commit in enumerate(tag_commits)}
+        tags_oldest_first = [
+            tag
+            for _, tag in sorted(
+                (-commit_order.get(info["hash"], 0), tag) for tag, info in self.tags.items()
+            )
         ]
         prev = None
-        for tag in reversed(tags_sorted_by_date_desc):
+        for tag in tags_oldest_first:
             cmd = f'git log --format="%H %aN" "{tag}"'
             if prev is not None:
                 cmd += f' "^{prev}"'
