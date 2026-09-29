@@ -259,7 +259,11 @@ class GitDataCollector(DataCollector):
         are included.
         """
         log_range = get_log_range("HEAD", False)
-        tag_commits = get_pipe_output([f"git rev-list {log_range}"]).strip().split("\n")
+        # --topo-order: never list a commit before its descendants, so the order
+        # below follows the history even when commit dates are skewed
+        tag_commits = (
+            get_pipe_output([f"git rev-list --topo-order {log_range}"]).strip().split("\n")
+        )
         tag_commits_set = set(tag_commits) if tag_commits[0] else set()
 
         # An annotated tag is listed with the hash of the tag object; --dereference
@@ -300,7 +304,9 @@ class GitDataCollector(DataCollector):
 
         # Walk the tags oldest first, so each one is credited with the commits
         # added since the previous tag. The order comes from the history itself:
-        # rev-list is newest first, so a larger index is an older commit. Sorting
+        # rev-list --topo-order lists descendants before their ancestors, so a
+        # larger index is an older commit (by default rev-list sorts on commit
+        # dates, which a skewed clock can put out of history order). Sorting
         # on the "%Y-%m-%d" date instead broke the tie between two tags of the
         # same day by tag name, and a newer tag sorted first took the older
         # tag's commits, leaving the older one with none.
