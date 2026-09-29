@@ -246,6 +246,54 @@ class TestGitDataCollectorIntegration:
         assert dc.tags["b-later"]["commits"] == 1
         assert dc.tags["a-first"]["commits"] == 1
 
+    def test_collect_tags_ordered_by_history_despite_clock_skew(self, temp_dir):
+        # "new" is a child of "old" but committed with an earlier date, and a
+        # merge also reaches "old" directly. Sorted on commit dates, rev-list
+        # lists "old" first, so "new" took both commits and "old" none;
+        # --topo-order keeps descendants before their ancestors.
+        repo = os.path.join(temp_dir, "skewed_tags")
+        os.makedirs(repo)
+        base_env = {
+            **os.environ,
+            "LC_ALL": "C",
+            "GIT_AUTHOR_NAME": "Tag Dev",
+            "GIT_AUTHOR_EMAIL": "tag@example.com",
+            "GIT_COMMITTER_NAME": "Tag Dev",
+            "GIT_COMMITTER_EMAIL": "tag@example.com",
+        }
+
+        def run(date, *args):
+            env = {**base_env, "GIT_AUTHOR_DATE": date, "GIT_COMMITTER_DATE": date}
+            return subprocess.run(
+                ["git", *args], cwd=repo, check=True, capture_output=True, text=True, env=env
+            ).stdout.strip()
+
+        day = "2024-01-{:02d}T00:00:00+0000".format
+        run(day(1), "init")
+        with open(os.path.join(repo, "f.txt"), "w") as handle:
+            handle.write("old")
+        run(day(5), "add", ".")
+        run(day(5), "commit", "-m", "old")
+        run(day(5), "tag", "old")
+        with open(os.path.join(repo, "f.txt"), "w") as handle:
+            handle.write("new")
+        run(day(1), "commit", "-am", "new")
+        run(day(1), "tag", "new")
+        tree = run(day(10), "write-tree")
+        merge = run(day(10), "commit-tree", tree, "-p", "new", "-p", "old", "-m", "merge")
+        run(day(10), "reset", "--hard", merge)
+
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(repo)
+            dc.collect(repo)
+        finally:
+            os.chdir(prevdir)
+
+        assert dc.tags["old"]["commits"] == 1
+        assert dc.tags["new"]["commits"] == 1
+
     def test_collect_annotated_tags(self, git_repo):
         subprocess.run(
             ["git", "tag", "-a", "v2.0.0", "-m", "release 2.0.0"],
