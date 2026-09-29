@@ -220,9 +220,7 @@ class TestGitDataCollectorIntegration:
         }
 
         def run(*args):
-            subprocess.run(
-                ["git", *args], cwd=repo, check=True, capture_output=True, env=env
-            )
+            subprocess.run(["git", *args], cwd=repo, check=True, capture_output=True, env=env)
 
         run("init")
         with open(os.path.join(repo, "one.txt"), "w") as handle:
