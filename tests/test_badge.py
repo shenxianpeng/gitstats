@@ -102,6 +102,18 @@ def test_render_badge_for_the_badge_style():
     assert int(re.search(r'width="(\d+)"', svg)[1]) > int(re.search(r'width="(\d+)"', flat)[1])
 
 
+def test_render_badge_light_style():
+    svg = render_badge("gitstats", "50 commits", style="light")
+    ET.fromstring(svg)
+    assert 'fill="#fff"/>' in svg  # white label
+    assert re.search(r'fill="#211e1e" textLength="[\d.]+">gitstats<', svg)
+    assert 'fill="#eef3fa"' in svg
+    assert re.search(r'fill="#2c5485" textLength="[\d.]+">50 commits<', svg)
+    assert 'stroke="#cfcecd"' in svg
+    assert "url(#s)" not in svg
+    assert 'fill-opacity=".3"' not in svg
+
+
 def test_render_badge_terminal_custom_color():
     svg = render_badge("gitstats", "50 commits", color="orange", style="terminal")
     assert 'fill="#fe7d37"' in svg

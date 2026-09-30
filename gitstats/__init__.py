@@ -36,7 +36,8 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "badge_label": "gitstats",  # Left-side badge text.
     "badge_color": "",  # Value-segment color: shields name (green, orange, ...), hex, or any SVG color (empty = brand blue).
     # Badge style: flat (rounded, subtle gradient), flat-square (sharp corners),
-    # terminal (monospace and square, like the report) or for-the-badge (large).
+    # terminal (monospace and square, like the report), for-the-badge (large)
+    # or light (white and pale blue, for white READMEs).
     "badge_style": "flat",
     # AI-powered features
     "ai_enabled": False,  # Enable AI-powered summaries (requires AI provider configuration).

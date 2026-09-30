@@ -134,6 +134,7 @@ class _Style:
     uppercase: bool = False
     bold: bool = False
     letter_spacing: float = 0  # px added after every character
+    outline: str = ""  # border around the whole badge
 
 
 _STYLES = {
@@ -169,6 +170,17 @@ _STYLES = {
         uppercase=True,
         bold=True,
         letter_spacing=1,
+    ),
+    # for white READMEs: white label, pale blue value, thin gray border
+    "light": _Style(
+        shine=False,
+        shadow=False,
+        icon=False,
+        label_bg="#fff",
+        label_fg="#211e1e",
+        value_bg="#eef3fa",
+        value_fg="#2c5485",
+        outline="#cfcecd",
     ),
 }
 
@@ -299,12 +311,18 @@ def render_segments(segments: list[Segment], style_name: str = "flat") -> str:
         group = '<g clip-path="url(#r)">'
     else:
         group = "<g>"
+    outline = ""
+    if style.outline:
+        outline = (
+            f'<rect x=".5" y=".5" width="{total_w - 1}" height="{height - 1}" '
+            f'rx="{max(style.radius - 0.5, 0):g}" fill="none" stroke="{style.outline}"/>'
+        )
 
     weight = ' font-weight="bold"' if style.bold else ""
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{total_w}" height="{height}" role="img" aria-label={quoteattr(title)}>
   <title>{escape(title)}</title>
   {"".join(defs)}
-  {group}{"".join(parts)}{shine}</g>
+  {group}{"".join(parts)}{shine}</g>{outline}
   {icon}{"".join(marks)}
   <g text-anchor="middle" font-family={quoteattr(style.font)} font-size="{style.font_size:g}"{weight} text-rendering="geometricPrecision">{"".join(texts)}</g>
 </svg>
@@ -318,7 +336,8 @@ def render_badge(label: str, value: str, color: str = "", style: str = "flat") -
     hex, or any SVG color). ``style`` is a badge style name: "flat" (3px
     radius, subtle gradient), "flat-square" (sharp corners, solid fill),
     "terminal" (the report's look: monospace, square, "//" before the label)
-    or "for-the-badge" (taller, bold, uppercase).
+    "for-the-badge" (taller, bold, uppercase) or "light" (white label, pale
+    value, for white READMEs).
     """
     return render_segments([Segment(label), Segment(value, bg=color)], style)
 
