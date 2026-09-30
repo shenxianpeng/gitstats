@@ -13,7 +13,7 @@ import time
 from typing import Any
 
 from gitstats import WEEKDAYS, get_i18n_text, load_config
-from gitstats.badge import create_badges
+from gitstats.badge import STYLE_NAMES, create_badges
 from gitstats.utils import (
     format_bytes,
     format_duration,
@@ -283,6 +283,7 @@ NAV_PAGES = (
     ("tags.html", "Tags"),
     ("ownership.html", "Code Ownership"),
     ("history.html", "History"),
+    ("badges.html", "Badges"),
 )
 
 
@@ -291,6 +292,199 @@ def nav_link(href: str, label: str, current: str | None = None) -> str:
     if href == current:
         return f'<li><a href="{href}" class="active" aria-current="page">{label}</a></li>'
     return f'<li><a href="{href}">{label}</a></li>'
+
+
+# The Badges page: its sections, and each badge's name and what it shows
+BADGES_PAGE_SECTIONS = (
+    (
+        "At a glance",
+        "Several numbers, or the pace of the last year, in one badge.",
+        (
+            ("summary", "Commits, authors and lines in one badge"),
+            ("activity", "Commits per month over the last year"),
+            ("health", "Active, quiet or dormant, by the age of the last commit"),
+        ),
+    ),
+    (
+        "Metrics",
+        "One number each.",
+        (
+            ("commits", "Total commits"),
+            ("authors", "People who committed"),
+            ("lines", "Lines of code"),
+            ("files", "Files in the repository"),
+            ("last-commit", "Month of the latest commit"),
+            ("release", "Newest tag and the tag count"),
+            ("active-days", "Days with at least one commit"),
+        ),
+    ),
+)
+
+# Where a snippet points until the report's address is known
+BADGES_PLACEHOLDER_URL = "https://<your-report-url>/"
+
+_COPY_ICONS = (
+    '<svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" '
+    'height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+    'stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12"/>'
+    '<path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>'
+    '<svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" '
+    'height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" '
+    'stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>'
+)
+
+# Keeps the snippets on the Badges page in step with the report URL, style and
+# format controls, and copies them. Page data comes from #badge-data.
+BADGES_SCRIPT = r"""<script>
+(function() {
+	const data = JSON.parse(document.getElementById('badge-data').textContent);
+	const input = document.getElementById('badge-url');
+	const status = document.getElementById('badge-url-status');
+	const hints = document.querySelectorAll('[data-url-hint]');
+	const live = document.getElementById('badge-live');
+	const rows = document.querySelectorAll('.badge-row');
+	const formats = { md: 'Markdown', rst: 'reStructuredText', html: 'HTML' };
+	const key = 'gitstats-badge-url:' + location.pathname.replace(/[^/]*$/, '');
+	let style = data.style;
+	let format = 'md';
+
+	// The report's own address: --site-url, else this page's directory when
+	// served over http(s); a page opened from a file can't know it.
+	const detected = /^https?:$/.test(location.protocol)
+		? location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '')
+		: '';
+	const auto = data.siteUrl || detected;
+	let saved = null;
+	try { saved = localStorage.getItem(key); } catch (e) {}
+	input.value = saved !== null ? saved : auto;
+
+	function base() {
+		const url = input.value.trim();
+		return url ? url.replace(/\/*$/, '/') : data.placeholder;
+	}
+
+	function snippet(image, link, alt) {
+		if (format === 'rst') return '.. image:: ' + image + '\n   :target: ' + link + '\n   :alt: ' + alt;
+		if (format === 'html') return '<a href="' + link + '"><img src="' + image + '" alt="' + alt + '"></a>';
+		return '[![' + alt + '](' + image + ')](' + link + ')';
+	}
+
+	function showStatus() {
+		const url = input.value.trim();
+		let state = 'detected';
+		if (!url) state = data.siteUrl || detected ? 'cleared' : 'missing';
+		else if (url !== auto) state = 'entered';
+		else if (data.siteUrl) state = 'site';
+		status.textContent = { detected: 'detected', site: '--site-url', entered: 'entered', missing: 'not set', cleared: 'not set' }[state];
+		status.className = 'badge-url-status' + (state === 'missing' || state === 'cleared' ? ' is-missing' : state === 'site' ? '' : ' is-ok');
+		hints.forEach(function(hint) { hint.hidden = hint.getAttribute('data-url-hint') !== state; });
+	}
+
+	function render() {
+		const link = base();
+		rows.forEach(function(row) {
+			const name = row.getAttribute('data-badge');
+			const kind = row.getAttribute('data-kind');
+			let path = 'badges/' + style + '/' + name + '.svg';
+			let alt = 'GitStats ' + name;
+			if (kind === 'default') { path = 'badge.svg'; alt = 'GitStats'; }
+			const image = kind === 'endpoint'
+				? 'https://img.shields.io/endpoint?url=' + link + 'badges/' + name + '.json'
+				: link + path;
+			const img = row.querySelector('img');
+			if (img && kind === 'style') img.src = path;
+			row.querySelector('.badge-code').textContent = snippet(image, link, alt);
+			row.querySelector('.badge-copy').setAttribute('aria-label', 'Copy ' + formats[format] + ' for ' + row.getAttribute('data-title'));
+		});
+		showStatus();
+	}
+
+	function pick(attr, value) {
+		document.querySelectorAll('[' + attr + ']').forEach(function(button) {
+			button.setAttribute('aria-pressed', String(button.getAttribute(attr) === value));
+		});
+	}
+
+	document.querySelectorAll('[data-style]').forEach(function(button) {
+		button.addEventListener('click', function() {
+			style = button.getAttribute('data-style');
+			pick('data-style', style);
+			render();
+		});
+	});
+	document.querySelectorAll('[data-format]').forEach(function(button) {
+		button.addEventListener('click', function() {
+			format = button.getAttribute('data-format');
+			pick('data-format', format);
+			render();
+		});
+	});
+
+	// What the reader types is kept in this browser, until it matches the
+	// detected address again
+	input.addEventListener('input', function() {
+		try {
+			if (input.value.trim() === auto) localStorage.removeItem(key);
+			else localStorage.setItem(key, input.value.trim());
+		} catch (e) {}
+		render();
+	});
+
+	// Pages opened from a file have no clipboard API, and a browser may refuse
+	// it anyway: fall back to the older copy command
+	function legacyCopy(text) {
+		const area = document.createElement('textarea');
+		area.value = text;
+		area.setAttribute('readonly', '');
+		area.style.position = 'fixed';
+		area.style.opacity = '0';
+		document.body.appendChild(area);
+		area.select();
+		let ok = false;
+		try { ok = document.execCommand('copy'); } catch (e) {}
+		document.body.removeChild(area);
+		return ok;
+	}
+
+	function copyText(text) {
+		if (navigator.clipboard && window.isSecureContext) {
+			return navigator.clipboard.writeText(text).catch(function() {
+				if (!legacyCopy(text)) throw new Error('copy failed');
+			});
+		}
+		return legacyCopy(text) ? Promise.resolve() : Promise.reject(new Error('copy failed'));
+	}
+
+	rows.forEach(function(row) {
+		const button = row.querySelector('.badge-copy');
+		const label = button.querySelector('span');
+		const code = row.querySelector('.badge-code');
+		let timer;
+		button.addEventListener('click', function() {
+			copyText(code.textContent).then(function() {
+				button.classList.add('is-copied');
+				label.textContent = 'Copied';
+				live.textContent = 'Copied ' + formats[format] + ' for ' + row.getAttribute('data-title');
+				clearTimeout(timer);
+				timer = setTimeout(function() {
+					button.classList.remove('is-copied');
+					label.textContent = 'Copy';
+				}, 1600);
+			}, function() {
+				// No clipboard access: select the snippet for a manual copy
+				const range = document.createRange();
+				range.selectNodeContents(code);
+				const selection = window.getSelection();
+				selection.removeAllRanges();
+				selection.addRange(range);
+				live.textContent = 'Snippet selected, press Ctrl+C or Cmd+C to copy';
+			});
+		});
+	});
+
+	render();
+})();
+</script>"""
 
 
 class ReportCreator:
@@ -349,6 +543,7 @@ class HTMLReportCreator(ReportCreator):
         self.create_tags_html(data, path)
         self.create_ownership_html(data, path)
         self.create_history_html(data, path)
+        self.create_badges_html(data, path)
 
         # Create AI Insights page if AI is enabled
         if hasattr(data, "ai_summaries") and data.ai_summaries:
@@ -1476,6 +1671,147 @@ class HTMLReportCreator(ReportCreator):
                     )
                 )
             f.write("</table></div>")
+
+        self.print_footer(f)
+        f.write("</body></html>")
+        f.close()
+
+    def create_badges_html(self, data: Any, path: str) -> None:
+        """Create the Badges page: every badge, ready to copy into a README.
+
+        The snippets need the report's public address, which the report
+        cannot know when it is generated. The page's script reads it from
+        the address the page is served from, and lets the reader type it in
+        (remembered in their browser) when the page is opened from a file.
+        """
+        conf = load_config()
+        style = str(conf.get("badge_style", "") or "flat")
+        if style not in STYLE_NAMES:
+            style = "flat"
+        names = [name for _, _, badges in BADGES_PAGE_SECTIONS for name, _ in badges]
+        metric = str(conf.get("badge_metric", "") or "commits")
+        if metric not in names:
+            metric = "commits"
+        link = BADGES_PLACEHOLDER_URL
+
+        def option_buttons(attr: str, options: list[tuple[str, str]], current: str) -> str:
+            return "".join(
+                f'<button type="button" {attr}="{value}" '
+                f'aria-pressed="{"true" if value == current else "false"}">{label}</button>'
+                for value, label in options
+            )
+
+        def row(kind: str, name: str, title: str, desc: str, image: str, alt: str) -> str:
+            if kind == "endpoint":
+                preview = f'<span class="badge-json">badges/{name}.json</span>'
+            else:
+                preview = f'<img src="{image}" alt="{html.escape(alt)}">'
+            code = f"[![{alt}]({link}{image})]({link})"
+            if kind == "endpoint":
+                code = f"[![{alt}](https://img.shields.io/endpoint?url={link}{image})]({link})"
+            return (
+                f'<div class="badge-row" data-kind="{kind}" data-badge="{name}" '
+                f'data-title="{html.escape(title)}">'
+                f'<div class="badge-info"><div class="badge-name"><code>{html.escape(title)}</code>'
+                f"<span>{html.escape(desc)}</span></div>{preview}</div>"
+                f'<pre class="badge-code">{html.escape(code)}</pre>'
+                f'<button type="button" class="badge-copy" '
+                f'aria-label="Copy Markdown for {html.escape(title)}">{_COPY_ICONS}'
+                "<span>Copy</span></button></div>"
+            )
+
+        f = self._open_report_file(path, "badges.html")
+        self.print_header(f)
+        self.print_nav(f, "badges.html")
+        f.write("<h1>Badges</h1>")
+        f.write(
+            '<p class="section-note">Live badges for this report. Pick a style and a format, '
+            "then copy a snippet into a README or wiki page: the badge links back here and "
+            "updates every time the report is regenerated.</p>"
+        )
+
+        f.write(
+            '<div class="badge-url"><label for="badge-url">Report URL</label>'
+            '<div class="badge-url-field">'
+            '<input id="badge-url" type="url" placeholder="https://reports.example.com/my-repo/" '
+            'spellcheck="false" autocomplete="off">'
+            '<span id="badge-url-status" class="badge-url-status is-missing">not set</span></div>'
+            '<p class="badge-url-hint" data-url-hint="detected" hidden>Read from this page\'s '
+            "address. Change it if the report is also served from another URL.</p>"
+            '<p class="badge-url-hint" data-url-hint="site" hidden>Set with '
+            "<code>--site-url</code> when the report was generated.</p>"
+            '<p class="badge-url-hint" data-url-hint="entered" hidden>Remembered in this '
+            "browser.</p>"
+            '<p class="badge-url-hint" data-url-hint="cleared" hidden>Enter the address the '
+            "report is published at.</p>"
+            '<p class="badge-url-hint" data-url-hint="missing">This page was opened from a file, '
+            "so it can't tell where the report lives. Enter the address it's published at, or "
+            "generate the report with <code>--site-url</code> to fill it in.</p></div>"
+        )
+
+        f.write(
+            '<div class="badge-controls">'
+            '<div class="badge-options" role="group" aria-labelledby="badge-style-label">'
+            '<span id="badge-style-label" class="badge-options-label">Style</span>'
+            '<div class="badge-option-list">'
+            + option_buttons("data-style", [(name, name) for name in STYLE_NAMES], style)
+            + "</div></div>"
+            '<div class="badge-options" role="group" aria-labelledby="badge-format-label">'
+            '<span id="badge-format-label" class="badge-options-label">Format</span>'
+            '<div class="badge-option-list">'
+            + option_buttons(
+                "data-format",
+                [("md", "Markdown"), ("rst", "reStructuredText"), ("html", "HTML")],
+                "md",
+            )
+            + "</div></div></div>"
+        )
+
+        for title, note, badges in BADGES_PAGE_SECTIONS:
+            f.write(html_header(2, title))
+            f.write(f'<p class="section-note">{note}</p><div class="badge-list">')
+            for name, desc in badges:
+                f.write(
+                    row("style", name, name, desc, f"badges/{style}/{name}.svg", f"GitStats {name}")
+                )
+            f.write("</div>")
+
+        f.write(html_header(2, "Other ways to use them"))
+        f.write(
+            '<p class="section-note">Every badge is a plain SVG file under '
+            "<code>badges/&lt;style&gt;/</code>, rewritten each time the report is "
+            'generated.</p><div class="badge-list">'
+        )
+        f.write(
+            row(
+                "default",
+                metric,
+                "badge.svg",
+                f"The default badge: {metric} in {style}, set by badge_metric and badge_style",
+                "badge.svg",
+                "GitStats",
+            )
+        )
+        f.write(
+            row(
+                "endpoint",
+                metric,
+                "shields.io endpoint",
+                "The same numbers as JSON, for shields.io styles and logos",
+                f"badges/{metric}.json",
+                f"GitStats {metric}",
+            )
+        )
+        f.write("</div>")
+        f.write('<p id="badge-live" class="visually-hidden" aria-live="polite"></p>')
+
+        page_data = {"style": style, "siteUrl": "", "placeholder": BADGES_PLACEHOLDER_URL}
+        f.write(
+            '<script type="application/json" id="badge-data">'
+            + json.dumps(page_data).replace("</", "<\\/")
+            + "</script>"
+        )
+        f.write(BADGES_SCRIPT)
 
         self.print_footer(f)
         f.write("</body></html>")
