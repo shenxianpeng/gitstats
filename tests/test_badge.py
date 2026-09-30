@@ -2,6 +2,7 @@
 
 import json
 import os
+import re
 import xml.etree.ElementTree as ET
 
 from gitstats import load_config
@@ -71,6 +72,28 @@ def test_render_badge_flat_square_style():
     flat = render_badge("gitstats", "50 commits", style="flat")
     assert "clip-path" in flat
     assert "url(#s)" in flat
+
+
+def test_render_badge_terminal_style():
+    svg = render_badge("gitstats", "50 commits", style="terminal")
+    ET.fromstring(svg)
+    assert 'height="22"' in svg
+    assert "monospace" in svg
+    assert ">//</text>" in svg
+    assert ">gitstats</text>" in svg
+    assert re.search(r'fill="#211e1e" textLength="[\d.]+">50 commits<', svg)  # dark on light
+    assert 'stroke="#211e1e"' in svg  # outlined value segment
+    assert "clip-path" not in svg
+    assert "url(#s)" not in svg
+    assert 'fill-opacity=".3"' not in svg  # no text shadow
+    assert "gitstats: 50 commits" in svg
+
+
+def test_render_badge_terminal_custom_color():
+    svg = render_badge("gitstats", "50 commits", color="orange", style="terminal")
+    assert 'fill="#fe7d37"' in svg
+    assert re.search(r'fill="#fff" textLength="[\d.]+">50 commits<', svg)
+    assert "stroke=" not in svg
 
 
 # ── resolve_color ────────────────────────────────────────────────────────

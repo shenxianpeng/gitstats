@@ -35,7 +35,9 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "badge_metric": "commits",  # Metric shown by badge.svg: commits, last-commit, authors, files, lines.
     "badge_label": "gitstats",  # Left-side badge text.
     "badge_color": "",  # Value-segment color: shields name (green, orange, ...), hex, or any SVG color (empty = brand blue).
-    "badge_style": "flat",  # Badge shape: flat (rounded, subtle gradient) or flat-square (sharp corners).
+    # Badge style: flat (rounded, subtle gradient), flat-square (sharp corners)
+    # or terminal (monospace and square, like the report).
+    "badge_style": "flat",
     # AI-powered features
     "ai_enabled": False,  # Enable AI-powered summaries (requires AI provider configuration).
     "ai_provider": "openai",  # AI provider: openai, claude, gemini, ollama.

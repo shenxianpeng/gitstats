@@ -108,6 +108,7 @@ def badge_metrics(data: Any) -> dict[str, str]:
 
 
 _VERDANA = "Verdana,Geneva,DejaVu Sans,sans-serif"
+_MONO = "IBM Plex Mono,JetBrains Mono,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
 
 
 @dataclass(frozen=True)
@@ -124,12 +125,35 @@ class _Style:
     icon: bool = True  # the three heatmap bars before the label
     label_bg: str = _LABEL_BG
     label_fg: str = "#fff"
+    value_bg: str = _VALUE_BG  # used when a segment brings no color of its own
     value_fg: str = "#fff"
+    value_border: str = ""  # outline drawn inside each value segment
+    char_width: float = 0  # fixed advance per character (monospace); 0: Verdana
+    prefix: str = ""  # drawn before the label, in prefix_fg
+    prefix_fg: str = ""
 
 
 _STYLES = {
     "flat": _Style(),
     "flat-square": _Style(radius=0, shine=False),
+    # the report's own look: mono, square, "//" before the label, light value
+    "terminal": _Style(
+        height=22,
+        radius=0,
+        font=_MONO,
+        font_size=12,
+        pad=8,
+        shine=False,
+        shadow=False,
+        icon=False,
+        label_fg="#f1ecec",
+        value_bg="#f1ecec",
+        value_fg="#211e1e",
+        value_border="#211e1e",
+        char_width=7.2,
+        prefix="//",
+        prefix_fg="#9e9a9a",
+    ),
 }
 
 
@@ -138,13 +162,15 @@ class Segment:
     """One colored block of a badge: text, or a row of bars (``spark``)."""
 
     text: str = ""
-    bg: str = _VALUE_BG
-    fg: str = ""  # empty: the style's value color
+    bg: str = ""  # empty: the style's value color; set: white text on it
+    fg: str = ""  # empty: white on a custom bg, else the style's value color
     spark: tuple[float, ...] = ()  # bar heights, 0..1
     spark_color: str = "#40c463"
 
 
 def _segment_text_width(text: str, style: _Style) -> float:
+    if style.char_width:
+        return len(text) * style.char_width
     return _text_width(text) * style.font_size / 11
 
 
@@ -161,8 +187,11 @@ def render_segments(segments: list[Segment], style_name: str = "flat") -> str:
     # Lay the segments out left to right
     blocks = []
     x = 0.0
+    prefix_w = _segment_text_width(style.prefix + " ", style) if style.prefix else 0.0
     for index, seg in enumerate(segments):
         lead = (style.pad + icon_w + icon_gap) if index == 0 and style.icon else style.pad
+        if index == 0:
+            lead += prefix_w
         if seg.spark:
             content_w: float = len(seg.spark) * 4 - 1
         else:
@@ -175,9 +204,14 @@ def render_segments(segments: list[Segment], style_name: str = "flat") -> str:
     title = segments[0].text + ": " + ", ".join(s.text for s in segments[1:] if s.text)
     parts = []
     for index, (seg, bx, bw, lead, cw) in enumerate(blocks):
-        bg = style.label_bg if index == 0 else resolve_color(seg.bg)
+        bg = style.label_bg if index == 0 else resolve_color(seg.bg or style.value_bg)
         bg = escape(bg, {'"': "&quot;"})
         parts.append(f'<rect x="{bx:.0f}" width="{bw:.0f}" height="{height}" fill="{bg}"/>')
+        if index and style.value_border and not seg.bg:
+            parts.append(
+                f'<rect x="{round(bx) + 0.5}" y="0.5" width="{round(bw) - 1}" height="{height - 1}" '
+                f'fill="none" stroke="{style.value_border}"/>'
+            )
 
     marks = []
     texts = []
@@ -193,7 +227,10 @@ def render_segments(segments: list[Segment], style_name: str = "flat") -> str:
                     f'height="{h:.1f}" fill="{escape(seg.spark_color)}"/>'
                 )
             continue
-        fg = style.label_fg if index == 0 else (seg.fg or style.value_fg)
+        if index == 0:
+            fg = style.label_fg
+        else:
+            fg = seg.fg or ("#fff" if seg.bg else style.value_fg)
         cx = bx + lead + cw / 2
         text = escape(seg.text)
         if style.shadow:
@@ -204,6 +241,12 @@ def render_segments(segments: list[Segment], style_name: str = "flat") -> str:
         texts.append(
             f'<text x="{cx:.1f}" y="{baseline:.1f}" fill="{escape(fg)}" '
             f'textLength="{cw:.1f}">{text}</text>'
+        )
+
+    if style.prefix:
+        texts.append(
+            f'<text x="{style.pad + prefix_w / 2:.1f}" y="{baseline:.1f}" '
+            f'fill="{style.prefix_fg}">{escape(style.prefix)}</text>'
         )
 
     icon = ""
@@ -249,10 +292,10 @@ def render_badge(label: str, value: str, color: str = "", style: str = "flat") -
 
     ``color`` overrides the value-segment background (shields color name,
     hex, or any SVG color). ``style`` is a badge style name: "flat" (3px
-    radius, subtle gradient) or "flat-square" (sharp corners, solid fill,
-    matching the report's angular terminal aesthetic).
+    radius, subtle gradient), "flat-square" (sharp corners, solid fill) or
+    "terminal" (the report's look: monospace, square, "//" before the label).
     """
-    return render_segments([Segment(label), Segment(value, bg=color or _VALUE_BG)], style)
+    return render_segments([Segment(label), Segment(value, bg=color)], style)
 
 
 def _endpoint_json(label: str, message: str, color: str) -> str:
