@@ -28,6 +28,7 @@ works through files and configuration instead:
 import json
 import logging
 import os
+from dataclasses import dataclass
 from typing import Any
 from xml.sax.saxutils import escape, quoteattr
 
@@ -106,82 +107,152 @@ def badge_metrics(data: Any) -> dict[str, str]:
     }
 
 
+_VERDANA = "Verdana,Geneva,DejaVu Sans,sans-serif"
+
+
+@dataclass(frozen=True)
+class _Style:
+    """How a badge style draws its segments."""
+
+    height: int = 20
+    radius: int = 3
+    font: str = _VERDANA
+    font_size: float = 11
+    pad: float = 5  # space around each segment's text
+    shine: bool = True  # the subtle top-to-bottom gradient
+    shadow: bool = True  # the dark text shadow under white text
+    icon: bool = True  # the three heatmap bars before the label
+    label_bg: str = _LABEL_BG
+    label_fg: str = "#fff"
+    value_fg: str = "#fff"
+
+
+_STYLES = {
+    "flat": _Style(),
+    "flat-square": _Style(radius=0, shine=False),
+}
+
+
+@dataclass(frozen=True)
+class Segment:
+    """One colored block of a badge: text, or a row of bars (``spark``)."""
+
+    text: str = ""
+    bg: str = _VALUE_BG
+    fg: str = ""  # empty: the style's value color
+    spark: tuple[float, ...] = ()  # bar heights, 0..1
+    spark_color: str = "#40c463"
+
+
+def _segment_text_width(text: str, style: _Style) -> float:
+    return _text_width(text) * style.font_size / 11
+
+
+def render_segments(segments: list[Segment], style_name: str = "flat") -> str:
+    """Return the SVG markup of a badge made of ``segments``, left to right.
+
+    The first segment is the label and takes the style's label colors and
+    icon; the others are values. ``style_name`` is a key of ``_STYLES``.
+    """
+    style = _STYLES.get(style_name, _STYLES["flat"])
+    height = style.height
+    icon_w, icon_gap = (13, 4) if style.icon else (0, 0)
+
+    # Lay the segments out left to right
+    blocks = []
+    x = 0.0
+    for index, seg in enumerate(segments):
+        lead = (style.pad + icon_w + icon_gap) if index == 0 and style.icon else style.pad
+        if seg.spark:
+            content_w: float = len(seg.spark) * 4 - 1
+        else:
+            content_w = _segment_text_width(seg.text, style)
+        width = lead + content_w + style.pad + (1 if index else 0)
+        blocks.append((seg, x, width, lead, content_w))
+        x += width
+    total_w = round(x)
+
+    title = segments[0].text + ": " + ", ".join(s.text for s in segments[1:] if s.text)
+    parts = []
+    for index, (seg, bx, bw, lead, cw) in enumerate(blocks):
+        bg = style.label_bg if index == 0 else resolve_color(seg.bg)
+        bg = escape(bg, {'"': "&quot;"})
+        parts.append(f'<rect x="{bx:.0f}" width="{bw:.0f}" height="{height}" fill="{bg}"/>')
+
+    marks = []
+    texts = []
+    baseline = height / 2 + style.font_size * 0.36
+    for index, (seg, bx, bw, lead, cw) in enumerate(blocks):
+        if seg.spark:
+            base = height - 5
+            span = height - 10
+            for i, level in enumerate(seg.spark):
+                h = max(1.0, span * level)
+                marks.append(
+                    f'<rect x="{bx + lead + i * 4:.1f}" y="{base - h:.1f}" width="3" '
+                    f'height="{h:.1f}" fill="{escape(seg.spark_color)}"/>'
+                )
+            continue
+        fg = style.label_fg if index == 0 else (seg.fg or style.value_fg)
+        cx = bx + lead + cw / 2
+        text = escape(seg.text)
+        if style.shadow:
+            texts.append(
+                f'<text aria-hidden="true" x="{cx:.1f}" y="{baseline + 1:.1f}" fill="#010101" '
+                f'fill-opacity=".3" textLength="{cw:.1f}">{text}</text>'
+            )
+        texts.append(
+            f'<text x="{cx:.1f}" y="{baseline:.1f}" fill="{escape(fg)}" '
+            f'textLength="{cw:.1f}">{text}</text>'
+        )
+
+    icon = ""
+    if style.icon:
+        bars = "".join(
+            f'<rect x="{bx}" y="{by}" width="3" height="{bh}" rx="1" fill="{color}"/>'
+            for (bx, by, bh), color in zip(
+                ((0.5, 6.0, 7.0), (5.0, 2.5, 10.5), (9.5, 4.5, 8.5)), _BAR_COLORS
+            )
+        )
+        icon = f'<g transform="translate({style.pad:g},{(height - 13) / 2:g})">{bars}</g>'
+
+    defs = []
+    shine = ""
+    if style.shine:
+        defs.append(
+            '<linearGradient id="s" x2="0" y2="100%">'
+            '<stop offset="0" stop-color="#bbb" stop-opacity=".1"/>'
+            '<stop offset="1" stop-opacity=".1"/></linearGradient>'
+        )
+        shine = f'<rect width="{total_w}" height="{height}" fill="url(#s)"/>'
+    if style.radius:
+        defs.append(
+            f'<clipPath id="r"><rect width="{total_w}" height="{height}" '
+            f'rx="{style.radius}" fill="#fff"/></clipPath>'
+        )
+        group = '<g clip-path="url(#r)">'
+    else:
+        group = "<g>"
+
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{total_w}" height="{height}" role="img" aria-label={quoteattr(title)}>
+  <title>{escape(title)}</title>
+  {"".join(defs)}
+  {group}{"".join(parts)}{shine}</g>
+  {icon}{"".join(marks)}
+  <g text-anchor="middle" font-family={quoteattr(style.font)} font-size="{style.font_size:g}" text-rendering="geometricPrecision">{"".join(texts)}</g>
+</svg>
+"""
+
+
 def render_badge(label: str, value: str, color: str = "", style: str = "flat") -> str:
     """Return the SVG markup for a badge reading ``label | value``.
 
     ``color`` overrides the value-segment background (shields color name,
-    hex, or any SVG color). ``style`` is "flat" (3px radius, subtle
-    gradient) or "flat-square" (sharp corners, solid fill — matches the
-    report's angular terminal aesthetic).
+    hex, or any SVG color). ``style`` is a badge style name: "flat" (3px
+    radius, subtle gradient) or "flat-square" (sharp corners, solid fill,
+    matching the report's angular terminal aesthetic).
     """
-    icon_x = 5  # left padding before the icon
-    icon_w = 13
-    gap = 4  # gap between icon and label text
-    pad = 5  # padding around text blocks
-
-    value_bg = resolve_color(color) if color else _VALUE_BG
-
-    label_tw = _text_width(label)
-    value_tw = _text_width(value)
-
-    label_x = icon_x + icon_w + gap
-    label_w = label_x + label_tw + pad
-    value_w = pad + value_tw + pad + 1
-    total_w = label_w + value_w
-
-    # Text coordinates are in shields' 10x scaled space for crisp rendering.
-    label_cx = (label_x + label_tw / 2.0) * 10
-    label_len = label_tw * 10
-    value_cx = (label_w + value_w / 2.0) * 10
-    value_len = value_tw * 10
-
-    # Widths are measured on the raw text, but everything written into the
-    # SVG has to be escaped: a label like "R&D" or "<3" would otherwise
-    # produce a document no SVG renderer can parse.
-    title = f"{label}: {value}"
-    aria_label = quoteattr(title)
-    title_text = escape(title)
-    label_text = escape(label)
-    value_text = escape(value)
-    value_bg = escape(value_bg, {'"': "&quot;"})
-
-    bars = "".join(
-        f'<rect x="{x}" y="{y}" width="3" height="{h}" rx="1" fill="{color}"/>'
-        for (x, y, h), color in zip(
-            ((0.5, 6.0, 7.0), (5.0, 2.5, 10.5), (9.5, 4.5, 8.5)), _BAR_COLORS
-        )
-    )
-
-    if style == "flat-square":
-        shine = ""
-        clip = ""
-        clip_open = "<g>"
-    else:
-        shine = f'<rect width="{total_w:.0f}" height="20" fill="url(#s)"/>'
-        clip = f'<clipPath id="r"><rect width="{total_w:.0f}" height="20" rx="3" fill="#fff"/></clipPath>'
-        clip_open = '<g clip-path="url(#r)">'
-
-    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{total_w:.0f}" height="20" role="img" aria-label={aria_label}>
-  <title>{title_text}</title>
-  <linearGradient id="s" x2="0" y2="100%">
-    <stop offset="0" stop-color="#bbb" stop-opacity=".1"/>
-    <stop offset="1" stop-opacity=".1"/>
-  </linearGradient>
-  {clip}
-  {clip_open}
-    <rect width="{label_w:.0f}" height="20" fill="{_LABEL_BG}"/>
-    <rect x="{label_w:.0f}" width="{value_w:.0f}" height="20" fill="{value_bg}"/>
-    {shine}
-  </g>
-  <g transform="translate({icon_x},3.5)">{bars}</g>
-  <g fill="#fff" text-anchor="middle" font-family="Verdana,Geneva,DejaVu Sans,sans-serif" text-rendering="geometricPrecision" font-size="110">
-    <text aria-hidden="true" x="{label_cx:.0f}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="{label_len:.0f}">{label_text}</text>
-    <text x="{label_cx:.0f}" y="140" transform="scale(.1)" textLength="{label_len:.0f}">{label_text}</text>
-    <text aria-hidden="true" x="{value_cx:.0f}" y="150" fill="#010101" fill-opacity=".3" transform="scale(.1)" textLength="{value_len:.0f}">{value_text}</text>
-    <text x="{value_cx:.0f}" y="140" transform="scale(.1)" textLength="{value_len:.0f}">{value_text}</text>
-  </g>
-</svg>
-"""
+    return render_segments([Segment(label), Segment(value, bg=color or _VALUE_BG)], style)
 
 
 def _endpoint_json(label: str, message: str, color: str) -> str:
@@ -210,7 +281,7 @@ def create_badges(data: Any, path: str) -> str:
     label = str(conf.get("badge_label", "") or "gitstats")
     color = str(conf.get("badge_color", "") or "")
     style = str(conf.get("badge_style", "") or "flat")
-    if style not in ("flat", "flat-square"):
+    if style not in _STYLES:
         logger.warning(f"Unknown badge_style '{style}', using 'flat'")
         style = "flat"
 
