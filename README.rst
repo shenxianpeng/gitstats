@@ -43,6 +43,18 @@
    :target: https://shenxianpeng.dev/gitstats/
    :alt: GitStats last commit
 
+.. |gitstats-summary| image:: https://shenxianpeng.dev/gitstats/badges/summary.svg
+   :target: https://shenxianpeng.dev/gitstats/
+   :alt: GitStats summary
+
+.. |gitstats-activity| image:: https://shenxianpeng.dev/gitstats/badges/activity.svg
+   :target: https://shenxianpeng.dev/gitstats/
+   :alt: GitStats activity
+
+.. |gitstats-health| image:: https://shenxianpeng.dev/gitstats/badges/health.svg
+   :target: https://shenxianpeng.dev/gitstats/
+   :alt: GitStats health
+
 |pypi-version| |python-versions| |test-badge| |docs-badge| |marketplace| |gitstats-report|
 
 ``$ gitstats``
@@ -170,7 +182,7 @@ regenerated.
 This repository eats its own dog food — these are live badges served from
 the `demo report <https://shenxianpeng.dev/gitstats/>`_ (click one):
 
-|gitstats-report| |gitstats-last-commit|
+|gitstats-report| |gitstats-last-commit| |gitstats-summary| |gitstats-activity| |gitstats-health|
 
 Embed it in your README so visitors can jump straight to the report:
 
@@ -228,27 +240,46 @@ says is just switching the URL:
 - ``badges/authors.svg`` — ``12 authors``
 - ``badges/files.svg`` — ``245 files``
 - ``badges/lines.svg`` — ``44,025 lines``
+- ``badges/release.svg`` — ``v2.7.0 · 46 tags`` (newest tag and tag count)
+- ``badges/active-days.svg`` — ``229 active days`` (days with commits)
+
+A few badges pack more into one image:
+
+- ``badges/summary.svg`` — ``563 commits | 40 authors | 18.5k lines``
+- ``badges/activity.svg`` — a sparkline of commits per month over the last
+  year of history, then the latest month: ``29 in Sep``
+- ``badges/health.svg`` — ``active``, ``quiet`` or ``dormant`` with the age
+  of the last commit (``last commit 3 days ago``), colored green, amber or
+  gray; active means a commit within 30 days, quiet within a year. It keeps
+  its own label and colors, and its age counts from when the report was
+  generated, so regenerate the report on a schedule to keep it honest
 
 **Style with config keys.** The ``badge_*`` options control every generated
-badge (including which metric ``badge.svg`` itself shows):
+badge (including which badge ``badge.svg`` itself is, any name above):
 
 .. code-block:: bash
 
    gitstats -c badge_metric=last-commit \
             -c badge_label="my project" \
             -c badge_color=green \
-            -c badge_style=flat-square . gitstats-report
+            -c badge_style=terminal . gitstats-report
 
 ``badge_color`` accepts shields.io color names (``brightgreen``, ``green``,
 ``yellow``, ``orange``, ``red``, ``blue``, ``lightgrey``), hex values like
-``#30a14e``, or any SVG color. ``badge_style`` is ``flat`` (rounded, subtle
-gradient) or ``flat-square`` (sharp corners, matching the report's angular
-terminal aesthetic).
+``#30a14e``, or any SVG color. ``badge_style`` is one of:
 
-**Full shields.io customization.** Each metric is also exported as
+- ``flat`` — rounded, subtle gradient (default)
+- ``flat-square`` — sharp corners, solid fill
+- ``terminal`` — the report's own look: monospace, square, a ``//`` before
+  the label and a light, outlined value
+- ``for-the-badge`` — taller, bold and uppercase, for a row of hero badges
+- ``light`` — white label and pale blue value with a thin border, for
+  READMEs on white pages
+
+**Full shields.io customization.** Each badge is also exported as
 ``badges/<metric>.json`` in the `shields.io endpoint schema
 <https://shields.io/badges/endpoint-badge>`_. Point shields at it and use
-any of their URL parameters — arbitrary colors, ``style=for-the-badge``,
+any of their URL parameters — arbitrary colors, ``style=plastic``,
 logos — while the data stays yours and stays live:
 
 .. code-block:: markdown

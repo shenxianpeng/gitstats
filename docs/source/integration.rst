@@ -164,10 +164,14 @@ can embed:
 
 The report also contains a ``badges/`` directory with one pre-rendered badge
 per metric (``commits``, ``last-commit``, ``authors``, ``files``,
-``lines``) — pick a different metric by pointing at
-``badges/<metric>.svg``. The ``badge_metric``, ``badge_label``,
-``badge_color`` and ``badge_style`` config keys customize the label, color
-and shape, and ``badges/<metric>.json`` exposes each metric in the
+``lines``, ``release``, ``active-days``), plus ``summary`` (commits, authors
+and lines in one badge), ``activity`` (a sparkline of commits per month) and
+``health`` (active, quiet or dormant by the age of the last commit) — pick
+one by pointing at ``badges/<name>.svg``. The ``badge_metric``,
+``badge_label``, ``badge_color`` and ``badge_style`` config keys choose the
+default badge, its label, color and style (``flat``, ``flat-square``,
+``terminal``, ``for-the-badge`` or ``light``), and ``badges/<name>.json``
+exposes each badge in the
 `shields.io endpoint schema <https://shields.io/badges/endpoint-badge>`_ for
 full URL-parameter customization via ``img.shields.io/endpoint``. See the
 README's "Share Your Report with a Badge" section for details.

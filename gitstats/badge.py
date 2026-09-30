@@ -17,9 +17,10 @@ works through files and configuration instead:
 
 - ``badge.svg`` — the default badge; its metric, label, color and style are
   chosen with the ``badge_*`` config keys (``-c badge_metric=last-commit``).
-- ``badges/<metric>.svg`` — every metric, pre-rendered, so switching what
-  the badge says is just switching the URL.
-- ``badges/<metric>.json`` — the same data in the shields.io endpoint
+- ``badges/<name>.svg`` — every metric, plus the multi-segment
+  ``summary``, ``activity`` (sparkline) and ``health`` badges,
+  pre-rendered, so switching what the badge says is just switching the URL.
+- ``badges/<name>.json`` — the same data in the shields.io endpoint
   schema. Users who want full URL-parameter customization can point
   ``https://img.shields.io/endpoint?url=...&style=...&color=...`` at these
   and get every shields style/color option while the numbers stay ours.

@@ -32,8 +32,8 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "authors": "",  # Comma-separated list of authors to filter commits (empty = include all authors).
     "exclude_exts": "",  # File extensions to exclude from line counting (others detected via null bytes).
     # Shareable badge (badge.svg and badges/ in the report output)
-    # Metric shown by badge.svg: commits, last-commit, authors, files, lines,
-    # release or active-days.
+    # Badge written as badge.svg: commits, last-commit, authors, files, lines,
+    # release, active-days, summary, activity or health.
     "badge_metric": "commits",
     "badge_label": "gitstats",  # Left-side badge text.
     "badge_color": "",  # Value-segment color: shields name (green, orange, ...), hex, or any SVG color (empty = brand blue).
