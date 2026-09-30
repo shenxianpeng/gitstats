@@ -141,6 +141,18 @@ def test_badge_metrics(mock_data_collector):
     assert metrics["authors"] == "3 authors"
     assert metrics["files"] == "25 files"
     assert metrics["lines"] == "2,000 lines"
+    assert metrics["release"] == "v1.1.0 · 2 tags"
+    assert metrics["active-days"] == "4 active days"
+
+
+def test_badge_metrics_release(mock_data_collector):
+    tags = mock_data_collector.tags
+    tags["v0.9.0"] = {"stamp": 1600000000}  # newest by name, oldest by date
+    assert badge_metrics(mock_data_collector)["release"] == "v1.1.0 · 3 tags"
+    mock_data_collector.tags = {"v1.0.0": tags["v1.0.0"]}
+    assert badge_metrics(mock_data_collector)["release"] == "v1.0.0"
+    mock_data_collector.tags = {}
+    assert badge_metrics(mock_data_collector)["release"] == "no tags"
 
 
 def test_badge_metrics_singular(mock_data_collector):
@@ -162,7 +174,7 @@ def test_create_badges_writes_default_and_variants(mock_data_collector, temp_dir
     assert ">50 commits</text>" in svg
 
     badges_dir = os.path.join(temp_dir, BADGES_DIRNAME)
-    for metric in ("commits", "last-commit", "authors", "files", "lines"):
+    for metric in ("commits", "last-commit", "authors", "files", "lines", "release", "active-days"):
         assert os.path.exists(os.path.join(badges_dir, f"{metric}.svg"))
         with open(os.path.join(badges_dir, f"{metric}.json"), encoding="utf-8") as f:
             endpoint = json.load(f)

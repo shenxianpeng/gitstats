@@ -104,7 +104,19 @@ def badge_metrics(data: Any) -> dict[str, str]:
         "authors": _count(data.get_total_authors(), "author"),
         "files": _count(data.get_total_files(), "file"),
         "lines": _count(data.get_total_loc(), "line"),
+        "release": _release(data.tags),
+        "active-days": _count(len(data.get_active_days()), "active day"),
     }
+
+
+def _release(tags: dict[str, dict[str, Any]]) -> str:
+    """The newest tag and the tag count: "v2.7.0 · 46 tags"."""
+    if not tags:
+        return "no tags"
+    latest = max(tags, key=lambda tag: (tags[tag].get("stamp", 0), tag))
+    if len(tags) == 1:
+        return latest
+    return f"{latest} · {_count(len(tags), 'tag')}"
 
 
 _VERDANA = "Verdana,Geneva,DejaVu Sans,sans-serif"
