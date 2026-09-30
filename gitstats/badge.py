@@ -131,6 +131,9 @@ class _Style:
     char_width: float = 0  # fixed advance per character (monospace); 0: Verdana
     prefix: str = ""  # drawn before the label, in prefix_fg
     prefix_fg: str = ""
+    uppercase: bool = False
+    bold: bool = False
+    letter_spacing: float = 0  # px added after every character
 
 
 _STYLES = {
@@ -154,6 +157,19 @@ _STYLES = {
         prefix="//",
         prefix_fg="#9e9a9a",
     ),
+    # large and loud, for a row of hero badges
+    "for-the-badge": _Style(
+        height=28,
+        radius=0,
+        font_size=10,
+        pad=12,
+        shine=False,
+        shadow=False,
+        icon=False,
+        uppercase=True,
+        bold=True,
+        letter_spacing=1,
+    ),
 }
 
 
@@ -168,10 +184,17 @@ class Segment:
     spark_color: str = "#40c463"
 
 
+def _segment_text(text: str, style: _Style) -> str:
+    return text.upper() if style.uppercase else text
+
+
 def _segment_text_width(text: str, style: _Style) -> float:
+    text = _segment_text(text, style)
     if style.char_width:
-        return len(text) * style.char_width
-    return _text_width(text) * style.font_size / 11
+        width = len(text) * style.char_width
+    else:
+        width = _text_width(text) * style.font_size / 11 * (1.1 if style.bold else 1)
+    return width + style.letter_spacing * max(len(text) - 1, 0)
 
 
 def render_segments(segments: list[Segment], style_name: str = "flat") -> str:
@@ -232,7 +255,7 @@ def render_segments(segments: list[Segment], style_name: str = "flat") -> str:
         else:
             fg = seg.fg or ("#fff" if seg.bg else style.value_fg)
         cx = bx + lead + cw / 2
-        text = escape(seg.text)
+        text = escape(_segment_text(seg.text, style))
         if style.shadow:
             texts.append(
                 f'<text aria-hidden="true" x="{cx:.1f}" y="{baseline + 1:.1f}" fill="#010101" '
@@ -277,12 +300,13 @@ def render_segments(segments: list[Segment], style_name: str = "flat") -> str:
     else:
         group = "<g>"
 
+    weight = ' font-weight="bold"' if style.bold else ""
     return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{total_w}" height="{height}" role="img" aria-label={quoteattr(title)}>
   <title>{escape(title)}</title>
   {"".join(defs)}
   {group}{"".join(parts)}{shine}</g>
   {icon}{"".join(marks)}
-  <g text-anchor="middle" font-family={quoteattr(style.font)} font-size="{style.font_size:g}" text-rendering="geometricPrecision">{"".join(texts)}</g>
+  <g text-anchor="middle" font-family={quoteattr(style.font)} font-size="{style.font_size:g}"{weight} text-rendering="geometricPrecision">{"".join(texts)}</g>
 </svg>
 """
 
@@ -292,8 +316,9 @@ def render_badge(label: str, value: str, color: str = "", style: str = "flat") -
 
     ``color`` overrides the value-segment background (shields color name,
     hex, or any SVG color). ``style`` is a badge style name: "flat" (3px
-    radius, subtle gradient), "flat-square" (sharp corners, solid fill) or
-    "terminal" (the report's look: monospace, square, "//" before the label).
+    radius, subtle gradient), "flat-square" (sharp corners, solid fill),
+    "terminal" (the report's look: monospace, square, "//" before the label)
+    or "for-the-badge" (taller, bold, uppercase).
     """
     return render_segments([Segment(label), Segment(value, bg=color)], style)
 

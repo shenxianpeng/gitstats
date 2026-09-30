@@ -89,6 +89,19 @@ def test_render_badge_terminal_style():
     assert "gitstats: 50 commits" in svg
 
 
+def test_render_badge_for_the_badge_style():
+    svg = render_badge("gitstats", "50 commits", style="for-the-badge")
+    ET.fromstring(svg)
+    assert 'height="28"' in svg
+    assert 'font-weight="bold"' in svg
+    assert ">GITSTATS</text>" in svg
+    assert ">50 COMMITS</text>" in svg
+    assert 'aria-label="gitstats: 50 commits"' in svg  # read as written
+    assert "clip-path" not in svg
+    flat = render_badge("gitstats", "50 commits")
+    assert int(re.search(r'width="(\d+)"', svg)[1]) > int(re.search(r'width="(\d+)"', flat)[1])
+
+
 def test_render_badge_terminal_custom_color():
     svg = render_badge("gitstats", "50 commits", color="orange", style="terminal")
     assert 'fill="#fe7d37"' in svg
