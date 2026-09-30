@@ -44,6 +44,7 @@ BADGES_DIRNAME = "badges"
 _LABEL_BG = "#211e1e"  # OpenCode warm near-black
 _VALUE_BG = "#4a7ab5"  # report link/bar blue
 _BAR_COLORS = ("#9be9a8", "#40c463", "#30a14e")  # heatmap greens
+_SUMMARY_BGS = ("#4a7ab5", "#3b6aa3", "#2c5485")  # value blue, then darker
 
 # Familiar shields.io color names, resolvable in badge_color.
 _NAMED_COLORS = {
@@ -354,6 +355,50 @@ def render_badge(label: str, value: str, color: str = "", style: str = "flat") -
     return render_segments([Segment(label), Segment(value, bg=color)], style)
 
 
+def _compact(value: int, noun: str) -> str:
+    """Short count for tight spaces: (18458, "line") -> "18.5k lines"."""
+    suffix = "" if value == 1 else "s"
+    for size, unit in ((1_000_000_000, "B"), (1_000_000, "M"), (1_000, "k")):
+        if value >= size - size // 20_000:  # 999,950 reads as 1M, not 1000k
+            number = f"{value / size:.1f}".removesuffix(".0")
+            return f"{number}{unit} {noun}{suffix}"
+    return f"{value} {noun}{suffix}"
+
+
+@dataclass(frozen=True)
+class _Composite:
+    """A badge built from several segments, and its shields.io endpoint data."""
+
+    segments: list[Segment]
+    label: str
+    message: str
+    color: str
+
+
+def _summary(data: Any, label: str, color: str, style: str) -> _Composite:
+    """Commits, authors and lines side by side, in three shades of blue."""
+    parts = [
+        _compact(data.get_total_commits(), "commit"),
+        _compact(data.get_total_authors(), "author"),
+        _compact(data.get_total_loc(), "line"),
+    ]
+    message = " · ".join(parts)
+    if color or _STYLES[style].value_bg != _VALUE_BG:
+        # one color throughout, or a light style: equal segments would run
+        # together, so the numbers share one segment
+        values = [Segment(message, bg=color)]
+    else:
+        values = [Segment(text, bg=bg) for text, bg in zip(parts, _SUMMARY_BGS)]
+    return _Composite([Segment(label), *values], label, message, color or _VALUE_BG)
+
+
+def composite_badges(data: Any, label: str, color: str, style: str) -> dict[str, _Composite]:
+    """Return the multi-segment badges, keyed by name."""
+    return {
+        "summary": _summary(data, label, color, style),
+    }
+
+
 def _endpoint_json(label: str, message: str, color: str) -> str:
     """Return shields.io endpoint-schema JSON for a badge."""
     return json.dumps(
@@ -371,8 +416,8 @@ def create_badges(data: Any, path: str) -> str:
     """Write the badge set into the report directory; return the default badge path.
 
     Writes ``badge.svg`` (metric chosen by the ``badge_metric`` config key)
-    plus ``badges/<metric>.svg`` and ``badges/<metric>.json`` for every
-    metric. All honor the ``badge_label``, ``badge_color`` and
+    plus ``badges/<name>.svg`` and ``badges/<name>.json`` for every metric
+    and every multi-segment badge (``summary``). All honor the ``badge_label``, ``badge_color`` and
     ``badge_style`` config keys. Regenerating the report keeps every badge
     up to date automatically.
     """
@@ -384,26 +429,29 @@ def create_badges(data: Any, path: str) -> str:
         logger.warning(f"Unknown badge_style '{style}', using 'flat'")
         style = "flat"
 
-    metrics = badge_metrics(data)
+    badges = {
+        name: _Composite([Segment(label), Segment(message, bg=color)], label, message, color)
+        for name, message in badge_metrics(data).items()
+    }
+    badges.update(composite_badges(data, label, color, style))
 
     metric = str(conf.get("badge_metric", "") or "commits")
-    if metric not in metrics:
+    if metric not in badges:
         logger.warning(
-            f"Unknown badge_metric '{metric}', using 'commits' (available: {', '.join(metrics)})"
+            f"Unknown badge_metric '{metric}', using 'commits' (available: {', '.join(badges)})"
         )
         metric = "commits"
 
-    endpoint_color = resolve_color(color) if color else _VALUE_BG
-
     badges_dir = os.path.join(path, BADGES_DIRNAME)
     os.makedirs(badges_dir, exist_ok=True)
-    for name, message in metrics.items():
+    for name, badge in badges.items():
         with open(os.path.join(badges_dir, f"{name}.svg"), "w", encoding="utf-8") as f:
-            f.write(render_badge(label, message, color, style))
+            f.write(render_segments(badge.segments, style))
+        endpoint_color = resolve_color(badge.color) if badge.color else _VALUE_BG
         with open(os.path.join(badges_dir, f"{name}.json"), "w", encoding="utf-8") as f:
-            f.write(_endpoint_json(label, message, endpoint_color))
+            f.write(_endpoint_json(badge.label, badge.message, endpoint_color))
 
     badge_path = os.path.join(path, BADGE_FILENAME)
     with open(badge_path, "w", encoding="utf-8") as f:
-        f.write(render_badge(label, metrics[metric], color, style))
+        f.write(render_segments(badges[metric].segments, style))
     return badge_path

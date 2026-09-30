@@ -9,9 +9,12 @@ from gitstats import load_config
 from gitstats.badge import (
     BADGE_FILENAME,
     BADGES_DIRNAME,
+    _compact,
     badge_metrics,
+    composite_badges,
     create_badges,
     render_badge,
+    render_segments,
     resolve_color,
 )
 
@@ -161,6 +164,38 @@ def test_badge_metrics_singular(mock_data_collector):
     assert metrics["commits"] == "1 commit"
 
 
+# ── composite badges ─────────────────────────────────────────────────────
+
+
+def test_compact():
+    assert _compact(1, "author") == "1 author"
+    assert _compact(563, "commit") == "563 commits"
+    assert _compact(18458, "line") == "18.5k lines"
+    assert _compact(2000, "line") == "2k lines"
+    assert _compact(999_950, "line") == "1M lines"
+    assert _compact(1_250_000, "line") == "1.2M lines"
+
+
+def test_summary_badge(mock_data_collector):
+    summary = composite_badges(mock_data_collector, "gitstats", "", "flat")["summary"]
+    assert summary.message == "50 commits · 3 authors · 2k lines"
+    svg = render_segments(summary.segments)
+    ET.fromstring(svg)
+    for text, bg in (("50 commits", "#4a7ab5"), ("3 authors", "#3b6aa3"), ("2k lines", "#2c5485")):
+        assert f">{text}</text>" in svg
+        assert f'fill="{bg}"' in svg
+    assert "gitstats: 50 commits, 3 authors, 2k lines" in svg
+
+
+def test_summary_badge_one_segment_when_colored_or_light(mock_data_collector):
+    for color, style in (("green", "flat"), ("", "light"), ("", "terminal")):
+        summary = composite_badges(mock_data_collector, "gitstats", color, style)["summary"]
+        assert [s.text for s in summary.segments] == [
+            "gitstats",
+            "50 commits · 3 authors · 2k lines",
+        ]
+
+
 # ── create_badges ────────────────────────────────────────────────────────
 
 
@@ -174,7 +209,8 @@ def test_create_badges_writes_default_and_variants(mock_data_collector, temp_dir
     assert ">50 commits</text>" in svg
 
     badges_dir = os.path.join(temp_dir, BADGES_DIRNAME)
-    for metric in ("commits", "last-commit", "authors", "files", "lines", "release", "active-days"):
+    metrics = ("commits", "last-commit", "authors", "files", "lines", "release", "active-days")
+    for metric in (*metrics, "summary"):
         assert os.path.exists(os.path.join(badges_dir, f"{metric}.svg"))
         with open(os.path.join(badges_dir, f"{metric}.json"), encoding="utf-8") as f:
             endpoint = json.load(f)
@@ -203,6 +239,13 @@ def test_create_badges_honors_config(mock_data_collector, temp_dir, monkeypatch)
         endpoint = json.load(f)
     assert endpoint["label"] == "my project"
     assert endpoint["color"] == "97ca00"
+
+
+def test_create_badges_default_can_be_a_composite(mock_data_collector, temp_dir, monkeypatch):
+    monkeypatch.setitem(load_config(), "badge_metric", "summary")
+    with open(create_badges(mock_data_collector, temp_dir), encoding="utf-8") as f:
+        svg = f.read()
+    assert ">3 authors</text>" in svg
 
 
 def test_create_badges_falls_back_on_unknown_config(mock_data_collector, temp_dir, monkeypatch):
