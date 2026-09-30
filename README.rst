@@ -199,6 +199,8 @@ server, ...) and point the badge at it. For example, on GitLab CI:
 .. code-block:: yaml
 
    pages:
+     variables:
+       GIT_DEPTH: 0   # CI clones are shallow by default: fetch all history
      script:
        - pip install gitstats
        - gitstats . public
@@ -207,7 +209,9 @@ server, ...) and point the badge at it. For example, on GitLab CI:
          - public
 
 then embed ``https://<group>.gitlab.io/<project>/badge.svg`` linking to
-``https://<group>.gitlab.io/<project>/``.
+``https://<group>.gitlab.io/<project>/``. The `integration docs
+<https://gitstats.readthedocs.io/en/latest/integration.html>`_ cover GitLab
+group badges, private GitLab projects and Bitbucket Pipelines.
 
 Customizing the badge
 ~~~~~~~~~~~~~~~~~~~~~
