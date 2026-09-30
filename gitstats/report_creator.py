@@ -565,6 +565,7 @@ class HTMLReportCreator(ReportCreator):
             f" &middot; generated {datetime.datetime.now().strftime(format)}"
             f" in {time.time() - data.get_stamp_created():.0f} s"
             f" &middot; gitstats {get_version()}, {get_git_version()}"
+            ' &middot; <a href="badges.html">Badge for your README</a>'
             "</p>"
         )
         if getattr(data, "shallow", False) is True:

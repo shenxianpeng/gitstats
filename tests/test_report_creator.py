@@ -2350,3 +2350,11 @@ def test_badges_page_script_keeps_escapes(mock_data_collector, temp_dir):
     # the snippet templates stay one-line JavaScript strings
     assert r"'\n   :target: '" in content
     assert r"url.replace(/\/*$/, '/')" in content
+
+
+def test_overview_links_the_badges_page(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "index.html"), encoding="utf-8") as f:
+        content = f.read()
+    meta = re.search(r'<p class="page-meta">(.*?)</p>', content)[1]
+    assert '<a href="badges.html">Badge for your README</a>' in meta
