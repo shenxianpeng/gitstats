@@ -1,16 +1,22 @@
 """Tests for gitstats.badge."""
 
+import datetime
 import json
 import os
+import re
 import xml.etree.ElementTree as ET
 
 from gitstats import load_config
 from gitstats.badge import (
     BADGE_FILENAME,
     BADGES_DIRNAME,
+    _age,
+    _compact,
     badge_metrics,
+    composite_badges,
     create_badges,
     render_badge,
+    render_segments,
     resolve_color,
 )
 
@@ -73,6 +79,53 @@ def test_render_badge_flat_square_style():
     assert "url(#s)" in flat
 
 
+def test_render_badge_terminal_style():
+    svg = render_badge("gitstats", "50 commits", style="terminal")
+    ET.fromstring(svg)
+    assert 'height="22"' in svg
+    assert "monospace" in svg
+    assert ">//</text>" in svg
+    assert ">gitstats</text>" in svg
+    assert re.search(r'fill="#211e1e" textLength="[\d.]+">50 commits<', svg)  # dark on light
+    assert 'stroke="#211e1e"' in svg  # outlined value segment
+    assert "clip-path" not in svg
+    assert "url(#s)" not in svg
+    assert 'fill-opacity=".3"' not in svg  # no text shadow
+    assert "gitstats: 50 commits" in svg
+
+
+def test_render_badge_for_the_badge_style():
+    svg = render_badge("gitstats", "50 commits", style="for-the-badge")
+    ET.fromstring(svg)
+    assert 'height="28"' in svg
+    assert 'font-weight="bold"' in svg
+    assert ">GITSTATS</text>" in svg
+    assert ">50 COMMITS</text>" in svg
+    assert 'aria-label="gitstats: 50 commits"' in svg  # read as written
+    assert "clip-path" not in svg
+    flat = render_badge("gitstats", "50 commits")
+    assert int(re.search(r'width="(\d+)"', svg)[1]) > int(re.search(r'width="(\d+)"', flat)[1])
+
+
+def test_render_badge_light_style():
+    svg = render_badge("gitstats", "50 commits", style="light")
+    ET.fromstring(svg)
+    assert 'fill="#fff"/>' in svg  # white label
+    assert re.search(r'fill="#211e1e" textLength="[\d.]+">gitstats<', svg)
+    assert 'fill="#eef3fa"' in svg
+    assert re.search(r'fill="#2c5485" textLength="[\d.]+">50 commits<', svg)
+    assert 'stroke="#cfcecd"' in svg
+    assert "url(#s)" not in svg
+    assert 'fill-opacity=".3"' not in svg
+
+
+def test_render_badge_terminal_custom_color():
+    svg = render_badge("gitstats", "50 commits", color="orange", style="terminal")
+    assert 'fill="#fe7d37"' in svg
+    assert re.search(r'fill="#fff" textLength="[\d.]+">50 commits<', svg)
+    assert "stroke=" not in svg
+
+
 # ── resolve_color ────────────────────────────────────────────────────────
 
 
@@ -93,12 +146,115 @@ def test_badge_metrics(mock_data_collector):
     assert metrics["authors"] == "3 authors"
     assert metrics["files"] == "25 files"
     assert metrics["lines"] == "2,000 lines"
+    assert metrics["release"] == "v1.1.0 · 2 tags"
+    assert metrics["active-days"] == "4 active days"
+
+
+def test_badge_metrics_release(mock_data_collector):
+    tags = mock_data_collector.tags
+    tags["v0.9.0"] = {"stamp": 1600000000}  # newest by name, oldest by date
+    assert badge_metrics(mock_data_collector)["release"] == "v1.1.0 · 3 tags"
+    mock_data_collector.tags = {"v1.0.0": tags["v1.0.0"]}
+    assert badge_metrics(mock_data_collector)["release"] == "v1.0.0"
+    mock_data_collector.tags = {}
+    assert badge_metrics(mock_data_collector)["release"] == "no tags"
 
 
 def test_badge_metrics_singular(mock_data_collector):
     mock_data_collector.get_total_commits.return_value = 1
     metrics = badge_metrics(mock_data_collector)
     assert metrics["commits"] == "1 commit"
+
+
+# ── composite badges ─────────────────────────────────────────────────────
+
+
+def test_compact():
+    assert _compact(1, "author") == "1 author"
+    assert _compact(563, "commit") == "563 commits"
+    assert _compact(18458, "line") == "18.5k lines"
+    assert _compact(2000, "line") == "2k lines"
+    assert _compact(999_950, "line") == "1M lines"
+    assert _compact(1_250_000, "line") == "1.2M lines"
+
+
+def test_summary_badge(mock_data_collector):
+    summary = composite_badges(mock_data_collector, "gitstats", "", "flat")["summary"]
+    assert summary.message == "50 commits · 3 authors · 2k lines"
+    svg = render_segments(summary.segments)
+    ET.fromstring(svg)
+    for text, bg in (("50 commits", "#4a7ab5"), ("3 authors", "#3b6aa3"), ("2k lines", "#2c5485")):
+        assert f">{text}</text>" in svg
+        assert f'fill="{bg}"' in svg
+    assert "gitstats: 50 commits, 3 authors, 2k lines" in svg
+
+
+def test_summary_badge_one_segment_when_colored_or_light(mock_data_collector):
+    for color, style in (("green", "flat"), ("", "light"), ("", "terminal")):
+        summary = composite_badges(mock_data_collector, "gitstats", color, style)["summary"]
+        assert [s.text for s in summary.segments] == [
+            "gitstats",
+            "50 commits · 3 authors · 2k lines",
+        ]
+
+
+def test_activity_badge(mock_data_collector):
+    activity = composite_badges(mock_data_collector, "gitstats", "", "flat")["activity"]
+    assert activity.message == "8 in Apr"  # the last commit's month
+    _, spark, value = activity.segments
+    # twelve months ending April 2023; only Jan-Apr have commits, peak is March
+    assert len(spark.spark) == 12
+    assert spark.spark[:8] == (0,) * 8
+    assert spark.spark[8:] == (5 / 15, 10 / 15, 1, 8 / 15)
+    assert value.text == "8 in Apr"
+    svg = render_segments(activity.segments)
+    ET.fromstring(svg)
+    assert svg.count('fill="#40c463"') == 12 + 1  # the bars, and the icon's middle one
+    assert 'fill="#30363d"' in svg
+    assert "gitstats: 8 in Apr" in svg
+
+
+def test_activity_badge_light_style(mock_data_collector):
+    activity = composite_badges(mock_data_collector, "gitstats", "", "light")["activity"]
+    svg = render_segments(activity.segments, "light")
+    assert "#30363d" not in svg
+    assert svg.count('fill="#30a14e"') == 12
+
+
+def test_age():
+    assert _age(0) == "today"
+    assert _age(1) == "1 day ago"
+    assert _age(29) == "29 days ago"
+    assert _age(45) == "1 month ago"
+    assert _age(364) == "12 months ago"
+    assert _age(800) == "2 years ago"
+
+
+def test_health_badge(mock_data_collector):
+    # the mock's last commit is 2023-04-01
+    for now, status, dot, color, message in (
+        ((2023, 4, 2), "active", "#40c463", "#1a7f37", "last commit 1 day ago"),
+        ((2023, 5, 1), "active", "#40c463", "#1a7f37", "last commit 1 month ago"),
+        ((2023, 7, 1), "quiet", "#e3a33b", "#9a6700", "last commit 3 months ago"),
+        ((2025, 6, 1), "dormant", "#9e9a9a", "#6e6a6a", "last commit 2 years ago"),
+    ):
+        health = composite_badges(
+            mock_data_collector, "gitstats", "orange", "flat", now=datetime.datetime(*now)
+        )["health"]
+        assert (health.label, health.message, health.color) == (status, message, color)
+        svg = render_segments(health.segments)
+        ET.fromstring(svg)
+        assert f'<circle cx="8.5" cy="10" r="3.5" fill="{dot}"/>' in svg
+        assert f'fill="{color}"' in svg  # ignores badge_color
+        assert "#fe7d37" not in svg
+        assert f">{status}</text>" in svg
+
+
+def test_health_badge_dot_replaces_terminal_prefix(mock_data_collector):
+    health = composite_badges(mock_data_collector, "gitstats", "", "terminal")["health"]
+    svg = render_segments(health.segments, "terminal")
+    assert "<circle" in svg
+    assert ">//</text>" not in svg
 
 
 # ── create_badges ────────────────────────────────────────────────────────
@@ -114,12 +270,14 @@ def test_create_badges_writes_default_and_variants(mock_data_collector, temp_dir
     assert ">50 commits</text>" in svg
 
     badges_dir = os.path.join(temp_dir, BADGES_DIRNAME)
-    for metric in ("commits", "last-commit", "authors", "files", "lines"):
+    metrics = ("commits", "last-commit", "authors", "files", "lines", "release", "active-days")
+    for metric in (*metrics, "summary", "activity", "health"):
         assert os.path.exists(os.path.join(badges_dir, f"{metric}.svg"))
         with open(os.path.join(badges_dir, f"{metric}.json"), encoding="utf-8") as f:
             endpoint = json.load(f)
         assert endpoint["schemaVersion"] == 1
-        assert endpoint["label"] == "gitstats"
+        if metric != "health":
+            assert endpoint["label"] == "gitstats"
         assert endpoint["message"]
         assert not endpoint["color"].startswith("#")
 
@@ -143,6 +301,13 @@ def test_create_badges_honors_config(mock_data_collector, temp_dir, monkeypatch)
         endpoint = json.load(f)
     assert endpoint["label"] == "my project"
     assert endpoint["color"] == "97ca00"
+
+
+def test_create_badges_default_can_be_a_composite(mock_data_collector, temp_dir, monkeypatch):
+    monkeypatch.setitem(load_config(), "badge_metric", "summary")
+    with open(create_badges(mock_data_collector, temp_dir), encoding="utf-8") as f:
+        svg = f.read()
+    assert ">3 authors</text>" in svg
 
 
 def test_create_badges_falls_back_on_unknown_config(mock_data_collector, temp_dir, monkeypatch):
