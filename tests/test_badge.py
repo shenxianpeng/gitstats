@@ -196,6 +196,29 @@ def test_summary_badge_one_segment_when_colored_or_light(mock_data_collector):
         ]
 
 
+def test_activity_badge(mock_data_collector):
+    activity = composite_badges(mock_data_collector, "gitstats", "", "flat")["activity"]
+    assert activity.message == "8 in Apr"  # the last commit's month
+    _, spark, value = activity.segments
+    # twelve months ending April 2023; only Jan-Apr have commits, peak is March
+    assert len(spark.spark) == 12
+    assert spark.spark[:8] == (0,) * 8
+    assert spark.spark[8:] == (5 / 15, 10 / 15, 1, 8 / 15)
+    assert value.text == "8 in Apr"
+    svg = render_segments(activity.segments)
+    ET.fromstring(svg)
+    assert svg.count('fill="#40c463"') == 12 + 1  # the bars, and the icon's middle one
+    assert 'fill="#30363d"' in svg
+    assert "gitstats: 8 in Apr" in svg
+
+
+def test_activity_badge_light_style(mock_data_collector):
+    activity = composite_badges(mock_data_collector, "gitstats", "", "light")["activity"]
+    svg = render_segments(activity.segments, "light")
+    assert "#30363d" not in svg
+    assert svg.count('fill="#30a14e"') == 12
+
+
 # ── create_badges ────────────────────────────────────────────────────────
 
 
@@ -210,7 +233,7 @@ def test_create_badges_writes_default_and_variants(mock_data_collector, temp_dir
 
     badges_dir = os.path.join(temp_dir, BADGES_DIRNAME)
     metrics = ("commits", "last-commit", "authors", "files", "lines", "release", "active-days")
-    for metric in (*metrics, "summary"):
+    for metric in (*metrics, "summary", "activity"):
         assert os.path.exists(os.path.join(badges_dir, f"{metric}.svg"))
         with open(os.path.join(badges_dir, f"{metric}.json"), encoding="utf-8") as f:
             endpoint = json.load(f)

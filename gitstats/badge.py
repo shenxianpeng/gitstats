@@ -392,10 +392,31 @@ def _summary(data: Any, label: str, color: str, style: str) -> _Composite:
     return _Composite([Segment(label), *values], label, message, color or _VALUE_BG)
 
 
+def _activity(data: Any, label: str, color: str, style: str) -> _Composite:
+    """Commits per month for the last year of history, and the latest month."""
+    last = data.get_last_commit_date()
+    months = []
+    year, month = last.year, last.month
+    for _ in range(12):
+        months.append(f"{year}-{month:02d}")
+        year, month = (year, month - 1) if month > 1 else (year - 1, 12)
+    counts = [data.commits_by_month.get(key, 0) for key in reversed(months)]
+    peak = max(counts) or 1
+    message = f"{format_int(counts[-1])} in {_MONTHS[last.month - 1]}"
+    if _STYLES[style].value_bg == _VALUE_BG:
+        spark = Segment(bg="#30363d", spark=tuple(c / peak for c in counts))
+    else:  # light styles: green bars on the style's own value color
+        spark = Segment(spark=tuple(c / peak for c in counts), spark_color="#30a14e")
+    return _Composite(
+        [Segment(label), spark, Segment(message, bg=color)], label, message, color or _VALUE_BG
+    )
+
+
 def composite_badges(data: Any, label: str, color: str, style: str) -> dict[str, _Composite]:
     """Return the multi-segment badges, keyed by name."""
     return {
         "summary": _summary(data, label, color, style),
+        "activity": _activity(data, label, color, style),
     }
 
 
@@ -417,7 +438,7 @@ def create_badges(data: Any, path: str) -> str:
 
     Writes ``badge.svg`` (metric chosen by the ``badge_metric`` config key)
     plus ``badges/<name>.svg`` and ``badges/<name>.json`` for every metric
-    and every multi-segment badge (``summary``). All honor the ``badge_label``, ``badge_color`` and
+    and every multi-segment badge (``summary``, ``activity``). All honor the ``badge_label``, ``badge_color`` and
     ``badge_style`` config keys. Regenerating the report keeps every badge
     up to date automatically.
     """
