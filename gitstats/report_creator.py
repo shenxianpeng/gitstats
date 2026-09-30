@@ -500,6 +500,9 @@ class ReportCreator:
 
 
 class HTMLReportCreator(ReportCreator):
+    # The report's public address, ending in "/", when it is known (--site-url)
+    site_url = ""
+
     @staticmethod
     def _heat_level(value, max_value):
         if max_value <= 0 or value <= 0:
@@ -1693,7 +1696,7 @@ class HTMLReportCreator(ReportCreator):
         metric = str(conf.get("badge_metric", "") or "commits")
         if metric not in names:
             metric = "commits"
-        link = BADGES_PLACEHOLDER_URL
+        link = self.site_url or BADGES_PLACEHOLDER_URL
 
         def option_buttons(attr: str, options: list[tuple[str, str]], current: str) -> str:
             return "".join(
@@ -1735,7 +1738,7 @@ class HTMLReportCreator(ReportCreator):
             '<div class="badge-url"><label for="badge-url">Report URL</label>'
             '<div class="badge-url-field">'
             '<input id="badge-url" type="url" placeholder="https://reports.example.com/my-repo/" '
-            'spellcheck="false" autocomplete="off">'
+            f'value="{html.escape(self.site_url)}" spellcheck="false" autocomplete="off">'
             '<span id="badge-url-status" class="badge-url-status is-missing">not set</span></div>'
             '<p class="badge-url-hint" data-url-hint="detected" hidden>Read from this page\'s '
             "address. Change it if the report is also served from another URL.</p>"
@@ -1806,7 +1809,11 @@ class HTMLReportCreator(ReportCreator):
         f.write("</div>")
         f.write('<p id="badge-live" class="visually-hidden" aria-live="polite"></p>')
 
-        page_data = {"style": style, "siteUrl": "", "placeholder": BADGES_PLACEHOLDER_URL}
+        page_data = {
+            "style": style,
+            "siteUrl": self.site_url,
+            "placeholder": BADGES_PLACEHOLDER_URL,
+        }
         f.write(
             '<script type="application/json" id="badge-data">'
             + json.dumps(page_data).replace("</", "<\\/")

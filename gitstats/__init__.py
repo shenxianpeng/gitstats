@@ -41,6 +41,9 @@ DEFAULT_CONFIG: dict[str, Any] = {
     # terminal (monospace and square, like the report), for-the-badge (large)
     # or light (white and pale blue, for white READMEs).
     "badge_style": "flat",
+    # Public address of the report (https://owner.github.io/repo/): fills in the
+    # Badges page's snippets and prints the README badge. Also --site-url.
+    "site_url": "",
     # AI-powered features
     "ai_enabled": False,  # Enable AI-powered summaries (requires AI provider configuration).
     "ai_provider": "openai",  # AI provider: openai, claude, gemini, ollama.

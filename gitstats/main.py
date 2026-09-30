@@ -15,6 +15,7 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from multiprocessing import Pool
 from typing import Any
+from urllib.parse import urlsplit
 
 from gitstats import exectime_external, load_config, parse_config_value, time_start
 from gitstats.aggregate import (
@@ -1032,12 +1033,30 @@ def _prepare_output_dir(path: str) -> str:
     return target
 
 
+def normalize_site_url(url: str) -> str:
+    """Check a ``site_url`` and give it a trailing slash; "" stays "".
+
+    Raises:
+        ValueError: when it is not an http(s) address of a directory.
+    """
+    url = url.strip()
+    if not url:
+        return ""
+    parts = urlsplit(url)
+    if parts.scheme not in ("http", "https") or not parts.netloc or parts.query or parts.fragment:
+        raise ValueError(
+            f"site_url must be an http(s) address like https://example.com/report/, got {url!r}"
+        )
+    return url.rstrip("/") + "/"
+
+
 def _run_single_repo(
     gitpath: str,
     outputpath: str,
     extra_fmt: str | None = None,
     project_name: str | None = None,
     json_sibling: bool = True,
+    site_url: str = "",
 ) -> DataCollector:
     """Collect, refine and render the full report for one repository.
 
@@ -1050,6 +1069,7 @@ def _run_single_repo(
             rename every repository identically)
         json_sibling: write the extra JSON next to the output directory
             (single-repo behavior) instead of inside it
+        site_url: the report's public address, ending in "/" ("" if unknown)
     Returns:
         the populated collector
     """
@@ -1100,7 +1120,11 @@ def _run_single_repo(
 
     logger.info("Generating report...")
     html_report = HTMLReportCreator()
+    html_report.site_url = site_url
     html_report.create(data, outputpath)
+    if site_url:
+        logger.info(f"README badge: [![GitStats]({site_url}badge.svg)]({site_url})")
+        logger.info(f"More badges: {site_url}badges.html")
 
     if extra_fmt:
         if extra_fmt == "json":
@@ -1152,17 +1176,23 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
         logger.error("FATAL: Output path is not a directory or does not exist")
         return 1
 
+    try:
+        site_url = normalize_site_url(str(conf.get("site_url", "") or ""))
+    except ValueError as e:
+        logger.error(f"FATAL: {e}")
+        return 1
+
     exit_code = 0
     try:
         if len(gitpath) == 1:
             try:
-                data = _run_single_repo(gitpath[0], outputpath, extra_fmt)
+                data = _run_single_repo(gitpath[0], outputpath, extra_fmt, site_url=site_url)
             except RuntimeError as e:
                 logger.error(f"FATAL: {e}")
                 return 1
             write_repo_summary(compute_repo_summary(data, "index.html"), outputpath)
         else:
-            exit_code = _run_multi_repo(gitpath, outputpath, extra_fmt)
+            exit_code = _run_multi_repo(gitpath, outputpath, extra_fmt, site_url=site_url)
     finally:
         os.chdir(rundir)
 
@@ -1239,8 +1269,12 @@ def _serve_report(outputpath: str, host: str, port: int) -> int:
     return 0
 
 
-def _run_multi_repo(gitpaths: list, outputpath: str, extra_fmt=None) -> int:
-    """Analyze several repositories and assemble the portfolio page."""
+def _run_multi_repo(gitpaths: list, outputpath: str, extra_fmt=None, site_url: str = "") -> int:
+    """Analyze several repositories and assemble the portfolio page.
+
+    ``site_url`` is the portfolio's address; each repository's report sits
+    in its own subdirectory under it.
+    """
     summaries = []
     failures = []
     seen_slugs: dict[str, int] = {}
@@ -1263,6 +1297,7 @@ def _run_multi_repo(gitpaths: list, outputpath: str, extra_fmt=None) -> int:
                 extra_fmt,
                 project_name=slug,
                 json_sibling=False,
+                site_url=f"{site_url}{slug}/" if site_url else "",
             )
         except Exception as e:
             logger.warning(f"Skipping repository {path!r}: {e}")
@@ -1329,6 +1364,15 @@ def get_parser() -> argparse.ArgumentParser:
         choices=["json"],
         required=False,
         help="Generate additional output format",
+    )
+
+    parser.add_argument(
+        "--site-url",
+        metavar="URL",
+        help=(
+            "Public address of the report, e.g. https://owner.github.io/repo/: fills in "
+            "the snippets on the Badges page and prints the README badge"
+        ),
     )
 
     parser.add_argument(
@@ -1445,6 +1489,8 @@ def main() -> int:
 
     # Handle AI CLI arguments (CLI takes precedence over config)
     _apply_ai_args(conf, args)
+    if args.site_url is not None:
+        conf["site_url"] = args.site_url
 
     exit_code = run(gitpath, outputpath, extra_fmt=extra_fmt)
     if exit_code == 0 and args.serve:
