@@ -2220,3 +2220,20 @@ def test_domain_section_keeps_its_old_anchor(mock_data_collector, temp_dir):
         html = f.read()
     old = html.index('<span id="commits_by_domains"></span>')
     assert html.index('<h2 id="commits_by_domain">') > old
+
+
+def test_overview_flags_a_shallow_clone(mock_data_collector, temp_dir):
+    """A report built from a shallow clone says so under the heading."""
+    mock_data_collector.shallow = True
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "index.html"), encoding="utf-8") as f:
+        html = f.read()
+    assert '<p class="section-note shallow-note"><strong>Shallow clone:</strong>' in html
+    assert html.index('class="page-meta"') < html.index("shallow-note")
+
+
+def test_overview_has_no_shallow_note_for_a_full_clone(mock_data_collector, temp_dir):
+    mock_data_collector.shallow = False
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "index.html"), encoding="utf-8") as f:
+        assert "shallow-note" not in f.read()

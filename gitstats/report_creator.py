@@ -371,6 +371,12 @@ class HTMLReportCreator(ReportCreator):
             f" &middot; gitstats {get_version()}, {get_git_version()}"
             "</p>"
         )
+        if getattr(data, "shallow", False) is True:
+            f.write(
+                '<p class="section-note shallow-note"><strong>Shallow clone:</strong> this '
+                "report only covers the commits that were fetched. Clone the full history "
+                "(for example <code>git fetch --unshallow</code>) and generate it again.</p>"
+            )
 
         total_commits = data.get_total_commits()
         active_days = len(data.get_active_days())

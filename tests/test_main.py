@@ -3,6 +3,7 @@
 import datetime
 import os
 import subprocess
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -200,6 +201,41 @@ class TestGitDataCollectorIntegration:
         # commit is untagged and must not be counted in either
         assert dc.tags["v1.0.0"]["commits"] == 2
         assert dc.tags["v1.1.0"]["commits"] == 2
+
+    def test_collect_warns_about_a_shallow_clone(self, git_repo, temp_dir, caplog):
+        # CI checkouts are shallow by default; the report must say it covers
+        # only the fetched history instead of silently under-counting.
+        shallow = os.path.join(temp_dir, "shallow_clone")
+        subprocess.run(
+            ["git", "clone", "--depth", "1", Path(git_repo).resolve().as_uri(), shallow],
+            check=True,
+            capture_output=True,
+        )
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(shallow)
+            with caplog.at_level("WARNING", logger="gitstats"):
+                dc.collect(shallow)
+        finally:
+            os.chdir(prevdir)
+
+        assert dc.shallow is True
+        assert "shallow clone" in caplog.text
+        assert "git fetch --unshallow" in caplog.text
+
+    def test_collect_full_clone_is_not_shallow(self, git_repo, caplog):
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(git_repo)
+            with caplog.at_level("WARNING", logger="gitstats"):
+                dc.collect(git_repo)
+        finally:
+            os.chdir(prevdir)
+
+        assert dc.shallow is False
+        assert "shallow clone" not in caplog.text
 
     def test_collect_tags_same_day_are_ordered_by_history(self, temp_dir):
         # Two tags whose commits carry the same timestamp: the ordering has to
