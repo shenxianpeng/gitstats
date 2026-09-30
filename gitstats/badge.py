@@ -20,6 +20,9 @@ works through files and configuration instead:
 - ``badges/<name>.svg`` — every metric, plus the multi-segment
   ``summary``, ``activity`` (sparkline) and ``health`` badges,
   pre-rendered, so switching what the badge says is just switching the URL.
+- ``badges/<style>/<name>.svg`` — the same badges in every style, so
+  switching the style is switching the URL too. A README that links one
+  keeps its look when ``badge_style`` changes later.
 - ``badges/<name>.json`` — the same data in the shields.io endpoint
   schema. Users who want full URL-parameter customization can point
   ``https://img.shields.io/endpoint?url=...&style=...&color=...`` at these
@@ -202,6 +205,9 @@ _STYLES = {
         outline="#cfcecd",
     ),
 }
+
+
+STYLE_NAMES = tuple(_STYLES)  # every style, as written under badges/<style>/
 
 
 @dataclass(frozen=True)
@@ -492,8 +498,9 @@ def create_badges(data: Any, path: str) -> str:
 
     Writes ``badge.svg`` (metric chosen by the ``badge_metric`` config key)
     plus ``badges/<name>.svg`` and ``badges/<name>.json`` for every metric
-    and every multi-segment badge (``summary``, ``activity``, ``health``).
-    All follow ``badge_style``, and all but ``health`` (whose label and
+    and every multi-segment badge (``summary``, ``activity``, ``health``),
+    and ``badges/<style>/<name>.svg`` for every style. All but the last
+    follow ``badge_style``, and all but ``health`` (whose label and
     color say the status) follow ``badge_label`` and ``badge_color``.
     Regenerating the report keeps every badge up to date automatically.
     """
@@ -505,11 +512,18 @@ def create_badges(data: Any, path: str) -> str:
         logger.warning(f"Unknown badge_style '{style}', using 'flat'")
         style = "flat"
 
-    badges = {
-        name: _Composite([Segment(label), Segment(message, bg=color)], label, message, color)
-        for name, message in badge_metrics(data).items()
-    }
-    badges.update(composite_badges(data, label, color, style))
+    now = datetime.datetime.now()
+    metrics = badge_metrics(data)
+
+    def badge_set(style: str) -> dict[str, _Composite]:
+        badges = {
+            name: _Composite([Segment(label), Segment(message, bg=color)], label, message, color)
+            for name, message in metrics.items()
+        }
+        badges.update(composite_badges(data, label, color, style, now=now))
+        return badges
+
+    badges = badge_set(style)
 
     metric = str(conf.get("badge_metric", "") or "commits")
     if metric not in badges:
@@ -526,6 +540,13 @@ def create_badges(data: Any, path: str) -> str:
         endpoint_color = resolve_color(badge.color) if badge.color else _VALUE_BG
         with open(os.path.join(badges_dir, f"{name}.json"), "w", encoding="utf-8") as f:
             f.write(_endpoint_json(badge.label, badge.message, endpoint_color))
+
+    for style_name in STYLE_NAMES:
+        style_dir = os.path.join(badges_dir, style_name)
+        os.makedirs(style_dir, exist_ok=True)
+        for name, badge in badge_set(style_name).items():
+            with open(os.path.join(style_dir, f"{name}.svg"), "w", encoding="utf-8") as f:
+                f.write(render_segments(badge.segments, style_name))
 
     badge_path = os.path.join(path, BADGE_FILENAME)
     with open(badge_path, "w", encoding="utf-8") as f:
