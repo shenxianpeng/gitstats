@@ -186,6 +186,9 @@ class DataCollector:
         # AI summaries
         self.ai_summaries: dict[str, dict[str, Any]] = {}  # page_type -> {summary, error}
 
+        # analyzed from a shallow clone: the report only covers the fetched history
+        self.shallow: bool = False
+
     ##
     # This should be the main function to extract data from the repository.
     def collect(self, repo_dir: str) -> None:
@@ -234,6 +237,19 @@ class GitDataCollector(DataCollector):
         need to attribute work to canonical identities.
         """
         DataCollector.collect(self, repo_dir)
+
+        # CI checkouts are shallow by default (GitLab fetches 20 commits,
+        # Bitbucket 50, actions/checkout 1), and every number in the report
+        # would silently cover only those.
+        shallow = get_pipe_output(["git rev-parse --is-shallow-repository"]).strip()
+        self.shallow = shallow == "true"
+        if self.shallow:
+            logger.warning(
+                "Warning: this is a shallow clone, so the report only covers the history "
+                "that was fetched. Fetch all of it first with 'git fetch --unshallow', or in "
+                "CI set GitHub Actions 'fetch-depth: 0', GitLab CI 'GIT_DEPTH: 0' or "
+                "Bitbucket Pipelines 'clone: depth: full'."
+            )
 
         self.total_authors += int(
             get_pipe_output(["git shortlog -s {}".format(get_log_range("HEAD", False)), "wc -l"])
