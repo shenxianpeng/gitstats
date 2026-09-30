@@ -25,6 +25,7 @@ works through files and configuration instead:
   and get every shields style/color option while the numbers stay ours.
 """
 
+import datetime
 import json
 import logging
 import os
@@ -207,6 +208,7 @@ class Segment:
     fg: str = ""  # empty: white on a custom bg, else the style's value color
     spark: tuple[float, ...] = ()  # bar heights, 0..1
     spark_color: str = "#40c463"
+    dot: str = ""  # a status dot before the label, in place of the icon
 
 
 def _segment_text(text: str, style: _Style) -> str:
@@ -230,14 +232,19 @@ def render_segments(segments: list[Segment], style_name: str = "flat") -> str:
     """
     style = _STYLES.get(style_name, _STYLES["flat"])
     height = style.height
-    icon_w, icon_gap = (13, 4) if style.icon else (0, 0)
+    dot = segments[0].dot
+    if dot:
+        icon_w, icon_gap = 7, 5
+    else:
+        icon_w, icon_gap = (13, 4) if style.icon else (0, 0)
 
     # Lay the segments out left to right
     blocks = []
     x = 0.0
-    prefix_w = _segment_text_width(style.prefix + " ", style) if style.prefix else 0.0
+    prefix = "" if dot else style.prefix  # the dot takes the prefix's place
+    prefix_w = _segment_text_width(prefix + " ", style) if prefix else 0.0
     for index, seg in enumerate(segments):
-        lead = (style.pad + icon_w + icon_gap) if index == 0 and style.icon else style.pad
+        lead = (style.pad + icon_w + icon_gap) if index == 0 and icon_w else style.pad
         if index == 0:
             lead += prefix_w
         if seg.spark:
@@ -291,14 +298,18 @@ def render_segments(segments: list[Segment], style_name: str = "flat") -> str:
             f'textLength="{cw:.1f}">{text}</text>'
         )
 
-    if style.prefix:
+    if prefix:
         texts.append(
             f'<text x="{style.pad + prefix_w / 2:.1f}" y="{baseline:.1f}" '
-            f'fill="{style.prefix_fg}">{escape(style.prefix)}</text>'
+            f'fill="{style.prefix_fg}">{escape(prefix)}</text>'
         )
 
     icon = ""
-    if style.icon:
+    if dot:
+        icon = (
+            f'<circle cx="{style.pad + 3.5:g}" cy="{height / 2:g}" r="3.5" fill="{escape(dot)}"/>'
+        )
+    elif style.icon:
         bars = "".join(
             f'<rect x="{bx}" y="{by}" width="3" height="{bh}" rx="1" fill="{color}"/>'
             for (bx, by, bh), color in zip(
@@ -412,11 +423,49 @@ def _activity(data: Any, label: str, color: str, style: str) -> _Composite:
     )
 
 
-def composite_badges(data: Any, label: str, color: str, style: str) -> dict[str, _Composite]:
-    """Return the multi-segment badges, keyed by name."""
+# Health by the age of the last commit: (max days, status, dot, value color)
+_HEALTH = (
+    (30, "active", "#40c463", "#1a7f37"),
+    (365, "quiet", "#e3a33b", "#9a6700"),
+    (None, "dormant", "#9e9a9a", "#6e6a6a"),
+)
+
+
+def _age(days: int) -> str:
+    """Rough age: 0 -> "today", 45 -> "1 month ago", 800 -> "2 years ago"."""
+    if days < 1:
+        return "today"
+    for size, unit in ((365, "year"), (30, "month"), (1, "day")):
+        if days >= size:
+            count = days // size
+            return f"{count} {unit}{'' if count == 1 else 's'} ago"
+    return "today"  # unreachable
+
+
+def _health(data: Any, now: datetime.datetime) -> _Composite:
+    """How recently the project moved: active, quiet or dormant."""
+    days = (now - data.get_last_commit_date()).days
+    for limit, status, dot, color in _HEALTH:
+        if limit is None or days <= limit:
+            break
+    message = f"last commit {_age(days)}"
+    return _Composite(
+        [Segment(status, dot=dot), Segment(message, bg=color)], status, message, color
+    )
+
+
+def composite_badges(
+    data: Any, label: str, color: str, style: str, now: datetime.datetime | None = None
+) -> dict[str, _Composite]:
+    """Return the multi-segment badges, keyed by name.
+
+    ``now`` is when the report is generated; the health badge measures the
+    age of the last commit from it.
+    """
     return {
         "summary": _summary(data, label, color, style),
         "activity": _activity(data, label, color, style),
+        "health": _health(data, now or datetime.datetime.now()),
     }
 
 
@@ -438,9 +487,10 @@ def create_badges(data: Any, path: str) -> str:
 
     Writes ``badge.svg`` (metric chosen by the ``badge_metric`` config key)
     plus ``badges/<name>.svg`` and ``badges/<name>.json`` for every metric
-    and every multi-segment badge (``summary``, ``activity``). All honor the ``badge_label``, ``badge_color`` and
-    ``badge_style`` config keys. Regenerating the report keeps every badge
-    up to date automatically.
+    and every multi-segment badge (``summary``, ``activity``, ``health``).
+    All follow ``badge_style``, and all but ``health`` (whose label and
+    color say the status) follow ``badge_label`` and ``badge_color``.
+    Regenerating the report keeps every badge up to date automatically.
     """
     conf = load_config()
     label = str(conf.get("badge_label", "") or "gitstats")
