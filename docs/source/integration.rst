@@ -162,12 +162,20 @@ can embed:
 
    [![GitStats](https://<your-report-url>/badge.svg)](https://<your-report-url>/)
 
+Or open the report's **Badges** page: it shows every badge in every style
+with a Copy button for a Markdown, reStructuredText or HTML snippet that
+already points at the report. It reads the report's address from its own
+URL; pass ``--site-url https://<your-report-url>/`` when generating the report
+to fill it in for copies opened from a file, and to print the README badge
+in the CI job log.
+
 The report also contains a ``badges/`` directory with one pre-rendered badge
 per metric (``commits``, ``last-commit``, ``authors``, ``files``,
 ``lines``, ``release``, ``active-days``), plus ``summary`` (commits, authors
 and lines in one badge), ``activity`` (a sparkline of commits per month) and
 ``health`` (active, quiet or dormant by the age of the last commit) — pick
-one by pointing at ``badges/<name>.svg``. The ``badge_metric``,
+one by pointing at ``badges/<name>.svg``, or at ``badges/<style>/<name>.svg``
+for a fixed style. The ``badge_metric``,
 ``badge_label``, ``badge_color`` and ``badge_style`` config keys choose the
 default badge, its label, color and style (``flat``, ``flat-square``,
 ``terminal``, ``for-the-badge`` or ``light``), and ``badges/<name>.json``

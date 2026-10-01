@@ -184,7 +184,22 @@ the `demo report <https://shenxianpeng.dev/gitstats/>`_ (click one):
 
 |gitstats-report| |gitstats-last-commit| |gitstats-summary| |gitstats-activity| |gitstats-health|
 
-Embed it in your README so visitors can jump straight to the report:
+**The quickest way: the report's Badges page.** Open the published report
+and go to **Badges** in the nav (or "Badge for your README" under the
+repository name). Pick a style and a format — Markdown, reStructuredText or
+HTML — and press **Copy** next to the badge you want: the snippet already
+points at your report. The page reads the report's address from its own URL;
+when it is opened from a local file, type the address in (your browser
+remembers it) or generate the report with ``--site-url``:
+
+.. code-block:: bash
+
+   gitstats --site-url https://reports.example.com/my-repo/ . gitstats-report
+
+``--site-url`` also prints the README badge in the run log, which is handy in
+CI.
+
+Or write the snippet yourself. Embed it in your README so visitors can jump straight to the report:
 
 .. code-block:: markdown
 
@@ -253,6 +268,11 @@ A few badges pack more into one image:
   gray; active means a commit within 30 days, quiet within a year. It keeps
   its own label and colors, and its age counts from when the report was
   generated, so regenerate the report on a schedule to keep it honest
+
+**Pick a style by URL too.** Every badge is also written in every style, as
+``badges/<style>/<name>.svg`` (``badges/terminal/summary.svg``). A README
+that links one of these keeps its look when ``badge_style`` changes; the
+Badges page uses them.
 
 **Style with config keys.** The ``badge_*`` options control every generated
 badge (including which badge ``badge.svg`` itself is, any name above):

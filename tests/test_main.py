@@ -2,6 +2,7 @@
 
 import datetime
 import os
+import re
 import subprocess
 from pathlib import Path
 from unittest.mock import patch
@@ -15,6 +16,7 @@ from gitstats.main import (
     _server_urls,
     get_parser,
     main,
+    normalize_site_url,
     parallel_map_with_fallback,
     run,
 )
@@ -869,6 +871,49 @@ class TestRunIntegration:
         # Per-repo pages must not leak into the output root
         assert not os.path.exists(f"{output}/activity.html")
 
+    def test_run_with_site_url(self, git_repo, temp_dir, caplog):
+        """site_url fills in the Badges page and prints the README badge."""
+        import json
+        import logging
+
+        import gitstats.main
+
+        gitstats.main.conf["site_url"] = "https://reports.example.com/repo"
+        output = os.path.join(temp_dir, "report")
+        with caplog.at_level(logging.INFO, logger="gitstats"):
+            assert run([git_repo], output) == 0
+
+        with open(f"{output}/badges.html", encoding="utf-8") as f:
+            page = f.read()
+        data = re.search(r'<script type="application/json" id="badge-data">(.*?)</script>', page)
+        assert json.loads(data[1])["siteUrl"] == "https://reports.example.com/repo/"
+        assert 'value="https://reports.example.com/repo/"' in page
+        assert (
+            "[![GitStats summary](https://reports.example.com/repo/badges/flat/summary.svg)]"
+            "(https://reports.example.com/repo/)" in page
+        )
+        assert (
+            "README badge: [![GitStats](https://reports.example.com/repo/badge.svg)]"
+            "(https://reports.example.com/repo/)" in caplog.text
+        )
+
+    def test_run_multi_repo_site_url(self, git_repo, git_repo_minimal, temp_dir):
+        """Each repository's Badges page points at its own subdirectory."""
+        import gitstats.main
+
+        gitstats.main.conf["site_url"] = "https://reports.example.com/"
+        output = os.path.join(temp_dir, "report")
+        assert run([git_repo, git_repo_minimal], output) == 0
+        with open(f"{output}/git_repo_minimal/badges.html", encoding="utf-8") as f:
+            assert '"siteUrl": "https://reports.example.com/git_repo_minimal/"' in f.read()
+
+    def test_run_rejects_bad_site_url(self, git_repo, temp_dir, caplog):
+        import gitstats.main
+
+        gitstats.main.conf["site_url"] = "reports.example.com/repo"
+        assert run([git_repo], os.path.join(temp_dir, "report")) == 1
+        assert "site_url must be an http(s) address" in caplog.text
+
     def test_run_missing_repository_path(self, temp_dir, caplog):
         """A git path that does not exist is a FATAL error, not a traceback."""
         import gitstats
@@ -961,6 +1006,21 @@ class TestCLI:
         args = parser.parse_args(["some-repo"])
         assert args.gitpath == ["some-repo"]
         assert args.outputpath is None
+
+    def test_parser_site_url(self):
+        parser = get_parser()
+        assert parser.parse_args(["repo"]).site_url is None
+        args = parser.parse_args(["--site-url", "https://example.com/r/", "repo"])
+        assert args.site_url == "https://example.com/r/"
+
+    def test_normalize_site_url(self):
+        assert normalize_site_url("") == ""
+        assert normalize_site_url("  ") == ""
+        assert normalize_site_url("https://example.com/r") == "https://example.com/r/"
+        assert normalize_site_url("http://host:8000/a/b//") == "http://host:8000/a/b/"
+        for bad in ("example.com/r", "ftp://example.com/", "https://example.com/?x=1", "https://"):
+            with pytest.raises(ValueError):
+                normalize_site_url(bad)
 
     def test_parser_format(self):
         parser = get_parser()

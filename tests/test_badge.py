@@ -10,6 +10,7 @@ from gitstats import load_config
 from gitstats.badge import (
     BADGE_FILENAME,
     BADGES_DIRNAME,
+    STYLE_NAMES,
     _age,
     _compact,
     badge_metrics,
@@ -290,6 +291,23 @@ def test_create_badges_writes_default_and_variants(mock_data_collector, temp_dir
             assert endpoint["label"] == "gitstats"
         assert endpoint["message"]
         assert not endpoint["color"].startswith("#")
+
+
+def test_create_badges_writes_every_style(mock_data_collector, temp_dir, monkeypatch):
+    monkeypatch.setitem(load_config(), "badge_style", "light")
+    create_badges(mock_data_collector, temp_dir)
+    badges_dir = os.path.join(temp_dir, BADGES_DIRNAME)
+    names = sorted(n[:-4] for n in os.listdir(badges_dir) if n.endswith(".svg"))
+    assert len(names) == 10
+    assert STYLE_NAMES == ("flat", "flat-square", "terminal", "for-the-badge", "light")
+    for style in STYLE_NAMES:
+        assert sorted(n[:-4] for n in os.listdir(os.path.join(badges_dir, style))) == names
+    with open(os.path.join(badges_dir, "terminal", "commits.svg"), encoding="utf-8") as f:
+        assert "monospace" in f.read()  # each directory has its own style,
+    with open(os.path.join(badges_dir, "flat", "summary.svg"), encoding="utf-8") as f:
+        assert ">3 authors</text>" in f.read()  # and style-dependent layouts
+    with open(os.path.join(badges_dir, "summary.svg"), encoding="utf-8") as f:
+        assert ">3 authors</text>" not in f.read()  # while badges/ follows badge_style
 
 
 def test_create_badges_honors_config(mock_data_collector, temp_dir, monkeypatch):

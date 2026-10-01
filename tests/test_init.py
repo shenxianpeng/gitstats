@@ -50,6 +50,7 @@ def test_default_config_keys():
         "badge_label",
         "badge_color",
         "badge_style",
+        "site_url",
         "ai_enabled",
         "ai_provider",
         "ai_api_key",

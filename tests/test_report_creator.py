@@ -1,6 +1,7 @@
 """Tests for gitstats.report_creator – HTML generation, helpers, chart rendering."""
 
 import datetime
+import json
 import os
 import re
 from io import StringIO
@@ -564,6 +565,7 @@ def test_print_nav_marks_current_page():
         "tags.html",
         "ownership.html",
         "history.html",
+        "badges.html",
     ],
 )
 def test_each_page_marks_itself_current(mock_data_collector, temp_dir, page):
@@ -1322,6 +1324,7 @@ def test_create_all_pages(mock_data_collector, temp_dir):
         "tags.html",
         "ownership.html",
         "history.html",
+        "badges.html",
     ]
     for fname in expected_files:
         path = f"{temp_dir}/{fname}"
@@ -2289,3 +2292,78 @@ def test_tags_newest_first_handles_an_unparsable_date():
 
 def test_tags_newest_first_is_empty_without_tags():
     assert tags_newest_first({}) == []
+
+
+# ── HTMLReportCreator.create_badges_html ─────────────────────────────────
+
+
+def _badges_page(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "badges.html"), encoding="utf-8") as f:
+        return f.read()
+
+
+def test_badges_page_lists_every_badge(mock_data_collector, temp_dir):
+    content = _badges_page(mock_data_collector, temp_dir)
+    badges_dir = os.path.join(temp_dir, "badges", "flat")
+    for name in os.listdir(badges_dir):
+        name = name[: -len(".svg")]
+        assert f'data-kind="style" data-badge="{name}"' in content
+        assert f'<img src="badges/flat/{name}.svg"' in content
+    assert content.count('class="badge-row"') == len(os.listdir(badges_dir)) + 2
+    assert 'data-kind="default"' in content
+    assert 'data-kind="endpoint"' in content
+
+
+def test_badges_page_controls_and_placeholder(mock_data_collector, temp_dir):
+    content = _badges_page(mock_data_collector, temp_dir)
+    for style in ("flat", "flat-square", "terminal", "for-the-badge", "light"):
+        assert f'data-style="{style}"' in content
+    assert 'data-style="flat" aria-pressed="true"' in content
+    assert 'data-format="md" aria-pressed="true"' in content
+    # until the script knows the report's address, snippets use a placeholder
+    assert (
+        "[![GitStats summary](https://&lt;your-report-url&gt;/badges/flat/summary.svg)]"
+        "(https://&lt;your-report-url&gt;/)" in content
+    )
+    data = re.search(r'<script type="application/json" id="badge-data">(.*?)</script>', content)
+    assert json.loads(data[1]) == {
+        "style": "flat",
+        "siteUrl": "",
+        "placeholder": "https://<your-report-url>/",
+    }
+    assert 'aria-live="polite"' in content
+
+
+def test_badges_page_follows_badge_config(mock_data_collector, temp_dir, monkeypatch):
+    monkeypatch.setitem(load_config(), "badge_style", "terminal")
+    monkeypatch.setitem(load_config(), "badge_metric", "health")
+    content = _badges_page(mock_data_collector, temp_dir)
+    assert 'data-style="terminal" aria-pressed="true"' in content
+    assert '<img src="badges/terminal/summary.svg"' in content
+    assert "The default badge: health in terminal" in content
+    assert "badges/health.json" in content
+
+
+def test_badges_page_has_a_hint_for_each_url_state(mock_data_collector, temp_dir):
+    content = _badges_page(mock_data_collector, temp_dir)
+    for state in ("detected", "site", "entered", "cleared", "missing", "invalid"):
+        assert f'data-url-hint="{state}"' in content
+    # only a finished, valid address is remembered; an empty field forgets it
+    assert "input.addEventListener('change'" in content
+    assert "if (!url || url === auto || !looksValid(url)) localStorage.removeItem(key);" in content
+
+
+def test_badges_page_script_keeps_escapes(mock_data_collector, temp_dir):
+    content = _badges_page(mock_data_collector, temp_dir)
+    # the snippet templates stay one-line JavaScript strings
+    assert r"'\n   :target: '" in content
+    assert r"url.replace(/\/*$/, '/')" in content
+
+
+def test_overview_links_the_badges_page(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "index.html"), encoding="utf-8") as f:
+        content = f.read()
+    meta = re.search(r'<p class="page-meta">(.*?)</p>', content)[1]
+    assert '<a href="badges.html">Badge for your README</a>' in meta
