@@ -150,6 +150,16 @@ def test_badge_metrics(mock_data_collector):
     assert metrics["active-days"] == "4 active days"
 
 
+def test_badge_metrics_release_follows_history(mock_data_collector):
+    # v2.0 is the newer commit but carries the earlier date (a rebased or
+    # imported history); the badge must name the tag the Tags page calls latest
+    mock_data_collector.tags = {
+        "v1.0": {"order": 1, "date": "2026-05-01", "stamp": 1777593600},
+        "v2.0": {"order": 0, "date": "2026-01-01", "stamp": 1767225600},
+    }
+    assert badge_metrics(mock_data_collector)["release"] == "v2.0 · 2 tags"
+
+
 def test_badge_metrics_release(mock_data_collector):
     tags = mock_data_collector.tags
     tags["v0.9.0"] = {"stamp": 1600000000}  # newest by name, oldest by date

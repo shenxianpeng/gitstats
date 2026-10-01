@@ -20,40 +20,8 @@ from gitstats.utils import (
     format_int,
     get_git_version,
     get_version,
+    tags_newest_first,
 )
-
-
-def tags_newest_first(tags: dict[str, Any]) -> list[str]:
-    """Order tags the way the history does, newest first.
-
-    Data collection records each tag's position in the commit walk, where a
-    smaller index is a newer commit. Falling back to the date string only
-    matters for a cache written before that position was stored; it breaks a
-    tie between two tags of the same day by name, which is the ordering this
-    replaces.
-    """
-    return sorted(
-        tags,
-        key=lambda tag: (
-            "order" not in tags[tag],
-            tags[tag].get("order", 0),
-            _reversed_date(tags[tag].get("date", "")),
-            tag,
-        ),
-    )
-
-
-def _reversed_date(date: str) -> tuple[int, ...]:
-    """Sort key putting the later date first, for the no-position fallback.
-
-    A date that does not parse sorts after every real one, rather than ahead
-    of them as an empty key would.
-    """
-    try:
-        return (0, *(-int(part) for part in date.split("-")))
-    except ValueError:
-        return (1,)
-
 
 # A table with its chart beside it; the chart wraps below on narrow screens.
 
