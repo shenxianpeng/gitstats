@@ -35,7 +35,7 @@ from typing import Any
 from xml.sax.saxutils import escape, quoteattr
 
 from gitstats import load_config
-from gitstats.utils import format_int
+from gitstats.utils import format_int, tags_newest_first
 
 logger = logging.getLogger(__name__)
 
@@ -113,10 +113,14 @@ def badge_metrics(data: Any) -> dict[str, str]:
 
 
 def _release(tags: dict[str, dict[str, Any]]) -> str:
-    """The newest tag and the tag count: "v2.7.0 · 46 tags"."""
+    """The newest tag and the tag count: "v2.7.0 · 46 tags".
+
+    Newest by history, as on the Tags page, not by date: a rebased or
+    imported history can date a newer tag before an older one.
+    """
     if not tags:
         return "no tags"
-    latest = max(tags, key=lambda tag: (tags[tag].get("stamp", 0), tag))
+    latest = tags_newest_first(tags)[0]
     if len(tags) == 1:
         return latest
     return f"{latest} · {_count(len(tags), 'tag')}"

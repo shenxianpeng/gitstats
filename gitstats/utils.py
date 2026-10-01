@@ -273,3 +273,35 @@ def get_log_range(defaultrange: str = "HEAD", end_only: bool = True) -> str:
     if options:
         return '{} "{}"'.format(" ".join(options), commit_range)
     return commit_range
+
+
+def tags_newest_first(tags: dict[str, Any]) -> list[str]:
+    """Order tags the way the history does, newest first.
+
+    Data collection records each tag's position in the commit walk, where a
+    smaller index is a newer commit. Tags without a position (data from an
+    older version, such as a JSON dump) fall back to the date, newest first.
+    Shared by the report pages and the release badge, so they agree on which
+    tag is the latest.
+    """
+    return sorted(
+        tags,
+        key=lambda tag: (
+            "order" not in tags[tag],
+            tags[tag].get("order", 0),
+            _reversed_date(tags[tag].get("date", "")),
+            tag,
+        ),
+    )
+
+
+def _reversed_date(date: str) -> tuple[int, ...]:
+    """Sort key putting the later date first, for the no-position fallback.
+
+    A date that does not parse sorts after every real one, rather than ahead
+    of them as an empty key would.
+    """
+    try:
+        return (0, *(-int(part) for part in date.split("-")))
+    except ValueError:
+        return (1,)
