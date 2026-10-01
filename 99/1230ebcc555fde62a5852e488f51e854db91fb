@@ -1,0 +1,29 @@
+tests/test_report_creator.py
+  s_36d3a463a5505b::t_a8be1d024b94fa 568,1327,2244-2245,2297-2352
+  s_36d3a463a5505b::t_ab92f12d13e474 4
+gitstats/report_creator.py
+  s_36d3a463a5505b::t_459460f3993565 16,318,329-369,371-464,481,488-521,578,1711-1846
+  s_36d3a463a5505b::t_fa1b5d0b6c63a3 370
+  s_36d3a463a5505b::t_f3864954332c0d 465-480,482-487
+  s_36d3a463a5505b::t_16c92ac8ed92a1 1847-1851
+gitstats/gitstats.css
+  s_36d3a463a5505b::t_5d9cbea9d25f0b 42,96,647-817,822-883
+  s_36d3a463a5505b::t_fa1b5d0b6c63a3 818-821
+  s_36d3a463a5505b::t_86b19c116c60d3 884
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "991230ebcc555fde62a5852e488f51e854db91fb",
+  "prompts": {},
+  "sessions": {
+    "s_36d3a463a5505b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1d57d16d-e8d6-4ee3-bed8-3b835be6549d",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
