@@ -354,8 +354,20 @@ BADGES_SCRIPT = r"""<script>
 		? location.href.replace(/[?#].*$/, '').replace(/[^/]*$/, '')
 		: '';
 	const auto = data.siteUrl || detected;
+	// A full http(s) address, with no second "://" from text pasted onto
+	// the end of another address
+	function looksValid(url) {
+		return /^https?:\/\/[^\/\s?#]+(\/[^\s?#]*)?$/.test(url) && url.indexOf('://') === url.lastIndexOf('://');
+	}
+
 	let saved = null;
-	try { saved = localStorage.getItem(key); } catch (e) {}
+	try {
+		saved = localStorage.getItem(key);
+		if (saved !== null && !looksValid(saved)) {
+			localStorage.removeItem(key);
+			saved = null;
+		}
+	} catch (e) {}
 	input.value = saved !== null ? saved : auto;
 
 	function base() {
@@ -372,11 +384,13 @@ BADGES_SCRIPT = r"""<script>
 	function showStatus() {
 		const url = input.value.trim();
 		let state = 'detected';
-		if (!url) state = data.siteUrl || detected ? 'cleared' : 'missing';
+		if (!url) state = auto ? 'cleared' : 'missing';
+		else if (!looksValid(url)) state = 'invalid';
 		else if (url !== auto) state = 'entered';
 		else if (data.siteUrl) state = 'site';
-		status.textContent = { detected: 'detected', site: '--site-url', entered: 'entered', missing: 'not set', cleared: 'not set' }[state];
-		status.className = 'badge-url-status' + (state === 'missing' || state === 'cleared' ? ' is-missing' : state === 'site' ? '' : ' is-ok');
+		status.textContent = { detected: 'detected', site: '--site-url', entered: 'entered', missing: 'not set', cleared: 'not set', invalid: 'invalid' }[state];
+		const warn = state === 'missing' || state === 'cleared' || state === 'invalid';
+		status.className = 'badge-url-status' + (warn ? ' is-missing' : state === 'site' ? '' : ' is-ok');
 		hints.forEach(function(hint) { hint.hidden = hint.getAttribute('data-url-hint') !== state; });
 	}
 
@@ -420,13 +434,19 @@ BADGES_SCRIPT = r"""<script>
 		});
 	});
 
-	// What the reader types is kept in this browser, until it matches the
-	// detected address again
-	input.addEventListener('input', function() {
+	input.addEventListener('input', render);
+
+	// Once the reader is done typing (the field loses focus, or Enter), a
+	// valid address is kept in this browser, so half-typed ones never are.
+	// Emptying the field, or typing the detected address again, forgets it
+	// and goes back to the detected address.
+	input.addEventListener('change', function() {
+		const url = input.value.trim();
 		try {
-			if (input.value.trim() === auto) localStorage.removeItem(key);
-			else localStorage.setItem(key, input.value.trim());
+			if (!url || url === auto || !looksValid(url)) localStorage.removeItem(key);
+			else localStorage.setItem(key, url);
 		} catch (e) {}
+		if (!url && auto) input.value = auto;
 		render();
 	});
 
@@ -1747,7 +1767,10 @@ class HTMLReportCreator(ReportCreator):
             '<p class="badge-url-hint" data-url-hint="entered" hidden>Remembered in this '
             "browser.</p>"
             '<p class="badge-url-hint" data-url-hint="cleared" hidden>Enter the address the '
-            "report is published at.</p>"
+            "report is published at, or leave it empty to use this page's address.</p>"
+            '<p class="badge-url-hint" data-url-hint="invalid" hidden>That doesn\'t look like a '
+            "web address: use the report's full address, starting with https://. It won't "
+            "be remembered.</p>"
             '<p class="badge-url-hint" data-url-hint="missing">This page was opened from a file, '
             "so it can't tell where the report lives. Enter the address it's published at, or "
             "generate the report with <code>--site-url</code> to fill it in.</p></div>"

@@ -2345,6 +2345,15 @@ def test_badges_page_follows_badge_config(mock_data_collector, temp_dir, monkeyp
     assert "badges/health.json" in content
 
 
+def test_badges_page_has_a_hint_for_each_url_state(mock_data_collector, temp_dir):
+    content = _badges_page(mock_data_collector, temp_dir)
+    for state in ("detected", "site", "entered", "cleared", "missing", "invalid"):
+        assert f'data-url-hint="{state}"' in content
+    # only a finished, valid address is remembered; an empty field forgets it
+    assert "input.addEventListener('change'" in content
+    assert "if (!url || url === auto || !looksValid(url)) localStorage.removeItem(key);" in content
+
+
 def test_badges_page_script_keeps_escapes(mock_data_collector, temp_dir):
     content = _badges_page(mock_data_collector, temp_dir)
     # the snippet templates stay one-line JavaScript strings
