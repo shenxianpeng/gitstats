@@ -22,6 +22,39 @@ from gitstats.utils import (
     get_version,
 )
 
+
+def tags_newest_first(tags: dict[str, Any]) -> list[str]:
+    """Order tags the way the history does, newest first.
+
+    Data collection records each tag's position in the commit walk, where a
+    smaller index is a newer commit. Falling back to the date string only
+    matters for a cache written before that position was stored; it breaks a
+    tie between two tags of the same day by name, which is the ordering this
+    replaces.
+    """
+    return sorted(
+        tags,
+        key=lambda tag: (
+            "order" not in tags[tag],
+            tags[tag].get("order", 0),
+            _reversed_date(tags[tag].get("date", "")),
+            tag,
+        ),
+    )
+
+
+def _reversed_date(date: str) -> tuple[int, ...]:
+    """Sort key putting the later date first, for the no-position fallback.
+
+    A date that does not parse sorts after every real one, rather than ahead
+    of them as an empty key would.
+    """
+    try:
+        return (0, *(-int(part) for part in date.split("-")))
+    except ValueError:
+        return (1,)
+
+
 # A table with its chart beside it; the chart wraps below on narrow screens.
 
 # Runs before the stylesheet loads so the page never flashes the wrong theme.
@@ -495,7 +528,7 @@ class HTMLReportCreator(ReportCreator):
 
     def _overview_releases_html(self, data: Any) -> str:
         """The five most recent tags with their commit count and main authors."""
-        latest = sorted(data.tags, key=lambda t: (data.tags[t]["date"], t), reverse=True)[:5]
+        latest = tags_newest_first(data.tags)[:5]
         rows = []
         for tag in latest:
             info = data.tags[tag]
@@ -1415,7 +1448,7 @@ class HTMLReportCreator(ReportCreator):
         f.write("<h1>Tags</h1>")
 
         if data.tags:
-            latest = max(data.tags, key=lambda t: (data.tags[t]["date"], t))
+            latest = tags_newest_first(data.tags)[0]
             f.write(
                 stat_tiles_html(
                     [
@@ -1446,13 +1479,8 @@ class HTMLReportCreator(ReportCreator):
                 '<tr><th>Name</th><th>Date</th><th class="num">Commits</th>'
                 '<th class="unsortable">Authors</th></tr>'
             )
-            # sort the tags by date desc
-            tags_sorted_by_date_desc = [
-                el[1]
-                for el in sorted([(el[1]["date"], el[0]) for el in data.tags.items()], reverse=True)
-            ]
             max_tags_authors = load_config()["max_tags_authors"]
-            for tag in tags_sorted_by_date_desc:
+            for tag in tags_newest_first(data.tags):
                 authorinfo = []
                 self.authors_by_commits = get_keys_sorted_by_values(data.tags[tag]["authors"])
                 authors_reversed = list(reversed(self.authors_by_commits))

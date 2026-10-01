@@ -327,6 +327,10 @@ class GitDataCollector(DataCollector):
         # same day by tag name, and a newer tag sorted first took the older
         # tag's commits, leaving the older one with none.
         commit_order = {commit: index for index, commit in enumerate(tag_commits)}
+        # Keep the position so the report can present tags in the same order,
+        # rather than re-deriving one from the date string.
+        for info in self.tags.values():
+            info["order"] = commit_order.get(info["hash"], 0)
         tags_oldest_first = [
             tag
             for _, tag in sorted(

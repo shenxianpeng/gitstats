@@ -25,6 +25,7 @@ from gitstats.report_creator import (
     parse_chronicle,
     quiet_months,
     stat_tiles_html,
+    tags_newest_first,
 )
 
 # ── html_linkify ─────────────────────────────────────────────────────────
@@ -2237,3 +2238,54 @@ def test_overview_has_no_shallow_note_for_a_full_clone(mock_data_collector, temp
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     with open(os.path.join(temp_dir, "index.html"), encoding="utf-8") as f:
         assert "shallow-note" not in f.read()
+
+
+# ── tags_newest_first ────────────────────────────────────────────────────
+
+
+def test_tags_newest_first_follows_history_not_the_date():
+    # "later" is the older commit but carries the later date, which is what a
+    # rebase or an imported history produces. The report must agree with the
+    # commit walk, which credits commits by position rather than by date.
+    tags = {
+        "later": {"order": 1, "date": "2026-05-01"},
+        "newer": {"order": 0, "date": "2026-01-01"},
+    }
+    assert tags_newest_first(tags) == ["newer", "later"]
+
+
+def test_tags_newest_first_orders_same_day_tags_by_history():
+    # Sorting on the "%Y-%m-%d" string alone leaves same-day tags tied, and the
+    # old tie-break on the name put v10 before v9.
+    tags = {
+        "v9": {"order": 1, "date": "2026-03-04"},
+        "v10": {"order": 0, "date": "2026-03-04"},
+    }
+    assert tags_newest_first(tags) == ["v10", "v9"]
+
+
+def test_tags_newest_first_falls_back_to_the_date_without_a_position():
+    # A cache written before the position was recorded has no "order" key.
+    tags = {
+        "old": {"date": "2024-01-01"},
+        "new": {"date": "2026-01-01"},
+        "middle": {"date": "2025-06-15"},
+    }
+    assert tags_newest_first(tags) == ["new", "middle", "old"]
+
+
+def test_tags_newest_first_puts_positioned_tags_before_the_fallback():
+    tags = {
+        "positioned": {"order": 3, "date": "2020-01-01"},
+        "cached": {"date": "2026-01-01"},
+    }
+    assert tags_newest_first(tags) == ["positioned", "cached"]
+
+
+def test_tags_newest_first_handles_an_unparsable_date():
+    tags = {"a": {"date": "not-a-date"}, "b": {"date": "2026-01-01"}}
+    assert tags_newest_first(tags) == ["b", "a"]
+
+
+def test_tags_newest_first_is_empty_without_tags():
+    assert tags_newest_first({}) == []

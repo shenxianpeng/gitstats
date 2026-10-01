@@ -329,6 +329,9 @@ class TestGitDataCollectorIntegration:
 
         assert dc.tags["old"]["commits"] == 1
         assert dc.tags["new"]["commits"] == 1
+        # The report orders tags from this position, so "new" being the
+        # descendant must rank ahead of "old" despite its earlier date.
+        assert dc.tags["new"]["order"] < dc.tags["old"]["order"]
 
     def test_collect_annotated_tags(self, git_repo):
         subprocess.run(
