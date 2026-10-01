@@ -274,15 +274,17 @@ THEME_TOGGLE_BUTTON = (
     f'aria-label="Switch to dark mode">{_THEME_TOGGLE_ICONS}</button>'
 )
 
+# Most-read first: the overview, then who and when, what is at risk, the code
+# itself, the story, and the reference lists; the Badges tool comes last
 NAV_PAGES = (
     ("index.html", "General"),
     ("activity.html", "Activity"),
     ("authors.html", "Authors"),
+    ("ownership.html", "Code Ownership"),
     ("files.html", "Files"),
+    ("history.html", "History"),
     ("lines.html", "Lines"),
     ("tags.html", "Tags"),
-    ("ownership.html", "Code Ownership"),
-    ("history.html", "History"),
     ("badges.html", "Badges"),
 )
 
@@ -1284,79 +1286,14 @@ class HTMLReportCreator(ReportCreator):
                 + ".</p>"
             )
 
-        # Build per-author time series data for Chart.js
-        time_labels, loc_datasets = self._build_author_time_series(data)
-
-        # The former heading's anchor still lands here
-        f.write('<span id="cumulated_added_lines_of_code_per_author"></span>')
-        f.write(html_header(2, "Cumulative lines added per author"))
-        f.write(
-            '<p class="section-note">'
-            f"Lines added over time by {top_of or 'each author'}; "
-            "the top 5 are in color, the rest in grey.</p>"
-        )
-        f.write(
-            self._render_chartjs(
-                "chart-loc-by-author",
-                "line",
-                time_labels,
-                loc_datasets,
-                time_axis=True,
-                highlight=5,
-                annotations=time_gap_annotations(data),
-            )
-        )
+        # The people first: who is around and when, how the group grew; then
+        # the per-month leaders, and the measures that need more care to read
+        # (lines added swing with generated or vendored code) or say less.
 
         # Replaces the former "Commits per Author" line chart; its anchor still lands here
         f.write('<span id="commits_per_author"></span>')
         f.write(html_header(2, "Contributor timeline"))
         f.write(self._contributor_timeline_html(data, data.get_authors(max_authors), top_of))
-
-        # Authors :: the top author of each year, then of each month (folded away).
-        # The old "Author of Month/Year" anchors are kept so existing links still land here.
-        f.write('<span id="author_of_month"></span><span id="author_of_year"></span>')
-        f.write(html_header(2, "Top author per year and month"))
-        f.write(
-            '<p class="section-note">'
-            "Who made the most commits in each year and month, the runners-up, "
-            "and how many people committed.</p>"
-        )
-        f.write(self._top_authors_table("aoy", "Year", data.author_of_year, data.commits_by_year))
-        months = len(data.author_of_month)
-        f.write(
-            '<details class="table-details"><summary>Table: top author of each month '
-            f"({months} month{'' if months == 1 else 's'} with commits)</summary>"
-        )
-        f.write(
-            self._top_authors_table("aom", "Month", data.author_of_month, data.commits_by_month)
-        )
-        f.write("</details>")
-
-        # Domains: a bar table (the numbers used to be shown twice, as a table and a chart).
-        # The former "Commits by Domains" anchor still lands here.
-        f.write('<span id="commits_by_domains"></span>')
-        f.write(html_header(2, "Commits by domain"))
-        domains_by_commits = get_keys_sorted_by_value_key(data.domains, "commits")
-        domains_by_commits.reverse()  # most first
-        top_domains = domains_by_commits[: load_config()["max_domains"]]
-        busiest = max((data.get_domain_info(d)["commits"] for d in top_domains), default=0) or 1
-        total = data.get_total_commits() or 1
-        rows = []
-        for domain in top_domains:
-            commits = data.get_domain_info(domain)["commits"]
-            rows.append(
-                f"<tr><td>{html.escape(domain)}</td>"
-                f'<td class="num">{format_int(commits)}</td>'
-                f'<td class="num">{100.0 * commits / total:.1f}%</td>'
-                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
-                f'<span style="width: {100.0 * commits / busiest:.1f}%"></span></span></td></tr>'
-            )
-        f.write(
-            '<div class="table-scroll"><table class="share-table">'
-            '<tr><th>Domain</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr>'
-            + "".join(rows)
-            + "</table></div>"
-        )
 
         # Contributor growth: everyone who has contributed so far, month by month
         if data.new_contributors_by_month:
@@ -1391,6 +1328,75 @@ class HTMLReportCreator(ReportCreator):
                     annotations=growth_gap,
                 )
             )
+
+        # Authors :: the top author of each year, then of each month (folded away).
+        # The old "Author of Month/Year" anchors are kept so existing links still land here.
+        f.write('<span id="author_of_month"></span><span id="author_of_year"></span>')
+        f.write(html_header(2, "Top author per year and month"))
+        f.write(
+            '<p class="section-note">'
+            "Who made the most commits in each year and month, the runners-up, "
+            "and how many people committed.</p>"
+        )
+        f.write(self._top_authors_table("aoy", "Year", data.author_of_year, data.commits_by_year))
+        months = len(data.author_of_month)
+        f.write(
+            '<details class="table-details"><summary>Table: top author of each month '
+            f"({months} month{'' if months == 1 else 's'} with commits)</summary>"
+        )
+        f.write(
+            self._top_authors_table("aom", "Month", data.author_of_month, data.commits_by_month)
+        )
+        f.write("</details>")
+
+        # Build per-author time series data for Chart.js
+        time_labels, loc_datasets = self._build_author_time_series(data)
+
+        # The former heading's anchor still lands here
+        f.write('<span id="cumulated_added_lines_of_code_per_author"></span>')
+        f.write(html_header(2, "Cumulative lines added per author"))
+        f.write(
+            '<p class="section-note">'
+            f"Lines added over time by {top_of or 'each author'}; "
+            "the top 5 are in color, the rest in grey.</p>"
+        )
+        f.write(
+            self._render_chartjs(
+                "chart-loc-by-author",
+                "line",
+                time_labels,
+                loc_datasets,
+                time_axis=True,
+                highlight=5,
+                annotations=time_gap_annotations(data),
+            )
+        )
+
+        # Domains: a bar table (the numbers used to be shown twice, as a table and a chart).
+        # The former "Commits by Domains" anchor still lands here.
+        f.write('<span id="commits_by_domains"></span>')
+        f.write(html_header(2, "Commits by domain"))
+        domains_by_commits = get_keys_sorted_by_value_key(data.domains, "commits")
+        domains_by_commits.reverse()  # most first
+        top_domains = domains_by_commits[: load_config()["max_domains"]]
+        busiest = max((data.get_domain_info(d)["commits"] for d in top_domains), default=0) or 1
+        total = data.get_total_commits() or 1
+        rows = []
+        for domain in top_domains:
+            commits = data.get_domain_info(domain)["commits"]
+            rows.append(
+                f"<tr><td>{html.escape(domain)}</td>"
+                f'<td class="num">{format_int(commits)}</td>'
+                f'<td class="num">{100.0 * commits / total:.1f}%</td>'
+                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                f'<span style="width: {100.0 * commits / busiest:.1f}%"></span></span></td></tr>'
+            )
+        f.write(
+            '<div class="table-scroll"><table class="share-table">'
+            '<tr><th>Domain</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr>'
+            + "".join(rows)
+            + "</table></div>"
+        )
 
         self.print_footer(f)
         f.write("</body></html>")
