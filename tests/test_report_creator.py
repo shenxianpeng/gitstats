@@ -1430,7 +1430,9 @@ def test_authors_summary_and_folded_tables(mock_data_collector, temp_dir):
         assert tile in html, tile
     # One section for the top author of each year (shown) and month (folded away);
     # the old Author of Month / Year anchors still land on it
-    section = html[html.index('id="author_of_month"') : html.index('<h2 id="commits_by_domain"')]
+    start = html.index('id="author_of_month"')
+    heading = html.index("<h2", start)
+    section = html[start : html.index("<h2", heading + 1)]
     assert 'id="author_of_year"' in section
     assert section.count("<h2") == 1
     assert section.index('id="aoy"') < section.index("<details")
@@ -2385,3 +2387,25 @@ def test_nav_orders_pages_by_importance(mock_data_collector, temp_dir):
         "Tags",
         "Badges",
     ]
+
+
+def test_authors_sections_order(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    with open(os.path.join(temp_dir, "authors.html"), encoding="utf-8") as f:
+        html = f.read()
+    titles = [re.sub("<[^>]+>", "", h) for h in re.findall(r"<h2[^>]*>(.*?)</h2>", html)]
+    assert titles == [
+        "List of authors",
+        "Contributor timeline",
+        "Contributor growth",
+        "Top author per year and month",
+        "Cumulative lines added per author",
+        "Commits by domain",
+    ]
+    # the old anchors still sit right before the sections that replaced them
+    for anchor, section in (
+        ("commits_per_author", "contributor_timeline"),
+        ("cumulated_added_lines_of_code_per_author", "cumulative_lines_added_per_author"),
+        ("commits_by_domains", "commits_by_domain"),
+    ):
+        assert html.index(f'<span id="{anchor}">') < html.index(f'<h2 id="{section}">')
