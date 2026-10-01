@@ -274,15 +274,17 @@ THEME_TOGGLE_BUTTON = (
     f'aria-label="Switch to dark mode">{_THEME_TOGGLE_ICONS}</button>'
 )
 
+# Most-read first: the overview, then who and when, what is at risk, the code
+# itself, the story, and the reference lists; the Badges tool comes last
 NAV_PAGES = (
     ("index.html", "General"),
     ("activity.html", "Activity"),
     ("authors.html", "Authors"),
+    ("ownership.html", "Code Ownership"),
     ("files.html", "Files"),
+    ("history.html", "History"),
     ("lines.html", "Lines"),
     ("tags.html", "Tags"),
-    ("ownership.html", "Code Ownership"),
-    ("history.html", "History"),
     ("badges.html", "Badges"),
 )
 
