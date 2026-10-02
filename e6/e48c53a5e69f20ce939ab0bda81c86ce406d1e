@@ -1,0 +1,43 @@
+.gitignore
+  s_66212c309e21f0::t_6f3846ae029976 11-13
+gitstats/badge.py
+  s_66212c309e21f0::t_9c01d553876d38 453
+gitstats/main.py
+  s_66212c309e21f0::t_b8041b71e7c1c8 534,627,632
+gitstats/utils.py
+  s_66212c309e21f0::t_a0daeb6e3b6d8a 121,130,137
+pyproject.toml
+  s_66212c309e21f0::t_d28c93a47d0d1e 72-82
+tests/test_aggregate.py
+  s_66212c309e21f0::t_e80ab499993e01 5,290-359
+tests/test_ai_providers.py
+  s_66212c309e21f0::t_f5d629de9faf29 1-285
+tests/test_ai_summarizer.py
+  s_66212c309e21f0::t_e2bfbf2207c9e7 3,5,7,738-783
+tests/test_generate_gallery_portfolio.py
+  s_66212c309e21f0::t_44807a1b56c21f 89-137
+tests/test_init.py
+  s_66212c309e21f0::t_1e553f5ae439f5 87-97
+tests/test_main.py
+  s_66212c309e21f0::t_6aae6d5369ccea 4-5,9,11,18-19,21-24,26,1228-1784
+tests/test_report_creator.py
+  s_66212c309e21f0::t_b1a8d3795ff282 8,273,2413-2577
+tests/test_utils.py
+  s_66212c309e21f0::t_88e0c91aa06984 4-8,13,22-24,172-177,202-207,288-363
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e6e48c53a5e69f20ce939ab0bda81c86ce406d1e",
+  "prompts": {},
+  "sessions": {
+    "s_66212c309e21f0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8763d161-5362-48a1-ae9b-11f7bcd83469",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
