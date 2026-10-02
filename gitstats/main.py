@@ -531,7 +531,7 @@ class GitDataCollector(DataCollector):
 
         # Merge aliased author entries into their canonical entries
         for alias, canonical in name_to_canonical.items():
-            if alias not in self.authors:
+            if alias not in self.authors:  # pragma: no cover - each alias is popped once
                 continue
             if canonical not in self.authors:
                 self.authors[canonical] = self.authors.pop(alias)
@@ -624,12 +624,12 @@ class GitDataCollector(DataCollector):
         self.total_commits += len(lines)
         for line in lines:
             parts = line.split(" ")
-            if len(parts) != 2:
+            if len(parts) != 2:  # pragma: no cover - lines are built as "%d %d" above
                 continue
             (stamp, files) = parts[0:2]
             try:
                 self.files_by_stamp[int(stamp)] = int(files)
-            except ValueError:
+            except ValueError:  # pragma: no cover - lines are built as "%d %d" above
                 logger.warning(f'Failed to parse line "{line}"')
 
     def _collect_extensions(self) -> None:

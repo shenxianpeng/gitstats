@@ -69,6 +69,17 @@ fallback_version = "0.0.0"
 testpaths = ["tests"]
 pythonpath = ["."]
 
+# Coverage is not installed by the test extra; measure it with, for example,
+#   uv run --extra test --with pytest-cov python -m pytest --cov
+[tool.coverage.run]
+source = ["gitstats", "scripts"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_also = ['if __name__ == "__main__":', '@(abc\.)?abstractmethod']
+
 [tool.mypy]
 show_error_codes = true
 show_column_numbers = true

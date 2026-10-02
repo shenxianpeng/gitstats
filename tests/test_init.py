@@ -84,6 +84,17 @@ def test_load_config_defaults():
     assert cfg["ai_enabled"] is False
 
 
+def test_load_config_without_a_file_starts_from_the_defaults(tmp_path):
+    """A first load with no config file on disk caches a copy of the defaults."""
+    import gitstats
+
+    gitstats._config = None
+    cfg = load_config(str(tmp_path / "missing.conf"))
+    assert cfg == gitstats.DEFAULT_CONFIG
+    assert cfg is not gitstats.DEFAULT_CONFIG
+    assert load_config() is cfg
+
+
 def test_load_config_from_file():
     """Load config from a temporary file."""
     content = """[gitstats]

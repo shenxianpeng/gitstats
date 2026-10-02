@@ -2,6 +2,7 @@
 
 import json
 import os
+from unittest.mock import patch
 
 import pytest
 
@@ -286,3 +287,73 @@ class TestAggregateReportCreator:
     def test_repo_name_escaped(self, temp_dir):
         html = self._render(temp_dir, [_summary("a<b>", 1, {"A": 1})])
         assert "a&lt;b&gt;" in html
+
+
+# ── reading summaries and writing the page, unusual paths ────────────────
+
+
+def test_load_repo_summaries_from_a_missing_directory(tmp_path):
+    assert load_repo_summaries(str(tmp_path / "missing")) == []
+
+
+def test_load_repo_summaries_skips_entries_it_cannot_place(tmp_path):
+    """A path that can't be compared with the root (another drive on Windows) is skipped."""
+    (tmp_path / "repo").mkdir()
+    (tmp_path / "repo" / "summary.json").write_text('{"name": "repo"}', encoding="utf-8")
+    with patch("gitstats.aggregate.os.path.commonpath", side_effect=ValueError("different drives")):
+        assert load_repo_summaries(str(tmp_path)) == []
+
+
+def test_compute_repo_summary_without_yearly_commits():
+    class Empty:
+        project_name = "empty"
+
+    summary = compute_repo_summary(Empty(), "index.html")
+    assert summary["era"] == ""
+    assert summary["commits_by_year"] == {}
+    assert summary["total_commits"] == 0
+
+
+def test_copy_assets_skips_a_missing_stylesheet(tmp_path):
+    import gitstats
+
+    gitstats._config = dict(gitstats.DEFAULT_CONFIG, style="missing.css")
+    AggregateReportCreator._copy_assets(str(tmp_path))
+    assert (tmp_path / "sortable.js").exists()
+    assert not (tmp_path / "missing.css").exists()
+
+
+def test_copy_assets_refuses_to_write_outside_the_output(tmp_path):
+    with (
+        patch("gitstats.aggregate.os.path.commonpath", return_value=str(tmp_path / "elsewhere")),
+        pytest.raises(ValueError, match="Refusing to write outside report directory"),
+    ):
+        AggregateReportCreator._copy_assets(str(tmp_path))
+
+
+def test_portfolio_file_refuses_to_open_outside_the_output(tmp_path):
+    with (
+        patch("gitstats.aggregate.os.path.commonpath", return_value=str(tmp_path / "elsewhere")),
+        pytest.raises(ValueError, match="Refusing to write outside report directory"),
+    ):
+        AggregateReportCreator._open_portfolio_file(str(tmp_path))
+    assert not (tmp_path / "index.html").exists()
+
+
+def test_load_repo_summaries_skips_unreadable_files(tmp_path, caplog):
+    (tmp_path / "good").mkdir()
+    (tmp_path / "good" / "summary.json").write_text('{"name": "good"}', encoding="utf-8")
+    (tmp_path / "broken").mkdir()
+    (tmp_path / "broken" / "summary.json").write_text("{not json", encoding="utf-8")
+
+    assert load_repo_summaries(str(tmp_path)) == [{"name": "good"}]
+    assert "Skipping unreadable summary" in caplog.text
+
+
+def test_write_repo_summary_refuses_to_write_outside_the_report(tmp_path):
+    with (
+        patch("gitstats.aggregate.os.path.commonpath", return_value=str(tmp_path / "elsewhere")),
+        pytest.raises(ValueError, match="Refusing to write outside report directory"),
+    ):
+        write_repo_summary({"name": "x"}, str(tmp_path))
+    assert not (tmp_path / "summary.json").exists()
