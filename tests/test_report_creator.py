@@ -5,6 +5,7 @@ import json
 import os
 import re
 from io import StringIO
+from types import SimpleNamespace
 
 import pytest
 
@@ -269,7 +270,7 @@ def test_render_chartjs_xss_protection():
         ["</script><script>alert(1)"],
         [{"label": "</script>", "data": [1]}],
     )
-    assert "</script>" not in result.replace("</script>", "")
+    assert result.count("</script>") == 1
 
 
 def test_render_chartjs_no_y_axis_title():
@@ -2409,3 +2410,168 @@ def test_authors_sections_order(mock_data_collector, temp_dir):
         ("commits_by_domains", "commits_by_domain"),
     ):
         assert html.index(f'<span id="{anchor}">') < html.index(f'<h2 id="{section}">')
+
+
+# ── pages built from sparse or unusual data ──────────────────────────────
+
+
+def _read_page(path, page):
+    with open(os.path.join(path, page), encoding="utf-8") as f:
+        return f.read()
+
+
+def test_create_with_sparse_data(mock_data_collector, temp_dir):
+    """No yearly, monthly, churn or hour-of-day data: every page still renders."""
+    import gitstats
+
+    gitstats._config["style"] = "missing.css"  # a stylesheet that isn't shipped is skipped
+    data = mock_data_collector
+    data.commits_by_year = {}
+    data.author_of_year = {}
+    data.commits_by_month = {}
+    data.author_of_month = {}
+    data.new_contributors_by_month = {}
+    data.file_churn = {}
+    data.lines_added_by_month = {}
+    data.lines_removed_by_month = {}
+    data.get_activity_by_hour_of_day.return_value = {}
+    data.get_activity_by_day_of_week.return_value = {}
+    data.get_total_files.return_value = 0
+
+    HTMLReportCreator().create(data, temp_dir)
+
+    assert not os.path.exists(os.path.join(temp_dir, "missing.css"))
+    assert os.path.exists(os.path.join(temp_dir, "sortable.js"))
+    activity = _read_page(temp_dir, "activity.html")
+    assert "<dt>Busiest Hour</dt>" not in activity
+    assert "<dt>Busiest Day</dt>" not in activity
+    authors = _read_page(temp_dir, "authors.html")
+    assert "Contributor growth" not in authors
+    assert "timeline-row" not in authors
+    files = _read_page(temp_dir, "files.html")
+    assert "<dt>Average File Size</dt>" not in files
+    assert "Most changed files" not in files
+    assert "Lines added and removed per month" not in _read_page(temp_dir, "lines.html")
+
+
+def test_authors_summary_without_a_last_commit_date_or_authors(mock_data_collector):
+    mock_data_collector.get_last_commit_date.return_value = None
+    mock_data_collector.get_authors.side_effect = lambda limit=None: []
+    summary = HTMLReportCreator()._authors_summary_html(mock_data_collector)
+    assert '<dd class="stat-value">0</dd>' in summary
+    assert "Active Authors" not in summary
+    assert "Top Author" not in summary
+
+
+def test_lines_page_shades_a_long_quiet_stretch(mock_data_collector, temp_dir):
+    mock_data_collector.commits_by_month = {"2020-01": 5, "2021-06": 3}
+    mock_data_collector.lines_added_by_month = {"2020-01": 100, "2021-06": 40}
+    mock_data_collector.lines_removed_by_month = {"2021-06": 10}
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_lines_html(mock_data_collector, temp_dir)
+
+    page = _read_page(temp_dir, "lines.html")
+    assert "Lines added and removed per month" in page
+    assert '"bands"' in page
+
+
+def test_tags_page_limits_the_authors_listed(mock_data_collector, temp_dir):
+    import gitstats
+
+    gitstats._config["max_tags_authors"] = 1
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_tags_html(mock_data_collector, temp_dir)
+
+    page = _read_page(temp_dir, "tags.html")
+    assert "<em>and 1 more authors</em>" in page
+
+
+def test_badges_page_falls_back_to_the_default_style_and_metric(mock_data_collector, temp_dir):
+    import gitstats
+
+    gitstats._config.update(badge_style="neon", badge_metric="stars")
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_badges_html(mock_data_collector, temp_dir)
+
+    page = _read_page(temp_dir, "badges.html")
+    assert "The default badge: commits in flat" in page
+    assert '"style": "flat"' in page
+
+
+def _ownership_page(data, path):
+    creator = HTMLReportCreator()
+    creator.title = data.project_name
+    creator.data = data
+    creator.create_ownership_html(data, path)
+    return _read_page(path, "ownership.html")
+
+
+def test_ownership_page_without_usable_data(mock_data_collector, temp_dir):
+    mock_data_collector.author_files = ["not", "a", "mapping"]
+    assert "No ownership data available" in _ownership_page(mock_data_collector, temp_dir)
+
+
+def test_ownership_page_when_every_file_is_shared(mock_data_collector, temp_dir):
+    mock_data_collector.author_files = {"Ann": {"a.py": 2}, "Bo": {"a.py": 1}}
+    page = _ownership_page(mock_data_collector, temp_dir)
+    assert "No single-owner files" in page
+
+
+def test_ownership_page_lists_the_top_25_contributors(mock_data_collector, temp_dir):
+    mock_data_collector.author_files = {f"Author {i:02d}": {f"f{i}.py": 1} for i in range(26)}
+    page = _ownership_page(mock_data_collector, temp_dir)
+    assert "Showing top 25 of 26 contributors." in page
+
+
+def test_history_page_without_a_top_author_or_dated_releases(mock_data_collector, temp_dir):
+    mock_data_collector.commits_by_year = {2022: 3, 2023: 2}
+    mock_data_collector.author_of_year = {2023: {"Alice Smith": 2}}
+    mock_data_collector.tags = {"nightly": {"date": "unknown", "commits": 1, "authors": {}}}
+    history = compute_project_history(mock_data_collector)
+    assert history["total_releases"] == 0
+    assert [y["top_author"] for y in history["years"]] == ["", "Alice Smith"]
+
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_history_html(mock_data_collector, temp_dir)
+    assert _read_page(temp_dir, "history.html").count("Led by") == 1
+
+
+def test_ai_insights_section_without_summary_or_error(mock_data_collector, temp_dir):
+    mock_data_collector.ai_summaries = {"index": {}}
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_ai_insights_html(mock_data_collector, temp_dir)
+    assert "No analysis available for this section." in _read_page(temp_dir, "ai-insights.html")
+
+
+def test_author_time_series_ignores_authors_not_plotted(mock_data_collector):
+    creator = HTMLReportCreator()
+    creator.data = mock_data_collector
+    mock_data_collector.changes_by_date_by_author = {
+        1670000000: {
+            "Alice Smith": {"lines_added": 10, "commits": 1},
+            "Not Plotted": {"lines_added": 99, "commits": 1},
+        }
+    }
+    _, datasets = creator._build_author_time_series(mock_data_collector)
+    assert "Not Plotted" not in [ds["label"] for ds in datasets]
+
+
+@pytest.mark.parametrize("by_month", [None, {}, ["2020-01"]])
+def test_quiet_months_without_monthly_data(by_month):
+    assert quiet_months(SimpleNamespace(commits_by_month=by_month)) is None
+
+
+def test_gap_annotations_skip_an_empty_side():
+    # the gap opens the series: only the bar after it gets a peak label
+    annotations = gap_annotations(["2019", "2020", "2021", "2022"], [0, 0, 0, 5], min_gap=2)
+    assert [peak["index"] for peak in annotations["peaks"]] == [3]

@@ -118,7 +118,7 @@ def get_pipe_output(cmds: list[str], quiet: bool = False) -> str:
         output = _run_command(cmds[0])
         try:
             text = output.decode("utf-8", errors="replace").rstrip("\n")
-        except UnicodeDecodeError:
+        except UnicodeDecodeError:  # pragma: no cover - errors="replace" never raises
             text = output.decode("latin-1", errors="replace").rstrip("\n")
         line_count = count_lines_in_text(text)
         result = str(line_count)
@@ -127,14 +127,14 @@ def get_pipe_output(cmds: list[str], quiet: bool = False) -> str:
         output = _run_command(cmds[0])
         try:
             text = output.decode("utf-8", errors="replace").rstrip("\n")
-        except UnicodeDecodeError:
+        except UnicodeDecodeError:  # pragma: no cover - errors="replace" never raises
             text = output.decode("latin-1", errors="replace").rstrip("\n")
         result = filter_lines_by_pattern(text, pattern)
     else:
         output = _run_pipe_chain(cmds)
         try:
             result = output.decode("utf-8", errors="replace").rstrip("\n")
-        except UnicodeDecodeError:
+        except UnicodeDecodeError:  # pragma: no cover - errors="replace" never raises
             result = output.decode("latin-1", errors="replace").rstrip("\n")
 
     end = time.time()

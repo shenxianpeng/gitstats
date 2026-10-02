@@ -450,7 +450,7 @@ def _age(days: int) -> str:
         if days >= size:
             count = days // size
             return f"{count} {unit}{'' if count == 1 else 's'} ago"
-    return "today"  # unreachable
+    return "today"  # pragma: no cover - unreachable
 
 
 def _health(data: Any, now: datetime.datetime) -> _Composite:

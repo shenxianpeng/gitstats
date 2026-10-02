@@ -1,7 +1,10 @@
 """Tests for gitstats.ai_summarizer – AISummarizer prompt prep, caching, and provider glue."""
 
+import datetime
 import json
+import logging
 import os
+from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
 import pytest
@@ -732,3 +735,49 @@ def test_generate_all_summaries_includes_chronicle():
     summaries = summarizer.generate_all_summaries(CHRONICLE_DATA)
 
     assert set(summaries) == {"index", "activity", "lines", "chronicle"}
+
+
+# ── cache write failures and field lookups ───────────────────────────────
+
+
+def test_save_cached_summary_failure_is_only_logged(tmp_path, caplog):
+    summarizer = make_summarizer()
+    not_a_dir = tmp_path / "cache"
+    not_a_dir.write_text("a file where the cache directory should be")
+    summarizer.cache_dir = not_a_dir
+    with caplog.at_level(logging.WARNING, logger="gitstats"):
+        summarizer._save_cached_summary("index_abc", "summary text")
+    assert "Failed to cache summary" in caplog.text
+
+
+def test_get_field_value_reads_object_attributes():
+    summarizer = make_summarizer()
+    data = SimpleNamespace(total_commits=7)
+    assert summarizer._get_field_value(data, "total_commits") == 7
+    assert summarizer._get_field_value(data, "missing", "fallback") == "fallback"
+
+
+def test_get_commit_date_prefers_the_collector_method():
+    data = SimpleNamespace(get_first_commit_date=lambda: "2020-01-01")
+    assert make_summarizer()._get_commit_date(data, "first") == "2020-01-01"
+
+
+def test_get_commit_date_falls_back_when_the_method_fails():
+    def broken():
+        raise RuntimeError("no commits")
+
+    data = SimpleNamespace(get_last_commit_date=broken, last_commit_date="2021-02-03")
+    assert make_summarizer()._get_commit_date(data, "last") == "2021-02-03"
+
+
+def test_get_commit_date_from_a_stamp():
+    stamp = int(datetime.datetime(2022, 5, 6, 12, 0).timestamp())
+    assert (
+        make_summarizer()._get_commit_date({"first_commit_stamp": stamp}, "first") == "2022-05-06"
+    )
+
+
+@pytest.mark.parametrize("stamp", [None, 0, 10**14])
+def test_get_commit_date_without_a_usable_stamp(stamp):
+    data = {"last_commit_stamp": stamp}
+    assert make_summarizer()._get_commit_date(data, "last") == "Unknown"

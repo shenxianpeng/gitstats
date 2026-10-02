@@ -1,10 +1,16 @@
 """Tests for gitstats.utils – pure logic and git helper functions."""
 
 import datetime
+import hashlib
+import logging
+import subprocess
+from importlib.metadata import PackageNotFoundError
+from unittest.mock import patch
 
 import pytest
 
 from gitstats.utils import (
+    _run_pipe_chain,
     count_lines_in_text,
     filter_lines_by_pattern,
     format_bytes,
@@ -13,6 +19,9 @@ from gitstats.utils import (
     get_commit_range,
     get_excluded_extensions,
     get_log_range,
+    get_num_of_files_from_rev,
+    get_num_of_lines_in_blob,
+    get_pipe_output,
     get_stat_summary_counts,
     get_version,
     should_exclude_file,
@@ -160,6 +169,12 @@ def test_get_version():
     assert isinstance(v, str)
 
 
+def test_get_version_from_a_source_checkout():
+    """Without installed package metadata the version reads "dev"."""
+    with patch("gitstats.utils.version", side_effect=PackageNotFoundError("gitstats")):
+        assert get_version() == "dev"
+
+
 # ── get_commit_range ─────────────────────────────────────────────────────
 
 
@@ -182,6 +197,12 @@ def test_get_commit_range_numeric_begin():
     """commit_begin as a number means 'N commits ago from commit_end'."""
     _set_config(commit_begin="10", commit_end="HEAD")
     assert get_commit_range() == "HEAD~10..HEAD"
+
+
+def test_get_commit_range_without_commit_end_uses_the_default():
+    _set_config(commit_begin="v1.0.0", commit_end="")
+    assert get_commit_range("HEAD") == "HEAD"
+    assert get_commit_range("main", end_only=True) == "main"
 
 
 # ── get_log_range ────────────────────────────────────────────────────────
@@ -264,3 +285,79 @@ def test_format_bytes(size, expected):
 )
 def test_format_duration(delta, expected):
     assert format_duration(delta) == expected
+
+
+# ── get_pipe_output / _run_pipe_chain ────────────────────────────────────
+
+
+def test_run_pipe_chain_without_commands():
+    assert _run_pipe_chain([]) == b""
+
+
+def test_run_pipe_chain_feeds_each_command_the_previous_output():
+    version = subprocess.run(["git", "--version"], capture_output=True, check=True).stdout
+    blob_id = hashlib.sha1(b"blob %d\0" % len(version) + version).hexdigest()
+    assert _run_pipe_chain(["git --version", "git hash-object --stdin"]).strip() == blob_id.encode()
+
+
+def test_get_pipe_output_echoes_commands_on_a_linux_terminal(caplog):
+    with (
+        patch("gitstats.utils.ON_LINUX", True),
+        patch("gitstats.utils.os.isatty", return_value=True),
+        caplog.at_level(logging.DEBUG, logger="gitstats"),
+    ):
+        output = get_pipe_output(["git --version"])
+    assert output.startswith("git version")
+    assert [r.message for r in caplog.records if r.message.startswith(">> ")] == [
+        ">> git --version"
+    ]
+
+
+def test_get_pipe_output_quiet_logs_nothing(caplog):
+    with caplog.at_level(logging.DEBUG, logger="gitstats"):
+        output = get_pipe_output(["git --version"], quiet=True)
+    assert output.startswith("git version")
+    assert caplog.records == []
+
+
+# ── get_num_of_lines_in_blob / get_num_of_files_from_rev ─────────────────
+# Data collection runs these in worker processes; here they run in-process.
+
+
+def _rev_parse(repo, rev):
+    return subprocess.run(
+        ["git", "rev-parse", rev], cwd=repo, capture_output=True, text=True, check=True
+    ).stdout.strip()
+
+
+def test_get_num_of_lines_in_blob_counts_text_lines(git_repo, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    blob = _rev_parse(git_repo, "HEAD:utils.py")
+    assert get_num_of_lines_in_blob(("py", blob)) == ("py", blob, 5)
+
+
+def test_get_num_of_lines_in_blob_binary_counts_zero(git_repo, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    blob = _rev_parse(git_repo, "HEAD:logo.png")
+    assert get_num_of_lines_in_blob(("png", blob)) == ("png", blob, 0)
+
+
+def test_get_num_of_lines_in_blob_excluded_extension_is_not_read():
+    _set_config(exclude_exts="png")
+    with patch("gitstats.utils.subprocess.check_output") as check_output:
+        assert get_num_of_lines_in_blob(("png", "abc123")) == ("png", "abc123", 0)
+    check_output.assert_not_called()
+
+
+def test_get_num_of_lines_in_blob_unreadable_blob_counts_zero(git_repo, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    missing = "0" * 40
+    assert get_num_of_lines_in_blob(("py", missing)) == ("py", missing, 0)
+
+
+def test_get_num_of_files_from_rev(git_repo, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    head = _rev_parse(git_repo, "HEAD")
+    first = _rev_parse(git_repo, "HEAD~4")
+    assert get_num_of_files_from_rev(("1683000000", head)) == (1683000000, head, 5)
+    assert get_num_of_files_from_rev(("1673776800", first)) == (1673776800, first, 2)
