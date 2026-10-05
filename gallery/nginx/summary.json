@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.7.0",
-  "generated_at": "2026-09-28T04:16:21+00:00",
+  "generated_by": "gitstats 2.8.0.post1.dev1",
+  "generated_at": "2026-10-05T04:38:04+00:00",
   "name": "nginx",
   "report_path": "index.html",
   "first_commit": "2002-08-06 16:39:45",
-  "last_commit": "2026-09-23 18:31:48",
-  "age_days": 8815,
-  "active_days": 3134,
-  "total_commits": 8728,
-  "total_authors": 137,
-  "active_authors_12mo": 37,
-  "commits_last_12mo": 262,
-  "total_files": 544,
-  "total_lines": 304778,
-  "lines_added": 503600,
-  "lines_removed": 198822,
+  "last_commit": "2026-09-30 13:23:05",
+  "age_days": 8821,
+  "active_days": 3138,
+  "total_commits": 8738,
+  "total_authors": 138,
+  "active_authors_12mo": 38,
+  "commits_last_12mo": 259,
+  "total_files": 547,
+  "total_lines": 308251,
+  "lines_added": 507790,
+  "lines_removed": 199539,
   "total_tags": 500,
   "era": "steady",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "Sergey Kandaurov",
-      "commits": 751
+      "commits": 753
     },
     {
       "name": "Roman Arutyunyan",
@@ -41,14 +41,16 @@
     }
   ],
   "author_commits": {
+    "Sergey Kandaurov": 753,
+    "Ivan Ovchinnikov": 2,
+    "Sai Krishna Kumar Reddy YADAMAKANTI": 2,
+    "Andrew Clayton": 32,
     "Sourav Bhowmik": 3,
     "Eugene Grebenschikov": 6,
     "Maxim Dounin": 1703,
-    "Sergey Kandaurov": 751,
     "Roman Arutyunyan": 657,
     "Ava Hahn": 3,
     "Dmitry Plotnikov": 4,
-    "Ivan Ovchinnikov": 1,
     "Vadim Zhestikov": 14,
     "Roman Semenov": 8,
     "Henry Yuan": 2,
@@ -61,7 +63,6 @@
     "Pavel Pautov": 5,
     "Patrik Wall": 3,
     "Zhidao HONG": 9,
-    "Andrew Clayton": 27,
     "Feng Wu": 2,
     "Miao Wang": 1,
     "Nitin Swami": 1,
@@ -204,6 +205,6 @@
     "2023": 186,
     "2024": 132,
     "2025": 163,
-    "2026": 218
+    "2026": 228
   }
 }

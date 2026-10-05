@@ -7,7 +7,7 @@
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.7.0">
+	<meta name="generator" content="GitStats 2.8.0.post1.dev1">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -241,11 +241,12 @@
             <li><a href="index.html" class="active" aria-current="page">General</a></li>
             <li><a href="activity.html">Activity</a></li>
             <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
             <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
             <li><a href="lines.html">Lines</a></li>
             <li><a href="tags.html">Tags</a></li>
-            <li><a href="ownership.html">Code Ownership</a></li>
-            <li><a href="history.html">History</a></li>
+            <li><a href="badges.html">Badges</a></li>
             
             </ul>
             <div class="nav-right">
@@ -253,7 +254,7 @@
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Rust</h1><p class="page-meta">2010-06-16 &rarr; 2026-09-28 &middot; generated 2026-09-28 05:05:25 in 2892 s &middot; gitstats 2.7.0, git version 2.55.0</p><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">341,639</dd><dd class="stat-note"><span class="nowrap">58.0 per active day</span>&nbsp;&middot; <span class="nowrap">57.4 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">7,717</dd><dd class="stat-note">44.3 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">6,127,219</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+14,783,901</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−8,656,682</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">63,223</dd><dd class="stat-note">86 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">5,890</dd><dd class="stat-note"><span class="nowrap">of 5,948 days</span>&nbsp;&middot; <span class="nowrap">99.0%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">5024 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
+            <h1>Rust</h1><p class="page-meta">2010-06-16 &rarr; 2026-10-04 &middot; generated 2026-10-05 05:50:25 in 4270 s &middot; gitstats 2.8.0.post1.dev1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">342,414</dd><dd class="stat-note"><span class="nowrap">58.1 per active day</span>&nbsp;&middot; <span class="nowrap">57.5 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">7,735</dd><dd class="stat-note">44.3 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">6,142,730</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+14,818,188</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−8,675,458</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">63,424</dd><dd class="stat-note">86 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">5,896</dd><dd class="stat-note"><span class="nowrap">of 5,955 days</span>&nbsp;&middot; <span class="nowrap">99.0%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">5030 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
 <h2 id="commits_per_year"><a href="#commits_per_year">Commits per year</a></h2>
 
 <div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly"></canvas></div>
@@ -266,7 +267,7 @@
     type: 'bar',
     data: {
       labels: labels,
-      datasets: [{"label": "Commits", "data": [1173, 5822, 7425, 10693, 11101, 14611, 13836, 15544, 22477, 27622, 32845, 27504, 30082, 28833, 33221, 32835, 26015], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+      datasets: [{"label": "Commits", "data": [1173, 5822, 7425, 10693, 11101, 14611, 13836, 15544, 22477, 27622, 32845, 27504, 30082, 28833, 33226, 32836, 26784], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
     },
     options: {
       responsive: true,
@@ -285,7 +286,7 @@
 <p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p><div class="two-columns"><section>
 <h2 id="top_contributors"><a href="#top_contributors">Top contributors</a></h2>
 
-<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>bors</td><td class="num">48,741</td><td class="num">14.3%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>Matthias Krüger</td><td class="num">13,334</td><td class="num">3.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 27.4%"></span></span></td></tr><tr><td>Ralf Jung</td><td class="num">10,579</td><td class="num">3.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 21.7%"></span></span></td></tr><tr><td>Guillaume Gomez</td><td class="num">8,419</td><td class="num">2.5%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 17.3%"></span></span></td></tr><tr><td>Oliver Scherer</td><td class="num">6,115</td><td class="num">1.8%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 12.5%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 7,717 authors &rarr;</a></p></section><section>
+<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>bors</td><td class="num">48,778</td><td class="num">14.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>Matthias Krüger</td><td class="num">13,334</td><td class="num">3.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 27.3%"></span></span></td></tr><tr><td>Ralf Jung</td><td class="num">10,618</td><td class="num">3.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 21.8%"></span></span></td></tr><tr><td>Guillaume Gomez</td><td class="num">8,430</td><td class="num">2.5%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 17.3%"></span></span></td></tr><tr><td>Oliver Scherer</td><td class="num">6,116</td><td class="num">1.8%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 12.5%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 7,735 authors &rarr;</a></p></section><section>
 <h2 id="latest_releases"><a href="#latest_releases">Latest releases</a></h2>
 
 <div class="table-scroll"><table class="share-table"><tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr><tr><td class="nowrap">1.0.0-beta</td><td class="nowrap">2015-04-02</td><td class="num">1,870</td><td>Manish Goregaokar, Alex Crichton +165</td></tr><tr><td class="nowrap">1.0.0-alpha.2</td><td class="nowrap">2015-02-19</td><td class="num">2,066</td><td>Alex Crichton, bors +199</td></tr><tr><td class="nowrap">1.0.0-alpha</td><td class="nowrap">2015-01-09</td><td class="num">3,757</td><td>Alex Crichton, bors +255</td></tr><tr><td class="nowrap">0.12.0</td><td class="nowrap">2014-10-07</td><td class="num">2,902</td><td>bors, Alex Crichton +208</td></tr><tr><td class="nowrap">0.11.0</td><td class="nowrap">2014-06-27</td><td class="num">2,472</td><td>bors, Alex Crichton +172</td></tr></table></div><p class="more-link"><a href="tags.html">All 23 tags &rarr;</a></p></section></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
