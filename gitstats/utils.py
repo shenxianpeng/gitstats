@@ -2,13 +2,15 @@
 # GPLv2 / GPLv3
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
 # GPLv2 / GPLv3
+import datetime
 import logging
 import os
 import re
 import shlex
 import subprocess
 import time
-from importlib.metadata import version
+from importlib.metadata import PackageNotFoundError, version
+from typing import Any
 
 from gitstats import ON_LINUX, exectime_external, load_config
 
@@ -34,7 +36,44 @@ def filter_lines_by_pattern(text: str | None, pattern: str) -> str:
 
 
 def get_version() -> str:
-    return version("gitstats")
+    """Installed package version, or "dev" when running from a source checkout."""
+    try:
+        return version("gitstats")
+    except PackageNotFoundError:
+        return "dev"
+
+
+def format_int(value: Any) -> str:
+    """Render an integer with thousands separators (44025623 -> "44,025,623").
+
+    Non-numeric values are returned unchanged so callers can pass through
+    already-formatted or missing data.
+    """
+    try:
+        return f"{int(value):,}"
+    except (TypeError, ValueError):
+        return str(value)
+
+
+def format_duration(delta: datetime.timedelta) -> str:
+    """Render a span compactly: "< 1 d", "9 d", "12 mo", "7.3 yr"."""
+    days = delta.total_seconds() / 86400
+    if days < 1:
+        return "< 1 d"
+    if days < 30:
+        return f"{int(days)} d"
+    if days < 365:
+        return f"{round(days / 30.44)} mo"
+    return f"{days / 365.25:.1f} yr"
+
+
+def format_bytes(size: float) -> str:
+    """Render a byte count in binary units (161307.78 -> "157.5 KB")."""
+    for unit in ("bytes", "KB", "MB", "GB"):
+        if abs(size) < 1024 or unit == "GB":
+            break
+        size /= 1024
+    return f"{size:.0f} bytes" if unit == "bytes" else f"{size:.1f} {unit}"
 
 
 def get_git_version() -> str:
@@ -79,7 +118,7 @@ def get_pipe_output(cmds: list[str], quiet: bool = False) -> str:
         output = _run_command(cmds[0])
         try:
             text = output.decode("utf-8", errors="replace").rstrip("\n")
-        except UnicodeDecodeError:
+        except UnicodeDecodeError:  # pragma: no cover - errors="replace" never raises
             text = output.decode("latin-1", errors="replace").rstrip("\n")
         line_count = count_lines_in_text(text)
         result = str(line_count)
@@ -88,14 +127,14 @@ def get_pipe_output(cmds: list[str], quiet: bool = False) -> str:
         output = _run_command(cmds[0])
         try:
             text = output.decode("utf-8", errors="replace").rstrip("\n")
-        except UnicodeDecodeError:
+        except UnicodeDecodeError:  # pragma: no cover - errors="replace" never raises
             text = output.decode("latin-1", errors="replace").rstrip("\n")
         result = filter_lines_by_pattern(text, pattern)
     else:
         output = _run_pipe_chain(cmds)
         try:
             result = output.decode("utf-8", errors="replace").rstrip("\n")
-        except UnicodeDecodeError:
+        except UnicodeDecodeError:  # pragma: no cover - errors="replace" never raises
             result = output.decode("latin-1", errors="replace").rstrip("\n")
 
     end = time.time()
@@ -234,3 +273,35 @@ def get_log_range(defaultrange: str = "HEAD", end_only: bool = True) -> str:
     if options:
         return '{} "{}"'.format(" ".join(options), commit_range)
     return commit_range
+
+
+def tags_newest_first(tags: dict[str, Any]) -> list[str]:
+    """Order tags the way the history does, newest first.
+
+    Data collection records each tag's position in the commit walk, where a
+    smaller index is a newer commit. Tags without a position (data from an
+    older version, such as a JSON dump) fall back to the date, newest first.
+    Shared by the report pages and the release badge, so they agree on which
+    tag is the latest.
+    """
+    return sorted(
+        tags,
+        key=lambda tag: (
+            "order" not in tags[tag],
+            tags[tag].get("order", 0),
+            _reversed_date(tags[tag].get("date", "")),
+            tag,
+        ),
+    )
+
+
+def _reversed_date(date: str) -> tuple[int, ...]:
+    """Sort key putting the later date first, for the no-position fallback.
+
+    A date that does not parse sorts after every real one, rather than ahead
+    of them as an empty key would.
+    """
+    try:
+        return (0, *(-int(part) for part in date.split("-")))
+    except ValueError:
+        return (1,)

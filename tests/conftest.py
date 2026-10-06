@@ -224,7 +224,8 @@ def mock_data_collector():
     data.get_last_commit_date.return_value = datetime.datetime(2023, 4, 1, 0, 0)
 
     # Active days
-    data.get_active_days.return_value = {"2023-01-01", "2023-01-15", "2023-02-01", "2023-03-10"}
+    data.active_days = {"2023-01-01", "2023-01-15", "2023-02-01", "2023-03-10"}
+    data.get_active_days.return_value = data.active_days
     data.get_longest_streak.return_value = 4
     data.longest_streak = 4
     data.get_commit_delta_days.return_value = 120
@@ -270,6 +271,7 @@ def mock_data_collector():
     data.authors = {
         "Alice Smith": {
             "commits": 30,
+            "first_commit_stamp": 1673776800,  # 2023-01-15
             "lines_added": 2000,
             "lines_removed": 500,
             "date_first": "2023-01-15",
@@ -281,6 +283,7 @@ def mock_data_collector():
         },
         "Bob Jones": {
             "commits": 15,
+            "first_commit_stamp": 1675245600,  # 2023-02-01
             "lines_added": 800,
             "lines_removed": 300,
             "date_first": "2023-02-01",
@@ -292,6 +295,7 @@ def mock_data_collector():
         },
         "Charlie Brown": {
             "commits": 5,
+            "first_commit_stamp": 1678442400,  # 2023-03-10
             "lines_added": 200,
             "lines_removed": 200,
             "date_first": "2023-03-10",

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import platform
+import re
 import time
 from typing import Any
 
@@ -30,6 +31,19 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "end_date": "",  # Ending date for commits, passed as --until to Git (optional). Format: YYYY-MM-DD.
     "authors": "",  # Comma-separated list of authors to filter commits (empty = include all authors).
     "exclude_exts": "",  # File extensions to exclude from line counting (others detected via null bytes).
+    # Shareable badge (badge.svg and badges/ in the report output)
+    # Badge written as badge.svg: commits, last-commit, authors, files, lines,
+    # release, active-days, summary, activity or health.
+    "badge_metric": "commits",
+    "badge_label": "gitstats",  # Left-side badge text.
+    "badge_color": "",  # Value-segment color: shields name (green, orange, ...), hex, or any SVG color (empty = brand blue).
+    # Badge style: flat (rounded, subtle gradient), flat-square (sharp corners),
+    # terminal (monospace and square, like the report), for-the-badge (large)
+    # or light (white and pale blue, for white READMEs).
+    "badge_style": "flat",
+    # Public address of the report (https://owner.github.io/repo/): fills in the
+    # Badges page's snippets and prints the README badge. Also --site-url.
+    "site_url": "",
     # AI-powered features
     "ai_enabled": False,  # Enable AI-powered summaries (requires AI provider configuration).
     "ai_provider": "openai",  # AI provider: openai, claude, gemini, ollama.
@@ -177,6 +191,19 @@ def get_i18n_text(key: str, language: str = "en") -> str:
     return translations.get(key, AI_INSIGHTS_I18N["en"].get(key, key))
 
 
+def parse_config_value(value: str) -> Any:
+    """Convert a config value from the config file or ``-c key=value``.
+
+    Integers, including negative ones such as ``max_tags_authors = -1``, become
+    ``int`` and ``true``/``false`` become ``bool``; anything else stays a string.
+    """
+    if re.fullmatch(r"-?\d+", value):
+        return int(value)
+    if value.lower() in ("true", "false"):
+        return value.lower() == "true"
+    return value
+
+
 def load_config(file_path: str = "gitstats.conf") -> dict[str, Any]:
     """Load configuration from a file, or fall back to defaults."""
     import configparser
@@ -193,11 +220,5 @@ def load_config(file_path: str = "gitstats.conf") -> dict[str, Any]:
     if os.path.exists(file_path):
         config_parser.read(file_path)
         for k, v in config_parser["gitstats"].items():
-            # Convert to appropriate type
-            if v.isdigit():
-                _config[k] = int(v)
-            elif v.lower() in ("true", "false"):
-                _config[k] = v.lower() == "true"
-            else:
-                _config[k] = v
+            _config[k] = parse_config_value(v)
     return _config

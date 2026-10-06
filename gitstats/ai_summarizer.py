@@ -386,6 +386,72 @@ Top 5 Contributors by Lines:
 """
         return context
 
+    def prepare_chronicle_data(self, data: dict[str, Any]) -> str:
+        """Prepare the year-by-year fact pack that grounds the chronicle.
+
+        Reuses the same deterministic history computation that renders the
+        History page, so the narration and the visible facts can never
+        disagree, and adds the sampled commit subjects for period flavor.
+        """
+        from types import SimpleNamespace
+
+        from gitstats.report_creator import compute_project_history
+
+        view = SimpleNamespace(
+            **{
+                key: self._get_field_value(data, key, {})
+                for key in (
+                    "commits_by_year",
+                    "author_of_year",
+                    "lines_added_by_year",
+                    "lines_removed_by_year",
+                    "authors",
+                    "tags",
+                )
+            }
+        )
+        history = compute_project_history(view)
+        if not history["years"]:
+            return "Project History:\n(no commits in the analyzed range)"
+
+        subjects_by_year = self._get_field_value(data, "commit_subjects_by_year", {}) or {}
+        project_name = self._get_field_value(data, "project_name", "this project")
+
+        blocks = []
+        for y in history["years"]:
+            lines = [
+                "Year %d [%s]: %d commits (%s%% of all), +%d/-%d lines, %d author%s."
+                % (
+                    y["year"],
+                    y["era"],
+                    y["commits"],
+                    y["commits_pct"],
+                    y["lines_added"],
+                    y["lines_removed"],
+                    y["active_authors"],
+                    "s" if y["active_authors"] != 1 else "",
+                )
+            ]
+            if y["top_author"]:
+                lines.append(
+                    "  Leading author: %s (%d commits)" % (y["top_author"], y["top_author_commits"])
+                )
+            if y["newcomers"]:
+                lines.append("  First-time contributors: " + ", ".join(y["newcomers"][:8]))
+            if y["releases"]:
+                lines.append("  Releases: " + ", ".join(y["releases"][:6]))
+            subjects = subjects_by_year.get(y["year"], [])
+            if subjects:
+                lines.append("  Sample commit subjects: " + "; ".join('"%s"' % s for s in subjects))
+            blocks.append("\n".join(lines))
+
+        return "Project History of %s (%d - %d):\n\n%s" % (
+            project_name,
+            history["first_year"],
+            history["last_year"],
+            "\n\n".join(blocks),
+        )
+
     def generate_summary(
         self, page_type: str, data: dict[str, Any], force_refresh: bool = False
     ) -> dict[str, Any]:
@@ -419,6 +485,12 @@ Top 5 Contributors by Lines:
             elif page_type == "lines":
                 data_context = self.prepare_lines_data(data)
                 prompt_focus = "summarize the codebase growth trajectory and what it indicates about the project."
+            elif page_type == "chronicle":
+                data_context = self.prepare_chronicle_data(data)
+                prompt_focus = (
+                    "write the project's chronicle: a short, engaging story of how it "
+                    "came to be, told strictly from the facts below."
+                )
             else:
                 result["error"] = f"Unknown page type: {page_type}"
                 return result
@@ -436,11 +508,21 @@ Top 5 Contributors by Lines:
 
             # Construct prompt
             language_instruction = self._get_language_instruction()
-            prompt = f"""You are analyzing git repository statistics. Based on the following data, {prompt_focus}
-
-{data_context}
-
-Requirements:
+            if page_type == "chronicle":
+                requirements = f"""Requirements:
+- Output PLAIN TEXT only: no HTML, no markdown, no bullet lists
+- Follow this exact structure, one block per year, in this order:
+[PROLOGUE]
+One short paragraph (2-3 sentences) framing the whole story.
+[YEAR <year>] <a short chapter title, a few words>
+One paragraph (2-4 sentences) telling that year's part of the story.
+- Include a [YEAR ...] block for EVERY year listed in the data, including dormant ones
+- Only narrate facts present in the data; never invent events, names, numbers or motivations
+- Use the era labels, contributor arrivals, releases and commit subjects as your material
+- Write vividly but honestly - a quiet year is part of the story, not a failure
+- {language_instruction}"""
+            else:
+                requirements = f"""Requirements:
 - Keep analysis concise: 2-3 short paragraphs maximum
 - Start with 2-3 key findings as bullet points using <ul><li><strong>Key finding</strong>: explanation</li></ul>
 - Use specific numbers and percentages to support your points
@@ -448,7 +530,13 @@ Requirements:
 - Focus on actionable insights rather than generic recommendations
 - Use clear, conversational language rather than academic tone
 - Format your response in HTML (use <p>, <ul>, <li>, <strong>, <em> tags)
-- {language_instruction}
+- {language_instruction}"""
+
+            prompt = f"""You are analyzing git repository statistics. Based on the following data, {prompt_focus}
+
+{data_context}
+
+{requirements}
 
 Generate your analysis:"""
 
@@ -484,7 +572,7 @@ Generate your analysis:"""
             Dictionary mapping page types to summary results
         """
         summaries = {}
-        page_types = ["index", "activity", "lines"]
+        page_types = ["index", "activity", "lines", "chronicle"]
 
         for page_type in page_types:
             summaries[page_type] = self.generate_summary(page_type, data, force_refresh)
