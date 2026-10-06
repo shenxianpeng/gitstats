@@ -36,7 +36,7 @@ from gitstats.utils import (
     get_version,
     should_exclude_file,
 )
-from gitstats.wrapped import WrappedCardGenerator
+from gitstats.wrapped import THEMES, WrappedCardGenerator
 
 os.environ["LC_ALL"] = "C"
 
@@ -1139,30 +1139,37 @@ def _run_single_repo(
         else:
             raise RuntimeError(f"Unsupported format '{extra_fmt}'")
 
-    # Generate Wrapped card if requested
     if wrapped_config and wrapped_config.get("enabled", False):
-        logger.info("Generating Wrapped card...")
-        try:
-            generator = WrappedCardGenerator(
-                data=data,
-                year=wrapped_config.get("year"),
-                theme=wrapped_config.get("theme", "midnight"),
-            )
-            wrapped_path = wrapped_config.get("output")
-            if wrapped_path:
-                # Explicit path: confine the card to its own directory.
-                base_dir = os.path.dirname(os.path.abspath(wrapped_path)) or outputpath
-            else:
-                # Default: write the card inside the report directory.
-                year_str = wrapped_config.get("year") or datetime.datetime.now().year
-                wrapped_path = os.path.join(outputpath, f"wrapped-{year_str}.svg")
-                base_dir = outputpath
-            wrapped_path = generator.generate(output_path=wrapped_path, base_dir=base_dir)
-            logger.info(f"To view the card, open: {wrapped_path}")
-        except Exception as e:
-            logger.warning(f"Failed to generate Wrapped card: {e}")
+        _write_wrapped_card(data, outputpath, wrapped_config)
 
     return data
+
+
+def _write_wrapped_card(
+    data: DataCollector, outputpath: str, wrapped_config: dict[str, Any]
+) -> None:
+    """Write the Repo Wrapped card for one repository.
+
+    The card goes into the report directory as ``wrapped-<year>.svg``, or
+    to the file ``wrapped_config["output"]`` names, whose directory must
+    already exist. The card is an extra: when it cannot be written the
+    failure is logged and the run carries on with the report it has.
+    """
+    logger.info("Generating Wrapped card...")
+    try:
+        generator = WrappedCardGenerator(
+            data=data,
+            year=wrapped_config.get("year"),
+            theme=wrapped_config.get("theme", "midnight"),
+        )
+        target = os.path.abspath(
+            wrapped_config.get("output")
+            or os.path.join(outputpath, f"wrapped-{generator.year}.svg")
+        )
+        # generate() keeps only the file name and writes it inside base_dir
+        generator.generate(output_path=target, base_dir=os.path.dirname(target))
+    except Exception as e:
+        logger.warning(f"Failed to generate Wrapped card: {e}")
 
 
 def _dump_json_within(directory: str, filename: str, data: DataCollector) -> None:
@@ -1477,29 +1484,31 @@ def get_parser() -> argparse.ArgumentParser:
         help="Force refresh AI-generated summaries (ignore cache)",
     )
 
-    # Wrapped card generation
+    # Repo Wrapped card
     parser.add_argument(
         "--wrapped",
         action="store_true",
-        default=False,
-        help="Generate a shareable 'Repo Wrapped' SVG card alongside the report",
+        help="Also write a shareable 'Repo Wrapped' SVG card next to the report",
     )
     parser.add_argument(
         "--wrapped-year",
         type=int,
-        default=None,
-        help="Year for the Wrapped card (default: current year)",
+        metavar="YEAR",
+        help="Year the Wrapped card is for (default: the current year)",
     )
     parser.add_argument(
         "--wrapped-theme",
-        choices=["midnight", "sunset", "clean"],
+        choices=list(THEMES),
         default="midnight",
-        help="Color theme for the Wrapped card (default: midnight)",
+        help="Color theme of the Wrapped card (default: midnight)",
     )
     parser.add_argument(
         "--wrapped-output",
-        default=None,
-        help="Output path for the Wrapped SVG card (default: <outputpath>/wrapped-<year>.svg)",
+        metavar="PATH",
+        help=(
+            "File to write the Wrapped card to, in an existing directory "
+            "(default: <outputpath>/wrapped-<year>.svg); single repository only"
+        ),
     )
 
     return parser
@@ -1560,14 +1569,19 @@ def main() -> int:
     if args.site_url is not None:
         conf["site_url"] = args.site_url
 
-    # Build wrapped config
     wrapped_config = None
     if args.wrapped:
+        if args.wrapped_output and len(gitpath) > 1:
+            parser.error(
+                "--wrapped-output names one file; with several repositories each "
+                "card is written into its repository's report directory"
+            )
         wrapped_config = {
             "enabled": True,
             "year": args.wrapped_year,
             "theme": args.wrapped_theme,
-            "output": args.wrapped_output,
+            # resolved now, like <outputpath>, before any change of directory
+            "output": os.path.abspath(args.wrapped_output) if args.wrapped_output else None,
         }
 
     exit_code = run(gitpath, outputpath, extra_fmt=extra_fmt, wrapped_config=wrapped_config)

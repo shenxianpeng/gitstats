@@ -30,6 +30,7 @@ from gitstats.main import (
     parallel_map_with_fallback,
     run,
 )
+from gitstats.wrapped import THEMES
 
 # ── DataCollector base class ─────────────────────────────────────────────
 
@@ -1023,6 +1024,27 @@ class TestCLI:
         args = parser.parse_args(["--site-url", "https://example.com/r/", "repo"])
         assert args.site_url == "https://example.com/r/"
 
+    def test_parser_wrapped_flags(self, capsys):
+        parser = get_parser()
+        args = parser.parse_args(["repo"])
+        assert args.wrapped is False
+        assert args.wrapped_year is None
+        assert args.wrapped_theme == "midnight"
+        assert args.wrapped_output is None
+
+        args = parser.parse_args(
+            ["--wrapped", "--wrapped-year", "2025", "--wrapped-theme", "sunset"]
+            + ["--wrapped-output", "card.svg", "repo"]
+        )
+        assert args.wrapped is True
+        assert args.wrapped_year == 2025
+        assert args.wrapped_theme == "sunset"
+        assert args.wrapped_output == "card.svg"
+
+        with pytest.raises(SystemExit):
+            parser.parse_args(["--wrapped", "--wrapped-theme", "neon", "repo"])
+        assert "invalid choice: 'neon'" in capsys.readouterr().err
+
     def test_normalize_site_url(self):
         assert normalize_site_url("") == ""
         assert normalize_site_url("  ") == ""
@@ -1654,6 +1676,116 @@ class TestRunSingleRepo:
         assert data.ai_summaries == {}
         assert "Failed to generate AI summaries: no API key" in caplog.text
         assert (tmp_path / "report" / "index.html").exists()
+
+
+class TestWrappedCard:
+    """--wrapped: a Repo Wrapped card next to each report."""
+
+    @staticmethod
+    def _config(**overrides):
+        return {"enabled": True, "year": 2023, "theme": "midnight", "output": None, **overrides}
+
+    def test_no_card_unless_asked(self, git_repo_minimal, tmp_path, sequential_map):
+        out = tmp_path / "report"
+        _run_single_repo(git_repo_minimal, str(out))
+        assert not list(out.glob("wrapped-*.svg"))
+
+    def test_writes_the_card_into_the_report_directory(
+        self, git_repo_minimal, tmp_path, caplog, sequential_map
+    ):
+        out = tmp_path / "report"
+        with caplog.at_level(logging.INFO, logger="gitstats"):
+            _run_single_repo(git_repo_minimal, str(out), wrapped_config=self._config(theme="clean"))
+
+        card = (out / "wrapped-2023.svg").read_text(encoding="utf-8")
+        assert "YOUR 2023 IN CODE" in card
+        assert "git_repo_minimal" in card
+        assert THEMES["clean"]["bg_start"] in card
+        assert "Wrapped card saved: " in caplog.text
+        # the report itself is unchanged by the card
+        assert (out / "index.html").exists()
+
+    def test_names_the_card_after_the_current_year_by_default(
+        self, git_repo_minimal, tmp_path, sequential_map
+    ):
+        out = tmp_path / "report"
+        _run_single_repo(git_repo_minimal, str(out), wrapped_config=self._config(year=None))
+        assert (out / f"wrapped-{datetime.datetime.now().year}.svg").exists()
+
+    def test_writes_the_card_where_asked(self, git_repo_minimal, tmp_path, sequential_map):
+        out = tmp_path / "report"
+        cards = tmp_path / "cards"
+        cards.mkdir()
+        _run_single_repo(
+            git_repo_minimal,
+            str(out),
+            wrapped_config=self._config(output=str(cards / "2023.svg")),
+        )
+        assert "YOUR 2023 IN CODE" in (cards / "2023.svg").read_text(encoding="utf-8")
+        assert not list(out.glob("wrapped-*.svg"))
+
+    def test_reports_without_the_card_when_it_cannot_be_written(
+        self, git_repo_minimal, tmp_path, caplog, sequential_map
+    ):
+        out = tmp_path / "report"
+        missing = tmp_path / "no-such-directory" / "card.svg"
+        with caplog.at_level(logging.INFO, logger="gitstats"):
+            data = _run_single_repo(
+                git_repo_minimal, str(out), wrapped_config=self._config(output=str(missing))
+            )
+        assert "Failed to generate Wrapped card" in caplog.text
+        assert not missing.exists()
+        assert data.total_commits == 1
+        assert (out / "index.html").exists()
+
+    def test_run_passes_the_card_on_for_one_repository(self, tmp_path):
+        config = self._config()
+        with (
+            patch("gitstats.main._run_single_repo", return_value=DataCollector()) as single,
+            patch("gitstats.main.write_repo_summary"),
+            patch("gitstats.main.compute_repo_summary"),
+        ):
+            assert run(["repo"], str(tmp_path / "report"), wrapped_config=config) == 0
+        assert single.call_args.kwargs["wrapped_config"] is config
+
+    def test_each_repository_of_a_portfolio_gets_its_card(
+        self, git_repo, git_repo_minimal, tmp_path, sequential_map
+    ):
+        out = tmp_path / "portfolio"
+        assert run([git_repo, git_repo_minimal], str(out), wrapped_config=self._config()) == 0
+        for name in ("git_repo", "git_repo_minimal"):
+            card = (out / name / "wrapped-2023.svg").read_text(encoding="utf-8")
+            assert name in card
+        assert not list(out.glob("wrapped-*.svg"))
+
+    def test_main_builds_the_card_from_the_flags(self, git_repo_minimal, tmp_path, sequential_map):
+        out = tmp_path / "report"
+        argv = ["gitstats", "--wrapped", "--wrapped-year", "2023", "--wrapped-theme", "sunset"]
+        with patch.object(sys, "argv", argv + [git_repo_minimal, str(out)]):
+            assert main() == 0
+        card = (out / "wrapped-2023.svg").read_text(encoding="utf-8")
+        assert THEMES["sunset"]["bg_start"] in card
+
+    def test_main_resolves_the_output_path_before_running(
+        self, git_repo_minimal, tmp_path, monkeypatch
+    ):
+        monkeypatch.chdir(tmp_path)
+        argv = ["gitstats", "--wrapped", "--wrapped-output", "card.svg", git_repo_minimal, "out"]
+        with patch.object(sys, "argv", argv), patch("gitstats.main.run", return_value=0) as run_:
+            assert main() == 0
+        assert run_.call_args.kwargs["wrapped_config"] == {
+            "enabled": True,
+            "year": None,
+            "theme": "midnight",
+            "output": os.path.abspath("card.svg"),
+        }
+
+    def test_main_rejects_one_output_file_for_several_repositories(self, tmp_path, capsys):
+        argv = ["gitstats", "--wrapped", "--wrapped-output", "card.svg", "one", "two", "out"]
+        with patch.object(sys, "argv", argv), pytest.raises(SystemExit) as exit_info:
+            main()
+        assert exit_info.value.code == 2
+        assert "--wrapped-output names one file" in capsys.readouterr().err
 
 
 class TestRunEdgeCases:
