@@ -1651,6 +1651,11 @@ class HTMLReportCreator(ReportCreator):
                 + "".join(rows)
                 + "</table></div>"
             )
+            # The Hotspots page weighs the same counts against each file's size
+            f.write(
+                '<p class="more-link"><a href="hotspots.html">'
+                "Change frequency by file size &rarr;</a></p>"
+            )
 
         self.print_footer(f)
         f.write("</body></html>")

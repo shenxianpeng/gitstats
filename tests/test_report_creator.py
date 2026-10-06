@@ -1706,6 +1706,16 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
     assert "</html>" in content
 
 
+def test_files_page_links_churn_to_the_hotspots_page(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    files = _read_page(temp_dir, "files.html")
+    churn = files[files.index('id="churn"') :]
+    assert (
+        '</table></div><p class="more-link"><a href="hotspots.html">'
+        "Change frequency by file size &rarr;</a></p>"
+    ) in churn
+
+
 def test_hotspots_chart_follows_the_theme(mock_data_collector, temp_dir):
     """Colors come from the CSS variables, so the chart switches with the theme."""
     page = _hotspots_html(mock_data_collector, temp_dir)
