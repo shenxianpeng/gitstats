@@ -1790,7 +1790,8 @@ def test_hotspots_table_shows_ten_and_folds_the_rest(mock_data_collector, temp_d
     shown = content[content.index('id="hotspots"') :]
     shown = shown[: shown.index("</table>")]
     assert shown.count("<tr>") == 11  # header + the ten highest-scoring
-    assert "f009.py" in shown and "f010.py" not in shown
+    assert "f009.py" in shown
+    assert "f010.py" not in shown
     assert (
         '<details class="table-details">'
         "<summary>Table: the 100 highest-scoring of 150 critical hotspots</summary>"

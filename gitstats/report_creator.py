@@ -2173,9 +2173,10 @@ class HTMLReportCreator(ReportCreator):
         ones at or above the median in both (the top-right quadrant) are
         listed as critical hotspots, highest score first.
         """
-        f = self._open_report_file(path, "hotspots.html")
+        page = "hotspots.html"
+        f = self._open_report_file(path, page)
         self.print_header(f)
-        self.print_nav(f, "hotspots.html")
+        self.print_nav(f, page)
         f.write("<h1>Hotspots</h1>")
 
         hotspot_files = getattr(data, "hotspot_files", {})
@@ -2306,9 +2307,10 @@ class HTMLReportCreator(ReportCreator):
                     if count <= 100
                     else f"the 100 highest-scoring of {format_int(count)} critical hotspots"
                 )
-                f.write(f'<details class="table-details"><summary>Table: {what}</summary>')
-                f.write(hotspot_table("hotspots-all", critical[:100]))
-                f.write("</details>")
+                f.write(
+                    f'<details class="table-details"><summary>Table: {what}</summary>'
+                    f"{hotspot_table('hotspots-all', critical[:100])}</details>"
+                )
         else:
             f.write("<p>No file is at or above the median in both size and number of changes.</p>")
 
