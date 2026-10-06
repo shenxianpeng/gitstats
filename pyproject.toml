@@ -26,6 +26,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
     "Topic :: Software Development :: Version Control :: Git",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
@@ -38,7 +39,7 @@ gitstats = "gitstats.main:main"
 [project.urls]
 source =  "https://github.com/shenxianpeng/gitstats"
 tracker = "https://github.com/shenxianpeng/gitstats/issues"
-homepage = "https://shenxianpeng.github.io/gitstats/index.html"
+homepage = "https://shenxianpeng.dev/gitstats/index.html"
 documentation = "https://gitstats.readthedocs.io/"
 
 [project.optional-dependencies]
@@ -67,6 +68,17 @@ fallback_version = "0.0.0"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+
+# Coverage is not installed by the test extra; measure it with, for example,
+#   uv run --extra test --with pytest-cov python -m pytest --cov
+[tool.coverage.run]
+source = ["gitstats", "scripts"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_also = ['if __name__ == "__main__":', '@(abc\.)?abstractmethod']
 
 [tool.mypy]
 show_error_codes = true

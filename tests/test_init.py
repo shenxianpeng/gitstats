@@ -46,6 +46,11 @@ def test_default_config_keys():
         "end_date",
         "authors",
         "exclude_exts",
+        "badge_metric",
+        "badge_label",
+        "badge_color",
+        "badge_style",
+        "site_url",
         "ai_enabled",
         "ai_provider",
         "ai_api_key",
@@ -77,6 +82,17 @@ def test_load_config_defaults():
     cfg = load_config("nonexistent_file.conf")
     assert cfg["max_authors"] == 20
     assert cfg["ai_enabled"] is False
+
+
+def test_load_config_without_a_file_starts_from_the_defaults(tmp_path):
+    """A first load with no config file on disk caches a copy of the defaults."""
+    import gitstats
+
+    gitstats._config = None
+    cfg = load_config(str(tmp_path / "missing.conf"))
+    assert cfg == gitstats.DEFAULT_CONFIG
+    assert cfg is not gitstats.DEFAULT_CONFIG
+    assert load_config() is cfg
 
 
 def test_load_config_from_file():
@@ -135,6 +151,48 @@ ai_cache_enabled = false
     finally:
         gitstats._config = None
         os.unlink(path)
+
+
+def test_load_config_negative_integer():
+    """max_tags_authors = -1 is the documented way to show every tag author."""
+    content = """[gitstats]
+max_tags_authors = -1
+"""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".conf", delete=False) as f:
+        f.write(content)
+        path = f.name
+
+    try:
+        import gitstats
+
+        gitstats._config = None
+
+        cfg = load_config(path)
+        assert cfg["max_tags_authors"] == -1
+        assert isinstance(cfg["max_tags_authors"], int)
+    finally:
+        gitstats._config = None
+        os.unlink(path)
+
+
+@pytest.mark.parametrize(
+    "value, expected",
+    [
+        ("5", 5),
+        ("-1", -1),
+        ("0", 0),
+        ("true", True),
+        ("False", False),
+        ("HEAD", "HEAD"),
+        ("-", "-"),
+        ("1.5", "1.5"),
+        ("2024-01-01", "2024-01-01"),
+    ],
+)
+def test_parse_config_value(value, expected):
+    from gitstats import parse_config_value
+
+    assert parse_config_value(value) == expected
 
 
 # ── get_i18n_text ────────────────────────────────────────────────────────

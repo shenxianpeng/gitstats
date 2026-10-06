@@ -19,3 +19,5 @@ To upgrade: download the UMD build from https://www.jsdelivr.com/package/npm/cha
 - **Source**: http://www.joostdevalk.nl/code/sortable-table/
 - **License**: MIT
 - **Usage**: Client-side table sorting in HTML reports
+- **Modifications**: sort indicators are drawn by CSS from a `data-sort` attribute instead of
+  `arrow-*.gif` images, and the sorted header cell gets `aria-sort`

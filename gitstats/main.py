@@ -8,12 +8,22 @@ import json
 import logging
 import os
 import re
+import socket
 import sys
 import time
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from multiprocessing import Pool
 from typing import Any
+from urllib.parse import urlsplit
 
-from gitstats import exectime_external, load_config, time_start
+from gitstats import exectime_external, load_config, parse_config_value, time_start
+from gitstats.aggregate import (
+    AggregateReportCreator,
+    _slugify_repo,
+    compute_repo_summary,
+    write_repo_summary,
+)
 from gitstats.ai_summarizer import AISummarizer
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.utils import (
@@ -66,14 +76,34 @@ def parallel_map_with_fallback(func, items):
         pool.terminate()
         pool.join()
         return results
-    except (OSError, RuntimeError) as e:
+    except OSError as e:
         # Fallback to sequential processing if multiprocessing fails
-        # (common in restricted environments like Netlify,
-        #  or on Windows where process spawning may not be available)
+        # (common in restricted environments like Netlify)
         logger.warning(
             f"Multiprocessing not available ({e}), falling back to sequential processing"
         )
         return [func(item) for item in items]
+
+
+def _sample_evenly(items: list[str], k: int) -> list[str]:
+    """Pick up to ``k`` items spread evenly across the list, order preserved."""
+    if len(items) <= k:
+        return list(items)
+    step = len(items) / k
+    return [items[int(i * step)] for i in range(k)]
+
+
+def _merge_period_aliases(
+    period_authors: dict[str, int], name_to_canonical: dict[str, str]
+) -> None:
+    """Fold aliased authors into their canonical name within one period.
+
+    ``period_authors`` maps author -> commit count for a single month or year
+    and is updated in place.
+    """
+    for alias, canonical in name_to_canonical.items():
+        if alias in period_authors:
+            period_authors[canonical] = period_authors.get(canonical, 0) + period_authors.pop(alias)
 
 
 class DataCollector:
@@ -145,11 +175,21 @@ class DataCollector:
         # code ownership: author -> file path -> number of commits touching it
         self.author_files: dict[str, dict[str, int]] = {}
 
+        # paths of the files at HEAD (ownership and churn skip deleted files)
+        self.head_files: list[str] = []
+
+        # evenly sampled commit subjects per year (collected only when AI
+        # features are enabled; they ground the AI chronicle narration)
+        self.commit_subjects_by_year: dict[int, list[str]] = {}
+
         # new contributors per month
         self.new_contributors_by_month: dict[str, int] = {}  # YYYY-MM -> count
 
         # AI summaries
         self.ai_summaries: dict[str, dict[str, Any]] = {}  # page_type -> {summary, error}
+
+        # analyzed from a shallow clone: the report only covers the fetched history
+        self.shallow: bool = False
 
     ##
     # This should be the main function to extract data from the repository.
@@ -192,30 +232,78 @@ class DataCollector:
 
 class GitDataCollector(DataCollector):
     def collect(self, repo_dir):
+        """Collect all statistics from the repository.
+
+        Each phase below owns one slice of the data model; the only value
+        passed between them is the author-alias mapping, which later phases
+        need to attribute work to canonical identities.
+        """
         DataCollector.collect(self, repo_dir)
+
+        # CI checkouts are shallow by default (GitLab fetches 20 commits,
+        # Bitbucket 50, actions/checkout 1), and every number in the report
+        # would silently cover only those.
+        shallow = get_pipe_output(["git rev-parse --is-shallow-repository"]).strip()
+        self.shallow = shallow == "true"
+        if self.shallow:
+            logger.warning(
+                "Warning: this is a shallow clone, so the report only covers the history "
+                "that was fetched. Fetch all of it first with 'git fetch --unshallow', or in "
+                "CI set GitHub Actions 'fetch-depth: 0', GitLab CI 'GIT_DEPTH: 0' or "
+                "Bitbucket Pipelines 'clone: depth: full'."
+            )
 
         self.total_authors += int(
             get_pipe_output(["git shortlog -s {}".format(get_log_range("HEAD", False)), "wc -l"])
         )
-        # self.total_lines = int(getoutput('git-ls-files -z |xargs -0 cat |wc -l'))
 
-        # tags
-        # Only include tags that are reachable within the commit range
+        self._collect_tags()
+        email_to_latest, author_to_email = self._collect_commit_stats()
+        name_to_canonical = self._merge_author_aliases(email_to_latest, author_to_email)
+        self._collect_files_by_stamp()
+        self._collect_extensions()
+        self._collect_line_stats()
+        self._collect_per_author_line_stats(name_to_canonical)
+        self._collect_file_churn_and_ownership(name_to_canonical)
+        if conf["ai_enabled"]:
+            self._collect_commit_subjects()
+
+    # ── collection phases ────────────────────────────────────────────────
+
+    def _collect_tags(self) -> None:
+        """Populate ``tags`` with each tag's date, commit count and authors.
+
+        Only tags whose commit is reachable within the configured commit range
+        are included.
+        """
         log_range = get_log_range("HEAD", False)
-        tag_commits = get_pipe_output([f"git rev-list {log_range}"]).strip().split("\n")
+        # --topo-order: never list a commit before its descendants, so the order
+        # below follows the history even when commit dates are skewed
+        tag_commits = (
+            get_pipe_output([f"git rev-list --topo-order {log_range}"]).strip().split("\n")
+        )
         tag_commits_set = set(tag_commits) if tag_commits[0] else set()
 
-        lines = get_pipe_output(["git show-ref --tags"]).split("\n")
+        # An annotated tag is listed with the hash of the tag object; --dereference
+        # adds a "<tag>^{}" line with the commit it points to, which is the one
+        # that can be found in the commit range.
+        tag_hashes: dict[str, str] = {}
+        lines = get_pipe_output(["git show-ref --tags --dereference"]).split("\n")
         for line in lines:
             if len(line) == 0:
                 continue
-            (hash, tag) = line.split(" ")
+            (hash, ref) = line.split(" ", 1)
+            tag = ref.replace("refs/tags/", "")
+            if tag.endswith("^{}"):
+                tag_hashes[tag[: -len("^{}")]] = hash
+            else:
+                tag_hashes.setdefault(tag, hash)
 
+        for tag, hash in tag_hashes.items():
             # Only include tags whose commit is in our range
             if hash not in tag_commits_set:
                 continue
 
-            tag = tag.replace("refs/tags/", "")
             output = get_pipe_output([f'git log "{hash}" --pretty=format:"%at %aN" -n 1'])
             if len(output) > 0:
                 parts = output.split(" ")
@@ -232,37 +320,54 @@ class GitDataCollector(DataCollector):
                     "authors": {},
                 }
 
-        # collect info on tags, starting from latest
-        # Only collect statistics for commits within our range
-        log_range = get_log_range("HEAD", False)
-        tags_sorted_by_date_desc = [
-            el[1]
-            for el in sorted([(el[1]["date"], el[0]) for el in self.tags.items()], reverse=True)
+        # Walk the tags oldest first, so each one is credited with the commits
+        # added since the previous tag. The order comes from the history itself:
+        # rev-list --topo-order lists descendants before their ancestors, so a
+        # larger index is an older commit (by default rev-list sorts on commit
+        # dates, which a skewed clock can put out of history order). Sorting
+        # on the "%Y-%m-%d" date instead broke the tie between two tags of the
+        # same day by tag name, and a newer tag sorted first took the older
+        # tag's commits, leaving the older one with none.
+        commit_order = {commit: index for index, commit in enumerate(tag_commits)}
+        # Keep the position so the report can present tags in the same order,
+        # rather than re-deriving one from the date string.
+        for info in self.tags.values():
+            info["order"] = commit_order.get(info["hash"], 0)
+        tags_oldest_first = [
+            tag
+            for _, tag in sorted(
+                (-commit_order.get(info["hash"], 0), tag) for tag, info in self.tags.items()
+            )
         ]
         prev = None
-        for tag in reversed(tags_sorted_by_date_desc):
-            # Modify command to only include commits within our range
-            cmd = f'git shortlog -s "{tag}"'
+        for tag in tags_oldest_first:
+            cmd = f'git log --format="%H %aN" "{tag}"'
             if prev is not None:
                 cmd += f' "^{prev}"'
-            # Intersect with our commit range and apply filters
-            cmd += f" {log_range}"
             output = get_pipe_output([cmd])
-            if len(output) == 0:
-                continue
-            prev = tag
+            # Keep the commits of our range, which also applies the date and
+            # author filters. Adding the range to the command instead would
+            # add its commits to the tag's, not intersect with them.
+            counts: dict[str, int] = {}
             for line in output.split("\n"):
                 if len(line.strip()) == 0:
                     continue
-                parts = re.split(r"\s+", line, 2)
-                if len(parts) < 3:
-                    continue
-                commits = int(parts[1])
-                author = parts[2]
+                commit, author = line.split(" ", 1)
+                if commit in tag_commits_set:
+                    counts[author] = counts.get(author, 0) + 1
+            if not counts:
+                continue
+            prev = tag
+            for author, commits in counts.items():
                 self.tags[tag]["commits"] += commits
                 self.tags[tag]["authors"][author] = commits
 
-        # Collect revision statistics
+    def _collect_commit_stats(self) -> tuple[dict[str, tuple[int, str]], dict[str, str]]:
+        """Walk every commit, accumulating activity, domain and author stats.
+
+        Returns the two mappings needed to resolve author identities:
+        ``email -> (latest stamp, author name)`` and ``author name -> email``.
+        """
         # Outputs "<stamp> <date> <time> <timezone> <author> '<' <mail> '>'"
         lines = get_pipe_output(
             [
@@ -309,17 +414,7 @@ class GitDataCollector(DataCollector):
             if self.first_commit_stamp == 0 or stamp < self.first_commit_stamp:
                 self.first_commit_stamp = stamp
 
-            # activity
-            # hour
-            hour = date.hour
-            self.activity_by_hour_of_day[hour] = self.activity_by_hour_of_day.get(hour, 0) + 1
-            # most active hour?
-            if self.activity_by_hour_of_day[hour] > self.activity_by_hour_of_day_busiest:
-                self.activity_by_hour_of_day_busiest = self.activity_by_hour_of_day[hour]
-
-            # day of week
-            day = date.weekday()
-            self.activity_by_day_of_week[day] = self.activity_by_day_of_week.get(day, 0) + 1
+            self._record_activity(date)
 
             # domain stats
             if domain not in self.domains:
@@ -327,73 +422,103 @@ class GitDataCollector(DataCollector):
             # commits
             self.domains[domain]["commits"] = self.domains[domain].get("commits", 0) + 1
 
-            # hour of week
-            if day not in self.activity_by_hour_of_week:
-                self.activity_by_hour_of_week[day] = {}
-            self.activity_by_hour_of_week[day][hour] = (
-                self.activity_by_hour_of_week[day].get(hour, 0) + 1
-            )
-            # most active hour?
-            if self.activity_by_hour_of_week[day][hour] > self.activity_by_hour_of_week_busiest:
-                self.activity_by_hour_of_week_busiest = self.activity_by_hour_of_week[day][hour]
-
-            # month of year
-            month = date.month
-            self.activity_by_month_of_year[month] = self.activity_by_month_of_year.get(month, 0) + 1
-
-            # yearly/weekly activity
-            yyw = date.strftime("%Y-%W")
-            self.activity_by_year_week[yyw] = self.activity_by_year_week.get(yyw, 0) + 1
-            if self.activity_by_year_week_peak < self.activity_by_year_week[yyw]:
-                self.activity_by_year_week_peak = self.activity_by_year_week[yyw]
-
-            # author stats
-            if author not in self.authors:
-                self.authors[author] = {}
-            # commits, note again that commits may be in any date order because of cherry-picking and patches
-            if "last_commit_stamp" not in self.authors[author]:
-                self.authors[author]["last_commit_stamp"] = stamp
-            if stamp > self.authors[author]["last_commit_stamp"]:
-                self.authors[author]["last_commit_stamp"] = stamp
-            if "first_commit_stamp" not in self.authors[author]:
-                self.authors[author]["first_commit_stamp"] = stamp
-            if stamp < self.authors[author]["first_commit_stamp"]:
-                self.authors[author]["first_commit_stamp"] = stamp
-
-            # author of the month/year
-            yymm = date.strftime("%Y-%m")
-            if yymm in self.author_of_month:
-                self.author_of_month[yymm][author] = self.author_of_month[yymm].get(author, 0) + 1
-            else:
-                self.author_of_month[yymm] = {}
-                self.author_of_month[yymm][author] = 1
-            self.commits_by_month[yymm] = self.commits_by_month.get(yymm, 0) + 1
-
-            yy = date.year
-            if yy in self.author_of_year:
-                self.author_of_year[yy][author] = self.author_of_year[yy].get(author, 0) + 1
-            else:
-                self.author_of_year[yy] = {}
-                self.author_of_year[yy][author] = 1
-            self.commits_by_year[yy] = self.commits_by_year.get(yy, 0) + 1
-
-            # authors: active days
-            yymmdd = date.strftime("%Y-%m-%d")
-            if "last_active_day" not in self.authors[author]:
-                self.authors[author]["last_active_day"] = yymmdd
-                self.authors[author]["active_days"] = set([yymmdd])
-            elif yymmdd != self.authors[author]["last_active_day"]:
-                self.authors[author]["last_active_day"] = yymmdd
-                self.authors[author]["active_days"].add(yymmdd)
-
-            # project: active days
-            if yymmdd != self.last_active_day:
-                self.last_active_day = yymmdd
-                self.active_days.add(yymmdd)
+            self._record_author_commit(author, stamp, date)
 
             # timezone
             self.commits_by_timezone[timezone] = self.commits_by_timezone.get(timezone, 0) + 1
 
+        return email_to_latest, author_to_email
+
+    def _record_activity(self, date: datetime.datetime) -> None:
+        """Accumulate the time-of-commit histograms for a single commit."""
+        # hour
+        hour = date.hour
+        self.activity_by_hour_of_day[hour] = self.activity_by_hour_of_day.get(hour, 0) + 1
+        # most active hour?
+        if self.activity_by_hour_of_day[hour] > self.activity_by_hour_of_day_busiest:
+            self.activity_by_hour_of_day_busiest = self.activity_by_hour_of_day[hour]
+
+        # day of week
+        day = date.weekday()
+        self.activity_by_day_of_week[day] = self.activity_by_day_of_week.get(day, 0) + 1
+
+        # hour of week
+        if day not in self.activity_by_hour_of_week:
+            self.activity_by_hour_of_week[day] = {}
+        self.activity_by_hour_of_week[day][hour] = (
+            self.activity_by_hour_of_week[day].get(hour, 0) + 1
+        )
+        # most active hour?
+        if self.activity_by_hour_of_week[day][hour] > self.activity_by_hour_of_week_busiest:
+            self.activity_by_hour_of_week_busiest = self.activity_by_hour_of_week[day][hour]
+
+        # month of year
+        month = date.month
+        self.activity_by_month_of_year[month] = self.activity_by_month_of_year.get(month, 0) + 1
+
+        # yearly/weekly activity
+        yyw = date.strftime("%Y-%W")
+        self.activity_by_year_week[yyw] = self.activity_by_year_week.get(yyw, 0) + 1
+        if self.activity_by_year_week_peak < self.activity_by_year_week[yyw]:
+            self.activity_by_year_week_peak = self.activity_by_year_week[yyw]
+
+    def _record_author_commit(self, author: str, stamp: int, date: datetime.datetime) -> None:
+        """Accumulate per-author and per-period stats for a single commit."""
+        # author stats
+        if author not in self.authors:
+            self.authors[author] = {}
+        # commits, note again that commits may be in any date order because of cherry-picking and patches
+        if "last_commit_stamp" not in self.authors[author]:
+            self.authors[author]["last_commit_stamp"] = stamp
+        if stamp > self.authors[author]["last_commit_stamp"]:
+            self.authors[author]["last_commit_stamp"] = stamp
+        if "first_commit_stamp" not in self.authors[author]:
+            self.authors[author]["first_commit_stamp"] = stamp
+        if stamp < self.authors[author]["first_commit_stamp"]:
+            self.authors[author]["first_commit_stamp"] = stamp
+
+        # author of the month/year
+        yymm = date.strftime("%Y-%m")
+        if yymm in self.author_of_month:
+            self.author_of_month[yymm][author] = self.author_of_month[yymm].get(author, 0) + 1
+        else:
+            self.author_of_month[yymm] = {}
+            self.author_of_month[yymm][author] = 1
+        self.commits_by_month[yymm] = self.commits_by_month.get(yymm, 0) + 1
+
+        yy = date.year
+        if yy in self.author_of_year:
+            self.author_of_year[yy][author] = self.author_of_year[yy].get(author, 0) + 1
+        else:
+            self.author_of_year[yy] = {}
+            self.author_of_year[yy][author] = 1
+        self.commits_by_year[yy] = self.commits_by_year.get(yy, 0) + 1
+
+        # authors: active days
+        yymmdd = date.strftime("%Y-%m-%d")
+        if "last_active_day" not in self.authors[author]:
+            self.authors[author]["last_active_day"] = yymmdd
+            self.authors[author]["active_days"] = set([yymmdd])
+        elif yymmdd != self.authors[author]["last_active_day"]:
+            self.authors[author]["last_active_day"] = yymmdd
+            self.authors[author]["active_days"].add(yymmdd)
+
+        # project: active days
+        if yymmdd != self.last_active_day:
+            self.last_active_day = yymmdd
+            self.active_days.add(yymmdd)
+
+    def _merge_author_aliases(
+        self,
+        email_to_latest: dict[str, tuple[int, str]],
+        author_to_email: dict[str, str],
+    ) -> dict[str, str]:
+        """Fold authors that share an email into one canonical identity.
+
+        Merges the alias entries in ``authors``, the per-period author dicts and
+        the tag author dicts, then returns the ``alias -> canonical`` mapping so
+        later phases can attribute their data to the same identities.
+        """
         # Build canonical name mapping: merge authors that share the same email
         # (same person who committed with different name/email configurations)
         email_to_canonical = {email: name for email, (_, name) in email_to_latest.items()}
@@ -407,7 +532,7 @@ class GitDataCollector(DataCollector):
 
         # Merge aliased author entries into their canonical entries
         for alias, canonical in name_to_canonical.items():
-            if alias not in self.authors:
+            if alias not in self.authors:  # pragma: no cover - each alias is popped once
                 continue
             if canonical not in self.authors:
                 self.authors[canonical] = self.authors.pop(alias)
@@ -431,14 +556,11 @@ class GitDataCollector(DataCollector):
             if "last_active_day" in aa:
                 ca["last_active_day"] = max(ca.get("last_active_day", ""), aa["last_active_day"])
 
-        # Merge aliases in time-based author dicts
-        for period_dict in (self.author_of_month, self.author_of_year):
-            for period in period_dict:
-                for alias, canonical in name_to_canonical.items():
-                    if alias in period_dict[period]:
-                        period_dict[period][canonical] = period_dict[period].get(
-                            canonical, 0
-                        ) + period_dict[period].pop(alias)
+        # Merge aliases in time-based author dicts. The two dicts are keyed
+        # differently (month string vs. year int) but their values share one
+        # shape, so the merge works on the inner author->commits dicts.
+        for period_authors in (*self.author_of_month.values(), *self.author_of_year.values()):
+            _merge_period_aliases(period_authors, name_to_canonical)
 
         # Merge aliases in tag author dicts
         for tag in self.tags:
@@ -451,6 +573,10 @@ class GitDataCollector(DataCollector):
         # Update total_authors to reflect merged identities
         self.total_authors = len(self.authors)
 
+        return name_to_canonical
+
+    def _collect_files_by_stamp(self) -> None:
+        """Record the file count of every revision, using the blob cache."""
         # outputs "<stamp> <files>" for each revision
         revlines = (
             get_pipe_output(
@@ -462,6 +588,13 @@ class GitDataCollector(DataCollector):
             .strip()
             .split("\n")
         )
+        revlines = [line for line in revlines if line.strip()]
+        if not revlines:
+            raise RuntimeError(
+                "No commits to analyze. The repository is empty, or no commit"
+                " matches the configured start_date, end_date, authors or"
+                " commit range."
+            )
         lines = []
         revs_to_read = []
         time_rev_count = []
@@ -492,14 +625,16 @@ class GitDataCollector(DataCollector):
         self.total_commits += len(lines)
         for line in lines:
             parts = line.split(" ")
-            if len(parts) != 2:
+            if len(parts) != 2:  # pragma: no cover - lines are built as "%d %d" above
                 continue
             (stamp, files) = parts[0:2]
             try:
                 self.files_by_stamp[int(stamp)] = int(files)
-            except ValueError:
+            except ValueError:  # pragma: no cover - lines are built as "%d %d" above
                 logger.warning(f'Failed to parse line "{line}"')
 
+    def _collect_extensions(self) -> None:
+        """Count files, total size and lines per file extension at HEAD."""
         # extensions and size of files
         lines = get_pipe_output(
             ["git ls-tree -r -l -z {}".format(get_commit_range("HEAD", end_only=True))]
@@ -518,6 +653,7 @@ class GitDataCollector(DataCollector):
 
             self.total_size += size
             self.total_files += 1
+            self.head_files.append(fullpath)
 
             filename = fullpath.split("/")[-1]  # strip directories
             if filename.find(".") == -1 or filename.rfind(".") == 0:
@@ -554,6 +690,12 @@ class GitDataCollector(DataCollector):
             self.cache["lines_in_blob"][blob_id] = linecount
             self.extensions[ext]["lines"] += self.cache["lines_in_blob"][blob_id]
 
+    def _collect_line_stats(self) -> None:
+        """Record lines added/removed over time (``changes_by_date``).
+
+        Computed on a linear history when ``linear_linestats`` is enabled, since
+        lines-of-code over time is better measured along the mainline.
+        """
         # line statistics
         # outputs:
         #  N files changed, N insertions (+), N deletions(-)
@@ -576,17 +718,17 @@ class GitDataCollector(DataCollector):
         inserted = 0
         deleted = 0
         total_lines = 0
-        author = None
         for line in lines:
             if len(line) == 0:
                 continue
 
-            # <stamp> <author>
+            # <stamp> <author>; only the stamp matters here, the author is
+            # attributed in _collect_per_author_line_stats
             if re.search("files? changed", line) is None:
                 pos = line.find(" ")
                 if pos != -1:
                     try:
-                        (stamp, author) = (int(line[:pos]), line[pos + 1 :])
+                        stamp = int(line[:pos])
                         self.changes_by_date[stamp] = {
                             "files": files,
                             "ins": inserted,
@@ -629,17 +771,18 @@ class GitDataCollector(DataCollector):
                 else:
                     logger.warning(f'Failed to handle line "{line}"')
                     (files, inserted, deleted) = (0, 0, 0)
-                # self.changes_by_date[stamp] = { 'files': files, 'ins': inserted, 'del': deleted }
         self.total_lines += total_lines
 
-        # Per-author statistics
+    def _collect_per_author_line_stats(self, name_to_canonical: dict[str, str]) -> None:
+        """Record each author's commits and line counts over time.
 
+        Unlike :meth:`_collect_line_stats` this never uses ``--first-parent``:
+        every commit must be walked to know who committed what, not just the
+        mainline.
+        """
         # defined for stamp, author only if author committed at this timestamp.
         self.changes_by_date_by_author = {}  # stamp -> author -> lines_added
 
-        # Similar to the above, but never use --first-parent
-        # (we need to walk through every commit to know who
-        # committed what, not just through mainline)
         lines = get_pipe_output(
             [
                 'git log --shortstat --date-order --pretty=format:"%at %aN" {}'.format(
@@ -648,7 +791,6 @@ class GitDataCollector(DataCollector):
             ]
         ).split("\n")
         lines.reverse()
-        files = 0
         inserted = 0
         deleted = 0
         author = None
@@ -691,7 +833,7 @@ class GitDataCollector(DataCollector):
                         self.changes_by_date_by_author[stamp][author]["commits"] = self.authors[
                             author
                         ]["commits"]
-                        files, inserted, deleted = 0, 0, 0
+                        inserted, deleted = 0, 0
                     except ValueError:
                         logger.warning(f'Unexpected line "{line}"')
                 else:
@@ -700,17 +842,22 @@ class GitDataCollector(DataCollector):
                 numbers = get_stat_summary_counts(line)
 
                 if len(numbers) == 3:
-                    (files, inserted, deleted) = [int(el) for el in numbers]
+                    # the file count is unused here; only line deltas matter
+                    (_, inserted, deleted) = [int(el) for el in numbers]
                 else:
                     logger.warning(f'Failed to handle line "{line}"')
-                    (files, inserted, deleted) = (0, 0, 0)
+                    (inserted, deleted) = (0, 0)
 
-        # Single name-only pass drives two metrics:
-        #   * file_churn   -> how many commits touched each file
-        #   * author_files -> which files each author touches (code ownership)
-        # Each commit is prefixed with a "COMMIT:<author>" marker line; the lines
-        # that follow are the file paths changed by that commit. Authors are
-        # resolved to their canonical identity so aliases merge here directly.
+    def _collect_file_churn_and_ownership(self, name_to_canonical: dict[str, str]) -> None:
+        """Record how often each file changes and who changes it.
+
+        A single name-only pass drives two metrics:
+        ``file_churn`` (commits touching each file) and ``author_files``
+        (which files each author touches, for code ownership). Each commit is
+        prefixed with a ``COMMIT:<author>`` marker line; the lines that follow
+        are the file paths changed by that commit. Authors are resolved to their
+        canonical identity so aliases merge here directly.
+        """
         churn_output = get_pipe_output(
             ['git log --format="COMMIT:%aN" --name-only {}'.format(get_log_range("HEAD", False))]
         )
@@ -727,6 +874,36 @@ class GitDataCollector(DataCollector):
             if current_author:
                 author_map = self.author_files.setdefault(current_author, {})
                 author_map[line] = author_map.get(line, 0) + 1
+
+    def _collect_commit_subjects(self) -> None:
+        """Sample commit subjects per year to ground the AI chronicle.
+
+        One subjects-only pass in chronological order; each year keeps an
+        evenly spaced sample so the whole span stays represented no matter
+        how large the repository is. Only runs when AI features are enabled.
+        """
+        output = get_pipe_output(
+            ['git log --reverse --format="%at %s" {}'.format(get_log_range("HEAD", False))]
+        )
+        by_year: dict[int, list[str]] = {}
+        for line in output.split("\n"):
+            line = line.strip()
+            if not line:
+                continue
+            pos = line.find(" ")
+            if pos == -1:
+                continue
+            try:
+                year = datetime.datetime.fromtimestamp(int(line[:pos])).year
+            except ValueError:
+                continue
+            subject = line[pos + 1 :].strip()
+            if subject:
+                by_year.setdefault(year, []).append(subject[:100])
+
+        self.commit_subjects_by_year = {
+            year: _sample_evenly(subjects, 10) for year, subjects in by_year.items()
+        }
 
     def refine(self) -> None:
         # authors
@@ -813,17 +990,8 @@ class GitDataCollector(DataCollector):
         return datetime.datetime.fromtimestamp(self.last_commit_stamp)
 
     def get_tags(self) -> list[str]:
-        lines = get_pipe_output(["git show-ref --tags"])
-        tags = []
-        for line in lines.split("\n"):
-            if not line.strip():
-                continue
-            # Line format: "<hash> refs/tags/<tagname>"
-            parts = line.split()
-            if len(parts) >= 2:
-                tag = parts[-1].replace("refs/tags/", "")
-                tags.append(tag)
-        return tags
+        lines = get_pipe_output(["git show-ref --tags", "cut -d/ -f3"])
+        return lines.split("\n")
 
     def get_tag_date(self, tag: str) -> str:
         return self.rev_to_date("tags/" + tag)
@@ -848,58 +1016,90 @@ class GitDataCollector(DataCollector):
         return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
 
 
-def run(gitpath, outputpath, extra_fmt=None, wrapped_config=None) -> int:
-    """Run the gitstats program.
-    Args:
-        gitpath: path to the git repository
-        outputpath: path to the output directory
-        extra_fmt: extra format
-    Returns:
-        0 on success, 1 on failure
-    """
-    rundir = os.getcwd()
+def _prepare_output_dir(path: str) -> str:
+    """Create an output directory and return its resolved path.
 
+    The directory name is reduced to its basename, re-anchored under its
+    parent and checked to stay there before creation, so a crafted value
+    cannot escape the intended location.
+    """
+    base = os.path.dirname(os.path.abspath(path))
+    target = os.path.abspath(os.path.join(base, os.path.basename(os.path.abspath(path))))
+    if os.path.commonpath([base, target]) != base:
+        raise ValueError(f"Refusing to create output directory outside {base}")
     try:
-        os.makedirs(outputpath)
+        os.makedirs(target)
     except OSError:
         pass
+    return target
 
+
+def normalize_site_url(url: str) -> str:
+    """Check a ``site_url`` and give it a trailing slash; "" stays "".
+
+    Raises:
+        ValueError: when it is not an http(s) address of a directory.
+    """
+    url = url.strip()
+    if not url:
+        return ""
+    parts = urlsplit(url)
+    if parts.scheme not in ("http", "https") or not parts.netloc or parts.query or parts.fragment:
+        raise ValueError(
+            f"site_url must be an http(s) address like https://example.com/report/, got {url!r}"
+        )
+    return url.rstrip("/") + "/"
+
+
+def _run_single_repo(
+    gitpath: str,
+    outputpath: str,
+    extra_fmt: str | None = None,
+    project_name: str | None = None,
+    json_sibling: bool = True,
+    site_url: str = "",
+    wrapped_config: dict[str, Any] | None = None,
+) -> DataCollector:
+    """Collect, refine and render the full report for one repository.
+
+    Args:
+        gitpath: path to the git repository
+        outputpath: directory receiving this repository's report
+        extra_fmt: extra output format ("json")
+        project_name: overrides the report's project name (multi-repo runs
+            ignore the process-global ``project_name`` config, which would
+            rename every repository identically)
+        json_sibling: write the extra JSON next to the output directory
+            (single-repo behavior) instead of inside it
+        site_url: the report's public address, ending in "/" ("" if unknown)
+        wrapped_config: the Wrapped card to write next to the report, if any
+    Returns:
+        the populated collector
+    """
+    if not os.path.isdir(gitpath):
+        raise RuntimeError(f"Git path is not a directory: {gitpath}")
+
+    outputpath = _prepare_output_dir(outputpath)
     if not os.path.isdir(outputpath):
-        logger.error("FATAL: Output path is not a directory or does not exist")
-        return 1
+        raise RuntimeError(f"Output path is not a directory: {outputpath}")
 
     logger.info(f"Output path: {outputpath}")
     cachefile = os.path.join(outputpath, "gitstats.cache")
 
-    # Guard: multi-repository analysis is not yet supported.
-    # When multiple paths are given, stats from all repos are merged into
-    # one report with the wrong project name (last repo wins).
-    # Track: https://github.com/shenxianpeng/gitstats/issues/234
-    if len(gitpath) > 1:
-        logger.error(
-            "Multi-repository analysis is not supported. "
-            "Only the first repository will be analyzed: %s",
-            gitpath[0],
-        )
-        logger.info(
-            "Track multi-repo dashboard feature: "
-            "https://github.com/shenxianpeng/gitstats/issues/234"
-        )
-        gitpath = gitpath[:1]
-
     data = GitDataCollector()
     data.load_cache(cachefile)
 
-    for gitpath in gitpath:
-        logger.info(f"Git path: {gitpath}")
-
-        prevdir = os.getcwd()
-        os.chdir(gitpath)
-
+    logger.info(f"Git path: {gitpath}")
+    prevdir = os.getcwd()
+    os.chdir(gitpath)
+    try:
         logger.info("Collecting data...")
         data.collect(gitpath)
-
+    finally:
         os.chdir(prevdir)
+
+    if project_name is not None:
+        data.project_name = project_name
 
     logger.info("Refining data...")
     data.save_cache(cachefile)
@@ -921,23 +1121,23 @@ def run(gitpath, outputpath, extra_fmt=None, wrapped_config=None) -> int:
     else:
         data.ai_summaries = {}
 
-    os.chdir(rundir)
-
     logger.info("Generating report...")
     html_report = HTMLReportCreator()
+    html_report.site_url = site_url
     html_report.create(data, outputpath)
+    if site_url:
+        logger.info(f"README badge: [![GitStats]({site_url}badge.svg)]({site_url})")
+        logger.info(f"More badges: {site_url}badges.html")
 
     if extra_fmt:
-        output_file = os.path.join(gitpath, f"{outputpath}.{extra_fmt}")
         if extra_fmt == "json":
-            import json
-
-            logger.info(f'Generating JSON file: "{output_file}"')
-            with open(output_file, "w", encoding="utf-8") as file:
-                json.dump(data.__dict__, file, default=str)
+            if json_sibling:
+                sibling = os.path.join(gitpath, f"{outputpath}.{extra_fmt}")
+                _dump_json_within(os.path.dirname(sibling), os.path.basename(sibling), data)
+            else:
+                _dump_json_within(outputpath, "gitstats.json", data)
         else:
-            logger.error(f"Unsupported format '{extra_fmt}'")
-            return 1
+            raise RuntimeError(f"Unsupported format '{extra_fmt}'")
 
     # Generate Wrapped card if requested
     if wrapped_config and wrapped_config.get("enabled", False):
@@ -962,17 +1162,200 @@ def run(gitpath, outputpath, extra_fmt=None, wrapped_config=None) -> int:
         except Exception as e:
             logger.warning(f"Failed to generate Wrapped card: {e}")
 
+    return data
+
+
+def _dump_json_within(directory: str, filename: str, data: DataCollector) -> None:
+    """Write the collector dump as JSON inside ``directory``.
+
+    The target is resolved from the basename only and checked to stay under
+    ``directory`` before writing, guarding against directory traversal.
+    """
+    base = os.path.abspath(directory)
+    target = os.path.abspath(os.path.join(base, os.path.basename(filename)))
+    if os.path.commonpath([base, target]) != base:
+        raise ValueError(f"Refusing to write outside output directory: {filename}")
+    logger.info(f'Generating JSON file: "{target}"')
+    with open(target, "w", encoding="utf-8") as file:
+        json.dump(data.__dict__, file, default=str)
+
+
+def run(gitpath, outputpath, extra_fmt=None, wrapped_config=None) -> int:
+    """Run the gitstats program.
+
+    With one repository path the report lands directly in ``outputpath``
+    (the historical layout). With several paths each repository gets its own
+    subdirectory plus a ``summary.json``, and an aggregate portfolio page is
+    written at ``outputpath/index.html``.
+
+    Args:
+        gitpath: list of paths to git repositories
+        outputpath: path to the output directory
+        extra_fmt: extra format
+        wrapped_config: the Wrapped card to write next to each report, if any
+    Returns:
+        0 if at least one repository was analyzed, 1 otherwise
+    """
+    rundir = os.getcwd()
+
+    outputpath = _prepare_output_dir(outputpath)
+    if not os.path.isdir(outputpath):
+        logger.error("FATAL: Output path is not a directory or does not exist")
+        return 1
+
+    try:
+        site_url = normalize_site_url(str(conf.get("site_url", "") or ""))
+    except ValueError as e:
+        logger.error(f"FATAL: {e}")
+        return 1
+
+    exit_code = 0
+    try:
+        if len(gitpath) == 1:
+            try:
+                data = _run_single_repo(
+                    gitpath[0],
+                    outputpath,
+                    extra_fmt,
+                    site_url=site_url,
+                    wrapped_config=wrapped_config,
+                )
+            except RuntimeError as e:
+                logger.error(f"FATAL: {e}")
+                return 1
+            write_repo_summary(compute_repo_summary(data, "index.html"), outputpath)
+        else:
+            exit_code = _run_multi_repo(
+                gitpath, outputpath, extra_fmt, site_url=site_url, wrapped_config=wrapped_config
+            )
+    finally:
+        os.chdir(rundir)
+
     time_end = time.time()
     exectime_internal = time_end - time_start
     logger.info(
         f"Execution time {exectime_internal:.5f} secs, {exectime_external:.5f} secs ({(100.0 * exectime_external) / exectime_internal:.2f} %) in external commands)"
     )
     if sys.stdin.isatty():
-        python_cmd = "python" if os.name == "nt" else "python3"
-        logger.info(
-            f"To view the report, run: {python_cmd} -m http.server 8000 --bind 127.0.0.1 -d {outputpath}"
-        )
+        logger.info("To view the report, re-run with --serve (see gitstats --help)")
 
+    return exit_code
+
+
+def _server_urls(host: str, port: int) -> tuple[str, str | None]:
+    """Return the (local, network) URLs to show for a bound server.
+
+    ``network`` is None when the server is only reachable from this machine
+    (loopback binds). Binding ``0.0.0.0`` probes the machine's LAN address;
+    any other address is reachable at that address directly.
+    """
+    # The preview server intentionally speaks plain HTTP: it serves a static
+    # report the user just generated, on an address they chose. Loopback URLs
+    # fall under the S5332 exception; the exposed variants are marked NOSONAR.
+    if host == "localhost":
+        return f"http://localhost:{port}/", None
+    if host == "::1":
+        return f"http://[::1]:{port}/", None
+    if host == "127.0.0.1":
+        return f"http://127.0.0.1:{port}/", None
+    if host == "0.0.0.0":  # noqa: S104 - user explicitly asked to expose
+        try:
+            probe = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            try:
+                probe.connect(("192.0.2.1", 80))  # no traffic sent; picks the outbound iface
+                lan_ip = probe.getsockname()[0]
+            finally:
+                probe.close()
+        except OSError:
+            lan_ip = socket.gethostname()
+        return f"http://127.0.0.1:{port}/", f"http://{lan_ip}:{port}/"  # NOSONAR
+    url = f"http://{host}:{port}/"  # NOSONAR
+    return url, url
+
+
+def _make_server(outputpath: str, host: str, port: int) -> ThreadingHTTPServer:
+    """Build a static file server rooted at the report directory."""
+    handler = partial(SimpleHTTPRequestHandler, directory=outputpath)
+    return ThreadingHTTPServer((host, port), handler)
+
+
+def _serve_report(outputpath: str, host: str, port: int) -> int:
+    """Serve the generated report until interrupted. Returns an exit code."""
+    try:
+        server = _make_server(outputpath, host, port)
+    except OSError as e:
+        logger.error(f"Cannot serve on {host}:{port}: {e}")
+        return 1
+
+    bound_port = server.server_address[1]
+    local_url, network_url = _server_urls(host, bound_port)
+    network_line = network_url or "use --host 0.0.0.0 to expose"
+    print(f"\n  gitstats v{get_version()}  report ready\n")
+    print(f"  ➜  Local:    {local_url}")
+    print(f"  ➜  Network:  {network_line}\n")
+    print("  press Ctrl+C to stop\n")
+
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\n  stopped")
+    finally:
+        server.server_close()
+    return 0
+
+
+def _run_multi_repo(
+    gitpaths: list,
+    outputpath: str,
+    extra_fmt=None,
+    site_url: str = "",
+    wrapped_config: dict[str, Any] | None = None,
+) -> int:
+    """Analyze several repositories and assemble the portfolio page.
+
+    ``site_url`` is the portfolio's address; each repository's report sits
+    in its own subdirectory under it. ``wrapped_config`` asks for a Wrapped
+    card next to each repository's report.
+    """
+    summaries = []
+    failures = []
+    seen_slugs: dict[str, int] = {}
+    for path in gitpaths:
+        try:
+            slug = _slugify_repo(path)
+        except ValueError as e:
+            logger.warning(f"Skipping repository {path!r}: {e}")
+            failures.append({"name": path, "path": path, "error": str(e)})
+            continue
+        count = seen_slugs.get(slug, 0) + 1
+        seen_slugs[slug] = count
+        if count > 1:
+            slug = f"{slug}-{count}"
+        repo_outdir = os.path.join(outputpath, slug)
+        try:
+            data = _run_single_repo(
+                path,
+                repo_outdir,
+                extra_fmt,
+                project_name=slug,
+                json_sibling=False,
+                site_url=f"{site_url}{slug}/" if site_url else "",
+                wrapped_config=wrapped_config,
+            )
+        except Exception as e:
+            logger.warning(f"Skipping repository {path!r}: {e}")
+            failures.append({"name": slug, "path": path, "error": str(e)})
+            continue
+        summary = compute_repo_summary(data, f"{slug}/index.html")
+        write_repo_summary(summary, repo_outdir)
+        summaries.append(summary)
+
+    if not summaries:
+        logger.error("FATAL: No repository could be analyzed")
+        return 1
+
+    logger.info("Generating portfolio page...")
+    AggregateReportCreator().create(summaries, failures, outputpath)
     return 0
 
 
@@ -1004,7 +1387,11 @@ def get_parser() -> argparse.ArgumentParser:
         "gitpath",
         metavar="<gitpath>",
         nargs="+",
-        help="Path to the Git repository. An optional output directory may follow.",
+        help=(
+            "Path(s) to Git repositories. With two or more positional arguments, "
+            "the last one is the output directory. Multiple repositories produce "
+            "per-repository reports plus an aggregate portfolio page."
+        ),
     )
     parser.add_argument(
         "outputpath",
@@ -1020,6 +1407,32 @@ def get_parser() -> argparse.ArgumentParser:
         choices=["json"],
         required=False,
         help="Generate additional output format",
+    )
+
+    parser.add_argument(
+        "--site-url",
+        metavar="URL",
+        help=(
+            "Public address of the report, e.g. https://owner.github.io/repo/: fills in "
+            "the snippets on the Badges page and prints the README badge"
+        ),
+    )
+
+    parser.add_argument(
+        "--serve",
+        action="store_true",
+        help="After generating the report, serve it over HTTP until Ctrl+C",
+    )
+    parser.add_argument(
+        "--host",
+        default="127.0.0.1",
+        help="Address to bind the --serve server to (default: 127.0.0.1, local only; use 0.0.0.0 to expose)",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="Port for the --serve server (default: 8000; 0 picks a free port)",
     )
 
     logging_group = parser.add_mutually_exclusive_group()
@@ -1101,13 +1514,8 @@ def _apply_config_from_args(conf: dict, args) -> None:
             raise ValueError("Config must be in the form key=value")
         if key not in conf:
             raise KeyError(f'No such key "{key}" in config')
-        # Convert numeric strings to integers to match config file behavior
-        if value.isdigit():
-            conf[key] = int(value)
-        elif value.lower() in ("true", "false"):
-            conf[key] = value.lower() == "true"
-        else:
-            conf[key] = value
+        # Convert the value the same way as the config file does
+        conf[key] = parse_config_value(value)
 
 
 def _apply_ai_args(conf: dict, args) -> None:
@@ -1149,6 +1557,8 @@ def main() -> int:
 
     # Handle AI CLI arguments (CLI takes precedence over config)
     _apply_ai_args(conf, args)
+    if args.site_url is not None:
+        conf["site_url"] = args.site_url
 
     # Build wrapped config
     wrapped_config = None
@@ -1160,9 +1570,10 @@ def main() -> int:
             "output": args.wrapped_output,
         }
 
-    run(gitpath, outputpath, extra_fmt=extra_fmt, wrapped_config=wrapped_config)
-
-    return 0
+    exit_code = run(gitpath, outputpath, extra_fmt=extra_fmt, wrapped_config=wrapped_config)
+    if exit_code == 0 and args.serve:
+        return _serve_report(outputpath, args.host, args.port)
+    return exit_code
 
 
 if __name__ == "__main__":

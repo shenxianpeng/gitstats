@@ -198,6 +198,6 @@ gitstats . -f json     # Also generate JSON output
 ## Additional Resources
 
 - Documentation: https://gitstats.readthedocs.io/
-- Example Report: https://shenxianpeng.github.io/gitstats/index.html
+- Example Report: https://shenxianpeng.dev/gitstats/index.html
 - Repository: https://github.com/shenxianpeng/gitstats
 - Issue Tracker: https://github.com/shenxianpeng/gitstats/issues

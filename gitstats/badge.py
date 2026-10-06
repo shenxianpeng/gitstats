@@ -1,0 +1,554 @@
+# Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
+# GPLv2 / GPLv3
+"""Render shareable SVG badges for a generated gitstats report.
+
+Badges are written next to ``index.html`` so that wherever the report is
+hosted (GitHub Pages, GitLab Pages, Netlify, an internal web server, ...)
+they are served from the same place and can be embedded in a README:
+
+    [![GitStats](https://example.com/report/badge.svg)](https://example.com/report/)
+
+Each badge is a self-contained vector image in the familiar shields.io
+style, using the gitstats brand palette, and shows live repository data so
+it refreshes automatically every time the report is regenerated.
+
+Static hosting cannot vary a response on query parameters, so customization
+works through files and configuration instead:
+
+- ``badge.svg`` — the default badge; its metric, label, color and style are
+  chosen with the ``badge_*`` config keys (``-c badge_metric=last-commit``).
+- ``badges/<name>.svg`` — every metric, plus the multi-segment
+  ``summary``, ``activity`` (sparkline) and ``health`` badges,
+  pre-rendered, so switching what the badge says is just switching the URL.
+- ``badges/<style>/<name>.svg`` — the same badges in every style, so
+  switching the style is switching the URL too. A README that links one
+  keeps its look when ``badge_style`` changes later.
+- ``badges/<name>.json`` — the same data in the shields.io endpoint
+  schema. Users who want full URL-parameter customization can point
+  ``https://img.shields.io/endpoint?url=...&style=...&color=...`` at these
+  and get every shields style/color option while the numbers stay ours.
+"""
+
+import datetime
+import json
+import logging
+import os
+from dataclasses import dataclass
+from typing import Any
+from xml.sax.saxutils import escape, quoteattr
+
+from gitstats import load_config
+from gitstats.utils import format_int, tags_newest_first
+
+logger = logging.getLogger(__name__)
+
+BADGE_FILENAME = "badge.svg"
+BADGES_DIRNAME = "badges"
+
+# Brand palette (matches gitstats.css)
+_LABEL_BG = "#211e1e"  # OpenCode warm near-black
+_VALUE_BG = "#4a7ab5"  # report link/bar blue
+_BAR_COLORS = ("#9be9a8", "#40c463", "#30a14e")  # heatmap greens
+_SUMMARY_BGS = ("#4a7ab5", "#3b6aa3", "#2c5485")  # value blue, then darker
+
+# Familiar shields.io color names, resolvable in badge_color.
+_NAMED_COLORS = {
+    "brightgreen": "#4c1",
+    "green": "#97ca00",
+    "yellowgreen": "#a4a61d",
+    "yellow": "#dfb317",
+    "orange": "#fe7d37",
+    "red": "#e05d44",
+    "blue": "#007ec6",
+    "lightgrey": "#9f9f9f",
+    "lightgray": "#9f9f9f",
+}
+
+_MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+# Approximate character widths for 11px Verdana, the font shields.io uses.
+# The rendered text is force-fitted with ``textLength``, so these only need
+# to be close enough for pleasant padding.
+_NARROW = set("iljI.,':;|!ft[]() ")
+_WIDE = set("mwMW@%")
+
+
+def _text_width(text: str) -> float:
+    """Estimate the rendered width in px of ``text`` at 11px Verdana."""
+    width = 0.0
+    for ch in text:
+        if ch in _NARROW:
+            width += 4.0
+        elif ch in _WIDE:
+            width += 10.0
+        elif ch.isdigit():
+            width += 7.0
+        elif ch.isupper():
+            width += 8.0
+        else:
+            width += 6.5
+    return width
+
+
+def _count(value: Any, noun: str) -> str:
+    """Format ``value`` with a pluralized noun: (1, "commit") -> "1 commit"."""
+    suffix = "" if value == 1 else "s"
+    return f"{format_int(value)} {noun}{suffix}"
+
+
+def resolve_color(color: str) -> str:
+    """Map shields.io color names to hex; pass anything else through."""
+    return _NAMED_COLORS.get(color.lower(), color)
+
+
+def badge_metrics(data: Any) -> dict[str, str]:
+    """Return the message text of every available badge metric."""
+    last = data.get_last_commit_date()
+    return {
+        "commits": _count(data.get_total_commits(), "commit"),
+        "last-commit": f"{_MONTHS[last.month - 1]} {last.year}",
+        "authors": _count(data.get_total_authors(), "author"),
+        "files": _count(data.get_total_files(), "file"),
+        "lines": _count(data.get_total_loc(), "line"),
+        "release": _release(data.tags),
+        "active-days": _count(len(data.get_active_days()), "active day"),
+    }
+
+
+def _release(tags: dict[str, dict[str, Any]]) -> str:
+    """The newest tag and the tag count: "v2.7.0 · 46 tags".
+
+    Newest by history, as on the Tags page, not by date: a rebased or
+    imported history can date a newer tag before an older one.
+    """
+    if not tags:
+        return "no tags"
+    latest = tags_newest_first(tags)[0]
+    if len(tags) == 1:
+        return latest
+    return f"{latest} · {_count(len(tags), 'tag')}"
+
+
+_VERDANA = "Verdana,Geneva,DejaVu Sans,sans-serif"
+_MONO = "IBM Plex Mono,JetBrains Mono,ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"
+
+
+@dataclass(frozen=True)
+class _Style:
+    """How a badge style draws its segments."""
+
+    height: int = 20
+    radius: int = 3
+    font: str = _VERDANA
+    font_size: float = 11
+    pad: float = 5  # space around each segment's text
+    shine: bool = True  # the subtle top-to-bottom gradient
+    shadow: bool = True  # the dark text shadow under white text
+    icon: bool = True  # the three heatmap bars before the label
+    label_bg: str = _LABEL_BG
+    label_fg: str = "#fff"
+    value_bg: str = _VALUE_BG  # used when a segment brings no color of its own
+    value_fg: str = "#fff"
+    value_border: str = ""  # outline drawn inside each value segment
+    char_width: float = 0  # fixed advance per character (monospace); 0: Verdana
+    prefix: str = ""  # drawn before the label, in prefix_fg
+    prefix_fg: str = ""
+    uppercase: bool = False
+    bold: bool = False
+    letter_spacing: float = 0  # px added after every character
+    outline: str = ""  # border around the whole badge
+
+
+_STYLES = {
+    "flat": _Style(),
+    "flat-square": _Style(radius=0, shine=False),
+    # the report's own look: mono, square, "//" before the label, light value
+    "terminal": _Style(
+        height=22,
+        radius=0,
+        font=_MONO,
+        font_size=12,
+        pad=8,
+        shine=False,
+        shadow=False,
+        icon=False,
+        label_fg="#f1ecec",
+        value_bg="#f1ecec",
+        value_fg="#211e1e",
+        value_border="#211e1e",
+        char_width=7.2,
+        prefix="//",
+        prefix_fg="#9e9a9a",
+    ),
+    # large and loud, for a row of hero badges
+    "for-the-badge": _Style(
+        height=28,
+        radius=0,
+        font_size=10,
+        pad=12,
+        shine=False,
+        shadow=False,
+        icon=False,
+        uppercase=True,
+        bold=True,
+        letter_spacing=1,
+    ),
+    # for white READMEs: white label, pale blue value, thin gray border
+    "light": _Style(
+        shine=False,
+        shadow=False,
+        icon=False,
+        label_bg="#fff",
+        label_fg="#211e1e",
+        value_bg="#eef3fa",
+        value_fg="#2c5485",
+        outline="#cfcecd",
+    ),
+}
+
+
+STYLE_NAMES = tuple(_STYLES)  # every style, as written under badges/<style>/
+
+
+@dataclass(frozen=True)
+class Segment:
+    """One colored block of a badge: text, or a row of bars (``spark``)."""
+
+    text: str = ""
+    bg: str = ""  # empty: the style's value color; set: white text on it
+    fg: str = ""  # empty: white on a custom bg, else the style's value color
+    spark: tuple[float, ...] = ()  # bar heights, 0..1
+    spark_color: str = "#40c463"
+    dot: str = ""  # a status dot before the label, in place of the icon
+
+
+def _segment_text(text: str, style: _Style) -> str:
+    return text.upper() if style.uppercase else text
+
+
+def _segment_text_width(text: str, style: _Style) -> float:
+    text = _segment_text(text, style)
+    if style.char_width:
+        width = len(text) * style.char_width
+    else:
+        width = _text_width(text) * style.font_size / 11 * (1.1 if style.bold else 1)
+    return width + style.letter_spacing * max(len(text) - 1, 0)
+
+
+def render_segments(segments: list[Segment], style_name: str = "flat") -> str:
+    """Return the SVG markup of a badge made of ``segments``, left to right.
+
+    The first segment is the label and takes the style's label colors and
+    icon; the others are values. ``style_name`` is a key of ``_STYLES``.
+    """
+    style = _STYLES.get(style_name, _STYLES["flat"])
+    height = style.height
+    dot = segments[0].dot
+    if dot:
+        icon_w, icon_gap = 7, 5
+    else:
+        icon_w, icon_gap = (13, 4) if style.icon else (0, 0)
+
+    # Lay the segments out left to right
+    blocks = []
+    x = 0.0
+    prefix = "" if dot else style.prefix  # the dot takes the prefix's place
+    prefix_w = _segment_text_width(prefix + " ", style) if prefix else 0.0
+    for index, seg in enumerate(segments):
+        lead = (style.pad + icon_w + icon_gap) if index == 0 and icon_w else style.pad
+        if index == 0:
+            lead += prefix_w
+        if seg.spark:
+            content_w: float = len(seg.spark) * 4 - 1
+        else:
+            content_w = _segment_text_width(seg.text, style)
+        width = lead + content_w + style.pad + (1 if index else 0)
+        blocks.append((seg, x, width, lead, content_w))
+        x += width
+    total_w = round(x)
+
+    title = segments[0].text + ": " + ", ".join(s.text for s in segments[1:] if s.text)
+    parts = []
+    for index, (seg, bx, bw, lead, cw) in enumerate(blocks):
+        bg = style.label_bg if index == 0 else resolve_color(seg.bg or style.value_bg)
+        bg = escape(bg, {'"': "&quot;"})
+        parts.append(f'<rect x="{bx:.0f}" width="{bw:.0f}" height="{height}" fill="{bg}"/>')
+        if index and style.value_border and not seg.bg:
+            parts.append(
+                f'<rect x="{round(bx) + 0.5}" y="0.5" width="{round(bw) - 1}" height="{height - 1}" '
+                f'fill="none" stroke="{style.value_border}"/>'
+            )
+
+    marks = []
+    texts = []
+    baseline = height / 2 + style.font_size * 0.36
+    for index, (seg, bx, bw, lead, cw) in enumerate(blocks):
+        if seg.spark:
+            base = height - 5
+            span = height - 10
+            for i, level in enumerate(seg.spark):
+                h = max(1.0, span * level)
+                marks.append(
+                    f'<rect x="{bx + lead + i * 4:.1f}" y="{base - h:.1f}" width="3" '
+                    f'height="{h:.1f}" fill="{escape(seg.spark_color)}"/>'
+                )
+            continue
+        if index == 0:
+            fg = style.label_fg
+        else:
+            fg = seg.fg or ("#fff" if seg.bg else style.value_fg)
+        cx = bx + lead + cw / 2
+        text = escape(_segment_text(seg.text, style))
+        if style.shadow:
+            texts.append(
+                f'<text aria-hidden="true" x="{cx:.1f}" y="{baseline + 1:.1f}" fill="#010101" '
+                f'fill-opacity=".3" textLength="{cw:.1f}">{text}</text>'
+            )
+        texts.append(
+            f'<text x="{cx:.1f}" y="{baseline:.1f}" fill="{escape(fg)}" '
+            f'textLength="{cw:.1f}">{text}</text>'
+        )
+
+    if prefix:
+        texts.append(
+            f'<text x="{style.pad + prefix_w / 2:.1f}" y="{baseline:.1f}" '
+            f'fill="{style.prefix_fg}">{escape(prefix)}</text>'
+        )
+
+    icon = ""
+    if dot:
+        icon = (
+            f'<circle cx="{style.pad + 3.5:g}" cy="{height / 2:g}" r="3.5" fill="{escape(dot)}"/>'
+        )
+    elif style.icon:
+        bars = "".join(
+            f'<rect x="{bx}" y="{by}" width="3" height="{bh}" rx="1" fill="{color}"/>'
+            for (bx, by, bh), color in zip(
+                ((0.5, 6.0, 7.0), (5.0, 2.5, 10.5), (9.5, 4.5, 8.5)), _BAR_COLORS
+            )
+        )
+        icon = f'<g transform="translate({style.pad:g},{(height - 13) / 2:g})">{bars}</g>'
+
+    defs = []
+    shine = ""
+    if style.shine:
+        defs.append(
+            '<linearGradient id="s" x2="0" y2="100%">'
+            '<stop offset="0" stop-color="#bbb" stop-opacity=".1"/>'
+            '<stop offset="1" stop-opacity=".1"/></linearGradient>'
+        )
+        shine = f'<rect width="{total_w}" height="{height}" fill="url(#s)"/>'
+    if style.radius:
+        defs.append(
+            f'<clipPath id="r"><rect width="{total_w}" height="{height}" '
+            f'rx="{style.radius}" fill="#fff"/></clipPath>'
+        )
+        group = '<g clip-path="url(#r)">'
+    else:
+        group = "<g>"
+    outline = ""
+    if style.outline:
+        outline = (
+            f'<rect x=".5" y=".5" width="{total_w - 1}" height="{height - 1}" '
+            f'rx="{max(style.radius - 0.5, 0):g}" fill="none" stroke="{style.outline}"/>'
+        )
+
+    weight = ' font-weight="bold"' if style.bold else ""
+    return f"""<svg xmlns="http://www.w3.org/2000/svg" width="{total_w}" height="{height}" role="img" aria-label={quoteattr(title)}>
+  <title>{escape(title)}</title>
+  {"".join(defs)}
+  {group}{"".join(parts)}{shine}</g>{outline}
+  {icon}{"".join(marks)}
+  <g text-anchor="middle" font-family={quoteattr(style.font)} font-size="{style.font_size:g}"{weight} text-rendering="geometricPrecision">{"".join(texts)}</g>
+</svg>
+"""
+
+
+def render_badge(label: str, value: str, color: str = "", style: str = "flat") -> str:
+    """Return the SVG markup for a badge reading ``label | value``.
+
+    ``color`` overrides the value-segment background (shields color name,
+    hex, or any SVG color). ``style`` is a badge style name: "flat" (3px
+    radius, subtle gradient), "flat-square" (sharp corners, solid fill),
+    "terminal" (the report's look: monospace, square, "//" before the label)
+    "for-the-badge" (taller, bold, uppercase) or "light" (white label, pale
+    value, for white READMEs).
+    """
+    return render_segments([Segment(label), Segment(value, bg=color)], style)
+
+
+def _compact(value: int, noun: str) -> str:
+    """Short count for tight spaces: (18458, "line") -> "18.5k lines"."""
+    suffix = "" if value == 1 else "s"
+    for size, unit in ((1_000_000_000, "B"), (1_000_000, "M"), (1_000, "k")):
+        if value >= size - size // 20_000:  # 999,950 reads as 1M, not 1000k
+            number = f"{value / size:.1f}".removesuffix(".0")
+            return f"{number}{unit} {noun}{suffix}"
+    return f"{value} {noun}{suffix}"
+
+
+@dataclass(frozen=True)
+class _Composite:
+    """A badge built from several segments, and its shields.io endpoint data."""
+
+    segments: list[Segment]
+    label: str
+    message: str
+    color: str
+
+
+def _summary(data: Any, label: str, color: str, style: str) -> _Composite:
+    """Commits, authors and lines side by side, in three shades of blue."""
+    parts = [
+        _compact(data.get_total_commits(), "commit"),
+        _compact(data.get_total_authors(), "author"),
+        _compact(data.get_total_loc(), "line"),
+    ]
+    message = " · ".join(parts)
+    if color or _STYLES[style].value_bg != _VALUE_BG:
+        # one color throughout, or a light style: equal segments would run
+        # together, so the numbers share one segment
+        values = [Segment(message, bg=color)]
+    else:
+        values = [Segment(text, bg=bg) for text, bg in zip(parts, _SUMMARY_BGS)]
+    return _Composite([Segment(label), *values], label, message, color or _VALUE_BG)
+
+
+def _activity(data: Any, label: str, color: str, style: str) -> _Composite:
+    """Commits per month for the last year of history, and the latest month."""
+    last = data.get_last_commit_date()
+    months = []
+    year, month = last.year, last.month
+    for _ in range(12):
+        months.append(f"{year}-{month:02d}")
+        year, month = (year, month - 1) if month > 1 else (year - 1, 12)
+    counts = [data.commits_by_month.get(key, 0) for key in reversed(months)]
+    peak = max(counts) or 1
+    message = f"{format_int(counts[-1])} in {_MONTHS[last.month - 1]}"
+    if _STYLES[style].value_bg == _VALUE_BG:
+        spark = Segment(bg="#30363d", spark=tuple(c / peak for c in counts))
+    else:  # light styles: green bars on the style's own value color
+        spark = Segment(spark=tuple(c / peak for c in counts), spark_color="#30a14e")
+    return _Composite(
+        [Segment(label), spark, Segment(message, bg=color)], label, message, color or _VALUE_BG
+    )
+
+
+# Health by the age of the last commit: (max days, status, dot, value color)
+_HEALTH = (
+    (30, "active", "#40c463", "#1a7f37"),
+    (365, "quiet", "#e3a33b", "#9a6700"),
+    (None, "dormant", "#9e9a9a", "#6e6a6a"),
+)
+
+
+def _age(days: int) -> str:
+    """Rough age: 0 -> "today", 45 -> "1 month ago", 800 -> "2 years ago"."""
+    if days < 1:
+        return "today"
+    for size, unit in ((365, "year"), (30, "month"), (1, "day")):
+        if days >= size:
+            count = days // size
+            return f"{count} {unit}{'' if count == 1 else 's'} ago"
+    return "today"  # pragma: no cover - unreachable
+
+
+def _health(data: Any, now: datetime.datetime) -> _Composite:
+    """How recently the project moved: active, quiet or dormant."""
+    days = (now - data.get_last_commit_date()).days
+    for limit, status, dot, color in _HEALTH:
+        if limit is None or days <= limit:
+            break
+    message = f"last commit {_age(days)}"
+    return _Composite(
+        [Segment(status, dot=dot), Segment(message, bg=color)], status, message, color
+    )
+
+
+def composite_badges(
+    data: Any, label: str, color: str, style: str, now: datetime.datetime | None = None
+) -> dict[str, _Composite]:
+    """Return the multi-segment badges, keyed by name.
+
+    ``now`` is when the report is generated; the health badge measures the
+    age of the last commit from it.
+    """
+    return {
+        "summary": _summary(data, label, color, style),
+        "activity": _activity(data, label, color, style),
+        "health": _health(data, now or datetime.datetime.now()),
+    }
+
+
+def _endpoint_json(label: str, message: str, color: str) -> str:
+    """Return shields.io endpoint-schema JSON for a badge."""
+    return json.dumps(
+        {
+            "schemaVersion": 1,
+            "label": label,
+            "message": message,
+            "color": color.lstrip("#"),
+        },
+        indent=2,
+    )
+
+
+def create_badges(data: Any, path: str) -> str:
+    """Write the badge set into the report directory; return the default badge path.
+
+    Writes ``badge.svg`` (metric chosen by the ``badge_metric`` config key)
+    plus ``badges/<name>.svg`` and ``badges/<name>.json`` for every metric
+    and every multi-segment badge (``summary``, ``activity``, ``health``),
+    and ``badges/<style>/<name>.svg`` for every style. All but the last
+    follow ``badge_style``, and all but ``health`` (whose label and
+    color say the status) follow ``badge_label`` and ``badge_color``.
+    Regenerating the report keeps every badge up to date automatically.
+    """
+    conf = load_config()
+    label = str(conf.get("badge_label", "") or "gitstats")
+    color = str(conf.get("badge_color", "") or "")
+    style = str(conf.get("badge_style", "") or "flat")
+    if style not in _STYLES:
+        logger.warning(f"Unknown badge_style '{style}', using 'flat'")
+        style = "flat"
+
+    now = datetime.datetime.now()
+    metrics = badge_metrics(data)
+
+    def badge_set(style: str) -> dict[str, _Composite]:
+        badges = {
+            name: _Composite([Segment(label), Segment(message, bg=color)], label, message, color)
+            for name, message in metrics.items()
+        }
+        badges.update(composite_badges(data, label, color, style, now=now))
+        return badges
+
+    badges = badge_set(style)
+
+    metric = str(conf.get("badge_metric", "") or "commits")
+    if metric not in badges:
+        logger.warning(
+            f"Unknown badge_metric '{metric}', using 'commits' (available: {', '.join(badges)})"
+        )
+        metric = "commits"
+
+    badges_dir = os.path.join(path, BADGES_DIRNAME)
+    os.makedirs(badges_dir, exist_ok=True)
+    for name, badge in badges.items():
+        with open(os.path.join(badges_dir, f"{name}.svg"), "w", encoding="utf-8") as f:
+            f.write(render_segments(badge.segments, style))
+        endpoint_color = resolve_color(badge.color) if badge.color else _VALUE_BG
+        with open(os.path.join(badges_dir, f"{name}.json"), "w", encoding="utf-8") as f:
+            f.write(_endpoint_json(badge.label, badge.message, endpoint_color))
+
+    for style_name in STYLE_NAMES:
+        style_dir = os.path.join(badges_dir, style_name)
+        os.makedirs(style_dir, exist_ok=True)
+        for name, badge in badge_set(style_name).items():
+            with open(os.path.join(style_dir, f"{name}.svg"), "w", encoding="utf-8") as f:
+                f.write(render_segments(badge.segments, style_name))
+
+    badge_path = os.path.join(path, BADGE_FILENAME)
+    with open(badge_path, "w", encoding="utf-8") as f:
+        f.write(render_segments(badges[metric].segments, style))
+    return badge_path

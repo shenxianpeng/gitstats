@@ -4,7 +4,7 @@ Configuration
 
 You can create a ``gitstats.conf`` file in the current directory to customize the configuration.
 
-* ``max_domains`` - Maximum number of domains to display in "Domains by Commits". Default: ``10``.
+* ``max_domains`` - Maximum number of domains to display in "Commits by domain". Default: ``10``.
 * ``max_ext_length`` - Maximum length of file extensions shown in statistics. Default: ``10``.
 * ``style`` - CSS stylesheet for the generated report. Default: ``gitstats.css``.
 * ``max_authors`` - Maximum number of authors to list in "Authors". Default: ``20``.
@@ -19,6 +19,11 @@ You can create a ``gitstats.conf`` file in the current directory to customize th
 * ``end_date`` - Ending date for commits, passed as --until to Git (optional). Format: ``YYYY-MM-DD``. Default: ``""`` (empty).
 * ``authors`` - Comma-separated list of authors to filter commits. Only commits from these authors will be included (uses OR logic: commits from any of the listed authors). If empty, all authors are included. Default: ``""`` (empty).
 * ``exclude_exts`` - Comma-separated list of file extensions to exclude from line counting. If empty, no files are excluded. Files with null bytes in their content are automatically detected as binary and excluded from line counting. This detection occurs in addition to any extensions specified in exclude_exts. Default: ``""`` (empty).
+* ``badge_metric`` - Badge written as the default ``badge.svg`` in the report output: ``commits``, ``last-commit``, ``authors``, ``files``, ``lines``, ``release``, ``active-days``, ``summary``, ``activity`` or ``health``. All of them are always pre-rendered in ``badges/<name>.svg`` regardless of this choice. Default: ``commits``.
+* ``badge_label`` - Left-side text of the generated badges. Default: ``gitstats``.
+* ``badge_color`` - Value-segment color of the generated badges: a shields.io color name (``brightgreen``, ``green``, ``yellowgreen``, ``yellow``, ``orange``, ``red``, ``blue``, ``lightgrey``), a hex value like ``#30a14e``, or any SVG color. Default: ``""`` (gitstats brand blue).
+* ``badge_style`` - Badge style: ``flat`` (rounded corners, subtle gradient), ``flat-square`` (sharp corners), ``terminal`` (monospace and square, like the report), ``for-the-badge`` (taller, bold, uppercase) or ``light`` (white and pale blue, for white READMEs). Default: ``flat``.
+* ``site_url`` - Public address of the report, such as ``https://owner.github.io/repo/``. The snippets on the report's Badges page point at it, and the run log prints the README badge. With several repositories, each report's address is this plus its subdirectory. Same as the ``--site-url`` option. Default: ``""`` (the Badges page reads the address from its own URL).
 
 Here is an example ``gitstats.conf`` file:
 
