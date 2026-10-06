@@ -16,6 +16,7 @@ from gitstats.report_creator import (
     _classify_eras,
     author_html,
     compute_code_ownership,
+    compute_hotspots,
     compute_project_history,
     gap_annotations,
     get_keys_sorted_by_value_key,
@@ -565,6 +566,7 @@ def test_print_nav_marks_current_page():
         "lines.html",
         "tags.html",
         "ownership.html",
+        "hotspots.html",
         "history.html",
         "badges.html",
     ],
@@ -744,14 +746,21 @@ def test_stat_tiles_empty_note_is_omitted():
 
 
 def test_page_summaries_use_stat_tiles(mock_data_collector, temp_dir):
-    """Files, Lines, Tags, Ownership and History open with stat tiles, not a bare <dl>."""
+    """Files, Lines, Tags, Ownership, Hotspots and History open with stat tiles, not a bare <dl>."""
     HTMLReportCreator().create(mock_data_collector, temp_dir)
 
     def page(name):
         with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
             return f.read()
 
-    for name in ("files.html", "lines.html", "tags.html", "ownership.html", "history.html"):
+    for name in (
+        "files.html",
+        "lines.html",
+        "tags.html",
+        "ownership.html",
+        "hotspots.html",
+        "history.html",
+    ):
         content = page(name)
         assert '<dl class="stat-tiles"' in content, name
         assert "<dl>" not in content, name
@@ -1592,45 +1601,222 @@ def test_open_report_file_confined_to_report_dir(temp_dir):
         creator._open_report_file(temp_dir, "../escape.html")
 
 
-# ── Hotspots page ────────────────────────────────────────────────────────
+# ── Hotspots ─────────────────────────────────────────────────────────────
+
+
+def _hotspots_html(data, path):
+    creator = HTMLReportCreator()
+    creator.data = data
+    creator.title = "t"
+    creator.create_hotspots_html(data, path)
+    return _read_page(path, "hotspots.html")
+
+
+def _hotspot_points(page):
+    data = page.split('<script type="application/json" id="hotspot-data">', 1)[1]
+    return json.loads(data.split("</script>", 1)[0])
+
+
+def test_compute_hotspots_stats():
+    hotspots = compute_hotspots(
+        {
+            "big_busy.py": {"lines": 400, "churn": 15, "score": 300.0},
+            "small_busy.py": {"lines": 30, "churn": 12, "score": 65.73},
+            "big_calm.py": {"lines": 900, "churn": 1, "score": 30.0},
+            "small_calm.py": {"lines": 10, "churn": 1, "score": 3.16},
+            # nothing to place on a logarithmic axis: no lines, or never changed
+            "logo.png": {"lines": 0, "churn": 4, "score": 0.0},
+            "vendored.py": {"lines": 5000, "churn": 0, "score": 0.0},
+        }
+    )
+
+    # highest score first, rounded to one decimal
+    assert [fs["path"] for fs in hotspots["files"]] == [
+        "big_busy.py",
+        "small_busy.py",
+        "big_calm.py",
+        "small_calm.py",
+    ]
+    assert hotspots["files"][1] == {
+        "path": "small_busy.py",
+        "lines": 30,
+        "churn": 12,
+        "score": 65.7,
+    }
+    # upper medians of (10, 30, 400, 900) and (1, 1, 12, 15)
+    assert hotspots["median_lines"] == 400
+    assert hotspots["median_churn"] == 12
+    # only the file at or above both medians is critical
+    assert [fs["path"] for fs in hotspots["critical"]] == ["big_busy.py"]
+
+
+def test_compute_hotspots_breaks_score_ties_by_path():
+    files = {name: {"lines": 100, "churn": 2, "score": 20.0} for name in ("b.py", "a.py", "c.py")}
+    assert [fs["path"] for fs in compute_hotspots(files)["files"]] == ["a.py", "b.py", "c.py"]
+
+
+def test_compute_hotspots_empty():
+    assert compute_hotspots({}) == {
+        "files": [],
+        "median_lines": 0,
+        "median_churn": 0,
+        "critical": [],
+    }
 
 
 def test_hotspots_page_renders(mock_data_collector, temp_dir):
-    creator = HTMLReportCreator()
-    creator.create(mock_data_collector, temp_dir)
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    content = _read_page(temp_dir, "hotspots.html")
 
-    with open(f"{temp_dir}/hotspots.html", encoding="utf-8") as f:
-        content = f.read()
+    assert "<h1>Hotspots</h1>" in content
+    # medians of the four mocked files: 120 lines, 10 changes -> main.py and utils.py
+    assert (
+        '<dt>Files Analyzed</dt><dd class="stat-value">4</dd>'
+        '<dd class="stat-note">with lines and at least one change</dd>'
+    ) in content
+    assert '<dt>Critical Hotspots</dt><dd class="stat-value">2</dd>' in content
+    assert "50.0% of analyzed files" in content
+    assert '<dt>Median File Size</dt><dd class="stat-value">120 lines</dd>' in content
+    assert '<dt>Median Changes</dt><dd class="stat-value">10 commits</dd>' in content
 
-    assert "Hotspots Analysis" in content
-    # scatter data inlined for Chart.js
-    assert "chart-hotspots" in content
-    assert "main.py" in content
+    # the scatter plot: every file as [path, lines, churn, score], highest score first
+    assert '<div class="chart-box has-legend"' in content
+    assert '<canvas id="chart-hotspots"></canvas>' in content
+    assert _hotspot_points(content) == {
+        "medianLines": 120,
+        "medianChurn": 10,
+        "points": [
+            ["main.py", 400, 15, 300.0],
+            ["utils.py", 120, 10, 109.5],
+            ["README.md", 60, 8, 62.0],
+            ["Dockerfile", 30, 2, 11.0],
+        ],
+    }
+
+    # the table lists the critical files only, with a bar scaled to the top score
+    table = content[content.index('<table class="sortable share-table" id="hotspots">') :]
+    table = table[: table.index("</table>")]
+    assert table.count('<td class="path">') == 2
+    assert (
+        '<tr><td class="path">utils.py</td><td class="num">120</td><td class="num">10</td>'
+        '<td class="num">109.5</td><td class="share-cell"><span class="share-bar" '
+        'aria-hidden="true"><span style="width: 36.5%"></span></span></td></tr>'
+    ) in table
+    assert "README.md" not in table
     assert "</html>" in content
 
 
-def test_hotspots_page_skipped_when_no_data(mock_data_collector, temp_dir):
-    mock_data_collector.hotspot_files = {}
-    creator = HTMLReportCreator()
-    creator.create(mock_data_collector, temp_dir)
+def test_hotspots_chart_follows_the_theme(mock_data_collector, temp_dir):
+    """Colors come from the CSS variables, so the chart switches with the theme."""
+    page = _hotspots_html(mock_data_collector, temp_dir)
+    script = page.split('id="hotspot-data"', 1)[1].split("<script>", 1)[1]
+    script = script[: script.index("</script>")]
+    assert "getCSSVar('--series-' + " in script
+    assert "getCSSVar('--border-strong')" in script
+    assert "applyChartTheme();" in script
+    assert "series: q[1]" in script  # read by applyChartTheme() on a theme switch
+    assert not re.search(r"#[0-9a-fA-F]{6}\b|rgba?\(", script)
 
-    # With no hotspot data the page is not generated at all
-    assert not os.path.exists(f"{temp_dir}/hotspots.html")
+
+def test_hotspots_page_counts_against_the_current_tree(mock_data_collector, temp_dir):
+    mock_data_collector.head_files = ["main.py", "utils.py", "README.md", "Dockerfile", "logo.png"]
+    page = _hotspots_html(mock_data_collector, temp_dir)
+    assert (
+        '<dt>Files Analyzed</dt><dd class="stat-value">4</dd>'
+        '<dd class="stat-note">of 5 in the current tree</dd>'
+    ) in page
+
+
+def test_hotspots_page_empty_state(mock_data_collector, temp_dir):
+    """The page is always written, since the nav links to it."""
+    mock_data_collector.hotspot_files = {}
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    content = _read_page(temp_dir, "hotspots.html")
+
+    assert "No hotspot data available" in content
+    assert '<a href="hotspots.html" class="active" aria-current="page">Hotspots</a>' in content
+    assert "chart-hotspots" not in content
+    assert "</html>" in content
+
+
+def test_hotspots_page_without_usable_data(mock_data_collector, temp_dir):
+    """Data written before hotspots existed, or files that cannot be placed."""
+    mock_data_collector.hotspot_files = None
+    assert "No hotspot data available" in _hotspots_html(mock_data_collector, temp_dir)
+
+    mock_data_collector.hotspot_files = {"logo.png": {"lines": 0, "churn": 3, "score": 0.0}}
+    assert "No hotspot data available" in _hotspots_html(mock_data_collector, temp_dir)
 
 
 def test_hotspots_page_escapes_paths(mock_data_collector, temp_dir):
     mock_data_collector.hotspot_files = {
-        "we<i>rd.py": {"churn": 9, "lines": 500, "score": 201.0},
-        "plain.py": {"churn": 2, "lines": 10, "score": 6.0},
+        "we<i>rd</script>.py": {"lines": 500, "churn": 9, "score": 201.2},
+        "plain.py": {"lines": 10, "churn": 2, "score": 6.3},
+    }
+    content = _hotspots_html(mock_data_collector, temp_dir)
+
+    # HTML-escaped in the table, and no "<" at all in the data the chart reads
+    assert '<td class="path">we&lt;i&gt;rd&lt;/script&gt;.py</td>' in content
+    assert "we<i>rd" not in content
+    data = content.split('id="hotspot-data">', 1)[1].split("</script>", 1)[0]
+    assert "<" not in data
+    assert json.loads(data)["points"][0][0] == "we<i>rd</script>.py"
+
+
+def test_hotspots_table_shows_ten_and_folds_the_rest(mock_data_collector, temp_dir):
+    mock_data_collector.hotspot_files = {
+        f"f{i:02d}.py": {"lines": 100, "churn": 30 - i, "score": 10.0 * (30 - i)} for i in range(15)
+    }
+    # every file has the median size; the eight at or above the median churn are critical
+    content = _hotspots_html(mock_data_collector, temp_dir)
+    assert content.count('<td class="path">') == 8
+    assert "<details" not in content
+
+    mock_data_collector.hotspot_files = {
+        f"f{i:03d}.py": {"lines": 100, "churn": 400 - i, "score": 10.0 * (400 - i)}
+        for i in range(300)
+    }
+    content = _hotspots_html(mock_data_collector, temp_dir)
+    shown = content[content.index('id="hotspots"') :]
+    shown = shown[: shown.index("</table>")]
+    assert shown.count("<tr>") == 11  # header + the ten highest-scoring
+    assert "f009.py" in shown and "f010.py" not in shown
+    assert (
+        '<details class="table-details">'
+        "<summary>Table: the 100 highest-scoring of 150 critical hotspots</summary>"
+        '<div class="table-scroll"><table class="sortable share-table" id="hotspots-all">'
+    ) in content
+    folded = content[content.index('id="hotspots-all"') :]
+    assert folded[: folded.index("</table>")].count("<tr>") == 101
+
+    mock_data_collector.hotspot_files = {
+        f"f{i:02d}.py": {"lines": 100, "churn": 60 - i, "score": 10.0 * (60 - i)} for i in range(40)
+    }
+    content = _hotspots_html(mock_data_collector, temp_dir)
+    assert "<summary>Table: all 20 critical hotspots</summary>" in content
+
+
+def test_hotspots_chart_plots_only_the_highest_scoring_files(mock_data_collector, temp_dir):
+    """A huge repository gets a capped plot, and the page says so."""
+    mock_data_collector.hotspot_files = {
+        f"f{i}.py": {"lines": 10 + i, "churn": 1 + i, "score": float(i)} for i in range(12)
     }
     creator = HTMLReportCreator()
-    creator.create(mock_data_collector, temp_dir)
+    creator.data = mock_data_collector
+    creator.title = "t"
+    creator.HOTSPOTS_MAX_POINTS = 5
+    creator.create_hotspots_html(mock_data_collector, temp_dir)
+    content = _read_page(temp_dir, "hotspots.html")
 
-    with open(f"{temp_dir}/hotspots.html", encoding="utf-8") as f:
-        content = f.read()
+    points = _hotspot_points(content)["points"]
+    assert [point[0] for point in points] == ["f11.py", "f10.py", "f9.py", "f8.py", "f7.py"]
+    assert "Showing the 5 highest-scoring of 12 files." in content
+    # the tiles and medians still cover every file
+    assert '<dt>Files Analyzed</dt><dd class="stat-value">12</dd>' in content
 
-    # The table cell must be HTML-escaped
-    assert "we&lt;i&gt;rd.py" in content
+    # nothing is said when every file is plotted
+    mock_data_collector.hotspot_files = {"a.py": {"lines": 10, "churn": 2, "score": 6.3}}
+    assert "highest-scoring of" not in _hotspots_html(mock_data_collector, temp_dir)
 
 
 # ── Project history ──────────────────────────────────────────────────────
@@ -1828,7 +2014,7 @@ def test_section_headings_use_sentence_case(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
     creator.create(mock_data_collector, temp_dir)
 
-    for page in ("index", "activity", "authors", "files", "lines", "ownership"):
+    for page in ("index", "activity", "authors", "files", "lines", "ownership", "hotspots"):
         with open(os.path.join(temp_dir, f"{page}.html")) as f:
             headings = re.findall(r"<h2[^>]*>(?:<a [^>]*>)?([^<]+)", f.read())
         assert headings, page
@@ -1843,7 +2029,16 @@ def test_section_descriptions_share_one_style(mock_data_collector, temp_dir):
     creator.create(mock_data_collector, temp_dir)
 
     notes = 0
-    for page in ("index", "activity", "authors", "files", "lines", "ownership", "history"):
+    for page in (
+        "index",
+        "activity",
+        "authors",
+        "files",
+        "lines",
+        "ownership",
+        "hotspots",
+        "history",
+    ):
         with open(os.path.join(temp_dir, f"{page}.html")) as f:
             html = f.read()
         assert "<p><em>" not in html, page
@@ -1967,7 +2162,16 @@ def test_numbers_have_thousands_separators_everywhere(mock_data_collector, temp_
 def test_percentages_have_one_decimal(mock_data_collector, temp_dir):
     """Shares read the same on every page: 43.1%, never 43.11%."""
     HTMLReportCreator().create(mock_data_collector, temp_dir)
-    for page in ("index", "activity", "authors", "files", "ownership", "history", "tags"):
+    for page in (
+        "index",
+        "activity",
+        "authors",
+        "files",
+        "ownership",
+        "hotspots",
+        "history",
+        "tags",
+    ):
         with open(os.path.join(temp_dir, f"{page}.html"), encoding="utf-8") as f:
             text = re.sub(r"<script>.*?</script>", "", f.read(), flags=re.S)
         assert not re.search(r"\d\.\d\d%", text), page
@@ -2102,7 +2306,16 @@ def test_every_page_opens_the_same_way(mock_data_collector, temp_dir):
     """h1, then an optional one-paragraph note, then stat tiles; no page-meta line
     except the overview's report period."""
     HTMLReportCreator().create(mock_data_collector, temp_dir)
-    for page in ("activity", "authors", "files", "lines", "tags", "ownership", "history"):
+    for page in (
+        "activity",
+        "authors",
+        "files",
+        "lines",
+        "tags",
+        "ownership",
+        "hotspots",
+        "history",
+    ):
         with open(os.path.join(temp_dir, f"{page}.html"), encoding="utf-8") as f:
             html = f.read()
         after_h1 = html[html.index("</h1>") + len("</h1>") :]

@@ -9,6 +9,7 @@ import math
 import os
 import re
 import shutil
+import statistics
 import time
 from typing import Any
 
@@ -274,8 +275,9 @@ THEME_TOGGLE_BUTTON = (
     f'aria-label="Switch to dark mode">{_THEME_TOGGLE_ICONS}</button>'
 )
 
-# Most-read first: the overview, then who and when, what is at risk, the code
-# itself, the story, and the reference lists; the Badges tool comes last
+# Most-read first: the overview, then who and when, what is at risk (knowledge
+# held by one person, then large files that keep changing), the code itself,
+# the story, and the reference lists; the Badges tool comes last
 NAV_PAGES = (
     ("index.html", "General"),
     ("activity.html", "Activity"),
@@ -506,6 +508,118 @@ BADGES_SCRIPT = r"""<script>
 	});
 
 	render();
+})();
+</script>"""
+
+
+# Draws the scatter plot on the Hotspots page: one dot per file, placed by its
+# size and change count, sized by its score. Page data comes from #hotspot-data.
+HOTSPOTS_SCRIPT = r"""<script>
+(function() {
+	const data = JSON.parse(document.getElementById('hotspot-data').textContent);
+	const points = data.points.map(function(p) {
+		return { path: p[0], x: p[1], y: p[2], score: p[3] };
+	});
+	const scores = points.map(function(p) { return p.score; });
+	const low = Math.min.apply(null, scores);
+	const range = (Math.max.apply(null, scores) - low) || 1;
+
+	// One dataset per quadrant around the medians: each gets a legend entry and
+	// a --series-N color that applyChartTheme() keeps in step with the theme.
+	const large = function(p) { return p.x >= data.medianLines; };
+	const busy = function(p) { return p.y >= data.medianChurn; };
+	const quadrants = [
+		['Critical: large, changed often', 3, function(p) { return large(p) && busy(p); }],
+		['Small, changed often', 5, function(p) { return !large(p) && busy(p); }],
+		['Large, rarely changed', 2, function(p) { return large(p) && !busy(p); }],
+		['Small, rarely changed', 1, function(p) { return !large(p) && !busy(p); }]
+	];
+	const datasets = quadrants.map(function(q) {
+		const own = points.filter(q[2]);
+		const color = getCSSVar('--series-' + q[1]);
+		// a bigger dot is a higher score
+		const radius = own.map(function(p) { return 3 + 9 * (p.score - low) / range; });
+		return {
+			label: q[0],
+			series: q[1],
+			data: own,
+			borderColor: color,
+			backgroundColor: color + '33',
+			borderWidth: 1.5,
+			pointRadius: radius,
+			pointHoverRadius: radius.map(function(r) { return r + 2; }),
+			pointHitRadius: 6,
+			clip: 16  // dots on the axes (one line, one change) are drawn whole
+		};
+	}).filter(function(ds) { return ds.data.length; });
+
+	// Dashed lines at the median size and the median change count
+	const medianLines = {
+		id: 'gsMedianLines',
+		beforeDatasetsDraw: function(chart) {
+			const ctx = chart.ctx, area = chart.chartArea;
+			const x = chart.scales.x.getPixelForValue(data.medianLines);
+			const y = chart.scales.y.getPixelForValue(data.medianChurn);
+			ctx.save();
+			ctx.strokeStyle = getCSSVar('--border-strong');
+			ctx.setLineDash([3, 3]);
+			ctx.beginPath();
+			ctx.moveTo(x, area.top); ctx.lineTo(x, area.bottom);
+			ctx.moveTo(area.left, y); ctx.lineTo(area.right, y);
+			ctx.stroke();
+			ctx.restore();
+		}
+	};
+
+	// A logarithmic axis ticked at 1, 2, 5, 10, 20, 50, ... with room past the
+	// largest value, so the highest-scoring dots are not drawn on the frame
+	function logAxis(title) {
+		return {
+			type: 'logarithmic',
+			min: 1,
+			title: { display: true, text: title },
+			afterDataLimits: function(scale) { scale.max *= 1.3; },
+			afterBuildTicks: function(scale) {
+				scale.ticks = scale.ticks.filter(function(tick) {
+					const lead = tick.value / Math.pow(10, Math.floor(Math.log10(tick.value) + 1e-9));
+					return [1, 2, 5].some(function(n) { return Math.abs(lead - n) < 1e-6; });
+				});
+			},
+			ticks: {
+				maxRotation: 0,
+				callback: function(value) { return value.toLocaleString(); }
+			}
+		};
+	}
+
+	applyChartTheme();
+	new Chart(document.getElementById('chart-hotspots').getContext('2d'), {
+		type: 'scatter',
+		plugins: [medianLines],
+		data: { datasets: datasets },
+		options: {
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: {
+				legend: { display: true, labels: { usePointStyle: true, pointStyle: 'circle' } },
+				tooltip: {
+					callbacks: {
+						// the path on its own line: a deep one is as wide as the rest together
+						label: function(item) {
+							const p = item.raw;
+							return [p.path, p.x.toLocaleString() + (p.x === 1 ? ' line' : ' lines')
+								+ ', changed ' + p.y.toLocaleString() + (p.y === 1 ? ' time' : ' times')
+								+ ', score ' + p.score.toLocaleString()];
+						}
+					}
+				}
+			},
+			scales: {
+				x: logAxis('File size (lines)'),
+				y: logAxis('Changes (commits)')
+			}
+		}
+	});
 })();
 </script>"""
 
@@ -2041,240 +2155,157 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    # The scatter plot shows at most this many files (the highest-scoring),
+    # so the page stays light on repositories with tens of thousands of files
+    HOTSPOTS_MAX_POINTS = 2000
+
     def create_hotspots_html(self, data: Any, path: str) -> None:
-        """
-        Create a Hotspots Analysis page with scatter plot of change frequency × file size.
+        """Create the Hotspots page: change frequency against file size.
 
-        Hotspots are files that are both frequently changed and large in size —
-        they are the most bug-prone files in the codebase (CodeScene concept).
+        A file that is both large and changed often is where defects tend to
+        cluster and where refactoring pays off first. Every file in the
+        current tree is plotted by its size and its number of changes; the
+        ones at or above the median in both (the top-right quadrant) are
+        listed as critical hotspots, highest score first.
         """
-        hotspot_data = getattr(data, "hotspot_files", {})
-        if not hotspot_data:
-            return
-
         f = self._open_report_file(path, "hotspots.html")
         self.print_header(f)
-        self.print_nav(f)
-        f.write("<h1>Hotspots Analysis</h1>")
+        self.print_nav(f, "hotspots.html")
+        f.write("<h1>Hotspots</h1>")
 
-        f.write("""
-        <div class="hotspots-intro">
-            <p>Files changed often <em>and</em> large in size are the most bug-prone.
-            Each dot is a file — bigger dot = higher risk.
-            Dashed lines show the median file size and change frequency.</p>
-        </div>
-        """)
+        hotspot_files = getattr(data, "hotspot_files", {})
+        if not isinstance(hotspot_files, dict):
+            hotspot_files = {}
+        hotspots = compute_hotspots(hotspot_files)
+        files = hotspots["files"]
 
-        # Build scatter data: filter to files with churn > 0 and lines > 0
-        scatter_points = []
-        for filepath, info in hotspot_data.items():
-            churn = info.get("churn", 0)
-            lines = info.get("lines", 0)
-            score = info.get("score", 0.0)
-            if churn > 0 and lines > 0:
-                scatter_points.append(
-                    {
-                        "path": filepath,
-                        "x": lines,
-                        "y": churn,
-                        "score": round(score, 1),
-                    }
-                )
-
-        if not scatter_points:
+        if not files:
             f.write(
-                "<p>No hotspot data available. Files must have been touched by at least one commit and have > 0 lines.</p>"
+                '<p class="section-note">No hotspot data available. A file is analyzed '
+                "when its lines are counted and at least one commit changed it.</p>"
             )
             self.print_footer(f)
             f.write("</body></html>")
             f.close()
             return
 
-        # Compute medians for quadrant lines
-        lines_list = [p["x"] for p in scatter_points]
-        churn_list = [p["y"] for p in scatter_points]
-        lines_list.sort()
-        churn_list.sort()
-        n = len(scatter_points)
-        median_x = lines_list[n // 2] if n else 0
-        median_y = churn_list[n // 2] if n else 0
+        critical = hotspots["critical"]
+        median_lines = hotspots["median_lines"]
+        median_churn = hotspots["median_churn"]
+        current = head_files(data)
 
-        # Serialize to JSON for Chart.js
-        scatter_json = json.dumps(scatter_points).replace("</", "<\\/")
+        f.write(
+            '<p class="section-note">'
+            "Files that are both large and changed often are where bugs tend to "
+            "cluster and where refactoring pays off first. Each file in the current "
+            "tree is placed by its size and by the number of commits that changed it; "
+            "its <strong>hotspot score</strong> is changes &times; &radic;lines. "
+            "Files without counted lines, such as binary files, are left out.</p>"
+        )
+        f.write(
+            stat_tiles_html(
+                [
+                    (
+                        "Files Analyzed",
+                        format_int(len(files)),
+                        f"of {format_int(len(current))} in the current tree"
+                        if current is not None
+                        else "with lines and at least one change",
+                    ),
+                    (
+                        "Critical Hotspots",
+                        format_int(len(critical)),
+                        f"{100.0 * len(critical) / len(files):.1f}% of analyzed files",
+                    ),
+                    (
+                        "Median File Size",
+                        f"{format_int(median_lines)} line{'' if median_lines == 1 else 's'}",
+                        "half of the files are at least this large",
+                    ),
+                    (
+                        "Median Changes",
+                        f"{format_int(median_churn)} commit{'' if median_churn == 1 else 's'}",
+                        "half of the files changed at least this often",
+                    ),
+                ]
+            )
+        )
 
-        f.write(f"""
-        <div style="max-width:100%;margin-bottom:8px">
-            <canvas id="chart-hotspots"></canvas>
-        </div>
-        <script>
-        (function() {{
-            var points = {scatter_json};
+        # Hotspots :: the scatter plot
+        f.write(html_header(2, "Change frequency by file size"))
+        plotted = files[: self.HOTSPOTS_MAX_POINTS]
+        shown = ""
+        if len(plotted) < len(files):
+            shown = (
+                f" Showing the {format_int(len(plotted))} highest-scoring of "
+                f"{format_int(len(files))} files."
+            )
+        f.write(
+            '<p class="section-note">'
+            "Each dot is a file; a bigger dot is a higher score. The dashed lines mark "
+            "the median file size and the median number of changes: files at or above "
+            f"both (top right) are the critical hotspots. Both axes are logarithmic.{shown}</p>"
+        )
+        page_data = {
+            "medianLines": median_lines,
+            "medianChurn": median_churn,
+            "points": [[fs["path"], fs["lines"], fs["churn"], fs["score"]] for fs in plotted],
+        }
+        f.write(
+            '<div class="chart-box has-legend" style="--chart-ratio: 2.4">'
+            '<canvas id="chart-hotspots"></canvas></div>'
+        )
+        # "<" is escaped whole: a path is repository content, and must not be
+        # able to end or re-open the script element it is embedded in
+        f.write(
+            '<script type="application/json" id="hotspot-data">'
+            + json.dumps(page_data).replace("<", "\\u003c")
+            + "</script>"
+        )
+        f.write(HOTSPOTS_SCRIPT)
 
-            var medianX = {median_x};
-            var medianY = {median_y};
+        # Hotspots :: the top-right quadrant as a table, highest score first
+        f.write(html_header(2, "Critical hotspots"))
+        f.write(
+            '<p class="section-note">'
+            "Files at or above the median in both size and number of changes, "
+            "highest score first.</p>"
+        )
+        if critical:
+            max_score = critical[0]["score"] or 1
 
-            // Build Chart.js scatter datasets with color by quadrant
-            // Point size scales with hotspot score: bigger = riskier
-            var allScores = points.map(function(p) {{ return p.score; }});
-            var maxScore = Math.max.apply(null, allScores);
-            var minScore = Math.min.apply(null, allScores);
-            var scoreRange = maxScore - minScore || 1;
-
-            var scatterData = points.map(function(p) {{
-                var color;
-                var quadrant;
-                if (p.x >= medianX && p.y >= medianY) {{
-                    color = '#cf222e';  // critical (top-right)
-                    quadrant = 'critical';
-                }} else if (p.x < medianX && p.y >= medianY) {{
-                    color = '#e16f24';  // warning (top-left)
-                    quadrant = 'warning';
-                }} else if (p.x >= medianX && p.y < medianY) {{
-                    color = '#1a7f37';  // calm (bottom-right)
-                    quadrant = 'calm';
-                }} else {{
-                    color = '#5b8dee';  // safe (bottom-left)
-                    quadrant = 'safe';
-                }}
-                // Normalize radius: 3 (min) to 12 (max) based on score percentile
-                var norm = (p.score - minScore) / scoreRange;
-                var radius = 3 + norm * 9;
-                return {{
-                    x: p.x,
-                    y: p.y,
-                    path: p.path,
-                    score: p.score,
-                    quadrant: quadrant,
-                    backgroundColor: color,
-                    borderColor: color,
-                    pointRadius: radius,
-                    pointHoverRadius: radius + 4,
-                }};
-            }});
-
-            // Custom plugin to draw quadrant median lines
-            var quadrantPlugin = {{
-                id: 'quadrantLines',
-                afterDraw: function(chart) {{
-                    var ctx = chart.ctx;
-                    var chartArea = chart.chartArea;
-                    var xScale = chart.scales.x;
-                    var yScale = chart.scales.y;
-
-                    var x = xScale.getPixelForValue(medianX);
-                    var y = yScale.getPixelForValue(medianY);
-
-                    ctx.save();
-                    ctx.strokeStyle = 'rgba(100, 100, 100, 0.6)';
-                    ctx.lineWidth = 1.5;
-                    ctx.setLineDash([6, 4]);
-
-                    // Vertical line (median file size)
-                    ctx.beginPath();
-                    ctx.moveTo(x, chartArea.top);
-                    ctx.lineTo(x, chartArea.bottom);
-                    ctx.stroke();
-
-                    // Horizontal line (median change frequency)
-                    ctx.beginPath();
-                    ctx.moveTo(chartArea.left, y);
-                    ctx.lineTo(chartArea.right, y);
-                    ctx.stroke();
-
-                    ctx.restore();
-                }}
-            }};
-
-            var ctx = document.getElementById('chart-hotspots').getContext('2d');
-            new Chart(ctx, {{
-                type: 'scatter',
-                data: {{
-                    datasets: [{{
-                        label: 'Files',
-                        data: scatterData,
-                        pointHitRadius: 10,
-                    }}]
-                }},
-                options: {{
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    aspectRatio: 3.0,
-                    plugins: {{
-                        legend: {{ display: false }},
-                        tooltip: {{
-                            callbacks: {{
-                                label: function(context) {{
-                                    var p = context.raw;
-                                    return ' ' + p.path + ' | ' + p.x + ' lines, changed ' + p.y + ' times, score: ' + p.score;
-                                }}
-                            }}
-                        }}
-                    }},
-                    scales: {{
-                        x: {{
-                            type: 'logarithmic',
-                            title: {{ display: true, text: 'File Size (lines of code)' }},
-                            min: 1,
-                            ticks: {{
-                                callback: function(value) {{
-                                    if (value >= 1000) return (value/1000) + 'k';
-                                    return value;
-                                }}
-                            }}
-                        }},
-                        y: {{
-                            type: 'logarithmic',
-                            title: {{ display: true, text: 'Change Frequency (commits)' }},
-                            min: 1,
-                            ticks: {{
-                                callback: function(value) {{
-                                    return value;
-                                }}
-                            }}
-                        }}
-                    }}
-                }},
-                plugins: [quadrantPlugin]
-            }});
-        }})();
-        </script>
-        """)
-
-        # Critical files = top-right quadrant of the scatter plot
-        # (above median in both lines and changes)
-        # This ensures red dots on the chart match the files in the table
-        critical_files = [p for p in scatter_points if p["x"] >= median_x and p["y"] >= median_y]
-        critical_files.sort(key=lambda p: p["score"], reverse=True)
-
-        # Summary stat line
-        f.write(f"""
-        <div class="hotspots-summary">
-            <span class="hotspot-stat">{len(scatter_points)} files changed</span>
-            <span class="hotspot-stat-sep">|</span>
-            <span class="hotspot-stat"><strong class="risk-critical">{len(critical_files)} critical</strong> (top-right quadrant)</span>
-            <span class="hotspot-stat-sep">|</span>
-            <span class="hotspot-stat">median {median_x} lines, {median_y} changes</span>
-        </div>
-        """)
-
-        # Show critical files in the table (matches red dots on the scatter plot)
-        if critical_files:
-            f.write(html_header(2, f"Critical Hotspots ({len(critical_files)})"))
-            f.write("""
-            <div class="table-scroll"><table class="sortable" id="hotspots">
-            <tr>
-                <th>File</th>
-                <th>Lines</th>
-                <th>Changes</th>
-                <th>Score</th>
-            </tr>
-            """)
-            for p in critical_files:
-                f.write(
-                    "<tr><td>%s</td><td>%d</td><td>%d</td><td>%.1f</td></tr>"
-                    % (html.escape(p["path"]), p["x"], p["y"], p["score"])
+            def hotspot_table(table_id: str, rows: list[dict]) -> str:
+                return (
+                    f'<div class="table-scroll"><table class="sortable share-table" id="{table_id}">'
+                    '<tr><th>File</th><th class="num">Lines</th><th class="num">Changes</th>'
+                    '<th class="num">Score</th><th class="unsortable"></th></tr>'
+                    + "".join(
+                        f'<tr><td class="path">{html.escape(fs["path"])}</td>'
+                        f'<td class="num">{format_int(fs["lines"])}</td>'
+                        f'<td class="num">{format_int(fs["churn"])}</td>'
+                        f'<td class="num">{fs["score"]:,.1f}</td>'
+                        '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                        f'<span style="width: {100.0 * fs["score"] / max_score:.1f}%"></span>'
+                        "</span></td></tr>"
+                        for fs in rows
+                    )
+                    + "</table></div>"
                 )
-            f.write("</table></div>")
+
+            # The ten highest-scoring are shown; the full list (up to 100) is folded away
+            f.write(hotspot_table("hotspots", critical[:10]))
+            if len(critical) > 10:
+                count = len(critical)
+                what = (
+                    f"all {format_int(count)} critical hotspots"
+                    if count <= 100
+                    else f"the 100 highest-scoring of {format_int(count)} critical hotspots"
+                )
+                f.write(f'<details class="table-details"><summary>Table: {what}</summary>')
+                f.write(hotspot_table("hotspots-all", critical[:100]))
+                f.write("</details>")
+        else:
+            f.write("<p>No file is at or above the median in both size and number of changes.</p>")
 
         self.print_footer(f)
         f.write("</body></html>")
@@ -3013,6 +3044,54 @@ def compute_code_ownership(author_files: dict[str, dict[str, int]]) -> dict[str,
         "authors": authors_stats,
         "total_files": len(files_stats),
         "single_owner_files": sum(1 for fs in files_stats if fs["contributors"] == 1),
+    }
+
+
+def compute_hotspots(hotspot_files: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """Derive the hotspot view from per-file size, churn and score.
+
+    Args:
+        hotspot_files: mapping of file path -> ``{"lines", "churn", "score"}``,
+            where the score is ``churn * sqrt(lines)``.
+
+    Only files with at least one line and one change can be placed on the
+    (logarithmic) size and change axes, so the rest are left out. Returns a
+    dict with:
+        files:    per-file stats (path, lines, churn, score rounded to one
+                  decimal), sorted by score descending;
+        median_lines, median_churn: the upper medians over those files, which
+                  split the plot into quadrants (0 when there are no files);
+        critical: the files at or above both medians, in the same order.
+    """
+    files = []
+    for filepath, info in hotspot_files.items():
+        lines = info.get("lines", 0)
+        churn = info.get("churn", 0)
+        if lines > 0 and churn > 0:
+            files.append(
+                {
+                    "path": filepath,
+                    "lines": lines,
+                    "churn": churn,
+                    "score": round(info.get("score", 0.0), 1),
+                }
+            )
+    # ties broken by path for determinism
+    files.sort(key=lambda fs: (-fs["score"], fs["path"]))
+
+    if files:
+        median_lines = statistics.median_high(fs["lines"] for fs in files)
+        median_churn = statistics.median_high(fs["churn"] for fs in files)
+    else:
+        median_lines = median_churn = 0
+
+    return {
+        "files": files,
+        "median_lines": median_lines,
+        "median_churn": median_churn,
+        "critical": [
+            fs for fs in files if fs["lines"] >= median_lines and fs["churn"] >= median_churn
+        ],
     }
 
 
