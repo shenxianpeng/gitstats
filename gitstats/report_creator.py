@@ -529,7 +529,7 @@ HOTSPOTS_SCRIPT = r"""<script>
 	const large = function(p) { return p.x >= data.medianLines; };
 	const busy = function(p) { return p.y >= data.medianChurn; };
 	const quadrants = [
-		['Critical: large, changed often', 3, function(p) { return large(p) && busy(p); }],
+		['Large, changed often', 3, function(p) { return large(p) && busy(p); }],
 		['Small, changed often', 5, function(p) { return !large(p) && busy(p); }],
 		['Large, rarely changed', 2, function(p) { return large(p) && !busy(p); }],
 		['Small, rarely changed', 1, function(p) { return !large(p) && !busy(p); }]
@@ -2169,9 +2169,10 @@ class HTMLReportCreator(ReportCreator):
 
         A file that is both large and changed often is where defects tend to
         cluster and where refactoring pays off first. Every file in the
-        current tree is plotted by its size and its number of changes; the
-        ones at or above the median in both (the top-right quadrant) are
-        listed as critical hotspots, highest score first.
+        current tree is plotted by its size and its number of changes, and
+        the highest-scoring files are listed below the plot. The medians only
+        color the plot: half of the files are above each one in any
+        repository, so being above both says nothing about a file by itself.
         """
         page = "hotspots.html"
         f = self._open_report_file(path, page)
@@ -2195,10 +2196,11 @@ class HTMLReportCreator(ReportCreator):
             f.close()
             return
 
-        critical = hotspots["critical"]
         median_lines = hotspots["median_lines"]
         median_churn = hotspots["median_churn"]
         current = head_files(data)
+        # The ten highest-scoring files are the ones the table below shows
+        top_files = files[:10]
 
         f.write(
             '<p class="section-note">'
@@ -2208,34 +2210,39 @@ class HTMLReportCreator(ReportCreator):
             "its <strong>hotspot score</strong> is changes &times; &radic;lines. "
             "Files without counted lines, such as binary files, are left out.</p>"
         )
-        f.write(
-            stat_tiles_html(
-                [
-                    (
-                        "Files Analyzed",
-                        format_int(len(files)),
-                        f"of {format_int(len(current))} in the current tree"
-                        if current is not None
-                        else "with lines and at least one change",
-                    ),
-                    (
-                        "Critical Hotspots",
-                        format_int(len(critical)),
-                        f"{100.0 * len(critical) / len(files):.1f}% of analyzed files",
-                    ),
-                    (
-                        "Median File Size",
-                        f"{format_int(median_lines)} line{'' if median_lines == 1 else 's'}",
-                        "half of the files are at least this large",
-                    ),
-                    (
-                        "Median Changes",
-                        f"{format_int(median_churn)} commit{'' if median_churn == 1 else 's'}",
-                        "half of the files changed at least this often",
-                    ),
-                ]
+        tiles = [
+            (
+                "Files Analyzed",
+                format_int(len(files)),
+                f"of {format_int(len(current))} in the current tree"
+                if current is not None
+                else "with lines and at least one change",
+            ),
+            (
+                "Median File Size",
+                f"{format_int(median_lines)} line{'' if median_lines == 1 else 's'}",
+                "half of the files are at least this large",
+            ),
+            (
+                "Median Changes",
+                f"{format_int(median_churn)} commit{'' if median_churn == 1 else 's'}",
+                "half of the files changed at least this often",
+            ),
+        ]
+        # How much of the risk sits in the ten files listed below; with ten
+        # files or fewer that is all of it, which says nothing
+        total_score = sum(fs["score"] for fs in files)
+        if len(files) > len(top_files) and total_score:
+            share = sum(fs["score"] for fs in top_files) / total_score
+            tiles.insert(
+                1,
+                (
+                    f"Top {len(top_files)} Files",
+                    f"{100.0 * share:.1f}%",
+                    "of the total hotspot score",
+                ),
             )
-        )
+        f.write(stat_tiles_html(tiles))
 
         # Hotspots :: the scatter plot
         f.write(html_header(2, "Change frequency by file size"))
@@ -2249,8 +2256,8 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<p class="section-note">'
             "Each dot is a file; a bigger dot is a higher score. The dashed lines mark "
-            "the median file size and the median number of changes: files at or above "
-            f"both (top right) are the critical hotspots. Both axes are logarithmic.{shown}</p>"
+            "the median file size and the median number of changes, so the large files "
+            f"that change often are in the top right. Both axes are logarithmic.{shown}</p>"
         )
         page_data = {
             "medianLines": median_lines,
@@ -2270,49 +2277,46 @@ class HTMLReportCreator(ReportCreator):
         )
         f.write(HOTSPOTS_SCRIPT)
 
-        # Hotspots :: the top-right quadrant as a table, highest score first
-        f.write(html_header(2, "Critical hotspots"))
+        # Hotspots :: the files as a table, highest score first
+        f.write(html_header(2, "Top hotspots"))
         f.write(
             '<p class="section-note">'
-            "Files at or above the median in both size and number of changes, "
-            "highest score first.</p>"
+            "The files ranked by hotspot score: the larger a file is and the more "
+            "often it changes, the higher it ranks.</p>"
         )
-        if critical:
-            max_score = critical[0]["score"] or 1
+        max_score = files[0]["score"] or 1
 
-            def hotspot_table(table_id: str, rows: list[dict]) -> str:
-                return (
-                    f'<div class="table-scroll"><table class="sortable share-table" id="{table_id}">'
-                    '<tr><th>File</th><th class="num">Lines</th><th class="num">Changes</th>'
-                    '<th class="num">Score</th><th class="unsortable"></th></tr>'
-                    + "".join(
-                        f'<tr><td class="path">{html.escape(fs["path"])}</td>'
-                        f'<td class="num">{format_int(fs["lines"])}</td>'
-                        f'<td class="num">{format_int(fs["churn"])}</td>'
-                        f'<td class="num">{fs["score"]:,.1f}</td>'
-                        '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
-                        f'<span style="width: {100.0 * fs["score"] / max_score:.1f}%"></span>'
-                        "</span></td></tr>"
-                        for fs in rows
-                    )
-                    + "</table></div>"
+        def hotspot_table(table_id: str, rows: list[dict]) -> str:
+            return (
+                f'<div class="table-scroll"><table class="sortable share-table" id="{table_id}">'
+                '<tr><th>File</th><th class="num">Lines</th><th class="num">Changes</th>'
+                '<th class="num">Score</th><th class="unsortable"></th></tr>'
+                + "".join(
+                    f'<tr><td class="path">{html.escape(fs["path"])}</td>'
+                    f'<td class="num">{format_int(fs["lines"])}</td>'
+                    f'<td class="num">{format_int(fs["churn"])}</td>'
+                    f'<td class="num">{fs["score"]:,.1f}</td>'
+                    '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                    f'<span style="width: {100.0 * fs["score"] / max_score:.1f}%"></span>'
+                    "</span></td></tr>"
+                    for fs in rows
                 )
+                + "</table></div>"
+            )
 
-            # The ten highest-scoring are shown; the full list (up to 100) is folded away
-            f.write(hotspot_table("hotspots", critical[:10]))
-            if len(critical) > 10:
-                count = len(critical)
-                what = (
-                    f"all {format_int(count)} critical hotspots"
-                    if count <= 100
-                    else f"the 100 highest-scoring of {format_int(count)} critical hotspots"
-                )
-                f.write(
-                    f'<details class="table-details"><summary>Table: {what}</summary>'
-                    f"{hotspot_table('hotspots-all', critical[:100])}</details>"
-                )
-        else:
-            f.write("<p>No file is at or above the median in both size and number of changes.</p>")
+        # The ten highest-scoring are shown; the full list (up to 100) is folded away
+        f.write(hotspot_table("hotspots", top_files))
+        if len(files) > len(top_files):
+            count = len(files)
+            what = (
+                f"all {format_int(count)} files"
+                if count <= 100
+                else f"the 100 highest-scoring of {format_int(count)} files"
+            )
+            f.write(
+                f'<details class="table-details"><summary>Table: {what}</summary>'
+                f"{hotspot_table('hotspots-all', files[:100])}</details>"
+            )
 
         self.print_footer(f)
         f.write("</body></html>")
@@ -3067,8 +3071,7 @@ def compute_hotspots(hotspot_files: dict[str, dict[str, Any]]) -> dict[str, Any]
         files:    per-file stats (path, lines, churn, score rounded to one
                   decimal), sorted by score descending;
         median_lines, median_churn: the upper medians over those files, which
-                  split the plot into quadrants (0 when there are no files);
-        critical: the files at or above both medians, in the same order.
+                  split the plot into quadrants (0 when there are no files).
     """
     files = []
     for filepath, info in hotspot_files.items():
@@ -3096,9 +3099,6 @@ def compute_hotspots(hotspot_files: dict[str, dict[str, Any]]) -> dict[str, Any]
         "files": files,
         "median_lines": median_lines,
         "median_churn": median_churn,
-        "critical": [
-            fs for fs in files if fs["lines"] >= median_lines and fs["churn"] >= median_churn
-        ],
     }
 
 

@@ -1646,8 +1646,6 @@ def test_compute_hotspots_stats():
     # upper medians of (10, 30, 400, 900) and (1, 1, 12, 15)
     assert hotspots["median_lines"] == 400
     assert hotspots["median_churn"] == 12
-    # only the file at or above both medians is critical
-    assert [fs["path"] for fs in hotspots["critical"]] == ["big_busy.py"]
 
 
 def test_compute_hotspots_breaks_score_ties_by_path():
@@ -1660,7 +1658,6 @@ def test_compute_hotspots_empty():
         "files": [],
         "median_lines": 0,
         "median_churn": 0,
-        "critical": [],
     }
 
 
@@ -1669,13 +1666,11 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
     content = _read_page(temp_dir, "hotspots.html")
 
     assert "<h1>Hotspots</h1>" in content
-    # medians of the four mocked files: 120 lines, 10 changes -> main.py and utils.py
+    # the upper medians of the four mocked files: 120 lines, 10 changes
     assert (
         '<dt>Files Analyzed</dt><dd class="stat-value">4</dd>'
         '<dd class="stat-note">with lines and at least one change</dd>'
     ) in content
-    assert '<dt>Critical Hotspots</dt><dd class="stat-value">2</dd>' in content
-    assert "50.0% of analyzed files" in content
     assert '<dt>Median File Size</dt><dd class="stat-value">120 lines</dd>' in content
     assert '<dt>Median Changes</dt><dd class="stat-value">10 commits</dd>' in content
 
@@ -1693,16 +1688,23 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
         ],
     }
 
-    # the table lists the critical files only, with a bar scaled to the top score
+    # the table ranks every file by score, with a bar scaled to the top score
+    assert "Top hotspots</a></h2>" in content
     table = content[content.index('<table class="sortable share-table" id="hotspots">') :]
     table = table[: table.index("</table>")]
-    assert table.count('<td class="path">') == 2
+    assert re.findall(r'<td class="path">([^<]+)</td>', table) == [
+        "main.py",
+        "utils.py",
+        "README.md",
+        "Dockerfile",
+    ]
     assert (
         '<tr><td class="path">utils.py</td><td class="num">120</td><td class="num">10</td>'
         '<td class="num">109.5</td><td class="share-cell"><span class="share-bar" '
         'aria-hidden="true"><span style="width: 36.5%"></span></span></td></tr>'
     ) in table
-    assert "README.md" not in table
+    # no file is called critical: half of them are above each median anyway
+    assert "ritical" not in content
     assert "</html>" in content
 
 
@@ -1775,11 +1777,11 @@ def test_hotspots_page_escapes_paths(mock_data_collector, temp_dir):
 
 def test_hotspots_table_shows_ten_and_folds_the_rest(mock_data_collector, temp_dir):
     mock_data_collector.hotspot_files = {
-        f"f{i:02d}.py": {"lines": 100, "churn": 30 - i, "score": 10.0 * (30 - i)} for i in range(15)
+        f"f{i:02d}.py": {"lines": 100, "churn": 30 - i, "score": 10.0 * (30 - i)} for i in range(10)
     }
-    # every file has the median size; the eight at or above the median churn are critical
+    # ten files or fewer are all shown, with nothing folded away
     content = _hotspots_html(mock_data_collector, temp_dir)
-    assert content.count('<td class="path">') == 8
+    assert content.count('<td class="path">') == 10
     assert "<details" not in content
 
     mock_data_collector.hotspot_files = {
@@ -1794,7 +1796,7 @@ def test_hotspots_table_shows_ten_and_folds_the_rest(mock_data_collector, temp_d
     assert "f010.py" not in shown
     assert (
         '<details class="table-details">'
-        "<summary>Table: the 100 highest-scoring of 150 critical hotspots</summary>"
+        "<summary>Table: the 100 highest-scoring of 300 files</summary>"
         '<div class="table-scroll"><table class="sortable share-table" id="hotspots-all">'
     ) in content
     folded = content[content.index('id="hotspots-all"') :]
@@ -1804,7 +1806,39 @@ def test_hotspots_table_shows_ten_and_folds_the_rest(mock_data_collector, temp_d
         f"f{i:02d}.py": {"lines": 100, "churn": 60 - i, "score": 10.0 * (60 - i)} for i in range(40)
     }
     content = _hotspots_html(mock_data_collector, temp_dir)
-    assert "<summary>Table: all 20 critical hotspots</summary>" in content
+    assert "<summary>Table: all 40 files</summary>" in content
+
+
+def test_hotspots_page_shows_the_share_of_the_top_ten(mock_data_collector, temp_dir):
+    """How much of the total score the ten files in the table hold."""
+    mock_data_collector.hotspot_files = {
+        f"f{i:02d}.py": {"lines": 100, "churn": 20 - i, "score": 10.0 * (20 - i)} for i in range(20)
+    }
+    content = _hotspots_html(mock_data_collector, temp_dir)
+    # scores 200, 190, ... 10: the top ten hold 1,550 of 2,100
+    assert (
+        '<dt>Top 10 Files</dt><dd class="stat-value">73.8%</dd>'
+        '<dd class="stat-note">of the total hotspot score</dd>'
+    ) in content
+    # second of four tiles, after the number of files
+    assert content.index("<dt>Files Analyzed</dt>") < content.index("<dt>Top 10 Files</dt>")
+    assert content.index("<dt>Top 10 Files</dt>") < content.index("<dt>Median File Size</dt>")
+
+
+def test_hotspots_page_leaves_the_share_out_when_it_says_nothing(mock_data_collector, temp_dir):
+    """With ten files or fewer the table holds them all, so the share is 100%."""
+    mock_data_collector.hotspot_files = {
+        f"f{i:02d}.py": {"lines": 100, "churn": 10 - i, "score": 10.0 * (10 - i)} for i in range(10)
+    }
+    content = _hotspots_html(mock_data_collector, temp_dir)
+    assert "Files</dt>" not in content
+    assert content.count('<div class="stat-tile">') == 3
+
+    # nor when no file has a score to take a share of
+    mock_data_collector.hotspot_files = {
+        f"f{i:02d}.py": {"lines": 100, "churn": 1, "score": 0.0} for i in range(12)
+    }
+    assert "Files</dt>" not in _hotspots_html(mock_data_collector, temp_dir)
 
 
 def test_hotspots_chart_plots_only_the_highest_scoring_files(mock_data_collector, temp_dir):
