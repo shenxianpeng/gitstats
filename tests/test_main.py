@@ -630,6 +630,23 @@ class TestCollectPhases:
         assert dc.activity_by_year_week == {d1.strftime("%Y-%W"): 3}
         assert dc.activity_by_year_week_peak == 3
 
+    def test_record_activity_keeps_the_hour_of_week_grid_for_each_year(self):
+        dc = GitDataCollector()
+        for date in (
+            datetime.datetime(2024, 5, 8, 14, 30),  # Wed
+            datetime.datetime(2024, 5, 8, 14, 45),
+            datetime.datetime(2024, 5, 9, 9, 0),  # Thu
+            datetime.datetime(2025, 1, 1, 23, 10),  # Wed, the next year
+        ):
+            dc._record_activity(date)
+
+        assert dc.activity_by_hour_of_week_by_year == {
+            2024: {2: {14: 2}, 3: {9: 1}},
+            2025: {2: {23: 1}},
+        }
+        # the all-time grid still counts every year together
+        assert dc.activity_by_hour_of_week == {2: {14: 2, 23: 1}, 3: {9: 1}}
+
     def test_record_author_commit_tracks_span_and_active_days(self):
         dc = GitDataCollector()
         early = datetime.datetime(2024, 1, 10, 9, 0)
@@ -1698,19 +1715,44 @@ class TestWrappedCard:
             _run_single_repo(git_repo_minimal, str(out), wrapped_config=self._config(theme="clean"))
 
         card = (out / "wrapped-2023.svg").read_text(encoding="utf-8")
-        assert "YOUR 2023 IN CODE" in card
+        assert "REPO WRAPPED" in card
+        assert ">2023</text>" in card
         assert "git_repo_minimal" in card
         assert THEMES["clean"]["bg_start"] in card
         assert "Wrapped card saved: " in caplog.text
         # the report itself is unchanged by the card
         assert (out / "index.html").exists()
 
-    def test_names_the_card_after_the_current_year_by_default(
+    def test_the_card_holds_the_numbers_of_its_year(
         self, git_repo_minimal, tmp_path, sequential_map
     ):
         out = tmp_path / "report"
-        _run_single_repo(git_repo_minimal, str(out), wrapped_config=self._config(year=None))
-        assert (out / f"wrapped-{datetime.datetime.now().year}.svg").exists()
+        _run_single_repo(git_repo_minimal, str(out), wrapped_config=self._config())
+        card = (out / "wrapped-2023.svg").read_text(encoding="utf-8")
+        # one commit on 2023-06-01 at noon, a Thursday
+        for value, label in (("1", "Commits"), ("1", "Active Days"), ("1 day", "Longest Streak")):
+            assert re.search(rf">{value}</text>\s*<text[^>]*>{label}</text>", card)
+        assert "Afternoon Coder" in card
+        assert "100% of commits between 12:00 and 18:00" in card
+        assert ">June</tspan>" in card
+        assert ">Thursday</tspan>" in card
+        assert ">Test</tspan> · 1 commit</text>" in card
+
+    def test_the_card_is_for_the_current_year_by_default(
+        self, git_repo_minimal, tmp_path, caplog, sequential_map
+    ):
+        """The repository's commits are from 2023: the current year has none."""
+        out = tmp_path / "report"
+        with caplog.at_level(logging.INFO, logger="gitstats"):
+            _run_single_repo(git_repo_minimal, str(out), wrapped_config=self._config(year=None))
+        year = datetime.datetime.now().year
+        assert (
+            f"Failed to generate Wrapped card: no commits in {year}; "
+            "the last year with commits is 2023"
+        ) in caplog.text
+        # no card of all-time numbers under a year they do not belong to
+        assert not list(out.glob("wrapped-*.svg"))
+        assert (out / "index.html").exists()
 
     def test_writes_the_card_where_asked(self, git_repo_minimal, tmp_path, sequential_map):
         out = tmp_path / "report"
@@ -1721,7 +1763,7 @@ class TestWrappedCard:
             str(out),
             wrapped_config=self._config(output=str(cards / "2023.svg")),
         )
-        assert "YOUR 2023 IN CODE" in (cards / "2023.svg").read_text(encoding="utf-8")
+        assert ">2023</text>" in (cards / "2023.svg").read_text(encoding="utf-8")
         assert not list(out.glob("wrapped-*.svg"))
 
     def test_reports_without_the_card_when_it_cannot_be_written(

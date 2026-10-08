@@ -117,6 +117,9 @@ class DataCollector:
         self.activity_by_day_of_week: dict[int, int] = {}  # day -> commits
         self.activity_by_month_of_year: dict[int, int] = {}  # month [1-12] -> commits
         self.activity_by_hour_of_week: dict[int, dict[int, int]] = {}  # weekday -> hour -> commits
+        # the same grid for each year (the Wrapped card is about one year):
+        # year -> weekday -> hour -> commits
+        self.activity_by_hour_of_week_by_year: dict[int, dict[int, dict[int, int]]] = {}
         self.activity_by_hour_of_day_busiest: int = 0
         self.activity_by_hour_of_week_busiest: int = 0
         self.activity_by_year_week: dict[str, int] = {}  # yy_wNN -> commits
@@ -451,6 +454,12 @@ class GitDataCollector(DataCollector):
         # most active hour?
         if self.activity_by_hour_of_week[day][hour] > self.activity_by_hour_of_week_busiest:
             self.activity_by_hour_of_week_busiest = self.activity_by_hour_of_week[day][hour]
+
+        # hour of week, for the commit's year
+        year_hours = self.activity_by_hour_of_week_by_year.setdefault(date.year, {}).setdefault(
+            day, {}
+        )
+        year_hours[hour] = year_hours.get(hour, 0) + 1
 
         # month of year
         month = date.month
@@ -1152,8 +1161,9 @@ def _write_wrapped_card(
 
     The card goes into the report directory as ``wrapped-<year>.svg``, or
     to the file ``wrapped_config["output"]`` names, whose directory must
-    already exist. The card is an extra: when it cannot be written the
-    failure is logged and the run carries on with the report it has.
+    already exist. The card is an extra: when it cannot be written, or the
+    year has no commits to put on it, that is logged and the run carries on
+    with the report it has.
     """
     logger.info("Generating Wrapped card...")
     try:
@@ -1494,7 +1504,10 @@ def get_parser() -> argparse.ArgumentParser:
         "--wrapped-year",
         type=int,
         metavar="YEAR",
-        help="Year the Wrapped card is for (default: the current year)",
+        help=(
+            "Year the Wrapped card is for (default: the current year); "
+            "a year without commits gets no card"
+        ),
     )
     parser.add_argument(
         "--wrapped-theme",

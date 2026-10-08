@@ -1,8 +1,9 @@
 """Generate a shareable "Repo Wrapped" SVG card for a Git repository.
 
-Inspired by Spotify Wrapped — creates a personality-driven,
-social-media-friendly card with the year's key git stats:
-commits, streak, night-owl ratio, most active month, and more.
+Inspired by Spotify Wrapped: a square card of one year in the repository,
+with that year's commits, active days, longest streak, lines changed,
+contributors, busiest month and weekday, top contributor and the commits
+in each month. Nothing on the card is an all-time number.
 """
 
 from __future__ import annotations
@@ -11,6 +12,8 @@ import datetime
 import logging
 import os
 from typing import Any
+
+from gitstats.report_creator import compute_project_history
 
 logger = logging.getLogger("gitstats")
 
@@ -115,107 +118,128 @@ WEEKDAY_NAMES: dict[int, str] = {
     6: "Sunday",
 }
 
+# The four quarters of the day, and what the card calls a year whose commits
+# fall mostly in each: (name, first hour, the hour after the last)
+DAY_PARTS: tuple[tuple[str, int, int], ...] = (
+    ("Night Owl", 0, 6),
+    ("Early Bird", 6, 12),
+    ("Afternoon Coder", 12, 18),
+    ("Evening Coder", 18, 24),
+)
+
 WIDTH = 1080
 HEIGHT = 1080
+# The content column: everything on the card sits between these two edges
+LEFT = 60
+RIGHT = 1020
+
+
+def _longest_streak(days: list[str]) -> int:
+    """Longest run of consecutive dates in ``days`` (sorted ``YYYY-MM-DD``)."""
+    longest = current = 0
+    previous: datetime.date | None = None
+    for day in days:
+        date = datetime.date.fromisoformat(day)
+        current = current + 1 if previous and (date - previous).days == 1 else 1
+        longest = max(longest, current)
+        previous = date
+    return longest
 
 
 class WrappedCardGenerator:
-    """Generate a shareable SVG "Repo Wrapped" card from collected stats."""
+    """Generate a shareable SVG "Repo Wrapped" card from collected stats.
 
-    def __init__(
-        self,
-        data: Any,
-        year: int | None = None,
-        theme: str = "midnight",
-        repo_dir: str | None = None,
-    ) -> None:
+    Every number on the card is for one year: the one it is headed with.
+    """
+
+    def __init__(self, data: Any, year: int | None = None, theme: str = "midnight") -> None:
         self.data = data
         self.year = year or datetime.datetime.now().year
         self.theme_name = theme
-        self.repo_dir = repo_dir
         self.colors = THEMES.get(theme, THEMES["midnight"])
 
     # ── data extraction helpers ─────────────────────────────────────────────
 
-    def _get_total_commits(self) -> int:
-        """Return commits for the target year (fall back to total)."""
-        yearly = getattr(self.data, "commits_by_year", {})
-        return yearly.get(self.year, getattr(self.data, "total_commits", 0))
+    def _year_grid(self) -> dict[int, dict[int, int]]:
+        """The year's commits as weekday -> hour -> commits ({} if not collected)."""
+        by_year = getattr(self.data, "activity_by_hour_of_week_by_year", {}) or {}
+        return by_year.get(self.year, {})
 
-    def _get_night_owl_ratio(self) -> float:
-        """Fraction of commits made between 00:00-05:59."""
-        hourly = getattr(self.data, "activity_by_hour_of_day", {})
-        total = sum(hourly.values()) or 1
-        night = sum(v for h, v in hourly.items() if h < 6)
-        return night / total
+    def _monthly_commits(self) -> list[int]:
+        """The year's commits in each month, January first."""
+        by_month = getattr(self.data, "commits_by_month", {}) or {}
+        return [by_month.get(f"{self.year}-{month:02d}", 0) for month in range(1, 13)]
 
-    def _get_most_active_month(self) -> str:
-        """Return the month name with the most commits."""
-        monthly = getattr(self.data, "activity_by_month_of_year", {})
-        if not monthly:
-            return "—"
-        best = max(monthly, key=monthly.get)  # type: ignore[arg-type]
-        return MONTH_NAMES.get(best, str(best))
+    def _busiest_weekday(self) -> str:
+        """The weekday with the most of the year's commits ("" if unknown)."""
+        totals = {day: sum(hours.values()) for day, hours in self._year_grid().items()}
+        if not any(totals.values()):
+            return ""
+        # a tie goes to the earlier weekday
+        return WEEKDAY_NAMES.get(max(sorted(totals), key=lambda day: totals[day]), "")
 
-    def _get_busiest_weekday(self) -> str:
-        """Return the weekday name with the most commits."""
-        daily = getattr(self.data, "activity_by_day_of_week", {})
-        if not daily:
-            return "—"
-        best = max(daily, key=daily.get)  # type: ignore[arg-type]
-        return WEEKDAY_NAMES.get(best, str(best))
+    def _day_part(self) -> dict[str, Any] | None:
+        """The quarter of the day with the most of the year's commits.
 
-    def _get_total_lines_touched(self) -> int:
-        added = getattr(self.data, "total_lines_added", 0)
-        removed = getattr(self.data, "total_lines_removed", 0)
-        return added + removed
-
-    def _get_top_author(self) -> str:
-        authors = getattr(self.data, "authors_by_commits", [])
-        return authors[0] if authors else "—"
-
-    def _get_first_commit_year(self) -> int:
-        stamp = getattr(self.data, "first_commit_stamp", 0)
-        if stamp:
-            return datetime.datetime.fromtimestamp(stamp).year
-        return self.year
+        Returns its name, its hours and its share of the commits, or None when
+        the hours were not collected. A tie goes to the earlier quarter.
+        """
+        by_hour: dict[int, int] = {}
+        for hours in self._year_grid().values():
+            for hour, commits in hours.items():
+                by_hour[hour] = by_hour.get(hour, 0) + commits
+        total = sum(by_hour.values())
+        if not total:
+            return None
+        counts = [
+            sum(commits for hour, commits in by_hour.items() if start <= hour < end)
+            for _, start, end in DAY_PARTS
+        ]
+        name, start, end = DAY_PARTS[counts.index(max(counts))]
+        return {"name": name, "start": start, "end": end, "share": max(counts) / total}
 
     def _collect_stats(self) -> dict[str, Any]:
-        """Assemble all the stats needed for the card."""
-        total_commits = self._get_total_commits()
-        night_ratio = self._get_night_owl_ratio()
-        lines_touched = self._get_total_lines_touched()
+        """Assemble the card's numbers, every one of them for ``self.year``.
 
-        # Fun personality labels
-        if night_ratio > 0.4:
-            night_label = "Night Owl 🦉"
-        elif night_ratio > 0.25:
-            night_label = "Evening Coder 🌙"
-        elif night_ratio < 0.1:
-            night_label = "Early Bird 🌅"
-        else:
-            night_label = "Balanced ☀️"
+        The per-year account is the History page's, so the two agree. Raises
+        ValueError when the year has no commits: a card of zeros, or one that
+        fills the year in with the repository's all-time numbers, would say
+        something that is not true.
+        """
+        history = compute_project_history(self.data)
+        entry = next(
+            (e for e in history["years"] if e["year"] == self.year and e["commits"]),
+            None,
+        )
+        if entry is None:
+            last = history["last_year"]
+            hint = f"; the last year with commits is {last}" if last else ""
+            raise ValueError(f"no commits in {self.year}{hint}")
 
-        streak = getattr(self.data, "longest_streak", 0)
-
+        days = sorted(
+            day
+            for day in getattr(self.data, "active_days", ())
+            if str(day).startswith(f"{self.year}-")
+        )
+        monthly = self._monthly_commits()
         return {
             "year": self.year,
-            "project_name": getattr(self.data, "project_name", "Repository"),
-            "total_commits": total_commits,
-            "total_authors": getattr(self.data, "total_authors", 0),
-            "total_files": getattr(self.data, "total_files", 0),
-            "longest_streak": streak,
-            "night_owl_ratio": night_ratio,
-            "night_owl_label": night_label,
-            "most_active_month": self._get_most_active_month(),
-            "busiest_weekday": self._get_busiest_weekday(),
-            "top_author": self._get_top_author(),
-            "lines_touched": lines_touched,
-            "lines_added": getattr(self.data, "total_lines_added", 0),
-            "lines_removed": getattr(self.data, "total_lines_removed", 0),
-            "active_days": len(getattr(self.data, "active_days", set())),
-            "first_commit_year": self._get_first_commit_year(),
-            "commits_by_month": getattr(self.data, "activity_by_month_of_year", {}),
+            "project_name": getattr(self.data, "project_name", "") or "Repository",
+            "commits": entry["commits"],
+            "active_days": len(days),
+            "longest_streak": _longest_streak(days),
+            "lines_changed": entry["lines_added"] + entry["lines_removed"],
+            "contributors": entry["active_authors"],
+            "new_contributors": len(entry["newcomers"]),
+            "releases": len(entry["releases"]),
+            # the most active person; a bot only when nobody else committed
+            "top_author": entry["top_author"],
+            "top_author_commits": entry["top_author_commits"],
+            "monthly_commits": monthly,
+            # a tie goes to the earlier month
+            "busiest_month": MONTH_NAMES[monthly.index(max(monthly)) + 1] if any(monthly) else "",
+            "busiest_weekday": self._busiest_weekday(),
+            "day_part": self._day_part(),
         }
 
     # ── SVG rendering ──────────────────────────────────────────────────────
@@ -229,17 +253,39 @@ class WrappedCardGenerator:
             return f"{n:,}"
         return str(n)
 
+    @staticmethod
+    def _clip(text: str, limit: int) -> str:
+        """Shorten ``text`` to ``limit`` characters, ending in an ellipsis."""
+        return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
+
     def _render_card(self, stats: dict[str, Any]) -> str:
         """Render the full SVG card."""
         c = self.colors
         year = stats["year"]
 
-        # ── accent bar chart for monthly activity ──
-        monthly_data = stats.get("commits_by_month", {})
-        monthly_chart = self._render_mini_bar_chart(monthly_data)
+        # The sixth number: the year's releases, or its newcomers when it had
+        # no release, so a repository that does not tag still shows a count
+        if stats["releases"] or not stats["new_contributors"]:
+            sixth = ("Releases", stats["releases"])
+        else:
+            sixth = ("New Contributors", stats["new_contributors"])
+        streak = stats["longest_streak"]
+        numbers = [
+            ("Commits", self._format_number(stats["commits"])),
+            ("Active Days", self._format_number(stats["active_days"])),
+            ("Longest Streak", f"{streak} day{'' if streak == 1 else 's'}"),
+            ("Lines Changed", self._format_number(stats["lines_changed"])),
+            ("Contributors", self._format_number(stats["contributors"])),
+            (sixth[0], self._format_number(sixth[1])),
+        ]
+        # three columns of 300 with 30 between them fill the content column
+        stat_cards = "\n  ".join(
+            self._stat_card(LEFT + 330 * (i % 3), 290 + 150 * (i // 3), label, value)
+            for i, (label, value) in enumerate(numbers)
+        )
 
         return f"""<?xml version="1.0" encoding="utf-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {HEIGHT}" width="{WIDTH}" height="{HEIGHT}">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {WIDTH} {HEIGHT}" width="{WIDTH}" height="{HEIGHT}" font-family="system-ui, -apple-system, sans-serif">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="{c["bg_start"]}"/>
@@ -250,127 +296,140 @@ class WrappedCardGenerator:
       <stop offset="0%" stop-color="{c["accent"]}"/>
       <stop offset="100%" stop-color="{c["title"]}"/>
     </linearGradient>
+    <clipPath id="card">
+      <rect width="{WIDTH}" height="{HEIGHT}" rx="32"/>
+    </clipPath>
   </defs>
 
-  <!-- Background -->
-  <rect width="{WIDTH}" height="{HEIGHT}" fill="url(#bg)" rx="32"/>
+  <!-- Everything is clipped to the card's rounded corners -->
+  <g clip-path="url(#card)">
+  <rect width="{WIDTH}" height="{HEIGHT}" fill="url(#bg)"/>
+  <rect width="{WIDTH}" height="6" fill="url(#accent-bar)"/>
 
-  <!-- Top accent line -->
-  <rect x="0" y="0" width="{WIDTH}" height="6" fill="url(#accent-bar)"/>
+  <!-- Header: the year and the repository -->
+  <text x="{LEFT}" y="80" font-size="20" font-weight="600" fill="{c["title"]}" letter-spacing="3">REPO WRAPPED</text>
+  <text x="{LEFT}" y="180" font-size="96" font-weight="800" fill="{c["year"]}" letter-spacing="-2">{year}</text>
+  <text x="{LEFT}" y="220" font-size="22" fill="{c["stat_label"]}">{self._escape_xml(self._clip(stats["project_name"], 60))}</text>
+  <line x1="{LEFT}" y1="250" x2="{RIGHT}" y2="250" stroke="{c["separator"]}" stroke-width="1"/>
 
-  <!-- Header -->
-  <text x="60" y="80" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="600" fill="{c["title"]}" letter-spacing="3">
-    YOUR {year} IN CODE
-  </text>
+  <!-- The year in six numbers -->
+  {stat_cards}
+  <line x1="{LEFT}" y1="590" x2="{RIGHT}" y2="590" stroke="{c["separator"]}" stroke-width="1"/>
 
-  <!-- Year – big hero number -->
-  <text x="60" y="180" font-family="system-ui, -apple-system, sans-serif" font-size="96" font-weight="800" fill="{c["year"]}" letter-spacing="-2">
-    {year}
-  </text>
+  <!-- When and by whom -->
+  {self._render_personality(stats["day_part"])}
+  {self._render_facts(stats)}
 
-  <!-- Project name -->
-  <text x="60" y="220" font-family="system-ui, -apple-system, sans-serif" font-size="22" fill="{c["stat_label"]}">
-    {self._escape_xml(stats["project_name"])}
-  </text>
-
-  <!-- Separator -->
-  <line x1="60" y1="250" x2="1020" y2="250" stroke="{c["separator"]}" stroke-width="1"/>
-
-  <!-- ── Stat grid (3 columns × 2 rows) ── -->
-  <!-- Row 1 -->
-  {self._stat_card(60, 290, "Total Commits", self._format_number(stats["total_commits"]), c)}
-  {self._stat_card(380, 290, "Longest Streak", f"{stats['longest_streak']} days", c)}
-  {self._stat_card(700, 290, "Active Days", self._format_number(stats["active_days"]), c)}
-
-  <!-- Row 2 -->
-  {self._stat_card(60, 440, "Lines Touched", self._format_number(stats["lines_touched"]), c)}
-  {self._stat_card(380, 440, "Contributors", self._format_number(stats["total_authors"]), c)}
-  {self._stat_card(700, 440, "Files", self._format_number(stats["total_files"]), c)}
-
-  <!-- ── Bottom section: personality badges + monthly chart ── -->
-  <line x1="60" y1="590" x2="1020" y2="590" stroke="{c["separator"]}" stroke-width="1"/>
-
-  <!-- Night owl badge -->
-  <text x="60" y="640" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="600" fill="{c["stat_label"]}" letter-spacing="1">
-    YOUR CODING PERSONALITY
-  </text>
-
-  <rect x="60" y="660" width="260" height="36" rx="18" fill="{c["badge_bg"]}" stroke="{c["badge_text"]}" stroke-width="1" stroke-opacity="0.3"/>
-  <text x="190" y="684" font-family="system-ui, -apple-system, sans-serif" font-size="15" font-weight="600" fill="{c["badge_text"]}" text-anchor="middle">
-    {stats["night_owl_label"]}
-  </text>
-  <text x="330" y="684" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="{c["stat_label"]}">
-    {stats["night_owl_ratio"]:.0%} of commits after midnight
-  </text>
-
-  <!-- Most active month & weekday -->
-  <text x="60" y="740" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="{c["stat_label"]}">
-    <tspan fill="{c["accent"]}" font-weight="600">{stats["most_active_month"]}</tspan> was your most active month
-    · <tspan fill="{c["accent"]}" font-weight="600">{stats["busiest_weekday"]}</tspan> was your busiest day
-  </text>
-
-  <!-- Top contributor -->
-  <text x="60" y="780" font-family="system-ui, -apple-system, sans-serif" font-size="14" fill="{c["stat_label"]}">
-    Top contributor: <tspan fill="{c["accent"]}" font-weight="600">{self._escape_xml(stats["top_author"])}</tspan>
-  </text>
-
-  <!-- Monthly activity mini-chart -->
-  {monthly_chart}
+  <!-- The year month by month -->
+  {self._render_mini_bar_chart(stats["monthly_commits"])}
 
   <!-- Footer -->
-  <line x1="60" y1="1000" x2="1020" y2="1000" stroke="{c["separator"]}" stroke-width="1"/>
-  <text x="540" y="1035" font-family="system-ui, -apple-system, sans-serif" font-size="13" fill="{c["footer"]}" text-anchor="middle">
-    Generated by gitstats · github.com/shenxianpeng/gitstats
-  </text>
+  <line x1="{LEFT}" y1="1000" x2="{RIGHT}" y2="1000" stroke="{c["separator"]}" stroke-width="1"/>
+  <text x="{WIDTH // 2}" y="1035" font-size="13" fill="{c["footer"]}" text-anchor="middle">Generated by gitstats · github.com/shenxianpeng/gitstats</text>
+  </g>
 </svg>"""
 
-    def _stat_card(self, x: int, y: int, label: str, value: str, c: dict[str, str]) -> str:
-        """Render a single stat card (300×120 px)."""
-        return f"""<rect x="{x}" y="{y}" width="290" height="120" rx="14" fill="{c["card_bg"]}" stroke="{c["card_border"]}" stroke-width="1"/>
-  <text x="{x + 20}" y="{y + 35}" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="700" fill="{c["stat_value"]}">
-    {value}
-  </text>
-  <text x="{x + 20}" y="{y + 65}" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="500" fill="{c["stat_label"]}" letter-spacing="0.5">
-    {label}
-  </text>"""
-
-    def _render_mini_bar_chart(self, monthly_data: dict[int, int]) -> str:
-        """Render a tiny bar chart of monthly activity."""
+    def _stat_card(self, x: int, y: int, label: str, value: str) -> str:
+        """Render one number in its box (300×120), the pair centered in it."""
         c = self.colors
-        if not monthly_data:
+        return (
+            f'<rect x="{x}" y="{y}" width="300" height="120" rx="14" '
+            f'fill="{c["card_bg"]}" stroke="{c["card_border"]}" stroke-width="1"/>\n'
+            f'  <text x="{x + 24}" y="{y + 60}" font-size="36" font-weight="700" '
+            f'fill="{c["stat_value"]}">{value}</text>\n'
+            f'  <text x="{x + 24}" y="{y + 90}" font-size="14" font-weight="500" '
+            f'fill="{c["stat_label"]}" letter-spacing="0.5">{label}</text>'
+        )
+
+    def _render_personality(self, day_part: dict[str, Any] | None) -> str:
+        """Render the quarter of the day the year's commits fell in most."""
+        if not day_part:
+            return ""
+        c = self.colors
+        share = (
+            f"{day_part['share']:.0%} of commits between "
+            f"{day_part['start']:02d}:00 and {day_part['end']:02d}:00"
+        )
+        return (
+            f'<text x="{LEFT}" y="640" font-size="15" font-weight="600" '
+            f'fill="{c["stat_label"]}" letter-spacing="1">CODING PERSONALITY</text>\n'
+            f'  <rect x="{LEFT}" y="660" width="190" height="36" rx="18" fill="{c["badge_bg"]}" '
+            f'stroke="{c["badge_text"]}" stroke-width="1" stroke-opacity="0.3"/>\n'
+            f'  <text x="{LEFT + 95}" y="684" font-size="15" font-weight="600" '
+            f'fill="{c["badge_text"]}" text-anchor="middle">{day_part["name"]}</text>\n'
+            f'  <text x="{LEFT + 206}" y="684" font-size="16" fill="{c["stat_label"]}">{share}</text>'
+        )
+
+    def _render_facts(self, stats: dict[str, Any]) -> str:
+        """Render the busiest month and weekday, and the top contributor."""
+        c = self.colors
+
+        def strong(text: str) -> str:
+            return f'<tspan fill="{c["accent"]}" font-weight="600">{text}</tspan>'
+
+        busiest = [
+            f"{what}: {strong(name)}"
+            for what, name in (
+                ("Busiest month", stats["busiest_month"]),
+                ("Busiest weekday", stats["busiest_weekday"]),
+            )
+            if name
+        ]
+        lines = [" · ".join(busiest)] if busiest else []
+        if stats["top_author"]:
+            commits = stats["top_author_commits"]
+            name = self._escape_xml(self._clip(stats["top_author"], 40))
+            lines.append(
+                f"Top contributor: {strong(name)} · {self._format_number(commits)} "
+                f"commit{'' if commits == 1 else 's'}"
+            )
+        return "\n  ".join(
+            f'<text x="{LEFT}" y="{740 + 40 * i}" font-size="16" fill="{c["stat_label"]}">{line}</text>'
+            for i, line in enumerate(lines)
+        )
+
+    def _render_mini_bar_chart(self, monthly: list[int]) -> str:
+        """Render the year's commits per month as twelve bars across the card."""
+        c = self.colors
+        peak = max(monthly, default=0)
+        if not peak:
             return ""
 
-        max_val = max(monthly_data.values()) or 1
-        bar_w = 50
-        gap = 14
-        start_x = 60
-        bar_y = 840
-        bar_max_h = 100
+        # twelve bars of 58 with 24 between them fill the content column
+        bar_w = 58
+        step = bar_w + 24
+        base_y = 940
+        bar_max_h = 90
 
-        bars: list[str] = []
-        for month_num in range(1, 13):
-            val = monthly_data.get(month_num, 0)
-            h = max(4, int((val / max_val) * bar_max_h))
-            cx = start_x + (month_num - 1) * (bar_w + gap)
-            # bar
-            bars.append(
-                f'<rect x="{cx}" y="{bar_y + bar_max_h - h}" width="{bar_w}" height="{h}" '
-                f'rx="4" fill="{c["accent"]}" fill-opacity="0.7"/>'
+        parts = [
+            f'<text x="{LEFT}" y="826" font-size="13" font-weight="600" '
+            f'fill="{c["stat_label"]}" letter-spacing="0.5">MONTHLY COMMITS</text>'
+        ]
+        for i, commits in enumerate(monthly):
+            x = LEFT + i * step
+            middle = x + bar_w // 2
+            if commits:
+                h = max(4, round(commits / peak * bar_max_h))
+                parts.append(
+                    f'<rect x="{x}" y="{base_y - h}" width="{bar_w}" height="{h}" rx="4" '
+                    f'fill="{c["accent"]}" fill-opacity="0.7"/>'
+                )
+                parts.append(
+                    f'<text x="{middle}" y="{base_y - h - 6}" font-size="11" '
+                    f'fill="{c["stat_label"]}" text-anchor="middle">'
+                    f"{self._format_number(commits)}</text>"
+                )
+            else:
+                # a month without commits keeps its place as a faint baseline
+                parts.append(
+                    f'<rect x="{x}" y="{base_y - 2}" width="{bar_w}" height="2" '
+                    f'fill="{c["accent"]}" fill-opacity="0.25"/>'
+                )
+            parts.append(
+                f'<text x="{middle}" y="{base_y + 18}" font-size="11" fill="{c["footer"]}" '
+                f'text-anchor="middle">{MONTH_NAMES[i + 1][:3]}</text>'
             )
-            # month label
-            bars.append(
-                f'<text x="{cx + bar_w / 2}" y="{bar_y + bar_max_h + 18}" '
-                f'font-family="system-ui, sans-serif" font-size="10" fill="{c["footer"]}" '
-                f'text-anchor="middle">{MONTH_NAMES[month_num][:3]}</text>'
-            )
-
-        label = (
-            f'<text x="{start_x}" y="{bar_y - 12}" '
-            f'font-family="system-ui, -apple-system, sans-serif" font-size="13" '
-            f'font-weight="600" fill="{c["stat_label"]}" letter-spacing="0.5">'
-            f"MONTHLY COMMITS</text>"
-        )
-        return label + "\n  " + "\n  ".join(bars)
+        return "\n  ".join(parts)
 
     @staticmethod
     def _escape_xml(text: str) -> str:
@@ -398,6 +457,9 @@ class WrappedCardGenerator:
 
         Returns:
             The path to the generated SVG file.
+
+        Raises:
+            ValueError: the year has no commits, so there is no card to write.
         """
         stats = self._collect_stats()
         svg = self._render_card(stats)
