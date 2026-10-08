@@ -307,6 +307,31 @@ logos — while the data stays yours and stays live:
    [![GitStats](https://img.shields.io/endpoint?url=https://<your-report-url>/badges/commits.json&style=for-the-badge&color=orange)](https://<your-report-url>/)
 
 
+Repo Wrapped Card
+-----------------
+
+Add ``--wrapped`` to also get a "Repo Wrapped" card: a square (1080×1080) SVG
+image written next to the report as ``wrapped-<year>.svg``, made for sharing.
+
+.. code-block:: bash
+
+   gitstats --wrapped .
+   gitstats --wrapped --wrapped-theme sunset .      # midnight (default), sunset or clean
+   gitstats --wrapped --wrapped-year 2025 .         # the card for another year
+   gitstats --wrapped --wrapped-output card.svg .   # write it to another file
+
+The card is about one year, the current one by default, and every number on
+it is that year's: commits, active days, longest streak, lines changed,
+contributors, releases (or new contributors, in a year without a release),
+the busiest month and weekday, the top contributor, the commits in each month
+and the part of the day most of them were made in. A year without commits
+gets no card: ``gitstats`` says so and names the last year that has any.
+
+With several repositories, each one gets its card in its own report
+directory; ``--wrapped-output`` names a single file, so it only works with one
+repository.
+
+
 What's New in v2.0.0
 --------------------
 
@@ -337,6 +362,7 @@ Here is a list of some features of ``gitstats``:
 * **Hotspots**: every file plotted by its size against how often it changes, and the large, frequently changed files ranked by score.
 * **History**: the project's life one year at a time — its peaks, quiet years and revivals, newcomers and releases — with optional AI narration.
 * **Portfolio**: analyze several repositories at once for an aggregate overview.
+* **Wrapped card**: a shareable SVG card of one year in the repository, with ``--wrapped``.
 * **Readable anywhere**: interactive charts, light and dark themes, and layouts that work on phones; long quiet periods are shaded on every timeline.
 * **Customizable**: config values through ``gitstats.conf``.
 * **Cross-platform**: works on Linux, Windows, and macOS.

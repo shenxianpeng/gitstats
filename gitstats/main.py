@@ -36,6 +36,7 @@ from gitstats.utils import (
     get_version,
     should_exclude_file,
 )
+from gitstats.wrapped import THEMES, WrappedCardGenerator
 
 os.environ["LC_ALL"] = "C"
 
@@ -116,6 +117,9 @@ class DataCollector:
         self.activity_by_day_of_week: dict[int, int] = {}  # day -> commits
         self.activity_by_month_of_year: dict[int, int] = {}  # month [1-12] -> commits
         self.activity_by_hour_of_week: dict[int, dict[int, int]] = {}  # weekday -> hour -> commits
+        # the same grid for each year (the Wrapped card is about one year):
+        # year -> weekday -> hour -> commits
+        self.activity_by_hour_of_week_by_year: dict[int, dict[int, dict[int, int]]] = {}
         self.activity_by_hour_of_day_busiest: int = 0
         self.activity_by_hour_of_week_busiest: int = 0
         self.activity_by_year_week: dict[str, int] = {}  # yy_wNN -> commits
@@ -454,6 +458,12 @@ class GitDataCollector(DataCollector):
         # most active hour?
         if self.activity_by_hour_of_week[day][hour] > self.activity_by_hour_of_week_busiest:
             self.activity_by_hour_of_week_busiest = self.activity_by_hour_of_week[day][hour]
+
+        # hour of week, for the commit's year
+        year_hours = self.activity_by_hour_of_week_by_year.setdefault(date.year, {}).setdefault(
+            day, {}
+        )
+        year_hours[hour] = year_hours.get(hour, 0) + 1
 
         # month of year
         month = date.month
@@ -1088,6 +1098,7 @@ def _run_single_repo(
     project_name: str | None = None,
     json_sibling: bool = True,
     site_url: str = "",
+    wrapped_config: dict[str, Any] | None = None,
 ) -> DataCollector:
     """Collect, refine and render the full report for one repository.
 
@@ -1101,6 +1112,7 @@ def _run_single_repo(
         json_sibling: write the extra JSON next to the output directory
             (single-repo behavior) instead of inside it
         site_url: the report's public address, ending in "/" ("" if unknown)
+        wrapped_config: the Wrapped card to write next to the report, if any
     Returns:
         the populated collector
     """
@@ -1167,7 +1179,38 @@ def _run_single_repo(
         else:
             raise RuntimeError(f"Unsupported format '{extra_fmt}'")
 
+    if wrapped_config and wrapped_config.get("enabled", False):
+        _write_wrapped_card(data, outputpath, wrapped_config)
+
     return data
+
+
+def _write_wrapped_card(
+    data: DataCollector, outputpath: str, wrapped_config: dict[str, Any]
+) -> None:
+    """Write the Repo Wrapped card for one repository.
+
+    The card goes into the report directory as ``wrapped-<year>.svg``, or
+    to the file ``wrapped_config["output"]`` names, whose directory must
+    already exist. The card is an extra: when it cannot be written, or the
+    year has no commits to put on it, that is logged and the run carries on
+    with the report it has.
+    """
+    logger.info("Generating Wrapped card...")
+    try:
+        generator = WrappedCardGenerator(
+            data=data,
+            year=wrapped_config.get("year"),
+            theme=wrapped_config.get("theme", "midnight"),
+        )
+        target = os.path.abspath(
+            wrapped_config.get("output")
+            or os.path.join(outputpath, f"wrapped-{generator.year}.svg")
+        )
+        # generate() keeps only the file name and writes it inside base_dir
+        generator.generate(output_path=target, base_dir=os.path.dirname(target))
+    except Exception as e:
+        logger.warning(f"Failed to generate Wrapped card: {e}")
 
 
 def _dump_json_within(directory: str, filename: str, data: DataCollector) -> None:
@@ -1185,7 +1228,7 @@ def _dump_json_within(directory: str, filename: str, data: DataCollector) -> Non
         json.dump(data.__dict__, file, default=str)
 
 
-def run(gitpath, outputpath, extra_fmt=None) -> int:
+def run(gitpath, outputpath, extra_fmt=None, wrapped_config=None) -> int:
     """Run the gitstats program.
 
     With one repository path the report lands directly in ``outputpath``
@@ -1197,6 +1240,7 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
         gitpath: list of paths to git repositories
         outputpath: path to the output directory
         extra_fmt: extra format
+        wrapped_config: the Wrapped card to write next to each report, if any
     Returns:
         0 if at least one repository was analyzed, 1 otherwise
     """
@@ -1217,13 +1261,21 @@ def run(gitpath, outputpath, extra_fmt=None) -> int:
     try:
         if len(gitpath) == 1:
             try:
-                data = _run_single_repo(gitpath[0], outputpath, extra_fmt, site_url=site_url)
+                data = _run_single_repo(
+                    gitpath[0],
+                    outputpath,
+                    extra_fmt,
+                    site_url=site_url,
+                    wrapped_config=wrapped_config,
+                )
             except RuntimeError as e:
                 logger.error(f"FATAL: {e}")
                 return 1
             write_repo_summary(compute_repo_summary(data, "index.html"), outputpath)
         else:
-            exit_code = _run_multi_repo(gitpath, outputpath, extra_fmt, site_url=site_url)
+            exit_code = _run_multi_repo(
+                gitpath, outputpath, extra_fmt, site_url=site_url, wrapped_config=wrapped_config
+            )
     finally:
         os.chdir(rundir)
 
@@ -1300,11 +1352,18 @@ def _serve_report(outputpath: str, host: str, port: int) -> int:
     return 0
 
 
-def _run_multi_repo(gitpaths: list, outputpath: str, extra_fmt=None, site_url: str = "") -> int:
+def _run_multi_repo(
+    gitpaths: list,
+    outputpath: str,
+    extra_fmt=None,
+    site_url: str = "",
+    wrapped_config: dict[str, Any] | None = None,
+) -> int:
     """Analyze several repositories and assemble the portfolio page.
 
     ``site_url`` is the portfolio's address; each repository's report sits
-    in its own subdirectory under it.
+    in its own subdirectory under it. ``wrapped_config`` asks for a Wrapped
+    card next to each repository's report.
     """
     summaries = []
     failures = []
@@ -1329,6 +1388,7 @@ def _run_multi_repo(gitpaths: list, outputpath: str, extra_fmt=None, site_url: s
                 project_name=slug,
                 json_sibling=False,
                 site_url=f"{site_url}{slug}/" if site_url else "",
+                wrapped_config=wrapped_config,
             )
         except Exception as e:
             logger.warning(f"Skipping repository {path!r}: {e}")
@@ -1465,6 +1525,36 @@ def get_parser() -> argparse.ArgumentParser:
         help="Force refresh AI-generated summaries (ignore cache)",
     )
 
+    # Repo Wrapped card
+    parser.add_argument(
+        "--wrapped",
+        action="store_true",
+        help="Also write a shareable 'Repo Wrapped' SVG card next to the report",
+    )
+    parser.add_argument(
+        "--wrapped-year",
+        type=int,
+        metavar="YEAR",
+        help=(
+            "Year the Wrapped card is for (default: the current year); "
+            "a year without commits gets no card"
+        ),
+    )
+    parser.add_argument(
+        "--wrapped-theme",
+        choices=list(THEMES),
+        default="midnight",
+        help="Color theme of the Wrapped card (default: midnight)",
+    )
+    parser.add_argument(
+        "--wrapped-output",
+        metavar="PATH",
+        help=(
+            "File to write the Wrapped card to, in an existing directory "
+            "(default: <outputpath>/wrapped-<year>.svg); single repository only"
+        ),
+    )
+
     return parser
 
 
@@ -1523,7 +1613,22 @@ def main() -> int:
     if args.site_url is not None:
         conf["site_url"] = args.site_url
 
-    exit_code = run(gitpath, outputpath, extra_fmt=extra_fmt)
+    wrapped_config = None
+    if args.wrapped:
+        if args.wrapped_output and len(gitpath) > 1:
+            parser.error(
+                "--wrapped-output names one file; with several repositories each "
+                "card is written into its repository's report directory"
+            )
+        wrapped_config = {
+            "enabled": True,
+            "year": args.wrapped_year,
+            "theme": args.wrapped_theme,
+            # resolved now, like <outputpath>, before any change of directory
+            "output": os.path.abspath(args.wrapped_output) if args.wrapped_output else None,
+        }
+
+    exit_code = run(gitpath, outputpath, extra_fmt=extra_fmt, wrapped_config=wrapped_config)
     if exit_code == 0 and args.serve:
         return _serve_report(outputpath, args.host, args.port)
     return exit_code
