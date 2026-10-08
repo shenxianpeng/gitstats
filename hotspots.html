@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - gitstats</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.8.0.post1.dev3">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// Colors are read from CSS at draw time, so they follow the theme.
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
+			const half = x.type === 'category' && chart.data.labels.length > 1
+				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			(opts.bands || []).forEach(function(band) {
+				const left = x.getPixelForValue(band.from) - half;
+				const right = x.getPixelForValue(band.to) + half;
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.fillStyle = getCSSVar('--chart-text');
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				let text = band.text;
+				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
+				if (ctx.measureText(text).width <= right - left - 4) {
+					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+			const marks = (opts.peaks || []).slice();
+			if (opts.values) {
+				chart.data.datasets[0].data.forEach(function(v, i) {
+					if (v) marks.push({ index: i, text: String(v), plain: true });
+				});
+			}
+			marks.forEach(function(mark) {
+				const bar = meta.data[mark.index];
+				if (!bar) return;
+				ctx.save();
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// keep labels on the first and last bars inside the plot area
+				const w = ctx.measureText(mark.text).width / 2;
+				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
+				ctx.fillText(mark.text, cx, bar.y - 6);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span.
+	function timeAxis(xs) {
+		return {
+			type: 'linear',
+			min: xs.length ? xs[0] : undefined,
+			max: xs.length ? xs[xs.length - 1] : undefined,
+			afterBuildTicks: function(scale) {
+				const from = new Date(scale.min), to = new Date(scale.max);
+				const ticks = [];
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						ticks.push({ value: new Date(y, 0, 1).getTime() });
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
+						ticks.push({ value: d.getTime() });
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html" class="active" aria-current="page">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Hotspots</h1><p class="section-note">Files that are both large and changed often are where bugs tend to cluster and where refactoring pays off first. Each file in the current tree is placed by its size and by the number of commits that changed it; its <strong>hotspot score</strong> is changes &times; &radic;lines. Files without counted lines, such as binary files, are left out.</p><dl class="stat-tiles" style="--cols: 4; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Files Analyzed</dt><dd class="stat-value">53</dd><dd class="stat-note">of 65 in the current tree</dd></div><div class="stat-tile"><dt>Top 10 Files</dt><dd class="stat-value">82.0%</dd><dd class="stat-note">of the total hotspot score</dd></div><div class="stat-tile"><dt>Median File Size</dt><dd class="stat-value">109 lines</dd><dd class="stat-note">half of the files are at least this large</dd></div><div class="stat-tile"><dt>Median Changes</dt><dd class="stat-value">6 commits</dd><dd class="stat-note">half of the files changed at least this often</dd></div></dl>
+<h2 id="change_frequency_by_file_size"><a href="#change_frequency_by_file_size">Change frequency by file size</a></h2>
+
+<p class="section-note">Each dot is a file; a bigger dot is a higher score. The dashed lines mark the median file size and the median number of changes, so the large files that change often are in the top right. Both axes are logarithmic.</p><div class="chart-box has-legend" style="--chart-ratio: 2.4"><canvas id="chart-hotspots"></canvas></div><script type="application/json" id="hotspot-data">{"medianLines": 109, "medianChurn": 6, "points": [["gitstats/report_creator.py", 3462, 62, 3648.0], ["gitstats/main.py", 1533, 53, 2075.1], ["tests/test_report_creator.py", 2878, 29, 1555.8], ["gitstats/gitstats.css", 1590, 27, 1076.6], ["tests/test_main.py", 1807, 24, 1020.2], ["README.rst", 377, 36, 699.0], ["gitstats/utils.py", 307, 22, 385.5], ["gitstats/__init__.py", 224, 19, 284.4], [".github/workflows/test.yml", 93, 28, 270.0], ["pyproject.toml", 96, 23, 225.4], ["uv.lock", 1905, 5, 218.2], ["gitstats/aggregate.py", 387, 9, 177.1], ["tests/test_aggregate.py", 359, 9, 170.5], ["tests/conftest.py", 446, 7, 147.8], ["gitstats/badge.py", 554, 6, 141.2], ["tests/test_init.py", 242, 7, 108.9], ["docs/source/integration.rst", 227, 7, 105.5], ["gitstats/ai_summarizer.py", 580, 4, 96.3], ["tests/test_badge.py", 350, 5, 93.5], [".github/workflows/gallery.yml", 95, 9, 87.7], ["noxfile.py", 63, 11, 87.3], ["tests/test_ai_summarizer.py", 783, 3, 83.9], ["docs/source/configuration.rst", 68, 10, 82.5], ["docs/source/getting-started.rst", 169, 6, 78.0], ["tests/test_utils.py", 363, 4, 76.2], [".pre-commit-config.yaml", 38, 12, 74.0], ["gitstats.conf", 109, 7, 73.1], [".github/copilot-instructions.md", 203, 5, 71.2], [".github/workflows/pages.yml", 49, 9, 63.0], [".github/workflows/publish-pypi.yml", 52, 8, 57.7], [".readthedocs.yaml", 26, 8, 40.8], ["docs/source/index.rst", 29, 7, 37.7], ["gitstats/sortable.js", 324, 2, 36.0], ["gitstats/ai_providers.py", 269, 2, 32.8], ["tests/test_generate_gallery_portfolio.py", 137, 2, 23.4], [".github/workflows/pre-commit.yml", 8, 8, 22.6], ["docs/source/ai-integration.rst", 376, 1, 19.4], ["docs/source/demo.tape", 33, 3, 17.2], ["scripts/generate_gallery_portfolio.py", 73, 2, 17.1], ["tests/test_ai_providers.py", 285, 1, 16.9], [".github/workflows/release-drafter.yml", 16, 4, 16.0], ["docs/source/contributors.rst", 14, 4, 15.0], [".github/workflows/docs-preview.yml", 23, 3, 14.4], [".github/dependabot.yml", 23, 2, 9.6], ["gitstats/THIRD_PARTY_NOTICES.md", 23, 2, 9.6], ["docs/source/conf.py", 19, 2, 8.7], ["docs/source/faq.rst", 16, 2, 8.0], ["docs/source/copyright.rst", 11, 2, 6.6], ["AGENTS.md", 41, 1, 6.4], ["gitstats/chart.umd.min.js", 20, 1, 4.5], [".github/workflows/stale.yml", 10, 1, 3.2], ["docs/source/license.rst", 10, 1, 3.2], ["docs/source/changelog.rst", 4, 1, 2.0]]}</script><script>
+(function() {
+	const data = JSON.parse(document.getElementById('hotspot-data').textContent);
+	const points = data.points.map(function(p) {
+		return { path: p[0], x: p[1], y: p[2], score: p[3] };
+	});
+	const scores = points.map(function(p) { return p.score; });
+	const low = Math.min.apply(null, scores);
+	const range = (Math.max.apply(null, scores) - low) || 1;
+
+	// One dataset per quadrant around the medians: each gets a legend entry and
+	// a --series-N color that applyChartTheme() keeps in step with the theme.
+	const large = function(p) { return p.x >= data.medianLines; };
+	const busy = function(p) { return p.y >= data.medianChurn; };
+	const quadrants = [
+		['Large, changed often', 3, function(p) { return large(p) && busy(p); }],
+		['Small, changed often', 5, function(p) { return !large(p) && busy(p); }],
+		['Large, rarely changed', 2, function(p) { return large(p) && !busy(p); }],
+		['Small, rarely changed', 1, function(p) { return !large(p) && !busy(p); }]
+	];
+	const datasets = quadrants.map(function(q) {
+		const own = points.filter(q[2]);
+		const color = getCSSVar('--series-' + q[1]);
+		// a bigger dot is a higher score
+		const radius = own.map(function(p) { return 3 + 9 * (p.score - low) / range; });
+		return {
+			label: q[0],
+			series: q[1],
+			data: own,
+			borderColor: color,
+			backgroundColor: color + '33',
+			borderWidth: 1.5,
+			pointRadius: radius,
+			pointHoverRadius: radius.map(function(r) { return r + 2; }),
+			pointHitRadius: 6,
+			clip: 16  // dots on the axes (one line, one change) are drawn whole
+		};
+	}).filter(function(ds) { return ds.data.length; });
+
+	// Dashed lines at the median size and the median change count
+	const medianLines = {
+		id: 'gsMedianLines',
+		beforeDatasetsDraw: function(chart) {
+			const ctx = chart.ctx, area = chart.chartArea;
+			const x = chart.scales.x.getPixelForValue(data.medianLines);
+			const y = chart.scales.y.getPixelForValue(data.medianChurn);
+			ctx.save();
+			ctx.strokeStyle = getCSSVar('--border-strong');
+			ctx.setLineDash([3, 3]);
+			ctx.beginPath();
+			ctx.moveTo(x, area.top); ctx.lineTo(x, area.bottom);
+			ctx.moveTo(area.left, y); ctx.lineTo(area.right, y);
+			ctx.stroke();
+			ctx.restore();
+		}
+	};
+
+	// A logarithmic axis ticked at 1, 2, 5, 10, 20, 50, ... with room past the
+	// largest value, so the highest-scoring dots are not drawn on the frame
+	function logAxis(title) {
+		return {
+			type: 'logarithmic',
+			min: 1,
+			title: { display: true, text: title },
+			afterDataLimits: function(scale) { scale.max *= 1.3; },
+			afterBuildTicks: function(scale) {
+				scale.ticks = scale.ticks.filter(function(tick) {
+					const lead = tick.value / Math.pow(10, Math.floor(Math.log10(tick.value) + 1e-9));
+					return [1, 2, 5].some(function(n) { return Math.abs(lead - n) < 1e-6; });
+				});
+			},
+			ticks: {
+				maxRotation: 0,
+				callback: function(value) { return value.toLocaleString(); }
+			}
+		};
+	}
+
+	applyChartTheme();
+	new Chart(document.getElementById('chart-hotspots').getContext('2d'), {
+		type: 'scatter',
+		plugins: [medianLines],
+		data: { datasets: datasets },
+		options: {
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: {
+				legend: { display: true, labels: { usePointStyle: true, pointStyle: 'circle' } },
+				tooltip: {
+					callbacks: {
+						// the path on its own line: a deep one is as wide as the rest together
+						label: function(item) {
+							const p = item.raw;
+							return [p.path, p.x.toLocaleString() + (p.x === 1 ? ' line' : ' lines')
+								+ ', changed ' + p.y.toLocaleString() + (p.y === 1 ? ' time' : ' times')
+								+ ', score ' + p.score.toLocaleString()];
+						}
+					}
+				}
+			},
+			scales: {
+				x: logAxis('File size (lines)'),
+				y: logAxis('Changes (commits)')
+			}
+		}
+	});
+})();
+</script>
+<h2 id="top_hotspots"><a href="#top_hotspots">Top hotspots</a></h2>
+
+<p class="section-note">The files ranked by hotspot score: the larger a file is and the more often it changes, the higher it ranks.</p><div class="table-scroll"><table class="sortable share-table" id="hotspots"><tr><th>File</th><th class="num">Lines</th><th class="num">Changes</th><th class="num">Score</th><th class="unsortable"></th></tr><tr><td class="path">gitstats/report_creator.py</td><td class="num">3,462</td><td class="num">62</td><td class="num">3,648.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td class="path">gitstats/main.py</td><td class="num">1,533</td><td class="num">53</td><td class="num">2,075.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 56.9%"></span></span></td></tr><tr><td class="path">tests/test_report_creator.py</td><td class="num">2,878</td><td class="num">29</td><td class="num">1,555.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 42.6%"></span></span></td></tr><tr><td class="path">gitstats/gitstats.css</td><td class="num">1,590</td><td class="num">27</td><td class="num">1,076.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 29.5%"></span></span></td></tr><tr><td class="path">tests/test_main.py</td><td class="num">1,807</td><td class="num">24</td><td class="num">1,020.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 28.0%"></span></span></td></tr><tr><td class="path">README.rst</td><td class="num">377</td><td class="num">36</td><td class="num">699.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 19.2%"></span></span></td></tr><tr><td class="path">gitstats/utils.py</td><td class="num">307</td><td class="num">22</td><td class="num">385.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 10.6%"></span></span></td></tr><tr><td class="path">gitstats/__init__.py</td><td class="num">224</td><td class="num">19</td><td class="num">284.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 7.8%"></span></span></td></tr><tr><td class="path">.github/workflows/test.yml</td><td class="num">93</td><td class="num">28</td><td class="num">270.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 7.4%"></span></span></td></tr><tr><td class="path">pyproject.toml</td><td class="num">96</td><td class="num">23</td><td class="num">225.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 6.2%"></span></span></td></tr></table></div><details class="table-details"><summary>Table: all 53 files</summary><div class="table-scroll"><table class="sortable share-table" id="hotspots-all"><tr><th>File</th><th class="num">Lines</th><th class="num">Changes</th><th class="num">Score</th><th class="unsortable"></th></tr><tr><td class="path">gitstats/report_creator.py</td><td class="num">3,462</td><td class="num">62</td><td class="num">3,648.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td class="path">gitstats/main.py</td><td class="num">1,533</td><td class="num">53</td><td class="num">2,075.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 56.9%"></span></span></td></tr><tr><td class="path">tests/test_report_creator.py</td><td class="num">2,878</td><td class="num">29</td><td class="num">1,555.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 42.6%"></span></span></td></tr><tr><td class="path">gitstats/gitstats.css</td><td class="num">1,590</td><td class="num">27</td><td class="num">1,076.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 29.5%"></span></span></td></tr><tr><td class="path">tests/test_main.py</td><td class="num">1,807</td><td class="num">24</td><td class="num">1,020.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 28.0%"></span></span></td></tr><tr><td class="path">README.rst</td><td class="num">377</td><td class="num">36</td><td class="num">699.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 19.2%"></span></span></td></tr><tr><td class="path">gitstats/utils.py</td><td class="num">307</td><td class="num">22</td><td class="num">385.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 10.6%"></span></span></td></tr><tr><td class="path">gitstats/__init__.py</td><td class="num">224</td><td class="num">19</td><td class="num">284.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 7.8%"></span></span></td></tr><tr><td class="path">.github/workflows/test.yml</td><td class="num">93</td><td class="num">28</td><td class="num">270.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 7.4%"></span></span></td></tr><tr><td class="path">pyproject.toml</td><td class="num">96</td><td class="num">23</td><td class="num">225.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 6.2%"></span></span></td></tr><tr><td class="path">uv.lock</td><td class="num">1,905</td><td class="num">5</td><td class="num">218.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 6.0%"></span></span></td></tr><tr><td class="path">gitstats/aggregate.py</td><td class="num">387</td><td class="num">9</td><td class="num">177.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 4.9%"></span></span></td></tr><tr><td class="path">tests/test_aggregate.py</td><td class="num">359</td><td class="num">9</td><td class="num">170.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 4.7%"></span></span></td></tr><tr><td class="path">tests/conftest.py</td><td class="num">446</td><td class="num">7</td><td class="num">147.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 4.1%"></span></span></td></tr><tr><td class="path">gitstats/badge.py</td><td class="num">554</td><td class="num">6</td><td class="num">141.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.9%"></span></span></td></tr><tr><td class="path">tests/test_init.py</td><td class="num">242</td><td class="num">7</td><td class="num">108.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.0%"></span></span></td></tr><tr><td class="path">docs/source/integration.rst</td><td class="num">227</td><td class="num">7</td><td class="num">105.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.9%"></span></span></td></tr><tr><td class="path">gitstats/ai_summarizer.py</td><td class="num">580</td><td class="num">4</td><td class="num">96.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.6%"></span></span></td></tr><tr><td class="path">tests/test_badge.py</td><td class="num">350</td><td class="num">5</td><td class="num">93.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.6%"></span></span></td></tr><tr><td class="path">.github/workflows/gallery.yml</td><td class="num">95</td><td class="num">9</td><td class="num">87.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.4%"></span></span></td></tr><tr><td class="path">noxfile.py</td><td class="num">63</td><td class="num">11</td><td class="num">87.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.4%"></span></span></td></tr><tr><td class="path">tests/test_ai_summarizer.py</td><td class="num">783</td><td class="num">3</td><td class="num">83.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.3%"></span></span></td></tr><tr><td class="path">docs/source/configuration.rst</td><td class="num">68</td><td class="num">10</td><td class="num">82.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.3%"></span></span></td></tr><tr><td class="path">docs/source/getting-started.rst</td><td class="num">169</td><td class="num">6</td><td class="num">78.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.1%"></span></span></td></tr><tr><td class="path">tests/test_utils.py</td><td class="num">363</td><td class="num">4</td><td class="num">76.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.1%"></span></span></td></tr><tr><td class="path">.pre-commit-config.yaml</td><td class="num">38</td><td class="num">12</td><td class="num">74.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.0%"></span></span></td></tr><tr><td class="path">gitstats.conf</td><td class="num">109</td><td class="num">7</td><td class="num">73.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.0%"></span></span></td></tr><tr><td class="path">.github/copilot-instructions.md</td><td class="num">203</td><td class="num">5</td><td class="num">71.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.0%"></span></span></td></tr><tr><td class="path">.github/workflows/pages.yml</td><td class="num">49</td><td class="num">9</td><td class="num">63.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.7%"></span></span></td></tr><tr><td class="path">.github/workflows/publish-pypi.yml</td><td class="num">52</td><td class="num">8</td><td class="num">57.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.6%"></span></span></td></tr><tr><td class="path">.readthedocs.yaml</td><td class="num">26</td><td class="num">8</td><td class="num">40.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.1%"></span></span></td></tr><tr><td class="path">docs/source/index.rst</td><td class="num">29</td><td class="num">7</td><td class="num">37.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.0%"></span></span></td></tr><tr><td class="path">gitstats/sortable.js</td><td class="num">324</td><td class="num">2</td><td class="num">36.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.0%"></span></span></td></tr><tr><td class="path">gitstats/ai_providers.py</td><td class="num">269</td><td class="num">2</td><td class="num">32.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.9%"></span></span></td></tr><tr><td class="path">tests/test_generate_gallery_portfolio.py</td><td class="num">137</td><td class="num">2</td><td class="num">23.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path">.github/workflows/pre-commit.yml</td><td class="num">8</td><td class="num">8</td><td class="num">22.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path">docs/source/ai-integration.rst</td><td class="num">376</td><td class="num">1</td><td class="num">19.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.5%"></span></span></td></tr><tr><td class="path">docs/source/demo.tape</td><td class="num">33</td><td class="num">3</td><td class="num">17.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.5%"></span></span></td></tr><tr><td class="path">scripts/generate_gallery_portfolio.py</td><td class="num">73</td><td class="num">2</td><td class="num">17.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.5%"></span></span></td></tr><tr><td class="path">tests/test_ai_providers.py</td><td class="num">285</td><td class="num">1</td><td class="num">16.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.5%"></span></span></td></tr><tr><td class="path">.github/workflows/release-drafter.yml</td><td class="num">16</td><td class="num">4</td><td class="num">16.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">docs/source/contributors.rst</td><td class="num">14</td><td class="num">4</td><td class="num">15.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">.github/workflows/docs-preview.yml</td><td class="num">23</td><td class="num">3</td><td class="num">14.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">.github/dependabot.yml</td><td class="num">23</td><td class="num">2</td><td class="num">9.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.3%"></span></span></td></tr><tr><td class="path">gitstats/THIRD_PARTY_NOTICES.md</td><td class="num">23</td><td class="num">2</td><td class="num">9.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.3%"></span></span></td></tr><tr><td class="path">docs/source/conf.py</td><td class="num">19</td><td class="num">2</td><td class="num">8.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">docs/source/faq.rst</td><td class="num">16</td><td class="num">2</td><td class="num">8.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">docs/source/copyright.rst</td><td class="num">11</td><td class="num">2</td><td class="num">6.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">AGENTS.md</td><td class="num">41</td><td class="num">1</td><td class="num">6.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">gitstats/chart.umd.min.js</td><td class="num">20</td><td class="num">1</td><td class="num">4.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.1%"></span></span></td></tr><tr><td class="path">.github/workflows/stale.yml</td><td class="num">10</td><td class="num">1</td><td class="num">3.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.1%"></span></span></td></tr><tr><td class="path">docs/source/license.rst</td><td class="num">10</td><td class="num">1</td><td class="num">3.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.1%"></span></span></td></tr><tr><td class="path">docs/source/changelog.rst</td><td class="num">4</td><td class="num">1</td><td class="num">2.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.1%"></span></span></td></tr></table></div></details><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>
