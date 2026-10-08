@@ -177,6 +177,10 @@ class DataCollector:
         # paths of the files at HEAD (ownership and churn skip deleted files)
         self.head_files: list[str] = []
 
+        # hotspots: change frequency against size for each file at HEAD whose
+        # lines are counted; filepath -> { lines, churn, score }
+        self.hotspot_files: dict[str, dict[str, float]] = {}
+
         # evenly sampled commit subjects per year (collected only when AI
         # features are enabled; they ground the AI chronicle narration)
         self.commit_subjects_by_year: dict[int, list[str]] = {}
@@ -639,6 +643,7 @@ class GitDataCollector(DataCollector):
             ["git ls-tree -r -l -z {}".format(get_commit_range("HEAD", end_only=True))]
         ).split("\000")
         blobs_to_read = []
+        counted_files = []  # (path, blob id) of every file whose lines are counted
         for line in lines:
             if len(line) == 0:
                 continue
@@ -669,6 +674,7 @@ class GitDataCollector(DataCollector):
             if ext not in self.extensions:
                 self.extensions[ext] = {"files": 0, "lines": 0}
             self.extensions[ext]["files"] += 1
+            counted_files.append((fullpath, blob_id))
             # if cache empty then add ext and blob id to list of new blob's
             # otherwise try to read needed info from cache
             if "lines_in_blob" not in list(self.cache.keys()):
@@ -688,6 +694,16 @@ class GitDataCollector(DataCollector):
                 self.cache["lines_in_blob"] = {}
             self.cache["lines_in_blob"][blob_id] = linecount
             self.extensions[ext]["lines"] += self.cache["lines_in_blob"][blob_id]
+
+        # Per-file line counts for the hotspot analysis, from the cache filled
+        # above; refine() adds each file's churn and score
+        lines_in_blob = self.cache.get("lines_in_blob", {})
+        for fullpath, blob_id in counted_files:
+            self.hotspot_files[fullpath] = {
+                "lines": lines_in_blob.get(blob_id, 0),
+                "churn": 0,
+                "score": 0.0,
+            }
 
     def _collect_line_stats(self) -> None:
         """Record lines added/removed over time (``changes_by_date``).
@@ -940,6 +956,9 @@ class GitDataCollector(DataCollector):
         # Compute longest consecutive active days streak
         self._compute_longest_streak()
 
+        # Merge file churn into the hotspot data and score each file
+        self._compute_hotspots()
+
     def _compute_longest_streak(self) -> None:
         """Compute longest consecutive active days streak."""
         dates = sorted(datetime.datetime.strptime(d, "%Y-%m-%d") for d in self.active_days)
@@ -952,6 +971,18 @@ class GitDataCollector(DataCollector):
                 current = current + 1 if diff <= 1 else 1
             longest = max(longest, current)
         self.longest_streak = longest
+
+    def _compute_hotspots(self) -> None:
+        """Give each hotspot file its churn and its score.
+
+        The score is ``churn * sqrt(lines)``: it grows with both, so the files
+        that are large and change often rank first, without size alone
+        deciding the order.
+        """
+        for filepath, info in self.hotspot_files.items():
+            churn = self.file_churn.get(filepath, 0)
+            info["churn"] = churn
+            info["score"] = churn * info["lines"] ** 0.5
 
     def get_active_days(self) -> set[str]:
         return self.active_days

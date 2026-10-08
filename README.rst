@@ -334,6 +334,7 @@ Here is a list of some features of ``gitstats``:
 * **Lines**: lines of code over time, and lines added and removed per month.
 * **Tags**: every tag with its commits and authors.
 * **Code Ownership**: bus-factor risk (files only one person has changed), ownership by author, and the files shared by the most people.
+* **Hotspots**: every file plotted by its size against how often it changes, and the large, frequently changed files ranked by score.
 * **History**: the project's life one year at a time — its peaks, quiet years and revivals, newcomers and releases — with optional AI narration.
 * **Portfolio**: analyze several repositories at once for an aggregate overview.
 * **Readable anywhere**: interactive charts, light and dark themes, and layouts that work on phones; long quiet periods are shaded on every timeline.

@@ -451,6 +451,29 @@ class TestGitDataCollectorIntegration:
         # file_churn comes from the same pass
         assert dc.file_churn["main.py"] == 2
 
+    def test_collect_hotspot_files(self, git_repo):
+        """Every counted file at HEAD gets its lines, its churn and a score."""
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(git_repo)
+            dc.collect(git_repo)
+        finally:
+            os.chdir(prevdir)
+
+        # sizes come with the extensions pass; churn and score wait for refine()
+        assert dc.hotspot_files["main.py"] == {"lines": 3, "churn": 0, "score": 0.0}
+        dc.refine()
+
+        assert dc.hotspot_files["main.py"] == {"lines": 3, "churn": 2, "score": 2 * 3**0.5}
+        assert dc.hotspot_files["utils.py"] == {"lines": 5, "churn": 1, "score": 5**0.5}
+        assert dc.hotspot_files["README.md"]["lines"] == 3
+        # a binary file has no lines, so it scores nothing however often it changes
+        assert dc.hotspot_files["logo.png"] == {"lines": 0, "churn": 1, "score": 0.0}
+        # files without an extension are not counted as lines of code, nor here
+        assert ".gitignore" in dc.head_files
+        assert ".gitignore" not in dc.hotspot_files
+
     def test_collect_changes_by_date(self, git_repo):
         dc = GitDataCollector()
         prevdir = os.getcwd()
