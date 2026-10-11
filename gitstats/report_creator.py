@@ -2167,17 +2167,8 @@ class HTMLReportCreator(ReportCreator):
         self.print_nav(f, "ownership.html")
         f.write("<h1>Code Ownership</h1>")
 
-        author_files = getattr(data, "author_files", {})
-        if not isinstance(author_files, dict):
-            author_files = {}
-        # Only files that still exist: a deleted file carries no bus-factor risk
         current = head_files(data)
-        if current is not None:
-            author_files = {
-                author: {p: n for p, n in files.items() if p in current}
-                for author, files in author_files.items()
-            }
-        ownership = compute_code_ownership(author_files)
+        ownership = head_ownership(data)
 
         if not ownership["files"]:
             f.write(
@@ -2199,7 +2190,14 @@ class HTMLReportCreator(ReportCreator):
             '<p class="section-note">'
             "Ownership is measured by how many commits each author made to each "
             "file in the current tree. It highlights <strong>bus-factor risk</strong> "
-            "(files only one person has ever touched) and where knowledge is concentrated.</p>"
+            "(files only one person has ever touched) and where knowledge is concentrated. "
+            "The <strong>bus factor</strong> is the smallest number of people who are, "
+            "between them, primary owner of more than half of the files.</p>"
+        )
+        bus_factor = ownership["bus_factor"]
+        bus_owned = (
+            f"primary owner of {format_int(ownership['bus_factor_files'])} "
+            f"of {format_int(total)} files"
         )
         f.write(
             stat_tiles_html(
@@ -2208,6 +2206,13 @@ class HTMLReportCreator(ReportCreator):
                         "Files Tracked",
                         format_int(total),
                         "in the current tree" if current is not None else "every file changed",
+                    ),
+                    (
+                        "Bus Factor",
+                        format_int(bus_factor),
+                        f"{author_html(ownership['bus_factor_authors'][0])} is {bus_owned}"
+                        if bus_factor == 1
+                        else f"{format_int(bus_factor)} authors are {bus_owned}",
                     ),
                     (
                         "Single-Owner Files",
@@ -2367,6 +2372,9 @@ class HTMLReportCreator(ReportCreator):
         median_lines = hotspots["median_lines"]
         median_churn = hotspots["median_churn"]
         current = head_files(data)
+        # How many people have changed each file, as the Code Ownership page counts
+        # them; empty when the data has no ownership, and then the column is left out
+        authors_of = {fs["path"]: fs["contributors"] for fs in head_ownership(data)["files"]}
         # The ten highest-scoring files are the ones the table below shows
         top_files = files[:10]
 
@@ -2450,20 +2458,46 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<p class="section-note">'
             "The files ranked by hotspot score: the larger a file is and the more "
-            "often it changes, the higher it ranks.</p>"
+            "often it changes, the higher it ranks."
+            + (
+                " <strong>Authors</strong> is how many people have changed the file, bots "
+                'aside, as on the <a href="ownership.html">Code Ownership</a> page: a '
+                "hotspot only one person has changed is also a bus-factor risk.</p>"
+                if authors_of
+                else "</p>"
+            )
         )
         max_score = files[0]["score"] or 1
+
+        def path_cell(filepath: str) -> str:
+            # the flag is drawn by CSS from data-tag, so the cell's text stays the path
+            flag = (
+                ' data-tag="sole owner" title="Only one person has changed this file"'
+                if authors_of.get(filepath) == 1
+                else ""
+            )
+            return f'<td class="path"{flag}>{html.escape(filepath)}</td>'
+
+        def authors_cell(filepath: str) -> str:
+            if not authors_of:
+                return ""
+            return (
+                f'<td class="num" data-label="Authors">'
+                f"{format_int(authors_of.get(filepath, 0))}</td>"
+            )
 
         def hotspot_table(table_id: str, rows: list[dict]) -> str:
             return (
                 f'<div class="table-scroll"><table class="sortable share-table {FILE_TABLE}" '
                 f'id="{table_id}">'
                 '<tr><th>File</th><th class="num">Lines</th><th class="num">Changes</th>'
-                '<th class="num">Score</th><th class="unsortable"></th></tr>'
+                + ('<th class="num">Authors</th>' if authors_of else "")
+                + '<th class="num">Score</th><th class="unsortable"></th></tr>'
                 + "".join(
-                    f'<tr><td class="path">{html.escape(fs["path"])}</td>'
+                    f"<tr>{path_cell(fs['path'])}"
                     f'<td class="num" data-label="Lines">{format_int(fs["lines"])}</td>'
                     f'<td class="num" data-label="Changes">{format_int(fs["churn"])}</td>'
+                    f"{authors_cell(fs['path'])}"
                     f'<td class="num" data-label="Score">{fs["score"]:,.1f}</td>'
                     '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
                     f'<span style="width: {100.0 * fs["score"] / max_score:.1f}%"></span>'
@@ -3192,7 +3226,11 @@ def compute_code_ownership(author_files: dict[str, dict[str, int]]) -> dict[str,
                  contributors), sorted by edits descending;
         authors: per-author stats (author, files_owned, files_solely_owned,
                  files_touched), sorted by files owned then files touched;
-        total_files, single_owner_files.
+        total_files, single_owner_files;
+        bus_factor: the fewest authors who are, between them, primary owner
+                 of more than half of the files (0 when there are no files),
+                 with bus_factor_authors, their names, largest owner first,
+                 and bus_factor_files, how many files they own.
     """
     # Invert to file -> {author: edits}, dropping bots.
     file_authors: dict[str, dict[str, int]] = {}
@@ -3240,11 +3278,24 @@ def compute_code_ownership(author_files: dict[str, dict[str, int]]) -> dict[str,
     ]
     authors_stats.sort(key=lambda x: (x["files_owned"], x["files_touched"]), reverse=True)
 
+    # Bus factor: take the largest owners until they hold more than half
+    bus_authors: list[str] = []
+    bus_files = 0
+    for stats in authors_stats:
+        if not files_stats or 2 * bus_files > len(files_stats):
+            break
+        author = str(stats["author"])
+        bus_authors.append(author)
+        bus_files += author_owned.get(author, 0)
+
     return {
         "files": files_stats,
         "authors": authors_stats,
         "total_files": len(files_stats),
         "single_owner_files": sum(1 for fs in files_stats if fs["contributors"] == 1),
+        "bus_factor": len(bus_authors),
+        "bus_factor_authors": bus_authors,
+        "bus_factor_files": bus_files,
     }
 
 
@@ -3457,6 +3508,24 @@ def parse_chronicle(text: str) -> dict[str, Any]:
 def is_bot(name: str) -> bool:
     """Bot accounts are named like ``dependabot[bot]``."""
     return name.endswith("[bot]")
+
+
+def head_ownership(data: Any) -> dict[str, Any]:
+    """compute_code_ownership() over the files that still exist.
+
+    A deleted file carries no bus-factor risk, so when the data knows the
+    files at HEAD only those are counted.
+    """
+    author_files = getattr(data, "author_files", {})
+    if not isinstance(author_files, dict):
+        author_files = {}
+    current = head_files(data)
+    if current is not None:
+        author_files = {
+            author: {p: n for p, n in files.items() if p in current}
+            for author, files in author_files.items()
+        }
+    return compute_code_ownership(author_files)
 
 
 def head_files(data: Any) -> set[str] | None:
