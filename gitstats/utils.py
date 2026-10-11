@@ -275,6 +275,28 @@ def get_log_range(defaultrange: str = "HEAD", end_only: bool = True) -> str:
     return commit_range
 
 
+def commit_local_time(stamp: float, utc_offset: str) -> datetime.datetime:
+    """The moment ``stamp`` on the clock of whoever made the commit.
+
+    ``utc_offset`` is the commit's own offset as git prints it (``+0300``,
+    ``-0530``), so the result does not depend on the timezone of the machine
+    the report is generated on. It is naive, like the report's other
+    datetimes. An offset that cannot be read falls back to this machine's
+    local time.
+    """
+    match = re.fullmatch(r"([+-])(\d{2})(\d{2})", utc_offset.strip())
+    if match:
+        sign, hours, minutes = match.groups()
+        offset = datetime.timedelta(hours=int(hours), minutes=int(minutes))
+        try:
+            zone = datetime.timezone(-offset if sign == "-" else offset)
+        except ValueError:  # a day or more, which no timezone is
+            zone = None
+        if zone is not None:
+            return datetime.datetime.fromtimestamp(stamp, zone).replace(tzinfo=None)
+    return datetime.datetime.fromtimestamp(stamp)
+
+
 def tags_newest_first(tags: dict[str, Any]) -> list[str]:
     """Order tags the way the history does, newest first.
 

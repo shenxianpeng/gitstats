@@ -11,6 +11,7 @@ import pytest
 
 from gitstats.utils import (
     _run_pipe_chain,
+    commit_local_time,
     count_lines_in_text,
     filter_lines_by_pattern,
     format_bytes,
@@ -361,3 +362,29 @@ def test_get_num_of_files_from_rev(git_repo, monkeypatch):
     first = _rev_parse(git_repo, "HEAD~4")
     assert get_num_of_files_from_rev(("1683000000", head)) == (1683000000, head, 5)
     assert get_num_of_files_from_rev(("1673776800", first)) == (1673776800, first, 2)
+
+
+# ── commit_local_time ────────────────────────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    "offset,expected",
+    [
+        # 1700000000 is 2023-11-14 22:13:20 UTC
+        ("+0000", datetime.datetime(2023, 11, 14, 22, 13, 20)),
+        ("+0900", datetime.datetime(2023, 11, 15, 7, 13, 20)),
+        ("-0800", datetime.datetime(2023, 11, 14, 14, 13, 20)),
+        # offsets are not always whole hours
+        ("+0530", datetime.datetime(2023, 11, 15, 3, 43, 20)),
+        ("-0330", datetime.datetime(2023, 11, 14, 18, 43, 20)),
+    ],
+)
+def test_commit_local_time_is_the_committers_clock(offset, expected):
+    """Whatever the timezone of the machine running the tests."""
+    assert commit_local_time(1700000000, offset) == expected
+
+
+@pytest.mark.parametrize("offset", ["", "UTC", "+9", "0300", "+2400", "-9960"])
+def test_commit_local_time_falls_back_to_this_machines_clock(offset):
+    """An offset git would not print, or one no timezone has."""
+    assert commit_local_time(1700000000, offset) == datetime.datetime.fromtimestamp(1700000000)
