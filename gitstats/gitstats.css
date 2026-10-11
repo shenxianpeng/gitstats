@@ -1139,6 +1139,93 @@ tr:hover td {
 	}
 }
 
+/* Tables of files on a phone. A path cannot share 390px with a few numbers:
+   squeezed into a 68px column, it broke every six characters. Each row is
+   two lines instead: the path, then its other cells, each named after its
+   column (data-label). The header row becomes the sort controls. */
+@media (max-width: 560px) {
+	table.file-table,
+	table.file-table tbody {
+		display: block;
+	}
+
+	table.file-table tr {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 2px var(--space-4);
+		padding: var(--space-2) 0;
+		border-bottom: 1px solid var(--table-border);
+	}
+
+	/* nothing scrolls sideways here, so the first column is not pinned */
+	.table-scroll table.file-table tr > th,
+	.table-scroll table.file-table tr > td,
+	.table-scroll table.file-table tr:hover > td {
+		position: static;
+		padding: 0;
+		border: 0;
+		box-shadow: none;
+		background-color: transparent;
+		text-align: left;
+	}
+
+	table.file-table td.path {
+		flex: 0 0 100%;
+	}
+
+	table.file-table td[data-label]::before {
+		content: attr(data-label);
+		margin-right: var(--space-2);
+		font-family: var(--font-mono);
+		font-size: var(--font-size-xs);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--text-secondary);
+	}
+
+	/* the bar runs under the row, thinner than in its own column */
+	.table-scroll table.file-table td.share-cell {
+		flex: 0 0 100%;
+		width: auto;
+		padding-top: 2px;
+	}
+
+	table.file-table .share-bar {
+		height: 3px;
+	}
+
+	/* The header row: "Sort by", then a button for each sortable column */
+	table.file-table tr:first-child {
+		align-items: center;
+		gap: 6px;
+		padding-top: 0;
+		border-bottom-color: var(--border-strong);
+	}
+
+	table.file-table tr:first-child::before {
+		content: "Sort by";
+		font-family: var(--font-mono);
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--table-header-color);
+	}
+
+	table.file-table th.unsortable {
+		display: none;
+	}
+
+	table.file-table th a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 32px;
+		padding: 0 6px;
+		border: 1px solid var(--border-color);
+	}
+}
+
 /* ===== Headings ===== */
 h1 {
 	font-family: var(--font-mono);

@@ -1564,7 +1564,7 @@ def test_file_paths_are_monospace_cells(mock_data_collector, temp_dir):
         files = f.read()
     # Churn: a bar table of paths; no heat-colored cells, no duplicate chart
     assert (
-        '<tr><td class="path">main.py</td><td class="num">15</td>'
+        '<tr><td class="path">main.py</td><td class="num" data-label="Times changed">15</td>'
         '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
         '<span style="width: 100.0%"></span></span></td></tr>'
     ) in files
@@ -1573,6 +1573,59 @@ def test_file_paths_are_monospace_cells(mock_data_collector, temp_dir):
     with open(f"{temp_dir}/ownership.html", encoding="utf-8") as f:
         ownership = f.read()
     assert ownership.count('<td class="path">') >= 2  # single-owner and shared tables
+
+
+def test_file_tables_name_their_cells_for_phones(mock_data_collector, temp_dir):
+    """On a phone a row of files is two lines: the path, then the other cells,
+    each named after its column by a data-label."""
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    expected = {
+        "hotspots.html": {"hotspots": ["Lines", "Changes", "Score"]},
+        "files.html": {"churn": ["Times changed"]},
+        "ownership.html": {
+            "ownership-busfactor": ["Sole owner", "Commits"],
+            "ownership-shared": ["Contributors", "Primary owner", "Owner share"],
+        },
+    }
+    for page, tables in expected.items():
+        with open(f"{temp_dir}/{page}", encoding="utf-8") as f:
+            html_text = f.read()
+        for table_id, labels in tables.items():
+            tag = re.search(rf'<table class="([^"]*)" id="{table_id}">', html_text)
+            assert tag, table_id
+            assert "file-table" in tag.group(1).split(), table_id
+            rows = html_text[tag.end() : html_text.index("</table>", tag.end())].split("</tr>")
+            header, first = rows[0], rows[1]
+            # the path leads the row and needs no name
+            assert first.startswith('<tr><td class="path">'), table_id
+            assert re.findall(r'data-label="([^"]+)"', first) == labels, table_id
+            # and the names are the headings of the columns they sit under
+            headings = [h for h in re.findall(r"<th[^>]*>([^<]*)</th>", header) if h]
+            assert [h.lower() for h in headings] == ["file", *(name.lower() for name in labels)]
+
+    # a table whose rows are not files keeps its columns
+    with open(f"{temp_dir}/files.html", encoding="utf-8") as f:
+        files = f.read()
+    extensions = re.search(r'<table class="([^"]*)" id="ext">', files)
+    assert extensions and "file-table" not in extensions.group(1)
+
+
+def test_file_tables_stack_on_phones():
+    css_path = os.path.join(os.path.dirname(__file__), "..", "gitstats", "gitstats.css")
+    with open(css_path, encoding="utf-8") as f:
+        css = f.read()
+    start = css.index("table.file-table,")
+    # only under the phone breakpoint: wider screens keep the columns
+    assert css[:start].rstrip().endswith("@media (max-width: 560px) {")
+    rules = css[start:]
+    assert "table.file-table td.path {\n\t\tflex: 0 0 100%;" in rules
+    assert "content: attr(data-label);" in rules
+    # the header row turns into the sort controls
+    assert 'content: "Sort by";' in rules
+    assert "table.file-table th.unsortable {\n\t\tdisplay: none;" in rules
+    # and the first column is no longer pinned, as it is in tables that scroll
+    unpinned = rules[rules.index(".table-scroll table.file-table tr > th") :]
+    assert "position: static;" in unpinned[: unpinned.index("}")]
 
 
 def test_ownership_page_empty_state(mock_data_collector, temp_dir):
@@ -1697,7 +1750,9 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
 
     # the table ranks every file by score, with a bar scaled to the top score
     assert "Top hotspots</a></h2>" in content
-    table = content[content.index('<table class="sortable share-table" id="hotspots">') :]
+    table = content[
+        content.index('<table class="sortable share-table file-table" id="hotspots">') :
+    ]
     table = table[: table.index("</table>")]
     assert re.findall(r'<td class="path">([^<]+)</td>', table) == [
         "main.py",
@@ -1706,8 +1761,9 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
         "Dockerfile",
     ]
     assert (
-        '<tr><td class="path">utils.py</td><td class="num">120</td><td class="num">10</td>'
-        '<td class="num">109.5</td><td class="share-cell"><span class="share-bar" '
+        '<tr><td class="path">utils.py</td><td class="num" data-label="Lines">120</td>'
+        '<td class="num" data-label="Changes">10</td>'
+        '<td class="num" data-label="Score">109.5</td><td class="share-cell"><span class="share-bar" '
         'aria-hidden="true"><span style="width: 36.5%"></span></span></td></tr>'
     ) in table
     # no file is called critical: half of them are above each median anyway
@@ -1804,7 +1860,8 @@ def test_hotspots_table_shows_ten_and_folds_the_rest(mock_data_collector, temp_d
     assert (
         '<details class="table-details">'
         "<summary>Table: the 100 highest-scoring of 300 files</summary>"
-        '<div class="table-scroll"><table class="sortable share-table" id="hotspots-all">'
+        '<div class="table-scroll"><table class="sortable share-table file-table" '
+        'id="hotspots-all">'
     ) in content
     folded = content[content.index('id="hotspots-all"') :]
     assert folded[: folded.index("</table>")].count("<tr>") == 101
@@ -2350,7 +2407,7 @@ def test_bus_factor_shows_ten_and_folds_the_rest(mock_data_collector, temp_dir):
     assert "f09.py" in shown and "f10.py" not in shown
     assert (
         '<details class="table-details"><summary>Table: all 15 single-owner files</summary>'
-        '<div class="table-scroll"><table class="sortable" id="ownership-busfactor-all">'
+        '<div class="table-scroll"><table class="sortable file-table" id="ownership-busfactor-all">'
     ) in html
 
 
