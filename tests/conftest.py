@@ -366,6 +366,48 @@ def mock_data_collector():
         "Dockerfile": {"churn": 2, "lines": 30, "score": 11.0},
     }
 
+    # Change coupling: the pairs of files that change in the same commits
+    data.file_coupling = {
+        "commits": 40,
+        "skipped": 0,
+        "max_files": 30,
+        "min_shared": 5,
+        "min_degree": 30,
+        "total_pairs": 3,
+        "pairs": [
+            {
+                "a": "main.py",
+                "b": "tests/test_main.py",
+                "shared": 9,
+                "degree": 90.0,
+                "revs_a": 15,
+                "revs_b": 5,
+            },
+            {
+                "a": "main.py",
+                "b": "utils.py",
+                "shared": 8,
+                "degree": 64.0,
+                "revs_a": 15,
+                "revs_b": 10,
+            },
+            {
+                "a": "README.md",
+                "b": "utils.py",
+                "shared": 5,
+                "degree": 55.6,
+                "revs_a": 8,
+                "revs_b": 10,
+            },
+        ],
+        "files": [
+            {"path": "main.py", "partners": 2, "shared": 17},
+            {"path": "utils.py", "partners": 2, "shared": 13},
+            {"path": "tests/test_main.py", "partners": 1, "shared": 9},
+            {"path": "README.md", "partners": 1, "shared": 5},
+        ],
+    }
+
     # Changes by date (lines)
     data.changes_by_date = {}
 

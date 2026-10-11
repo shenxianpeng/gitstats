@@ -23,6 +23,7 @@ from gitstats.main import (
     _run_single_repo,
     _serve_report,
     _server_urls,
+    change_coupling,
     configure_logging,
     get_parser,
     main,
@@ -1380,6 +1381,131 @@ def test_parallel_map_falls_back_to_sequential_without_a_pool(caplog):
     assert "falling back to sequential processing" in caplog.text
 
 
+# ── change coupling ──────────────────────────────────────────────────────
+
+
+def test_change_coupling_pairs_files_that_change_together():
+    # a.py and b.py change together in 5 of a.py's 6 commits and b.py's 5
+    changesets = [["a.py", "b.py"]] * 5 + [["a.py"]]
+    coupling = change_coupling(changesets)
+
+    assert coupling["commits"] == 6
+    assert coupling["skipped"] == 0
+    assert coupling["total_pairs"] == 1
+    # 5 shared, over the average of 6 and 5 commits
+    assert coupling["pairs"] == [
+        {"a": "a.py", "b": "b.py", "shared": 5, "degree": 90.9, "revs_a": 6, "revs_b": 5}
+    ]
+    assert coupling["files"] == [
+        {"path": "a.py", "partners": 1, "shared": 5},
+        {"path": "b.py", "partners": 1, "shared": 5},
+    ]
+    assert (coupling["max_files"], coupling["min_shared"], coupling["min_degree"]) == (30, 5, 30)
+
+
+def test_change_coupling_names_a_pair_once_whatever_the_order():
+    changesets = [["b.py", "a.py"], ["a.py", "b.py"], ["b.py", "a.py", "a.py"]]
+    pairs = change_coupling(changesets, min_shared=3)["pairs"]
+    # one pair, the smaller path first; a file named twice in a commit counts once
+    assert pairs == [
+        {"a": "a.py", "b": "b.py", "shared": 3, "degree": 100.0, "revs_a": 3, "revs_b": 3}
+    ]
+
+
+def test_change_coupling_needs_enough_shared_commits():
+    changesets = [["a.py", "b.py"]] * 4
+    assert change_coupling(changesets)["pairs"] == []
+    assert change_coupling(changesets, min_shared=4)["total_pairs"] == 1
+    # five commits each, but only four of them together
+    changesets = [["a.py", "b.py"]] * 4 + [["a.py"], ["b.py"]]
+    assert change_coupling(changesets)["pairs"] == []
+    assert change_coupling(changesets, min_shared=4)["pairs"][0]["degree"] == 80.0
+
+
+def test_change_coupling_needs_a_high_enough_degree():
+    # 5 shared commits, but hub.py changes in 45 commits of its own as well:
+    # 5 over the average of 50 and 5 is 18.2%
+    changesets = [["hub.py", "leaf.py"]] * 5 + [["hub.py"]] * 45
+    assert change_coupling(changesets)["pairs"] == []
+    listed = change_coupling(changesets, min_degree=18)["pairs"]
+    assert [(p["shared"], p["degree"]) for p in listed] == [(5, 18.2)]
+
+
+def test_change_coupling_leaves_out_bulk_commits():
+    bulk = [f"f{i}.py" for i in range(4)]
+    changesets = [bulk] * 9 + [["f0.py", "f1.py"]] * 5
+    coupling = change_coupling(changesets, max_files=3)
+
+    # the nine commits of four files say nothing: only f0 and f1 are coupled
+    assert coupling["skipped"] == 9
+    assert coupling["commits"] == 5
+    assert [(p["a"], p["b"], p["shared"]) for p in coupling["pairs"]] == [("f0.py", "f1.py", 5)]
+    # a commit of exactly max_files files still counts
+    assert change_coupling([bulk] * 5, max_files=4)["total_pairs"] == 6
+
+
+def test_change_coupling_counts_only_the_files_kept():
+    changesets = [["a.py", "b.py", "gone.py"]] * 5 + [["gone.py"]] * 3
+    coupling = change_coupling(changesets, keep={"a.py", "b.py"})
+
+    # the commits that only changed a file since deleted are not analyzed
+    assert coupling["commits"] == 5
+    assert [(p["a"], p["b"]) for p in coupling["pairs"]] == [("a.py", "b.py")]
+    assert {f["path"] for f in coupling["files"]} == {"a.py", "b.py"}
+    # the size of a commit is what it changed, deleted files included
+    assert change_coupling(changesets, keep={"a.py", "b.py"}, max_files=2)["skipped"] == 5
+
+
+def test_change_coupling_orders_pairs_and_files():
+    changesets = (
+        [["core.py", "api.py"]] * 8
+        + [["core.py", "db.py"]] * 6
+        + [["core.py", "cli.py"]] * 6
+        + [["cli.py"]] * 2
+    )
+    coupling = change_coupling(changesets, min_degree=0)
+
+    # most shared commits first; then the higher degree (db.py has no commits
+    # of its own, cli.py has two)
+    assert [(p["a"], p["b"], p["shared"]) for p in coupling["pairs"]] == [
+        ("api.py", "core.py", 8),
+        ("core.py", "db.py", 6),
+        ("cli.py", "core.py", 6),
+    ]
+    # the file coupled to the most others leads, then the most shared commits
+    assert coupling["files"] == [
+        {"path": "core.py", "partners": 3, "shared": 20},
+        {"path": "api.py", "partners": 1, "shared": 8},
+        {"path": "cli.py", "partners": 1, "shared": 6},
+        {"path": "db.py", "partners": 1, "shared": 6},
+    ]
+
+
+def test_change_coupling_keeps_the_strongest_pairs_and_counts_them_all():
+    changesets = [["a.py", "b.py", "c.py"]] * 5 + [["a.py", "b.py"]] * 2
+    coupling = change_coupling(changesets, max_pairs=1)
+
+    assert coupling["total_pairs"] == 3
+    assert [(p["a"], p["b"], p["shared"]) for p in coupling["pairs"]] == [("a.py", "b.py", 7)]
+    # the files of the pairs cut off are still counted
+    assert [f["path"] for f in coupling["files"]] == ["a.py", "b.py", "c.py"]
+
+
+def test_change_coupling_of_nothing():
+    assert change_coupling([]) == {
+        "commits": 0,
+        "skipped": 0,
+        "max_files": 30,
+        "min_shared": 5,
+        "min_degree": 30,
+        "total_pairs": 0,
+        "pairs": [],
+        "files": [],
+    }
+    # commits that changed no file (merges) are not analyzed
+    assert change_coupling([[], []])["commits"] == 0
+
+
 # ── collection phases on unusual input ───────────────────────────────────
 
 
@@ -1630,6 +1756,101 @@ class TestCollectEdgeCases:
 
         assert dc.file_churn == {"orphan.txt": 1, "a.py": 2, "b.py": 1}
         assert dc.author_files == {"Ann": {"a.py": 1}, "Robert": {"a.py": 1, "b.py": 1}}
+        # nor does the coupling count it: two commits, one of them of two files
+        assert dc.file_coupling["commits"] == 2
+        assert dc.file_coupling["pairs"] == []
+
+    def test_file_coupling_comes_from_the_churn_pass(self, monkeypatch):
+        log = "COMMIT:Ann\napp.py\ntests/test_app.py\nold.py\n\n" * 5 + "COMMIT:Ann\nold.py\n"
+        monkeypatch.setattr(
+            "gitstats.main.get_pipe_output", _fake_git({'git log --format="COMMIT:%aN"': log})
+        )
+        dc = GitDataCollector()
+        dc.head_files = ["app.py", "tests/test_app.py"]
+        dc._collect_file_churn_and_ownership({})
+
+        # old.py is no longer in the tree: it is in no pair, and the commit
+        # that changed nothing else is not analyzed
+        assert dc.file_coupling["commits"] == 5
+        assert dc.file_coupling["pairs"] == [
+            {
+                "a": "app.py",
+                "b": "tests/test_app.py",
+                "shared": 5,
+                "degree": 100.0,
+                "revs_a": 5,
+                "revs_b": 5,
+            }
+        ]
+
+    def test_file_coupling_follows_the_config(self, monkeypatch):
+        log = "COMMIT:Ann\na.py\nb.py\nc.py\n\n" * 3 + "COMMIT:Ann\na.py\nb.py\n\n" * 2
+        monkeypatch.setattr(
+            "gitstats.main.get_pipe_output", _fake_git({'git log --format="COMMIT:%aN"': log})
+        )
+        import gitstats
+
+        cfg = dict(
+            gitstats.DEFAULT_CONFIG,
+            coupling_max_files=2,
+            coupling_min_shared=2,
+            coupling_min_degree=50,
+        )
+        monkeypatch.setattr("gitstats.main.conf", cfg)
+        dc = GitDataCollector()
+        dc._collect_file_churn_and_ownership({})
+
+        coupling = dc.file_coupling
+        assert (coupling["max_files"], coupling["min_shared"], coupling["min_degree"]) == (2, 2, 50)
+        # the three commits of three files are bulk changes under this config
+        assert coupling["skipped"] == 3
+        assert [(p["a"], p["b"], p["shared"]) for p in coupling["pairs"]] == [("a.py", "b.py", 2)]
+
+    def test_file_coupling_in_a_real_repository(self, temp_dir):
+        repo = os.path.join(temp_dir, "coupled")
+        os.makedirs(os.path.join(repo, "tests"))
+        _git(repo, "init", "-q")
+        _git(repo, "config", "user.name", "Ann")
+        _git(repo, "config", "user.email", "ann@example.com")
+
+        def commit(message, **files):
+            for name, text in files.items():
+                with open(os.path.join(repo, name.replace("__", "/")), "w") as f:
+                    f.write(text)
+            _git(repo, "add", "-A")
+            _git(repo, "commit", "-q", "-m", message)
+
+        for i in range(5):
+            commit(f"change {i}", **{"app.py": f"v{i}\n", "tests__test_app.py": f"t{i}\n"})
+        commit("docs", **{"README.md": "hello\n"})
+        # a file that changed with app.py every time, then went away
+        for i in range(5):
+            commit(f"old {i}", **{"app.py": f"w{i}\n", "old.py": f"o{i}\n"})
+        _git(repo, "rm", "-q", "old.py")
+        _git(repo, "commit", "-q", "-m", "drop old.py")
+
+        dc = GitDataCollector()
+        prevdir = os.getcwd()
+        try:
+            os.chdir(repo)
+            dc.collect(repo)
+        finally:
+            os.chdir(prevdir)
+
+        coupling = dc.file_coupling
+        # twelve commits, eleven of them changing a file that is still there
+        assert coupling["commits"] == 11
+        assert coupling["pairs"] == [
+            {
+                "a": "app.py",
+                "b": "tests/test_app.py",
+                "shared": 5,
+                "degree": 66.7,
+                "revs_a": 10,
+                "revs_b": 5,
+            }
+        ]
+        assert [f["path"] for f in coupling["files"]] == ["app.py", "tests/test_app.py"]
 
     def test_commit_subjects_skip_unreadable_lines(self, monkeypatch):
         fake = _fake_git(

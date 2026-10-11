@@ -363,6 +363,7 @@ Here is a list of some features of ``gitstats``:
 * **Tags**: every tag with its commits and authors.
 * **Code Ownership**: the bus factor, bus-factor risk (files only one person has changed), ownership by author, and the files shared by the most people.
 * **Hotspots**: every file plotted by its size against how often it changes, and the large, frequently changed files ranked by score, with how many people have changed each.
+* **Change Coupling**: the files that keep changing in the same commits, whether or not the code says they depend on each other; the pairs that cross directories; and the files coupled to the most others.
 * **History**: the project's life one year at a time — its peaks, quiet years and revivals, newcomers and releases — with optional AI narration.
 * **Portfolio**: analyze several repositories at once for an aggregate overview.
 * **Wrapped card**: a shareable SVG card of one year in the repository, with ``--wrapped``.

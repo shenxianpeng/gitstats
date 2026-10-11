@@ -19,6 +19,9 @@ You can create a ``gitstats.conf`` file in the current directory to customize th
 * ``end_date`` - Ending date for commits, passed as --until to Git (optional). Format: ``YYYY-MM-DD``. Default: ``""`` (empty).
 * ``authors`` - Comma-separated list of authors to filter commits. Only commits from these authors will be included (uses OR logic: commits from any of the listed authors). If empty, all authors are included. Default: ``""`` (empty).
 * ``exclude_exts`` - Comma-separated list of file extensions to exclude from line counting. If empty, no files are excluded. Files with null bytes in their content are automatically detected as binary and excluded from line counting. This detection occurs in addition to any extensions specified in exclude_exts. Default: ``""`` (empty).
+* ``coupling_max_files`` - Change coupling: a commit that changed more files than this is left out as a bulk change (a rename, a reformat, a vendored drop). Default: ``30``.
+* ``coupling_min_shared`` - Change coupling: the commits two files must share to be listed as a pair. Default: ``5``.
+* ``coupling_min_degree`` - Change coupling: those shared commits as a percentage of the two files' own commits, at least. Default: ``30``.
 * ``badge_metric`` - Badge written as the default ``badge.svg`` in the report output: ``commits``, ``last-commit``, ``authors``, ``files``, ``lines``, ``release``, ``active-days``, ``summary``, ``activity`` or ``health``. All of them are always pre-rendered in ``badges/<name>.svg`` regardless of this choice. Default: ``commits``.
 * ``badge_label`` - Left-side text of the generated badges. Default: ``gitstats``.
 * ``badge_color`` - Value-segment color of the generated badges: a shields.io color name (``brightgreen``, ``green``, ``yellowgreen``, ``yellow``, ``orange``, ``red``, ``blue``, ``lightgrey``), a hex value like ``#30a14e``, or any SVG color. Default: ``""`` (gitstats brand blue).

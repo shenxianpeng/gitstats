@@ -575,6 +575,7 @@ def test_print_nav_marks_current_page():
         "tags.html",
         "ownership.html",
         "hotspots.html",
+        "coupling.html",
         "history.html",
         "badges.html",
     ],
@@ -767,6 +768,7 @@ def test_page_summaries_use_stat_tiles(mock_data_collector, temp_dir):
         "tags.html",
         "ownership.html",
         "hotspots.html",
+        "coupling.html",
         "history.html",
     ):
         content = page(name)
@@ -1342,6 +1344,7 @@ def test_create_all_pages(mock_data_collector, temp_dir):
         "tags.html",
         "ownership.html",
         "hotspots.html",
+        "coupling.html",
         "history.html",
         "badges.html",
     ]
@@ -1622,6 +1625,11 @@ def test_file_tables_name_their_cells_for_phones(mock_data_collector, temp_dir):
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     expected = {
         "hotspots.html": {"hotspots": ["Lines", "Changes", "Authors", "Score"]},
+        "coupling.html": {
+            "coupling": ["Changes with", "Shared commits", "Coupling"],
+            "coupling-across": ["Changes with", "Shared commits", "Coupling"],
+            "coupling-files": ["Coupled files", "Shared commits"],
+        },
         "files.html": {"churn": ["Times changed"]},
         "ownership.html": {
             "ownership-busfactor": ["Sole owner", "Commits"],
@@ -2022,6 +2030,226 @@ def test_hotspots_chart_plots_only_the_highest_scoring_files(mock_data_collector
     # nothing is said when every file is plotted
     mock_data_collector.hotspot_files = {"a.py": {"lines": 10, "churn": 2, "score": 6.3}}
     assert "highest-scoring of" not in _hotspots_html(mock_data_collector, temp_dir)
+
+
+# ── Change coupling ──────────────────────────────────────────────────────
+
+
+def _coupling_html(data, path):
+    creator = HTMLReportCreator()
+    creator.data = data
+    creator.title = "t"
+    creator.create_coupling_html(data, path)
+    return _read_page(path, "coupling.html")
+
+
+def _coupling_of(count):
+    """Coupling data of ``count`` pairs, all in src/ but the first."""
+    pairs = [
+        {
+            "a": f"src/a{i:03}.py",
+            "b": f"src/b{i:03}.py" if i else "tests/test_a.py",
+            "shared": 500 - i,
+            "degree": 80.0,
+            "revs_a": 600,
+            "revs_b": 600,
+        }
+        for i in range(count)
+    ]
+    files = [
+        {"path": path, "partners": 1, "shared": pair["shared"]}
+        for pair in pairs
+        for path in (pair["a"], pair["b"])
+    ]
+    return {
+        "commits": 1000,
+        "skipped": 0,
+        "max_files": 30,
+        "min_shared": 5,
+        "min_degree": 30,
+        "total_pairs": count,
+        "pairs": pairs,
+        "files": files,
+    }
+
+
+def test_coupling_page_content(mock_data_collector, temp_dir):
+    content = _coupling_html(mock_data_collector, temp_dir)
+
+    assert "<h1>Change Coupling</h1>" in content
+    assert content.count('aria-current="page"') == 1
+    assert (
+        '<a href="coupling.html" class="active" aria-current="page">Change Coupling</a>' in content
+    )
+    # the thresholds are part of what the page says a pair is
+    assert "A pair is listed from 5 shared commits and 30% coupling.</p>" in content
+
+    tiles = dict(re.findall(r'<dt>([^<]+)</dt><dd class="stat-value">([^<]+)</dd>', content))
+    assert tiles == {
+        "Commits Analyzed": "40",
+        "Coupled Pairs": "3",
+        "Files Involved": "4",
+        "Across Directories": "1",
+    }
+    assert "that changed files in the current tree" in content
+    assert "with 5 or more shared commits" in content
+    # the fixture has no list of the files at HEAD to count against
+    assert "in at least one pair" in content
+
+    titles = [re.sub("<[^>]+>", "", h) for h in re.findall(r"<h2[^>]*>(.*?)</h2>", content)]
+    assert titles == [
+        "Files that change together",
+        "Coupling across directories",
+        "Most coupled files",
+    ]
+
+    # a pair: both paths, the shared commits, the coupling and a bar of it
+    assert (
+        '<tr><td class="path">main.py</td>'
+        '<td class="path" data-label="Changes with">tests/test_main.py</td>'
+        '<td class="num" data-label="Shared commits">9</td>'
+        '<td class="num" data-label="Coupling">90.0%</td>'
+        '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+        '<span style="width: 90.0%"></span></span></td></tr>'
+    ) in content
+    # three pairs: nothing to fold away
+    assert "<details" not in content
+
+
+def test_coupling_page_lists_pairs_in_the_order_given(mock_data_collector, temp_dir):
+    content = _coupling_html(mock_data_collector, temp_dir)
+    table = content.split('id="coupling">', 1)[1].split("</table>", 1)[0]
+    assert re.findall(r'<td class="path">([^<]+)</td>', table) == [
+        "main.py",
+        "main.py",
+        "README.md",
+    ]
+    assert re.findall(r'data-label="Coupling">([^<]+)<', table) == ["90.0%", "64.0%", "55.6%"]
+
+
+def test_coupling_page_singles_out_pairs_across_directories(mock_data_collector, temp_dir):
+    content = _coupling_html(mock_data_collector, temp_dir)
+    table = content.split('id="coupling-across">', 1)[1].split("</table>", 1)[0]
+    # main.py sits at the top level and its test under tests/; the two other
+    # pairs are of top-level files
+    assert table.count("<tr>") == 2
+    assert 'data-label="Changes with">tests/test_main.py</td>' in table
+
+    # with every pair inside one directory the section is left out
+    mock_data_collector.file_coupling["pairs"] = [
+        dict(pair, a="src/" + pair["a"], b="src/" + pair["b"])
+        for pair in mock_data_collector.file_coupling["pairs"]
+    ]
+    content = _coupling_html(mock_data_collector, temp_dir)
+    assert "Coupling across directories" not in content
+    assert 'id="coupling-across"' not in content
+    assert '<dd class="stat-value">0</dd>' in content
+
+
+def test_coupling_page_ranks_the_most_coupled_files(mock_data_collector, temp_dir):
+    content = _coupling_html(mock_data_collector, temp_dir)
+    table = content.split('id="coupling-files">', 1)[1].split("</table>", 1)[0]
+    assert re.findall(r'<td class="path">([^<]+)</td>', table) == [
+        "main.py",
+        "utils.py",
+        "tests/test_main.py",
+        "README.md",
+    ]
+    assert re.findall(r'data-label="Coupled files">(\d+)<', table) == ["2", "2", "1", "1"]
+    assert re.findall(r'data-label="Shared commits">(\d+)<', table) == ["17", "13", "9", "5"]
+    # the bar is the number of coupled files against the most of any file
+    assert re.findall(r'<span style="width: ([\d.]+)%">', table) == [
+        "100.0",
+        "100.0",
+        "50.0",
+        "50.0",
+    ]
+
+
+def test_coupling_page_counts_files_against_the_current_tree(mock_data_collector, temp_dir):
+    mock_data_collector.head_files = [f"f{i}.py" for i in range(1234)]
+    content = _coupling_html(mock_data_collector, temp_dir)
+    assert "of 1,234 in the current tree" in content
+    assert "in at least one pair" not in content
+
+
+def test_coupling_page_says_how_many_bulk_commits_were_left_out(mock_data_collector, temp_dir):
+    mock_data_collector.file_coupling.update(commits=12345, skipped=1200)
+    content = _coupling_html(mock_data_collector, temp_dir)
+    assert '<dd class="stat-value">12,345</dd>' in content
+    assert "1,200 with more than 30 files left out" in content
+    assert "that changed files in the current tree" not in content
+
+
+def test_coupling_page_folds_the_rest_of_a_long_table(mock_data_collector, temp_dir):
+    mock_data_collector.file_coupling = _coupling_of(25)
+    content = _coupling_html(mock_data_collector, temp_dir)
+
+    shown = content.split('id="coupling">', 1)[1].split("</table>", 1)[0]
+    assert shown.count('<td class="path">') == 10
+    assert '<details class="table-details"><summary>Table: all 25 pairs</summary>' in content
+    folded = content.split('id="coupling-all">', 1)[1].split("</table>", 1)[0]
+    assert folded.count('<td class="path">') == 25
+    # one pair crosses directories: that table is short, and not folded
+    assert 'id="coupling-across-all"' not in content
+    # the files table shows the ten first of the fifty
+    files = content.split('id="coupling-files">', 1)[1].split("</table>", 1)[0]
+    assert files.count('<td class="path">') == 10
+
+
+def test_coupling_page_folds_at_most_a_hundred_pairs(mock_data_collector, temp_dir):
+    coupling = _coupling_of(130)
+    # more pairs were found than the collector kept
+    coupling["total_pairs"] = 2500
+    mock_data_collector.file_coupling = coupling
+    content = _coupling_html(mock_data_collector, temp_dir)
+
+    assert '<dd class="stat-value">2,500</dd>' in content
+    assert "<summary>Table: the first 100 of 2,500 pairs</summary>" in content
+    folded = content.split('id="coupling-all">', 1)[1].split("</table>", 1)[0]
+    assert folded.count('<td class="path">') == 100
+
+
+def test_coupling_page_escapes_paths(mock_data_collector, temp_dir):
+    coupling = _coupling_of(1)
+    coupling["pairs"][0].update(a="src/<a>&.py", b="src/b.py")
+    coupling["files"] = [{"path": "src/<a>&.py", "partners": 1, "shared": 500}]
+    mock_data_collector.file_coupling = coupling
+    content = _coupling_html(mock_data_collector, temp_dir)
+    assert content.count('<td class="path">src/&lt;a&gt;&amp;.py</td>') == 2
+    assert "<a>&.py" not in content
+
+
+def test_coupling_page_without_pairs(mock_data_collector, temp_dir):
+    mock_data_collector.file_coupling = _coupling_of(0)
+    content = _coupling_html(mock_data_collector, temp_dir)
+
+    # the numbers still stand, and the page says why there is no table
+    assert '<dl class="stat-tiles"' in content
+    assert '<dd class="stat-value">1,000</dd>' in content
+    assert "No two files reach 5 shared commits at 30% coupling." in content
+    assert "<table" not in content
+    assert "<h2" not in content
+    assert content.rstrip().endswith("</body></html>")
+
+
+def test_coupling_page_without_data(mock_data_collector, temp_dir):
+    # data from before the coupling was collected
+    for missing in ({}, None, "n/a"):
+        mock_data_collector.file_coupling = missing
+        content = _coupling_html(mock_data_collector, temp_dir)
+        assert "<h1>Change Coupling</h1>" in content
+        assert "No coupling data available." in content
+        assert "stat-tiles" not in content
+        assert "<table" not in content
+        assert content.rstrip().endswith("</body></html>")
+
+
+def test_coupling_page_shows_a_threshold_that_is_not_whole(mock_data_collector, temp_dir):
+    mock_data_collector.file_coupling.update(min_shared=12, min_degree=42.5)
+    content = _coupling_html(mock_data_collector, temp_dir)
+    assert "A pair is listed from 12 shared commits and 42.5% coupling.</p>" in content
+    assert "with 12 or more shared commits" in content
 
 
 # ── Project history ──────────────────────────────────────────────────────
@@ -3150,6 +3378,7 @@ def test_nav_orders_pages_by_importance(mock_data_collector, temp_dir):
         "Authors",
         "Code Ownership",
         "Hotspots",
+        "Change Coupling",
         "Files",
         "History",
         "Lines",

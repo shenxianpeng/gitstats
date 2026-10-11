@@ -31,6 +31,10 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "end_date": "",  # Ending date for commits, passed as --until to Git (optional). Format: YYYY-MM-DD.
     "authors": "",  # Comma-separated list of authors to filter commits (empty = include all authors).
     "exclude_exts": "",  # File extensions to exclude from line counting (others detected via null bytes).
+    # Change coupling (the files that keep changing in the same commits)
+    "coupling_max_files": 30,  # A commit that changed more files than this is left out as a bulk change.
+    "coupling_min_shared": 5,  # Commits two files must share to be listed as a pair.
+    "coupling_min_degree": 30,  # Those commits as a percentage of the two files' own, at least.
     # Shareable badge (badge.svg and badges/ in the report output)
     # Badge written as badge.svg: commits, last-commit, authors, files, lines,
     # release, active-days, summary, activity or health.

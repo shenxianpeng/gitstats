@@ -412,14 +412,16 @@ THEME_TOGGLE_BUTTON = (
 FILE_TABLE = "file-table"
 
 # Most-read first: the overview, then who and when, what is at risk (knowledge
-# held by one person, then large files that keep changing), the code itself,
-# the story, and the reference lists; the Badges tool comes last
+# held by one person, large files that keep changing, files that cannot change
+# alone), the code itself, the story, and the reference lists; the Badges tool
+# comes last
 NAV_PAGES = (
     ("index.html", "General"),
     ("activity.html", "Activity"),
     ("authors.html", "Authors"),
     ("ownership.html", "Code Ownership"),
     ("hotspots.html", "Hotspots"),
+    ("coupling.html", "Change Coupling"),
     ("files.html", "Files"),
     ("history.html", "History"),
     ("lines.html", "Lines"),
@@ -831,6 +833,7 @@ class HTMLReportCreator(ReportCreator):
         self.create_tags_html(data, path)
         self.create_ownership_html(data, path)
         self.create_hotspots_html(data, path)
+        self.create_coupling_html(data, path)
         self.create_history_html(data, path)
         self.create_badges_html(data, path)
 
@@ -2566,6 +2569,173 @@ class HTMLReportCreator(ReportCreator):
                 f'<details class="table-details"><summary>Table: {what}</summary>'
                 f"{hotspot_table('hotspots-all', files[:100])}</details>"
             )
+
+        self.print_footer(f)
+        f.write("</body></html>")
+        f.close()
+
+    def create_coupling_html(self, data: Any, path: str) -> None:
+        """Create the Change Coupling page: the files that change together.
+
+        Two files that keep changing in the same commits depend on each other,
+        whether or not one imports the other: a change to one usually means a
+        change to the other. The page lists the pairs (see change_coupling()
+        in main.py for how they are found), the pairs that cross directories,
+        and the files coupled to the most others.
+        """
+        page = "coupling.html"
+        f = self._open_report_file(path, page)
+        self.print_header(f)
+        self.print_nav(f, page)
+        f.write("<h1>Change Coupling</h1>")
+
+        coupling = getattr(data, "file_coupling", {})
+        if not isinstance(coupling, dict) or "pairs" not in coupling:
+            f.write(
+                '<p class="section-note">No coupling data available. Coupling is found '
+                "from the files each commit changed.</p>"
+            )
+            self.print_footer(f)
+            f.write("</body></html>")
+            f.close()
+            return
+
+        pairs = coupling["pairs"]
+        min_shared = format_int(coupling["min_shared"])
+        min_degree = f"{coupling['min_degree']:g}%"
+        f.write(
+            '<p class="section-note">'
+            "Files that keep changing in the same commits depend on each other, whether "
+            "or not the code says so: a change to one usually needs a change to the other. "
+            "The <strong>coupling</strong> of two files is the commits that changed both, "
+            "as a share of the average of their own commit counts. A pair is listed from "
+            f"{min_shared} shared commits and {min_degree} coupling.</p>"
+        )
+
+        def directory(filepath: str) -> str:
+            return filepath.split("/", 1)[0] if "/" in filepath else ""
+
+        across = [p for p in pairs if directory(p["a"]) != directory(p["b"])]
+        skipped = coupling["skipped"]
+        current = head_files(data)
+        f.write(
+            stat_tiles_html(
+                [
+                    (
+                        "Commits Analyzed",
+                        format_int(coupling["commits"]),
+                        f"{format_int(skipped)} with more than "
+                        f"{format_int(coupling['max_files'])} files left out"
+                        if skipped
+                        else "that changed files in the current tree",
+                    ),
+                    (
+                        "Coupled Pairs",
+                        format_int(coupling["total_pairs"]),
+                        f"with {min_shared} or more shared commits",
+                    ),
+                    (
+                        "Files Involved",
+                        format_int(len(coupling["files"])),
+                        f"of {format_int(len(current))} in the current tree"
+                        if current is not None
+                        else "in at least one pair",
+                    ),
+                    (
+                        "Across Directories",
+                        format_int(len(across)),
+                        "pairs in different top-level directories",
+                    ),
+                ]
+            )
+        )
+
+        if not pairs:
+            f.write(
+                f"<p>No two files reach {min_shared} shared commits at {min_degree} coupling. "
+                "A young repository, or one whose commits each change one file, has none.</p>"
+            )
+            self.print_footer(f)
+            f.write("</body></html>")
+            f.close()
+            return
+
+        def pair_table(table_id: str, rows: list[dict]) -> str:
+            return (
+                f'<div class="table-scroll"><table class="sortable share-table {FILE_TABLE}" '
+                f'id="{table_id}">'
+                '<tr><th>File</th><th>Changes with</th><th class="num">Shared commits</th>'
+                '<th class="num">Coupling</th><th class="unsortable"></th></tr>'
+                + "".join(
+                    f'<tr><td class="path">{html.escape(p["a"])}</td>'
+                    f'<td class="path" data-label="Changes with">{html.escape(p["b"])}</td>'
+                    f'<td class="num" data-label="Shared commits">{format_int(p["shared"])}</td>'
+                    f'<td class="num" data-label="Coupling">{p["degree"]:.1f}%</td>'
+                    '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                    f'<span style="width: {min(p["degree"], 100.0):.1f}%"></span></span></td></tr>'
+                    for p in rows
+                )
+                + "</table></div>"
+            )
+
+        def folded(table_id: str, rows: list[dict], what: str, total: int) -> str:
+            """The ten first rows, and the rest (up to 100) folded away."""
+            shown = pair_table(table_id, rows[:10])
+            if len(rows) <= 10:
+                return shown
+            label = (
+                f"all {format_int(total)} {what}"
+                if total <= 100
+                else f"the first 100 of {format_int(total)} {what}"
+            )
+            return (
+                shown + f'<details class="table-details"><summary>Table: {label}</summary>'
+                f"{pair_table(table_id + '-all', rows[:100])}</details>"
+            )
+
+        # Coupling :: the pairs, most shared commits first
+        f.write(html_header(2, "Files that change together"))
+        f.write(
+            '<p class="section-note">'
+            "The pairs with the most commits in common. The bar is the coupling: at 100% "
+            "neither file ever changed without the other.</p>"
+        )
+        f.write(folded("coupling", pairs, "pairs", coupling["total_pairs"]))
+
+        # Coupling :: the pairs that cross a directory boundary
+        if across:
+            f.write(html_header(2, "Coupling across directories"))
+            f.write(
+                '<p class="section-note">'
+                "The pairs whose files sit in different top-level directories. Code and its "
+                "tests are expected here; two parts of the code that were meant to be "
+                "separate are worth a look.</p>"
+            )
+            f.write(folded("coupling-across", across, "pairs across directories", len(across)))
+
+        # Coupling :: the files tied to the most others
+        files = coupling["files"]
+        most = max(fs["partners"] for fs in files)
+        f.write(html_header(2, "Most coupled files"))
+        f.write(
+            '<p class="section-note">'
+            "The files coupled to the most others: a change here tends to spread.</p>"
+        )
+        f.write(
+            f'<div class="table-scroll"><table class="sortable share-table {FILE_TABLE}" '
+            'id="coupling-files">'
+            '<tr><th>File</th><th class="num">Coupled files</th>'
+            '<th class="num">Shared commits</th><th class="unsortable"></th></tr>'
+            + "".join(
+                f'<tr><td class="path">{html.escape(fs["path"])}</td>'
+                f'<td class="num" data-label="Coupled files">{format_int(fs["partners"])}</td>'
+                f'<td class="num" data-label="Shared commits">{format_int(fs["shared"])}</td>'
+                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                f'<span style="width: {100.0 * fs["partners"] / most:.1f}%"></span></span></td></tr>'
+                for fs in files[:10]
+            )
+            + "</table></div>"
+        )
 
         self.print_footer(f)
         f.write("</body></html>")

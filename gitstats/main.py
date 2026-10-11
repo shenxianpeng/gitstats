@@ -4,6 +4,7 @@
 # GPLv2 / GPLv3
 import argparse
 import datetime
+import itertools
 import json
 import logging
 import os
@@ -107,6 +108,106 @@ def _merge_period_aliases(
             period_authors[canonical] = period_authors.get(canonical, 0) + period_authors.pop(alias)
 
 
+def change_coupling(
+    changesets: list[list[str]],
+    keep: set[str] | None = None,
+    max_files: int = 30,
+    min_shared: int = 5,
+    min_degree: float = 30,
+    max_pairs: int = 500,
+) -> dict[str, Any]:
+    """Find the files that keep changing in the same commits.
+
+    ``changesets`` holds the files each commit changed. Two files are coupled
+    when many of their commits changed both. The *degree* of a pair is its
+    shared commits as a percentage of the average of the two files' own
+    commit counts, the measure code-maat and CodeScene use, and a pair is
+    reported from ``min_shared`` shared commits and ``min_degree`` percent.
+    The defaults are code-maat's.
+
+    A commit that changed more than ``max_files`` files is left out whole:
+    a rename, a reformat or a vendored drop ties together files that have
+    nothing to do with each other. With ``keep``, only those files count
+    (the files that still exist).
+
+    Returns a dict with:
+        commits: the commits analyzed, each changing at least one counted file;
+        skipped: the commits left out for their size;
+        max_files, min_shared, min_degree: the thresholds used;
+        total_pairs: the pairs at or above the thresholds;
+        pairs: the ``max_pairs`` of them with the most shared commits, each
+            ``{"a", "b", "shared", "degree", "revs_a", "revs_b"}`` with
+            ``a`` < ``b`` and the degree rounded to one decimal;
+        files: every file in a pair as ``{"path", "partners", "shared"}``,
+            the file coupled to the most others first.
+    """
+    commits = skipped = 0
+    revs: dict[str, int] = {}
+    multi: list[list[str]] = []  # the changesets with two or more counted files
+    for changeset in changesets:
+        if len(changeset) > max_files:
+            skipped += 1
+            continue
+        counted = sorted({path for path in changeset if keep is None or path in keep})
+        if not counted:
+            continue
+        commits += 1
+        for path in counted:
+            revs[path] = revs.get(path, 0) + 1
+        if len(counted) > 1:
+            multi.append(counted)
+
+    # A pair with min_shared commits in common is made of files with at least
+    # that many of their own: pairing only those keeps the table of pairs small
+    # in a repository full of rarely changed files
+    shared: dict[tuple[str, str], int] = {}
+    for counted in multi:
+        frequent = [path for path in counted if revs[path] >= min_shared]
+        for pair in itertools.combinations(frequent, 2):
+            shared[pair] = shared.get(pair, 0) + 1
+
+    pairs: list[dict[str, Any]] = []
+    for (a, b), count in shared.items():
+        if count < min_shared:
+            continue
+        degree = 200.0 * count / (revs[a] + revs[b])
+        if degree < min_degree:
+            continue
+        pairs.append(
+            {
+                "a": a,
+                "b": b,
+                "shared": count,
+                "degree": round(degree, 1),
+                "revs_a": revs[a],
+                "revs_b": revs[b],
+            }
+        )
+    pairs.sort(key=lambda p: (-p["shared"], -p["degree"], p["a"], p["b"]))
+
+    partners: dict[str, list[int]] = {}
+    for coupled in pairs:
+        for path in (coupled["a"], coupled["b"]):
+            entry = partners.setdefault(path, [0, 0])
+            entry[0] += 1
+            entry[1] += coupled["shared"]
+    files: list[dict[str, Any]] = [
+        {"path": path, "partners": entry[0], "shared": entry[1]} for path, entry in partners.items()
+    ]
+    files.sort(key=lambda f: (-f["partners"], -f["shared"], f["path"]))
+
+    return {
+        "commits": commits,
+        "skipped": skipped,
+        "max_files": max_files,
+        "min_shared": min_shared,
+        "min_degree": min_degree,
+        "total_pairs": len(pairs),
+        "pairs": pairs[:max_pairs],
+        "files": files,
+    }
+
+
 class DataCollector:
     """Manages data collection from a revision control repository."""
 
@@ -185,6 +286,10 @@ class DataCollector:
         # hotspots: change frequency against size for each file at HEAD whose
         # lines are counted; filepath -> { lines, churn, score }
         self.hotspot_files: dict[str, dict[str, float]] = {}
+
+        # change coupling: the files that keep changing in the same commits,
+        # as change_coupling() returns it
+        self.file_coupling: dict[str, Any] = {}
 
         # evenly sampled commit subjects per year (collected only when AI
         # features are enabled; they ground the AI chronicle narration)
@@ -888,29 +993,43 @@ class GitDataCollector(DataCollector):
     def _collect_file_churn_and_ownership(self, name_to_canonical: dict[str, str]) -> None:
         """Record how often each file changes and who changes it.
 
-        A single name-only pass drives two metrics:
-        ``file_churn`` (commits touching each file) and ``author_files``
-        (which files each author touches, for code ownership). Each commit is
-        prefixed with a ``COMMIT:<author>`` marker line; the lines that follow
-        are the file paths changed by that commit. Authors are resolved to their
-        canonical identity so aliases merge here directly.
+        A single name-only pass drives three metrics:
+        ``file_churn`` (commits touching each file), ``author_files``
+        (which files each author touches, for code ownership) and
+        ``file_coupling`` (the files that change in the same commits). Each
+        commit is prefixed with a ``COMMIT:<author>`` marker line; the lines
+        that follow are the file paths changed by that commit. Authors are
+        resolved to their canonical identity so aliases merge here directly.
         """
         churn_output = get_pipe_output(
             ['git log --format="COMMIT:%aN" --name-only {}'.format(get_log_range("HEAD", False))]
         )
         current_author = None
+        changesets: list[list[str]] = []  # the files of each commit, for the coupling
         for line in churn_output.split("\n"):
             line = line.strip()
             if not line:
                 continue
             if line.startswith("COMMIT:"):
                 current_author = name_to_canonical.get(line[7:], line[7:])
+                changesets.append([])
                 continue
             # A changed-file line.
             self.file_churn[line] = self.file_churn.get(line, 0) + 1
+            if changesets:
+                changesets[-1].append(line)
             if current_author:
                 author_map = self.author_files.setdefault(current_author, {})
                 author_map[line] = author_map.get(line, 0) + 1
+
+        self.file_coupling = change_coupling(
+            changesets,
+            # only files that still exist: a deleted one cannot be untangled
+            keep=set(self.head_files) or None,
+            max_files=int(conf["coupling_max_files"]),
+            min_shared=int(conf["coupling_min_shared"]),
+            min_degree=float(conf["coupling_min_degree"]),
+        )
 
     def _collect_commit_subjects(self) -> None:
         """Sample commit subjects per year to ground the AI chronicle.
