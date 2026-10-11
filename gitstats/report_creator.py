@@ -145,64 +145,169 @@ CHART_SCRIPT = """<script>
 	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
 	//   peaks  a label above chosen bars
 	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
 	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
 	const chartAnnotations = {
 		id: 'gsAnnotations',
 		beforeDatasetsDraw: function(chart, args, opts) {
-			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
-			const half = x.type === 'category' && chart.data.labels.length > 1
-				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
 			(opts.bands || []).forEach(function(band) {
-				const left = x.getPixelForValue(band.from) - half;
-				const right = x.getPixelForValue(band.to) + half;
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
 				ctx.save();
 				ctx.fillStyle = getCSSVar('--surface-color');
-				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
 				ctx.strokeStyle = getCSSVar('--border-strong');
 				ctx.setLineDash([3, 3]);
 				ctx.beginPath();
 				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
 				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
 				ctx.stroke();
-				ctx.fillStyle = getCSSVar('--chart-text');
 				ctx.font = '11px ' + getCSSVar('--font-mono');
 				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
 				let text = band.text;
-				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
-				if (ctx.measureText(text).width <= right - left - 4) {
-					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
 				}
 				ctx.restore();
 			});
 		},
 		afterDatasetsDraw: function(chart, args, opts) {
-			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
-			const marks = (opts.peaks || []).slice();
-			if (opts.values) {
-				chart.data.datasets[0].data.forEach(function(v, i) {
-					if (v) marks.push({ index: i, text: String(v), plain: true });
-				});
-			}
-			marks.forEach(function(mark) {
-				const bar = meta.data[mark.index];
-				if (!bar) return;
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
 				ctx.save();
-				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
-				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.font = mark.font;
 				ctx.textAlign = 'center';
-				// keep labels on the first and last bars inside the plot area
-				const w = ctx.measureText(mark.text).width / 2;
-				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
-				ctx.fillText(mark.text, cx, bar.y - 6);
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
 				ctx.restore();
 			});
 		}
 	};
 
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 \u2013 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' \u2013 ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
 	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
 	// thinned so labels never collide; short spans label every few months.
 	function monthAxisTick(value) {
 		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
 		const n = this.chart.data.labels.length;
 		const width = Math.max(this.width, 1);
 		if (n <= 24) {
@@ -226,26 +331,49 @@ CHART_SCRIPT = """<script>
 		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
 	}
 
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
 	// A linear x-axis over millisecond timestamps, ticked on year (or month)
-	// boundaries, so gaps in history take up the space they really span.
-	function timeAxis(xs) {
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
 		return {
 			type: 'linear',
-			min: xs.length ? xs[0] : undefined,
-			max: xs.length ? xs[xs.length - 1] : undefined,
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
 			afterBuildTicks: function(scale) {
-				const from = new Date(scale.min), to = new Date(scale.max);
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
 				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
 				let unit = 'year';
 				if (to.getFullYear() - from.getFullYear() >= 2) {
 					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
-						ticks.push({ value: new Date(y, 0, 1).getTime() });
+						add(new Date(y, 0, 1).getTime());
 					}
 				} else {
 					unit = 'month';
 					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
-					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
-						ticks.push({ value: d.getTime() });
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
 					}
 				}
 				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
@@ -254,7 +382,9 @@ CHART_SCRIPT = """<script>
 			ticks: {
 				maxRotation: 0,
 				autoSkipPadding: 12,
-				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
 			}
 		};
 	}
@@ -1231,8 +1361,30 @@ class HTMLReportCreator(ReportCreator):
         index = {month: i for i, month in enumerate(months)}
         n = len(months)
 
+        # The longest stretch without commits: months[a:b]. When it is long
+        # enough to be collapsed on the charts it is here too, to `slots`
+        # months wide, so the page's time axes agree.
+        quiet = quiet_months(data)
+        a = b = 0
+        slots = None
+        if quiet and quiet[0] in index and quiet[1] in index:
+            a, b = index[quiet[0]], index[quiet[1]] + 1
+            slots = collapsed_slots(n, b - a)
+        width = n if slots is None else n - (b - a) + slots
+
+        def place(i: float) -> float:
+            """Where month index ``i`` falls on the axis, in months from its start."""
+            if slots is None or i <= a:
+                return i
+            if i >= b:
+                return i - (b - a) + slots
+            return a + (i - a) / (b - a) * slots
+
         def left(i: float) -> str:
-            return f"{100.0 * i / n:.3f}%"
+            return f"{100.0 * place(i) / width:.3f}%"
+
+        def span(i: float, j: float) -> str:
+            return f"{100.0 * (place(j) - place(i)) / width:.3f}%"
 
         per_author: dict[str, dict[str, int]] = {a: {} for a in authors}
         for month, counts in data.author_of_month.items():
@@ -1240,24 +1392,32 @@ class HTMLReportCreator(ReportCreator):
                 if author in per_author:
                     per_author[author][month] = commits
 
-        # Year boundaries as gridlines; label every year, or every 2nd/5th on long histories
+        # Year boundaries as gridlines; label every year, or every 2nd/5th on long
+        # histories. The years inside a collapsed stretch have no line of their own.
         first_year, last_year = int(months[0][:4]), int(months[-1][:4])
-        span = last_year - first_year + 1
-        every = 1 if span <= 12 else 2 if span <= 24 else 5
+        years = [
+            year
+            for year in range(first_year + 1, last_year + 1)
+            if slots is None or not a <= index[f"{year}-01"] < b
+        ]
+        every = 1 if len(years) < 12 else 2 if len(years) < 24 else 5
         grid = []
-        for year in range(first_year + 1, last_year + 1):
+        for year in years:
             pos = left(index[f"{year}-01"])
             label = str(year) if year % every == 0 else ""
             grid.append(f'<span class="timeline-year" style="left: {pos}">{label}</span>')
 
-        # The longest stretch without commits, shaded like the charts' gap bands
-        quiet = quiet_months(data)
-        if quiet and quiet[0] in index and quiet[1] in index:
-            a, b = index[quiet[0]], index[quiet[1]] + 1
+        # The quiet stretch, shaded like the charts' gap bands; collapsed, it is
+        # hatched and names its years where the year labels are
+        if quiet and b > a:
+            collapsed = slots is not None
             grid.insert(
                 0,
-                f'<span class="timeline-gap" style="left: {left(a)}; width: {left(b - a)}" '
-                f'title="No commits {quiet[0]} \u2013 {quiet[1]}"></span>',
+                f'<span class="timeline-gap{" is-collapsed" if collapsed else ""}" '
+                f'style="left: {left(a)}; width: {span(a, b)}" '
+                f'title="No commits {quiet[0]} \u2013 {quiet[1]}">'
+                + (f"<span>{year_span(quiet[0], quiet[1])}</span>" if collapsed else "")
+                + "</span>",
             )
 
         rows = []
@@ -1269,7 +1429,7 @@ class HTMLReportCreator(ReportCreator):
                 start, end = index[active[0]], index[active[-1]]
                 marks = [
                     f'<span class="timeline-span" style="left: {left(start + 0.5)}; '
-                    f'width: {left(end - start)}"></span>'
+                    f'width: {span(start, end)}"></span>'
                 ]
                 for month in active:
                     count = per_author[author][month]
@@ -2656,6 +2816,11 @@ class HTMLReportCreator(ReportCreator):
         of collapsing between two adjacent points. Line series are drawn as steps
         because each point holds its value until the next one.
 
+        A shaded band (``annotations["bands"]``) that covers a quarter of the
+        x-axis or more is cut out of it and drawn as a short hatched break, so
+        the years with commits get the room: see collapsed_width(). This
+        applies to category and time axes alike.
+
         With ``highlight=N`` (multi-series charts), only the first N series get
         colors and legend entries; the rest are thin grey lines drawn behind
         them, so colors never repeat.
@@ -2720,8 +2885,19 @@ class HTMLReportCreator(ReportCreator):
                 entry.setdefault("stepped", True)
             js_datasets.append(entry)
 
+        gap_json = "null"
         if time_axis:
             labels = [int(stamp) * 1000 for stamp in labels]
+            if annotations:
+                annotations, gap = collapse_gap_time(labels, annotations)
+                gap_json = json.dumps(gap)
+        elif annotations:
+            labels, js_datasets, annotations = collapse_gap_categories(
+                labels, js_datasets, annotations
+            )
+        collapsed = bool(annotations) and any(
+            band.get("collapsed") for band in annotations.get("bands", [])
+        )
         labels_json = json.dumps(labels).replace("</", "<\\/")
         datasets_json = json.dumps(js_datasets).replace("</", "<\\/")
         # Replace quoted placeholders with JS expressions
@@ -2748,14 +2924,16 @@ class HTMLReportCreator(ReportCreator):
             # pair each value with its timestamp: {x, y} points on a linear axis
             data_js = f"""datasets: (function(xs, sets) {{
         sets.forEach(function(ds) {{
-          ds.data = ds.data.map(function(y, i) {{ return {{ x: xs[i], y: y }}; }});
+          ds.data = ds.data.map(function(y, i) {{
+            return {{ x: squeezeTime(gap, xs[i]), y: y }};
+          }});
         }});
         return sets;
       }})(labels, {datasets_json})"""
-            x_scale_js = "timeAxis(labels)"
+            x_scale_js = "timeAxis(labels, gap)"
             tooltip_callbacks = [
                 """title: function(items) {
-          return items.length ? formatChartDate(items[0].parsed.x) : '';
+          return items.length ? formatChartDate(stretchTime(gap, items[0].parsed.x)) : '';
         }"""
             ]
         else:
@@ -2768,6 +2946,8 @@ class HTMLReportCreator(ReportCreator):
                 )
             else:
                 x_ticks = "maxRotation: 45, minRotation: 45" if x_ticks_rotate else "maxRotation: 0"
+                if collapsed:
+                    x_ticks += ", callback: categoryTick"
                 # each bar is its own category: a gridline per bar is only noise
                 x_grid = ", grid: { display: false }" if chart_type == "bar" else ""
                 x_scale_js = f"{{ ticks: {{ {x_ticks} }}{x_grid} }}"
@@ -2834,6 +3014,7 @@ class HTMLReportCreator(ReportCreator):
 (function() {{
   var ctx = document.getElementById('{chart_id}').getContext('2d');
   var labels = {labels_json};
+  var gap = {gap_json};
   applyChartTheme();
   new Chart(ctx, {{
     type: '{chart_type}',{register_js}
@@ -3331,6 +3512,135 @@ def gap_annotations(labels: list[Any], values: list[int], min_gap: int) -> dict[
         ],
         "peaks": peaks,
     }
+
+
+# A stretch without commits that takes up at least this share of a time axis
+# is cut out of it, and drawn as a break this share of what is left of the
+# axis wide. Under the first, a stretch is only shaded and keeps its width.
+GAP_COLLAPSE_MIN_SHARE = 0.25
+GAP_BREAK_SHARE = 0.05
+
+
+def collapsed_width(total: float, gap: float) -> float | None:
+    """How wide a quiet stretch ``gap`` long is drawn on an axis ``total`` long.
+
+    None when it is left alone: it covers less than GAP_COLLAPSE_MIN_SHARE
+    of the axis, so the years around it are not short of room. Otherwise
+    GAP_BREAK_SHARE of the rest of the axis, in the units of ``total``: a
+    repository silent for nine of its twenty years gives those nine the
+    width of half a year, and the eleven with commits almost all of the plot.
+    """
+    if total <= 0 or gap < GAP_COLLAPSE_MIN_SHARE * total:
+        return None
+    return GAP_BREAK_SHARE * (total - gap)
+
+
+def collapsed_slots(total: int, gap: int) -> int | None:
+    """collapsed_width() for an axis of categories: whole slots, at least one.
+
+    None too when the stretch is no longer than the slots it would be given.
+    """
+    width = collapsed_width(total, gap)
+    if width is None:
+        return None
+    slots = max(1, round(width))
+    return slots if gap > slots else None
+
+
+def year_span(first: Any, last: Any) -> str:
+    """The years from ``first`` to ``last`` as a short axis label: "2016\u201324".
+
+    Each is a year or anything that starts with one, such as "2016-01".
+    """
+    a, b = str(first)[:4], str(last)[:4]
+    if a == b:
+        return a
+    return f"{a}\u2013{b[2:] if a[:2] == b[:2] else b}"
+
+
+def collapse_gap_categories(
+    labels: list[Any], datasets: list[dict[str, Any]], annotations: dict[str, Any]
+) -> tuple[list[Any], list[dict[str, Any]], dict[str, Any]]:
+    """Cut a long shaded stretch out of a category axis.
+
+    When the one band in ``annotations`` is long enough (collapsed_slots()),
+    its categories are replaced by a few slots named after the whole stretch
+    ("2016 \u2013 2023"), which keep the values the stretch began with: zeros
+    on a bar chart, the level a cumulative line stays at. The band is narrowed
+    to those slots and flagged ``collapsed``, with the ``axis`` label the
+    chart draws under it, and the peaks after it move up. Everything is
+    returned unchanged when there is nothing to collapse.
+    """
+    bands = annotations.get("bands") or []
+    if len(bands) != 1:
+        return labels, datasets, annotations
+    band = bands[0]
+    start, end = band["from"], band["to"]
+    gap = end - start + 1
+    slots = collapsed_slots(len(labels), gap)
+    if slots is None:
+        return labels, datasets, annotations
+    cut = gap - slots
+
+    name = f"{labels[start]} \u2013 {labels[end]}"
+    new_labels = [*labels[:start], *([name] * slots), *labels[end + 1 :]]
+    new_datasets = []
+    for dataset in datasets:
+        entry = dict(dataset)
+        for key in ("data", "notes"):
+            if isinstance(entry.get(key), list):
+                entry[key] = entry[key][: start + slots] + entry[key][end + 1 :]
+        new_datasets.append(entry)
+    new_annotations = {
+        **annotations,
+        "bands": [
+            {
+                **band,
+                "to": start + slots - 1,
+                "collapsed": True,
+                "axis": year_span(labels[start], labels[end]),
+            }
+        ],
+    }
+    if "peaks" in annotations:
+        new_annotations["peaks"] = [
+            {**peak, "index": peak["index"] - cut} if peak["index"] > end else peak
+            for peak in annotations["peaks"]
+        ]
+    return new_labels, new_datasets, new_annotations
+
+
+def collapse_gap_time(
+    stamps: list[int], annotations: dict[str, Any]
+) -> tuple[dict[str, Any], dict[str, int] | None]:
+    """Cut a long shaded stretch out of a time axis.
+
+    ``stamps`` are the chart's x values in milliseconds, in order. When the
+    one band in ``annotations`` is long enough (collapsed_width()), returns
+    the annotations with that band narrowed to the break and flagged
+    ``collapsed``, and the gap ``{"from", "to", "width"}`` the chart's
+    squeezeTime() needs. Otherwise the annotations as they were, and None.
+    """
+    bands = annotations.get("bands") or []
+    if len(bands) != 1 or len(stamps) < 2:
+        return annotations, None
+    band = bands[0]
+    if band["from"] < stamps[0] or band["to"] > stamps[-1]:
+        return annotations, None  # not a stretch between two of the chart's points
+    width = collapsed_width(stamps[-1] - stamps[0], band["to"] - band["from"])
+    if width is None:
+        return annotations, None
+    gap = {"from": band["from"], "to": band["to"], "width": round(width)}
+    first = datetime.datetime.fromtimestamp(band["from"] / 1000)
+    # the band ends on the first day after its last quiet month
+    last = datetime.datetime.fromtimestamp(band["to"] / 1000) - datetime.timedelta(days=1)
+    collapsed = {
+        **band,
+        "to": band["from"] + gap["width"],
+        "collapsed": True,
+        "axis": year_span(first.year, last.year),
+    }
+    return {**annotations, "bands": [collapsed]}, gap
 
 
 def quiet_months(data: Any, min_months: int = 12) -> tuple[str, str] | None:
