@@ -27,6 +27,7 @@ from gitstats.aggregate import (
 from gitstats.ai_summarizer import AISummarizer
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.utils import (
+    commit_local_time,
     get_commit_range,
     get_log_range,
     get_num_of_files_from_rev,
@@ -421,7 +422,7 @@ class GitDataCollector(DataCollector):
             if self.first_commit_stamp == 0 or stamp < self.first_commit_stamp:
                 self.first_commit_stamp = stamp
 
-            self._record_activity(date)
+            self._record_activity(date, commit_local_time(stamp, timezone))
 
             # domain stats
             if domain not in self.domains:
@@ -436,17 +437,28 @@ class GitDataCollector(DataCollector):
 
         return email_to_latest, author_to_email
 
-    def _record_activity(self, date: datetime.datetime) -> None:
-        """Accumulate the time-of-commit histograms for a single commit."""
+    def _record_activity(
+        self, date: datetime.datetime, local: datetime.datetime | None = None
+    ) -> None:
+        """Accumulate the time-of-commit histograms for a single commit.
+
+        ``date`` is the commit on this machine's clock, and decides which
+        month, week and year it is counted in, like the rest of the report.
+        ``local`` is the same moment on the committer's clock (the commit's
+        own UTC offset) and decides the hour and the day of the week: a
+        commit made at 23:00 in Tokyo is a late-evening commit wherever the
+        report is generated. Without it, ``date`` stands in for both.
+        """
+        local = local or date
         # hour
-        hour = date.hour
+        hour = local.hour
         self.activity_by_hour_of_day[hour] = self.activity_by_hour_of_day.get(hour, 0) + 1
         # most active hour?
         if self.activity_by_hour_of_day[hour] > self.activity_by_hour_of_day_busiest:
             self.activity_by_hour_of_day_busiest = self.activity_by_hour_of_day[hour]
 
         # day of week
-        day = date.weekday()
+        day = local.weekday()
         self.activity_by_day_of_week[day] = self.activity_by_day_of_week.get(day, 0) + 1
 
         # hour of week
@@ -459,7 +471,7 @@ class GitDataCollector(DataCollector):
         if self.activity_by_hour_of_week[day][hour] > self.activity_by_hour_of_week_busiest:
             self.activity_by_hour_of_week_busiest = self.activity_by_hour_of_week[day][hour]
 
-        # hour of week, for the commit's year
+        # hour of week, for the year the commit is counted in
         year_hours = self.activity_by_hour_of_week_by_year.setdefault(date.year, {}).setdefault(
             day, {}
         )

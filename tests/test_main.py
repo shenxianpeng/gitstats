@@ -670,6 +670,23 @@ class TestCollectPhases:
         # the all-time grid still counts every year together
         assert dc.activity_by_hour_of_week == {2: {14: 2, 23: 1}, 3: {9: 1}}
 
+    def test_record_activity_takes_hour_and_weekday_from_the_commits_own_clock(self):
+        dc = GitDataCollector()
+        # one moment: Tue 2024-12-31 20:30 on this machine, Wed 2025-01-01 05:30
+        # where the commit was made
+        here = datetime.datetime(2024, 12, 31, 20, 30)
+        there = datetime.datetime(2025, 1, 1, 5, 30)
+        dc._record_activity(here, there)
+
+        # the hour and the day of the week are the committer's
+        assert dc.activity_by_hour_of_day == {5: 1}
+        assert dc.activity_by_day_of_week == {2: 1}
+        assert dc.activity_by_hour_of_week == {2: {5: 1}}
+        # the month, week and year it is counted in are this machine's
+        assert dc.activity_by_month_of_year == {12: 1}
+        assert dc.activity_by_year_week == {here.strftime("%Y-%W"): 1}
+        assert dc.activity_by_hour_of_week_by_year == {2024: {2: {5: 1}}}
+
     def test_record_author_commit_tracks_span_and_active_days(self):
         dc = GitDataCollector()
         early = datetime.datetime(2024, 1, 10, 9, 0)
@@ -1420,6 +1437,27 @@ class TestCollectEdgeCases:
         assert dc.commits_by_timezone == {"+0000": 1, "+0100": 1}
         assert author_to_email == {"Ann": "ann@example.com", "Bo": "bo-at-nowhere"}
         assert email_to_latest["ann@example.com"] == (1700000000, "Ann")
+
+    def test_commit_stats_count_hours_on_each_commits_own_clock(self, monkeypatch):
+        """Not on the clock of the machine the report is generated on."""
+        fake = _fake_git(
+            {
+                "git rev-list --pretty": (
+                    # one moment, 2023-11-14 22:13:20 UTC, committed in three places
+                    "1700000000 2023-11-15 07:13:20 +0900 Ann <ann@example.com>\n"
+                    "1700000000 2023-11-14 14:13:20 -0800 Bo <bo@example.com>\n"
+                    "1700000000 2023-11-15 03:43:20 +0530 Cy <cy@example.com>\n"
+                )
+            }
+        )
+        monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+        dc = GitDataCollector()
+        dc._collect_commit_stats()
+
+        assert dc.activity_by_hour_of_day == {7: 1, 14: 1, 3: 1}
+        # already Wednesday in Tokyo and Kolkata, still Tuesday in California
+        assert dc.activity_by_day_of_week == {2: 2, 1: 1}
+        assert dc.activity_by_hour_of_week == {2: {7: 1, 3: 1}, 1: {14: 1}}
 
     def test_record_author_commit_moves_last_commit_forward(self):
         dc = GitDataCollector()
