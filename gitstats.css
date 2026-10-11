@@ -493,6 +493,27 @@ table {
 	border-right: 1px dashed var(--border-strong);
 }
 
+/* Cut down to a short break when it would take a quarter of the axis or more
+   (see collapsed_width()): hatched, and naming its years on the label row */
+.timeline-gap.is-collapsed {
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	background-image: repeating-linear-gradient(
+		135deg,
+		transparent 0 7px,
+		var(--border-color) 7px 8px
+	);
+	font-family: var(--font-mono);
+	font-size: var(--font-size-xs);
+	color: var(--text-secondary);
+	white-space: nowrap;
+}
+
+.timeline-gap.is-collapsed > span {
+	background-color: var(--surface-color);
+}
+
 .timeline-year {
 	position: absolute;
 	top: 0;
