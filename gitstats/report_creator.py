@@ -405,6 +405,12 @@ THEME_TOGGLE_BUTTON = (
     f'aria-label="Switch to dark mode">{_THEME_TOGGLE_ICONS}</button>'
 )
 
+# Class of a table whose rows are files. A path cannot share a phone's width
+# with a few numbers, so under 560px each row is laid out as two lines: the
+# path, then the other cells, each named by its ``data-label`` (the column's
+# heading), and the header row becomes the sort controls. See gitstats.css.
+FILE_TABLE = "file-table"
+
 # Most-read first: the overview, then who and when, what is at risk (knowledge
 # held by one person, then large files that keep changing), the code itself,
 # the story, and the reference lists; the Badges tool comes last
@@ -1800,13 +1806,13 @@ class HTMLReportCreator(ReportCreator):
             # table and a bar chart whose rotated path labels were unreadable
             rows = [
                 f'<tr><td class="path">{html.escape(filepath)}</td>'
-                f'<td class="num">{format_int(count)}</td>'
+                f'<td class="num" data-label="Times changed">{format_int(count)}</td>'
                 '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
                 f'<span style="width: {100.0 * count / max_churn:.1f}%"></span></span></td></tr>'
                 for filepath, count in top_churn
             ]
             f.write(
-                '<div class="table-scroll"><table class="sortable share-table" id="churn">'
+                f'<div class="table-scroll"><table class="sortable share-table {FILE_TABLE}" id="churn">'
                 '<tr><th>File</th><th class="num">Times Changed</th><th class="unsortable"></th></tr>'
                 + "".join(rows)
                 + "</table></div>"
@@ -2229,12 +2235,12 @@ class HTMLReportCreator(ReportCreator):
 
             def risk_table(table_id: str, rows: list[dict]) -> str:
                 return (
-                    f'<div class="table-scroll"><table class="sortable" id="{table_id}">'
+                    f'<div class="table-scroll"><table class="sortable {FILE_TABLE}" id="{table_id}">'
                     '<tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr>'
                     + "".join(
                         f'<tr><td class="path">{html.escape(fs["path"])}</td>'
-                        f"<td>{author_html(fs['owner'])}</td>"
-                        f'<td class="num">{format_int(fs["edits"])}</td></tr>'
+                        f'<td data-label="Sole owner">{author_html(fs["owner"])}</td>'
+                        f'<td class="num" data-label="Commits">{format_int(fs["edits"])}</td></tr>'
                         for fs in rows
                     )
                     + "</table></div>"
@@ -2298,13 +2304,15 @@ class HTMLReportCreator(ReportCreator):
         )
         if shared:
             f.write(
-                '<div class="table-scroll"><table class="sortable" id="ownership-shared">'
+                f'<div class="table-scroll"><table class="sortable {FILE_TABLE}" id="ownership-shared">'
                 '<tr><th>File</th><th class="num">Contributors</th><th>Primary owner</th>'
                 '<th class="num">Owner share</th></tr>'
             )
             for fs in shared[:20]:
                 f.write(
-                    '<tr><td class="path">%s</td><td class="num">%s</td><td>%s</td><td class="num">%.1f%%</td></tr>'
+                    '<tr><td class="path">%s</td><td class="num" data-label="Contributors">%s</td>'
+                    '<td data-label="Primary owner">%s</td>'
+                    '<td class="num" data-label="Owner share">%.1f%%</td></tr>'
                     % (
                         html.escape(fs["path"]),
                         format_int(fs["contributors"]),
@@ -2448,14 +2456,15 @@ class HTMLReportCreator(ReportCreator):
 
         def hotspot_table(table_id: str, rows: list[dict]) -> str:
             return (
-                f'<div class="table-scroll"><table class="sortable share-table" id="{table_id}">'
+                f'<div class="table-scroll"><table class="sortable share-table {FILE_TABLE}" '
+                f'id="{table_id}">'
                 '<tr><th>File</th><th class="num">Lines</th><th class="num">Changes</th>'
                 '<th class="num">Score</th><th class="unsortable"></th></tr>'
                 + "".join(
                     f'<tr><td class="path">{html.escape(fs["path"])}</td>'
-                    f'<td class="num">{format_int(fs["lines"])}</td>'
-                    f'<td class="num">{format_int(fs["churn"])}</td>'
-                    f'<td class="num">{fs["score"]:,.1f}</td>'
+                    f'<td class="num" data-label="Lines">{format_int(fs["lines"])}</td>'
+                    f'<td class="num" data-label="Changes">{format_int(fs["churn"])}</td>'
+                    f'<td class="num" data-label="Score">{fs["score"]:,.1f}</td>'
                     '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
                     f'<span style="width: {100.0 * fs["score"] / max_score:.1f}%"></span>'
                     "</span></td></tr>"
