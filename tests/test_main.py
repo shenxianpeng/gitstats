@@ -1781,8 +1781,49 @@ class TestWrappedCard:
         assert "git_repo_minimal" in card
         assert THEMES["clean"]["bg_start"] in card
         assert "Wrapped card saved: " in caplog.text
-        # the report itself is unchanged by the card
         assert (out / "index.html").exists()
+
+    def test_the_report_shows_the_card_and_links_it_from_its_year(
+        self, git_repo_minimal, tmp_path, sequential_map
+    ):
+        out = tmp_path / "report"
+        _run_single_repo(git_repo_minimal, str(out), wrapped_config=self._config(theme="sunset"))
+
+        badges = (out / "badges.html").read_text(encoding="utf-8")
+        assert 'data-kind="card" data-badge="wrapped-2023.svg"' in badges
+        assert "1080 &times; 1080, sunset theme" in badges
+        assert '<img src="wrapped-2023.svg" width="240" height="240"' in badges
+        history = (out / "history.html").read_text(encoding="utf-8")
+        assert '<a href="wrapped-2023.svg">Wrapped card &rarr;</a>' in history
+
+    def test_the_report_has_no_card_to_show_when_none_is_next_to_it(
+        self, git_repo_minimal, tmp_path, sequential_map
+    ):
+        def pages(out):
+            return (
+                (out / "badges.html").read_text(encoding="utf-8"),
+                (out / "history.html").read_text(encoding="utf-8"),
+            )
+
+        # not asked for
+        _run_single_repo(git_repo_minimal, str(tmp_path / "plain"))
+        # written to another directory
+        cards = tmp_path / "cards"
+        cards.mkdir()
+        _run_single_repo(
+            git_repo_minimal,
+            str(tmp_path / "elsewhere"),
+            wrapped_config=self._config(output=str(cards / "2023.svg")),
+        )
+        # a year without commits: no card is written
+        _run_single_repo(
+            git_repo_minimal, str(tmp_path / "empty-year"), wrapped_config=self._config(year=2019)
+        )
+        for name in ("plain", "elsewhere", "empty-year"):
+            badges, history = pages(tmp_path / name)
+            assert "There is none next to this report" in badges, name
+            assert 'data-kind="card"' not in badges, name
+            assert "Wrapped card" not in history, name
 
     def test_the_card_holds_the_numbers_of_its_year(
         self, git_repo_minimal, tmp_path, sequential_map

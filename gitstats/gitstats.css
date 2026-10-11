@@ -861,6 +861,13 @@ tr:hover td {
 	background: none;
 }
 
+/* The Repo Wrapped card on the Badges page: a preview that opens the file */
+.badge-info .wrapped-preview {
+	align-self: flex-start;
+	line-height: 0;
+	border: 1px solid var(--border-color);
+}
+
 .badge-json {
 	align-self: flex-start;
 	padding: 1px var(--space-2);

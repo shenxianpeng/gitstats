@@ -11,6 +11,7 @@ import pytest
 
 from gitstats import load_config
 from gitstats.report_creator import (
+    BADGES_PLACEHOLDER_URL,
     HTMLReportCreator,
     ReportCreator,
     _classify_eras,
@@ -3001,6 +3002,87 @@ def test_badges_page_lists_every_badge(mock_data_collector, temp_dir):
     assert content.count('class="badge-row"') == len(os.listdir(badges_dir)) + 2
     assert 'data-kind="default"' in content
     assert 'data-kind="endpoint"' in content
+
+
+def _report_with_card(data, path, card):
+    creator = HTMLReportCreator()
+    creator.wrapped_card = card
+    creator.create(data, path)
+
+    def page(name):
+        with open(os.path.join(path, name), encoding="utf-8") as f:
+            return f.read()
+
+    return page
+
+
+def test_badges_page_shows_the_wrapped_card(mock_data_collector, temp_dir):
+    """The card --wrapped wrote next to the report: a preview, a snippet, the file."""
+    card = {"year": 2023, "theme": "sunset", "file": "wrapped-2023.svg"}
+    content = _report_with_card(mock_data_collector, temp_dir, card)("badges.html")
+
+    section = content[content.index('<h2 id="repo_wrapped">') :]
+    # a row like the badges', so the page's script fills in its snippet and copies it
+    assert (
+        '<div class="badge-row" data-kind="card" data-badge="wrapped-2023.svg" '
+        'data-alt="test-project in 2023" data-title="wrapped-2023.svg">'
+    ) in section
+    assert "<code>wrapped-2023.svg</code><span>1080 &times; 1080, sunset theme</span>" in section
+    assert (
+        '<a class="wrapped-preview" href="wrapped-2023.svg">'
+        '<img src="wrapped-2023.svg" width="240" height="240" '
+        'alt="Repo Wrapped card for test-project in 2023"></a>'
+    ) in section
+    # until the script knows the report's address, the placeholder stands in for it
+    placeholder = BADGES_PLACEHOLDER_URL.replace("<", "&lt;").replace(">", "&gt;")
+    assert (
+        '<pre class="badge-code">[![test-project in 2023]'
+        f"({placeholder}wrapped-2023.svg)]({placeholder})</pre>"
+    ) in section
+    assert 'aria-label="Copy Markdown for wrapped-2023.svg"' in section
+    assert '<a href="wrapped-2023.svg" download>Download SVG &rarr;</a>' in section
+    # it comes after the badges
+    assert content.index('<h2 id="other_ways_to_use_them">') < content.index(
+        '<h2 id="repo_wrapped">'
+    )
+
+
+def test_badges_page_without_a_wrapped_card_says_how_to_get_one(mock_data_collector, temp_dir):
+    content = _badges_page(mock_data_collector, temp_dir)
+    section = content[content.index('<h2 id="repo_wrapped">') :]
+    assert "There is none next to this report" in section
+    assert '<code class="nowrap">--wrapped</code>' in section
+    assert 'data-kind="card"' not in content
+    assert "download" not in section
+
+
+def test_badges_script_gives_the_card_its_own_file_and_a_width():
+    from gitstats.report_creator import BADGES_SCRIPT
+
+    assert "if (kind === 'card') { path = name; alt = row.getAttribute('data-alt'); }" in (
+        BADGES_SCRIPT
+    )
+    # 1080px wide: the formats that can say so show it at 480
+    assert "snippet(image, link, alt, kind === 'card' ? 480 : 0)" in BADGES_SCRIPT
+    assert "(width ? '\\n   :width: ' + width : '')" in BADGES_SCRIPT
+    assert """(width ? ' width="' + width + '"' : '')""" in BADGES_SCRIPT
+
+
+def test_history_links_the_wrapped_card_from_its_year(mock_data_collector, temp_dir):
+    mock_data_collector.commits_by_year = {2022: 20, 2023: 50}
+    card = {"year": 2023, "theme": "midnight", "file": "wrapped-2023.svg"}
+    history = _report_with_card(mock_data_collector, temp_dir, card)("history.html")
+
+    link = '<p class="history-people"><a href="wrapped-2023.svg">Wrapped card &rarr;</a></p>'
+    assert history.count(link) == 1
+    # in the entry for 2023, not the one for 2022
+    assert history.index('<span class="history-year-num">2023</span>') < history.index(link)
+    year_2022 = history[history.index('<span class="history-year-num">2022</span>') :]
+    assert link not in year_2022[: year_2022.index('<span class="history-year-num">2023</span>')]
+
+    # and no link at all without a card
+    plain = _report_with_card(mock_data_collector, temp_dir, None)("history.html")
+    assert "Wrapped card" not in plain
 
 
 def test_badges_page_controls_and_placeholder(mock_data_collector, temp_dir):
