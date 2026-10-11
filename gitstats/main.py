@@ -1173,9 +1173,15 @@ def _run_single_repo(
     else:
         data.ai_summaries = {}
 
+    # The card comes first, so the report can show it and link to it
+    wrapped_card = None
+    if wrapped_config and wrapped_config.get("enabled", False):
+        wrapped_card = _write_wrapped_card(data, outputpath, wrapped_config)
+
     logger.info("Generating report...")
     html_report = HTMLReportCreator()
     html_report.site_url = site_url
+    html_report.wrapped_card = wrapped_card
     html_report.create(data, outputpath)
     if site_url:
         logger.info(f"README badge: [![GitStats]({site_url}badge.svg)]({site_url})")
@@ -1191,15 +1197,12 @@ def _run_single_repo(
         else:
             raise RuntimeError(f"Unsupported format '{extra_fmt}'")
 
-    if wrapped_config and wrapped_config.get("enabled", False):
-        _write_wrapped_card(data, outputpath, wrapped_config)
-
     return data
 
 
 def _write_wrapped_card(
     data: DataCollector, outputpath: str, wrapped_config: dict[str, Any]
-) -> None:
+) -> dict[str, Any] | None:
     """Write the Repo Wrapped card for one repository.
 
     The card goes into the report directory as ``wrapped-<year>.svg``, or
@@ -1207,6 +1210,10 @@ def _write_wrapped_card(
     already exist. The card is an extra: when it cannot be written, or the
     year has no commits to put on it, that is logged and the run carries on
     with the report it has.
+
+    Returns what the report needs to show the card, ``{"year", "theme",
+    "file"}`` with the file's name in the report directory, or None when
+    there is no card there: none was written, or it was written elsewhere.
     """
     logger.info("Generating Wrapped card...")
     try:
@@ -1220,9 +1227,17 @@ def _write_wrapped_card(
             or os.path.join(outputpath, f"wrapped-{generator.year}.svg")
         )
         # generate() keeps only the file name and writes it inside base_dir
-        generator.generate(output_path=target, base_dir=os.path.dirname(target))
+        written = generator.generate(output_path=target, base_dir=os.path.dirname(target))
     except Exception as e:
         logger.warning(f"Failed to generate Wrapped card: {e}")
+        return None
+    if os.path.dirname(written) != os.path.abspath(outputpath):
+        return None  # written elsewhere: the report has nothing next to it to show
+    return {
+        "year": generator.year,
+        "theme": generator.theme_name,
+        "file": os.path.basename(written),
+    }
 
 
 def _dump_json_within(directory: str, filename: str, data: DataCollector) -> None:

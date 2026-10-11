@@ -516,9 +516,17 @@ BADGES_SCRIPT = r"""<script>
 		return url ? url.replace(/\/*$/, '/') : data.placeholder;
 	}
 
-	function snippet(image, link, alt) {
-		if (format === 'rst') return '.. image:: ' + image + '\n   :target: ' + link + '\n   :alt: ' + alt;
-		if (format === 'html') return '<a href="' + link + '"><img src="' + image + '" alt="' + alt + '"></a>';
+	// `width` is for the Wrapped card, which is 1080px wide: reStructuredText
+	// and HTML can show it smaller, Markdown has no way to say so
+	function snippet(image, link, alt, width) {
+		if (format === 'rst') {
+			return '.. image:: ' + image + '\n   :target: ' + link + '\n   :alt: ' + alt
+				+ (width ? '\n   :width: ' + width : '');
+		}
+		if (format === 'html') {
+			return '<a href="' + link + '"><img src="' + image + '" alt="' + alt + '"'
+				+ (width ? ' width="' + width + '"' : '') + '></a>';
+		}
 		return '[![' + alt + '](' + image + ')](' + link + ')';
 	}
 
@@ -543,12 +551,13 @@ BADGES_SCRIPT = r"""<script>
 			let path = 'badges/' + style + '/' + name + '.svg';
 			let alt = 'GitStats ' + name;
 			if (kind === 'default') { path = 'badge.svg'; alt = 'GitStats'; }
+			if (kind === 'card') { path = name; alt = row.getAttribute('data-alt'); }
 			const image = kind === 'endpoint'
 				? 'https://img.shields.io/endpoint?url=' + link + 'badges/' + name + '.json'
 				: link + path;
 			const img = row.querySelector('img');
 			if (img && kind === 'style') img.src = path;
-			row.querySelector('.badge-code').textContent = snippet(image, link, alt);
+			row.querySelector('.badge-code').textContent = snippet(image, link, alt, kind === 'card' ? 480 : 0);
 			row.querySelector('.badge-copy').setAttribute('aria-label', 'Copy ' + formats[format] + ' for ' + row.getAttribute('data-title'));
 		});
 		showStatus();
@@ -775,6 +784,9 @@ class ReportCreator:
 class HTMLReportCreator(ReportCreator):
     # The report's public address, ending in "/", when it is known (--site-url)
     site_url = ""
+    # The Repo Wrapped card written next to the report by --wrapped, as
+    # {"year", "theme", "file"}; None when there is none to show
+    wrapped_card: dict[str, Any] | None = None
 
     @staticmethod
     def _heat_level(value, max_value):
@@ -2123,6 +2135,40 @@ class HTMLReportCreator(ReportCreator):
             )
         )
         f.write("</div>")
+
+        # Badges :: Repo Wrapped, the card written by --wrapped
+        f.write(html_header(2, "Repo Wrapped"))
+        card = self.wrapped_card
+        if card:
+            name = html.escape(str(card["file"]))
+            year = int(card["year"])
+            project = str(getattr(data, "project_name", "") or "repository")
+            alt = f"{project} in {year}"
+            code = f"[![{alt}]({link}{card['file']})]({link})"
+            f.write(
+                '<p class="section-note">A card of one year in the repository, written by '
+                '<code class="nowrap">--wrapped</code>: show it in a README, or save it and '
+                "share it as "
+                'an image.</p><div class="badge-list">'
+                f'<div class="badge-row" data-kind="card" data-badge="{name}" '
+                f'data-alt="{html.escape(alt)}" data-title="{name}">'
+                f'<div class="badge-info"><div class="badge-name"><code>{name}</code>'
+                f"<span>1080 &times; 1080, {html.escape(str(card.get('theme', '')))} theme</span>"
+                f'</div><a class="wrapped-preview" href="{name}">'
+                f'<img src="{name}" width="240" height="240" '
+                f'alt="Repo Wrapped card for {html.escape(alt)}"></a></div>'
+                f'<pre class="badge-code">{html.escape(code)}</pre>'
+                f'<button type="button" class="badge-copy" '
+                f'aria-label="Copy Markdown for {name}">{_COPY_ICONS}'
+                "<span>Copy</span></button></div></div>"
+                f'<p class="more-link"><a href="{name}" download>Download SVG &rarr;</a></p>'
+            )
+        else:
+            f.write(
+                '<p class="section-note">A card of one year in the repository, to show in a '
+                "README or share as an image. There is none next to this report: generate it "
+                'with <code class="nowrap">--wrapped</code> to get one.</p>'
+            )
         f.write('<p id="badge-live" class="visually-hidden" aria-live="polite"></p>')
 
         page_data = {
@@ -2712,6 +2758,12 @@ class HTMLReportCreator(ReportCreator):
                             if len(entry["releases"]) > 5
                             else "",
                         )
+                    )
+                card = self.wrapped_card
+                if card and card.get("year") == entry["year"]:
+                    f.write(
+                        '<p class="history-people">'
+                        f'<a href="{html.escape(str(card["file"]))}">Wrapped card &rarr;</a></p>'
                     )
             else:
                 f.write('<p class="history-facts">No commits this year.</p>')

@@ -327,6 +327,9 @@ the busiest month and weekday, the top contributor, the commits in each month
 and the part of the day most of them were made in. A year without commits
 gets no card: ``gitstats`` says so and names the last year that has any.
 
+The report shows the card on its Badges page, with a snippet to put it in a
+README, and links to it from its year on the History page.
+
 With several repositories, each one gets its card in its own report
 directory; ``--wrapped-output`` names a single file, so it only works with one
 repository.
