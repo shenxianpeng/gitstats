@@ -1531,6 +1531,11 @@ def test_compute_code_ownership_stats():
     assert authors["Bob"]["files_owned"] == 2  # shared.py + b.py
     assert authors["Bob"]["files_touched"] == 2
 
+    # Bob alone is primary owner of two of the three files: more than half
+    assert result["bus_factor"] == 1
+    assert result["bus_factor_authors"] == ["Bob"]
+    assert result["bus_factor_files"] == 2
+
 
 def test_compute_code_ownership_empty():
     assert compute_code_ownership({}) == {
@@ -1538,7 +1543,34 @@ def test_compute_code_ownership_empty():
         "authors": [],
         "total_files": 0,
         "single_owner_files": 0,
+        "bus_factor": 0,
+        "bus_factor_authors": [],
+        "bus_factor_files": 0,
     }
+
+
+def test_bus_factor_counts_owners_until_they_hold_more_than_half():
+    # Ann owns four files, Ben three, Cy two, Di one: ten in all
+    author_files = {
+        "Ann": {f"a{i}.py": 5 for i in range(4)},
+        "Ben": {f"b{i}.py": 5 for i in range(3)},
+        "Cy": {f"c{i}.py": 5 for i in range(2)},
+        "Di": {"d0.py": 5},
+    }
+    result = compute_code_ownership(author_files)
+    # Ann's four are not more than half of ten, Ann's and Ben's seven are
+    assert result["bus_factor"] == 2
+    assert result["bus_factor_authors"] == ["Ann", "Ben"]
+    assert result["bus_factor_files"] == 7
+
+    # exactly half is not more than half: two files, one owner each
+    even = compute_code_ownership({"Ann": {"a.py": 1}, "Ben": {"b.py": 1}})
+    assert even["bus_factor"] == 2
+    assert even["bus_factor_files"] == 2
+
+    # a file only bots have changed has no owner, and is not counted
+    bots = compute_code_ownership({"Ann": {"a.py": 1}, "dependabot[bot]": {"uv.lock": 9}})
+    assert (bots["total_files"], bots["bus_factor"]) == (1, 1)
 
 
 def test_ownership_page_renders(mock_data_collector, temp_dir):
@@ -1550,6 +1582,14 @@ def test_ownership_page_renders(mock_data_collector, temp_dir):
 
     assert "Code Ownership" in content
     assert "Bus factor risk" in content
+    # Alice and Bob are primary owner of two files each: neither holds more than half
+    assert (
+        '<dt>Bus Factor</dt><dd class="stat-value">2</dd>'
+        '<dd class="stat-note">2 authors are primary owner of 4 of 4 files</dd>'
+    ) in content
+    assert content.index("<dt>Files Tracked</dt>") < content.index("<dt>Bus Factor</dt>")
+    assert content.index("<dt>Bus Factor</dt>") < content.index("<dt>Single-Owner Files</dt>")
+    assert "The <strong>bus factor</strong> is the smallest number of people" in content
     # solo_alice.py is only touched by Alice -> appears as a single-owner file
     assert "solo_alice.py" in content
     assert "Alice Smith" in content
@@ -1580,7 +1620,7 @@ def test_file_tables_name_their_cells_for_phones(mock_data_collector, temp_dir):
     each named after its column by a data-label."""
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     expected = {
-        "hotspots.html": {"hotspots": ["Lines", "Changes", "Score"]},
+        "hotspots.html": {"hotspots": ["Lines", "Changes", "Authors", "Score"]},
         "files.html": {"churn": ["Times changed"]},
         "ownership.html": {
             "ownership-busfactor": ["Sole owner", "Commits"],
@@ -1754,7 +1794,7 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
         content.index('<table class="sortable share-table file-table" id="hotspots">') :
     ]
     table = table[: table.index("</table>")]
-    assert re.findall(r'<td class="path">([^<]+)</td>', table) == [
+    assert re.findall(r'<td class="path"[^>]*>([^<]+)</td>', table) == [
         "main.py",
         "utils.py",
         "README.md",
@@ -1763,12 +1803,67 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
     assert (
         '<tr><td class="path">utils.py</td><td class="num" data-label="Lines">120</td>'
         '<td class="num" data-label="Changes">10</td>'
+        '<td class="num" data-label="Authors">2</td>'
         '<td class="num" data-label="Score">109.5</td><td class="share-cell"><span class="share-bar" '
         'aria-hidden="true"><span style="width: 36.5%"></span></span></td></tr>'
     ) in table
     # no file is called critical: half of them are above each median anyway
     assert "ritical" not in content
     assert "</html>" in content
+
+
+def test_hotspots_table_counts_the_authors_of_each_file(mock_data_collector, temp_dir):
+    """As the Code Ownership page counts them, so the two pages agree."""
+    content = _hotspots_html(mock_data_collector, temp_dir)
+    table = content[content.index('id="hotspots">') :]
+    table = table[: table.index("</table>")]
+
+    assert (
+        '<th class="num">Changes</th><th class="num">Authors</th><th class="num">Score</th>'
+    ) in table
+    authors = dict(
+        re.findall(r'<td class="path"[^>]*>([^<]+)</td>.*?data-label="Authors">(\d+)</td>', table)
+    )
+    # main.py: Alice, Bob and Charlie; README.md: Bob; nobody on record for Dockerfile
+    assert authors == {"main.py": "3", "utils.py": "2", "README.md": "1", "Dockerfile": "0"}
+
+    # a hotspot only one person has changed is flagged; the flag is drawn by CSS
+    # from the attribute, so the cell's text, which the table sorts by, is the path
+    assert (
+        '<td class="path" data-tag="sole owner" '
+        'title="Only one person has changed this file">README.md</td>'
+    ) in table
+    assert table.count("data-tag=") == 1
+    assert "sole owner</td>" not in table
+    assert '<a href="ownership.html">Code Ownership</a>' in content
+
+    # only the files that still exist count, as on the Code Ownership page
+    mock_data_collector.head_files = ["main.py", "utils.py", "README.md", "Dockerfile"]
+    mock_data_collector.author_files["Dana"] = {"gone.py": 3, "README.md": 1}
+    content = _hotspots_html(mock_data_collector, temp_dir)
+    assert 'data-tag="sole owner"' not in content  # README.md has two authors now
+
+
+def test_hotspots_table_without_ownership_data_has_no_authors_column(mock_data_collector, temp_dir):
+    mock_data_collector.author_files = {}
+    content = _hotspots_html(mock_data_collector, temp_dir)
+    assert '<th class="num">Authors</th>' not in content
+    assert 'data-label="Authors"' not in content
+    assert "<strong>Authors</strong>" not in content
+    assert "data-tag" not in content
+    assert (
+        '<td class="num" data-label="Changes">10</td><td class="num" data-label="Score">109.5</td>'
+    ) in content
+
+
+def test_path_flag_is_drawn_by_css():
+    css_path = os.path.join(os.path.dirname(__file__), "..", "gitstats", "gitstats.css")
+    with open(css_path, encoding="utf-8") as f:
+        css = f.read()
+    rule = css[css.index("td.path[data-tag]::after {") :]
+    rule = rule[: rule.index("}")]
+    assert "content: attr(data-tag);" in rule
+    assert "color: var(--warn-color);" in rule
 
 
 def test_files_page_links_churn_to_the_hotspots_page(mock_data_collector, temp_dir):
