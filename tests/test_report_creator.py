@@ -15,6 +15,10 @@ from gitstats.report_creator import (
     ReportCreator,
     _classify_eras,
     author_html,
+    collapse_gap_categories,
+    collapse_gap_time,
+    collapsed_slots,
+    collapsed_width,
     compute_code_ownership,
     compute_hotspots,
     compute_project_history,
@@ -29,6 +33,7 @@ from gitstats.report_creator import (
     quiet_months,
     stat_tiles_html,
     tags_newest_first,
+    year_span,
 )
 
 # ── html_linkify ─────────────────────────────────────────────────────────
@@ -404,11 +409,13 @@ def test_render_chartjs_time_axis():
     )
     # Unix seconds become JS milliseconds on a linear x-axis
     assert "var labels = [1000000000000, 1700000000000];" in result
-    assert "x: timeAxis(labels)" in result
-    assert "x: xs[i], y: y" in result
+    # no stretch is cut out of the axis, so the helpers leave every value alone
+    assert "var gap = null;" in result
+    assert "x: timeAxis(labels, gap)" in result
+    assert "x: squeezeTime(gap, xs[i]), y: y" in result
     # Cumulative series hold their value until the next point
     assert '"stepped": true' in result
-    assert "formatChartDate(items[0].parsed.x)" in result
+    assert "formatChartDate(stretchTime(gap, items[0].parsed.x))" in result
 
 
 def test_render_chartjs_single_dataset_follows_theme():
@@ -2379,11 +2386,12 @@ def test_stat_tiles_span_the_content_width():
 
 def test_quiet_stretch_is_shaded_on_line_charts_and_timeline(mock_data_collector, temp_dir):
     """The longest year+ without commits is shaded on every time chart, not just the bars."""
-    months = {f"2010-{m:02d}": 2 for m in range(1, 13)}
-    months.update({f"2013-{m:02d}": 3 for m in range(1, 13)})
+    # one quiet year in six: shaded, but too short to be cut out of the axis
+    months = {f"{y}-{m:02d}": 2 for y in (2008, 2009, 2010) for m in range(1, 13)}
+    months.update({f"{y}-{m:02d}": 3 for y in (2012, 2013) for m in range(1, 13)})
     mock_data_collector.commits_by_month = months
     mock_data_collector.author_of_month = {m: {"Alice Smith": n} for m, n in months.items()}
-    mock_data_collector.new_contributors_by_month = {"2010-01": 1, "2013-06": 1}
+    mock_data_collector.new_contributors_by_month = {"2008-01": 1, "2013-06": 1}
     HTMLReportCreator().create(mock_data_collector, temp_dir)
 
     def page(name):
@@ -2391,8 +2399,8 @@ def test_quiet_stretch_is_shaded_on_line_charts_and_timeline(mock_data_collector
             return f.read()
 
     start = int(datetime.datetime(2011, 1, 1).timestamp() * 1000)
-    end = int(datetime.datetime(2013, 1, 1).timestamp() * 1000)
-    band = f'"bands": [{{"from": {start}, "to": {end}, "text": "No commits 2011-01 \\u2013 2012-12"'
+    end = int(datetime.datetime(2012, 1, 1).timestamp() * 1000)
+    band = f'"bands": [{{"from": {start}, "to": {end}, "text": "No commits 2011-01 \\u2013 2011-12"'
     for name, chart in (
         ("files.html", "chart-files-by-date"),
         ("lines.html", "chart-lines-of-code"),
@@ -2404,9 +2412,234 @@ def test_quiet_stretch_is_shaded_on_line_charts_and_timeline(mock_data_collector
     authors = page("authors.html")
     growth = authors[authors.index('id="chart-contributor-growth"') :]
     growth = growth[: growth.index("</script>")]
-    # 2010-01 .. 2013-12 by month: the quiet stretch is indexes 12..35
-    assert '"bands": [{"from": 12, "to": 35, "text": "No commits 2011-01' in growth
-    assert '<span class="timeline-gap" style="left: 25.000%; width: 50.000%" ' in authors
+    # 2008-01 .. 2013-12 by month: the quiet stretch is indexes 36..47
+    assert '"bands": [{"from": 36, "to": 47, "text": "No commits 2011-01' in growth
+    assert '"collapsed"' not in growth
+    assert '<span class="timeline-gap" style="left: 50.000%; width: 16.667%" ' in authors
+    assert "is-collapsed" not in authors
+
+
+def test_long_quiet_stretch_is_cut_out_of_the_time_axes(mock_data_collector, temp_dir):
+    """Half the history without commits: a short break, not half of every chart."""
+    months = {f"2010-{m:02d}": 2 for m in range(1, 13)}
+    months.update({f"2013-{m:02d}": 3 for m in range(1, 13)})
+    mock_data_collector.commits_by_month = months
+    mock_data_collector.author_of_month = {m: {"Alice Smith": n} for m, n in months.items()}
+    mock_data_collector.new_contributors_by_month = {"2010-01": 1, "2013-06": 1}
+    # a file count on each side of the two quiet years
+    mock_data_collector.files_by_stamp = {
+        int(datetime.datetime(2010, 1, 5).timestamp()): 3,
+        int(datetime.datetime(2010, 12, 20).timestamp()): 8,
+        int(datetime.datetime(2013, 1, 10).timestamp()): 9,
+        int(datetime.datetime(2013, 12, 30).timestamp()): 12,
+    }
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+
+    def page(name):
+        with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
+            return f.read()
+
+    authors = page("authors.html")
+    growth = authors[authors.index('id="chart-contributor-growth"') :]
+    growth = growth[: growth.index("</script>")]
+    # 48 months, 24 of them quiet: those 24 are one slot, named after all of them
+    labels = json.loads(growth.split("var labels = ", 1)[1].split(";\n", 1)[0])
+    assert len(labels) == 25
+    assert labels[11:14] == ["2010-12", "2011-01 \u2013 2012-12", "2013-01"]
+    assert (
+        '"bands": [{"from": 12, "to": 12, "text": "No commits 2011-01 \\u2013 2012-12", '
+        '"short": "no commits", "collapsed": true, "axis": "2011\\u201312"}]'
+    ) in growth
+    # the line stays where it was through the break: one contributor so far
+    data = json.loads(growth.split('"data": ', 1)[1].split("]", 1)[0] + "]")
+    assert data[11:14] == [1, 1, 1]
+
+    # the timeline cuts the same stretch to the same slot: 12 + 1 + 12 months
+    assert (
+        '<span class="timeline-gap is-collapsed" style="left: 48.000%; width: 4.000%" '
+        'title="No commits 2011-01 \u2013 2012-12"><span>2011\u201312</span></span>'
+    ) in authors
+    # 2011 and 2012 have no gridline of their own; 2013 starts right after the break
+    assert re.findall(
+        r'<span class="timeline-year" style="left: ([\d.]+)%">(\d*)</span>', authors
+    ) == [("52.000", "2013")]
+    # a mark in 2013-01 sits half a month past the break
+    assert 'class="timeline-mark" style="left: 54.000%;' in authors
+
+    # the time-axis chart is handed the gap, and its band is the break
+    files = page("files.html")
+    chart = files[files.index('id="chart-files-by-date"') :]
+    chart = chart[: chart.index("</script>")]
+    start = int(datetime.datetime(2011, 1, 1).timestamp() * 1000)
+    end = int(datetime.datetime(2013, 1, 1).timestamp() * 1000)
+    gap = json.loads(chart.split("var gap = ", 1)[1].split(";\n", 1)[0])
+    assert (gap["from"], gap["to"]) == (start, end)
+    span = (
+        datetime.datetime(2013, 12, 30).timestamp() - datetime.datetime(2010, 1, 5).timestamp()
+    ) * 1000
+    assert gap["width"] == round(0.05 * (span - (end - start)))
+    assert (
+        f'"bands": [{{"from": {start}, "to": {start + gap["width"]}, '
+        '"text": "No commits 2011-01 \\u2013 2012-12", "short": "no commits", '
+        '"collapsed": true, "axis": "2011\\u201312"}]'
+    ) in chart
+
+
+@pytest.mark.parametrize(
+    ("total", "gap", "expected"),
+    [
+        (232, 106, 6.3),  # gitstats itself: 106 quiet months of 232
+        (100, 25, 3.75),  # a quarter of the axis is enough
+        (100, 24, None),  # under a quarter: shaded, and left as wide as it is
+        (0, 0, None),
+    ],
+)
+def test_collapsed_width(total, gap, expected):
+    assert collapsed_width(total, gap) == pytest.approx(expected)
+
+
+def test_collapsed_slots():
+    assert collapsed_slots(232, 106) == 6
+    # a year chart: eight empty years of twenty become one slot
+    assert collapsed_slots(20, 8) == 1
+    # nothing to gain when the stretch is no longer than its break would be
+    assert collapsed_slots(4, 1) is None
+    assert collapsed_slots(100, 24) is None
+
+
+def test_year_span():
+    assert year_span("2016-01", "2024-10") == "2016\u201324"
+    assert year_span(2016, 2023) == "2016\u201323"
+    assert year_span("2020-02", "2020-12") == "2020"
+    assert year_span(1998, 2003) == "1998\u20132003"
+
+
+def test_collapse_gap_categories_on_a_bar_chart():
+    years = [2007, 2008, 2016, 2017, 2018, 2019, 2024, 2025]
+    values = [9, 4, 0, 0, 0, 0, 6, 12]
+    annotations = gap_annotations(years, values, min_gap=2)
+    datasets = [{"label": "Commits", "data": values, "notes": ["a", "b", "", "", "", "", "c", "d"]}]
+    labels, sets, collapsed = collapse_gap_categories(years, datasets, annotations)
+
+    # four empty years of eight become one slot, named after all four
+    assert labels == [2007, 2008, "2016 \u2013 2019", 2024, 2025]
+    assert sets == [
+        {"label": "Commits", "data": [9, 4, 0, 6, 12], "notes": ["a", "b", "", "c", "d"]}
+    ]
+    assert collapsed["bands"] == [
+        {
+            "from": 2,
+            "to": 2,
+            "text": "No commits 2016 \u2013 2019",
+            "short": "no commits",
+            "collapsed": True,
+            "axis": "2016\u201319",
+        }
+    ]
+    # the peak before the stretch stays put, the one after it moves up
+    assert collapsed["peaks"] == [
+        {"index": 0, "text": "2007 \u00b7 9"},
+        {"index": 4, "text": "2025 \u00b7 12"},
+    ]
+    # the caller's lists are not touched
+    assert len(years) == 8 and len(datasets[0]["data"]) == 8
+    assert annotations["bands"][0]["to"] == 5
+
+
+def test_collapse_gap_categories_keeps_a_cumulative_line_level():
+    labels = [f"m{i}" for i in range(10)]
+    band = {"from": 2, "to": 7, "text": "No commits", "short": "no commits"}
+    datasets = [{"label": "Contributors", "data": [1, 2, 2, 2, 2, 2, 2, 2, 3, 4]}]
+    new_labels, sets, _ = collapse_gap_categories(labels, datasets, {"bands": [band]})
+    assert new_labels == ["m0", "m1", "m2 \u2013 m7", "m8", "m9"]
+    assert sets[0]["data"] == [1, 2, 2, 3, 4]
+
+
+def test_collapse_gap_categories_leaves_short_stretches_alone():
+    years = [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028]
+    values = [5, 0, 0, 3, 4, 5, 6, 7, 8, 9]
+    annotations = gap_annotations(years, values, min_gap=2)
+    datasets = [{"label": "Commits", "data": values}]
+    # two empty years of ten are shaded, but under a quarter of the axis
+    assert collapse_gap_categories(years, datasets, annotations) == (years, datasets, annotations)
+    # and without a band there is nothing to collapse
+    assert collapse_gap_categories(years, datasets, {"values": True}) == (
+        years,
+        datasets,
+        {"values": True},
+    )
+
+
+def test_collapse_gap_time():
+    day = 86_400_000
+    stamps = [0, 10 * day, 110 * day, 200 * day]
+    band = {"from": 20 * day, "to": 100 * day, "text": "No commits", "short": "no commits"}
+    annotations, gap = collapse_gap_time(stamps, {"bands": [band]})
+
+    # 80 quiet days of 200 are drawn as wide as 5% of the other 120: six days
+    assert gap == {"from": 20 * day, "to": 100 * day, "width": 6 * day}
+    assert annotations["bands"] == [
+        {**band, "to": 26 * day, "collapsed": True, "axis": annotations["bands"][0]["axis"]}
+    ]
+    # the caller's band is not touched
+    assert band["to"] == 100 * day
+
+
+def test_collapse_gap_time_names_the_years_of_the_stretch():
+    start = int(datetime.datetime(2016, 1, 1).timestamp() * 1000)
+    end = int(datetime.datetime(2024, 11, 1).timestamp() * 1000)  # the day after 2024-10
+    stamps = [
+        int(datetime.datetime(2007, 7, 30).timestamp() * 1000),
+        int(datetime.datetime(2026, 10, 11).timestamp() * 1000),
+    ]
+    annotations, _ = collapse_gap_time(stamps, {"bands": [{"from": start, "to": end}]})
+    assert annotations["bands"][0]["axis"] == "2016\u201324"
+
+
+def test_collapse_gap_time_leaves_the_rest_alone():
+    day = 86_400_000
+    band = {"from": 20 * day, "to": 40 * day, "text": "No commits"}
+    annotations = {"bands": [band]}
+    # under a quarter of the axis
+    assert collapse_gap_time([0, 10 * day, 200 * day], annotations) == (annotations, None)
+    # a stretch that is not between two of the chart's points
+    assert collapse_gap_time([25 * day, 60 * day], annotations) == (annotations, None)
+    # nothing to place it against
+    assert collapse_gap_time([], annotations) == (annotations, None)
+    assert collapse_gap_time([0, 200 * day], {"values": True}) == ({"values": True}, None)
+
+
+def test_render_chartjs_collapses_a_long_gap_on_a_year_axis():
+    creator = HTMLReportCreator()
+    years = [2007, 2008, 2016, 2017, 2018, 2019, 2024, 2025]
+    values = [9, 4, 0, 0, 0, 0, 6, 12]
+    result = creator._render_chartjs(
+        "chart-years",
+        "bar",
+        years,
+        [{"label": "Commits", "data": values}],
+        annotations=gap_annotations(years, values, min_gap=2),
+    )
+    assert 'var labels = [2007, 2008, "2016 \\u2013 2019", 2024, 2025];' in result
+    assert '"data": [9, 4, 0, 6, 12]' in result
+    assert '"collapsed": true, "axis": "2016\\u201319"' in result
+    # the slot's own name is for tooltips: the tick under it is left to the band
+    assert "callback: categoryTick" in result
+    # a chart with nothing collapsed keeps the plain axis
+    plain = creator._render_chartjs("c", "bar", [2020, 2021], [{"label": "C", "data": [1, 2]}])
+    assert "categoryTick" not in plain
+
+
+def test_chart_script_knows_how_to_draw_a_collapsed_stretch():
+    from gitstats.report_creator import CHART_SCRIPT
+
+    for name in ("function squeezeTime(gap, ms)", "function stretchTime(gap, at)"):
+        assert name in CHART_SCRIPT
+    assert "function timeAxis(xs, gap)" in CHART_SCRIPT
+    assert "function categoryTick(value)" in CHART_SCRIPT
+    # month axes do not label the slots standing in for the stretch
+    assert "if (isCollapsedLabel(label)) return '';" in CHART_SCRIPT
+    assert "band.collapsed" in CHART_SCRIPT
 
 
 def test_quiet_months_needs_a_year():

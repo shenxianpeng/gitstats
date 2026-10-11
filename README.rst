@@ -363,7 +363,7 @@ Here is a list of some features of ``gitstats``:
 * **History**: the project's life one year at a time — its peaks, quiet years and revivals, newcomers and releases — with optional AI narration.
 * **Portfolio**: analyze several repositories at once for an aggregate overview.
 * **Wrapped card**: a shareable SVG card of one year in the repository, with ``--wrapped``.
-* **Readable anywhere**: interactive charts, light and dark themes, and layouts that work on phones; long quiet periods are shaded on every timeline.
+* **Readable anywhere**: interactive charts, light and dark themes, and layouts that work on phones; long quiet periods are shaded on every timeline, and cut down to a short break when they would take up a quarter of it or more.
 * **Customizable**: config values through ``gitstats.conf``.
 * **Cross-platform**: works on Linux, Windows, and macOS.
 
