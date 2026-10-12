@@ -46,6 +46,7 @@ def test_default_config_keys():
         "end_date",
         "authors",
         "exclude_exts",
+        "author_inactive_days",
         "badge_metric",
         "badge_label",
         "badge_color",

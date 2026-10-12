@@ -1499,14 +1499,16 @@ class HTMLReportCreator(ReportCreator):
                 else "no bot accounts",
             )
         ]
-        last = data.get_last_commit_date()
-        if isinstance(last, datetime.datetime):
-            cutoff = (last - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
+        # the window the Code Ownership page calls an author active in
+        days = inactive_days() or 365
+        cutoff = active_since(data, days)
+        if cutoff is not None:
+            window = window_text(days)
             infos = [data.get_author_info(a) for a in everyone]
             active = sum(1 for i in infos if str(i.get("date_last", "")) >= cutoff)
             new = sum(1 for i in infos if str(i.get("date_first", "")) >= cutoff)
-            tiles.append(("Active Authors", format_int(active), "committed in the last 12 months"))
-            tiles.append(("New Authors", format_int(new), "first commit in the last 12 months"))
+            tiles.append(("Active Authors", format_int(active), f"committed in the last {window}"))
+            tiles.append(("New Authors", format_int(new), f"first commit in the last {window}"))
         top = everyone[:2]
         if top:
             share = sum(data.get_author_info(a)["commits_frac"] for a in top)
@@ -2204,7 +2206,9 @@ class HTMLReportCreator(ReportCreator):
         """Create the Code Ownership page.
 
         Turns the per-author file-edit data into actionable views: files with a
-        single owner (bus-factor / knowledge-silo risk), how ownership is
+        single owner (bus-factor / knowledge-silo risk), what would be left
+        without an active author if each active author stopped, the knowledge
+        already lost (files nobody still active has changed), how ownership is
         concentrated per author, and the files touched by the most people
         (coordination hotspots).
         """
@@ -2231,6 +2235,21 @@ class HTMLReportCreator(ReportCreator):
         single = ownership["single_owner_files"]
         single_pct = (100.0 * single / total) if total else 0.0
 
+        # Who is still active: None when the data cannot tell, or the config
+        # turns the question off, and then the page says nothing about it
+        since = ownership["active_since"]
+        window = window_text(inactive_days())
+        inactive = {a["author"] for a in ownership["authors"] if not a["active"]}
+
+        def who(name: str) -> str:
+            """An author's name, flagged when they are no longer active."""
+            if name not in inactive:
+                return author_html(name)
+            return (
+                f"{author_html(name)} "
+                f'<span class="badge" title="No commit since {since}">inactive</span>'
+            )
+
         # Summary
         f.write(
             '<p class="section-note">'
@@ -2238,41 +2257,59 @@ class HTMLReportCreator(ReportCreator):
             "file in the current tree. It highlights <strong>bus-factor risk</strong> "
             "(files only one person has ever touched) and where knowledge is concentrated. "
             "The <strong>bus factor</strong> is the smallest number of people who are, "
-            "between them, primary owner of more than half of the files.</p>"
+            "between them, primary owner of more than half of the files."
+            + (
+                f" An author is <strong>active</strong> with a commit in the {window} "
+                f"up to the last one, that is since {since}: a file no active author "
+                "has changed is <strong>knowledge loss</strong>.</p>"
+                if since
+                else "</p>"
+            )
         )
         bus_factor = ownership["bus_factor"]
         bus_owned = (
             f"primary owner of {format_int(ownership['bus_factor_files'])} "
             f"of {format_int(total)} files"
         )
-        f.write(
-            stat_tiles_html(
-                [
-                    (
-                        "Files Tracked",
-                        format_int(total),
-                        "in the current tree" if current is not None else "every file changed",
-                    ),
-                    (
-                        "Bus Factor",
-                        format_int(bus_factor),
-                        f"{author_html(ownership['bus_factor_authors'][0])} is {bus_owned}"
-                        if bus_factor == 1
-                        else f"{format_int(bus_factor)} authors are {bus_owned}",
-                    ),
-                    (
-                        "Single-Owner Files",
-                        format_int(single),
-                        f"{single_pct:.1f}% of tracked files",
-                    ),
-                    (
-                        "Contributors",
-                        format_int(len(ownership["authors"])),
-                        "authors who changed files",
-                    ),
-                ]
-            )
-        )
+        tiles = [
+            (
+                "Files Tracked",
+                format_int(total),
+                "in the current tree" if current is not None else "every file changed",
+            ),
+            (
+                "Bus Factor",
+                format_int(bus_factor),
+                f"{author_html(ownership['bus_factor_authors'][0])} is {bus_owned}"
+                if bus_factor == 1
+                else f"{format_int(bus_factor)} authors are {bus_owned}",
+            ),
+            (
+                "Single-Owner Files",
+                format_int(single),
+                f"{single_pct:.1f}% of tracked files",
+            ),
+            (
+                "Contributors",
+                format_int(len(ownership["authors"])),
+                f"{format_int(ownership['active_authors'])} active in the last {window}"
+                if since
+                else "authors who changed files",
+            ),
+        ]
+        if since:
+            tiles += [
+                (
+                    label,
+                    format_int(count),
+                    f"{100.0 * count / total:.1f}% of tracked files",
+                )
+                for label, count in (
+                    ("No Active Author", ownership["no_active_files"]),
+                    ("One Active Author", ownership["one_active_files"]),
+                )
+            ]
+        f.write(stat_tiles_html(tiles))
 
         # Bus-factor risk: single-owner files, most-changed first
         f.write(html_header(2, "Bus factor risk — single-owner files"))
@@ -2290,7 +2327,7 @@ class HTMLReportCreator(ReportCreator):
                     '<tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr>'
                     + "".join(
                         f'<tr><td class="path">{html.escape(fs["path"])}</td>'
-                        f'<td data-label="Sole owner">{author_html(fs["owner"])}</td>'
+                        f'<td data-label="Sole owner">{who(fs["owner"])}</td>'
                         f'<td class="num" data-label="Commits">{format_int(fs["edits"])}</td></tr>'
                         for fs in rows
                     )
@@ -2312,6 +2349,9 @@ class HTMLReportCreator(ReportCreator):
         else:
             f.write("<p>No single-owner files — every file has multiple contributors.</p>")
 
+        if since:
+            f.write(self._knowledge_loss_html(data, ownership))
+
         # Ownership concentration by author
         f.write(html_header(2, "Ownership by author"))
         f.write(
@@ -2322,16 +2362,20 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<div class="table-scroll"><table class="sortable" id="ownership-by-author">'
             '<tr><th>Author</th><th class="num">Files owned</th><th class="num">Solely owned</th>'
-            '<th class="num">Files touched</th></tr>'
+            '<th class="num">Files touched</th>'
+            # last, so that a phone shows the same columns first as it did without it
+            + ('<th class="num">Last commit</th></tr>' if since else "</tr>")
         )
         for a in ownership["authors"][:25]:
             f.write(
-                '<tr><td>%s</td><td class="num">%s</td><td class="num">%s</td><td class="num">%s</td></tr>'
+                '<tr><td>%s</td><td class="num">%s</td><td class="num">%s</td>'
+                '<td class="num">%s</td>%s</tr>'
                 % (
-                    author_html(a["author"]),
+                    who(a["author"]),
                     format_int(a["files_owned"]),
                     format_int(a["files_solely_owned"]),
                     format_int(a["files_touched"]),
+                    f'<td class="num">{last_commit_day(data, a["author"])}</td>' if since else "",
                 )
             )
         f.write("</table></div>")
@@ -2367,7 +2411,7 @@ class HTMLReportCreator(ReportCreator):
                     % (
                         html.escape(fs["path"]),
                         format_int(fs["contributors"]),
-                        author_html(fs["owner"]),
+                        who(fs["owner"]),
                         fs["ownership_pct"],
                     )
                 )
@@ -2378,6 +2422,146 @@ class HTMLReportCreator(ReportCreator):
         self.print_footer(f)
         f.write("</body></html>")
         f.close()
+
+    def _knowledge_loss_html(self, data: Any, ownership: dict[str, Any]) -> str:
+        """The Code Ownership sections about who is still active.
+
+        "If an active author left" is the risk: the files each active author
+        is the only active one to have changed. "Knowledge loss" is the risk
+        that already happened: the files no active author has changed, by
+        directory and one by one. ``ownership`` is head_ownership()'s, with
+        the authors and files marked active or not.
+        """
+        total = ownership["total_files"]
+        parts: list[str] = []
+
+        # What would go with each active author
+        parts.append(html_header(2, "If an active author left"))
+        parts.append(
+            '<p class="section-note">'
+            "How many files each active author is the only active one to have changed. "
+            "If they stopped committing, nobody active would have worked on these files.</p>"
+        )
+        last_ones = sorted(
+            (a for a in ownership["authors"] if a["active"] and a["files_only_active"]),
+            key=lambda a: (-a["files_only_active"], a["author"]),
+        )
+        if last_ones:
+            parts.append(
+                '<div class="table-scroll"><table class="sortable share-table" '
+                'id="ownership-if-left">'
+                '<tr><th>Author</th><th class="num">Files</th>'
+                '<th class="num">Share of files</th><th class="unsortable"></th></tr>'
+                + "".join(
+                    f"<tr><td>{author_html(a['author'])}</td>"
+                    f'<td class="num">{format_int(a["files_only_active"])}</td>'
+                    f'<td class="num">{100.0 * a["files_only_active"] / total:.1f}%</td>'
+                    '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                    f'<span style="width: {100.0 * a["files_only_active"] / total:.1f}%">'
+                    "</span></span></td></tr>"
+                    for a in last_ones[:10]
+                )
+                + "</table></div>"
+            )
+            if len(last_ones) > 10:
+                parts.append(
+                    '<p class="moreauthors">Showing top 10 of '
+                    f"{format_int(len(last_ones))} active authors with such files.</p>"
+                )
+        else:
+            parts.append("<p>No file has exactly one active author.</p>")
+
+        # What is already gone
+        lost = [fs for fs in ownership["files"] if fs["active"] == 0]
+        if not lost:
+            parts.append(html_header(2, "Knowledge loss"))
+            parts.append(
+                "<p>No files without an active author — someone who has changed "
+                "each file is still committing.</p>"
+            )
+            return "".join(parts)
+
+        def directory(filepath: str) -> str:
+            return "/".join(filepath.split("/")[:-1][:2]) or "(top level)"
+
+        in_directory: dict[str, int] = {}
+        lost_in: dict[str, int] = {}
+        for fs in ownership["files"]:
+            name = directory(fs["path"])
+            in_directory[name] = in_directory.get(name, 0) + 1
+            if fs["active"] == 0:
+                lost_in[name] = lost_in.get(name, 0) + 1
+        directories = sorted(lost_in, key=lambda d: (-lost_in[d], -lost_in[d] / in_directory[d], d))
+
+        parts.append(html_header(2, "Knowledge loss by directory"))
+        parts.append(
+            '<p class="section-note">'
+            "Where the files without an active author are: files changed only by authors "
+            "who no longer commit, so nobody who still does has worked on them. "
+            "A directory is the first two levels of the path, and the share is of its "
+            "files in the current tree.</p>"
+        )
+        parts.append(
+            f'<div class="table-scroll"><table class="sortable share-table {FILE_TABLE}" '
+            'id="ownership-lost-dirs">'
+            '<tr><th>Directory</th><th class="num">Files</th>'
+            '<th class="num">No active author</th><th class="num">Share</th>'
+            '<th class="unsortable"></th></tr>'
+            + "".join(
+                f'<tr><td class="path">{html.escape(name)}</td>'
+                f'<td class="num" data-label="Files">{format_int(in_directory[name])}</td>'
+                f'<td class="num" data-label="No active author">{format_int(lost_in[name])}</td>'
+                f'<td class="num" data-label="Share">'
+                f"{100.0 * lost_in[name] / in_directory[name]:.1f}%</td>"
+                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                f'<span style="width: {100.0 * lost_in[name] / in_directory[name]:.1f}%">'
+                "</span></span></td></tr>"
+                for name in directories[:10]
+            )
+            + "</table></div>"
+        )
+        if len(directories) > 10:
+            parts.append(
+                '<p class="moreauthors">Showing top 10 of '
+                f"{format_int(len(directories))} directories with such files.</p>"
+            )
+
+        def lost_table(table_id: str, rows: list[dict]) -> str:
+            return (
+                f'<div class="table-scroll"><table class="sortable {FILE_TABLE}" id="{table_id}">'
+                "<tr><th>File</th><th>Primary owner</th><th>Owner's last commit</th>"
+                '<th class="num">Commits</th></tr>'
+                + "".join(
+                    f'<tr><td class="path">{html.escape(fs["path"])}</td>'
+                    f'<td data-label="Primary owner">{author_html(fs["owner"])}</td>'
+                    '<td data-label="Owner\'s last commit">'
+                    f"{last_commit_day(data, fs['owner'])}</td>"
+                    f'<td class="num" data-label="Commits">{format_int(fs["edits"])}</td></tr>'
+                    for fs in rows
+                )
+                + "</table></div>"
+            )
+
+        parts.append(html_header(2, "Files without an active author"))
+        parts.append(
+            '<p class="section-note">'
+            "The most-changed of them: the more a file has changed, the more knowledge "
+            "went with the people who changed it.</p>"
+        )
+        # The ten most-changed are shown; the full list (up to 100) is folded away
+        parts.append(lost_table("ownership-lost", lost[:10]))
+        if len(lost) > 10:
+            count = len(lost)
+            what = (
+                f"all {format_int(count)} files without an active author"
+                if count <= 100
+                else f"the 100 most-changed of {format_int(count)} files without an active author"
+            )
+            parts.append(
+                f'<details class="table-details"><summary>Table: {what}</summary>'
+                f"{lost_table('ownership-lost-all', lost[:100])}</details>"
+            )
+        return "".join(parts)
 
     # The scatter plot shows at most this many files (the highest-scoring),
     # so the page stays light on repositories with tens of thousands of files
@@ -2420,7 +2604,10 @@ class HTMLReportCreator(ReportCreator):
         current = head_files(data)
         # How many people have changed each file, as the Code Ownership page counts
         # them; empty when the data has no ownership, and then the column is left out
-        authors_of = {fs["path"]: fs["contributors"] for fs in head_ownership(data)["files"]}
+        ownership = head_ownership(data)
+        authors_of = {fs["path"]: fs["contributors"] for fs in ownership["files"]}
+        # The files whose authors have all gone inactive (see the Code Ownership page)
+        no_active = {fs["path"] for fs in ownership["files"] if fs["active"] == 0}
         # The ten highest-scoring files are the ones the table below shows
         top_files = files[:10]
 
@@ -2508,7 +2695,12 @@ class HTMLReportCreator(ReportCreator):
             + (
                 " <strong>Authors</strong> is how many people have changed the file, bots "
                 'aside, as on the <a href="ownership.html">Code Ownership</a> page: a '
-                "hotspot only one person has changed is also a bus-factor risk.</p>"
+                "hotspot only one person has changed is also a bus-factor risk"
+                + (
+                    ", and one that no active author has changed is knowledge already lost.</p>"
+                    if ownership["active_since"]
+                    else ".</p>"
+                )
                 if authors_of
                 else "</p>"
             )
@@ -2517,11 +2709,15 @@ class HTMLReportCreator(ReportCreator):
 
         def path_cell(filepath: str) -> str:
             # the flag is drawn by CSS from data-tag, so the cell's text stays the path
-            flag = (
-                ' data-tag="sole owner" title="Only one person has changed this file"'
-                if authors_of.get(filepath) == 1
-                else ""
-            )
+            if filepath in no_active:
+                flag = (
+                    ' data-tag="no active author" '
+                    'title="Nobody who has changed this file is still active"'
+                )
+            elif authors_of.get(filepath) == 1:
+                flag = ' data-tag="sole owner" title="Only one person has changed this file"'
+            else:
+                flag = ""
             return f'<td class="path"{flag}>{html.escape(filepath)}</td>'
 
         def authors_cell(filepath: str) -> str:
@@ -3265,20 +3461,32 @@ class HTMLReportCreator(ReportCreator):
         """
 
 
-def compute_code_ownership(author_files: dict[str, dict[str, int]]) -> dict[str, Any]:
+def compute_code_ownership(
+    author_files: dict[str, dict[str, int]],
+    inactive: set[str] | frozenset[str] = frozenset(),
+) -> dict[str, Any]:
     """Derive per-file ownership and per-author stats from author edit counts.
 
     Args:
         author_files: mapping of author -> file path -> number of commits that
             author made touching the file.
+        inactive: the authors who are no longer active (see inactive_authors()).
+            What only they know is knowledge the project has lost. Without
+            it every author counts as active.
 
     Bot accounts (names ending in ``[bot]``) are excluded so ownership reflects
     human contributors. Returns a dict with:
         files:   per-file stats (path, edits, owner, owner_edits, ownership_pct,
-                 contributors), sorted by edits descending;
+                 contributors, and active, how many of the contributors are
+                 active), sorted by edits descending;
         authors: per-author stats (author, files_owned, files_solely_owned,
-                 files_touched), sorted by files owned then files touched;
+                 files_touched, whether they are active, and files_only_active,
+                 the files they are the only active contributor of), sorted by
+                 files owned then files touched;
         total_files, single_owner_files;
+        active_authors: how many of the authors are active;
+        no_active_files, one_active_files: the files none, and exactly one, of
+                 whose contributors is active;
         bus_factor: the fewest authors who are, between them, primary owner
                  of more than half of the files (0 when there are no files),
                  with bus_factor_authors, their names, largest owner first,
@@ -3296,11 +3504,13 @@ def compute_code_ownership(author_files: dict[str, dict[str, int]]) -> dict[str,
     author_owned: dict[str, int] = {}
     author_solely: dict[str, int] = {}
     author_touched: dict[str, int] = {}
+    author_only_active: dict[str, int] = {}
     for filepath, authors in file_authors.items():
         edits = sum(authors.values())
         # Primary owner: most edits; ties broken alphabetically for determinism.
         owner = max(zip(authors.values(), authors.keys()))[1]
         contributors = len(authors)
+        active = [a for a in authors if a not in inactive]
         files_stats.append(
             {
                 "path": filepath,
@@ -3309,11 +3519,14 @@ def compute_code_ownership(author_files: dict[str, dict[str, int]]) -> dict[str,
                 "owner_edits": authors[owner],
                 "ownership_pct": round(100.0 * authors[owner] / edits, 1) if edits else 0.0,
                 "contributors": contributors,
+                "active": len(active),
             }
         )
         author_owned[owner] = author_owned.get(owner, 0) + 1
         if contributors == 1:
             author_solely[owner] = author_solely.get(owner, 0) + 1
+        if len(active) == 1:
+            author_only_active[active[0]] = author_only_active.get(active[0], 0) + 1
         for a in authors:
             author_touched[a] = author_touched.get(a, 0) + 1
 
@@ -3325,6 +3538,8 @@ def compute_code_ownership(author_files: dict[str, dict[str, int]]) -> dict[str,
             "files_owned": author_owned.get(a, 0),
             "files_solely_owned": author_solely.get(a, 0),
             "files_touched": author_touched[a],
+            "active": a not in inactive,
+            "files_only_active": author_only_active.get(a, 0),
         }
         for a in author_touched
     ]
@@ -3345,6 +3560,9 @@ def compute_code_ownership(author_files: dict[str, dict[str, int]]) -> dict[str,
         "authors": authors_stats,
         "total_files": len(files_stats),
         "single_owner_files": sum(1 for fs in files_stats if fs["contributors"] == 1),
+        "active_authors": sum(1 for a in author_touched if a not in inactive),
+        "no_active_files": sum(1 for fs in files_stats if fs["active"] == 0),
+        "one_active_files": sum(1 for fs in files_stats if fs["active"] == 1),
         "bus_factor": len(bus_authors),
         "bus_factor_authors": bus_authors,
         "bus_factor_files": bus_files,
@@ -3562,11 +3780,66 @@ def is_bot(name: str) -> bool:
     return name.endswith("[bot]")
 
 
+def inactive_days() -> int:
+    """Config author_inactive_days: how long without a commit makes an author
+    inactive. 0, or a value that is not a number, turns the notion off."""
+    try:
+        return max(int(load_config().get("author_inactive_days", 365)), 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def window_text(days: int) -> str:
+    """A number of days as the report words it: "12 months" for a year."""
+    return "12 months" if days == 365 else f"{format_int(days)} days"
+
+
+def active_since(data: Any, days: int) -> str | None:
+    """The day (YYYY-MM-DD) ``days`` before the last commit.
+
+    An author with a commit on or after it is active. It is counted from the
+    last commit, not from today, so a report says the same thing whenever it
+    is generated. None when ``days`` is 0 or the data has no last commit.
+    """
+    last = data.get_last_commit_date() if hasattr(data, "get_last_commit_date") else None
+    if days <= 0 or not isinstance(last, datetime.datetime):
+        return None
+    return (last - datetime.timedelta(days=days)).strftime("%Y-%m-%d")
+
+
+def inactive_authors(data: Any, since: str | None) -> set[str]:
+    """The authors whose last commit is before ``since``.
+
+    An author whose last commit the data does not have is taken to be active:
+    the report only calls knowledge lost when it can show the date.
+    """
+    authors = getattr(data, "authors", {})
+    if since is None or not isinstance(authors, dict):
+        return set()
+    return {
+        name
+        for name, info in authors.items()
+        if isinstance(info, dict)
+        and isinstance(info.get("date_last"), str)
+        and info["date_last"] < since
+    }
+
+
+def last_commit_day(data: Any, author: str) -> str:
+    """The day of an author's last commit (YYYY-MM-DD), or "" when unknown."""
+    authors = getattr(data, "authors", {})
+    info = authors.get(author) if isinstance(authors, dict) else None
+    day = info.get("date_last") if isinstance(info, dict) else None
+    return html.escape(day) if isinstance(day, str) else ""
+
+
 def head_ownership(data: Any) -> dict[str, Any]:
     """compute_code_ownership() over the files that still exist.
 
     A deleted file carries no bus-factor risk, so when the data knows the
-    files at HEAD only those are counted.
+    files at HEAD only those are counted. ``active_since`` is added: the day
+    an author has to have committed since to be active, or None when every
+    author counts as active (see active_since()).
     """
     author_files = getattr(data, "author_files", {})
     if not isinstance(author_files, dict):
@@ -3577,7 +3850,10 @@ def head_ownership(data: Any) -> dict[str, Any]:
             author: {p: n for p, n in files.items() if p in current}
             for author, files in author_files.items()
         }
-    return compute_code_ownership(author_files)
+    since = active_since(data, inactive_days())
+    ownership = compute_code_ownership(author_files, inactive_authors(data, since))
+    ownership["active_since"] = since
+    return ownership
 
 
 def head_files(data: Any) -> set[str] | None:

@@ -31,6 +31,9 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "end_date": "",  # Ending date for commits, passed as --until to Git (optional). Format: YYYY-MM-DD.
     "authors": "",  # Comma-separated list of authors to filter commits (empty = include all authors).
     "exclude_exts": "",  # File extensions to exclude from line counting (others detected via null bytes).
+    # An author without a commit in this many days before the last one is no longer
+    # active: what they knew is counted as knowledge loss on the Code Ownership page.
+    "author_inactive_days": 365,  # 0 = every author is active.
     # Shareable badge (badge.svg and badges/ in the report output)
     # Badge written as badge.svg: commits, last-commit, authors, files, lines,
     # release, active-days, summary, activity or health.

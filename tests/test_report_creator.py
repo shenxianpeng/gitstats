@@ -15,6 +15,7 @@ from gitstats.report_creator import (
     HTMLReportCreator,
     ReportCreator,
     _classify_eras,
+    active_since,
     author_html,
     collapse_gap_categories,
     collapse_gap_time,
@@ -26,14 +27,19 @@ from gitstats.report_creator import (
     gap_annotations,
     get_keys_sorted_by_value_key,
     get_keys_sorted_by_values,
+    head_ownership,
     html_header,
     html_linkify,
+    inactive_authors,
+    inactive_days,
+    last_commit_day,
     longest_zero_run,
     month_range,
     parse_chronicle,
     quiet_months,
     stat_tiles_html,
     tags_newest_first,
+    window_text,
     year_span,
 )
 
@@ -1544,10 +1550,56 @@ def test_compute_code_ownership_empty():
         "authors": [],
         "total_files": 0,
         "single_owner_files": 0,
+        "active_authors": 0,
+        "no_active_files": 0,
+        "one_active_files": 0,
         "bus_factor": 0,
         "bus_factor_authors": [],
         "bus_factor_files": 0,
     }
+
+
+def test_compute_code_ownership_takes_every_author_as_active_by_default():
+    result = compute_code_ownership({"Ann": {"a.py": 1, "b.py": 1}, "Ben": {"b.py": 2}})
+    assert {fs["path"]: fs["active"] for fs in result["files"]} == {"a.py": 1, "b.py": 2}
+    assert all(a["active"] for a in result["authors"])
+    assert result["active_authors"] == 2
+    assert result["no_active_files"] == 0
+    # with everyone active, a file with one active author is a single-owner file
+    assert result["one_active_files"] == result["single_owner_files"] == 1
+
+
+def test_compute_code_ownership_marks_who_is_still_active():
+    author_files = {
+        "Ann": {"core.py": 5, "shared.py": 1, "old.py": 2},
+        "Ben": {"shared.py": 3, "api.py": 4},
+        "Cy": {"api.py": 1, "old.py": 1},
+        "Di": {"api.py": 1},
+        "release[bot]": {"core.py": 9},  # a bot is neither active nor inactive
+    }
+    result = compute_code_ownership(author_files, inactive={"Ann", "Cy"})
+
+    files = {fs["path"]: fs for fs in result["files"]}
+    # core.py: Ann only. old.py: Ann and Cy. Nobody active has changed either
+    assert (files["core.py"]["active"], files["old.py"]["active"]) == (0, 0)
+    # shared.py: Ann and Ben, of whom Ben is active. api.py: Ben, Cy and Di
+    assert (files["shared.py"]["active"], files["api.py"]["active"]) == (1, 2)
+    assert result["no_active_files"] == 2
+    assert result["one_active_files"] == 1
+    assert result["active_authors"] == 2
+
+    authors = {a["author"]: a for a in result["authors"]}
+    assert [name for name, a in authors.items() if a["active"]] == ["Ben", "Di"]
+    # Ben is the only active author of shared.py; api.py has Di as well
+    assert authors["Ben"]["files_only_active"] == 1
+    assert authors["Di"]["files_only_active"] == 0
+    # an inactive author is the only active author of nothing
+    assert authors["Ann"]["files_only_active"] == 0
+
+    # who owns what does not depend on who is still there
+    assert files["core.py"]["owner"] == "Ann"
+    assert files["old.py"]["contributors"] == 2
+    assert result["single_owner_files"] == 1
 
 
 def test_bus_factor_counts_owners_until_they_hold_more_than_half():
@@ -3295,6 +3347,403 @@ def test_ownership_page_lists_the_top_25_contributors(mock_data_collector, temp_
     mock_data_collector.author_files = {f"Author {i:02d}": {f"f{i}.py": 1} for i in range(26)}
     page = _ownership_page(mock_data_collector, temp_dir)
     assert "Showing top 25 of 26 contributors." in page
+
+
+# ── Knowledge loss: who is still active ──────────────────────────────────
+
+
+def test_inactive_days_comes_from_the_config(monkeypatch):
+    assert inactive_days() == 365
+    for value, expected in ((180, 180), ("90", 90), (0, 0), (-5, 0), ("soon", 0), (None, 0)):
+        monkeypatch.setitem(load_config(), "author_inactive_days", value)
+        assert inactive_days() == expected, value
+
+
+def test_window_text():
+    assert window_text(365) == "12 months"
+    assert window_text(180) == "180 days"
+    assert window_text(1000) == "1,000 days"
+
+
+def test_active_since_counts_back_from_the_last_commit(mock_data_collector):
+    # the last commit is on 2023-04-01
+    assert active_since(mock_data_collector, 365) == "2022-04-01"
+    assert active_since(mock_data_collector, 30) == "2023-03-02"
+    # no window, no last commit, no way to ask for one: nobody can be called inactive
+    assert active_since(mock_data_collector, 0) is None
+    mock_data_collector.get_last_commit_date.return_value = None
+    assert active_since(mock_data_collector, 365) is None
+    assert active_since(SimpleNamespace(), 365) is None
+
+
+def test_inactive_authors_are_those_whose_last_commit_is_before_the_day(mock_data_collector):
+    # last commits: Alice 2023-06-15, Bob 2023-05-30, Charlie 2023-04-20
+    assert inactive_authors(mock_data_collector, "2023-04-20") == set()
+    assert inactive_authors(mock_data_collector, "2023-04-21") == {"Charlie Brown"}
+    assert inactive_authors(mock_data_collector, "2023-06-01") == {"Bob Jones", "Charlie Brown"}
+    assert inactive_authors(mock_data_collector, None) == set()
+
+    # an author whose last commit is unknown is not called inactive
+    del mock_data_collector.authors["Bob Jones"]["date_last"]
+    mock_data_collector.authors["Dee"] = "not a mapping"
+    assert inactive_authors(mock_data_collector, "2023-06-01") == {"Charlie Brown"}
+    mock_data_collector.authors = ["not", "a", "mapping"]
+    assert inactive_authors(mock_data_collector, "2023-06-01") == set()
+
+
+def test_last_commit_day(mock_data_collector):
+    assert last_commit_day(mock_data_collector, "Alice Smith") == "2023-06-15"
+    assert last_commit_day(mock_data_collector, "Nobody") == ""
+    mock_data_collector.authors["Alice Smith"]["date_last"] = "<soon>"
+    assert last_commit_day(mock_data_collector, "Alice Smith") == "&lt;soon&gt;"
+    mock_data_collector.authors = None
+    assert last_commit_day(mock_data_collector, "Alice Smith") == ""
+
+
+def test_head_ownership_knows_who_is_still_active(mock_data_collector, monkeypatch):
+    ownership = head_ownership(mock_data_collector)
+    assert ownership["active_since"] == "2022-04-01"
+    assert ownership["active_authors"] == 3
+    assert ownership["no_active_files"] == 0
+
+    # Bob's last commit is the day before: README.md, which only he changed, is lost
+    mock_data_collector.authors["Bob Jones"]["date_last"] = "2022-03-31"
+    ownership = head_ownership(mock_data_collector)
+    assert ownership["active_authors"] == 2
+    assert [fs["path"] for fs in ownership["files"] if fs["active"] == 0] == ["README.md"]
+    # the day itself still counts
+    mock_data_collector.authors["Bob Jones"]["date_last"] = "2022-04-01"
+    assert head_ownership(mock_data_collector)["no_active_files"] == 0
+
+    # turned off, every author is active whatever the dates say
+    mock_data_collector.authors["Bob Jones"]["date_last"] = "2001-01-01"
+    monkeypatch.setitem(load_config(), "author_inactive_days", 0)
+    ownership = head_ownership(mock_data_collector)
+    assert ownership["active_since"] is None
+    assert ownership["no_active_files"] == 0
+
+
+def _tiles(page):
+    return {
+        label: (value, note)
+        for label, value, note in re.findall(
+            r'<dt>([^<]+)</dt><dd class="stat-value">([^<]+)</dd><dd class="stat-note">(.*?)</dd>',
+            page,
+        )
+    }
+
+
+def _h2s(page):
+    return [re.sub("<[^>]+>", "", h) for h in re.findall(r"<h2[^>]*>(.*?)</h2>", page)]
+
+
+def _table(page, table_id):
+    return page.split(f'id="{table_id}">', 1)[1].split("</table>", 1)[0]
+
+
+def test_ownership_page_when_everyone_is_active(mock_data_collector, temp_dir):
+    page = _ownership_page(mock_data_collector, temp_dir)
+
+    assert (
+        "An author is <strong>active</strong> with a commit in the 12 months up to the "
+        "last one, that is since 2022-04-01: a file no active author has changed is "
+        "<strong>knowledge loss</strong>.</p>"
+    ) in page
+    tiles = _tiles(page)
+    assert list(tiles) == [
+        "Files Tracked",
+        "Bus Factor",
+        "Single-Owner Files",
+        "Contributors",
+        "No Active Author",
+        "One Active Author",
+    ]
+    assert tiles["Contributors"] == ("3", "3 active in the last 12 months")
+    assert tiles["No Active Author"] == ("0", "0.0% of tracked files")
+    # solo_alice.py and README.md have one author each
+    assert tiles["One Active Author"] == ("2", "50.0% of tracked files")
+
+    assert _h2s(page) == [
+        "Bus factor risk — single-owner files",
+        "If an active author left",
+        "Knowledge loss",
+        "Ownership by author",
+        "Most shared files",
+    ]
+    assert "No files without an active author" in page
+    assert 'id="ownership-lost' not in page
+    assert '<span class="badge"' not in page
+
+    # each of the two would leave one file of the four behind
+    assert re.findall(
+        r'<tr><td>([^<]+)</td><td class="num">(\d+)</td><td class="num">([\d.]+%)</td>'
+        r'<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+        r'<span style="width: ([\d.]+)%">',
+        _table(page, "ownership-if-left"),
+    ) == [("Alice Smith", "1", "25.0%", "25.0"), ("Bob Jones", "1", "25.0%", "25.0")]
+
+    # Ownership by author says when each was last seen
+    by_author = _table(page, "ownership-by-author")
+    assert by_author.split("</tr>")[0].endswith('<th class="num">Last commit</th>')
+    assert (
+        '<tr><td>Alice Smith</td><td class="num">2</td><td class="num">1</td>'
+        '<td class="num">3</td><td class="num">2023-06-15</td></tr>'
+    ) in by_author
+
+
+def test_ownership_page_shows_the_knowledge_that_left(mock_data_collector, temp_dir):
+    mock_data_collector.authors["Bob Jones"]["date_last"] = "2021-11-30"
+    page = _ownership_page(mock_data_collector, temp_dir)
+
+    tiles = _tiles(page)
+    assert tiles["Contributors"] == ("3", "2 active in the last 12 months")
+    # README.md: only Bob changed it
+    assert tiles["No Active Author"] == ("1", "25.0% of tracked files")
+    # solo_alice.py, and utils.py now that Bob is gone
+    assert tiles["One Active Author"] == ("2", "50.0% of tracked files")
+
+    assert _h2s(page) == [
+        "Bus factor risk — single-owner files",
+        "If an active author left",
+        "Knowledge loss by directory",
+        "Files without an active author",
+        "Ownership by author",
+        "Most shared files",
+    ]
+    # Alice is the last active author of two files; Bob, inactive, is not listed
+    if_left = _table(page, "ownership-if-left")
+    assert re.findall(r"<tr><td>([^<]+)</td>", if_left) == ["Alice Smith"]
+    assert '<td class="num">2</td><td class="num">50.0%</td>' in if_left
+
+    assert (
+        '<tr><td class="path">(top level)</td><td class="num" data-label="Files">4</td>'
+        '<td class="num" data-label="No active author">1</td>'
+        '<td class="num" data-label="Share">25.0%</td>'
+        '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+        '<span style="width: 25.0%"></span></span></td></tr>'
+    ) in _table(page, "ownership-lost-dirs")
+    assert _table(page, "ownership-lost").endswith(
+        '<tr><td class="path">README.md</td><td data-label="Primary owner">Bob Jones</td>'
+        '<td data-label="Owner\'s last commit">2021-11-30</td>'
+        '<td class="num" data-label="Commits">8</td></tr>'
+    )
+    assert "<details" not in page
+
+    # wherever else the page names Bob, it says he is gone
+    badge = ' <span class="badge" title="No commit since 2022-04-01">inactive</span>'
+    assert f'<td data-label="Sole owner">Bob Jones{badge}</td>' in _table(
+        page, "ownership-busfactor"
+    )
+    by_author = _table(page, "ownership-by-author")
+    assert f'<tr><td>Bob Jones{badge}</td><td class="num">' in by_author
+    assert '<td class="num">2021-11-30</td></tr>' in by_author
+    assert f'<td data-label="Primary owner">Bob Jones{badge}</td>' in _table(
+        page, "ownership-shared"
+    )
+    assert page.count(badge) == 3
+    assert f"Alice Smith{badge}" not in page
+
+
+def test_knowledge_loss_tables_are_file_tables(mock_data_collector, temp_dir):
+    mock_data_collector.authors["Bob Jones"]["date_last"] = "2021-11-30"
+    page = _ownership_page(mock_data_collector, temp_dir)
+    for table_id, headings in {
+        "ownership-lost": ["File", "Primary owner", "Owner's last commit", "Commits"],
+        "ownership-lost-dirs": ["Directory", "Files", "No active author", "Share"],
+    }.items():
+        tag = re.search(rf'<table class="([^"]*)" id="{table_id}">', page)
+        assert "file-table" in tag.group(1).split(), table_id
+        header, first = _table(page, table_id).split("</tr>")[:2]
+        assert [h for h in re.findall(r"<th[^>]*>([^<]*)</th>", header) if h] == headings
+        # on a phone each cell after the path is named after its column
+        assert first.startswith('<tr><td class="path">'), table_id
+        assert re.findall(r'data-label="([^"]+)"', first) == headings[1:], table_id
+
+
+def _two_authors(mock_data_collector, gone_files, kept_files=("src/app/main.py",)):
+    """Gone, inactive, changed ``gone_files``; Here, active, changed ``kept_files``."""
+    mock_data_collector.authors = {
+        "Gone": {"date_last": "2020-01-01"},
+        "Here": {"date_last": "2023-03-30"},
+    }
+    mock_data_collector.author_files = {
+        "Gone": dict(gone_files),
+        "Here": {path: 1 for path in kept_files},
+    }
+
+
+def test_knowledge_loss_by_directory(mock_data_collector, temp_dir):
+    gone = {
+        "setup.py": 1,
+        "docs/index.md": 1,
+        "docs/guide/a.md": 1,
+        "docs/guide/b.md": 1,
+        "docs/guide/deep/er/c.md": 1,
+        "src/app/old.py": 1,
+        "src/<lib>/x.py": 1,
+    }
+    _two_authors(mock_data_collector, gone, kept_files=("src/app/main.py", "docs/guide/d.md"))
+    page = _ownership_page(mock_data_collector, temp_dir)
+
+    rows = re.findall(
+        r'<tr><td class="path">([^<]+)</td><td class="num" data-label="Files">(\d+)</td>'
+        r'<td class="num" data-label="No active author">(\d+)</td>'
+        r'<td class="num" data-label="Share">([\d.]+%)</td>',
+        _table(page, "ownership-lost-dirs"),
+    )
+    # a directory is the two first levels of the path; the most files first,
+    # then the larger share, then the name
+    assert rows == [
+        ("docs/guide", "4", "3", "75.0%"),
+        ("(top level)", "1", "1", "100.0%"),
+        ("docs", "1", "1", "100.0%"),
+        ("src/&lt;lib&gt;", "1", "1", "100.0%"),
+        ("src/app", "2", "1", "50.0%"),
+    ]
+    assert "directories with such files" not in page
+
+
+def test_knowledge_loss_lists_ten_directories(mock_data_collector, temp_dir):
+    _two_authors(mock_data_collector, {f"pkg{i:02}/mod/f.py": 1 for i in range(12)})
+    page = _ownership_page(mock_data_collector, temp_dir)
+    assert _table(page, "ownership-lost-dirs").count('<td class="path">') == 10
+    assert '<p class="moreauthors">Showing top 10 of 12 directories with such files.</p>' in page
+
+
+def test_files_without_an_active_author_fold_after_ten(mock_data_collector, temp_dir):
+    # the more commits, the higher: f29.py has 30, f00.py has 1
+    _two_authors(mock_data_collector, {f"f{i:02}.py": i + 1 for i in range(30)})
+    page = _ownership_page(mock_data_collector, temp_dir)
+
+    shown = re.findall(r'<td class="path">([^<]+)</td>', _table(page, "ownership-lost"))
+    assert shown == [f"f{i:02}.py" for i in range(29, 19, -1)]
+    assert (
+        '<details class="table-details">'
+        "<summary>Table: all 30 files without an active author</summary>"
+    ) in page
+    assert _table(page, "ownership-lost-all").count('<td class="path">') == 30
+    assert _tiles(page)["No Active Author"] == ("30", "96.8% of tracked files")
+
+
+def test_files_without_an_active_author_fold_at_most_a_hundred(mock_data_collector, temp_dir):
+    _two_authors(mock_data_collector, {f"f{i:04}.py": 1 for i in range(1500)})
+    page = _ownership_page(mock_data_collector, temp_dir)
+    assert (
+        "<summary>Table: the 100 most-changed of 1,500 files without an active author</summary>"
+    ) in page
+    assert _table(page, "ownership-lost-all").count('<td class="path">') == 100
+
+
+def test_if_an_active_author_left_lists_ten(mock_data_collector, temp_dir):
+    # author NN is the only one to have changed NN + 1 files
+    mock_data_collector.authors = {f"Author {i:02}": {"date_last": "2023-03-30"} for i in range(12)}
+    mock_data_collector.author_files = {
+        f"Author {i:02}": {f"a{i:02}/f{n}.py": 1 for n in range(i + 1)} for i in range(12)
+    }
+    page = _ownership_page(mock_data_collector, temp_dir)
+
+    listed = re.findall(r"<tr><td>([^<]+)</td>", _table(page, "ownership-if-left"))
+    assert listed == [f"Author {i:02}" for i in range(11, 1, -1)]
+    assert (
+        '<p class="moreauthors">Showing top 10 of 12 active authors with such files.</p>'
+    ) in page
+    # 12 of the 78 files would be left without an active author
+    assert '<td class="num">12</td><td class="num">15.4%</td>' in page
+
+
+def test_if_an_active_author_left_when_no_file_depends_on_one(mock_data_collector, temp_dir):
+    mock_data_collector.author_files = {"Alice Smith": {"a.py": 2}, "Bob Jones": {"a.py": 1}}
+    page = _ownership_page(mock_data_collector, temp_dir)
+    assert "<p>No file has exactly one active author.</p>" in page
+    assert 'id="ownership-if-left"' not in page
+    assert _tiles(page)["One Active Author"] == ("0", "0.0% of tracked files")
+
+
+def test_ownership_page_without_a_window_says_nothing_of_activity(
+    mock_data_collector, temp_dir, monkeypatch
+):
+    mock_data_collector.authors["Bob Jones"]["date_last"] = "2001-01-01"
+    monkeypatch.setitem(load_config(), "author_inactive_days", 0)
+    page = _ownership_page(mock_data_collector, temp_dir)
+
+    assert list(_tiles(page)) == [
+        "Files Tracked",
+        "Bus Factor",
+        "Single-Owner Files",
+        "Contributors",
+    ]
+    assert _tiles(page)["Contributors"] == ("3", "authors who changed files")
+    assert _h2s(page) == [
+        "Bus factor risk — single-owner files",
+        "Ownership by author",
+        "Most shared files",
+    ]
+    assert "<strong>active</strong>" not in page
+    assert "inactive" not in page
+    by_author = _table(page, "ownership-by-author")
+    assert by_author.split("</tr>")[0].endswith('<th class="num">Files touched</th>')
+    assert "Last commit" not in by_author
+    assert '<tr><td>Bob Jones</td><td class="num">' in by_author
+
+
+def test_ownership_page_without_a_last_commit_says_nothing_of_activity(
+    mock_data_collector, temp_dir
+):
+    mock_data_collector.get_last_commit_date.return_value = None
+    page = _ownership_page(mock_data_collector, temp_dir)
+    assert "No Active Author" not in page
+    assert "If an active author left" not in page
+
+
+def test_the_window_of_activity_follows_the_config(mock_data_collector, temp_dir, monkeypatch):
+    # 30 days before 2023-04-01 is 2023-03-02
+    monkeypatch.setitem(load_config(), "author_inactive_days", 30)
+    mock_data_collector.authors["Charlie Brown"]["date_last"] = "2023-03-01"
+    page = _ownership_page(mock_data_collector, temp_dir)
+    assert "with a commit in the 30 days up to the last one, that is since 2023-03-02" in page
+    assert _tiles(page)["Contributors"] == ("3", "2 active in the last 30 days")
+    assert 'title="No commit since 2023-03-02">inactive</span>' in page
+
+    # the Authors page counts its active and new authors over the same window
+    summary = HTMLReportCreator()._authors_summary_html(mock_data_collector)
+    assert (
+        '<dt>Active Authors</dt><dd class="stat-value">2</dd>'
+        '<dd class="stat-note">committed in the last 30 days</dd>'
+    ) in summary
+    assert '<dd class="stat-note">first commit in the last 30 days</dd>' in summary
+
+    # which keeps its 12 months when the Code Ownership page is told not to ask
+    monkeypatch.setitem(load_config(), "author_inactive_days", 0)
+    summary = HTMLReportCreator()._authors_summary_html(mock_data_collector)
+    assert '<dd class="stat-note">committed in the last 12 months</dd>' in summary
+
+
+def test_hotspots_flag_a_file_no_active_author_has_changed(
+    mock_data_collector, temp_dir, monkeypatch
+):
+    # README.md is Bob's alone; utils.py is Alice's and Bob's
+    mock_data_collector.authors["Bob Jones"]["date_last"] = "2021-11-30"
+    page = _hotspots_html(mock_data_collector, temp_dir)
+    table = _table(page, "hotspots")
+    assert (
+        '<td class="path" data-tag="no active author" '
+        'title="Nobody who has changed this file is still active">README.md</td>'
+    ) in table
+    # a file one active author has changed is flagged as before, the others not at all
+    assert '<td class="path">utils.py</td>' in table
+    assert "and one that no active author has changed is knowledge already lost.</p>" in page
+
+    # everyone active: README.md is a sole-owner file again
+    mock_data_collector.authors["Bob Jones"]["date_last"] = "2023-05-30"
+    page = _hotspots_html(mock_data_collector, temp_dir)
+    assert '<td class="path" data-tag="sole owner"' in _table(page, "hotspots")
+    assert "no active author" not in _table(page, "hotspots")
+
+    # and without a window the page does not speak of activity
+    monkeypatch.setitem(load_config(), "author_inactive_days", 0)
+    page = _hotspots_html(mock_data_collector, temp_dir)
+    assert "is also a bus-factor risk.</p>" in page
+    assert "no active author" not in page
 
 
 def test_history_page_without_a_top_author_or_dated_releases(mock_data_collector, temp_dir):
