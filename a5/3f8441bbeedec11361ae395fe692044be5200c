@@ -1,0 +1,37 @@
+README.rst
+  s_f7be7338a47928::t_9d5e11c884a1ab 364
+tests/test_init.py
+  s_f7be7338a47928::t_5d4b2884be4c82 49
+tests/test_report_creator.py
+  s_f7be7338a47928::t_670a38f484f7ab 3487-3491,3537-3539,3683-3686
+  s_f7be7338a47928::t_4300ed4fe0cc1e 1553-1555,1562-1602
+  s_f7be7338a47928::t_69ed71d4ee9f2e 18,30,33-35,42,3352-3486,3492-3536,3540-3682,3687-3746
+  s_f7be7338a47928::t_598d37544d014e 1603-1604,3747-3748
+docs/source/configuration.rst
+  s_f7be7338a47928::t_4748de929eca26 22
+gitstats/__init__.py
+  s_f7be7338a47928::t_4748de929eca26 34-36
+gitstats.conf
+  s_f7be7338a47928::t_4748de929eca26 60-65
+gitstats/report_creator.py
+  s_f7be7338a47928::t_0177c68913dfe9 1502-1506,1510-1511,3464-3467,3473-3475,3480-3481,3483-3485,3487-3489,3507,3513,3522,3528-3529,3541-3542,3563-3565,3783-3825,3834-3835,3840-3842,3853-3856
+  s_f7be7338a47928::t_670a38f484f7ab 2365-2367,2371-2372,2378,2442,2453
+  s_f7be7338a47928::t_9ff024ebfaad9c 2209-2211,2238-2252,2260-2267,2274-2312,2330,2352-2353,2374,2414,2426-2441,2443-2452,2454-2565,2607-2610,2698-2703,2712-2720,3826-3833
+  s_f7be7338a47928::t_05dc5bf047db53 2354
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "a53f8441bbeedec11361ae395fe692044be5200c",
+  "prompts": {},
+  "sessions": {
+    "s_f7be7338a47928": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b41fad1c-3178-484f-83cd-bad405dbb5d4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
