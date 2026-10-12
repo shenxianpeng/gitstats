@@ -354,7 +354,9 @@ def _git(repo, *args, **env):
         ["git", *args],
         cwd=repo,
         capture_output=True,
-        text=True,
+        # git writes UTF-8 whatever the locale: on Windows the default would
+        # read an author's "ë" as two other characters
+        encoding="utf-8",
         check=True,
         env={**os.environ, **env},
     ).stdout
@@ -905,6 +907,26 @@ def test_shortstat_logs_use_every_process_once_the_counting_is_slow(monkeypatch)
     # and fast by the usual measure: two processes, as long as the wait for a third lasts
     monkeypatch.setattr(utils, "SHORTSTAT_SLOW_SECONDS", 0.35)
     assert _busiest(monkeypatch, workers=6, seconds_per_process=60, jobs=24) == 2
+
+
+def test_shortstat_logs_count_the_shares_spread_over_the_history(monkeypatch):
+    import gitstats.utils as utils
+
+    commits = [f"{i:040x}" for i in range(10)]
+    order = []
+
+    def recording(args, data=None, env=None):
+        if data is None:
+            return "".join(f"{commit}\t\t1 Ann\n" for commit in commits)
+        order.append(int(data.split()[0], 16))
+        return data
+
+    monkeypatch.setattr(utils, "_git_text", recording)
+    monkeypatch.setattr(utils, "SHORTSTAT_COMMITS_PER_PROCESS", 1)
+    shortstat_logs([("", False)], "HEAD", 1)
+    # ten shares of one commit, one process: each share is a good half of the
+    # list after the one before, and any few in a row cover the whole of it
+    assert order == [0, 5, 2, 7, 4, 9, 1, 6, 3, 8]
 
 
 def test_shortstat_logs_stop_counting_when_git_fails(monkeypatch):

@@ -6,7 +6,6 @@ import datetime
 import heapq
 import logging
 import os
-import random
 import re
 import shlex
 import subprocess
@@ -553,10 +552,16 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
             for commits, first_parent in ((list(plain_commits), False), (list(merge_commits), True))
             for start in range(0, len(commits), size)
         ]
-        # In no order of the history, always the same one: recent commits tend
-        # to cost more than old ones, and the first shares to be counted say
-        # how long the rest will take.
-        random.Random(0).shuffle(jobs)
+        # Not in the order of the history: recent commits tend to cost more
+        # than old ones, and the first shares to be counted say how long the
+        # rest will take. Each share comes 0.618 of the list after the one
+        # before it, going round, so that the shares counted so far are
+        # always spread over the whole history. The order is the same from
+        # one run to the next.
+        jobs = [
+            jobs[index]
+            for index in sorted(range(len(jobs)), key=lambda index: index * 0.6180339887498949 % 1)
+        ]
         plain: dict[str, str] = {}
         merges: dict[str, str] = {}
         timer = threading.Thread(target=allow_more, name="git-shortstat-more", daemon=True)
