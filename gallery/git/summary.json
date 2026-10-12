@@ -1,35 +1,35 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.8.0.post1.dev1",
-  "generated_at": "2026-10-05T04:41:54+00:00",
+  "generated_by": "gitstats 2.9.0.post1.dev5",
+  "generated_at": "2026-10-12T04:57:30+00:00",
   "name": "Git",
   "report_path": "index.html",
   "first_commit": "2005-04-07 22:13:13",
-  "last_commit": "2026-10-04 04:45:55",
-  "age_days": 7850,
-  "active_days": 7328,
-  "total_commits": 82399,
-  "total_authors": 2358,
-  "active_authors_12mo": 217,
-  "commits_last_12mo": 3461,
+  "last_commit": "2026-10-06 17:13:31",
+  "age_days": 7852,
+  "active_days": 7334,
+  "total_commits": 82443,
+  "total_authors": 2362,
+  "active_authors_12mo": 220,
+  "commits_last_12mo": 3505,
   "total_files": 4856,
-  "total_lines": 1689030,
-  "lines_added": 3896368,
-  "lines_removed": 2207338,
+  "total_lines": 1689534,
+  "lines_added": 3897070,
+  "lines_removed": 2207536,
   "total_tags": 1010,
   "era": "steady",
   "top_authors": [
     {
       "name": "Junio C Hamano",
-      "commits": 28612
+      "commits": 28631
     },
     {
       "name": "Jeff King",
-      "commits": 4742
+      "commits": 4747
     },
     {
       "name": "Johannes Schindelin",
-      "commits": 2552
+      "commits": 2557
     },
     {
       "name": "Patrick Steinhardt",
@@ -41,7 +41,11 @@
     }
   ],
   "author_commits": {
-    "Junio C Hamano": 28612,
+    "Junio C Hamano": 28631,
+    "Khan Zimov": 1,
+    "Aleksei Sviridkin": 3,
+    "Jeff King": 4747,
+    "jyotish kumar": 1,
     "St\u00e9fan Driaan Turvey": 2,
     "Daniel Pereira": 1,
     "Jiang Xin": 853,
@@ -53,10 +57,18 @@
     "Jean-No\u00ebl Avila": 265,
     "Peter Krefting": 136,
     "Bagas Sanjaya": 51,
+    "Ren\u00e9 Scharfe": 1401,
+    "Jon Simons": 4,
+    "Yoichi NAKAYAMA": 12,
+    "Julia Evans": 34,
+    "Johannes Schindelin": 2557,
+    "Karthik Nayak": 258,
+    "Pushkar Singh": 9,
+    "Justin Tobler": 117,
     "Jiri Kuncar": 1,
+    "Yongqiang Tian": 1,
     "Haokai Ding": 1,
-    "Johannes Schindelin": 2552,
-    "Yoichi NAKAYAMA": 11,
+    "Thomas Bachem": 3,
     "Royce Remer": 1,
     "Orestis Floros": 1,
     "Todd Zullinger": 111,
@@ -64,8 +76,6 @@
     "SZEDER G\u00e1bor": 589,
     "Yannik Tausch": 3,
     "Ariel Keselman": 1,
-    "Jeff King": 4742,
-    "Karthik Nayak": 257,
     "D. Ben Knoble": 32,
     "Patrick Steinhardt": 2423,
     "James Le Cuirot": 1,
@@ -73,7 +83,6 @@
     "Tuomas Ahola": 11,
     "Harald Nordgren": 42,
     "Ted Nyman": 9,
-    "Aleksei Sviridkin": 2,
     "Kristoffer Haugsbakk": 181,
     "Johannes Sixt": 614,
     "Siddharth Asthana": 15,
@@ -84,8 +93,6 @@
     "Hardik Kumar": 1,
     "Toon Claes": 47,
     "Nikolaus Schuetz": 3,
-    "Ren\u00e9 Scharfe": 1400,
-    "Justin Tobler": 115,
     "Friel": 1,
     "Lutz Lengemann": 1,
     "Shlok Kulshreshtha": 7,
@@ -133,7 +140,6 @@
     "Tamir Duberstein": 6,
     "Mirko Faina": 21,
     "Jayesh Daga": 3,
-    "Pushkar Singh": 8,
     "Andrew Kreimer": 42,
     "Alexander Monakov": 2,
     "Lucas Seiki Oshiro": 31,
@@ -239,7 +245,6 @@
     "Michael Lyons": 2,
     "Ashlesh Gawande": 1,
     "Andrew Chitester": 1,
-    "Julia Evans": 33,
     "Greg Funni": 4,
     "Matthew Hughes": 3,
     "David Macek": 1,
@@ -869,7 +874,6 @@
     "Andrey Mazo": 9,
     "Herv\u00e9 Beraud": 1,
     "Cl\u00e9ment Chigot": 3,
-    "Jon Simons": 3,
     "Birger Skogeng Pedersen": 3,
     "Gabriele Mazzotta": 2,
     "Paul Wise": 1,
@@ -2422,6 +2426,6 @@
     "2023": 2835,
     "2024": 3967,
     "2025": 3491,
-    "2026": 3001
+    "2026": 3045
   }
 }

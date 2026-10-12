@@ -7,7 +7,7 @@
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.8.0.post1.dev1">
+	<meta name="generator" content="GitStats 2.9.0.post1.dev5">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -118,64 +118,169 @@
 	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
 	//   peaks  a label above chosen bars
 	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
 	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
 	const chartAnnotations = {
 		id: 'gsAnnotations',
 		beforeDatasetsDraw: function(chart, args, opts) {
-			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
-			const half = x.type === 'category' && chart.data.labels.length > 1
-				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
 			(opts.bands || []).forEach(function(band) {
-				const left = x.getPixelForValue(band.from) - half;
-				const right = x.getPixelForValue(band.to) + half;
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
 				ctx.save();
 				ctx.fillStyle = getCSSVar('--surface-color');
-				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
 				ctx.strokeStyle = getCSSVar('--border-strong');
 				ctx.setLineDash([3, 3]);
 				ctx.beginPath();
 				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
 				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
 				ctx.stroke();
-				ctx.fillStyle = getCSSVar('--chart-text');
 				ctx.font = '11px ' + getCSSVar('--font-mono');
 				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
 				let text = band.text;
-				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
-				if (ctx.measureText(text).width <= right - left - 4) {
-					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
 				}
 				ctx.restore();
 			});
 		},
 		afterDatasetsDraw: function(chart, args, opts) {
-			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
-			const marks = (opts.peaks || []).slice();
-			if (opts.values) {
-				chart.data.datasets[0].data.forEach(function(v, i) {
-					if (v) marks.push({ index: i, text: String(v), plain: true });
-				});
-			}
-			marks.forEach(function(mark) {
-				const bar = meta.data[mark.index];
-				if (!bar) return;
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
 				ctx.save();
-				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
-				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.font = mark.font;
 				ctx.textAlign = 'center';
-				// keep labels on the first and last bars inside the plot area
-				const w = ctx.measureText(mark.text).width / 2;
-				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
-				ctx.fillText(mark.text, cx, bar.y - 6);
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
 				ctx.restore();
 			});
 		}
 	};
 
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
 	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
 	// thinned so labels never collide; short spans label every few months.
 	function monthAxisTick(value) {
 		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
 		const n = this.chart.data.labels.length;
 		const width = Math.max(this.width, 1);
 		if (n <= 24) {
@@ -199,26 +304,49 @@
 		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
 	}
 
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
 	// A linear x-axis over millisecond timestamps, ticked on year (or month)
-	// boundaries, so gaps in history take up the space they really span.
-	function timeAxis(xs) {
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
 		return {
 			type: 'linear',
-			min: xs.length ? xs[0] : undefined,
-			max: xs.length ? xs[xs.length - 1] : undefined,
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
 			afterBuildTicks: function(scale) {
-				const from = new Date(scale.min), to = new Date(scale.max);
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
 				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
 				let unit = 'year';
 				if (to.getFullYear() - from.getFullYear() >= 2) {
 					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
-						ticks.push({ value: new Date(y, 0, 1).getTime() });
+						add(new Date(y, 0, 1).getTime());
 					}
 				} else {
 					unit = 'month';
 					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
-					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
-						ticks.push({ value: d.getTime() });
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
 					}
 				}
 				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
@@ -227,7 +355,9 @@
 			ticks: {
 				maxRotation: 0,
 				autoSkipPadding: 12,
-				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
 			}
 		};
 	}
@@ -242,6 +372,7 @@
             <li><a href="activity.html">Activity</a></li>
             <li><a href="authors.html">Authors</a></li>
             <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
             <li><a href="files.html">Files</a></li>
             <li><a href="history.html">History</a></li>
             <li><a href="lines.html">Lines</a></li>
@@ -263,7 +394,10 @@
 <p class="section-note">One number each.</p><div class="badge-list"><div class="badge-row" data-kind="style" data-badge="commits" data-title="commits"><div class="badge-info"><div class="badge-name"><code>commits</code><span>Total commits</span></div><img src="badges/flat/commits.svg" alt="GitStats commits"></div><pre class="badge-code">[![GitStats commits](https://&lt;your-report-url&gt;/badges/flat/commits.svg)](https://&lt;your-report-url&gt;/)</pre><button type="button" class="badge-copy" aria-label="Copy Markdown for commits"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Copy</span></button></div><div class="badge-row" data-kind="style" data-badge="authors" data-title="authors"><div class="badge-info"><div class="badge-name"><code>authors</code><span>People who committed</span></div><img src="badges/flat/authors.svg" alt="GitStats authors"></div><pre class="badge-code">[![GitStats authors](https://&lt;your-report-url&gt;/badges/flat/authors.svg)](https://&lt;your-report-url&gt;/)</pre><button type="button" class="badge-copy" aria-label="Copy Markdown for authors"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Copy</span></button></div><div class="badge-row" data-kind="style" data-badge="lines" data-title="lines"><div class="badge-info"><div class="badge-name"><code>lines</code><span>Lines of code</span></div><img src="badges/flat/lines.svg" alt="GitStats lines"></div><pre class="badge-code">[![GitStats lines](https://&lt;your-report-url&gt;/badges/flat/lines.svg)](https://&lt;your-report-url&gt;/)</pre><button type="button" class="badge-copy" aria-label="Copy Markdown for lines"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Copy</span></button></div><div class="badge-row" data-kind="style" data-badge="files" data-title="files"><div class="badge-info"><div class="badge-name"><code>files</code><span>Files in the repository</span></div><img src="badges/flat/files.svg" alt="GitStats files"></div><pre class="badge-code">[![GitStats files](https://&lt;your-report-url&gt;/badges/flat/files.svg)](https://&lt;your-report-url&gt;/)</pre><button type="button" class="badge-copy" aria-label="Copy Markdown for files"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Copy</span></button></div><div class="badge-row" data-kind="style" data-badge="last-commit" data-title="last-commit"><div class="badge-info"><div class="badge-name"><code>last-commit</code><span>Month of the latest commit</span></div><img src="badges/flat/last-commit.svg" alt="GitStats last-commit"></div><pre class="badge-code">[![GitStats last-commit](https://&lt;your-report-url&gt;/badges/flat/last-commit.svg)](https://&lt;your-report-url&gt;/)</pre><button type="button" class="badge-copy" aria-label="Copy Markdown for last-commit"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Copy</span></button></div><div class="badge-row" data-kind="style" data-badge="release" data-title="release"><div class="badge-info"><div class="badge-name"><code>release</code><span>Newest tag and the tag count</span></div><img src="badges/flat/release.svg" alt="GitStats release"></div><pre class="badge-code">[![GitStats release](https://&lt;your-report-url&gt;/badges/flat/release.svg)](https://&lt;your-report-url&gt;/)</pre><button type="button" class="badge-copy" aria-label="Copy Markdown for release"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Copy</span></button></div><div class="badge-row" data-kind="style" data-badge="active-days" data-title="active-days"><div class="badge-info"><div class="badge-name"><code>active-days</code><span>Days with at least one commit</span></div><img src="badges/flat/active-days.svg" alt="GitStats active-days"></div><pre class="badge-code">[![GitStats active-days](https://&lt;your-report-url&gt;/badges/flat/active-days.svg)](https://&lt;your-report-url&gt;/)</pre><button type="button" class="badge-copy" aria-label="Copy Markdown for active-days"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Copy</span></button></div></div>
 <h2 id="other_ways_to_use_them"><a href="#other_ways_to_use_them">Other ways to use them</a></h2>
 
-<p class="section-note">Every badge is a plain SVG file under <code>badges/&lt;style&gt;/</code>, rewritten each time the report is generated.</p><div class="badge-list"><div class="badge-row" data-kind="default" data-badge="commits" data-title="badge.svg"><div class="badge-info"><div class="badge-name"><code>badge.svg</code><span>The default badge: commits in flat, set by badge_metric and badge_style</span></div><img src="badge.svg" alt="GitStats"></div><pre class="badge-code">[![GitStats](https://&lt;your-report-url&gt;/badge.svg)](https://&lt;your-report-url&gt;/)</pre><button type="button" class="badge-copy" aria-label="Copy Markdown for badge.svg"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Copy</span></button></div><div class="badge-row" data-kind="endpoint" data-badge="commits" data-title="shields.io endpoint"><div class="badge-info"><div class="badge-name"><code>shields.io endpoint</code><span>The same numbers as JSON, for shields.io styles and logos</span></div><span class="badge-json">badges/commits.json</span></div><pre class="badge-code">[![GitStats commits](https://img.shields.io/endpoint?url=https://&lt;your-report-url&gt;/badges/commits.json)](https://&lt;your-report-url&gt;/)</pre><button type="button" class="badge-copy" aria-label="Copy Markdown for shields.io endpoint"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Copy</span></button></div></div><p id="badge-live" class="visually-hidden" aria-live="polite"></p><script type="application/json" id="badge-data">{"style": "flat", "siteUrl": "", "placeholder": "https://<your-report-url>/"}</script><script>
+<p class="section-note">Every badge is a plain SVG file under <code>badges/&lt;style&gt;/</code>, rewritten each time the report is generated.</p><div class="badge-list"><div class="badge-row" data-kind="default" data-badge="commits" data-title="badge.svg"><div class="badge-info"><div class="badge-name"><code>badge.svg</code><span>The default badge: commits in flat, set by badge_metric and badge_style</span></div><img src="badge.svg" alt="GitStats"></div><pre class="badge-code">[![GitStats](https://&lt;your-report-url&gt;/badge.svg)](https://&lt;your-report-url&gt;/)</pre><button type="button" class="badge-copy" aria-label="Copy Markdown for badge.svg"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Copy</span></button></div><div class="badge-row" data-kind="endpoint" data-badge="commits" data-title="shields.io endpoint"><div class="badge-info"><div class="badge-name"><code>shields.io endpoint</code><span>The same numbers as JSON, for shields.io styles and logos</span></div><span class="badge-json">badges/commits.json</span></div><pre class="badge-code">[![GitStats commits](https://img.shields.io/endpoint?url=https://&lt;your-report-url&gt;/badges/commits.json)](https://&lt;your-report-url&gt;/)</pre><button type="button" class="badge-copy" aria-label="Copy Markdown for shields.io endpoint"><svg class="icon-copy" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><svg class="icon-check" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg><span>Copy</span></button></div></div>
+<h2 id="repo_wrapped"><a href="#repo_wrapped">Repo Wrapped</a></h2>
+
+<p class="section-note">A card of one year in the repository, to show in a README or share as an image. There is none next to this report: generate it with <code class="nowrap">--wrapped</code> to get one.</p><p id="badge-live" class="visually-hidden" aria-live="polite"></p><script type="application/json" id="badge-data">{"style": "flat", "siteUrl": "", "placeholder": "https://<your-report-url>/"}</script><script>
 (function() {
 	const data = JSON.parse(document.getElementById('badge-data').textContent);
 	const input = document.getElementById('badge-url');
@@ -303,9 +437,17 @@
 		return url ? url.replace(/\/*$/, '/') : data.placeholder;
 	}
 
-	function snippet(image, link, alt) {
-		if (format === 'rst') return '.. image:: ' + image + '\n   :target: ' + link + '\n   :alt: ' + alt;
-		if (format === 'html') return '<a href="' + link + '"><img src="' + image + '" alt="' + alt + '"></a>';
+	// `width` is for the Wrapped card, which is 1080px wide: reStructuredText
+	// and HTML can show it smaller, Markdown has no way to say so
+	function snippet(image, link, alt, width) {
+		if (format === 'rst') {
+			return '.. image:: ' + image + '\n   :target: ' + link + '\n   :alt: ' + alt
+				+ (width ? '\n   :width: ' + width : '');
+		}
+		if (format === 'html') {
+			return '<a href="' + link + '"><img src="' + image + '" alt="' + alt + '"'
+				+ (width ? ' width="' + width + '"' : '') + '></a>';
+		}
 		return '[![' + alt + '](' + image + ')](' + link + ')';
 	}
 
@@ -330,12 +472,13 @@
 			let path = 'badges/' + style + '/' + name + '.svg';
 			let alt = 'GitStats ' + name;
 			if (kind === 'default') { path = 'badge.svg'; alt = 'GitStats'; }
+			if (kind === 'card') { path = name; alt = row.getAttribute('data-alt'); }
 			const image = kind === 'endpoint'
 				? 'https://img.shields.io/endpoint?url=' + link + 'badges/' + name + '.json'
 				: link + path;
 			const img = row.querySelector('img');
 			if (img && kind === 'style') img.src = path;
-			row.querySelector('.badge-code').textContent = snippet(image, link, alt);
+			row.querySelector('.badge-code').textContent = snippet(image, link, alt, kind === 'card' ? 480 : 0);
 			row.querySelector('.badge-copy').setAttribute('aria-label', 'Copy ' + formats[format] + ' for ' + row.getAttribute('data-title'));
 		});
 		showStatus();

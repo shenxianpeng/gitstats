@@ -7,7 +7,7 @@
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.8.0.post1.dev1">
+	<meta name="generator" content="GitStats 2.9.0.post1.dev5">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -118,64 +118,169 @@
 	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
 	//   peaks  a label above chosen bars
 	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
 	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
 	const chartAnnotations = {
 		id: 'gsAnnotations',
 		beforeDatasetsDraw: function(chart, args, opts) {
-			const x = chart.scales.x, area = chart.chartArea, ctx = chart.ctx;
-			const half = x.type === 'category' && chart.data.labels.length > 1
-				? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
 			(opts.bands || []).forEach(function(band) {
-				const left = x.getPixelForValue(band.from) - half;
-				const right = x.getPixelForValue(band.to) + half;
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
 				ctx.save();
 				ctx.fillStyle = getCSSVar('--surface-color');
-				ctx.fillRect(left, area.top, right - left, area.bottom - area.top);
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
 				ctx.strokeStyle = getCSSVar('--border-strong');
 				ctx.setLineDash([3, 3]);
 				ctx.beginPath();
 				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
 				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
 				ctx.stroke();
-				ctx.fillStyle = getCSSVar('--chart-text');
 				ctx.font = '11px ' + getCSSVar('--font-mono');
 				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
 				let text = band.text;
-				if (ctx.measureText(text).width > right - left - 8) text = band.short || '';
-				if (ctx.measureText(text).width <= right - left - 4) {
-					ctx.fillText(text, (left + right) / 2, area.top + (area.bottom - area.top) / 2);
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
 				}
 				ctx.restore();
 			});
 		},
 		afterDatasetsDraw: function(chart, args, opts) {
-			const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
-			const marks = (opts.peaks || []).slice();
-			if (opts.values) {
-				chart.data.datasets[0].data.forEach(function(v, i) {
-					if (v) marks.push({ index: i, text: String(v), plain: true });
-				});
-			}
-			marks.forEach(function(mark) {
-				const bar = meta.data[mark.index];
-				if (!bar) return;
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
 				ctx.save();
-				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
-				ctx.font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+				ctx.font = mark.font;
 				ctx.textAlign = 'center';
-				// keep labels on the first and last bars inside the plot area
-				const w = ctx.measureText(mark.text).width / 2;
-				const cx = Math.min(Math.max(bar.x, area.left + w), area.right - w);
-				ctx.fillText(mark.text, cx, bar.y - 6);
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
 				ctx.restore();
 			});
 		}
 	};
 
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
 	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
 	// thinned so labels never collide; short spans label every few months.
 	function monthAxisTick(value) {
 		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
 		const n = this.chart.data.labels.length;
 		const width = Math.max(this.width, 1);
 		if (n <= 24) {
@@ -199,26 +304,49 @@
 		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
 	}
 
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
 	// A linear x-axis over millisecond timestamps, ticked on year (or month)
-	// boundaries, so gaps in history take up the space they really span.
-	function timeAxis(xs) {
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
 		return {
 			type: 'linear',
-			min: xs.length ? xs[0] : undefined,
-			max: xs.length ? xs[xs.length - 1] : undefined,
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
 			afterBuildTicks: function(scale) {
-				const from = new Date(scale.min), to = new Date(scale.max);
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
 				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
 				let unit = 'year';
 				if (to.getFullYear() - from.getFullYear() >= 2) {
 					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
-						ticks.push({ value: new Date(y, 0, 1).getTime() });
+						add(new Date(y, 0, 1).getTime());
 					}
 				} else {
 					unit = 'month';
 					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
-					for (; d.getTime() <= scale.max; d.setMonth(d.getMonth() + 1)) {
-						ticks.push({ value: d.getTime() });
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
 					}
 				}
 				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
@@ -227,7 +355,9 @@
 			ticks: {
 				maxRotation: 0,
 				autoSkipPadding: 12,
-				callback: function(value) { return formatChartDate(value, this.dateUnit); }
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
 			}
 		};
 	}
@@ -242,6 +372,7 @@
             <li><a href="activity.html">Activity</a></li>
             <li><a href="authors.html">Authors</a></li>
             <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
             <li><a href="files.html">Files</a></li>
             <li><a href="history.html">History</a></li>
             <li><a href="lines.html">Lines</a></li>
@@ -254,7 +385,7 @@
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>nginx</h1><p class="page-meta">2002-08-06 &rarr; 2026-09-30 &middot; generated 2026-10-05 04:38:04 in 19 s &middot; gitstats 2.8.0.post1.dev1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">8,738</dd><dd class="stat-note"><span class="nowrap">2.8 per active day</span>&nbsp;&middot; <span class="nowrap">1.0 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">138</dd><dd class="stat-note">63.3 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">308,251</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+507,790</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−199,539</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">547</dd><dd class="stat-note">27 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">3,138</dd><dd class="stat-note"><span class="nowrap">of 8,821 days</span>&nbsp;&middot; <span class="nowrap">35.6%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">13 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
+            <h1>nginx</h1><p class="page-meta">2002-08-06 &rarr; 2026-09-30 &middot; generated 2026-10-12 04:53:43 in 19 s &middot; gitstats 2.9.0.post1.dev5, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">8,738</dd><dd class="stat-note"><span class="nowrap">2.8 per active day</span>&nbsp;&middot; <span class="nowrap">1.0 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">138</dd><dd class="stat-note">63.3 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">308,251</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+507,790</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−199,539</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">547</dd><dd class="stat-note">27 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">3,138</dd><dd class="stat-note"><span class="nowrap">of 8,821 days</span>&nbsp;&middot; <span class="nowrap">35.6%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">13 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
 <h2 id="commits_per_year"><a href="#commits_per_year">Commits per year</a></h2>
 
 <div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly"></canvas></div>
@@ -262,6 +393,7 @@
 (function() {
   var ctx = document.getElementById('chart-overview-yearly').getContext('2d');
   var labels = [2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
+  var gap = null;
   applyChartTheme();
   new Chart(ctx, {
     type: 'bar',

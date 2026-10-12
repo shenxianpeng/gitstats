@@ -493,6 +493,27 @@ table {
 	border-right: 1px dashed var(--border-strong);
 }
 
+/* Cut down to a short break when it would take a quarter of the axis or more
+   (see collapsed_width()): hatched, and naming its years on the label row */
+.timeline-gap.is-collapsed {
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	background-image: repeating-linear-gradient(
+		135deg,
+		transparent 0 7px,
+		var(--border-color) 7px 8px
+	);
+	font-family: var(--font-mono);
+	font-size: var(--font-size-xs);
+	color: var(--text-secondary);
+	white-space: nowrap;
+}
+
+.timeline-gap.is-collapsed > span {
+	background-color: var(--surface-color);
+}
+
 .timeline-year {
 	position: absolute;
 	top: 0;
@@ -599,6 +620,25 @@ td.path {
 	font-family: var(--font-mono);
 	overflow-wrap: anywhere;
 	text-align: left;
+}
+
+/* A flag after a path (data-tag), such as "sole owner" on the Hotspots page.
+   Drawn here rather than written in the cell, so the cell's text, which the
+   table sorts by, stays the path. */
+td.path[data-tag]::after {
+	content: attr(data-tag);
+	display: inline-block;
+	margin-left: var(--space-2);
+	padding: 0 5px;
+	border: 1px solid var(--warn-color);
+	font-size: 10px;
+	font-weight: 600;
+	line-height: 1.5;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--warn-color);
+	vertical-align: 1px;
+	white-space: nowrap;
 }
 
 /* Rows are separated by hairlines only: no outer border, no vertical lines */
@@ -819,6 +859,13 @@ tr:hover td {
 	padding: 0;
 	border: 0;
 	background: none;
+}
+
+/* The Repo Wrapped card on the Badges page: a preview that opens the file */
+.badge-info .wrapped-preview {
+	align-self: flex-start;
+	line-height: 0;
+	border: 1px solid var(--border-color);
 }
 
 .badge-json {
@@ -1115,6 +1162,94 @@ tr:hover td {
 		left: 0;
 		z-index: 1;
 		background-color: var(--bg-color);
+	}
+}
+
+/* Tables of files on a phone. A path cannot share 390px with a few numbers:
+   squeezed into a 68px column, it broke every six characters. Each row is
+   two lines instead: the path, then its other cells, each named after its
+   column (data-label). The header row becomes the sort controls. */
+@media (max-width: 560px) {
+	table.file-table,
+	table.file-table tbody {
+		display: block;
+	}
+
+	table.file-table tr {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		/* tight enough for four named numbers to share a 343px line */
+		gap: 2px 10px;
+		padding: var(--space-2) 0;
+		border-bottom: 1px solid var(--table-border);
+	}
+
+	/* nothing scrolls sideways here, so the first column is not pinned */
+	.table-scroll table.file-table tr > th,
+	.table-scroll table.file-table tr > td,
+	.table-scroll table.file-table tr:hover > td {
+		position: static;
+		padding: 0;
+		border: 0;
+		box-shadow: none;
+		background-color: transparent;
+		text-align: left;
+	}
+
+	table.file-table td.path {
+		flex: 0 0 100%;
+	}
+
+	table.file-table td[data-label]::before {
+		content: attr(data-label);
+		margin-right: 6px;
+		font-family: var(--font-mono);
+		font-size: var(--font-size-xs);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--text-secondary);
+	}
+
+	/* the bar runs under the row, thinner than in its own column */
+	.table-scroll table.file-table td.share-cell {
+		flex: 0 0 100%;
+		width: auto;
+		padding-top: 2px;
+	}
+
+	table.file-table .share-bar {
+		height: 3px;
+	}
+
+	/* The header row: "Sort by", then a button for each sortable column */
+	table.file-table tr:first-child {
+		align-items: center;
+		gap: 6px;
+		padding-top: 0;
+		border-bottom-color: var(--border-strong);
+	}
+
+	table.file-table tr:first-child::before {
+		content: "Sort by";
+		font-family: var(--font-mono);
+		font-size: var(--font-size-xs);
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--table-header-color);
+	}
+
+	table.file-table th.unsortable {
+		display: none;
+	}
+
+	table.file-table th a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 32px;
+		padding: 0 6px;
+		border: 1px solid var(--border-color);
 	}
 }
 
