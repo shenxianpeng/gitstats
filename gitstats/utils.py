@@ -9,8 +9,10 @@ import re
 import shlex
 import subprocess
 import tempfile
+import threading
 import time
 from collections.abc import Iterable, Iterator
+from concurrent.futures import ThreadPoolExecutor
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any
 
@@ -373,6 +375,181 @@ def _skip(stream: Any, size: int) -> None:
         if not chunk:
             return
         size -= len(chunk)
+
+
+# How many commits one git process is asked the line counts of. Small enough for
+# the processes to share the work evenly, whatever the commits cost and however
+# fast the cores are; large enough for starting them not to count.
+SHORTSTAT_COMMITS_PER_PROCESS = 1000
+# The processes that count lines are two at first and one more every few
+# seconds, up to as many as were asked for. A history of small diffs is done
+# before they are many, and they take no processor from the phases of the run
+# that go on meanwhile; a history that needs them all has them soon enough.
+SHORTSTAT_PROCESSES_AT_FIRST = 2
+SHORTSTAT_SECONDS_PER_PROCESS = 3.0
+
+# "<commit>\t<parents>\t<stamp> <author>", a commit of a walk
+_LOG_ROW = re.compile(r"^([0-9a-f]+)\t([0-9a-f ]*)\t(.*)$", re.MULTILINE)
+# a line that is a commit's hash and nothing else
+_COMMIT_LINE = re.compile(r"^([0-9a-f]{40}|[0-9a-f]{64})$", re.MULTILINE)
+
+
+def _git_text(args: list[str], data: str | None = None, env: dict[str, str] | None = None) -> str:
+    """Run a git command, giving it ``data`` to read, and return what it prints.
+
+    Raises subprocess.CalledProcessError if git fails.
+    """
+    global exectime_external
+    start = time.time()
+    # What git reads comes from a file, not a pipe. With a pipe each way,
+    # subprocess reads the output in the pieces git writes it in, and git
+    # writes a commit at a time: a few seconds of Python on a long history,
+    # during which the other threads of the run wait. With one pipe it is
+    # one read.
+    with tempfile.TemporaryFile("w+") as given:
+        if data is not None:
+            given.write(data)
+            given.seek(0)
+        result = subprocess.run(
+            ["git", *args],
+            stdin=given if data is not None else subprocess.DEVNULL,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            check=True,
+            env=env,
+        )
+    exectime_external += time.time() - start
+    return result.stdout.decode("utf-8", errors="replace")
+
+
+def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int) -> list[str]:
+    """Write what `git log --shortstat` prints for several walks of one history.
+
+    Each of ``passes`` is ``(walk, first_parent)``: ``walk`` holds the options
+    that pick and order its commits (``--first-parent``, ``--date-order``),
+    and ``first_parent`` says whether a merge is compared with its first
+    parent (``-m --first-parent``) or shown without a count. The text
+    returned for a pass is, blank lines aside, the output of::
+
+        git log --shortstat <walk> [-m] --pretty=format:"%at %aN" <log_range>
+
+    Counting the lines of every diff is what those commands spend their time
+    on, each in one process, and the walks mostly cover the same commits.
+    Here the commits of each walk are listed first, which is quick. The
+    counts are then asked for once per commit, whatever the number of walks
+    it is in, and from up to ``workers`` git processes at a time
+    (``git log --shortstat --no-walk``), each taking the next
+    SHORTSTAT_COMMITS_PER_PROCESS commits when it is done with the last.
+    They are SHORTSTAT_PROCESSES_AT_FIRST to begin with, and one more every
+    SHORTSTAT_SECONDS_PER_PROCESS seconds.
+
+    The outputs are cut and joined whole, with as little work per commit in
+    Python as can be: the caller is parsing other output meanwhile, and the
+    two would take turns.
+
+    Raises OSError or subprocess.CalledProcessError when git fails.
+    """
+    workers = max(workers, 1)
+    # git fills its buffer before it writes, where it would write after every commit
+    env = {**os.environ, "GIT_FLUSH": "0"}
+
+    def listing(walk: str) -> list[tuple[str, str, str]]:
+        """(commit, parents, "<stamp> <author>") in the order of the walk."""
+        return _LOG_ROW.findall(
+            _git_text(
+                [
+                    "log",
+                    *shlex.split(walk),
+                    "--format=%H%x09%P%x09%at %aN",
+                    *shlex.split(log_range),
+                ],
+                env=env,
+            )
+        )
+
+    # how many git processes may count lines at this moment
+    allowed = threading.Semaphore(min(workers, SHORTSTAT_PROCESSES_AT_FIRST))
+    counted = threading.Event()
+
+    def allow_more() -> None:
+        for _ in range(workers - SHORTSTAT_PROCESSES_AT_FIRST):
+            if counted.wait(SHORTSTAT_SECONDS_PER_PROCESS):
+                return
+            allowed.release()
+
+    def counts(job: tuple[list[str], bool]) -> dict[str, str]:
+        """commit -> what git prints under it, for one process's share of the commits."""
+        commits, first_parent = job
+        with allowed:
+            text = _git_text(
+                [
+                    "log",
+                    "--shortstat",
+                    *(["-m", "--first-parent"] if first_parent else []),
+                    "--no-walk",
+                    # from its input: a thousand hashes are more than a
+                    # command line holds on Windows
+                    "--stdin",
+                    "--format=%H",
+                ],
+                "\n".join(commits) + "\n",
+                env,
+            )
+        # [what comes before the first commit, commit, what is under it, commit, ...]
+        parts = _COMMIT_LINE.split(text)
+        return dict(zip(parts[1::2], parts[2::2]))
+
+    with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="git-shortstat") as pool:
+        walks = list(pool.map(listing, [walk for walk, _ in passes]))
+
+        # Every commit once: a merge of a first-parent walk with its first
+        # parent, any other commit the plain way, which is the same in every
+        # walk. The commits stay in the order of the walks, so that those of
+        # one process are neighbors in the history.
+        plain_commits: dict[str, None] = {}
+        merge_commits: dict[str, None] = {}
+        for (_, first_parent), rows in zip(passes, walks):
+            if first_parent:
+                merge_commits.update(
+                    (commit, None) for commit, parents, _ in rows if " " in parents
+                )
+                plain_commits.update(
+                    (commit, None) for commit, parents, _ in rows if " " not in parents
+                )
+            else:
+                plain_commits.update((row[0], None) for row in rows)
+        size = SHORTSTAT_COMMITS_PER_PROCESS
+        jobs = [
+            (commits[start : start + size], first_parent)
+            for commits, first_parent in ((list(plain_commits), False), (list(merge_commits), True))
+            for start in range(0, len(commits), size)
+        ]
+        plain: dict[str, str] = {}
+        merges: dict[str, str] = {}
+        timer = threading.Thread(target=allow_more, name="git-shortstat-more", daemon=True)
+        timer.start()
+        try:
+            for (_, first_parent), found in zip(jobs, pool.map(counts, jobs)):
+                (merges if first_parent else plain).update(found)
+        except BaseException:
+            # git failed for some commits: the others need not be counted
+            pool.shutdown(cancel_futures=True)
+            raise
+        finally:
+            counted.set()
+            timer.join()
+
+    texts = []
+    for (_, first_parent), rows in zip(passes, walks):
+        # in a first-parent walk the merges have the counts made that way
+        under = {**plain, **merges} if first_parent and merges else plain
+        try:
+            texts.append("\n".join([header + under[commit] for commit, _, header in rows]))
+        except KeyError as missing:
+            raise subprocess.CalledProcessError(
+                1, ["git", "log", "--shortstat", "--no-walk"], f"nothing printed for {missing}"
+            ) from None
+    return texts
 
 
 def get_stat_summary_counts(line: str) -> list[str | int]:

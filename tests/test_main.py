@@ -806,9 +806,10 @@ class TestCollectPhases:
         ]
 
     @staticmethod
-    def _collect_recording(git_repo, processes):
-        """Run collect(); return the data, the git commands that ran and what
-        each of the three history phases was handed as output."""
+    def _collect_recording(git_repo, processes, cpus=8, shortstat_logs=None):
+        """Run collect() on a machine of ``cpus`` processors; return the data,
+        the git commands that ran through get_pipe_output() and what each of
+        the three history phases was handed as output."""
         import gitstats.main as main_mod
 
         _use_config(processes=processes)
@@ -833,7 +834,13 @@ class TestCollectPhases:
 
             setattr(dc, phase, spy)
         prevdir = os.getcwd()
-        with patch.object(main_mod, "get_pipe_output", recording):
+        with (
+            patch.object(main_mod, "get_pipe_output", recording),
+            patch.object(main_mod.os, "cpu_count", return_value=cpus),
+            patch.object(
+                main_mod, "shortstat_logs", side_effect=shortstat_logs or main_mod.shortstat_logs
+            ) as spread,
+        ):
             try:
                 os.chdir(git_repo)
                 dc.collect(git_repo)
@@ -844,45 +851,104 @@ class TestCollectPhases:
             for key, value in dc.__dict__.items()
             if key not in ("stamp_created", "cache") and not key.startswith("_collect")
         }
-        return data, ran, handed, dc
+        return data, ran, handed, dc, spread
 
-    def test_collect_starts_the_history_passes_ahead(self, git_repo):
-        """The three `git log` passes are started by collect() itself, each of
-        them once, and their phases are handed the output."""
-        _, ran, handed, dc = self._collect_recording(git_repo, processes=8)
+    @staticmethod
+    def _text(output):
+        """The lines of a `git log`, blank ones aside."""
+        return [line for line in output.split("\n") if line]
 
-        passes = [
-            dc._line_stats_command(),
-            dc._author_line_stats_command(),
-            dc._churn_command(),
-        ]
-        assert len(set(passes)) == 3
-        for command in passes:
-            assert ran.count(command) == 1, command
-        # each phase got the text of its own pass
-        assert "files changed" in handed["_collect_line_stats"]
-        assert "files changed" in handed["_collect_per_author_line_stats"]
+    def test_collect_starts_the_history_passes_ahead(self, git_repo, monkeypatch):
+        """collect() has git start on the three passes itself. The two that
+        count the lines of every diff are spread over git processes, and none
+        of their commands runs; the third runs once. Each phase is handed the
+        text of its pass."""
+        _, ran, handed, dc, spread = self._collect_recording(git_repo, processes=8)
+
+        # eight processes: seven for the line counts, one left to the phases
+        spread.assert_called_once_with(
+            [("--first-parent", True), ("--date-order", False)], "HEAD", 7
+        )
+        assert dc._line_stats_command() not in ran
+        assert dc._author_line_stats_command() not in ran
+        assert ran.count(dc._churn_command()) == 1
         assert handed["_collect_file_churn_and_ownership"].startswith("COMMIT:")
 
-    def test_collect_gathers_the_same_with_one_process(self, git_repo):
-        """`processes = 1` leaves each phase to run its own command, in its
-        turn; the data does not change."""
-        side_by_side, ran_ahead, _, _ = self._collect_recording(git_repo, processes=8)
-        in_turn, ran_in_turn, handed, dc = self._collect_recording(git_repo, processes=1)
+        # what the two phases were handed is what their commands print
+        from gitstats.utils import get_pipe_output
 
+        monkeypatch.chdir(git_repo)
+        for phase, command in (
+            ("_collect_line_stats", dc._line_stats_command()),
+            ("_collect_per_author_line_stats", dc._author_line_stats_command()),
+        ):
+            assert "files changed" in handed[phase]
+            assert self._text(handed[phase]) == self._text(get_pipe_output([command])), phase
+
+    @pytest.mark.parametrize("processes, cpus, workers", [(8, 4, 3), (3, 16, 2), (2, 2, 1)])
+    def test_collect_asks_for_no_more_processes_than_the_machine_has(
+        self, git_repo, processes, cpus, workers
+    ):
+        _, _, _, _, spread = self._collect_recording(git_repo, processes, cpus)
+        assert spread.call_args.args[2] == workers
+
+    @pytest.mark.parametrize("processes, cpus", [(1, 8), (8, 1)])
+    def test_collect_gathers_the_same_with_one_process(self, git_repo, processes, cpus):
+        """`processes = 1`, or a machine with one processor, leaves each phase
+        to run its own command, in its turn; the data does not change."""
+        side_by_side, _, _, _, _ = self._collect_recording(git_repo, processes=8)
+        in_turn, ran, handed, dc, spread = self._collect_recording(git_repo, processes, cpus)
+
+        spread.assert_not_called()
         assert handed == {
             "_collect_line_stats": None,
             "_collect_per_author_line_stats": None,
             "_collect_file_churn_and_ownership": None,
         }
         assert side_by_side == in_turn
-        assert sorted(ran_ahead) == sorted(ran_in_turn)
         # in turn, the three passes are the three last commands, in the order of their phases
-        assert ran_in_turn[-3:] == [
+        assert ran[-3:] == [
             dc._line_stats_command(),
             dc._author_line_stats_command(),
             dc._churn_command(),
         ]
+
+    def test_collect_runs_the_commands_when_the_counts_cannot_be_spread(self, git_repo):
+        """git failing in one of the processes is not the end of the run: the
+        two phases run their commands, as they would in turn."""
+        side_by_side, _, _, _, _ = self._collect_recording(git_repo, processes=8)
+
+        def failing(passes, log_range, workers):
+            raise subprocess.CalledProcessError(128, ["git", "log"])
+
+        fallen_back, ran, handed, dc, _ = self._collect_recording(
+            git_repo, processes=8, shortstat_logs=failing
+        )
+        assert handed["_collect_line_stats"] is None
+        assert handed["_collect_per_author_line_stats"] is None
+        assert ran.count(dc._line_stats_command()) == 1
+        assert ran.count(dc._author_line_stats_command()) == 1
+        # the pass that does not count lines had been started ahead all the same
+        assert handed["_collect_file_churn_and_ownership"].startswith("COMMIT:")
+        assert fallen_back == side_by_side
+
+    def test_line_stat_passes_follow_linear_linestats(self):
+        assert GitDataCollector._line_stat_passes() == [
+            ("--first-parent", True),
+            ("--date-order", False),
+        ]
+        assert GitDataCollector._line_stats_command() == (
+            'git log --shortstat --first-parent -m --pretty=format:"%at %aN" HEAD'
+        )
+        assert GitDataCollector._author_line_stats_command() == (
+            'git log --shortstat --date-order --pretty=format:"%at %aN" HEAD'
+        )
+        _use_config(linear_linestats=0)
+        # every commit, and a merge is not compared with anything
+        assert GitDataCollector._line_stat_passes() == [("", False), ("--date-order", False)]
+        assert GitDataCollector._line_stats_command() == (
+            'git log --shortstat  --pretty=format:"%at %aN" HEAD'
+        )
 
 
 # ── commit subject sampling (grounds the AI chronicle) ──────────────────
