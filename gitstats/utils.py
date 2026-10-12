@@ -3,6 +3,7 @@
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
 # GPLv2 / GPLv3
 import datetime
+import heapq
 import logging
 import os
 import re
@@ -384,9 +385,14 @@ SHORTSTAT_COMMITS_PER_PROCESS = 1000
 # The processes that count lines are two at first and one more every few
 # seconds, up to as many as were asked for. A history of small diffs is done
 # before they are many, and they take no processor from the phases of the run
-# that go on meanwhile; a history that needs them all has them soon enough.
+# that go on meanwhile. A history of large diffs is what a run waits for: once
+# the processes take SHORTSTAT_SLOW_SECONDS over their commits on average, all
+# those asked for are allowed. (At that rate two processes would still be
+# counting when the other phases, which cost about half as much per commit,
+# are done.)
 SHORTSTAT_PROCESSES_AT_FIRST = 2
 SHORTSTAT_SECONDS_PER_PROCESS = 3.0
+SHORTSTAT_SLOW_SECONDS = 0.35
 
 # "<commit>\t<parents>\t<stamp> <author>", a commit of a walk
 _LOG_ROW = re.compile(r"^([0-9a-f]+)\t([0-9a-f ]*)\t(.*)$", re.MULTILINE)
@@ -440,8 +446,9 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
     it is in, and from up to ``workers`` git processes at a time
     (``git log --shortstat --no-walk``), each taking the next
     SHORTSTAT_COMMITS_PER_PROCESS commits when it is done with the last.
-    They are SHORTSTAT_PROCESSES_AT_FIRST to begin with, and one more every
-    SHORTSTAT_SECONDS_PER_PROCESS seconds.
+    They are SHORTSTAT_PROCESSES_AT_FIRST to begin with and one more every
+    SHORTSTAT_SECONDS_PER_PROCESS seconds, or all of them once they take
+    SHORTSTAT_SLOW_SECONDS over their commits on average.
 
     The outputs are cut and joined whole, with as little work per commit in
     Python as can be: the caller is parsing other output meanwhile, and the
@@ -467,20 +474,31 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
             )
         )
 
-    # how many git processes may count lines at this moment
+    # how many git processes may count lines at this moment, and how many
+    # more may be allowed later
     allowed = threading.Semaphore(min(workers, SHORTSTAT_PROCESSES_AT_FIRST))
+    held_back = [max(workers - SHORTSTAT_PROCESSES_AT_FIRST, 0)]
+    # the seconds the processes have taken so far, and how many have finished
+    spent = [0.0, 0]
+    holding = threading.Lock()
     counted = threading.Event()
 
-    def allow_more() -> None:
-        for _ in range(workers - SHORTSTAT_PROCESSES_AT_FIRST):
-            if counted.wait(SHORTSTAT_SECONDS_PER_PROCESS):
-                return
+    def allow(processes: int) -> None:
+        with holding:
+            processes = min(processes, held_back[0])
+            held_back[0] -= processes
+        for _ in range(processes):
             allowed.release()
+
+    def allow_more() -> None:
+        while held_back[0] and not counted.wait(SHORTSTAT_SECONDS_PER_PROCESS):
+            allow(1)
 
     def counts(job: tuple[list[str], bool]) -> dict[str, str]:
         """commit -> what git prints under it, for one process's share of the commits."""
         commits, first_parent = job
         with allowed:
+            began = time.monotonic()
             text = _git_text(
                 [
                     "log",
@@ -495,6 +513,16 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
                 "\n".join(commits) + "\n",
                 env,
             )
+            took = time.monotonic() - began
+            with holding:
+                spent[0] += took
+                spent[1] += 1
+                # the average, of four processes at least: one slow share of
+                # the commits does not make a slow history, unless it is very slow
+                slow = spent[0] > SHORTSTAT_SLOW_SECONDS * max(spent[1], 4)
+            if slow:
+                # large diffs: the run will be waiting for these counts
+                allow(workers)
         # [what comes before the first commit, commit, what is under it, commit, ...]
         parts = _COMMIT_LINE.split(text)
         return dict(zip(parts[1::2], parts[2::2]))
@@ -524,6 +552,16 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
             for commits, first_parent in ((list(plain_commits), False), (list(merge_commits), True))
             for start in range(0, len(commits), size)
         ]
+        # Not in the order of the history: recent commits tend to cost more
+        # than old ones, and the first shares to be counted say how long the
+        # rest will take. Each share comes 0.618 of the list after the one
+        # before it, going round, so that the shares counted so far are
+        # always spread over the whole history. The order is the same from
+        # one run to the next.
+        jobs = [
+            jobs[index]
+            for index in sorted(range(len(jobs)), key=lambda index: index * 0.6180339887498949 % 1)
+        ]
         plain: dict[str, str] = {}
         merges: dict[str, str] = {}
         timer = threading.Thread(target=allow_more, name="git-shortstat-more", daemon=True)
@@ -550,6 +588,71 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
                 1, ["git", "log", "--shortstat", "--no-walk"], f"nothing printed for {missing}"
             ) from None
     return texts
+
+
+def history_graph(rev: str) -> tuple[dict[str, int], list[list[int]], list[str]]:
+    """Read the commits leading to ``rev``, with what joins them, in one `git log`.
+
+    Returns ``(place, parents, headers)``:
+        place:   commit hash -> its place in the two lists. A commit comes
+                 before its parents (``--topo-order``), so a smaller place is
+                 never an ancestor of a larger one;
+        parents: for each commit, the places of its parents (a parent git
+                 does not have, as at the edge of a shallow clone, is left out);
+        headers: for each commit, "<author timestamp> <author name>", as
+                 ``git log --format="%at %aN"`` prints it.
+    """
+    rows = _LOG_ROW.findall(
+        get_pipe_output([f'git log --topo-order --format="%H%x09%P%x09%at %aN" "{rev}"'])
+    )
+    place = {row[0]: index for index, row in enumerate(rows)}
+    parents = [[place[parent] for parent in row[1].split() if parent in place] for row in rows]
+    return place, parents, [row[2] for row in rows]
+
+
+def commits_reached(parents: list[list[int]], tip: int, base: int | None = None) -> list[int]:
+    """List the commits that lead to ``tip`` and not to ``base``.
+
+    The commits of ``git rev-list <tip> ^<base>`` (those of ``git rev-list
+    <tip>`` without a base), in a graph as history_graph() gives it:
+    ``parents[i]`` holds the places of the parents of commit ``i``, and a
+    commit comes before its parents. Descendants come first in the result.
+
+    Both sides are walked at once, the nearest descendants first, the way git
+    does it: a commit is known to lead to ``base`` or not by the time it is
+    reached, and the walk stops when everything left to visit leads to it.
+    What it costs is the commits listed and those of the other side as far
+    back as they go, not the whole history.
+    """
+    wanted, unwanted = 1, 2
+    state = {tip: wanted}
+    queue = [tip]
+    # how many of the commits waiting in the queue are still wanted
+    waiting = 1
+    if base is not None:
+        if base == tip:
+            return []
+        state[base] = unwanted
+        heapq.heappush(queue, base)
+    reached = []
+    while waiting:
+        commit = heapq.heappop(queue)
+        mine = state[commit]
+        if mine == wanted:
+            waiting -= 1
+            reached.append(commit)
+        for parent in parents[commit]:
+            theirs = state.get(parent)
+            if theirs is None:
+                state[parent] = mine
+                heapq.heappush(queue, parent)
+                if mine == wanted:
+                    waiting += 1
+            elif theirs == wanted and mine == unwanted:
+                # reached from the tip first, and now from the base as well
+                state[parent] = unwanted
+                waiting -= 1
+    return reached
 
 
 def get_stat_summary_counts(line: str) -> list[str | int]:
