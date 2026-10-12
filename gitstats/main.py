@@ -11,6 +11,7 @@ import re
 import socket
 import sys
 import time
+from concurrent.futures import Future, ThreadPoolExecutor
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from multiprocessing import Pool
@@ -28,10 +29,11 @@ from gitstats.ai_summarizer import AISummarizer
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.utils import (
     commit_local_time,
+    count_files_in_trees,
+    count_lines_in_blobs,
     get_commit_range,
     get_log_range,
     get_num_of_files_from_rev,
-    get_num_of_lines_in_blob,
     get_pipe_output,
     get_stat_summary_counts,
     get_version,
@@ -265,14 +267,39 @@ class GitDataCollector(DataCollector):
             get_pipe_output(["git shortlog -s {}".format(get_log_range("HEAD", False)), "wc -l"])
         )
 
-        self._collect_tags()
-        email_to_latest, author_to_email = self._collect_commit_stats()
-        name_to_canonical = self._merge_author_aliases(email_to_latest, author_to_email)
-        self._collect_files_by_stamp()
-        self._collect_extensions()
-        self._collect_line_stats()
-        self._collect_per_author_line_stats(name_to_canonical)
-        self._collect_file_churn_and_ownership(name_to_canonical)
+        # Three phases read a `git log` of the whole history, two of them with
+        # the line counts of every diff: what is left of a run is mostly git
+        # working those out. The three do not depend on each other, so git
+        # starts on all of them now, side by side, and each phase parses its
+        # output when its turn comes. Threads are enough: they only wait for
+        # git. With `processes = 1` the phases run their commands themselves,
+        # one after the other.
+        ahead: dict[str, Future[str]] = {}
+        with ThreadPoolExecutor(max_workers=3, thread_name_prefix="git-log") as pool:
+            if int(conf["processes"]) > 1:
+                ahead = {
+                    command: pool.submit(get_pipe_output, [command])
+                    for command in (
+                        self._line_stats_command(),
+                        self._author_line_stats_command(),
+                        self._churn_command(),
+                    )
+                }
+
+            def output(command: str) -> str | None:
+                # taken out of `ahead`, so the output is let go once its phase has read it
+                return ahead.pop(command).result() if command in ahead else None
+
+            self._collect_tags()
+            email_to_latest, author_to_email = self._collect_commit_stats()
+            name_to_canonical = self._merge_author_aliases(email_to_latest, author_to_email)
+            self._collect_files_by_stamp()
+            self._collect_extensions()
+            self._collect_line_stats(output(self._line_stats_command()))
+            self._collect_per_author_line_stats(
+                name_to_canonical, output(self._author_line_stats_command())
+            )
+            self._collect_file_churn_and_ownership(name_to_canonical, output(self._churn_command()))
         if conf["ai_enabled"]:
             self._collect_commit_subjects()
 
@@ -622,30 +649,35 @@ class GitDataCollector(DataCollector):
             )
         lines = []
         revs_to_read = []
-        time_rev_count = []
-        # Look up rev in cache and take info from cache if found
-        # If not append rev to list of rev to read from repo
+        # Take the count of a tree from the cache if it is there; the others
+        # are counted below
+        files_in_tree = self.cache.setdefault("files_in_tree", {})
         for revline in revlines:
             time, rev = revline.split(" ")
-            # if cache empty then add time and rev to list of new rev's
-            # otherwise try to read needed info from cache
-            if "files_in_tree" not in list(self.cache.keys()):
-                revs_to_read.append((time, rev))
-                continue
-            if rev in list(self.cache["files_in_tree"].keys()):
-                lines.append("%d %d" % (int(time), self.cache["files_in_tree"][rev]))
+            if rev in files_in_tree:
+                lines.append("%d %d" % (int(time), files_in_tree[rev]))
             else:
                 revs_to_read.append((time, rev))
 
-        # Read revisions from repo
-        time_rev_count = parallel_map_with_fallback(get_num_of_files_from_rev, revs_to_read)
-
-        # Update cache with new revisions and append then to general list
-        for time, rev, count in time_rev_count:
-            if "files_in_tree" not in self.cache:
-                self.cache["files_in_tree"] = {}
-            self.cache["files_in_tree"][rev] = count
-            lines.append("%d %d" % (int(time), count))
+        if revs_to_read:
+            # One git process counts them all, from what each commit added to
+            # and deleted from its parent. Listing the tree of every commit
+            # instead takes a process per commit, and time that grows with
+            # commits x files: most of an hour on a large repository.
+            counted = count_files_in_trees(
+                get_commit_range("HEAD", end_only=True),
+                {rev for _, rev in revs_to_read},
+                files_in_tree,
+            )
+            # the trees of the ancestors counted on the way are kept as well
+            files_in_tree.update(counted)
+            # whatever that could not find is listed, a tree at a time
+            left = [(time, rev) for time, rev in revs_to_read if rev not in counted]
+            if left:
+                for _, rev, count in parallel_map_with_fallback(get_num_of_files_from_rev, left):
+                    files_in_tree[rev] = count
+            for time, rev in revs_to_read:
+                lines.append("%d %d" % (int(time), files_in_tree[rev]))
 
         self.total_commits += len(lines)
         for line in lines:
@@ -666,6 +698,7 @@ class GitDataCollector(DataCollector):
         ).split("\000")
         blobs_to_read = []
         counted_files = []  # (path, blob id) of every file whose lines are counted
+        lines_in_blob = self.cache.setdefault("lines_in_blob", {})
         for line in lines:
             if len(line) == 0:
                 continue
@@ -697,29 +730,21 @@ class GitDataCollector(DataCollector):
                 self.extensions[ext] = {"files": 0, "lines": 0}
             self.extensions[ext]["files"] += 1
             counted_files.append((fullpath, blob_id))
-            # if cache empty then add ext and blob id to list of new blob's
-            # otherwise try to read needed info from cache
-            if "lines_in_blob" not in list(self.cache.keys()):
-                blobs_to_read.append((ext, blob_id))
-                continue
-            if blob_id in list(self.cache["lines_in_blob"].keys()):
-                self.extensions[ext]["lines"] += self.cache["lines_in_blob"][blob_id]
+            # the line count of a blob comes from the cache if it is there
+            if blob_id in lines_in_blob:
+                self.extensions[ext]["lines"] += lines_in_blob[blob_id]
             else:
                 blobs_to_read.append((ext, blob_id))
 
-        # Get info about line count for new blob's that wasn't found in cache
-        ext_blob_linecount = parallel_map_with_fallback(get_num_of_lines_in_blob, blobs_to_read)
-
-        # Update cache and write down info about number of number of lines
-        for ext, blob_id, linecount in ext_blob_linecount:
-            if "lines_in_blob" not in self.cache:
-                self.cache["lines_in_blob"] = {}
-            self.cache["lines_in_blob"][blob_id] = linecount
-            self.extensions[ext]["lines"] += self.cache["lines_in_blob"][blob_id]
+        # One git process reads the blobs the cache does not have, where two
+        # processes per blob took minutes on a tree of tens of thousands of files
+        counts = count_lines_in_blobs(blob_id for _, blob_id in blobs_to_read)
+        for ext, blob_id in blobs_to_read:
+            lines_in_blob[blob_id] = counts[blob_id]
+            self.extensions[ext]["lines"] += counts[blob_id]
 
         # Per-file line counts for the hotspot analysis, from the cache filled
         # above; refine() adds each file's churn and score
-        lines_in_blob = self.cache.get("lines_in_blob", {})
         for fullpath, blob_id in counted_files:
             self.hotspot_files[fullpath] = {
                 "lines": lines_in_blob.get(blob_id, 0),
@@ -727,29 +752,46 @@ class GitDataCollector(DataCollector):
                 "score": 0.0,
             }
 
-    def _collect_line_stats(self) -> None:
+    @staticmethod
+    def _line_stats_command() -> str:
+        """The `git log` that _collect_line_stats() reads."""
+        # computation of lines of code by date is better done
+        # on a linear history.
+        extra = ""
+        if conf["linear_linestats"]:
+            extra = "--first-parent -m"
+        return 'git log --shortstat {} --pretty=format:"%at %aN" {}'.format(
+            extra, get_log_range("HEAD", False)
+        )
+
+    @staticmethod
+    def _author_line_stats_command() -> str:
+        """The `git log` that _collect_per_author_line_stats() reads."""
+        return 'git log --shortstat --date-order --pretty=format:"%at %aN" {}'.format(
+            get_log_range("HEAD", False)
+        )
+
+    @staticmethod
+    def _churn_command() -> str:
+        """The `git log` that _collect_file_churn_and_ownership() reads."""
+        return 'git log --format="COMMIT:%aN" --name-only {}'.format(get_log_range("HEAD", False))
+
+    def _collect_line_stats(self, output: str | None = None) -> None:
         """Record lines added/removed over time (``changes_by_date``).
 
         Computed on a linear history when ``linear_linestats`` is enabled, since
         lines-of-code over time is better measured along the mainline.
+        ``output`` is that of _line_stats_command() when collect() has already
+        run it.
         """
         # line statistics
         # outputs:
         #  N files changed, N insertions (+), N deletions(-)
         # <stamp> <author>
         self.changes_by_date = {}  # stamp -> { files, ins, del }
-        # computation of lines of code by date is better done
-        # on a linear history.
-        extra = ""
-        if conf["linear_linestats"]:
-            extra = "--first-parent -m"
-        lines = get_pipe_output(
-            [
-                'git log --shortstat {} --pretty=format:"%at %aN" {}'.format(
-                    extra, get_log_range("HEAD", False)
-                )
-            ]
-        ).split("\n")
+        if output is None:
+            output = get_pipe_output([self._line_stats_command()])
+        lines = output.split("\n")
         lines.reverse()
         files = 0
         inserted = 0
@@ -810,23 +852,22 @@ class GitDataCollector(DataCollector):
                     (files, inserted, deleted) = (0, 0, 0)
         self.total_lines += total_lines
 
-    def _collect_per_author_line_stats(self, name_to_canonical: dict[str, str]) -> None:
+    def _collect_per_author_line_stats(
+        self, name_to_canonical: dict[str, str], output: str | None = None
+    ) -> None:
         """Record each author's commits and line counts over time.
 
         Unlike :meth:`_collect_line_stats` this never uses ``--first-parent``:
         every commit must be walked to know who committed what, not just the
-        mainline.
+        mainline. ``output`` is that of _author_line_stats_command() when
+        collect() has already run it.
         """
         # defined for stamp, author only if author committed at this timestamp.
         self.changes_by_date_by_author = {}  # stamp -> author -> lines_added
 
-        lines = get_pipe_output(
-            [
-                'git log --shortstat --date-order --pretty=format:"%at %aN" {}'.format(
-                    get_log_range("HEAD", False)
-                )
-            ]
-        ).split("\n")
+        if output is None:
+            output = get_pipe_output([self._author_line_stats_command()])
+        lines = output.split("\n")
         lines.reverse()
         inserted = 0
         deleted = 0
@@ -885,7 +926,9 @@ class GitDataCollector(DataCollector):
                     logger.warning(f'Failed to handle line "{line}"')
                     (inserted, deleted) = (0, 0)
 
-    def _collect_file_churn_and_ownership(self, name_to_canonical: dict[str, str]) -> None:
+    def _collect_file_churn_and_ownership(
+        self, name_to_canonical: dict[str, str], output: str | None = None
+    ) -> None:
         """Record how often each file changes and who changes it.
 
         A single name-only pass drives two metrics:
@@ -893,13 +936,13 @@ class GitDataCollector(DataCollector):
         (which files each author touches, for code ownership). Each commit is
         prefixed with a ``COMMIT:<author>`` marker line; the lines that follow
         are the file paths changed by that commit. Authors are resolved to their
-        canonical identity so aliases merge here directly.
+        canonical identity so aliases merge here directly. ``output`` is that of
+        _churn_command() when collect() has already run it.
         """
-        churn_output = get_pipe_output(
-            ['git log --format="COMMIT:%aN" --name-only {}'.format(get_log_range("HEAD", False))]
-        )
+        if output is None:
+            output = get_pipe_output([self._churn_command()])
         current_author = None
-        for line in churn_output.split("\n"):
+        for line in output.split("\n"):
             line = line.strip()
             if not line:
                 continue

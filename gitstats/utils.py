@@ -8,7 +8,9 @@ import os
 import re
 import shlex
 import subprocess
+import tempfile
 import time
+from collections.abc import Iterable, Iterator
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any
 
@@ -191,36 +193,6 @@ def should_exclude_file(ext: str) -> bool:
     return ext.lower() in excluded_extensions
 
 
-def get_num_of_lines_in_blob(ext_blob: tuple[str, str]) -> tuple[str, str, int]:
-    """
-    Get number of lines in blob.
-    Returns 0 for binary files (detected by null bytes).
-    """
-    ext, blob_id = ext_blob
-
-    # Skip excluded files
-    if should_exclude_file(ext):
-        return (ext, blob_id, 0)
-
-    # Check if file is binary by reading first 8192 bytes and looking for null bytes
-    try:
-        # Here not use get_pipe_output because we need raw bytes
-        blob_content = subprocess.check_output(
-            ["git", "cat-file", "blob", blob_id], stderr=subprocess.DEVNULL
-        )
-        # Check first 8KB for null bytes (binary indicator)
-        if b"\x00" in blob_content[:8192]:
-            return (ext, blob_id, 0)
-    except subprocess.CalledProcessError:
-        return (ext, blob_id, 0)
-
-    return (
-        ext,
-        blob_id,
-        int(get_pipe_output([f"git cat-file blob {blob_id}", _WC_L_CMD]).split()[0]),
-    )
-
-
 def get_num_of_files_from_rev(time_rev: tuple[str, str]) -> tuple[int, str, int]:
     """
     Get number of files changed in commit
@@ -231,6 +203,176 @@ def get_num_of_files_from_rev(time_rev: tuple[str, str]) -> tuple[int, str, int]
         rev,
         int(get_pipe_output([f'git ls-tree -r --name-only "{rev}"', _WC_L_CMD]).split("\n")[0]),
     )
+
+
+def _git_lines(args: list[str], stdin: Any = None) -> Iterator[bytes]:
+    """Run a git command and yield its output line by line, without the newline.
+
+    For the commands whose output is as long as the history: nothing is held
+    in memory but the line being read. ``stdin`` is a file the command reads.
+    Raises subprocess.CalledProcessError once the output is read if git failed.
+    """
+    global exectime_external
+    start = time.time()
+    with subprocess.Popen(
+        ["git", *args], stdin=stdin, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL
+    ) as process:
+        assert process.stdout is not None
+        for line in process.stdout:
+            yield line.rstrip(b"\n")
+    exectime_external += time.time() - start
+    if process.returncode:
+        raise subprocess.CalledProcessError(process.returncode, ["git", *args])
+
+
+def count_files_in_trees(rev: str, wanted: set[str], known: dict[str, int]) -> dict[str, int]:
+    """Count the files in the trees of the commits leading to ``rev``.
+
+    ``wanted`` are the trees (hashes, as ``%T`` prints them) whose counts are
+    needed; ``known`` maps the trees already counted to their counts. Returns
+    the counts worked out, which are those of ``wanted`` and of any ancestor
+    that had to be counted on the way.
+
+    ``git ls-tree -r`` on every commit lists every file of every commit: a
+    process per commit, and work that grows with commits x files. Here a
+    commit's count is its first parent's, plus the files it added, minus the
+    ones it deleted, and a single ``git diff-tree --stdin`` reports those for
+    the whole history. A commit whose first parent's tree is in ``known``
+    starts from there, so with a cache only the new commits are compared.
+
+    A tree that is not found among the commits leading to ``rev`` is left
+    out of the result, as is everything if git fails: the caller counts
+    those with get_num_of_files_from_rev().
+    """
+    try:
+        return _count_files_in_trees(rev, wanted, known)
+    except (OSError, subprocess.CalledProcessError) as error:
+        # half a listing would give wrong counts, not missing ones
+        logger.debug(f"Could not count files from the commits' differences: {error}")
+        return {}
+
+
+def _count_files_in_trees(rev: str, wanted: set[str], known: dict[str, int]) -> dict[str, int]:
+    """count_files_in_trees(), with git's failures left to the caller."""
+    # ancestors before descendants: [commit, tree, first parent or None]
+    commits: list[tuple[str, str, str | None]] = []
+    tree_of: dict[str, str] = {}
+    for line in _git_lines(["log", "--topo-order", "--reverse", "--format=%H %T %P", rev]):
+        parts = line.decode("ascii", errors="replace").split(" ")
+        if len(parts) < 2:
+            continue
+        commit, tree = parts[0], parts[1]
+        commits.append((commit, tree, parts[2] if len(parts) > 2 and parts[2] else None))
+        tree_of[commit] = tree
+
+    # The commits to compare with their first parent: the wanted ones, and the
+    # ancestors a count has to be carried up from
+    needed: set[str] = set()
+    for commit, tree, parent in reversed(commits):
+        if commit not in needed:
+            if tree not in wanted or tree in known:
+                continue
+            needed.add(commit)
+        if parent is not None and tree_of.get(parent) not in known:
+            needed.add(parent)
+    if not needed:
+        return {}
+
+    delta: dict[str, int] = {}
+    with tempfile.TemporaryFile("w+") as pairs:
+        for commit, _, parent in commits:
+            if commit in needed:
+                # a commit without a parent we know of is compared with nothing (--root)
+                pairs.write(f"{commit} {parent}\n" if parent in tree_of else f"{commit}\n")
+        pairs.seek(0)
+        current = ""
+        for line in _git_lines(
+            [
+                "diff-tree",
+                "--stdin",
+                "-r",
+                "--root",
+                "--no-renames",
+                "--diff-filter=AD",
+                "--name-status",
+            ],
+            stdin=pairs,
+        ):
+            if line[:2] == b"A\t":
+                delta[current] = delta.get(current, 0) + 1
+            elif line[:2] == b"D\t":
+                delta[current] = delta.get(current, 0) - 1
+            else:
+                # the commit the following lines are about
+                current = line.split(b" ", 1)[0].decode("ascii", errors="replace")
+
+    counts: dict[str, int] = {}
+    of_commit: dict[str, int] = {}
+    for commit, tree, parent in commits:
+        if commit not in needed:
+            continue
+        if parent not in tree_of:
+            base = 0
+        elif parent in of_commit:
+            base = of_commit[parent]
+        else:
+            base = known[tree_of[parent]]
+        of_commit[commit] = counts[tree] = base + delta.get(commit, 0)
+    return counts
+
+
+def count_lines_in_blobs(blob_ids: Iterable[str]) -> dict[str, int]:
+    """Count the lines of each blob, with one ``git cat-file --batch``.
+
+    0 for a binary blob (a null byte in its first 8192 bytes), for one git
+    cannot read, and for an id that is not a blob's. Leading and trailing
+    blank lines are not counted (see count_lines_in_text()).
+    """
+    ids = list(dict.fromkeys(blob_ids))
+    counts: dict[str, int] = dict.fromkeys(ids, 0)
+    if not ids:
+        return counts
+    global exectime_external
+    start = time.time()
+    with tempfile.TemporaryFile("w+") as names:
+        names.write("\n".join(ids) + "\n")
+        names.seek(0)
+        with subprocess.Popen(
+            ["git", "cat-file", "--batch"],
+            stdin=names,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+        ) as process:
+            out = process.stdout
+            assert out is not None
+            for blob_id in ids:
+                # "<id> <type> <size>", or "<id> missing"
+                header = out.readline().split()
+                if not header:
+                    break  # git stopped: the blobs left count nothing
+                if len(header) != 3:
+                    continue
+                size = int(header[2])
+                head = out.read(min(size, 8192))
+                if header[1] != b"blob" or b"\x00" in head:
+                    _skip(out, size - len(head) + 1)
+                    continue
+                content = head + out.read(size - len(head))
+                out.read(1)  # the newline that ends the entry
+                counts[blob_id] = count_lines_in_text(
+                    content.decode("utf-8", errors="replace").rstrip("\n")
+                )
+    exectime_external += time.time() - start
+    return counts
+
+
+def _skip(stream: Any, size: int) -> None:
+    """Read ``size`` bytes of a stream and drop them, a megabyte at a time."""
+    while size > 0:
+        chunk = stream.read(min(size, 1 << 20))
+        if not chunk:
+            return
+        size -= len(chunk)
 
 
 def get_stat_summary_counts(line: str) -> list[str | int]:
