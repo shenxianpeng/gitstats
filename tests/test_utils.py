@@ -891,6 +891,22 @@ def test_shortstat_logs_add_processes_as_time_passes(monkeypatch):
     assert 2 < most <= 6
 
 
+def test_shortstat_logs_use_every_process_once_the_counting_is_slow(monkeypatch):
+    import gitstats.utils as utils
+
+    # the countings take 50 ms: slow, by this measure, so no waiting for the others
+    monkeypatch.setattr(utils, "SHORTSTAT_SLOW_SECONDS", 0.01)
+    most = _busiest(monkeypatch, workers=6, seconds_per_process=60, jobs=24)
+    assert 2 < most <= 6
+    # one counting of 50 ms is not slow when four of them may take 30 ms each:
+    # the average has to be reached, by four countings at least
+    monkeypatch.setattr(utils, "SHORTSTAT_SLOW_SECONDS", 0.03)
+    assert 2 < _busiest(monkeypatch, workers=6, seconds_per_process=60, jobs=24) <= 6
+    # and fast by the usual measure: two processes, as long as the wait for a third lasts
+    monkeypatch.setattr(utils, "SHORTSTAT_SLOW_SECONDS", 0.35)
+    assert _busiest(monkeypatch, workers=6, seconds_per_process=60, jobs=24) == 2
+
+
 def test_shortstat_logs_stop_counting_when_git_fails(monkeypatch):
     import time
 
