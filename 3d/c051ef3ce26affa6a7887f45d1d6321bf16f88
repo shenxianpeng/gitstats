@@ -1,0 +1,38 @@
+gitstats/utils.py
+  s_f7be7338a47928::t_374e0a49e80d42 384-387,389-403,422-425,431-434,437-461,467-471,473-481,485,488-489,495-502
+  s_f7be7338a47928::t_6650616df81f5d 14,379-383,388,404-421,426-430,462-466,472,482-484,486-487,490-494,503
+  s_f7be7338a47928::t_17b400dc70b9ef 435-436
+  s_f7be7338a47928::t_582b21283cdcfc 504-505
+tests/test_utils.py
+  s_f7be7338a47928::t_a16ae06310617f 787-794,825-841
+  s_f7be7338a47928::t_a662677c82bf95 31,675-786,795-824
+gitstats/main.py
+  s_f7be7338a47928::t_a16ae06310617f 277-282,293
+  s_f7be7338a47928::t_abe9b374937119 12,41,274-276,283-292,294,301-314,769-776,779-785,787,790-791,793-795
+tests/test_main.py
+  s_f7be7338a47928::t_429c545a87e9c8 809-812,837-843,854,856-867,869,871-874,877-878,880-887,895-902,910,916-951
+  s_f7be7338a47928::t_a16ae06310617f 868,870,888-893
+  s_f7be7338a47928::t_4badff17b70b0e 894,952
+docs/source/configuration.rst
+  s_f7be7338a47928::t_ac006642ccba44 17
+gitstats.conf
+  s_f7be7338a47928::t_5beccac0ae721e 39-40
+gitstats/__init__.py
+  s_f7be7338a47928::t_2d0b093090da32 29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "3dc051ef3ce26affa6a7887f45d1d6321bf16f88",
+  "prompts": {},
+  "sessions": {
+    "s_f7be7338a47928": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b41fad1c-3178-484f-83cd-bad405dbb5d4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
