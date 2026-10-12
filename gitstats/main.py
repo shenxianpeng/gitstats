@@ -11,7 +11,9 @@ import re
 import socket
 import subprocess
 import sys
+import threading
 import time
+from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -29,6 +31,7 @@ from gitstats.aggregate import (
 from gitstats.ai_summarizer import AISummarizer
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.utils import (
+    History,
     commit_local_time,
     commits_reached,
     count_files_in_trees,
@@ -284,7 +287,9 @@ class GitDataCollector(DataCollector):
         # the other.
         processes = min(int(conf["processes"]), os.cpu_count() or 1)
         churn: Future[str] | None = None
-        line_stats: Future[list[str]] | None = None
+        line_stats: Future[tuple[list[str], dict[str, int]]] | None = None
+        # set when the phases have nothing left to do but wait for the line counts
+        waiting = threading.Event()
         with ThreadPoolExecutor(max_workers=2, thread_name_prefix="git-log") as pool:
             if processes > 1:
                 churn = pool.submit(get_pipe_output, [self._churn_command()])
@@ -293,21 +298,48 @@ class GitDataCollector(DataCollector):
                     self._line_stat_passes(),
                     get_log_range("HEAD", False),
                     processes - 1,
+                    waiting,
                 )
 
-            self._collect_tags()
+            # The history that leads to the end of the range, read once and
+            # when a phase first asks for it: the tags and the files of each
+            # commit are both worked out from it.
+            read: list[History] = []
+
+            def history() -> History:
+                if not read:
+                    read.append(history_graph(get_commit_range("HEAD", end_only=True)))
+                return read[0]
+
+            # What the line counts give when they are in: the text of each of
+            # the two walks, and the files each commit adds. None leaves a
+            # phase to ask git itself.
+            counted: list[tuple[list[str | None], dict[str, int] | None]] = []
+
+            def line_counts() -> tuple[list[str | None], dict[str, int] | None]:
+                if not counted:
+                    counted.append(([None, None], None))
+                    if line_stats is not None:
+                        # no processor needs sparing for the phases any more
+                        waiting.set()
+                        try:
+                            texts, added = line_stats.result()
+                            counted[0] = (list(texts), added)
+                        except (OSError, subprocess.CalledProcessError) as error:
+                            logger.debug(
+                                f"Could not spread the line counts over git processes: {error}"
+                            )
+                return counted[0]
+
+            self._collect_tags(history)
             email_to_latest, author_to_email = self._collect_commit_stats()
             name_to_canonical = self._merge_author_aliases(email_to_latest, author_to_email)
-            self._collect_files_by_stamp()
             self._collect_extensions()
+            # after the others: it waits for the line counts, which say what
+            # files each commit adds
+            self._collect_files_by_stamp(history, lambda: line_counts()[1])
 
-            # None leaves a phase to run its own command
-            outputs: list[str | None] = [None, None]
-            if line_stats is not None:
-                try:
-                    outputs = list(line_stats.result())
-                except (OSError, subprocess.CalledProcessError) as error:
-                    logger.debug(f"Could not spread the line counts over git processes: {error}")
+            outputs = line_counts()[0]
             self._collect_line_stats(outputs[0])
             outputs[0] = None  # let go of the text once its phase has read it
             self._collect_per_author_line_stats(name_to_canonical, outputs[1])
@@ -320,11 +352,12 @@ class GitDataCollector(DataCollector):
 
     # ── collection phases ────────────────────────────────────────────────
 
-    def _collect_tags(self) -> None:
+    def _collect_tags(self, history: Callable[[], History] | None = None) -> None:
         """Populate ``tags`` with each tag's date, commit count and authors.
 
         Only tags whose commit is reachable within the configured commit range
-        are included.
+        are included. ``history`` gives the history that leads to the end of
+        the range when collect() shares one reading of it between phases.
         """
         log_range = get_log_range("HEAD", False)
         # --topo-order: never list a commit before its descendants, so the order
@@ -361,7 +394,8 @@ class GitDataCollector(DataCollector):
         # The whole history that leads to the end of the range is read, not
         # the range: a tag's commits are found by walking back from it, which
         # the date and author filters would leave holes in.
-        place, parents, headers = history_graph(get_commit_range("HEAD", end_only=True))
+        graph = history() if history else history_graph(get_commit_range("HEAD", end_only=True))
+        place, parents, headers = graph.place, graph.parents, graph.headers
         in_range = [False] * len(parents)
         for commit in tag_commits_set:
             if commit in place:
@@ -650,8 +684,19 @@ class GitDataCollector(DataCollector):
 
         return name_to_canonical
 
-    def _collect_files_by_stamp(self) -> None:
-        """Record the file count of every revision, using the blob cache."""
+    def _collect_files_by_stamp(
+        self,
+        history: Callable[[], History] | None = None,
+        added: Callable[[], dict[str, int] | None] | None = None,
+    ) -> None:
+        """Record the file count of every revision, using the blob cache.
+
+        ``history`` gives the history that leads to the end of the range when
+        collect() shares one reading of it between phases. ``added`` gives
+        the files each commit adds, less those it deletes, as the line counts
+        found them (see shortstat_logs()), or None when they did not; it may
+        wait for those counts to be in.
+        """
         # outputs "<stamp> <files>" for each revision
         revlines = (
             get_pipe_output(
@@ -683,15 +728,25 @@ class GitDataCollector(DataCollector):
                 revs_to_read.append((time, rev))
 
         if revs_to_read:
-            # One git process counts them all, from what each commit added to
-            # and deleted from its parent. Listing the tree of every commit
-            # instead takes a process per commit, and time that grows with
-            # commits x files: most of an hour on a large repository.
-            counted = count_files_in_trees(
-                get_commit_range("HEAD", end_only=True),
-                {rev for _, rev in revs_to_read},
-                files_in_tree,
-            )
+            # They are counted from what each commit added to and deleted from
+            # its parent. Listing the tree of every commit instead takes a
+            # process per commit, and time that grows with commits x files:
+            # most of an hour on a large repository.
+            wanted = {rev for _, rev in revs_to_read}
+            graph = history() if history else history_graph(get_commit_range("HEAD", end_only=True))
+            # The line counts have had git compare nearly every commit with
+            # its parent already, and say what files each one added: git is
+            # asked again only about the commits they leave out.
+            files_added = added() if added else None
+            counted = count_files_in_trees(graph, wanted, files_in_tree, files_added)
+            if files_added and counted:
+                # What the line counts say rests on how git shows a diff, which
+                # a configuration can change. The newest tree is listed to make
+                # sure of it: its count has all the others behind it.
+                _, newest = revs_to_read[0]
+                if counted.get(newest) != get_num_of_files_from_rev(("0", newest))[2]:
+                    logger.debug("The files added by each commit do not add up: asking git again")
+                    counted = count_files_in_trees(graph, wanted, files_in_tree)
             # the trees of the ancestors counted on the way are kept as well
             files_in_tree.update(counted)
             # whatever that could not find is listed, a tree at a time

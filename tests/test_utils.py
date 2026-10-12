@@ -12,6 +12,7 @@ from unittest.mock import patch
 import pytest
 
 from gitstats.utils import (
+    History,
     _run_pipe_chain,
     commit_local_time,
     commits_reached,
@@ -426,7 +427,7 @@ def test_count_files_in_trees_counts_as_ls_tree_does(git_repo, monkeypatch):
     monkeypatch.chdir(git_repo)
     expected = _trees_by_ls_tree(git_repo)
     assert sorted(expected.values()) == [2, 3, 3, 4, 5]
-    assert count_files_in_trees("HEAD", set(expected), {}) == expected
+    assert count_files_in_trees(history_graph("HEAD"), set(expected), {}) == expected
 
 
 def test_count_files_in_trees_follows_a_tangled_history(tangled_repo, monkeypatch):
@@ -434,7 +435,7 @@ def test_count_files_in_trees_follows_a_tangled_history(tangled_repo, monkeypatc
     expected = _trees_by_ls_tree(tangled_repo)
     # nine commits; the one that changes nothing has its parent's tree
     assert len(expected) == 8
-    assert count_files_in_trees("HEAD", set(expected), {}) == expected
+    assert count_files_in_trees(history_graph("HEAD"), set(expected), {}) == expected
     # the merge of the second root ends with everything: b, c, side.txt, lib,
     # the submodule and the two files of the other history
     assert expected[_tree(tangled_repo, "HEAD")] == 7
@@ -446,7 +447,7 @@ def test_count_files_in_trees_counts_what_is_asked_and_what_leads_to_it(git_repo
     monkeypatch.chdir(git_repo)
     expected = _trees_by_ls_tree(git_repo)
     middle = _tree(git_repo, "HEAD~2")
-    counts = count_files_in_trees("HEAD", {middle}, {})
+    counts = count_files_in_trees(history_graph("HEAD"), {middle}, {})
     # the third commit, and the two before it that its count is built on
     assert counts == {
         tree: expected[tree] for tree in _git(git_repo, "log", "--format=%T", "HEAD~2").split()
@@ -472,15 +473,16 @@ def test_count_files_in_trees_starts_from_the_trees_it_knows(git_repo, monkeypat
         return real(args, stdin)
 
     monkeypatch.setattr(utils, "_git_lines", spy)
-    assert count_files_in_trees("HEAD", {newest}, known) == {newest: expected[newest]}
+    history = history_graph("HEAD")
+    assert count_files_in_trees(history, {newest}, known) == {newest: expected[newest]}
     # one commit was compared with its parent, not the whole history
     head, parent = _git(git_repo, "rev-parse", "HEAD", "HEAD~1").split()
     assert compared == [f"{head} {parent}"]
 
     # nothing to count: git is not asked to compare anything
     compared.clear()
-    assert count_files_in_trees("HEAD", set(), expected) == {}
-    assert count_files_in_trees("HEAD", {newest}, expected) == {}
+    assert count_files_in_trees(history, set(), expected) == {}
+    assert count_files_in_trees(history, {newest}, expected) == {}
     assert compared == []
 
 
@@ -491,56 +493,106 @@ def test_count_files_in_trees_of_a_shallow_clone(git_repo, temp_dir, monkeypatch
     expected = _trees_by_ls_tree(shallow)
     # the older of the two commits has a parent that was not fetched
     assert sorted(expected.values()) == [4, 5]
-    assert count_files_in_trees("HEAD", set(expected), {}) == expected
+    assert count_files_in_trees(history_graph("HEAD"), set(expected), {}) == expected
 
 
 def test_count_files_in_trees_leaves_out_what_it_cannot_find(git_repo, monkeypatch):
     monkeypatch.chdir(git_repo)
     unknown = "f" * 40
-    assert count_files_in_trees("HEAD", {unknown}, {}) == {}
-    # a revision git does not know: nothing is counted, nothing is raised
-    assert count_files_in_trees("no-such-branch", {_tree(git_repo, "HEAD")}, {}) == {}
+    assert count_files_in_trees(history_graph("HEAD"), {unknown}, {}) == {}
+    # a revision git does not know has no history: nothing is counted, nothing is raised
+    nothing = history_graph("no-such-branch")
+    assert nothing.commits == []
+    assert count_files_in_trees(nothing, {_tree(git_repo, "HEAD")}, {}) == {}
 
 
-def test_count_files_in_trees_reads_two_listings(monkeypatch):
-    """What it asks git for, and what it makes of the answers."""
+def _history(*rows):
+    """A history written by hand: (commit, tree, parents), newest first."""
+    place = {commit: index for index, (commit, _, _) in enumerate(rows)}
+    return History(
+        place=place,
+        commits=[commit for commit, _, _ in rows],
+        trees=[tree for _, tree, _ in rows],
+        parents=[
+            [place[parent] for parent in parents if parent in place] for _, _, parents in rows
+        ],
+        first_parents=[place.get(parents[0], -1) if parents else -1 for _, _, parents in rows],
+        headers=["1 Ann" for _ in rows],
+    )
+
+
+def test_count_files_in_trees_asks_git_for_the_differences(monkeypatch):
+    """What it asks git for, and what it makes of the answer."""
     import gitstats.utils as utils
 
+    history = _history(("c3", "t3", ["c2", "c9"]), ("c2", "t2", ["c1"]), ("c1", "t1", []))
     asked = []
 
     def fake(args, stdin=None):
-        asked.append((args[0], stdin.read() if stdin is not None else None))
-        if args[0] == "log":
-            # commit, tree, parents, oldest first; a line that is none of that is passed over
-            return iter([b"", b"oops", b"c1 t1 ", b"c2 t2 c1", b"c3 t3 c2 c9"])
+        asked.append((args[0], stdin.read()))
         # the files each commit added to and deleted from its first parent
         return iter([b"c1", b"A\ta", b"A\tb", b"A\tc", b"c3", b"D\ta", b"D\tb", b"A\td"])
 
     monkeypatch.setattr(utils, "_git_lines", fake)
     # c2 changed no file list: it is not in the answer, and has its parent's count
-    assert count_files_in_trees("main", {"t3"}, {}) == {"t1": 3, "t2": 3, "t3": 2}
-    assert asked == [("log", None), ("diff-tree", "c1\nc2 c1\nc3 c2\n")]
+    assert count_files_in_trees(history, {"t3"}, {}) == {"t1": 3, "t2": 3, "t3": 2}
+    # each commit with its first parent, the oldest alone
+    assert asked == [("diff-tree", "c3 c2\nc2 c1\nc1\n")]
 
     # with t2 known, only c3 is compared, and counted from there
     asked.clear()
-    assert count_files_in_trees("main", {"t3"}, {"t2": 10}) == {"t3": 9}
-    assert asked[1] == ("diff-tree", "c3 c2\n")
+    assert count_files_in_trees(history, {"t3"}, {"t2": 10}) == {"t3": 9}
+    assert asked == [("diff-tree", "c3 c2\n")]
+
+
+def test_count_files_in_trees_takes_the_differences_it_is_given(monkeypatch):
+    import gitstats.utils as utils
+
+    history = _history(
+        ("c4", "t4", ["c3"]), ("c3", "t3", ["c2", "c9"]), ("c2", "t2", ["c1"]), ("c1", "t1", [])
+    )
+    asked = []
+
+    def fake(args, stdin=None):
+        asked.append(stdin.read())
+        return iter([b"c1", b"A\ta", b"A\tb", b"c3", b"A\tc"])
+
+    monkeypatch.setattr(utils, "_git_lines", fake)
+    # c2 and c4 have their differences already: git is asked about the two others
+    counts = count_files_in_trees(history, {"t4"}, {}, {"c2": 5, "c4": -1})
+    assert asked == ["c3 c2\nc1\n"]
+    assert counts == {"t1": 2, "t2": 7, "t3": 8, "t4": 7}
+
+    # with every difference given, git is not asked anything
+    asked.clear()
+    given = {"c1": 2, "c2": 5, "c3": 1, "c4": -1}
+    assert count_files_in_trees(history, {"t4"}, {}, given) == counts
+    assert asked == []
 
 
 def test_count_files_in_trees_counts_nothing_when_git_fails_half_way(monkeypatch):
     import gitstats.utils as utils
 
+    history = _history(("c2", "t2", ["c1"]), ("c1", "t1", []))
+
     def failing(args, stdin=None):
-        if args[0] == "log":
-            yield from (b"c1 t1 ", b"c2 t2 c1")
-            return
         # the comparison dies after its first commit
         yield from (b"c1", b"A\ta")
         raise subprocess.CalledProcessError(128, ["git", *args])
 
     monkeypatch.setattr(utils, "_git_lines", failing)
     # c2 would be counted as c1 with nothing added: no answer is better
-    assert count_files_in_trees("main", {"t1", "t2"}, {}) == {}
+    assert count_files_in_trees(history, {"t1", "t2"}, {}) == {}
+
+
+def test_git_lines_raise_when_git_fails(git_repo, monkeypatch):
+    import gitstats.utils as utils
+
+    monkeypatch.chdir(git_repo)
+    assert list(utils._git_lines(["rev-parse", "--verify", "HEAD"])) != []
+    # the lines git wrote are read first, then its failure is raised
+    with pytest.raises(subprocess.CalledProcessError):
+        list(utils._git_lines(["rev-parse", "--verify", "no-such-revision"]))
 
 
 def _lines_one_by_one(repo, blob):
@@ -698,10 +750,8 @@ def _shortstat_commands(passes, log_range):
 
 
 def _shortstat_logs(passes, log_range, workers=4):
-    return [
-        [line for line in text.split("\n") if line]
-        for text in shortstat_logs(passes, log_range, workers)
-    ]
+    texts, _ = shortstat_logs(passes, log_range, workers)
+    return [[line for line in text.split("\n") if line] for text in texts]
 
 
 @pytest.fixture
@@ -814,12 +864,85 @@ def test_shortstat_logs_count_a_commit_once(merged_repo, monkeypatch):
     assert asked[True] == []
 
 
+def _files_added(repo, commit):
+    """Files a commit adds, less those it deletes, against its first parent: by git diff-tree."""
+    changes = _git(
+        repo, "diff-tree", "-r", "--no-renames", "--diff-filter=AD", "--name-status",
+        commit + "^1", commit,
+    ).split("\n")  # fmt: skip
+    return sum(line.startswith("A") for line in changes) - sum(
+        line.startswith("D") for line in changes
+    )
+
+
+@pytest.mark.parametrize("per_process", [1, 1000])
+def test_shortstat_logs_say_what_files_each_commit_adds(merged_repo, monkeypatch, per_process):
+    import gitstats.utils as utils
+
+    monkeypatch.chdir(merged_repo)
+    monkeypatch.setattr(utils, "SHORTSTAT_COMMITS_PER_PROCESS", per_process)
+    parents = {
+        line.split(" ")[0]: line.split(" ")[1:]
+        for line in _git(merged_repo, "log", "--format=%H %P", "HEAD").strip().split("\n")
+    }
+    parents = {commit: [p for p in named if p] for commit, named in parents.items()}
+    one_parent = {commit for commit, named in parents.items() if len(named) == 1}
+    merges = {commit for commit, named in parents.items() if len(named) > 1}
+    roots = {commit for commit, named in parents.items() if not named}
+    assert (len(one_parent), len(merges), len(roots)) == (9, 3, 2)
+
+    # along the first parents the merges are compared with theirs, and say what they add
+    _, added = shortstat_logs(LINEAR, "HEAD", 3)
+    assert set(added) == one_parent | merges
+    assert added == {commit: _files_added(merged_repo, commit) for commit in one_parent | merges}
+    # some add files, some delete them, the rename does neither
+    assert sorted(set(added.values())) == [-2, 0, 1, 2]
+    rename = _git(merged_repo, "rev-parse", "HEAD").strip()
+    assert added[rename] == 0
+
+    # when no walk compares merges with a parent, they are left out
+    _, added = shortstat_logs(EVERY_COMMIT, "HEAD", 3)
+    assert set(added) == one_parent
+    assert added == {commit: _files_added(merged_repo, commit) for commit in one_parent}
+
+
+def test_files_are_counted_from_what_the_line_counts_say(merged_repo, monkeypatch):
+    """The differences shortstat_logs() gives lead to the counts of `git ls-tree`,
+    and leave git little to compare."""
+    import gitstats.utils as utils
+
+    monkeypatch.chdir(merged_repo)
+    expected = _trees_by_ls_tree(merged_repo)
+    _, added = shortstat_logs(LINEAR, "HEAD", 3)
+
+    compared = []
+    real = utils._git_lines
+
+    def spy(args, stdin=None):
+        compared.extend(line for line in stdin.read().split("\n") if line)
+        stdin.seek(0)
+        return real(args, stdin)
+
+    monkeypatch.setattr(utils, "_git_lines", spy)
+    history = history_graph("HEAD")
+    assert count_files_in_trees(history, set(expected), {}, added) == expected
+    # git is asked about the two commits without parents, and nothing else
+    roots = _git(merged_repo, "rev-list", "--max-parents=0", "HEAD").split()
+    assert sorted(compared) == sorted(roots)
+
+    # without the merges' differences (no first-parent walk), about them as well
+    compared.clear()
+    _, added = shortstat_logs(EVERY_COMMIT, "HEAD", 3)
+    assert count_files_in_trees(history, set(expected), {}, added) == expected
+    assert len(compared) == 2 + 3
+
+
 def test_shortstat_logs_with_one_worker_or_none(git_repo, monkeypatch):
     monkeypatch.chdir(git_repo)
     expected = _shortstat_commands(LINEAR, "HEAD")
     assert _shortstat_logs(LINEAR, "HEAD", workers=1) == expected
     assert _shortstat_logs(LINEAR, "HEAD", workers=0) == expected
-    assert shortstat_logs([], "HEAD", 4) == []
+    assert shortstat_logs([], "HEAD", 4) == ([], {})
 
 
 def test_shortstat_logs_raise_when_git_fails(git_repo, monkeypatch):
@@ -845,7 +968,7 @@ def test_shortstat_logs_raise_when_git_leaves_a_commit_out(git_repo, monkeypatch
         shortstat_logs(LINEAR, "HEAD", 2)
 
 
-def _busiest(monkeypatch, workers, seconds_per_process, jobs=12):
+def _busiest(monkeypatch, workers, seconds_per_process, jobs=12, waiting=None):
     """Run shortstat_logs() with a git that takes a moment to count; return
     how many countings were going on at once, at most."""
     import threading
@@ -872,7 +995,7 @@ def _busiest(monkeypatch, workers, seconds_per_process, jobs=12):
     monkeypatch.setattr(utils, "_git_text", slow)
     monkeypatch.setattr(utils, "SHORTSTAT_COMMITS_PER_PROCESS", 1)
     monkeypatch.setattr(utils, "SHORTSTAT_SECONDS_PER_PROCESS", seconds_per_process)
-    (text,) = shortstat_logs([("", False)], "HEAD", workers)
+    (text,), _ = shortstat_logs([("", False)], "HEAD", workers, waiting)
     # every commit is there, in the order of the walk, with its count under it
     assert [line for line in text.split("\n") if line] == [
         line for i in range(jobs) for line in (f"{i} Ann", " 1 file changed, 1 insertion(+)")
@@ -929,6 +1052,23 @@ def test_shortstat_logs_count_the_shares_spread_over_the_history(monkeypatch):
     assert order == [0, 5, 2, 7, 4, 9, 1, 6, 3, 8]
 
 
+def test_shortstat_logs_use_every_process_once_the_caller_waits(monkeypatch):
+    import threading
+
+    # nobody waiting yet: two processes, as without anyone to listen for
+    waiting = threading.Event()
+    assert _busiest(monkeypatch, workers=6, seconds_per_process=60, waiting=waiting) == 2
+    # the caller has nothing else to do: no processor is spared
+    waiting.set()
+    most = _busiest(monkeypatch, workers=6, seconds_per_process=60, jobs=24, waiting=waiting)
+    assert 2 < most <= 6
+    # it may say so while the counting is going on
+    waiting.clear()
+    threading.Timer(0.1, waiting.set).start()
+    most = _busiest(monkeypatch, workers=6, seconds_per_process=60, jobs=48, waiting=waiting)
+    assert 2 < most <= 6
+
+
 def test_shortstat_logs_stop_counting_when_git_fails(monkeypatch):
     import time
 
@@ -959,18 +1099,22 @@ def test_shortstat_logs_stop_counting_when_git_fails(monkeypatch):
 
 def test_history_graph_lists_a_commit_before_its_parents(merged_repo, monkeypatch):
     monkeypatch.chdir(merged_repo)
-    place, parents, headers = history_graph("HEAD")
+    history = history_graph("HEAD")
+    place, parents, headers = history.place, history.parents, history.headers
 
     commits = _git(merged_repo, "rev-list", "HEAD").split()
     assert sorted(place) == sorted(commits)
     assert sorted(place.values()) == list(range(len(commits)))
     assert len(parents) == len(headers) == len(commits)
+    assert [history.commits[index] for index in range(len(commits))] == list(place)
     by_place = {index: commit for commit, index in place.items()}
     for commit, index in place.items():
         # the parents git names, and each of them further down the list
         named = _git(merged_repo, "log", "-1", "--format=%P", commit).split()
         assert [by_place[parent] for parent in parents[index]] == named
         assert all(parent > index for parent in parents[index])
+        assert history.first_parents[index] == (place[named[0]] if named else -1)
+        assert history.trees[index] == _tree(merged_repo, commit)
         assert headers[index] == _git(merged_repo, "log", "-1", "--format=%at %aN", commit).strip()
     # HEAD comes first; the two roots and the merge of three branches are there
     assert place[commits[0]] == 0
@@ -981,23 +1125,26 @@ def test_history_graph_lists_a_commit_before_its_parents(merged_repo, monkeypatc
 
 def test_history_graph_of_another_revision_and_of_a_shallow_clone(git_repo, temp_dir, monkeypatch):
     monkeypatch.chdir(git_repo)
-    place, parents, _ = history_graph("HEAD~2")
-    assert len(place) == 3
-    assert parents == [[1], [2], []]
+    history = history_graph("HEAD~2")
+    assert len(history.place) == 3
+    assert history.parents == [[1], [2], []]
+    assert history.first_parents == [1, 2, -1]
 
     shallow = os.path.join(temp_dir, "shallow")
     _git(temp_dir, "clone", "-q", "--depth", "2", "file://" + git_repo, shallow)
     monkeypatch.chdir(shallow)
-    place, parents, _ = history_graph("HEAD")
+    history = history_graph("HEAD")
     # the parent of the older commit was not fetched: it is left out
-    assert parents == [[1], []]
+    assert history.parents == [[1], []]
+    assert history.first_parents == [1, -1]
 
 
 def test_commits_reached_are_those_of_rev_list(merged_repo, monkeypatch):
     """For every pair of commits of a tangled history: the commits that lead
     to the one and not to the other are those `git rev-list` gives."""
     monkeypatch.chdir(merged_repo)
-    place, parents, _ = history_graph("HEAD")
+    history = history_graph("HEAD")
+    place, parents = history.place, history.parents
     by_place = {index: commit for commit, index in place.items()}
     commits = list(place)
     assert len(commits) == 14

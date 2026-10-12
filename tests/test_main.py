@@ -798,8 +798,8 @@ class TestCollectPhases:
             "tags",
             "commits",
             "aliases",
-            "files",
             "extensions",
+            "files",
             "lines",
             "author_lines",
             "churn",
@@ -866,9 +866,15 @@ class TestCollectPhases:
         _, ran, handed, dc, spread = self._collect_recording(git_repo, processes=8)
 
         # eight processes: seven for the line counts, one left to the phases
-        spread.assert_called_once_with(
-            [("--first-parent", True), ("--date-order", False)], "HEAD", 7
+        spread.assert_called_once()
+        passes, log_range, workers, waiting = spread.call_args.args
+        assert (passes, log_range, workers) == (
+            [("--first-parent", True), ("--date-order", False)],
+            "HEAD",
+            7,
         )
+        # and the phases said so when they had nothing left to do but wait
+        assert waiting.is_set()
         assert dc._line_stats_command() not in ran
         assert dc._author_line_stats_command() not in ran
         assert ran.count(dc._churn_command()) == 1
@@ -918,7 +924,7 @@ class TestCollectPhases:
         two phases run their commands, as they would in turn."""
         side_by_side, _, _, _, _ = self._collect_recording(git_repo, processes=8)
 
-        def failing(passes, log_range, workers):
+        def failing(passes, log_range, workers, waiting):
             raise subprocess.CalledProcessError(128, ["git", "log"])
 
         fallen_back, ran, handed, dc, _ = self._collect_recording(
@@ -1537,7 +1543,7 @@ class TestCollectEdgeCases:
                 # the history that leads to the end of the range: c2 is not in
                 # it, so its tag is left out; the stamp of c1 is unreadable,
                 # and counted as 0
-                "git log --topo-order": "c1\tc0\tgarbage Ann\nc0\t\t5 Outside Range",
+                "git log --topo-order": "c1\te1\tc0\tgarbage Ann\nc0\te0\t\t5 Outside Range",
             }
         )
         monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
@@ -1554,7 +1560,7 @@ class TestCollectEdgeCases:
         assert fake.calls == [
             "git rev-list --topo-order HEAD",
             "git show-ref --tags --dereference",
-            'git log --topo-order --format="%H%x09%P%x09%at %aN" "HEAD"',
+            'git log --topo-order --format="%H%x09%T%x09%P%x09%at %aN" "HEAD"',
         ]
 
     def test_tags_outside_the_range_need_no_history(self, monkeypatch):
@@ -1791,8 +1797,11 @@ class TestCollectEdgeCases:
         ):
             second._collect_files_by_stamp()
 
-        rev, wanted, _ = counted.call_args.args
-        assert (rev, wanted) == ("HEAD", {forgotten})
+        history, wanted, _, added = counted.call_args.args
+        assert wanted == {forgotten}
+        # the history of HEAD, and nothing known of the files its commits add
+        assert len(history.commits) == 5
+        assert added is None
         # no tree had to be listed file by file
         listed.assert_not_called()
         assert second.cache["files_in_tree"] == first.cache["files_in_tree"]
@@ -1832,6 +1841,95 @@ class TestCollectEdgeCases:
         assert dc.files_by_stamp == reference.files_by_stamp
         assert dc.cache["files_in_tree"] == reference.cache["files_in_tree"]
 
+    def test_files_by_stamp_use_what_the_line_counts_say(self, git_repo, monkeypatch):
+        """Handed the files each commit adds, the phase has git compare only
+        the commits that are left out, and lists one tree to make sure."""
+        import gitstats.utils as utils
+        from gitstats.utils import get_num_of_files_from_rev, history_graph, shortstat_logs
+
+        monkeypatch.chdir(git_repo)
+        reference = GitDataCollector()
+        reference._collect_files_by_stamp()
+
+        _, added = shortstat_logs(GitDataCollector._line_stat_passes(), "HEAD", 2)
+        # the four commits that have a parent: three add a file, one changes one
+        assert sorted(added.values()) == [0, 1, 1, 1]
+        compared = []
+        real = utils._git_lines
+
+        def spy(args, stdin=None):
+            compared.extend(line for line in stdin.read().split("\n") if line)
+            stdin.seek(0)
+            return real(args, stdin)
+
+        monkeypatch.setattr(utils, "_git_lines", spy)
+        read = []
+
+        def history():
+            read.append(history_graph("HEAD"))
+            return read[-1]
+
+        dc = GitDataCollector()
+        with patch(
+            "gitstats.main.get_num_of_files_from_rev", side_effect=get_num_of_files_from_rev
+        ) as listed:
+            dc._collect_files_by_stamp(history, lambda: added)
+
+        assert dc.files_by_stamp == reference.files_by_stamp
+        assert dc.cache["files_in_tree"] == reference.cache["files_in_tree"]
+        # the history it was handed, read once; git compared the first commit only
+        assert len(read) == 1
+        root = subprocess.run(
+            ["git", "rev-list", "--max-parents=0", "HEAD"],
+            cwd=git_repo, capture_output=True, text=True, check=True,
+        ).stdout.split()  # fmt: skip
+        assert compared == root
+        # and the newest tree was listed, to check the sum
+        assert listed.call_count == 1
+
+    def test_files_by_stamp_do_not_trust_counts_that_do_not_add_up(
+        self, git_repo, monkeypatch, caplog
+    ):
+        """If what the line counts say of the files does not lead to the number
+        of files there are, git is asked about every commit, as without them."""
+        from gitstats.utils import count_files_in_trees, shortstat_logs
+
+        monkeypatch.chdir(git_repo)
+        reference = GitDataCollector()
+        reference._collect_files_by_stamp()
+
+        _, added = shortstat_logs(GitDataCollector._line_stat_passes(), "HEAD", 2)
+        # as a git set up to show diffs another way might have it
+        wrong = {commit: change + 1 for commit, change in added.items()}
+
+        dc = GitDataCollector()
+        with (
+            patch(
+                "gitstats.main.count_files_in_trees", side_effect=count_files_in_trees
+            ) as counted,
+            caplog.at_level(logging.DEBUG, logger="gitstats"),
+        ):
+            dc._collect_files_by_stamp(None, lambda: wrong)
+
+        assert "do not add up" in caplog.text
+        # counted twice: with what it was told, then without
+        assert [len(call.args) for call in counted.call_args_list] == [4, 3]
+        assert dc.files_by_stamp == reference.files_by_stamp
+        assert dc.cache["files_in_tree"] == reference.cache["files_in_tree"]
+
+    def test_files_by_stamp_without_line_counts(self, git_repo, monkeypatch):
+        """The line counts failed, or `processes = 1`: nothing is known of the
+        files the commits add, and nothing needs checking."""
+        monkeypatch.chdir(git_repo)
+        reference = GitDataCollector()
+        reference._collect_files_by_stamp()
+
+        dc = GitDataCollector()
+        with patch("gitstats.main.get_num_of_files_from_rev") as listed:
+            dc._collect_files_by_stamp(None, lambda: None)
+        listed.assert_not_called()
+        assert dc.files_by_stamp == reference.files_by_stamp
+
     def test_files_by_stamp_counts_up_to_the_configured_end(self, git_repo, monkeypatch):
         _use_config(commit_end="HEAD~2")
         monkeypatch.chdir(git_repo)
@@ -1842,7 +1940,7 @@ class TestCollectEdgeCases:
             "gitstats.main.count_files_in_trees", side_effect=count_files_in_trees
         ) as counted:
             dc._collect_files_by_stamp()
-        assert counted.call_args.args[0] == "HEAD~2"
+        assert len(counted.call_args.args[0].commits) == 3
         # the three first commits, and nothing of the two after them
         assert sorted(dc.files_by_stamp.values()) == [2, 3, 3]
         assert len(dc.cache["files_in_tree"]) == 3
