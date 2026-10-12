@@ -14,7 +14,7 @@ You can create a ``gitstats.conf`` file in the current directory to customize th
 * ``commit_end`` - End of commit range. Default: ``HEAD``.
 * ``linear_linestats`` - Enable linear history for line statistics (``1`` = enabled, ``0`` = disabled). Default: ``1``.
 * ``project_name`` - Project name to display (default: repository directory name). Default: ``""`` (empty).
-* ``processes`` - Number of parallel processes to use when gathering data. Default: ``8``.
+* ``processes`` - Number of parallel processes to use when gathering data. With ``1``, the git commands run one at a time. Default: ``8``.
 * ``start_date`` - Starting date for commits, passed as --since to Git (optional). Format: ``YYYY-MM-DD``. Default: ``""`` (empty).
 * ``end_date`` - Ending date for commits, passed as --until to Git (optional). Format: ``YYYY-MM-DD``. Default: ``""`` (empty).
 * ``authors`` - Comma-separated list of authors to filter commits. Only commits from these authors will be included (uses OR logic: commits from any of the listed authors). If empty, all authors are included. Default: ``""`` (empty).

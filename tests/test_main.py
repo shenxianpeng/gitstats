@@ -805,6 +805,85 @@ class TestCollectPhases:
             "churn",
         ]
 
+    @staticmethod
+    def _collect_recording(git_repo, processes):
+        """Run collect(); return the data, the git commands that ran and what
+        each of the three history phases was handed as output."""
+        import gitstats.main as main_mod
+
+        _use_config(processes=processes)
+        real = main_mod.get_pipe_output
+        ran = []
+
+        def recording(cmds, quiet=False):
+            ran.append(cmds[0])
+            return real(cmds, quiet)
+
+        dc = GitDataCollector()
+        handed = {}
+        for phase, position in (
+            ("_collect_line_stats", 0),
+            ("_collect_per_author_line_stats", 1),
+            ("_collect_file_churn_and_ownership", 1),
+        ):
+
+            def spy(*args, _phase=phase, _position=position, _original=getattr(dc, phase)):
+                handed[_phase] = args[_position]
+                return _original(*args)
+
+            setattr(dc, phase, spy)
+        prevdir = os.getcwd()
+        with patch.object(main_mod, "get_pipe_output", recording):
+            try:
+                os.chdir(git_repo)
+                dc.collect(git_repo)
+            finally:
+                os.chdir(prevdir)
+        data = {
+            key: value
+            for key, value in dc.__dict__.items()
+            if key not in ("stamp_created", "cache") and not key.startswith("_collect")
+        }
+        return data, ran, handed, dc
+
+    def test_collect_starts_the_history_passes_ahead(self, git_repo):
+        """The three `git log` passes are started by collect() itself, each of
+        them once, and their phases are handed the output."""
+        _, ran, handed, dc = self._collect_recording(git_repo, processes=8)
+
+        passes = [
+            dc._line_stats_command(),
+            dc._author_line_stats_command(),
+            dc._churn_command(),
+        ]
+        assert len(set(passes)) == 3
+        for command in passes:
+            assert ran.count(command) == 1, command
+        # each phase got the text of its own pass
+        assert "files changed" in handed["_collect_line_stats"]
+        assert "files changed" in handed["_collect_per_author_line_stats"]
+        assert handed["_collect_file_churn_and_ownership"].startswith("COMMIT:")
+
+    def test_collect_gathers_the_same_with_one_process(self, git_repo):
+        """`processes = 1` leaves each phase to run its own command, in its
+        turn; the data does not change."""
+        side_by_side, ran_ahead, _, _ = self._collect_recording(git_repo, processes=8)
+        in_turn, ran_in_turn, handed, dc = self._collect_recording(git_repo, processes=1)
+
+        assert handed == {
+            "_collect_line_stats": None,
+            "_collect_per_author_line_stats": None,
+            "_collect_file_churn_and_ownership": None,
+        }
+        assert side_by_side == in_turn
+        assert sorted(ran_ahead) == sorted(ran_in_turn)
+        # in turn, the three passes are the three last commands, in the order of their phases
+        assert ran_in_turn[-3:] == [
+            dc._line_stats_command(),
+            dc._author_line_stats_command(),
+            dc._churn_command(),
+        ]
+
 
 # ── commit subject sampling (grounds the AI chronicle) ──────────────────
 
@@ -1518,24 +1597,76 @@ class TestCollectEdgeCases:
         first = GitDataCollector()
         first._collect_files_by_stamp()
 
-        # forget one revision: only that one is read from git again
+        # forget one revision: only that one is counted again
         second = GitDataCollector()
         second.cache = json.loads(json.dumps(first.cache))
         forgotten = sorted(second.cache["files_in_tree"])[0]
         del second.cache["files_in_tree"][forgotten]
-        from gitstats.utils import get_num_of_files_from_rev
+        from gitstats.utils import count_files_in_trees
 
-        with patch(
-            "gitstats.main.get_num_of_files_from_rev", side_effect=get_num_of_files_from_rev
-        ) as read:
+        with (
+            patch(
+                "gitstats.main.count_files_in_trees", side_effect=count_files_in_trees
+            ) as counted,
+            patch("gitstats.main.get_num_of_files_from_rev") as listed,
+        ):
             second._collect_files_by_stamp()
 
-        assert [call.args[0][1] for call in read.call_args_list] == [forgotten]
+        rev, wanted, _ = counted.call_args.args
+        assert (rev, wanted) == ("HEAD", {forgotten})
+        # no tree had to be listed file by file
+        listed.assert_not_called()
         assert second.cache["files_in_tree"] == first.cache["files_in_tree"]
         assert second.files_by_stamp == first.files_by_stamp
         # files in the tree after each of the five commits
         assert sorted(second.files_by_stamp.values()) == [2, 3, 3, 4, 5]
         assert second.total_commits == 5
+
+        # with every revision in the cache, git is not asked to count anything
+        third = GitDataCollector()
+        third.cache = json.loads(json.dumps(first.cache))
+        with patch("gitstats.main.count_files_in_trees") as counted:
+            third._collect_files_by_stamp()
+        counted.assert_not_called()
+        assert third.files_by_stamp == first.files_by_stamp
+
+    def test_files_by_stamp_lists_the_trees_that_could_not_be_counted(
+        self, git_repo, monkeypatch, sequential_map
+    ):
+        monkeypatch.chdir(git_repo)
+        reference = GitDataCollector()
+        reference._collect_files_by_stamp()
+
+        # the comparison of commits finds nothing (git failed, say): every
+        # tree is listed, as it was before, and the numbers are the same
+        from gitstats.utils import get_num_of_files_from_rev
+
+        dc = GitDataCollector()
+        with (
+            patch("gitstats.main.count_files_in_trees", return_value={}),
+            patch(
+                "gitstats.main.get_num_of_files_from_rev", side_effect=get_num_of_files_from_rev
+            ) as listed,
+        ):
+            dc._collect_files_by_stamp()
+        assert listed.call_count == 5
+        assert dc.files_by_stamp == reference.files_by_stamp
+        assert dc.cache["files_in_tree"] == reference.cache["files_in_tree"]
+
+    def test_files_by_stamp_counts_up_to_the_configured_end(self, git_repo, monkeypatch):
+        _use_config(commit_end="HEAD~2")
+        monkeypatch.chdir(git_repo)
+        from gitstats.utils import count_files_in_trees
+
+        dc = GitDataCollector()
+        with patch(
+            "gitstats.main.count_files_in_trees", side_effect=count_files_in_trees
+        ) as counted:
+            dc._collect_files_by_stamp()
+        assert counted.call_args.args[0] == "HEAD~2"
+        # the three first commits, and nothing of the two after them
+        assert sorted(dc.files_by_stamp.values()) == [2, 3, 3]
+        assert len(dc.cache["files_in_tree"]) == 3
 
     def test_extensions_skip_submodules_and_bucket_long_extensions(
         self, git_repo, monkeypatch, sequential_map

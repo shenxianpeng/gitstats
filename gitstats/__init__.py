@@ -26,7 +26,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "commit_end": "HEAD",  # End of commit range (default: HEAD).
     "linear_linestats": 1,  # Enable linear history for line statistics (1 = enabled, 0 = disabled).
     "project_name": "",  # Project name to display (default: repository directory name).
-    "processes": 8,  # Number of parallel processes to use when gathering data.
+    "processes": 8,  # Number of parallel processes to use when gathering data (1 = one git command at a time).
     "start_date": "",  # Starting date for commits, passed as --since to Git (optional).
     "end_date": "",  # Ending date for commits, passed as --until to Git (optional). Format: YYYY-MM-DD.
     "authors": "",  # Comma-separated list of authors to filter commits (empty = include all authors).

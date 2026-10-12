@@ -2,7 +2,9 @@
 
 import datetime
 import hashlib
+import io
 import logging
+import os
 import subprocess
 from importlib.metadata import PackageNotFoundError
 from unittest.mock import patch
@@ -12,6 +14,8 @@ import pytest
 from gitstats.utils import (
     _run_pipe_chain,
     commit_local_time,
+    count_files_in_trees,
+    count_lines_in_blobs,
     count_lines_in_text,
     filter_lines_by_pattern,
     format_bytes,
@@ -21,7 +25,6 @@ from gitstats.utils import (
     get_excluded_extensions,
     get_log_range,
     get_num_of_files_from_rev,
-    get_num_of_lines_in_blob,
     get_pipe_output,
     get_stat_summary_counts,
     get_version,
@@ -321,8 +324,8 @@ def test_get_pipe_output_quiet_logs_nothing(caplog):
     assert caplog.records == []
 
 
-# ── get_num_of_lines_in_blob / get_num_of_files_from_rev ─────────────────
-# Data collection runs these in worker processes; here they run in-process.
+# ── get_num_of_files_from_rev ────────────────────────────────────────────
+# Data collection runs this in worker processes; here it runs in-process.
 
 
 def _rev_parse(repo, rev):
@@ -331,37 +334,317 @@ def _rev_parse(repo, rev):
     ).stdout.strip()
 
 
-def test_get_num_of_lines_in_blob_counts_text_lines(git_repo, monkeypatch):
-    monkeypatch.chdir(git_repo)
-    blob = _rev_parse(git_repo, "HEAD:utils.py")
-    assert get_num_of_lines_in_blob(("py", blob)) == ("py", blob, 5)
-
-
-def test_get_num_of_lines_in_blob_binary_counts_zero(git_repo, monkeypatch):
-    monkeypatch.chdir(git_repo)
-    blob = _rev_parse(git_repo, "HEAD:logo.png")
-    assert get_num_of_lines_in_blob(("png", blob)) == ("png", blob, 0)
-
-
-def test_get_num_of_lines_in_blob_excluded_extension_is_not_read():
-    _set_config(exclude_exts="png")
-    with patch("gitstats.utils.subprocess.check_output") as check_output:
-        assert get_num_of_lines_in_blob(("png", "abc123")) == ("png", "abc123", 0)
-    check_output.assert_not_called()
-
-
-def test_get_num_of_lines_in_blob_unreadable_blob_counts_zero(git_repo, monkeypatch):
-    monkeypatch.chdir(git_repo)
-    missing = "0" * 40
-    assert get_num_of_lines_in_blob(("py", missing)) == ("py", missing, 0)
-
-
 def test_get_num_of_files_from_rev(git_repo, monkeypatch):
     monkeypatch.chdir(git_repo)
     head = _rev_parse(git_repo, "HEAD")
     first = _rev_parse(git_repo, "HEAD~4")
     assert get_num_of_files_from_rev(("1683000000", head)) == (1683000000, head, 5)
     assert get_num_of_files_from_rev(("1673776800", first)) == (1673776800, first, 2)
+
+
+# ── count_files_in_trees / count_lines_in_blobs ──────────────────────────
+# The same numbers, from one git process instead of one per commit or blob.
+
+
+def _git(repo, *args, **env):
+    return subprocess.run(
+        ["git", *args],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=True,
+        env={**os.environ, **env},
+    ).stdout
+
+
+def _trees_by_ls_tree(repo, rev="HEAD"):
+    """tree -> its number of files, counted the old way for every commit."""
+    trees = _git(repo, "log", "--format=%T", rev).split()
+    return {tree: get_num_of_files_from_rev(("0", tree))[2] for tree in trees}
+
+
+def _tree(repo, rev):
+    return _git(repo, "log", "-1", "--format=%T", rev).strip()
+
+
+@pytest.fixture
+def tangled_repo(temp_dir):
+    """A history with what a file count can trip over: deletions, a merge, a
+    directory that becomes a file, a submodule, a second root and a commit
+    that changes nothing."""
+    repo = os.path.join(temp_dir, "tangled")
+    os.makedirs(repo)
+    _git(repo, "init", "-q", "-b", "main")
+    _git(repo, "config", "user.name", "Ann")
+    _git(repo, "config", "user.email", "ann@example.com")
+
+    def write(**files):
+        for name, text in files.items():
+            path = os.path.join(repo, *name.split("__"))
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "w") as f:
+                f.write(text)
+
+    def commit(message, *extra):
+        _git(repo, "add", "-A")
+        _git(repo, "commit", "-q", "-m", message, *extra)
+
+    write(**{"a.txt": "a\n", "b.txt": "b\n", "lib__x.py": "x\n", "lib__y.py": "y\n"})
+    commit("four files")
+    _git(repo, "checkout", "-q", "-b", "side")
+    os.remove(os.path.join(repo, "a.txt"))
+    write(**{"lib__deep__z.py": "z\n", "side.txt": "s\n"})
+    commit("side: delete one, add two")
+    _git(repo, "checkout", "-q", "main")
+    write(**{"c.txt": "c\n"})
+    commit("main: add one")
+    _git(repo, "merge", "-q", "--no-ff", "-m", "merge side", "side")
+    # the directory lib (three files) becomes a file called lib
+    _git(repo, "rm", "-q", "-r", "lib")
+    write(lib="not a directory any more\n")
+    commit("lib is a file now")
+    head = _git(repo, "rev-parse", "HEAD").strip()
+    _git(repo, "update-index", "--add", "--cacheinfo", f"160000,{head},vendor/sub")
+    _git(repo, "commit", "-q", "-m", "a submodule")
+    _git(repo, "commit", "-q", "--allow-empty", "-m", "nothing changes")
+    # a second root, merged in
+    _git(repo, "checkout", "-q", "--orphan", "other")
+    _git(repo, "rm", "-q", "-r", "-f", ".")
+    write(**{"other__one.md": "1\n", "other__two.md": "2\n"})
+    commit("another beginning")
+    _git(repo, "checkout", "-q", "main")
+    _git(repo, "merge", "-q", "--allow-unrelated-histories", "-m", "merge other", "other")
+    return repo
+
+
+def test_count_files_in_trees_counts_as_ls_tree_does(git_repo, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    expected = _trees_by_ls_tree(git_repo)
+    assert sorted(expected.values()) == [2, 3, 3, 4, 5]
+    assert count_files_in_trees("HEAD", set(expected), {}) == expected
+
+
+def test_count_files_in_trees_follows_a_tangled_history(tangled_repo, monkeypatch):
+    monkeypatch.chdir(tangled_repo)
+    expected = _trees_by_ls_tree(tangled_repo)
+    # nine commits; the one that changes nothing has its parent's tree
+    assert len(expected) == 8
+    assert count_files_in_trees("HEAD", set(expected), {}) == expected
+    # the merge of the second root ends with everything: b, c, side.txt, lib,
+    # the submodule and the two files of the other history
+    assert expected[_tree(tangled_repo, "HEAD")] == 7
+    # and a merge is counted from its first parent, not from both
+    assert expected[_tree(tangled_repo, "HEAD~4")] == 6
+
+
+def test_count_files_in_trees_counts_what_is_asked_and_what_leads_to_it(git_repo, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    expected = _trees_by_ls_tree(git_repo)
+    middle = _tree(git_repo, "HEAD~2")
+    counts = count_files_in_trees("HEAD", {middle}, {})
+    # the third commit, and the two before it that its count is built on
+    assert counts == {
+        tree: expected[tree] for tree in _git(git_repo, "log", "--format=%T", "HEAD~2").split()
+    }
+    assert len(counts) == 3
+
+
+def test_count_files_in_trees_starts_from_the_trees_it_knows(git_repo, monkeypatch):
+    import gitstats.utils as utils
+
+    monkeypatch.chdir(git_repo)
+    expected = _trees_by_ls_tree(git_repo)
+    newest = _tree(git_repo, "HEAD")
+    known = {tree: count for tree, count in expected.items() if tree != newest}
+
+    compared = []
+    real = utils._git_lines
+
+    def spy(args, stdin=None):
+        if stdin is not None:
+            compared.extend(line for line in stdin.read().split("\n") if line)
+            stdin.seek(0)
+        return real(args, stdin)
+
+    monkeypatch.setattr(utils, "_git_lines", spy)
+    assert count_files_in_trees("HEAD", {newest}, known) == {newest: expected[newest]}
+    # one commit was compared with its parent, not the whole history
+    head, parent = _git(git_repo, "rev-parse", "HEAD", "HEAD~1").split()
+    assert compared == [f"{head} {parent}"]
+
+    # nothing to count: git is not asked to compare anything
+    compared.clear()
+    assert count_files_in_trees("HEAD", set(), expected) == {}
+    assert count_files_in_trees("HEAD", {newest}, expected) == {}
+    assert compared == []
+
+
+def test_count_files_in_trees_of_a_shallow_clone(git_repo, temp_dir, monkeypatch):
+    shallow = os.path.join(temp_dir, "shallow")
+    _git(temp_dir, "clone", "-q", "--depth", "2", "file://" + git_repo, shallow)
+    monkeypatch.chdir(shallow)
+    expected = _trees_by_ls_tree(shallow)
+    # the older of the two commits has a parent that was not fetched
+    assert sorted(expected.values()) == [4, 5]
+    assert count_files_in_trees("HEAD", set(expected), {}) == expected
+
+
+def test_count_files_in_trees_leaves_out_what_it_cannot_find(git_repo, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    unknown = "f" * 40
+    assert count_files_in_trees("HEAD", {unknown}, {}) == {}
+    # a revision git does not know: nothing is counted, nothing is raised
+    assert count_files_in_trees("no-such-branch", {_tree(git_repo, "HEAD")}, {}) == {}
+
+
+def test_count_files_in_trees_reads_two_listings(monkeypatch):
+    """What it asks git for, and what it makes of the answers."""
+    import gitstats.utils as utils
+
+    asked = []
+
+    def fake(args, stdin=None):
+        asked.append((args[0], stdin.read() if stdin is not None else None))
+        if args[0] == "log":
+            # commit, tree, parents, oldest first; a line that is none of that is passed over
+            return iter([b"", b"oops", b"c1 t1 ", b"c2 t2 c1", b"c3 t3 c2 c9"])
+        # the files each commit added to and deleted from its first parent
+        return iter([b"c1", b"A\ta", b"A\tb", b"A\tc", b"c3", b"D\ta", b"D\tb", b"A\td"])
+
+    monkeypatch.setattr(utils, "_git_lines", fake)
+    # c2 changed no file list: it is not in the answer, and has its parent's count
+    assert count_files_in_trees("main", {"t3"}, {}) == {"t1": 3, "t2": 3, "t3": 2}
+    assert asked == [("log", None), ("diff-tree", "c1\nc2 c1\nc3 c2\n")]
+
+    # with t2 known, only c3 is compared, and counted from there
+    asked.clear()
+    assert count_files_in_trees("main", {"t3"}, {"t2": 10}) == {"t3": 9}
+    assert asked[1] == ("diff-tree", "c3 c2\n")
+
+
+def test_count_files_in_trees_counts_nothing_when_git_fails_half_way(monkeypatch):
+    import gitstats.utils as utils
+
+    def failing(args, stdin=None):
+        if args[0] == "log":
+            yield from (b"c1 t1 ", b"c2 t2 c1")
+            return
+        # the comparison dies after its first commit
+        yield from (b"c1", b"A\ta")
+        raise subprocess.CalledProcessError(128, ["git", *args])
+
+    monkeypatch.setattr(utils, "_git_lines", failing)
+    # c2 would be counted as c1 with nothing added: no answer is better
+    assert count_files_in_trees("main", {"t1", "t2"}, {}) == {}
+
+
+def _lines_one_by_one(repo, blob):
+    """The lines of a blob as they were counted before, a process per blob:
+    none for a binary one, otherwise those of its text, blank ends aside."""
+    content = subprocess.run(
+        ["git", "cat-file", "blob", blob], cwd=repo, capture_output=True, check=True
+    ).stdout
+    if b"\x00" in content[:8192]:
+        return 0
+    return count_lines_in_text(content.decode("utf-8", errors="replace").rstrip("\n"))
+
+
+def _blobs(repo):
+    """Every blob of HEAD: path -> id."""
+    entries = [
+        line.split(None, 3) for line in _git(repo, "ls-tree", "-r", "HEAD").split("\n") if line
+    ]
+    return {entry[3]: entry[2] for entry in entries if entry[1] == "blob"}
+
+
+def test_count_lines_in_blobs_counts_as_one_by_one(git_repo, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    blobs = _blobs(git_repo)
+    expected = {blob: _lines_one_by_one(git_repo, blob) for blob in blobs.values()}
+    counts = count_lines_in_blobs(blobs.values())
+    assert counts == expected
+    assert counts[blobs["utils.py"]] == 5
+    assert counts[blobs["logo.png"]] == 0
+
+
+def test_count_lines_in_blobs_of_awkward_files(git_repo, monkeypatch):
+    files = {
+        "empty.txt": b"",
+        "no-newline.txt": b"one\ntwo",
+        "blank-ends.txt": b"\n\none\n\ntwo\n\n\n",
+        "only-blank.txt": b"\n \n\t\n",
+        "latin1.txt": b"\xe9t\xe9\n\xfcber\n",
+        "crlf.txt": b"one\r\ntwo\r\n",
+        # longer than the 8192 bytes read to tell text from binary
+        "long.txt": b"line\n" * 5000,
+        # a null byte past those 8192 bytes does not make a file binary
+        "late-null.txt": b"x\n" * 5000 + b"\x00\n",
+        # a binary file longer than the megabyte skipped at a time
+        "big.bin": b"\x00" + os.urandom(1_500_000),
+        "after-big.txt": b"still\nread\nright\n",
+    }
+    for name, content in files.items():
+        with open(os.path.join(git_repo, name), "wb") as f:
+            f.write(content)
+    _git(git_repo, "add", "-A")
+    _git(git_repo, "commit", "-q", "-m", "awkward files")
+    monkeypatch.chdir(git_repo)
+
+    blobs = _blobs(git_repo)
+    counts = count_lines_in_blobs(blobs.values())
+    assert {name: counts[blobs[name]] for name in files} == {
+        "empty.txt": 0,
+        "no-newline.txt": 2,
+        "blank-ends.txt": 3,
+        "only-blank.txt": 0,
+        "latin1.txt": 2,
+        "crlf.txt": 2,
+        "long.txt": 5000,
+        "late-null.txt": 5001,
+        "big.bin": 0,
+        "after-big.txt": 3,
+    }
+    # and each is what reading the blobs one by one gives
+    for name in files:
+        assert _lines_one_by_one(git_repo, blobs[name]) == counts[blobs[name]], name
+
+
+def test_count_lines_in_blobs_that_are_not_there(git_repo, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    assert count_lines_in_blobs([]) == {}
+    blob = _blobs(git_repo)["utils.py"]
+    missing = "0" * 40
+    tree = _tree(git_repo, "HEAD")
+    # a missing object and one that is not a blob count nothing, and do not
+    # put the blobs after them out of step; an id given twice is read once
+    assert count_lines_in_blobs([missing, blob, tree, blob]) == {missing: 0, blob: 5, tree: 0}
+
+
+@pytest.mark.parametrize(
+    "said",
+    [
+        # nothing at all
+        b"",
+        # a binary blob, cut off before its end
+        b"aaa blob 5000000\n\x00\x01\x02",
+        # a text blob counted, then silence
+        b"aaa blob 4\none\n\n",
+    ],
+)
+def test_count_lines_in_blobs_when_git_stops_early(said):
+    class Stopped:
+        stdout = io.BytesIO(said)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+    with patch("gitstats.utils.subprocess.Popen", return_value=Stopped()):
+        counts = count_lines_in_blobs(["aaa", "bbb", "ccc"])
+    # what was read in full is counted; the rest counts nothing, and nothing hangs
+    assert counts == {"aaa": 1 if said.startswith(b"aaa blob 4") else 0, "bbb": 0, "ccc": 0}
 
 
 # ── commit_local_time ────────────────────────────────────────────────────
