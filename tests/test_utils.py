@@ -28,6 +28,7 @@ from gitstats.utils import (
     get_pipe_output,
     get_stat_summary_counts,
     get_version,
+    shortstat_logs,
     should_exclude_file,
 )
 
@@ -671,3 +672,242 @@ def test_commit_local_time_is_the_committers_clock(offset, expected):
 def test_commit_local_time_falls_back_to_this_machines_clock(offset):
     """An offset git would not print, or one no timezone has."""
     assert commit_local_time(1700000000, offset) == datetime.datetime.fromtimestamp(1700000000)
+
+
+# ── shortstat_logs ───────────────────────────────────────────────────────
+# The text of `git log --shortstat`, put together from many git processes.
+
+LINEAR = [("--first-parent", True), ("--date-order", False)]
+EVERY_COMMIT = [("", False), ("--date-order", False)]
+
+
+def _shortstat_commands(passes, log_range):
+    """What the commands themselves print, a pass at a time, blank lines aside."""
+    outputs = []
+    for walk, first_parent in passes:
+        extra = walk + (" -m" if first_parent else "")
+        output = get_pipe_output(
+            [f'git log --shortstat {extra} --pretty=format:"%at %aN" {log_range}']
+        )
+        outputs.append([line for line in output.split("\n") if line])
+    return outputs
+
+
+def _shortstat_logs(passes, log_range, workers=4):
+    return [
+        [line for line in text.split("\n") if line]
+        for text in shortstat_logs(passes, log_range, workers)
+    ]
+
+
+@pytest.fixture
+def merged_repo(tangled_repo):
+    """tangled_repo, and on top of it a merge of three branches at once, an
+    author whose name is not ASCII and a commit that only renames a file."""
+    repo = tangled_repo
+    for branch, name in (("one", "one.txt"), ("two", "two.txt")):
+        _git(repo, "checkout", "-q", "-b", branch, "main")
+        with open(os.path.join(repo, name), "w") as f:
+            f.write(f"{branch}\n" * 3)
+        _git(repo, "add", "-A")
+        _git(repo, "commit", "-q", "-m", f"add {name}")
+    _git(repo, "checkout", "-q", "main")
+    with open(os.path.join(repo, "b.txt"), "a") as f:
+        f.write("more\n")
+    _git(repo, "commit", "-q", "-a", "-m", "main moves on")
+    _git(repo, "merge", "-q", "--no-ff", "-m", "merge two branches at once", "one", "two")
+    _git(repo, "mv", "c.txt", "renamed.txt")
+    _git(
+        repo,
+        "commit",
+        "-q",
+        "-m",
+        "a rename",
+        GIT_AUTHOR_NAME="Zoë Müller",
+        GIT_AUTHOR_EMAIL="zoe@example.com",
+    )
+    return repo
+
+
+@pytest.mark.parametrize("passes", [LINEAR, EVERY_COMMIT])
+def test_shortstat_logs_write_what_the_commands_print(git_repo, monkeypatch, passes):
+    monkeypatch.chdir(git_repo)
+    expected = _shortstat_commands(passes, "HEAD")
+    assert _shortstat_logs(passes, "HEAD") == expected
+    # five commits, each with the line that counts its changes
+    assert len(expected[1]) == 10
+    assert expected[1][1].startswith(" 1 file changed, 2 insertions(+)")
+
+
+@pytest.mark.parametrize("passes", [LINEAR, EVERY_COMMIT])
+@pytest.mark.parametrize("per_process", [1, 3, 1000])
+def test_shortstat_logs_of_a_history_with_merges(merged_repo, monkeypatch, passes, per_process):
+    import gitstats.utils as utils
+
+    monkeypatch.chdir(merged_repo)
+    monkeypatch.setattr(utils, "SHORTSTAT_COMMITS_PER_PROCESS", per_process)
+    expected = _shortstat_commands(passes, "HEAD")
+    assert _shortstat_logs(passes, "HEAD", workers=3) == expected
+
+    counted = [line for line in expected[0] if "changed" in line]
+    headers = [line for line in expected[0] if "changed" not in line]
+    if passes is LINEAR:
+        # along the first parents every commit but the empty one has a count,
+        # the three merges among them
+        assert len(counted) == len(headers) - 1
+    else:
+        # among all the commits, the three merges and the empty one have none
+        assert len(counted) == len(headers) - 4
+    assert any(line.endswith(" Zoë Müller") for line in headers)
+
+
+@pytest.mark.parametrize(
+    "log_range",
+    [
+        '--since="2023-03-01" "HEAD"',
+        '--until="2023-03-01" "HEAD"',
+        '--author="Bob Jones" "HEAD"',
+        '--author="Alice Smith" --author="Bob Jones" "HEAD"',
+        "HEAD~3..HEAD",
+        '--since="2023-02-01" --until="2023-04-30" "v1.0.0..HEAD"',
+        '--author="Nobody" "HEAD"',
+    ],
+)
+def test_shortstat_logs_keep_to_the_range(git_repo, monkeypatch, log_range):
+    monkeypatch.chdir(git_repo)
+    assert _shortstat_logs(LINEAR, log_range) == _shortstat_commands(LINEAR, log_range)
+
+
+def test_shortstat_logs_count_a_commit_once(merged_repo, monkeypatch):
+    import gitstats.utils as utils
+
+    monkeypatch.chdir(merged_repo)
+    monkeypatch.setattr(utils, "SHORTSTAT_COMMITS_PER_PROCESS", 4)
+    asked = {False: [], True: []}
+    real = utils._git_text
+
+    def spy(args, data=None, env=None):
+        if data is not None:
+            asked["--first-parent" in args].extend(data.split())
+        return real(args, data, env)
+
+    monkeypatch.setattr(utils, "_git_text", spy)
+    shortstat_logs(LINEAR, "HEAD", 3)
+
+    every = _git(merged_repo, "log", "--format=%H", "HEAD").split()
+    chain_merges = _git(merged_repo, "log", "--first-parent", "--merges", "--format=%H").split()
+    assert len(chain_merges) == 3
+    # every commit is asked for the plain way once, though most are in both walks
+    assert sorted(asked[False]) == sorted(every)
+    # and the merges along the first parents once more, against their first parent
+    assert sorted(asked[True]) == sorted(chain_merges)
+
+    # when no walk compares merges with a parent, nothing is asked that way
+    asked[False].clear()
+    asked[True].clear()
+    shortstat_logs(EVERY_COMMIT, "HEAD", 3)
+    assert sorted(asked[False]) == sorted(every)
+    assert asked[True] == []
+
+
+def test_shortstat_logs_with_one_worker_or_none(git_repo, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    expected = _shortstat_commands(LINEAR, "HEAD")
+    assert _shortstat_logs(LINEAR, "HEAD", workers=1) == expected
+    assert _shortstat_logs(LINEAR, "HEAD", workers=0) == expected
+    assert shortstat_logs([], "HEAD", 4) == []
+
+
+def test_shortstat_logs_raise_when_git_fails(git_repo, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    with pytest.raises(subprocess.CalledProcessError):
+        shortstat_logs(LINEAR, "no-such-branch", 4)
+
+
+def test_shortstat_logs_raise_when_git_leaves_a_commit_out(git_repo, monkeypatch):
+    import gitstats.utils as utils
+
+    monkeypatch.chdir(git_repo)
+    real = utils._git_text
+
+    def forgetful(args, data=None, env=None):
+        text = real(args, data, env)
+        # the process that counts lines says nothing of its last commit
+        return text if data is None else text[: text.rindex(data.split()[-1])]
+
+    monkeypatch.setattr(utils, "_git_text", forgetful)
+    monkeypatch.setattr(utils, "SHORTSTAT_COMMITS_PER_PROCESS", 2)
+    with pytest.raises(subprocess.CalledProcessError):
+        shortstat_logs(LINEAR, "HEAD", 2)
+
+
+def _busiest(monkeypatch, workers, seconds_per_process, jobs=12):
+    """Run shortstat_logs() with a git that takes a moment to count; return
+    how many countings were going on at once, at most."""
+    import threading
+    import time
+
+    import gitstats.utils as utils
+
+    commits = [f"{i:040x}" for i in range(jobs)]
+    lock = threading.Lock()
+    running = most = 0
+
+    def slow(args, data=None, env=None):
+        nonlocal running, most
+        if data is None:
+            return "".join(f"{commit}\t\t{i} Ann\n" for i, commit in enumerate(commits))
+        with lock:
+            running += 1
+            most = max(most, running)
+        time.sleep(0.05)
+        with lock:
+            running -= 1
+        return "".join(f"{commit}\n\n 1 file changed, 1 insertion(+)\n" for commit in data.split())
+
+    monkeypatch.setattr(utils, "_git_text", slow)
+    monkeypatch.setattr(utils, "SHORTSTAT_COMMITS_PER_PROCESS", 1)
+    monkeypatch.setattr(utils, "SHORTSTAT_SECONDS_PER_PROCESS", seconds_per_process)
+    (text,) = shortstat_logs([("", False)], "HEAD", workers)
+    # every commit is there, in the order of the walk, with its count under it
+    assert [line for line in text.split("\n") if line] == [
+        line for i in range(jobs) for line in (f"{i} Ann", " 1 file changed, 1 insertion(+)")
+    ]
+    return most
+
+
+def test_shortstat_logs_start_with_two_processes(monkeypatch):
+    # with a long wait before a third, two is all there ever is
+    assert _busiest(monkeypatch, workers=6, seconds_per_process=60) == 2
+    # one worker is one process
+    assert _busiest(monkeypatch, workers=1, seconds_per_process=60) == 1
+
+
+def test_shortstat_logs_add_processes_as_time_passes(monkeypatch):
+    # twelve countings of 50 ms, and another process allowed every 10 ms
+    most = _busiest(monkeypatch, workers=6, seconds_per_process=0.01)
+    assert 2 < most <= 6
+
+
+def test_shortstat_logs_stop_counting_when_git_fails(monkeypatch):
+    import time
+
+    import gitstats.utils as utils
+
+    commits = [f"{i:040x}" for i in range(40)]
+    asked = []
+
+    def failing(args, data=None, env=None):
+        if data is None:
+            return "".join(f"{commit}\t\t1 Ann\n" for commit in commits)
+        asked.append(data)
+        time.sleep(0.02)
+        raise subprocess.CalledProcessError(128, ["git", *args])
+
+    monkeypatch.setattr(utils, "_git_text", failing)
+    monkeypatch.setattr(utils, "SHORTSTAT_COMMITS_PER_PROCESS", 1)
+    monkeypatch.setattr(utils, "SHORTSTAT_SECONDS_PER_PROCESS", 60)
+    with pytest.raises(subprocess.CalledProcessError):
+        shortstat_logs([("", False)], "HEAD", 2)
+    # the countings that had not begun were called off
+    assert len(asked) < len(commits)

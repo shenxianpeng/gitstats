@@ -9,6 +9,7 @@ import logging
 import os
 import re
 import socket
+import subprocess
 import sys
 import time
 from concurrent.futures import Future, ThreadPoolExecutor
@@ -37,6 +38,7 @@ from gitstats.utils import (
     get_pipe_output,
     get_stat_summary_counts,
     get_version,
+    shortstat_logs,
     should_exclude_file,
 )
 from gitstats.wrapped import THEMES, WrappedCardGenerator
@@ -269,37 +271,48 @@ class GitDataCollector(DataCollector):
 
         # Three phases read a `git log` of the whole history, two of them with
         # the line counts of every diff: what is left of a run is mostly git
-        # working those out. The three do not depend on each other, so git
-        # starts on all of them now, side by side, and each phase parses its
-        # output when its turn comes. Threads are enough: they only wait for
-        # git. With `processes = 1` the phases run their commands themselves,
-        # one after the other.
-        ahead: dict[str, Future[str]] = {}
-        with ThreadPoolExecutor(max_workers=3, thread_name_prefix="git-log") as pool:
-            if int(conf["processes"]) > 1:
-                ahead = {
-                    command: pool.submit(get_pipe_output, [command])
-                    for command in (
-                        self._line_stats_command(),
-                        self._author_line_stats_command(),
-                        self._churn_command(),
-                    )
-                }
-
-            def output(command: str) -> str | None:
-                # taken out of `ahead`, so the output is let go once its phase has read it
-                return ahead.pop(command).result() if command in ahead else None
+        # working those out. None of the three depends on the phases before
+        # it, so git starts on them now and each phase parses its output when
+        # its turn comes. The line counts are asked for once per commit and
+        # from several git processes at a time (shortstat_logs()): one fewer
+        # than `processes`, and than the machine has processors, so that the
+        # phases below, which the run cannot go faster than, keep one to
+        # themselves. Threads are enough here: they only wait for git. With
+        # `processes = 1` the phases run their commands themselves, one after
+        # the other.
+        processes = min(int(conf["processes"]), os.cpu_count() or 1)
+        churn: Future[str] | None = None
+        line_stats: Future[list[str]] | None = None
+        with ThreadPoolExecutor(max_workers=2, thread_name_prefix="git-log") as pool:
+            if processes > 1:
+                churn = pool.submit(get_pipe_output, [self._churn_command()])
+                line_stats = pool.submit(
+                    shortstat_logs,
+                    self._line_stat_passes(),
+                    get_log_range("HEAD", False),
+                    processes - 1,
+                )
 
             self._collect_tags()
             email_to_latest, author_to_email = self._collect_commit_stats()
             name_to_canonical = self._merge_author_aliases(email_to_latest, author_to_email)
             self._collect_files_by_stamp()
             self._collect_extensions()
-            self._collect_line_stats(output(self._line_stats_command()))
-            self._collect_per_author_line_stats(
-                name_to_canonical, output(self._author_line_stats_command())
+
+            # None leaves a phase to run its own command
+            outputs: list[str | None] = [None, None]
+            if line_stats is not None:
+                try:
+                    outputs = list(line_stats.result())
+                except (OSError, subprocess.CalledProcessError) as error:
+                    logger.debug(f"Could not spread the line counts over git processes: {error}")
+            self._collect_line_stats(outputs[0])
+            outputs[0] = None  # let go of the text once its phase has read it
+            self._collect_per_author_line_stats(name_to_canonical, outputs[1])
+            outputs[1] = None
+            self._collect_file_churn_and_ownership(
+                name_to_canonical, churn.result() if churn is not None else None
             )
-            self._collect_file_churn_and_ownership(name_to_canonical, output(self._churn_command()))
         if conf["ai_enabled"]:
             self._collect_commit_subjects()
 
@@ -753,22 +766,33 @@ class GitDataCollector(DataCollector):
             }
 
     @staticmethod
-    def _line_stats_command() -> str:
-        """The `git log` that _collect_line_stats() reads."""
+    def _line_stat_passes() -> list[tuple[str, bool]]:
+        """The two walks of the history that have the lines of every diff counted.
+
+        As shortstat_logs() takes them: the options that pick and order the
+        commits, and whether a merge is compared with its first parent. The
+        first is that of _collect_line_stats(), the second that of
+        _collect_per_author_line_stats().
+        """
         # computation of lines of code by date is better done
         # on a linear history.
-        extra = ""
-        if conf["linear_linestats"]:
-            extra = "--first-parent -m"
+        linear = bool(conf["linear_linestats"])
+        return [("--first-parent" if linear else "", linear), ("--date-order", False)]
+
+    @classmethod
+    def _line_stats_command(cls) -> str:
+        """The `git log` that _collect_line_stats() reads."""
+        walk, first_parent = cls._line_stat_passes()[0]
         return 'git log --shortstat {} --pretty=format:"%at %aN" {}'.format(
-            extra, get_log_range("HEAD", False)
+            walk + (" -m" if first_parent else ""), get_log_range("HEAD", False)
         )
 
-    @staticmethod
-    def _author_line_stats_command() -> str:
+    @classmethod
+    def _author_line_stats_command(cls) -> str:
         """The `git log` that _collect_per_author_line_stats() reads."""
-        return 'git log --shortstat --date-order --pretty=format:"%at %aN" {}'.format(
-            get_log_range("HEAD", False)
+        walk, _ = cls._line_stat_passes()[1]
+        return 'git log --shortstat {} --pretty=format:"%at %aN" {}'.format(
+            walk, get_log_range("HEAD", False)
         )
 
     @staticmethod
