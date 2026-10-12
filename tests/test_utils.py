@@ -14,6 +14,7 @@ import pytest
 from gitstats.utils import (
     _run_pipe_chain,
     commit_local_time,
+    commits_reached,
     count_files_in_trees,
     count_lines_in_blobs,
     count_lines_in_text,
@@ -28,6 +29,7 @@ from gitstats.utils import (
     get_pipe_output,
     get_stat_summary_counts,
     get_version,
+    history_graph,
     shortstat_logs,
     should_exclude_file,
 )
@@ -911,3 +913,84 @@ def test_shortstat_logs_stop_counting_when_git_fails(monkeypatch):
         shortstat_logs([("", False)], "HEAD", 2)
     # the countings that had not begun were called off
     assert len(asked) < len(commits)
+
+
+# ── history_graph / commits_reached ──────────────────────────────────────
+# The commits a tag adds to the tag before it, without a `git log` per tag.
+
+
+def test_history_graph_lists_a_commit_before_its_parents(merged_repo, monkeypatch):
+    monkeypatch.chdir(merged_repo)
+    place, parents, headers = history_graph("HEAD")
+
+    commits = _git(merged_repo, "rev-list", "HEAD").split()
+    assert sorted(place) == sorted(commits)
+    assert sorted(place.values()) == list(range(len(commits)))
+    assert len(parents) == len(headers) == len(commits)
+    by_place = {index: commit for commit, index in place.items()}
+    for commit, index in place.items():
+        # the parents git names, and each of them further down the list
+        named = _git(merged_repo, "log", "-1", "--format=%P", commit).split()
+        assert [by_place[parent] for parent in parents[index]] == named
+        assert all(parent > index for parent in parents[index])
+        assert headers[index] == _git(merged_repo, "log", "-1", "--format=%at %aN", commit).strip()
+    # HEAD comes first; the two roots and the merge of three branches are there
+    assert place[commits[0]] == 0
+    assert sorted(len(p) for p in parents).count(0) == 2
+    assert max(len(p) for p in parents) == 3
+    assert any(header.endswith(" Zoë Müller") for header in headers)
+
+
+def test_history_graph_of_another_revision_and_of_a_shallow_clone(git_repo, temp_dir, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    place, parents, _ = history_graph("HEAD~2")
+    assert len(place) == 3
+    assert parents == [[1], [2], []]
+
+    shallow = os.path.join(temp_dir, "shallow")
+    _git(temp_dir, "clone", "-q", "--depth", "2", "file://" + git_repo, shallow)
+    monkeypatch.chdir(shallow)
+    place, parents, _ = history_graph("HEAD")
+    # the parent of the older commit was not fetched: it is left out
+    assert parents == [[1], []]
+
+
+def test_commits_reached_are_those_of_rev_list(merged_repo, monkeypatch):
+    """For every pair of commits of a tangled history: the commits that lead
+    to the one and not to the other are those `git rev-list` gives."""
+    monkeypatch.chdir(merged_repo)
+    place, parents, _ = history_graph("HEAD")
+    by_place = {index: commit for commit, index in place.items()}
+    commits = list(place)
+    assert len(commits) == 14
+
+    for tip in commits:
+        listed = _git(merged_repo, "rev-list", tip).split()
+        reached = commits_reached(parents, place[tip])
+        assert sorted(by_place[index] for index in reached) == sorted(listed), tip
+        # descendants first
+        assert reached == sorted(reached)
+        for base in commits:
+            listed = _git(merged_repo, "rev-list", tip, "^" + base).split()
+            reached = commits_reached(parents, place[tip], place[base])
+            assert sorted(by_place[index] for index in reached) == sorted(listed), (tip, base)
+
+
+def test_commits_reached_stop_where_the_base_takes_over():
+    # 0 - 1 - 2 - 3 - 4 - ... - 99, each the child of the next
+    chain = [[index + 1] for index in range(99)] + [[]]
+    assert commits_reached(chain, 0, 3) == [0, 1, 2]
+    assert commits_reached(chain, 3, 0) == []
+    assert commits_reached(chain, 5, 5) == []
+    assert commits_reached(chain, 97) == [97, 98, 99]
+
+    # the walk from 0 to 3 does not go on to the end of the history
+    class Counting(list):
+        asked = 0
+
+        def __getitem__(self, index):
+            Counting.asked += 1
+            return super().__getitem__(index)
+
+    assert commits_reached(Counting(chain), 0, 3) == [0, 1, 2]
+    assert Counting.asked < 10

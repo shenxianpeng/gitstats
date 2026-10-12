@@ -3,6 +3,7 @@
 # Copyright (c) 2024-present Xianpeng Shen <xianpeng.shen@gmail.com>.
 # GPLv2 / GPLv3
 import datetime
+import heapq
 import logging
 import os
 import re
@@ -550,6 +551,71 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
                 1, ["git", "log", "--shortstat", "--no-walk"], f"nothing printed for {missing}"
             ) from None
     return texts
+
+
+def history_graph(rev: str) -> tuple[dict[str, int], list[list[int]], list[str]]:
+    """Read the commits leading to ``rev``, with what joins them, in one `git log`.
+
+    Returns ``(place, parents, headers)``:
+        place:   commit hash -> its place in the two lists. A commit comes
+                 before its parents (``--topo-order``), so a smaller place is
+                 never an ancestor of a larger one;
+        parents: for each commit, the places of its parents (a parent git
+                 does not have, as at the edge of a shallow clone, is left out);
+        headers: for each commit, "<author timestamp> <author name>", as
+                 ``git log --format="%at %aN"`` prints it.
+    """
+    rows = _LOG_ROW.findall(
+        get_pipe_output([f'git log --topo-order --format="%H%x09%P%x09%at %aN" "{rev}"'])
+    )
+    place = {row[0]: index for index, row in enumerate(rows)}
+    parents = [[place[parent] for parent in row[1].split() if parent in place] for row in rows]
+    return place, parents, [row[2] for row in rows]
+
+
+def commits_reached(parents: list[list[int]], tip: int, base: int | None = None) -> list[int]:
+    """List the commits that lead to ``tip`` and not to ``base``.
+
+    The commits of ``git rev-list <tip> ^<base>`` (those of ``git rev-list
+    <tip>`` without a base), in a graph as history_graph() gives it:
+    ``parents[i]`` holds the places of the parents of commit ``i``, and a
+    commit comes before its parents. Descendants come first in the result.
+
+    Both sides are walked at once, the nearest descendants first, the way git
+    does it: a commit is known to lead to ``base`` or not by the time it is
+    reached, and the walk stops when everything left to visit leads to it.
+    What it costs is the commits listed and those of the other side as far
+    back as they go, not the whole history.
+    """
+    wanted, unwanted = 1, 2
+    state = {tip: wanted}
+    queue = [tip]
+    # how many of the commits waiting in the queue are still wanted
+    waiting = 1
+    if base is not None:
+        if base == tip:
+            return []
+        state[base] = unwanted
+        heapq.heappush(queue, base)
+    reached = []
+    while waiting:
+        commit = heapq.heappop(queue)
+        mine = state[commit]
+        if mine == wanted:
+            waiting -= 1
+            reached.append(commit)
+        for parent in parents[commit]:
+            theirs = state.get(parent)
+            if theirs is None:
+                state[parent] = mine
+                heapq.heappush(queue, parent)
+                if mine == wanted:
+                    waiting += 1
+            elif theirs == wanted and mine == unwanted:
+                # reached from the tip first, and now from the base as well
+                state[parent] = unwanted
+                waiting -= 1
+    return reached
 
 
 def get_stat_summary_counts(line: str) -> list[str | int]:

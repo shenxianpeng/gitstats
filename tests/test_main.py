@@ -1534,12 +1534,14 @@ class TestCollectEdgeCases:
             {
                 "git rev-list --topo-order": "c2\nc1",
                 "git show-ref --tags --dereference": "c2 refs/tags/v2\nc1 refs/tags/v1\n",
-                'git log "c2"': "",  # no output: the tag is left out
-                'git log "c1"': "garbage Ann",  # unreadable stamp: counted as 0
-                'git log --format="%H %aN" "v1"': "c1 Ann\n\nc0 Outside Range",
+                # the history that leads to the end of the range: c2 is not in
+                # it, so its tag is left out; the stamp of c1 is unreadable,
+                # and counted as 0
+                "git log --topo-order": "c1\tc0\tgarbage Ann\nc0\t\t5 Outside Range",
             }
         )
         monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+        monkeypatch.setattr("gitstats.utils.get_pipe_output", fake)
         dc = GitDataCollector()
         dc._collect_tags()
 
@@ -1548,6 +1550,117 @@ class TestCollectEdgeCases:
         # c0 is not in the analyzed range, so only c1 counts
         assert dc.tags["v1"]["commits"] == 1
         assert dc.tags["v1"]["authors"] == {"Ann": 1}
+        # one command reads the history, whatever the number of tags
+        assert fake.calls == [
+            "git rev-list --topo-order HEAD",
+            "git show-ref --tags --dereference",
+            'git log --topo-order --format="%H%x09%P%x09%at %aN" "HEAD"',
+        ]
+
+    def test_tags_outside_the_range_need_no_history(self, monkeypatch):
+        fake = _fake_git(
+            {
+                "git rev-list --topo-order": "c2\nc1",
+                "git show-ref --tags --dereference": "c9 refs/tags/elsewhere\n",
+            }
+        )
+        monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+        monkeypatch.setattr("gitstats.utils.get_pipe_output", fake)
+        dc = GitDataCollector()
+        dc._collect_tags()
+        # no tag to date or to count for: the history is not read
+        assert dc.tags == {}
+        assert len(fake.calls) == 2
+
+    def test_tags_are_counted_as_git_log_counts_them(self, temp_dir, monkeypatch):
+        """On a history with tags on branches, on one commit and outside the
+        history, each tag has the commits of `git log <tag> ^<the tag before>`."""
+        repo = os.path.join(temp_dir, "tagged")
+        os.makedirs(repo)
+        _git(repo, "init", "-q", "-b", "main")
+        _git(repo, "config", "user.name", "Merger")
+        _git(repo, "config", "user.email", "merger@example.com")
+
+        def commit(name, author, date):
+            with open(os.path.join(repo, name), "w") as f:
+                f.write(name)
+            _git(repo, "add", "-A")
+            env = {
+                "GIT_AUTHOR_NAME": author,
+                "GIT_AUTHOR_EMAIL": author.lower() + "@example.com",
+                "GIT_COMMITTER_NAME": author,
+                "GIT_COMMITTER_EMAIL": author.lower() + "@example.com",
+                "GIT_AUTHOR_DATE": date,
+                "GIT_COMMITTER_DATE": date,
+            }
+            subprocess.run(
+                ["git", "commit", "-q", "-m", name],
+                cwd=repo,
+                check=True,
+                capture_output=True,
+                env={**os.environ, **env},
+            )
+
+        commit("a", "Ann", "2023-01-01T10:00:00")
+        commit("b", "Ben", "2023-01-02T10:00:00")
+        _git(repo, "tag", "v1.0")
+        _git(repo, "tag", "-a", "-m", "the same commit", "first", "v1.0")
+        _git(repo, "checkout", "-q", "-b", "fix")
+        commit("c", "Cy", "2023-01-03T10:00:00")
+        commit("d", "Ann", "2023-01-04T10:00:00")
+        _git(repo, "tag", "v1.0.1")
+        _git(repo, "checkout", "-q", "main")
+        commit("e", "Ben", "2023-01-05T10:00:00")
+        commit("f", "Ben", "2023-01-06T10:00:00")
+        _git(repo, "tag", "v1.1-rc")
+        _git(repo, "merge", "-q", "--no-ff", "-m", "merge fix", "fix")
+        commit("g", "Di", "2023-01-07T10:00:00")
+        _git(repo, "tag", "v1.1")
+        commit("h", "Ann", "2023-01-08T10:00:00")
+        # a tag the history of HEAD does not lead to
+        _git(repo, "checkout", "-q", "-b", "elsewhere", "v1.0")
+        commit("x", "Eve", "2023-01-09T10:00:00")
+        _git(repo, "tag", "experiment")
+        _git(repo, "checkout", "-q", "main")
+
+        monkeypatch.chdir(repo)
+        dc = GitDataCollector()
+        dc._collect_tags()
+
+        assert "experiment" not in dc.tags
+        # what git says, a tag at a time, oldest first as the collector takes them
+        from gitstats.utils import get_pipe_output
+
+        in_range = set(get_pipe_output(["git rev-list HEAD"]).split())
+        expected = {}
+        prev = None
+        for tag in sorted(dc.tags, key=lambda tag: (-dc.tags[tag]["order"], tag)):
+            command = f'git log --format="%H %aN" "{tag}"' + (f' "^{prev}"' if prev else "")
+            authors = {}
+            for line in get_pipe_output([command]).split("\n"):
+                if line and line.split(" ", 1)[0] in in_range:
+                    author = line.split(" ", 1)[1]
+                    authors[author] = authors.get(author, 0) + 1
+            expected[tag] = authors
+            if authors:
+                prev = tag
+        assert {tag: info["authors"] for tag, info in dc.tags.items()} == expected
+        assert expected == {
+            # the two first commits; the tag of the same commit that comes after has none
+            "first": {"Ann": 1, "Ben": 1},
+            "v1.0": {},
+            # the main line since v1.0
+            "v1.1-rc": {"Ben": 2},
+            # the branch: the tag before it is v1.1-rc, which leads to neither c nor d
+            "v1.0.1": {"Cy": 1, "Ann": 1},
+            # the tag before it is v1.0.1, on the branch: e and f are counted
+            # again, with the merge and g. A tag is compared with the one
+            # before it, not with all of them.
+            "v1.1": {"Ben": 2, "Di": 1, "Merger": 1},
+        }
+        for tag, info in dc.tags.items():
+            assert info["commits"] == sum(expected[tag].values())
+        assert dc.tags["v1.1"]["date"] == "2023-01-07"
 
     def test_second_tag_on_a_tagged_commit_gets_no_commits(self, git_repo, monkeypatch):
         _git(git_repo, "tag", "release-1.1", "v1.1.0")

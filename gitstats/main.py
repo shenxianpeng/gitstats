@@ -30,6 +30,7 @@ from gitstats.ai_summarizer import AISummarizer
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.utils import (
     commit_local_time,
+    commits_reached,
     count_files_in_trees,
     count_lines_in_blobs,
     get_commit_range,
@@ -38,6 +39,7 @@ from gitstats.utils import (
     get_pipe_output,
     get_stat_summary_counts,
     get_version,
+    history_graph,
     shortstat_logs,
     should_exclude_file,
 )
@@ -347,26 +349,39 @@ class GitDataCollector(DataCollector):
             else:
                 tag_hashes.setdefault(tag, hash)
 
-        for tag, hash in tag_hashes.items():
-            # Only include tags whose commit is in our range
-            if hash not in tag_commits_set:
-                continue
+        # Only the tags whose commit is in our range are included
+        tag_hashes = {tag: hash for tag, hash in tag_hashes.items() if hash in tag_commits_set}
+        if not tag_hashes:
+            return
 
-            output = get_pipe_output([f'git log "{hash}" --pretty=format:"%at %aN" -n 1'])
-            if len(output) > 0:
-                parts = output.split(" ")
+        # The date of each tag and the commits it adds to the tag before it
+        # come from the history read once, with what joins its commits. Asking
+        # git for each tag took two processes per tag: most of a run on a
+        # small repository, and half a minute on one with a thousand tags.
+        # The whole history that leads to the end of the range is read, not
+        # the range: a tag's commits are found by walking back from it, which
+        # the date and author filters would leave holes in.
+        place, parents, headers = history_graph(get_commit_range("HEAD", end_only=True))
+        in_range = [False] * len(parents)
+        for commit in tag_commits_set:
+            if commit in place:
+                in_range[place[commit]] = True
+
+        for tag, hash in tag_hashes.items():
+            if hash not in place:
+                continue
+            stamp = 0
+            try:
+                stamp = int(headers[place[hash]].partition(" ")[0])
+            except ValueError:
                 stamp = 0
-                try:
-                    stamp = int(parts[0])
-                except ValueError:
-                    stamp = 0
-                self.tags[tag] = {
-                    "stamp": stamp,
-                    "hash": hash,
-                    "date": datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d"),
-                    "commits": 0,
-                    "authors": {},
-                }
+            self.tags[tag] = {
+                "stamp": stamp,
+                "hash": hash,
+                "date": datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d"),
+                "commits": 0,
+                "authors": {},
+            }
 
         # Walk the tags oldest first, so each one is credited with the commits
         # added since the previous tag. The order comes from the history itself:
@@ -387,25 +402,20 @@ class GitDataCollector(DataCollector):
                 (-commit_order.get(info["hash"], 0), tag) for tag, info in self.tags.items()
             )
         ]
-        prev = None
+        prev: int | None = None
         for tag in tags_oldest_first:
-            cmd = f'git log --format="%H %aN" "{tag}"'
-            if prev is not None:
-                cmd += f' "^{prev}"'
-            output = get_pipe_output([cmd])
-            # Keep the commits of our range, which also applies the date and
-            # author filters. Adding the range to the command instead would
-            # add its commits to the tag's, not intersect with them.
+            tip = place[self.tags[tag]["hash"]]
+            # The commits that lead to this tag and not to the one before
+            # (`git log <tag> ^<prev>`). Of those, keep the commits of our
+            # range, which also applies the date and author filters.
             counts: dict[str, int] = {}
-            for line in output.split("\n"):
-                if len(line.strip()) == 0:
-                    continue
-                commit, author = line.split(" ", 1)
-                if commit in tag_commits_set:
+            for reached in commits_reached(parents, tip, prev):
+                if in_range[reached]:
+                    author = headers[reached].partition(" ")[2]
                     counts[author] = counts.get(author, 0) + 1
             if not counts:
                 continue
-            prev = tag
+            prev = tip
             for author, commits in counts.items():
                 self.tags[tag]["commits"] += commits
                 self.tags[tag]["authors"][author] = commits
