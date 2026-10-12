@@ -859,37 +859,40 @@ class TestCollectPhases:
         return [line for line in output.split("\n") if line]
 
     def test_collect_starts_the_history_passes_ahead(self, git_repo, monkeypatch):
-        """collect() has git start on the three passes itself. The two that
-        count the lines of every diff are spread over git processes, and none
-        of their commands runs; the third runs once. Each phase is handed the
-        text of its pass."""
+        """collect() has git start on the three passes itself: the diffs of
+        every commit, made once and spread over git processes, give the line
+        counts of two phases and the file names of the third. None of the
+        three commands runs, and each phase is handed the text of its own."""
         _, ran, handed, dc, spread = self._collect_recording(git_repo, processes=8)
 
-        # eight processes: seven for the line counts, one left to the phases
+        # eight processes: seven for the diffs, one left to the phases
         spread.assert_called_once()
-        passes, log_range, workers, waiting = spread.call_args.args
-        assert (passes, log_range, workers) == (
+        passes, log_range, workers, waiting, names = spread.call_args.args
+        assert (passes, log_range, workers, names) == (
             [("--first-parent", True), ("--date-order", False)],
             "HEAD",
             7,
+            "COMMIT:%aN",
         )
         # and the phases said so when they had nothing left to do but wait
         assert waiting.is_set()
         assert dc._line_stats_command() not in ran
         assert dc._author_line_stats_command() not in ran
-        assert ran.count(dc._churn_command()) == 1
-        assert handed["_collect_file_churn_and_ownership"].startswith("COMMIT:")
+        assert dc._churn_command() not in ran
 
-        # what the two phases were handed is what their commands print
+        # what the phases were handed is what their commands print
         from gitstats.utils import get_pipe_output
 
         monkeypatch.chdir(git_repo)
         for phase, command in (
             ("_collect_line_stats", dc._line_stats_command()),
             ("_collect_per_author_line_stats", dc._author_line_stats_command()),
+            ("_collect_file_churn_and_ownership", dc._churn_command()),
         ):
-            assert "files changed" in handed[phase]
             assert self._text(handed[phase]) == self._text(get_pipe_output([command])), phase
+        assert "files changed" in handed["_collect_line_stats"]
+        assert handed["_collect_file_churn_and_ownership"].startswith("COMMIT:")
+        assert "\nutils.py\n" in handed["_collect_file_churn_and_ownership"]
 
     @pytest.mark.parametrize("processes, cpus, workers", [(8, 4, 3), (3, 16, 2), (2, 2, 1)])
     def test_collect_asks_for_no_more_processes_than_the_machine_has(
@@ -921,21 +924,23 @@ class TestCollectPhases:
 
     def test_collect_runs_the_commands_when_the_counts_cannot_be_spread(self, git_repo):
         """git failing in one of the processes is not the end of the run: the
-        two phases run their commands, as they would in turn."""
+        three phases run their commands, as they would in turn."""
         side_by_side, _, _, _, _ = self._collect_recording(git_repo, processes=8)
 
-        def failing(passes, log_range, workers, waiting):
+        def failing(passes, log_range, workers, waiting, names):
             raise subprocess.CalledProcessError(128, ["git", "log"])
 
         fallen_back, ran, handed, dc, _ = self._collect_recording(
             git_repo, processes=8, shortstat_logs=failing
         )
-        assert handed["_collect_line_stats"] is None
-        assert handed["_collect_per_author_line_stats"] is None
+        assert handed == {
+            "_collect_line_stats": None,
+            "_collect_per_author_line_stats": None,
+            "_collect_file_churn_and_ownership": None,
+        }
         assert ran.count(dc._line_stats_command()) == 1
         assert ran.count(dc._author_line_stats_command()) == 1
-        # the pass that does not count lines had been started ahead all the same
-        assert handed["_collect_file_churn_and_ownership"].startswith("COMMIT:")
+        assert ran.count(dc._churn_command()) == 1
         assert fallen_back == side_by_side
 
     def test_line_stat_passes_follow_linear_linestats(self):
@@ -1851,7 +1856,7 @@ class TestCollectEdgeCases:
         reference = GitDataCollector()
         reference._collect_files_by_stamp()
 
-        _, added = shortstat_logs(GitDataCollector._line_stat_passes(), "HEAD", 2)
+        _, added, _ = shortstat_logs(GitDataCollector._line_stat_passes(), "HEAD", 2)
         # the four commits that have a parent: three add a file, one changes one
         assert sorted(added.values()) == [0, 1, 1, 1]
         compared = []
@@ -1898,7 +1903,7 @@ class TestCollectEdgeCases:
         reference = GitDataCollector()
         reference._collect_files_by_stamp()
 
-        _, added = shortstat_logs(GitDataCollector._line_stat_passes(), "HEAD", 2)
+        _, added, _ = shortstat_logs(GitDataCollector._line_stat_passes(), "HEAD", 2)
         # as a git set up to show diffs another way might have it
         wrong = {commit: change + 1 for commit, change in added.items()}
 

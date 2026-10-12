@@ -750,7 +750,7 @@ def _shortstat_commands(passes, log_range):
 
 
 def _shortstat_logs(passes, log_range, workers=4):
-    texts, _ = shortstat_logs(passes, log_range, workers)
+    texts, _, _ = shortstat_logs(passes, log_range, workers)
     return [[line for line in text.split("\n") if line] for text in texts]
 
 
@@ -892,7 +892,7 @@ def test_shortstat_logs_say_what_files_each_commit_adds(merged_repo, monkeypatch
     assert (len(one_parent), len(merges), len(roots)) == (9, 3, 2)
 
     # along the first parents the merges are compared with theirs, and say what they add
-    _, added = shortstat_logs(LINEAR, "HEAD", 3)
+    _, added, _ = shortstat_logs(LINEAR, "HEAD", 3)
     assert set(added) == one_parent | merges
     assert added == {commit: _files_added(merged_repo, commit) for commit in one_parent | merges}
     # some add files, some delete them, the rename does neither
@@ -901,7 +901,7 @@ def test_shortstat_logs_say_what_files_each_commit_adds(merged_repo, monkeypatch
     assert added[rename] == 0
 
     # when no walk compares merges with a parent, they are left out
-    _, added = shortstat_logs(EVERY_COMMIT, "HEAD", 3)
+    _, added, _ = shortstat_logs(EVERY_COMMIT, "HEAD", 3)
     assert set(added) == one_parent
     assert added == {commit: _files_added(merged_repo, commit) for commit in one_parent}
 
@@ -913,7 +913,7 @@ def test_files_are_counted_from_what_the_line_counts_say(merged_repo, monkeypatc
 
     monkeypatch.chdir(merged_repo)
     expected = _trees_by_ls_tree(merged_repo)
-    _, added = shortstat_logs(LINEAR, "HEAD", 3)
+    _, added, _ = shortstat_logs(LINEAR, "HEAD", 3)
 
     compared = []
     real = utils._git_lines
@@ -932,7 +932,7 @@ def test_files_are_counted_from_what_the_line_counts_say(merged_repo, monkeypatc
 
     # without the merges' differences (no first-parent walk), about them as well
     compared.clear()
-    _, added = shortstat_logs(EVERY_COMMIT, "HEAD", 3)
+    _, added, _ = shortstat_logs(EVERY_COMMIT, "HEAD", 3)
     assert count_files_in_trees(history, set(expected), {}, added) == expected
     assert len(compared) == 2 + 3
 
@@ -942,7 +942,7 @@ def test_shortstat_logs_with_one_worker_or_none(git_repo, monkeypatch):
     expected = _shortstat_commands(LINEAR, "HEAD")
     assert _shortstat_logs(LINEAR, "HEAD", workers=1) == expected
     assert _shortstat_logs(LINEAR, "HEAD", workers=0) == expected
-    assert shortstat_logs([], "HEAD", 4) == ([], {})
+    assert shortstat_logs([], "HEAD", 4) == ([], {}, None)
 
 
 def test_shortstat_logs_raise_when_git_fails(git_repo, monkeypatch):
@@ -968,6 +968,181 @@ def test_shortstat_logs_raise_when_git_leaves_a_commit_out(git_repo, monkeypatch
         shortstat_logs(LINEAR, "HEAD", 2)
 
 
+CHURN = "COMMIT:%aN"
+
+
+def _names_command(log_range, header=CHURN):
+    """What `git log --name-only` itself prints, blank lines aside."""
+    output = get_pipe_output([f'git log --format="{header}" --name-only {log_range}'])
+    return [line for line in output.split("\n") if line]
+
+
+def _names(passes, log_range, workers=3, header=CHURN):
+    _, _, names = shortstat_logs(passes, log_range, workers, None, header)
+    return [line for line in names.split("\n") if line]
+
+
+@pytest.mark.parametrize("passes", [LINEAR, EVERY_COMMIT, [("--first-parent", True)], []])
+@pytest.mark.parametrize("per_process", [1, 3, 1000])
+def test_shortstat_logs_name_the_files_each_commit_changes(
+    merged_repo, monkeypatch, passes, per_process
+):
+    """Whatever the walks that have their lines counted: the names are those
+    of every commit of the range, a merge has none, and a renamed file goes
+    by its new name."""
+    import gitstats.utils as utils
+
+    monkeypatch.chdir(merged_repo)
+    monkeypatch.setattr(utils, "SHORTSTAT_COMMITS_PER_PROCESS", per_process)
+    expected = _names_command("HEAD")
+    assert _names(passes, "HEAD") == expected
+
+    assert len([line for line in expected if line.startswith("COMMIT:")]) == 14
+    assert "COMMIT:Zoë Müller" in expected
+    renamed = expected[expected.index("COMMIT:Zoë Müller") + 1]
+    assert renamed == "renamed.txt"
+    # the merges are there, with no name under them
+    merges = [
+        i
+        for i, line in enumerate(expected[:-1])
+        if line.startswith("COMMIT:") and expected[i + 1].startswith("COMMIT:")
+    ]
+    assert len(merges) >= 3
+    # and the texts with the line counts are what they are without the names
+    texts, added, _ = shortstat_logs(passes, "HEAD", 3, None, CHURN)
+    assert (texts, added) == shortstat_logs(passes, "HEAD", 3)[:2]
+
+
+def test_shortstat_logs_name_files_with_awkward_names(git_repo, monkeypatch):
+    """git quotes the names it has to, in a raw line as in `--name-only`; the
+    others are taken as they are, whatever they look like."""
+    awkward = [
+        " leading space.txt",
+        " 1 file changed, 1 insertion(+)",
+        " create mode 100644 x",
+        ":colon.txt",
+        "0123456789abcdef0123456789abcdef01234567",
+        "tab\there.txt",
+        "naïve/日本語.txt",
+        'say "hi".txt',
+        "dir/ inner space.txt",
+        "a => b.txt",
+    ]
+    if os.name == "nt":
+        # not names a Windows checkout can hold
+        awkward = [name for name in awkward if not set(name) & set(':">\t')]
+    for name in awkward:
+        path = os.path.join(git_repo, name)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(f"{name}\n" * 3)
+    _git(git_repo, "add", "-A")
+    _git(git_repo, "commit", "-q", "-m", "awkward names")
+    # each is then renamed, and changed enough for git to see a new file in some
+    for i, name in enumerate(awkward):
+        _git(git_repo, "mv", name, name + ".moved")
+        if i % 2:
+            with open(os.path.join(git_repo, name + ".moved"), "w") as f:
+                f.write("something else altogether\n" * 5)
+    _git(git_repo, "add", "-A")
+    _git(git_repo, "commit", "-q", "-m", "awkward renames")
+    _git(git_repo, "rm", "-q", "-r", "naïve", "dir")
+    _git(git_repo, "commit", "-q", "-m", "awkward deletions")
+    monkeypatch.chdir(git_repo)
+
+    expected = _names_command("HEAD")
+    assert _names(LINEAR, "HEAD") == expected
+    assert len(expected) > 5 + 2 * len(awkward)
+    assert " leading space.txt" in expected
+    # the counts and the files added are still read right, under such names
+    assert _shortstat_logs(LINEAR, "HEAD") == _shortstat_commands(LINEAR, "HEAD")
+    _, added, _ = shortstat_logs(LINEAR, "HEAD", 3, None, CHURN)
+    commits = _git(git_repo, "log", "--format=%H", "-3", "HEAD").split()
+    assert [added[commit] for commit in commits] == [-2, 0, len(awkward)]
+
+
+@pytest.mark.parametrize(
+    "log_range",
+    [
+        '--since="2023-03-01" "HEAD"',
+        '--author="Bob Jones" "HEAD"',
+        "HEAD~3..HEAD",
+        '--author="Nobody" "HEAD"',
+    ],
+)
+def test_shortstat_logs_name_the_files_of_the_range(git_repo, monkeypatch, log_range):
+    monkeypatch.chdir(git_repo)
+    assert _names(LINEAR, log_range) == _names_command(log_range)
+    # the line that starts a commit is the caller's to choose
+    assert _names(LINEAR, log_range, header="%H %s") == _names_command(log_range, "%H %s")
+
+
+def test_shortstat_logs_ask_for_names_only_when_told(merged_repo, monkeypatch):
+    import gitstats.utils as utils
+
+    monkeypatch.chdir(merged_repo)
+    asked = []
+    real = utils._git_text
+
+    def spy(args, data=None, env=None):
+        asked.append(args)
+        return real(args, data, env)
+
+    monkeypatch.setattr(utils, "_git_text", spy)
+    _, _, names = shortstat_logs(LINEAR, "HEAD", 3)
+    assert names is None
+    assert not any("--raw" in args for args in asked)
+    # two walks listed, and no third for the names
+    assert len([args for args in asked if "--no-walk" not in args]) == 2
+
+    asked.clear()
+    shortstat_logs(LINEAR, "HEAD", 3, None, CHURN)
+    assert len([args for args in asked if "--no-walk" not in args]) == 3
+    counting = [args for args in asked if "--no-walk" in args]
+    # the names come with the plain diffs, not with those of the merges
+    # against their first parent
+    assert sorted(("--raw" in args, "--first-parent" in args) for args in counting) == [
+        (False, True),
+        (True, False),
+    ]
+
+
+def test_shortstat_logs_take_no_other_line_for_a_name(merged_repo, monkeypatch):
+    """What else git may print between two commits, such as the check of a
+    signature (log.showSignature), is neither a file nor a count."""
+    import gitstats.utils as utils
+
+    monkeypatch.chdir(merged_repo)
+    expected = _names_command("HEAD")
+    counts = _shortstat_commands(LINEAR, "HEAD")
+    real = utils._git_text
+
+    def chatty(args, data=None, env=None):
+        text = real(args, data, env)
+        if data is None:
+            return text
+        return text.replace("\x01", "gpg: Good signature from somebody\n\x01")
+
+    monkeypatch.setattr(utils, "_git_text", chatty)
+    assert _names(LINEAR, "HEAD") == expected
+    assert _shortstat_logs(LINEAR, "HEAD") == counts
+
+
+def test_shortstat_logs_raise_when_git_leaves_the_names_of_a_commit_out(git_repo, monkeypatch):
+    import gitstats.utils as utils
+
+    monkeypatch.chdir(git_repo)
+    real = utils._git_text
+
+    def forgetful(args, data=None, env=None):
+        text = real(args, data, env)
+        return text if data is None else text[: text.rindex(data.split()[-1])]
+
+    monkeypatch.setattr(utils, "_git_text", forgetful)
+    with pytest.raises(subprocess.CalledProcessError):
+        shortstat_logs([], "HEAD", 2, None, CHURN)
+
+
 def _busiest(monkeypatch, workers, seconds_per_process, jobs=12, waiting=None):
     """Run shortstat_logs() with a git that takes a moment to count; return
     how many countings were going on at once, at most."""
@@ -990,12 +1165,14 @@ def _busiest(monkeypatch, workers, seconds_per_process, jobs=12, waiting=None):
         time.sleep(0.05)
         with lock:
             running -= 1
-        return "".join(f"{commit}\n\n 1 file changed, 1 insertion(+)\n" for commit in data.split())
+        return "".join(
+            f"\x01{commit}\n\n 1 file changed, 1 insertion(+)\n" for commit in data.split()
+        )
 
     monkeypatch.setattr(utils, "_git_text", slow)
     monkeypatch.setattr(utils, "SHORTSTAT_COMMITS_PER_PROCESS", 1)
     monkeypatch.setattr(utils, "SHORTSTAT_SECONDS_PER_PROCESS", seconds_per_process)
-    (text,), _ = shortstat_logs([("", False)], "HEAD", workers, waiting)
+    (text,), _, _ = shortstat_logs([("", False)], "HEAD", workers, waiting)
     # every commit is there, in the order of the walk, with its count under it
     assert [line for line in text.split("\n") if line] == [
         line for i in range(jobs) for line in (f"{i} Ann", " 1 file changed, 1 insertion(+)")
@@ -1042,7 +1219,7 @@ def test_shortstat_logs_count_the_shares_spread_over_the_history(monkeypatch):
         if data is None:
             return "".join(f"{commit}\t\t1 Ann\n" for commit in commits)
         order.append(int(data.split()[0], 16))
-        return data
+        return "".join(f"\x01{commit}\n" for commit in data.split())
 
     monkeypatch.setattr(utils, "_git_text", recording)
     monkeypatch.setattr(utils, "SHORTSTAT_COMMITS_PER_PROCESS", 1)

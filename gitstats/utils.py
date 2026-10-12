@@ -427,14 +427,11 @@ SHORTSTAT_PROCESSES_AT_FIRST = 2
 SHORTSTAT_SECONDS_PER_PROCESS = 3.0
 SHORTSTAT_SLOW_SECONDS = 0.35
 
-# "<commit>\t<parents>\t<stamp> <author>", a commit of a walk
+# "<commit>\t<parents>\t<the line that starts it>", a commit of a walk
 _LOG_ROW = re.compile(r"^([0-9a-f]+)\t([0-9a-f ]*)\t(.*)$", re.MULTILINE)
-# a line that is a commit's hash and nothing else
-_COMMIT_LINE = re.compile(r"^([0-9a-f]{40}|[0-9a-f]{64})$", re.MULTILINE)
-# a line of `git log --summary`: " create mode 100644 <path>", " delete mode ...",
-# " rename ...", " copy ...", " mode change ...". The line that counts the
-# changes, " 3 files changed, ...", starts with a number.
-_SUMMARY_LINE = re.compile(r"^ [a-z][^\n]*\n", re.MULTILINE)
+# What starts a commit in the output of a process that counts lines. git puts
+# no such character in what follows: it quotes the paths that have one.
+_COMMIT_MARK = "\x01"
 
 
 def _git_text(args: list[str], data: str | None = None, env: dict[str, str] | None = None) -> str:
@@ -470,7 +467,8 @@ def shortstat_logs(
     log_range: str,
     workers: int,
     waiting: threading.Event | None = None,
-) -> tuple[list[str], dict[str, int]]:
+    names: str | None = None,
+) -> tuple[list[str], dict[str, int], str | None]:
     """Write what `git log --shortstat` prints for several walks of one history.
 
     Each of ``passes`` is ``(walk, first_parent)``: ``walk`` holds the options
@@ -488,6 +486,15 @@ def shortstat_logs(
     without parents is left out, as git may or may not show what it adds.
     count_files_in_trees() takes it, and has nothing left to ask git about
     for most commits.
+
+    With ``names``, the same diffs also say what files each commit changes.
+    ``names`` is the format of the line that starts a commit, and the third
+    text returned is, blank lines aside, the output of::
+
+        git log --format=<names> --name-only <log_range>
+
+    which would compare every commit once more. Without it, None is returned
+    in its place.
 
     Counting the lines of every diff is what those commands spend their time
     on, each in one process, and the walks mostly cover the same commits.
@@ -512,14 +519,14 @@ def shortstat_logs(
     # git fills its buffer before it writes, where it would write after every commit
     env = {**os.environ, "GIT_FLUSH": "0"}
 
-    def listing(walk: str) -> list[tuple[str, str, str]]:
-        """(commit, parents, "<stamp> <author>") in the order of the walk."""
+    def listing(walk: str, header: str) -> list[tuple[str, str, str]]:
+        """(commit, parents, the line that starts it) in the order of the walk."""
         return _LOG_ROW.findall(
             _git_text(
                 [
                     "log",
                     *shlex.split(walk),
-                    "--format=%H%x09%P%x09%at %aN",
+                    f"--format=%H%x09%P%x09{header}",
                     *shlex.split(log_range),
                 ],
                 env=env,
@@ -557,11 +564,16 @@ def shortstat_logs(
                 allow(1)
                 due += SHORTSTAT_SECONDS_PER_PROCESS
 
-    def counts(job: tuple[list[str], bool]) -> tuple[dict[str, str], dict[str, int]]:
+    def counts(
+        job: tuple[list[str], bool],
+    ) -> tuple[dict[str, str], dict[str, int], dict[str, str]]:
         """For one process's share of the commits: commit -> the count git
-        prints under it, and commit -> the files it adds less those it
-        deletes, where that is not nothing."""
+        prints under it, commit -> the files it adds less those it deletes,
+        where that is not nothing, and, when the names are asked for,
+        commit -> the files it changes, a line each."""
         commits, first_parent = job
+        # the names are those of the plain diff, as `git log --name-only` shows it
+        with_names = names is not None and not first_parent
         with allowed:
             began = time.monotonic()
             text = _git_text(
@@ -570,12 +582,16 @@ def shortstat_logs(
                     "--shortstat",
                     # the files created and deleted, from the same diff
                     "--summary",
+                    # and every file changed. --name-only would print the names
+                    # and nothing else; a raw line ends with the name, quoted
+                    # the same way, and full hashes cost git nothing to print
+                    *(["--raw", "--no-abbrev"] if with_names else []),
                     *(["--first-parent", "-m"] if first_parent else []),
                     "--no-walk",
                     # from its input: a thousand hashes are more than a
                     # command line holds on Windows
                     "--stdin",
-                    "--format=%H",
+                    "--format=%x01%H",
                 ],
                 "\n".join(commits) + "\n",
                 env,
@@ -590,26 +606,59 @@ def shortstat_logs(
             if slow:
                 # large diffs: the run will be waiting for these counts
                 allow(workers)
-        # [what comes before the first commit, commit, what is under it, commit, ...]
-        parts = _COMMIT_LINE.split(text)
-        found = dict(zip(parts[1::2], parts[2::2]))
+        found: dict[str, str] = {}
         files: dict[str, int] = {}
-        for commit, under in found.items():
-            if _SUMMARY_LINE.search(under):
-                # a renamed file is neither created nor deleted; a copied one is new
-                change = (
-                    under.count("\n create mode ")
-                    + under.count("\n copy ")
-                    - under.count("\n delete mode ")
+        changed: dict[str, str] = {}
+        # [what comes before the first commit, "<commit>\n<what is under it>", ...]
+        for block in text.split(_COMMIT_MARK)[1:]:
+            commit, _, under = block.partition("\n")
+            # Under a commit, in this order: a line for each file changed
+            # (":100644 100644 <blob> <blob> M\t<path>"), the line that
+            # counts the changes (" 3 files changed, ..."), and a line for
+            # each file created, deleted or renamed (" create mode 100644
+            # <path>"). The first kind starts with a colon, the two others
+            # with a space, whatever the paths are.
+            count_at = under.find("\n ")
+            if count_at < 0:
+                # nothing changed, or a merge shown without a diff
+                found[commit] = ""
+                raw = under
+            else:
+                summary_at = under.find("\n", count_at + 1)
+                # the text is that of the commands, which print the count alone
+                found[commit] = under[count_at : summary_at + 1]
+                if summary_at + 1 < len(under):
+                    # a renamed file is neither created nor deleted; a copied one is new
+                    change = (
+                        under.count("\n create mode ", summary_at)
+                        + under.count("\n copy ", summary_at)
+                        - under.count("\n delete mode ", summary_at)
+                    )
+                    if change:
+                        files[commit] = change
+                raw = under[:count_at]
+            if with_names:
+                # the name is what follows the last tab: for a renamed file,
+                # the new name, which comes after the old one
+                changed[commit] = "".join(
+                    [
+                        "\n" + line.rpartition("\t")[2]
+                        for line in raw.split("\n")
+                        if line.startswith(":")
+                    ]
                 )
-                if change:
-                    files[commit] = change
-                # the text is that of the commands, which print no such lines
-                found[commit] = _SUMMARY_LINE.sub("", under)
-        return found, files
+        return found, files, changed
 
     with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="git-shortstat") as pool:
-        walks = list(pool.map(listing, [walk for walk, _ in passes]))
+        walks = list(
+            pool.map(
+                listing,
+                # the walk of `git log` for the names comes last
+                [walk for walk, _ in passes] + ([""] if names is not None else []),
+                ["%at %aN"] * len(passes) + ([names] if names is not None else []),
+            )
+        )
+        named_walk = walks.pop() if names is not None else None
 
         # Every commit once: a merge of a first-parent walk with its first
         # parent, any other commit the plain way, which is the same in every
@@ -632,6 +681,9 @@ def shortstat_logs(
                 )
             else:
                 plain_commits.update((row[0], None) for row in rows)
+        if named_walk is not None:
+            # those no walk has the lines counted of are asked for their names
+            plain_commits.update((row[0], None) for row in named_walk)
         size = SHORTSTAT_COMMITS_PER_PROCESS
         jobs = [
             (commits[start : start + size], first_parent)
@@ -650,17 +702,19 @@ def shortstat_logs(
         ]
         plain: dict[str, str] = {}
         merges: dict[str, str] = {}
+        changed: dict[str, str] = {}
         added: dict[str, int] = dict.fromkeys(one_parent, 0)
         added.update(dict.fromkeys(merge_commits, 0))
         timer = threading.Thread(target=allow_more, name="git-shortstat-more", daemon=True)
         timer.start()
         try:
-            for (_, first_parent), (found, files) in zip(jobs, pool.map(counts, jobs)):
+            for (_, first_parent), (found, files, their_names) in zip(jobs, pool.map(counts, jobs)):
                 if first_parent:
                     merges.update(found)
                     added.update(files)
                 else:
                     plain.update(found)
+                    changed.update(their_names)
                     # not the merges, which the plain count shows nothing of, nor
                     # the commits without parents
                     added.update(
@@ -675,16 +729,19 @@ def shortstat_logs(
             timer.join()
 
     texts = []
-    for (_, first_parent), rows in zip(passes, walks):
-        # in a first-parent walk the merges have the counts made that way
-        under = {**plain, **merges} if first_parent and merges else plain
-        try:
+    names_text = None
+    try:
+        for (_, first_parent), rows in zip(passes, walks):
+            # in a first-parent walk the merges have the counts made that way
+            under = {**plain, **merges} if first_parent and merges else plain
             texts.append("\n".join([header + under[commit] for commit, _, header in rows]))
-        except KeyError as missing:
-            raise subprocess.CalledProcessError(
-                1, ["git", "log", "--shortstat", "--no-walk"], f"nothing printed for {missing}"
-            ) from None
-    return texts, added
+        if named_walk is not None:
+            names_text = "\n".join([header + changed[commit] for commit, _, header in named_walk])
+    except KeyError as missing:
+        raise subprocess.CalledProcessError(
+            1, ["git", "log", "--shortstat", "--no-walk"], f"nothing printed for {missing}"
+        ) from None
+    return texts, added, names_text
 
 
 # "<commit>\t<tree>\t<parents>\t<stamp> <author>", a commit of the history

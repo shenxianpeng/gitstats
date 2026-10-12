@@ -275,30 +275,30 @@ class GitDataCollector(DataCollector):
         )
 
         # Three phases read a `git log` of the whole history, two of them with
-        # the line counts of every diff: what is left of a run is mostly git
-        # working those out. None of the three depends on the phases before
-        # it, so git starts on them now and each phase parses its output when
-        # its turn comes. The line counts are asked for once per commit and
-        # from several git processes at a time (shortstat_logs()): one fewer
-        # than `processes`, and than the machine has processors, so that the
-        # phases below, which the run cannot go faster than, keep one to
-        # themselves. Threads are enough here: they only wait for git. With
+        # the line counts of every diff and the third with the names of the
+        # files it changes: what is left of a run is mostly git working those
+        # out. None of the three depends on the phases before it, so git
+        # starts on them now and each phase parses its text when its turn
+        # comes. A commit is compared with its parent once, for the three of
+        # them, and from several git processes at a time (shortstat_logs()):
+        # one fewer than `processes`, and than the machine has processors, so
+        # that the phases below, which the run cannot go faster than, keep one
+        # to themselves. A thread is enough here: it only waits for git. With
         # `processes = 1` the phases run their commands themselves, one after
         # the other.
         processes = min(int(conf["processes"]), os.cpu_count() or 1)
-        churn: Future[str] | None = None
-        line_stats: Future[tuple[list[str], dict[str, int]]] | None = None
+        line_stats: Future[tuple[list[str], dict[str, int], str | None]] | None = None
         # set when the phases have nothing left to do but wait for the line counts
         waiting = threading.Event()
-        with ThreadPoolExecutor(max_workers=2, thread_name_prefix="git-log") as pool:
+        with ThreadPoolExecutor(max_workers=1, thread_name_prefix="git-log") as pool:
             if processes > 1:
-                churn = pool.submit(get_pipe_output, [self._churn_command()])
                 line_stats = pool.submit(
                     shortstat_logs,
                     self._line_stat_passes(),
                     get_log_range("HEAD", False),
                     processes - 1,
                     waiting,
+                    self.CHURN_FORMAT,
                 )
 
             # The history that leads to the end of the range, read once and
@@ -312,19 +312,20 @@ class GitDataCollector(DataCollector):
                 return read[0]
 
             # What the line counts give when they are in: the text of each of
-            # the two walks, and the files each commit adds. None leaves a
-            # phase to ask git itself.
-            counted: list[tuple[list[str | None], dict[str, int] | None]] = []
+            # the two walks, the files each commit adds, and the text with
+            # the names of the files each commit changes. None leaves a phase
+            # to ask git itself.
+            counted: list[tuple[list[str | None], dict[str, int] | None, str | None]] = []
 
-            def line_counts() -> tuple[list[str | None], dict[str, int] | None]:
+            def line_counts() -> tuple[list[str | None], dict[str, int] | None, str | None]:
                 if not counted:
-                    counted.append(([None, None], None))
+                    counted.append(([None, None], None, None))
                     if line_stats is not None:
                         # no processor needs sparing for the phases any more
                         waiting.set()
                         try:
-                            texts, added = line_stats.result()
-                            counted[0] = (list(texts), added)
+                            texts, added, names = line_stats.result()
+                            counted[0] = (list(texts), added, names)
                         except (OSError, subprocess.CalledProcessError) as error:
                             logger.debug(
                                 f"Could not spread the line counts over git processes: {error}"
@@ -339,14 +340,12 @@ class GitDataCollector(DataCollector):
             # files each commit adds
             self._collect_files_by_stamp(history, lambda: line_counts()[1])
 
-            outputs = line_counts()[0]
+            outputs, _, names = line_counts()
             self._collect_line_stats(outputs[0])
             outputs[0] = None  # let go of the text once its phase has read it
             self._collect_per_author_line_stats(name_to_canonical, outputs[1])
             outputs[1] = None
-            self._collect_file_churn_and_ownership(
-                name_to_canonical, churn.result() if churn is not None else None
-            )
+            self._collect_file_churn_and_ownership(name_to_canonical, names)
         if conf["ai_enabled"]:
             self._collect_commit_subjects()
 
@@ -860,10 +859,15 @@ class GitDataCollector(DataCollector):
             walk, get_log_range("HEAD", False)
         )
 
-    @staticmethod
-    def _churn_command() -> str:
+    # the line that starts a commit in what _collect_file_churn_and_ownership() reads
+    CHURN_FORMAT = "COMMIT:%aN"
+
+    @classmethod
+    def _churn_command(cls) -> str:
         """The `git log` that _collect_file_churn_and_ownership() reads."""
-        return 'git log --format="COMMIT:%aN" --name-only {}'.format(get_log_range("HEAD", False))
+        return 'git log --format="{}" --name-only {}'.format(
+            cls.CHURN_FORMAT, get_log_range("HEAD", False)
+        )
 
     def _collect_line_stats(self, output: str | None = None) -> None:
         """Record lines added/removed over time (``changes_by_date``).
@@ -1026,7 +1030,8 @@ class GitDataCollector(DataCollector):
         prefixed with a ``COMMIT:<author>`` marker line; the lines that follow
         are the file paths changed by that commit. Authors are resolved to their
         canonical identity so aliases merge here directly. ``output`` is that of
-        _churn_command() when collect() has already run it.
+        _churn_command() when collect() has it already, from the diffs that
+        count the lines (see shortstat_logs()).
         """
         if output is None:
             output = get_pipe_output([self._churn_command()])
