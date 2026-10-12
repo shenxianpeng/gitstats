@@ -15,7 +15,7 @@ import time
 from collections.abc import Iterable, Iterator
 from concurrent.futures import ThreadPoolExecutor
 from importlib.metadata import PackageNotFoundError, version
-from typing import Any
+from typing import Any, NamedTuple
 
 from gitstats import ON_LINUX, exectime_external, load_config
 
@@ -208,6 +208,21 @@ def get_num_of_files_from_rev(time_rev: tuple[str, str]) -> tuple[int, str, int]
     )
 
 
+class History(NamedTuple):
+    """The commits leading to a revision, as history_graph() reads them.
+
+    A commit is known by its place in the lists. It comes before its parents,
+    so a smaller place is never an ancestor of a larger one.
+    """
+
+    place: dict[str, int]  # commit hash -> its place
+    commits: list[str]  # the hash of each commit
+    trees: list[str]  # the hash of its tree
+    parents: list[list[int]]  # the places of its parents, those git has
+    first_parents: list[int]  # the place of its first parent, -1 without one
+    headers: list[str]  # "<author timestamp> <author name>"
+
+
 def _git_lines(args: list[str], stdin: Any = None) -> Iterator[bytes]:
     """Run a git command and yield its output line by line, without the newline.
 
@@ -228,8 +243,13 @@ def _git_lines(args: list[str], stdin: Any = None) -> Iterator[bytes]:
         raise subprocess.CalledProcessError(process.returncode, ["git", *args])
 
 
-def count_files_in_trees(rev: str, wanted: set[str], known: dict[str, int]) -> dict[str, int]:
-    """Count the files in the trees of the commits leading to ``rev``.
+def count_files_in_trees(
+    history: History,
+    wanted: set[str],
+    known: dict[str, int],
+    added: dict[str, int] | None = None,
+) -> dict[str, int]:
+    """Count the files in the trees of the commits of ``history``.
 
     ``wanted`` are the trees (hashes, as ``%T`` prints them) whose counts are
     needed; ``known`` maps the trees already counted to their counts. Returns
@@ -239,88 +259,101 @@ def count_files_in_trees(rev: str, wanted: set[str], known: dict[str, int]) -> d
     ``git ls-tree -r`` on every commit lists every file of every commit: a
     process per commit, and work that grows with commits x files. Here a
     commit's count is its first parent's, plus the files it added, minus the
-    ones it deleted, and a single ``git diff-tree --stdin`` reports those for
-    the whole history. A commit whose first parent's tree is in ``known``
-    starts from there, so with a cache only the new commits are compared.
+    ones it deleted. A commit whose first parent's tree is in ``known``
+    starts from there, so with a cache only the new commits are looked at.
 
-    A tree that is not found among the commits leading to ``rev`` is left
-    out of the result, as is everything if git fails: the caller counts
-    those with get_num_of_files_from_rev().
+    ``added`` gives that difference for the commits it has: commit hash ->
+    files added less files deleted, against its first parent
+    (shortstat_logs() reads it off the diffs it has git make for the line
+    counts). The other commits are compared with their first parent by a
+    single ``git diff-tree --stdin``; without ``added`` that is all of them.
+
+    A tree that is not found in the history is left out of the result, as is
+    everything if git fails: the caller counts those with
+    get_num_of_files_from_rev().
     """
     try:
-        return _count_files_in_trees(rev, wanted, known)
+        return _count_files_in_trees(history, wanted, known, added or {})
     except (OSError, subprocess.CalledProcessError) as error:
         # half a listing would give wrong counts, not missing ones
         logger.debug(f"Could not count files from the commits' differences: {error}")
         return {}
 
 
-def _count_files_in_trees(rev: str, wanted: set[str], known: dict[str, int]) -> dict[str, int]:
+def _count_files_in_trees(
+    history: History, wanted: set[str], known: dict[str, int], added: dict[str, int]
+) -> dict[str, int]:
     """count_files_in_trees(), with git's failures left to the caller."""
-    # ancestors before descendants: [commit, tree, first parent or None]
-    commits: list[tuple[str, str, str | None]] = []
-    tree_of: dict[str, str] = {}
-    for line in _git_lines(["log", "--topo-order", "--reverse", "--format=%H %T %P", rev]):
-        parts = line.decode("ascii", errors="replace").split(" ")
-        if len(parts) < 2:
-            continue
-        commit, tree = parts[0], parts[1]
-        commits.append((commit, tree, parts[2] if len(parts) > 2 and parts[2] else None))
-        tree_of[commit] = tree
+    commits, trees, first_parents = history.commits, history.trees, history.first_parents
 
-    # The commits to compare with their first parent: the wanted ones, and the
-    # ancestors a count has to be carried up from
-    needed: set[str] = set()
-    for commit, tree, parent in reversed(commits):
-        if commit not in needed:
+    # The commits whose difference with their first parent is needed: the
+    # wanted ones, and the ancestors a count has to be carried up from.
+    # Descendants come first, so a commit is marked before it is reached.
+    needed = bytearray(len(commits))
+    for commit, tree in enumerate(trees):
+        if not needed[commit]:
             if tree not in wanted or tree in known:
                 continue
-            needed.add(commit)
-        if parent is not None and tree_of.get(parent) not in known:
-            needed.add(parent)
-    if not needed:
-        return {}
+            needed[commit] = 1
+        parent = first_parents[commit]
+        if parent >= 0 and trees[parent] not in known:
+            needed[parent] = 1
 
-    delta: dict[str, int] = {}
+    # That difference, from the counts already made, or else from git
+    delta: dict[int, int] = {}
+    place = history.place
     with tempfile.TemporaryFile("w+") as pairs:
-        for commit, _, parent in commits:
-            if commit in needed:
-                # a commit without a parent we know of is compared with nothing (--root)
-                pairs.write(f"{commit} {parent}\n" if parent in tree_of else f"{commit}\n")
-        pairs.seek(0)
-        current = ""
-        for line in _git_lines(
-            [
-                "diff-tree",
-                "--stdin",
-                "-r",
-                "--root",
-                "--no-renames",
-                "--diff-filter=AD",
-                "--name-status",
-            ],
-            stdin=pairs,
-        ):
-            if line[:2] == b"A\t":
-                delta[current] = delta.get(current, 0) + 1
-            elif line[:2] == b"D\t":
-                delta[current] = delta.get(current, 0) - 1
-            else:
-                # the commit the following lines are about
-                current = line.split(b" ", 1)[0].decode("ascii", errors="replace")
+        asked = False
+        for commit in range(len(commits)):
+            if not needed[commit]:
+                continue
+            difference = added.get(commits[commit])
+            if difference is not None:
+                delta[commit] = difference
+                continue
+            parent = first_parents[commit]
+            # a commit without a parent we know of is compared with nothing (--root)
+            pairs.write(
+                f"{commits[commit]} {commits[parent]}\n" if parent >= 0 else f"{commits[commit]}\n"
+            )
+            asked = True
+        if asked:
+            pairs.seek(0)
+            current = -1
+            for line in _git_lines(
+                [
+                    "diff-tree",
+                    "--stdin",
+                    "-r",
+                    "--root",
+                    "--no-renames",
+                    "--diff-filter=AD",
+                    "--name-status",
+                ],
+                stdin=pairs,
+            ):
+                if line[:2] == b"A\t":
+                    delta[current] = delta.get(current, 0) + 1
+                elif line[:2] == b"D\t":
+                    delta[current] = delta.get(current, 0) - 1
+                else:
+                    # the commit the following lines are about
+                    current = place[line.split(b" ", 1)[0].decode("ascii", errors="replace")]
 
     counts: dict[str, int] = {}
-    of_commit: dict[str, int] = {}
-    for commit, tree, parent in commits:
-        if commit not in needed:
+    of_commit: dict[int, int] = {}
+    # ancestors first, so that a parent is counted before its children
+    for commit in range(len(commits) - 1, -1, -1):
+        if not needed[commit]:
             continue
-        if parent not in tree_of:
+        parent = first_parents[commit]
+        if parent < 0:
             base = 0
-        elif parent in of_commit:
+        elif needed[parent]:
             base = of_commit[parent]
         else:
-            base = known[tree_of[parent]]
-        of_commit[commit] = counts[tree] = base + delta.get(commit, 0)
+            base = known[trees[parent]]
+        of_commit[commit] = counts[trees[commit]] = base + delta.get(commit, 0)
     return counts
 
 
@@ -389,7 +422,7 @@ SHORTSTAT_COMMITS_PER_PROCESS = 1000
 # the processes take SHORTSTAT_SLOW_SECONDS over their commits on average, all
 # those asked for are allowed. (At that rate two processes would still be
 # counting when the other phases, which cost about half as much per commit,
-# are done.)
+# are done.) They are all allowed, too, when the run says it is waiting.
 SHORTSTAT_PROCESSES_AT_FIRST = 2
 SHORTSTAT_SECONDS_PER_PROCESS = 3.0
 SHORTSTAT_SLOW_SECONDS = 0.35
@@ -398,6 +431,10 @@ SHORTSTAT_SLOW_SECONDS = 0.35
 _LOG_ROW = re.compile(r"^([0-9a-f]+)\t([0-9a-f ]*)\t(.*)$", re.MULTILINE)
 # a line that is a commit's hash and nothing else
 _COMMIT_LINE = re.compile(r"^([0-9a-f]{40}|[0-9a-f]{64})$", re.MULTILINE)
+# a line of `git log --summary`: " create mode 100644 <path>", " delete mode ...",
+# " rename ...", " copy ...", " mode change ...". The line that counts the
+# changes, " 3 files changed, ...", starts with a number.
+_SUMMARY_LINE = re.compile(r"^ [a-z][^\n]*\n", re.MULTILINE)
 
 
 def _git_text(args: list[str], data: str | None = None, env: dict[str, str] | None = None) -> str:
@@ -428,16 +465,29 @@ def _git_text(args: list[str], data: str | None = None, env: dict[str, str] | No
     return result.stdout.decode("utf-8", errors="replace")
 
 
-def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int) -> list[str]:
+def shortstat_logs(
+    passes: list[tuple[str, bool]],
+    log_range: str,
+    workers: int,
+    waiting: threading.Event | None = None,
+) -> tuple[list[str], dict[str, int]]:
     """Write what `git log --shortstat` prints for several walks of one history.
 
     Each of ``passes`` is ``(walk, first_parent)``: ``walk`` holds the options
     that pick and order its commits (``--first-parent``, ``--date-order``),
     and ``first_parent`` says whether a merge is compared with its first
-    parent (``-m --first-parent``) or shown without a count. The text
-    returned for a pass is, blank lines aside, the output of::
+    parent (``--first-parent -m``) or shown without a count. The text
+    written for a pass is, blank lines aside, the output of::
 
         git log --shortstat <walk> [-m] --pretty=format:"%at %aN" <log_range>
+
+    Returns the texts, and with them what the same diffs say of the files of
+    each commit: commit hash -> files it adds, less files it deletes, against
+    its first parent (``--summary``). That is given for the commits with one
+    parent, and for the merges compared with their first parent; a commit
+    without parents is left out, as git may or may not show what it adds.
+    count_files_in_trees() takes it, and has nothing left to ask git about
+    for most commits.
 
     Counting the lines of every diff is what those commands spend their time
     on, each in one process, and the walks mostly cover the same commits.
@@ -448,7 +498,9 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
     SHORTSTAT_COMMITS_PER_PROCESS commits when it is done with the last.
     They are SHORTSTAT_PROCESSES_AT_FIRST to begin with and one more every
     SHORTSTAT_SECONDS_PER_PROCESS seconds, or all of them once they take
-    SHORTSTAT_SLOW_SECONDS over their commits on average.
+    SHORTSTAT_SLOW_SECONDS over their commits on average. They are held back
+    to leave processors to what the caller does meanwhile: when it sets
+    ``waiting``, it has nothing left to do but wait, and they are all allowed.
 
     The outputs are cut and joined whole, with as little work per commit in
     Python as can be: the caller is parsing other output meanwhile, and the
@@ -491,11 +543,24 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
             allowed.release()
 
     def allow_more() -> None:
-        while held_back[0] and not counted.wait(SHORTSTAT_SECONDS_PER_PROCESS):
-            allow(1)
+        """One more process when it is due; all of them once the caller waits."""
+        due = time.monotonic() + SHORTSTAT_SECONDS_PER_PROCESS
+        while held_back[0]:
+            if waiting is not None and waiting.is_set():
+                allow(workers)
+                return
+            # with a caller to listen for, a short nap; without, until the next is due
+            nap = 0.05 if waiting is not None else due - time.monotonic()
+            if counted.wait(max(nap, 0)):
+                return
+            if time.monotonic() >= due:
+                allow(1)
+                due += SHORTSTAT_SECONDS_PER_PROCESS
 
-    def counts(job: tuple[list[str], bool]) -> dict[str, str]:
-        """commit -> what git prints under it, for one process's share of the commits."""
+    def counts(job: tuple[list[str], bool]) -> tuple[dict[str, str], dict[str, int]]:
+        """For one process's share of the commits: commit -> the count git
+        prints under it, and commit -> the files it adds less those it
+        deletes, where that is not nothing."""
         commits, first_parent = job
         with allowed:
             began = time.monotonic()
@@ -503,7 +568,9 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
                 [
                     "log",
                     "--shortstat",
-                    *(["-m", "--first-parent"] if first_parent else []),
+                    # the files created and deleted, from the same diff
+                    "--summary",
+                    *(["--first-parent", "-m"] if first_parent else []),
                     "--no-walk",
                     # from its input: a thousand hashes are more than a
                     # command line holds on Windows
@@ -525,7 +592,21 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
                 allow(workers)
         # [what comes before the first commit, commit, what is under it, commit, ...]
         parts = _COMMIT_LINE.split(text)
-        return dict(zip(parts[1::2], parts[2::2]))
+        found = dict(zip(parts[1::2], parts[2::2]))
+        files: dict[str, int] = {}
+        for commit, under in found.items():
+            if _SUMMARY_LINE.search(under):
+                # a renamed file is neither created nor deleted; a copied one is new
+                change = (
+                    under.count("\n create mode ")
+                    + under.count("\n copy ")
+                    - under.count("\n delete mode ")
+                )
+                if change:
+                    files[commit] = change
+                # the text is that of the commands, which print no such lines
+                found[commit] = _SUMMARY_LINE.sub("", under)
+        return found, files
 
     with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="git-shortstat") as pool:
         walks = list(pool.map(listing, [walk for walk, _ in passes]))
@@ -536,7 +617,12 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
         # one process are neighbors in the history.
         plain_commits: dict[str, None] = {}
         merge_commits: dict[str, None] = {}
+        # the commits with one parent: what they add is read off the plain count
+        one_parent: set[str] = set()
         for (_, first_parent), rows in zip(passes, walks):
+            one_parent.update(
+                commit for commit, parents, _ in rows if parents and " " not in parents
+            )
             if first_parent:
                 merge_commits.update(
                     (commit, None) for commit, parents, _ in rows if " " in parents
@@ -564,11 +650,22 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
         ]
         plain: dict[str, str] = {}
         merges: dict[str, str] = {}
+        added: dict[str, int] = dict.fromkeys(one_parent, 0)
+        added.update(dict.fromkeys(merge_commits, 0))
         timer = threading.Thread(target=allow_more, name="git-shortstat-more", daemon=True)
         timer.start()
         try:
-            for (_, first_parent), found in zip(jobs, pool.map(counts, jobs)):
-                (merges if first_parent else plain).update(found)
+            for (_, first_parent), (found, files) in zip(jobs, pool.map(counts, jobs)):
+                if first_parent:
+                    merges.update(found)
+                    added.update(files)
+                else:
+                    plain.update(found)
+                    # not the merges, which the plain count shows nothing of, nor
+                    # the commits without parents
+                    added.update(
+                        (commit, change) for commit, change in files.items() if commit in one_parent
+                    )
         except BaseException:
             # git failed for some commits: the others need not be counted
             pool.shutdown(cancel_futures=True)
@@ -587,27 +684,35 @@ def shortstat_logs(passes: list[tuple[str, bool]], log_range: str, workers: int)
             raise subprocess.CalledProcessError(
                 1, ["git", "log", "--shortstat", "--no-walk"], f"nothing printed for {missing}"
             ) from None
-    return texts
+    return texts, added
 
 
-def history_graph(rev: str) -> tuple[dict[str, int], list[list[int]], list[str]]:
+# "<commit>\t<tree>\t<parents>\t<stamp> <author>", a commit of the history
+_HISTORY_ROW = re.compile(r"^([0-9a-f]+)\t([0-9a-f]+)\t([0-9a-f ]*)\t(.*)$", re.MULTILINE)
+
+
+def history_graph(rev: str) -> History:
     """Read the commits leading to ``rev``, with what joins them, in one `git log`.
 
-    Returns ``(place, parents, headers)``:
-        place:   commit hash -> its place in the two lists. A commit comes
-                 before its parents (``--topo-order``), so a smaller place is
-                 never an ancestor of a larger one;
-        parents: for each commit, the places of its parents (a parent git
-                 does not have, as at the edge of a shallow clone, is left out);
-        headers: for each commit, "<author timestamp> <author name>", as
-                 ``git log --format="%at %aN"`` prints it.
+    The tags and the number of files of each commit are both worked out from
+    it, where each used to walk the history again, or to ask git about every
+    commit. A parent git does not have, as at the edge of a shallow clone, is
+    left out; the header of a commit is what ``git log --format="%at %aN"``
+    prints for it.
     """
-    rows = _LOG_ROW.findall(
-        get_pipe_output([f'git log --topo-order --format="%H%x09%P%x09%at %aN" "{rev}"'])
+    rows = _HISTORY_ROW.findall(
+        get_pipe_output([f'git log --topo-order --format="%H%x09%T%x09%P%x09%at %aN" "{rev}"'])
     )
     place = {row[0]: index for index, row in enumerate(rows)}
-    parents = [[place[parent] for parent in row[1].split() if parent in place] for row in rows]
-    return place, parents, [row[2] for row in rows]
+    named = [row[2].split() for row in rows]
+    return History(
+        place=place,
+        commits=[row[0] for row in rows],
+        trees=[row[1] for row in rows],
+        parents=[[place[parent] for parent in hashes if parent in place] for hashes in named],
+        first_parents=[place.get(hashes[0], -1) if hashes else -1 for hashes in named],
+        headers=[row[3] for row in rows],
+    )
 
 
 def commits_reached(parents: list[list[int]], tip: int, base: int | None = None) -> list[int]:
