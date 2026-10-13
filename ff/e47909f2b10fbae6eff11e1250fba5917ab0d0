@@ -1,0 +1,29 @@
+.github/workflows/gallery.yml
+  s_f7be7338a47928::t_1a647d108b4c03 29,36,51,62,66,80
+.github/workflows/release-drafter.yml
+  s_f7be7338a47928::t_1a647d108b4c03 14
+.github/workflows/docs-preview.yml
+  s_f7be7338a47928::t_1a647d108b4c03 20
+.github/workflows/test.yml
+  s_f7be7338a47928::t_1a647d108b4c03 27,33,66,75,80
+.github/workflows/publish-pypi.yml
+  s_f7be7338a47928::t_1a647d108b4c03 26,32
+.github/workflows/pages.yml
+  s_f7be7338a47928::t_1a647d108b4c03 17,23,39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ffe47909f2b10fbae6eff11e1250fba5917ab0d0",
+  "prompts": {},
+  "sessions": {
+    "s_f7be7338a47928": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b41fad1c-3178-484f-83cd-bad405dbb5d4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
