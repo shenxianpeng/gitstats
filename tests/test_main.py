@@ -786,6 +786,7 @@ class TestCollectPhases:
         dc._collect_line_stats = spy("lines")
         dc._collect_per_author_line_stats = spy("author_lines")
         dc._collect_file_churn_and_ownership = spy("churn")
+        dc._collect_ai_assisted = spy("assisted")
 
         prevdir = os.getcwd()
         try:
@@ -803,13 +804,14 @@ class TestCollectPhases:
             "lines",
             "author_lines",
             "churn",
+            "assisted",
         ]
 
     @staticmethod
     def _collect_recording(git_repo, processes, cpus=8, shortstat_logs=None):
         """Run collect() on a machine of ``cpus`` processors; return the data,
         the git commands that ran through get_pipe_output() and what each of
-        the three history phases was handed as output."""
+        the phases that read the whole history was handed."""
         import gitstats.main as main_mod
 
         _use_config(processes=processes)
@@ -826,6 +828,7 @@ class TestCollectPhases:
             ("_collect_line_stats", 0),
             ("_collect_per_author_line_stats", 1),
             ("_collect_file_churn_and_ownership", 1),
+            ("_collect_ai_assisted", 0),
         ):
 
             def spy(*args, _phase=phase, _position=position, _original=getattr(dc, phase)):
@@ -893,6 +896,8 @@ class TestCollectPhases:
         assert "files changed" in handed["_collect_line_stats"]
         assert handed["_collect_file_churn_and_ownership"].startswith("COMMIT:")
         assert "\nutils.py\n" in handed["_collect_file_churn_and_ownership"]
+        # the messages were read beside the rest: no commit of this history names an assistant
+        assert handed["_collect_ai_assisted"] == []
 
     @pytest.mark.parametrize("processes, cpus, workers", [(8, 4, 3), (3, 16, 2), (2, 2, 1)])
     def test_collect_asks_for_no_more_processes_than_the_machine_has(
@@ -913,6 +918,7 @@ class TestCollectPhases:
             "_collect_line_stats": None,
             "_collect_per_author_line_stats": None,
             "_collect_file_churn_and_ownership": None,
+            "_collect_ai_assisted": None,
         }
         assert side_by_side == in_turn
         # in turn, the three passes are the three last commands, in the order of their phases
@@ -937,11 +943,108 @@ class TestCollectPhases:
             "_collect_line_stats": None,
             "_collect_per_author_line_stats": None,
             "_collect_file_churn_and_ownership": None,
+            # read by one `git log` of its own, which did not fail
+            "_collect_ai_assisted": [],
         }
         assert ran.count(dc._line_stats_command()) == 1
         assert ran.count(dc._author_line_stats_command()) == 1
         assert ran.count(dc._churn_command()) == 1
         assert fallen_back == side_by_side
+
+    # ── commits that name an AI coding assistant ────────────────────────
+
+    @staticmethod
+    def _commit_as(repo, name, email, date, *paragraphs):
+        subprocess.run(
+            [
+                "git", "commit", "-q", "--allow-empty",
+                *(arg for paragraph in paragraphs for arg in ("-m", paragraph)),
+            ],
+            cwd=repo,
+            check=True,
+            capture_output=True,
+            env={
+                **os.environ,
+                "LC_ALL": "C",
+                "GIT_AUTHOR_NAME": name,
+                "GIT_AUTHOR_EMAIL": email,
+                "GIT_COMMITTER_NAME": name,
+                "GIT_COMMITTER_EMAIL": email,
+                "GIT_AUTHOR_DATE": date,
+                "GIT_COMMITTER_DATE": date,
+            },
+        )  # fmt: skip
+
+    def test_ai_assisted_commits_by_month_and_by_assistant(self):
+        from gitstats.assistants import AssistedCommit
+
+        def stamp(month, day):
+            return int(datetime.datetime(2025, month, day, 12).timestamp())
+
+        dc = GitDataCollector()
+        dc._collect_ai_assisted(
+            [
+                AssistedCommit(stamp(6, 10), ["GitHub Copilot"], False),
+                # an assistant made it, and names another: counted under both, once in all
+                AssistedCommit(stamp(3, 20), ["GitHub Copilot", "Claude"], True),
+                AssistedCommit(stamp(3, 10), ["Claude"], False),
+            ]
+        )
+        assert dc.ai_assisted_commits == 3
+        assert dc.ai_assisted_authored == 1
+        assert dc.ai_assisted_by_month == {"2025-06": 1, "2025-03": 2}
+        assert dc.ai_assistants == {
+            "GitHub Copilot": {
+                "commits": 2,
+                "authored": 1,
+                "first_commit_stamp": stamp(3, 20),
+                "last_commit_stamp": stamp(6, 10),
+            },
+            "Claude": {
+                "commits": 2,
+                # named by the commit Copilot made, which is Copilot's
+                "authored": 0,
+                "first_commit_stamp": stamp(3, 10),
+                "last_commit_stamp": stamp(3, 20),
+            },
+        }
+
+    @pytest.mark.parametrize("processes", [8, 1])
+    def test_collect_counts_the_commits_that_name_an_assistant(self, git_repo, processes):
+        self._commit_as(
+            git_repo, "Alice Smith", "alice@example.com", "2023-06-01T10:00:00",
+            "Parse the header",
+            "Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>",
+        )  # fmt: skip
+        self._commit_as(
+            git_repo, "copilot-swe-agent[bot]", "198982749+Copilot@users.noreply.github.com",
+            "2023-07-01T10:00:00", "Initial plan",
+        )  # fmt: skip
+        import gitstats.assistants as assistants
+
+        with patch.object(
+            assistants, "get_pipe_output", side_effect=assistants.get_pipe_output
+        ) as read:
+            data, _, _, dc, _ = self._collect_recording(git_repo, processes)
+
+        assert data["ai_assisted_commits"] == 2
+        assert data["ai_assisted_authored"] == 1
+        assert data["ai_assisted_by_month"] == {"2023-07": 1, "2023-06": 1}
+        assert {name: info["commits"] for name, info in data["ai_assistants"].items()} == {
+            "GitHub Copilot": 1,
+            "Claude": 1,
+        }
+        # one reading of the messages, whether ahead of the phases or in its turn
+        read.assert_called_once()
+        assert "%B" in read.call_args.args[0][0]
+        assert dc.get_total_commits() == 7
+
+    def test_collect_of_a_history_that_names_no_assistant(self, git_repo):
+        data, _, _, _, _ = self._collect_recording(git_repo, processes=8)
+        assert data["ai_assisted_commits"] == 0
+        assert data["ai_assisted_authored"] == 0
+        assert data["ai_assisted_by_month"] == {}
+        assert data["ai_assistants"] == {}
 
     def test_line_stat_passes_follow_linear_linestats(self):
         assert GitDataCollector._line_stat_passes() == [
