@@ -30,9 +30,12 @@ from gitstats.report_creator import (
     html_linkify,
     longest_zero_run,
     month_range,
+    months_back,
     parse_chronicle,
     quiet_months,
+    share_text,
     stat_tiles_html,
+    sum_since,
     tags_newest_first,
     year_span,
 )
@@ -3343,3 +3346,207 @@ def test_gap_annotations_skip_an_empty_side():
     # the gap opens the series: only the bar after it gets a peak label
     annotations = gap_annotations(["2019", "2020", "2021", "2022"], [0, 0, 0, 5], min_gap=2)
     assert [peak["index"] for peak in annotations["peaks"]] == [3]
+
+
+# ── AI-assisted commits (Authors page) ───────────────────────────────────
+
+
+def _stamp(year, month, day):
+    return int(datetime.datetime(year, month, day, 12).timestamp())
+
+
+def _with_assistants(data):
+    """Three years of commits, 60 in all; from 2025 on some name an assistant."""
+    data.get_total_commits.return_value = 60
+    data.commits_by_month = {
+        "2023-05": 20,
+        "2025-02": 10,
+        "2025-03": 8,
+        "2025-11": 12,
+        "2026-01": 10,
+    }
+    data.ai_assisted_commits = 9
+    data.ai_assisted_authored = 2
+    data.ai_assisted_by_month = {"2025-03": 4, "2025-11": 3, "2026-01": 2}
+    data.ai_assistants = {
+        "Claude": {
+            "commits": 3,
+            "authored": 0,
+            "first_commit_stamp": _stamp(2025, 11, 2),
+            "last_commit_stamp": _stamp(2026, 1, 20),
+        },
+        "GitHub Copilot": {
+            "commits": 7,
+            "authored": 2,
+            "first_commit_stamp": _stamp(2025, 3, 5),
+            "last_commit_stamp": _stamp(2026, 1, 9),
+        },
+    }
+    return data
+
+
+def test_authors_summary_says_how_many_commits_name_an_assistant(mock_data_collector):
+    summary = HTMLReportCreator()._authors_summary_html(_with_assistants(mock_data_collector))
+    assert (
+        '<dt>AI-assisted Commits</dt><dd class="stat-value">15.0%</dd>'
+        '<dd class="stat-note">at least 9 commits</dd>'
+    ) in summary
+
+    mock_data_collector.ai_assisted_commits = 1
+    summary = HTMLReportCreator()._authors_summary_html(mock_data_collector)
+    assert '<dd class="stat-value">1.7%</dd><dd class="stat-note">at least 1 commit</dd>' in summary
+
+
+def test_authors_summary_when_no_commit_names_an_assistant(mock_data_collector):
+    # data collected before these were counted has no such number at all
+    summary = HTMLReportCreator()._authors_summary_html(mock_data_collector)
+    tile = (
+        '<dt>AI-assisted Commits</dt><dd class="stat-value">0</dd>'
+        '<dd class="stat-note">no commit names an assistant</dd>'
+    )
+    assert tile in summary
+    mock_data_collector.ai_assisted_commits = 0
+    assert tile in HTMLReportCreator()._authors_summary_html(mock_data_collector)
+
+
+def test_ai_assisted_section_is_left_out_without_any(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    assert creator._ai_assisted_html(mock_data_collector) == ""
+    mock_data_collector.ai_assisted_commits = 0
+    assert creator._ai_assisted_html(mock_data_collector) == ""
+    creator.create(mock_data_collector, temp_dir)
+    authors = _read_page(temp_dir, "authors.html")
+    assert "AI-assisted commits</a></h2>" not in authors
+    assert "chart-ai-assisted" not in authors
+
+
+def test_ai_assisted_section(mock_data_collector):
+    section = HTMLReportCreator()._ai_assisted_html(_with_assistants(mock_data_collector))
+    assert '<h2 id="ai-assisted_commits">' in section
+    # the share of the whole history, those an assistant made itself, and the last
+    # twelve months: February 2025 to January 2026, 40 commits, all nine among them
+    assert "9 of 60 commits (15.0%) name an AI coding assistant" in section
+    assert "2 of them were made by an assistant under its own account." in section
+    assert "In the last 12 months: 9 of 40 (22.5%)." in section
+    assert "These are lower bounds." in section
+
+    # the chart starts with the twelve months, the first assisted commit being inside them
+    labels = json.loads(re.search(r"var labels = (\[.*?\]);", section).group(1))
+    assert labels == month_range(["2025-02", "2026-01"])
+    chart = section[section.index("chart-ai-assisted") :]
+    counts = json.loads(re.search(r'"data": (\[[^\]]*\])', chart).group(1))
+    assert counts == [0, 4, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2]
+    assert '"50.0% of 8 that month"' in chart
+    assert '"25.0% of 12 that month"' in chart
+
+    # the assistants, the most named first; Copilot made two of its commits itself
+    rows = re.findall(r"<tr><td>(.*?)</td><td class=\"num\">(\d+)</td>", section)
+    assert rows == [("GitHub Copilot", "7"), ("Claude", "3")]
+    assert (
+        '<td class="num">2</td><td class="nowrap">2025-03-05</td><td class="nowrap">2026-01-09</td>'
+    ) in section
+    assert '<span style="width: 42.9%">' in section
+    # 7 + 3 is more than 9: one commit names both
+    assert "A commit that names two assistants is counted under both." in section
+    assert "<summary>What is counted</summary>" in section
+
+
+def _with_one_assisted_commit(data):
+    """The fixture's six months of history, with one commit that names an assistant."""
+    data.get_total_commits.return_value = 50
+    data.ai_assisted_commits = 1
+    data.ai_assisted_authored = 0
+    data.ai_assisted_by_month = {"2023-04": 1}
+    data.ai_assistants = {
+        "Aider": {
+            "commits": 1,
+            "authored": 0,
+            "first_commit_stamp": _stamp(2023, 4, 3),
+            "last_commit_stamp": _stamp(2023, 4, 3),
+        }
+    }
+    return data
+
+
+def test_ai_assisted_section_of_a_short_history_with_one_commit(mock_data_collector):
+    data = _with_one_assisted_commit(mock_data_collector)
+    section = HTMLReportCreator()._ai_assisted_html(data)
+    assert "1 of 50 commits (2.0%) names an AI coding assistant" in section
+    # nothing an assistant made itself, and no "last 12 months" of a history of six
+    assert "under its own account" not in section
+    assert "In the last 12 months" not in section
+    assert "counted under both" not in section
+    # the chart covers the history, which is shorter than a year
+    labels = json.loads(re.search(r"var labels = (\[.*?\]);", section).group(1))
+    assert labels == month_range(data.commits_by_month)
+
+
+def test_ai_assisted_section_starts_where_the_assistants_do(mock_data_collector):
+    """Older than a year: the chart goes back to the first commit that names one,
+    and a long stretch without commits is shaded as on the other charts."""
+    data = _with_assistants(mock_data_collector)
+    data.commits_by_month = {"2022-01": 20, "2023-06": 18, "2025-11": 12, "2026-01": 10}
+    data.ai_assisted_by_month = {"2023-06": 4, "2025-11": 3, "2026-01": 2}
+    section = HTMLReportCreator()._ai_assisted_html(data)
+    labels = json.loads(re.search(r"var labels = (\[.*?\]);", section).group(1))
+    assert labels[0] == "2023-06"
+    assert labels[-1] == "2026-01"
+    assert "2022-01" not in labels
+    # the longest stretch without commits is inside it
+    assert "No commits 2023-07 \\u2013 2025-10" in section
+    assert "In the last 12 months: 5 of 22 (22.7%)." in section
+
+
+def test_ai_assisted_section_escapes_what_it_shows(mock_data_collector):
+    data = _with_assistants(mock_data_collector)
+    data.ai_assistants = {"<b>Robo</b>": dict(data.ai_assistants["Claude"])}
+    section = HTMLReportCreator()._ai_assisted_html(data)
+    assert "&lt;b&gt;Robo&lt;/b&gt;" in section
+    assert "<b>Robo</b>" not in section
+
+
+def test_authors_page_has_the_ai_assisted_section(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(_with_one_assisted_commit(mock_data_collector), temp_dir)
+    authors = _read_page(temp_dir, "authors.html")
+    assert authors.count('<h2 id="ai-assisted_commits">') == 1
+    # after the people, before the tables that rank them
+    assert authors.index("ai-assisted_commits") < authors.index("Top author per year and month")
+
+
+@pytest.mark.parametrize(
+    "month, count, expected",
+    [
+        ("2026-01", 0, "2026-01"),
+        ("2026-01", 1, "2025-12"),
+        ("2026-01", 11, "2025-02"),
+        ("2026-12", 11, "2026-01"),
+        ("2026-03", 27, "2023-12"),
+    ],
+)
+def test_months_back(month, count, expected):
+    assert months_back(month, count) == expected
+
+
+def test_sum_since():
+    by_month = {"2025-01": 1, "2025-02": 2, "2025-12": 4, "2026-01": 8}
+    assert sum_since(by_month, "2025-02") == 14
+    assert sum_since(by_month, "2026-02") == 0
+    assert sum_since({}, "2025-01") == 0
+
+
+@pytest.mark.parametrize(
+    "part, whole, expected",
+    [
+        (13, 583, "2.2%"),
+        (1, 2, "50.0%"),
+        (5, 5, "100.0%"),
+        # too small for one decimal, but not nothing
+        (10, 130654, "&lt;0.1%"),
+        (88, 169347, "0.1%"),
+        (0, 100, "0%"),
+        (0, 0, "0%"),
+        (3, 0, "0%"),
+    ],
+)
+def test_share_text(part, whole, expected):
+    assert share_text(part, whole) == expected

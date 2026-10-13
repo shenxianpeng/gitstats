@@ -1512,7 +1512,135 @@ class HTMLReportCreator(ReportCreator):
             share = sum(data.get_author_info(a)["commits_frac"] for a in top)
             label = "Top Author" if len(top) == 1 else "Top 2 Authors"
             tiles.append((label, f"{share:.1f}%", "of all commits"))
+        assisted = ai_assisted_count(data)
+        if assisted:
+            tiles.append(
+                (
+                    "AI-assisted Commits",
+                    share_text(assisted, data.get_total_commits()),
+                    f"at least {format_int(assisted)} commit{'' if assisted == 1 else 's'}",
+                )
+            )
+        else:
+            tiles.append(("AI-assisted Commits", "0", "no commit names an assistant"))
         return stat_tiles_html(tiles)
+
+    def _ai_assisted_html(self, data: Any) -> str:
+        """The "AI-assisted commits" section of the Authors page: how many
+        commits name an AI coding assistant, when, and which. Nothing when
+        none does."""
+        assisted = ai_assisted_count(data)
+        if not assisted:
+            return ""
+        total = data.get_total_commits()
+        by_month = data.ai_assisted_by_month
+        authored = data.ai_assisted_authored
+        parts = [html_header(2, "AI-assisted commits")]
+
+        note = (
+            f"{format_int(assisted)} of {format_int(total)} commits "
+            f"({share_text(assisted, total)}) name{'s' if assisted == 1 else ''} an AI coding "
+            "assistant: as their author, as a co-author, or in the line it signs with."
+        )
+        if authored:
+            note += (
+                f" {format_int(authored)} of them {'was' if authored == 1 else 'were'} made by "
+                "an assistant under its own account."
+            )
+        # the twelve months that end with the last commit
+        last = max([*data.commits_by_month, *by_month])
+        year_ago = months_back(last, 11)
+        if min(data.commits_by_month, default=last) < year_ago:
+            recent = sum_since(by_month, year_ago)
+            recent_total = sum_since(data.commits_by_month, year_ago)
+            note += (
+                f" In the last 12 months: {format_int(recent)} of {format_int(recent_total)} "
+                f"({share_text(recent, recent_total)})."
+            )
+        parts.append(f'<p class="section-note">{note}</p>')
+        parts.append(
+            '<p class="section-note">These are lower bounds. An assistant that leaves no mark '
+            "in the commit is not counted, and a mark does not say how much of the commit the "
+            "assistant wrote.</p>"
+        )
+
+        # per month since the first one, and the last twelve months at least,
+        # as far as the history goes back
+        first = max(min(min(by_month), year_ago), min([*data.commits_by_month, *by_month]))
+        months = month_range([first, last])
+        counts = [by_month.get(month, 0) for month in months]
+        notes = [
+            f"{share_text(count, data.commits_by_month.get(month, 0))} of "
+            f"{format_int(data.commits_by_month.get(month, 0))} that month"
+            if count
+            else ""
+            for month, count in zip(months, counts)
+        ]
+        quiet = quiet_months(data)
+        gap = {}
+        if quiet and quiet[0] in months and quiet[1] in months:
+            gap = {"bands": [quiet_band(*quiet, months.index(quiet[0]), months.index(quiet[1]))]}
+        parts.append(
+            self._render_chartjs(
+                "chart-ai-assisted",
+                "bar",
+                months,
+                [{"label": "AI-assisted commits", "data": counts, "notes": notes}],
+                month_axis=True,
+                aspect_ratio=4,
+                annotations=gap,
+            )
+        )
+
+        assistants = sorted(
+            data.ai_assistants.items(), key=lambda item: (-item[1]["commits"], item[0])
+        )
+        most = assistants[0][1]["commits"]
+        rows = []
+        for name, info in assistants:
+            first, last_day = (
+                datetime.datetime.fromtimestamp(info[key]).strftime("%Y-%m-%d")
+                for key in ("first_commit_stamp", "last_commit_stamp")
+            )
+            rows.append(
+                f"<tr><td>{html.escape(name)}</td>"
+                f'<td class="num">{format_int(info["commits"])}</td>'
+                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                f'<span style="width: {100.0 * info["commits"] / most:.1f}%"></span></span></td>'
+                f'<td class="num">{format_int(info["authored"])}</td>'
+                f'<td class="nowrap">{first}</td><td class="nowrap">{last_day}</td></tr>'
+            )
+        parts.append(
+            '<div class="table-scroll"><table class="share-table">'
+            '<tr><th>Assistant</th><th class="num">Commits</th><th></th>'
+            '<th class="num">As author</th><th>First commit</th><th>Last commit</th></tr>'
+            + "".join(rows)
+            + "</table></div>"
+        )
+        if len(assistants) > 1 and sum(info["commits"] for _, info in assistants) > assisted:
+            parts.append(
+                '<p class="section-note">A commit that names two assistants is counted '
+                "under both.</p>"
+            )
+        parts.append(
+            '<details class="table-details"><summary>What is counted</summary>'
+            "<ul>"
+            "<li>The author is an assistant's own account, such as the Copilot coding agent, "
+            "Devin or Cursor's agent.</li>"
+            "<li>A <code>Co-authored-by:</code> line names an assistant, as Claude Code, "
+            "Copilot, Cursor, Codex, Aider and others add when they commit for a person. A "
+            "review bot whose suggestion was applied is named the same way.</li>"
+            "<li>An <code>Assisted-by:</code> or <code>Generated-by:</code> line names an "
+            "assistant.</li>"
+            "<li>The message has the line an assistant leaves in it, such as "
+            "&ldquo;Generated with [Claude Code]&rdquo; or the link to a Devin or Codex "
+            "session.</li>"
+            "</ul>"
+            "<p>Accounts and addresses are matched, not first names: a person called Claude, "
+            "Devin or Jules is not an assistant.</p>"
+            "</details>"
+        )
+        return "".join(parts)
 
     def create_authors_html(self, data: Any, path: str) -> None:
         ###
@@ -1622,6 +1750,8 @@ class HTMLReportCreator(ReportCreator):
                     annotations=growth_gap,
                 )
             )
+
+        f.write(self._ai_assisted_html(data))
 
         # Authors :: the top author of each year, then of each month (folded away).
         # The old "Author of Month/Year" anchors are kept so existing links still land here.
@@ -3831,6 +3961,34 @@ def month_range(months: Any) -> list[str]:
         result.append(f"{year:04d}-{month:02d}")
         year, month = (year + 1, 1) if month == 12 else (year, month + 1)
     return result
+
+
+def ai_assisted_count(data: Any) -> int:
+    """How many commits name an AI coding assistant; none for data collected
+    before that was counted."""
+    count = getattr(data, "ai_assisted_commits", 0)
+    return count if isinstance(count, int) else 0
+
+
+def months_back(month: str, count: int) -> str:
+    """The "YYYY-MM" month ``count`` months before ``month``."""
+    year, number = map(int, month.split("-"))
+    year, number = divmod(year * 12 + number - 1 - count, 12)
+    return f"{year:04d}-{number + 1:02d}"
+
+
+def sum_since(by_month: dict[str, int], month: str) -> int:
+    """What ``by_month`` ("YYYY-MM" -> count) adds up to from ``month`` on."""
+    return sum(count for key, count in by_month.items() if key >= month)
+
+
+def share_text(part: int, whole: int) -> str:
+    """``part`` as a percentage of ``whole``, to one decimal; a share too small
+    to show that way is "&lt;0.1%", not "0.0%"."""
+    if not part or not whole:
+        return "0%"
+    share = 100.0 * part / whole
+    return "&lt;0.1%" if share < 0.05 else f"{share:.1f}%"
 
 
 def stat_tiles_html(tiles: list[tuple[str, str, str]]) -> str:

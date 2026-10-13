@@ -29,6 +29,7 @@ from gitstats.aggregate import (
     write_repo_summary,
 )
 from gitstats.ai_summarizer import AISummarizer
+from gitstats.assistants import AssistedCommit, assisted_commits
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.utils import (
     History,
@@ -202,6 +203,16 @@ class DataCollector:
         # new contributors per month
         self.new_contributors_by_month: dict[str, int] = {}  # YYYY-MM -> count
 
+        # Commits that name an AI coding assistant, as their author, as a
+        # co-author or in the line it signs with (see gitstats.assistants).
+        # A lower bound: an assistant that leaves no mark is not counted.
+        self.ai_assisted_commits: int = 0
+        # those of them an assistant made under its own account
+        self.ai_assisted_authored: int = 0
+        self.ai_assisted_by_month: dict[str, int] = {}  # YYYY-MM -> commits
+        # assistant -> { commits, authored, first_commit_stamp, last_commit_stamp }
+        self.ai_assistants: dict[str, dict[str, int]] = {}
+
         # AI summaries
         self.ai_summaries: dict[str, dict[str, Any]] = {}  # page_type -> {summary, error}
 
@@ -288,10 +299,13 @@ class GitDataCollector(DataCollector):
         # the other.
         processes = min(int(conf["processes"]), os.cpu_count() or 1)
         line_stats: Future[tuple[list[str], dict[str, int], str | None]] | None = None
+        assisted: Future[list[AssistedCommit]] | None = None
         # set when the phases have nothing left to do but wait for the line counts
         waiting = threading.Event()
-        with ThreadPoolExecutor(max_workers=1, thread_name_prefix="git-log") as pool:
+        with ThreadPoolExecutor(max_workers=2, thread_name_prefix="git-log") as pool:
             if processes > 1:
+                # the messages of every commit, read beside the rest: one quick `git log`
+                assisted = pool.submit(self._assisted_commits)
                 line_stats = pool.submit(
                     shortstat_logs,
                     self._line_stat_passes(),
@@ -346,6 +360,7 @@ class GitDataCollector(DataCollector):
             self._collect_per_author_line_stats(name_to_canonical, outputs[1])
             outputs[1] = None
             self._collect_file_churn_and_ownership(name_to_canonical, names)
+            self._collect_ai_assisted(assisted.result() if assisted is not None else None)
         if conf["ai_enabled"]:
             self._collect_commit_subjects()
 
@@ -1048,6 +1063,41 @@ class GitDataCollector(DataCollector):
             if current_author:
                 author_map = self.author_files.setdefault(current_author, {})
                 author_map[line] = author_map.get(line, 0) + 1
+
+    @staticmethod
+    def _assisted_commits() -> list[AssistedCommit]:
+        """The commits of the range that name an AI coding assistant."""
+        return list(assisted_commits(get_log_range("HEAD", False)))
+
+    def _collect_ai_assisted(self, commits: list[AssistedCommit] | None = None) -> None:
+        """Count the commits that name an AI coding assistant.
+
+        By month, and by assistant: a commit that names two is counted under
+        both, and once in the total. ``commits`` are those of
+        _assisted_commits() when collect() has already asked for them.
+        """
+        if commits is None:
+            commits = self._assisted_commits()
+        for commit in commits:
+            self.ai_assisted_commits += 1
+            self.ai_assisted_authored += commit.authored
+            yymm = datetime.datetime.fromtimestamp(commit.stamp).strftime("%Y-%m")
+            self.ai_assisted_by_month[yymm] = self.ai_assisted_by_month.get(yymm, 0) + 1
+            for place, name in enumerate(commit.assistants):
+                info = self.ai_assistants.setdefault(
+                    name,
+                    {
+                        "commits": 0,
+                        "authored": 0,
+                        "first_commit_stamp": commit.stamp,
+                        "last_commit_stamp": commit.stamp,
+                    },
+                )
+                info["commits"] += 1
+                # the author, when it is an assistant, is the first one named
+                info["authored"] += commit.authored and place == 0
+                info["first_commit_stamp"] = min(info["first_commit_stamp"], commit.stamp)
+                info["last_commit_stamp"] = max(info["last_commit_stamp"], commit.stamp)
 
     def _collect_commit_subjects(self) -> None:
         """Sample commit subjects per year to ground the AI chronicle.
