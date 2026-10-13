@@ -13,11 +13,13 @@ updates:
       github-action:
         patterns:
           - "*"
-  - package-ecosystem: pip
+  # The Python dependencies are locked in uv.lock, which the "pip" ecosystem
+  # does not update: "uv" reads pyproject.toml and keeps the lock file current.
+  - package-ecosystem: uv
     directory: /
     schedule:
       interval: "monthly"
     groups:
-      pip:
+      uv:
         patterns:
           - "*"
