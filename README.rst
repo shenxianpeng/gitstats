@@ -85,7 +85,7 @@ Example
    :width: 100%
    :target: https://shenxianpeng.dev/gitstats/index.html
 
-Check out the `GitStats Gallery <https://shenxianpeng.dev/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly.
+Check out the `GitStats Gallery <https://shenxianpeng.dev/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly — and its `AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ai.html>`_ page: how many of each project's commits name an AI coding assistant, quarter by quarter.
 
 .. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/demo.gif
    :alt: gitstats terminal demo
@@ -132,7 +132,9 @@ machine-readable ``summary.json``, and an aggregate page at
 ``<outputpath>/index.html`` shows a sortable table of every repository —
 commits, authors, recent activity, lines of code and a health label — linking
 into the individual reports. Repositories that fail to analyze are listed on
-the page without stopping the run.
+the page without stopping the run. A second page, ``<outputpath>/ai.html``,
+compares the share of commits that name an AI coding assistant in each
+repository over the last four quarters.
 
 Add ``--serve`` to preview the generated report right away — gitstats starts a
 local web server and prints the URL (bound to ``127.0.0.1`` by default; pass
@@ -364,7 +366,7 @@ Here is a list of some features of ``gitstats``:
 * **Code Ownership**: the bus factor, bus-factor risk (files only one person has changed), ownership by author, and the files shared by the most people.
 * **Hotspots**: every file plotted by its size against how often it changes, and the large, frequently changed files ranked by score, with how many people have changed each.
 * **History**: the project's life one year at a time — its peaks, quiet years and revivals, newcomers and releases — with optional AI narration.
-* **Portfolio**: analyze several repositories at once for an aggregate overview.
+* **Portfolio**: analyze several repositories at once for an aggregate overview, with a page that compares their AI-assisted commits quarter by quarter.
 * **Wrapped card**: a shareable SVG card of one year in the repository, with ``--wrapped``.
 * **Readable anywhere**: interactive charts, light and dark themes, and layouts that work on phones; long quiet periods are shaded on every timeline, and cut down to a short break when they would take up a quarter of it or more.
 * **Customizable**: config values through ``gitstats.conf``.

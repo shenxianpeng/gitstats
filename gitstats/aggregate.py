@@ -21,11 +21,13 @@ from typing import Any
 
 from gitstats import load_config
 from gitstats.report_creator import (
+    AI_ASSISTED_COUNTED,
     THEME_INIT_SCRIPT,
     THEME_SCRIPT,
     THEME_TOGGLE_BUTTON,
     _classify_eras,
     nav_link,
+    share_text,
     stat_tiles_html,
 )
 from gitstats.utils import format_int, get_version
@@ -36,6 +38,10 @@ conf = load_config()
 
 _SECONDS_PER_DAY = 86400
 _ACTIVE_WINDOW_DAYS = 365
+# How many months of AI-assisted commits a summary keeps, up to the month it is
+# made in: the last four complete quarters, and a year before them.
+_AI_MONTHS = 24
+_MONTH_NAMES = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
 
 
 def _slugify_repo(path: str) -> str:
@@ -135,7 +141,72 @@ def compute_repo_summary(data: Any, report_path: str) -> dict[str, Any]:
         "commits_by_year": {
             str(year): commits for year, commits in sorted(commits_by_year.items())
         },
+        "ai_assisted": ai_assisted_summary(data, now),
     }
+
+
+def _months_up_to(now: datetime.datetime, count: int) -> list[str]:
+    """The ``count`` calendar months that end with the month of ``now``, oldest first."""
+    months = []
+    year, month = now.year, now.month
+    for _ in range(count):
+        months.append(f"{year:04d}-{month:02d}")
+        year, month = (year - 1, 12) if month == 1 else (year, month - 1)
+    return months[::-1]
+
+
+def ai_assisted_summary(data: Any, now: datetime.datetime) -> dict[str, Any] | None:
+    """The commits that name an AI coding assistant, as a summary keeps them.
+
+    In all and by assistant, and for each of the last _AI_MONTHS months next
+    to all the commits of that month, so that a share can be worked out for
+    any quarter in them. None for data collected before they were counted.
+    """
+    commits = getattr(data, "ai_assisted_commits", None)
+    by_month = getattr(data, "ai_assisted_by_month", None)
+    if not isinstance(commits, int) or not isinstance(by_month, dict):
+        return None
+    all_by_month = getattr(data, "commits_by_month", {}) or {}
+    assistants = getattr(data, "ai_assistants", {}) or {}
+    months = _months_up_to(now, _AI_MONTHS)
+    return {
+        "commits": commits,
+        "authored": int(getattr(data, "ai_assisted_authored", 0) or 0),
+        "assistants": {
+            name: int(info.get("commits", 0))
+            for name, info in sorted(
+                assistants.items(), key=lambda item: (-int(item[1].get("commits", 0)), item[0])
+            )
+        },
+        "by_month": {month: int(by_month.get(month, 0)) for month in months},
+        "commits_by_month": {month: int(all_by_month.get(month, 0)) for month in months},
+    }
+
+
+def last_quarters(now: datetime.datetime, count: int = 4) -> list[tuple[str, list[str]]]:
+    """The last ``count`` complete calendar quarters before ``now``, oldest first:
+    ``("Jul–Sep 2026", ["2026-07", "2026-08", "2026-09"])``."""
+    year, month = now.year, (now.month - 1) // 3 * 3 + 1  # the current quarter's first month
+    quarters = []
+    for _ in range(count):
+        month -= 3
+        if month < 1:
+            year, month = year - 1, month + 12
+        label = f"{_MONTH_NAMES[month - 1]}\u2013{_MONTH_NAMES[month + 1]} {year}"
+        quarters.append((label, [f"{year:04d}-{m:02d}" for m in range(month, month + 3)]))
+    return quarters[::-1]
+
+
+def _quarter_counts(ai: dict[str, Any], months: list[str]) -> tuple[int, int] | None:
+    """(commits that name an assistant, all commits) in these months, or None
+    when the summary does not cover all of them."""
+    by_month, all_by_month = ai.get("by_month") or {}, ai.get("commits_by_month") or {}
+    if any(month not in all_by_month for month in months):
+        return None
+    return (
+        sum(int(by_month.get(month, 0)) for month in months),
+        sum(int(all_by_month[month]) for month in months),
+    )
 
 
 def write_repo_summary(summary: dict[str, Any], path: str) -> None:
@@ -193,11 +264,19 @@ class AggregateReportCreator:
         title: str = "GitStats Portfolio",
     ) -> None:
         self._copy_assets(path)
+        # the page of AI-assisted commits, when a summary counts them
+        ai = any(isinstance(summary.get("ai_assisted"), dict) for summary in summaries)
         f = self._open_portfolio_file(path)
         try:
-            self._write_page(f, summaries, failures, title)
+            self._write_page(f, summaries, failures, title, ai)
         finally:
             f.close()
+        if ai:
+            f = self._open_portfolio_file(path, "ai.html")
+            try:
+                self._write_ai_page(f, summaries, title)
+            finally:
+                f.close()
 
     @staticmethod
     def _copy_assets(path: str) -> None:
@@ -220,14 +299,17 @@ class AggregateReportCreator:
                 shutil.copyfile(src, target)
 
     @staticmethod
-    def _open_portfolio_file(path: str) -> Any:
-        """Open the portfolio index for writing, confined to the output root.
+    def _open_portfolio_file(path: str, name: str = "index.html") -> Any:
+        """Open a portfolio page for writing, confined to the output root.
 
-        The filename is fixed; resolving the target and checking it stays
-        under the output root guards against directory traversal.
+        The filename is one of the portfolio's own; resolving the target and
+        checking it stays under the output root guards against directory
+        traversal.
         """
+        if name not in ("index.html", "ai.html"):
+            raise ValueError(f"Not a portfolio page: {name}")
         base = os.path.abspath(path)
-        target = os.path.abspath(os.path.join(base, "index.html"))
+        target = os.path.abspath(os.path.join(base, name))
         if os.path.commonpath([base, target]) != base:
             raise ValueError(f"Refusing to write outside report directory: {path}")
         return open(target, "w", encoding="utf-8")
@@ -238,9 +320,10 @@ class AggregateReportCreator:
         summaries: list[dict[str, Any]],
         failures: list[dict[str, str]],
         title: str,
+        ai: bool = False,
     ) -> None:
         self._print_header(f, title)
-        self._print_nav(f, title)
+        self._print_nav(f, title, "index.html", ai)
 
         f.write(f"<h1>{html.escape(title)}</h1>")
         generated = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -250,9 +333,18 @@ class AggregateReportCreator:
         )
 
         self._write_totals(f, summaries)
+        if ai:
+            f.write(
+                '<p class="more-link"><a href="ai.html">AI-assisted commits, quarter by '
+                "quarter &rarr;</a></p>"
+            )
         self._write_repo_table(f, summaries)
         self._write_failures(f, failures)
 
+        self._print_footer(f)
+
+    @staticmethod
+    def _print_footer(f: Any) -> None:
         f.write(
             '<div class="footer">'
             '<span class="footer-generated">Generated by '
@@ -261,6 +353,145 @@ class AggregateReportCreator:
             "</div>\n"
         )
         f.write("</body>\n</html>")
+
+    def _write_ai_page(self, f: Any, summaries: list[dict[str, Any]], title: str) -> None:
+        """The commits that name an AI coding assistant, repository by
+        repository and quarter by quarter."""
+        self._print_header(f, f"{title}: AI-assisted commits")
+        self._print_nav(f, title, "ai.html", True)
+        f.write("<h1>AI-assisted commits</h1>")
+        now = datetime.datetime.now()
+        f.write(
+            f'<p class="portfolio-subtitle">{len(summaries)} repositories &middot; '
+            f"generated by gitstats {html.escape(get_version())} on "
+            f"{now.strftime('%Y-%m-%d %H:%M:%S')}</p>"
+        )
+        f.write(
+            '<p class="section-note">Commits that name an AI coding assistant: as their '
+            "author, as a co-author, or in the line it signs with. These are lower bounds. "
+            "An assistant that leaves no mark in a commit is not counted, so a share near "
+            "zero says that commits are not signed, not that no assistant is used. And a "
+            "mark does not say how much of the commit the assistant wrote.</p>"
+        )
+
+        quarters = last_quarters(now)
+        rows = []
+        for summary in summaries:
+            ai = summary.get("ai_assisted")
+            counts = [
+                _quarter_counts(ai, months) if isinstance(ai, dict) else None
+                for _, months in quarters
+            ]
+            rows.append((summary, ai if isinstance(ai, dict) else None, counts))
+
+        def share(counts: tuple[int, int] | None) -> float:
+            return counts[0] / counts[1] if counts and counts[1] else -1.0
+
+        # the largest share in the last quarter first, then in the quarter before it
+        rows.sort(key=lambda row: (-share(row[2][-1]), -share(row[2][-2]), row[0].get("name", "")))
+        self._write_ai_tiles(f, rows, quarters)
+
+        f.write("<h2>By quarter</h2>")
+        f.write(
+            '<p class="section-note">The share of each quarter&rsquo;s commits that name an '
+            "assistant, and under it those commits and all of them. The darker, the larger "
+            "the share.</p>"
+        )
+        f.write('<div class="table-scroll"><table class="ai-grid">')
+        f.write(
+            "<tr><th>Repository</th>"
+            + "".join(f'<th class="num">{label}</th>' for label, _ in quarters)
+            + "<th>Named most</th></tr>"
+        )
+        for summary, ai, counts in rows:
+            link = summary.get("report_path", "") or ""
+            if link.endswith("index.html"):
+                link = link[: -len("index.html")] + "authors.html"
+                if ai and ai.get("commits"):
+                    link += "#ai-assisted_commits"
+            cells = "".join(self._ai_cell(quarter) for quarter in counts)
+            named = ", ".join(
+                html.escape(name) for name in list((ai or {}).get("assistants") or {})[:2]
+            )
+            f.write(
+                f'<tr><td><a href="{html.escape(link, quote=True)}">'
+                f"{html.escape(summary.get('name', ''))}</a></td>{cells}"
+                f"<td>{named or '&ndash;'}</td></tr>"
+            )
+        f.write("</table></div>")
+        # Where the table scrolls sideways (a phone), it starts at the last
+        # quarter: the column the page is about, not the oldest one
+        f.write(
+            "<script>document.querySelectorAll('table.ai-grid').forEach(function (table) {"
+            " var box = table.parentElement, cells = table.rows[0].cells;"
+            " var last = cells[cells.length - 2];"
+            " if (box.scrollWidth > box.clientWidth) {"
+            " box.scrollLeft = last.offsetLeft + last.offsetWidth - box.clientWidth; }"
+            " });</script>"
+        )
+        f.write(AI_ASSISTED_COUNTED)
+        self._print_footer(f)
+
+    @staticmethod
+    def _ai_cell(counts: tuple[int, int] | None) -> str:
+        """One repository's quarter: its share, shaded, with the two counts under it."""
+        if counts is None:
+            return '<td class="share">&ndash;</td>'
+        part, whole = counts
+        ratio = part / whole if whole else 0.0
+        # one hue, darker for more; a square root, so that a few per cent still shows
+        strength = 0 if ratio <= 0 else 10 + 65 * min(1.0, ratio / 0.6) ** 0.5
+        return (
+            f'<td class="share" style="--share-strength: {strength:.0f}%">'
+            f"{share_text(part, whole) if part else '0'}"
+            f"<small>{format_int(part)} / {format_int(whole)}</small></td>"
+        )
+
+    @staticmethod
+    def _write_ai_tiles(
+        f: Any,
+        rows: list[tuple[dict[str, Any], dict[str, Any] | None, list[tuple[int, int] | None]]],
+        quarters: list[tuple[str, list[str]]],
+    ) -> None:
+        """Headline numbers, each about the repositories one by one: shares are
+        not added up across them, where the largest would decide the total."""
+        naming = sum(
+            1 for _, _, counts in rows if any(quarter and quarter[0] for quarter in counts)
+        )
+        tiles = [
+            (
+                "Repositories",
+                f"{naming} of {len(rows)}",
+                "name an assistant in the last four quarters",
+            )
+        ]
+        summary, _, counts = rows[0]
+        latest = counts[-1]
+        if latest and latest[0]:
+            tiles.append(
+                (
+                    "Largest Share",
+                    share_text(*latest),
+                    f"{html.escape(summary.get('name', ''))}, {quarters[-1][0]}",
+                )
+            )
+        # the assistant named in the most repositories, then in the most commits
+        repositories: dict[str, int] = {}
+        commits: dict[str, int] = {}
+        for _, ai, _ in rows:
+            for name, count in ((ai or {}).get("assistants") or {}).items():
+                repositories[name] = repositories.get(name, 0) + 1
+                commits[name] = commits.get(name, 0) + int(count)
+        if repositories:
+            name = max(repositories, key=lambda key: (repositories[key], commits[key], key))
+            tiles.append(
+                (
+                    "Named Most Widely",
+                    html.escape(name),
+                    f"in {repositories[name]} of {len(rows)} repositories",
+                )
+            )
+        f.write(stat_tiles_html(tiles))
 
     @staticmethod
     def _print_header(f: Any, title: str) -> None:
@@ -289,13 +520,15 @@ class AggregateReportCreator:
         )
 
     @staticmethod
-    def _print_nav(f: Any, title: str) -> None:
+    def _print_nav(f: Any, title: str, current: str = "index.html", ai: bool = False) -> None:
+        ai_link = nav_link("ai.html", "AI-assisted commits", current=current) if ai else ""
         f.write(
             f"""
             <div class="nav">
             <a href="index.html" class="nav-brand">GitStats</a>
             <ul>
-            {nav_link("index.html", html.escape(title), current="index.html")}
+            {nav_link("index.html", html.escape(title), current=current)}
+            {ai_link}
             </ul>
             <div class="nav-right">
             {THEME_TOGGLE_BUTTON}

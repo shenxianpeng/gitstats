@@ -1,7 +1,9 @@
 """Tests for the multi-repository aggregation module."""
 
+import datetime
 import json
 import os
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
@@ -9,7 +11,9 @@ import pytest
 from gitstats.aggregate import (
     AggregateReportCreator,
     _slugify_repo,
+    ai_assisted_summary,
     compute_repo_summary,
+    last_quarters,
     load_repo_summaries,
     write_repo_summary,
 )
@@ -357,3 +361,215 @@ def test_write_repo_summary_refuses_to_write_outside_the_report(tmp_path):
     ):
         write_repo_summary({"name": "x"}, str(tmp_path))
     assert not (tmp_path / "summary.json").exists()
+
+
+# ── AI-assisted commits ──────────────────────────────────────────────────
+
+
+class TestAiAssistedSummary:
+    def test_keeps_the_last_two_years_month_by_month(self):
+        data = SimpleNamespace(
+            ai_assisted_commits=5,
+            ai_assisted_authored=1,
+            ai_assisted_by_month={"2026-09": 3, "2026-01": 1, "2023-05": 1},
+            commits_by_month={"2026-09": 30, "2026-01": 10, "2024-11": 7, "2023-05": 9},
+            ai_assistants={
+                "Claude": {"commits": 2},
+                "GitHub Copilot": {"commits": 3},
+                "Aider": {"commits": 2},
+            },
+        )
+        ai = ai_assisted_summary(data, datetime.datetime(2026, 10, 14))
+        assert list(ai["by_month"])[0] == "2024-11"
+        assert list(ai["by_month"])[-1] == "2026-10"
+        assert len(ai["by_month"]) == len(ai["commits_by_month"]) == 24
+        assert (ai["by_month"]["2026-09"], ai["commits_by_month"]["2026-09"]) == (3, 30)
+        assert (ai["by_month"]["2024-11"], ai["commits_by_month"]["2024-11"]) == (0, 7)
+        assert "2023-05" not in ai["by_month"]
+        assert (ai["commits"], ai["authored"]) == (5, 1)
+        # the most named first, then by name
+        assert list(ai["assistants"].items()) == [
+            ("GitHub Copilot", 3),
+            ("Aider", 2),
+            ("Claude", 2),
+        ]
+
+    def test_none_for_data_collected_before_they_were_counted(self, mock_data_collector):
+        now = datetime.datetime.now()
+        assert ai_assisted_summary(SimpleNamespace(commits_by_month={}), now) is None
+        # a Mock has every attribute, and none of them is a count
+        assert compute_repo_summary(mock_data_collector, "index.html")["ai_assisted"] is None
+
+    def test_in_the_summary_of_a_repository(self, mock_data_collector):
+        mock_data_collector.ai_assisted_commits = 2
+        mock_data_collector.ai_assisted_authored = 0
+        mock_data_collector.ai_assisted_by_month = {"2023-03": 2}
+        mock_data_collector.ai_assistants = {"Claude": {"commits": 2}}
+        summary = compute_repo_summary(mock_data_collector, "alpha/index.html")
+        assert summary["ai_assisted"]["commits"] == 2
+        assert summary["ai_assisted"]["assistants"] == {"Claude": 2}
+        # it is written as JSON with the rest
+        assert json.loads(json.dumps(summary))["ai_assisted"]["commits"] == 2
+
+
+@pytest.mark.parametrize(
+    "now, labels, last",
+    [
+        (
+            datetime.datetime(2026, 10, 14),
+            ["Oct\u2013Dec 2025", "Jan\u2013Mar 2026", "Apr\u2013Jun 2026", "Jul\u2013Sep 2026"],
+            ["2026-07", "2026-08", "2026-09"],
+        ),
+        (
+            datetime.datetime(2026, 1, 1),
+            ["Jan\u2013Mar 2025", "Apr\u2013Jun 2025", "Jul\u2013Sep 2025", "Oct\u2013Dec 2025"],
+            ["2025-10", "2025-11", "2025-12"],
+        ),
+        (
+            datetime.datetime(2026, 3, 31),
+            ["Jan\u2013Mar 2025", "Apr\u2013Jun 2025", "Jul\u2013Sep 2025", "Oct\u2013Dec 2025"],
+            ["2025-10", "2025-11", "2025-12"],
+        ),
+        (
+            datetime.datetime(2026, 4, 1),
+            ["Apr\u2013Jun 2025", "Jul\u2013Sep 2025", "Oct\u2013Dec 2025", "Jan\u2013Mar 2026"],
+            ["2026-01", "2026-02", "2026-03"],
+        ),
+    ],
+)
+def test_last_quarters_are_the_complete_ones(now, labels, last):
+    quarters = last_quarters(now)
+    assert [label for label, _ in quarters] == labels
+    assert quarters[-1][1] == last
+
+
+def _ai(by_quarter, assistants):
+    """An ai_assisted block for the last four quarters: (commits that name an
+    assistant, all commits) in each, put in the quarter's first month."""
+    by_month, all_by_month = {}, {}
+    for (_, months), (part, whole) in zip(last_quarters(datetime.datetime.now()), by_quarter):
+        for month in months:
+            by_month[month] = all_by_month[month] = 0
+        by_month[months[0]], all_by_month[months[0]] = part, whole
+    return {
+        "commits": sum(part for part, _ in by_quarter),
+        "authored": 0,
+        "assistants": assistants,
+        "by_month": by_month,
+        "commits_by_month": all_by_month,
+    }
+
+
+class TestAiAssistedPage:
+    @staticmethod
+    def _render(temp_dir, summaries):
+        AggregateReportCreator().create(summaries, [], temp_dir, title="GitStats Gallery")
+        pages = {}
+        for name in ("index.html", "ai.html"):
+            path = os.path.join(temp_dir, name)
+            if os.path.exists(path):
+                with open(path, encoding="utf-8") as f:
+                    pages[name] = f.read()
+        return pages
+
+    def test_no_page_when_no_summary_counts_them(self, temp_dir):
+        pages = self._render(temp_dir, [_summary("alpha", 10, {"Alice": 10})])
+        assert list(pages) == ["index.html"]
+        assert "ai.html" not in pages["index.html"]
+
+    def test_repositories_quarter_by_quarter(self, temp_dir):
+        pages = self._render(
+            temp_dir,
+            [
+                _summary(
+                    "alpha",
+                    100,
+                    {},
+                    ai_assisted=_ai([(0, 10), (1, 10), (2, 10), (5, 10)], {"Claude": 8}),
+                ),
+                _summary("beta", 100, {}, ai_assisted=_ai([(0, 10)] * 4, {})),
+                _summary(
+                    "gamma",
+                    100,
+                    {},
+                    ai_assisted=_ai(
+                        [(3, 10), (3, 10), (6, 20), (6, 10)], {"GitHub Copilot": 10, "Claude": 8}
+                    ),
+                ),
+                # summarised by a gitstats that did not count them
+                _summary("old", 100, {}),
+            ],
+        )
+        index, page = pages["index.html"], pages["ai.html"]
+        # reached from the portfolio page, by its navigation and a link under the totals
+        assert 'href="ai.html"' in index
+        assert "AI-assisted commits, quarter by quarter" in index
+        assert page.count('aria-current="page"') == 1
+        assert "<h1>AI-assisted commits</h1>" in page
+        assert "These are lower bounds." in page
+
+        # the largest share in the last quarter first: gamma 60%, alpha 50%, beta 0, old unknown
+        order = [page.index(f">{name}</a>") for name in ("gamma", "alpha", "beta", "old")]
+        assert order == sorted(order)
+        # each to its Authors page, at the section when the report has one
+        assert 'href="gamma/authors.html#ai-assisted_commits"' in page
+        assert 'href="beta/authors.html"' in page
+        # a cell: the share, shaded, over the two counts
+        assert '--share-strength: 75%">60.0%<small>6 / 10</small></td>' in page
+        assert '--share-strength: 0%">0<small>0 / 10</small></td>' in page
+        assert page.count('<td class="share">&ndash;</td>') == 4
+        # the assistants named most in each repository
+        assert "<td>GitHub Copilot, Claude</td>" in page
+        assert "<td>&ndash;</td>" in page
+
+        last_quarter = last_quarters(datetime.datetime.now())[-1][0]
+        assert (
+            '<dt>Repositories</dt><dd class="stat-value">2 of 4</dd>'
+            '<dd class="stat-note">name an assistant in the last four quarters</dd>'
+        ) in page
+        assert (
+            '<dt>Largest Share</dt><dd class="stat-value">60.0%</dd>'
+            f'<dd class="stat-note">gamma, {last_quarter}</dd>'
+        ) in page
+        assert (
+            '<dt>Named Most Widely</dt><dd class="stat-value">Claude</dd>'
+            '<dd class="stat-note">in 2 of 4 repositories</dd>'
+        ) in page
+        assert "<summary>What is counted</summary>" in page
+        # on a narrow screen the table starts at its last quarter
+        assert "box.scrollLeft = last.offsetLeft + last.offsetWidth - box.clientWidth" in page
+
+    def test_a_summary_that_does_not_reach_back_that_far(self, temp_dir):
+        old = _ai([(1, 10)] * 4, {"Claude": 4})
+        # made long ago: the last four quarters are not among its months
+        old["by_month"] = {"2001-01": 1}
+        old["commits_by_month"] = {"2001-01": 10}
+        # and its report is elsewhere: linked as it is
+        alpha = _summary("alpha", 10, {}, ai_assisted=old, report_path="https://example.com/alpha/")
+        page = self._render(temp_dir, [alpha])["ai.html"]
+        assert 'href="https://example.com/alpha/"' in page
+        assert page.count('<td class="share">&ndash;</td>') == 4
+        assert '<dd class="stat-value">0 of 1</dd>' in page
+        assert "Largest Share" not in page
+
+    def test_names_are_escaped(self, temp_dir):
+        page = self._render(
+            temp_dir,
+            [
+                _summary(
+                    "<b>alpha</b>",
+                    10,
+                    {},
+                    ai_assisted=_ai([(0, 10), (0, 10), (0, 10), (1, 10)], {"<i>bot</i>": 1}),
+                )
+            ],
+        )["ai.html"]
+        assert "<b>alpha</b>" not in page
+        assert "&lt;b&gt;alpha&lt;/b&gt;" in page
+        assert "<i>bot</i>" not in page
+        assert "&lt;i&gt;bot&lt;/i&gt;" in page
+
+
+def test_portfolio_file_opens_only_its_own_pages(tmp_path):
+    with pytest.raises(ValueError):
+        AggregateReportCreator._open_portfolio_file(str(tmp_path), "../elsewhere.html")
