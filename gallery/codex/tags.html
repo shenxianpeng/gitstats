@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - Codex CLI</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.10.0.post1.dev6">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html" class="active" aria-current="page">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Tags</h1><dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">48</dd><dd class="stat-note"><span class="nowrap">latest voice-cygwin-108b38cf67cbb731</span>&nbsp;&middot; <span class="nowrap">2026-09-10</span></dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">255.1</dd><dd class="stat-note">12,245 commits in total</dd></div></dl>
+<h2 id="all_tags"><a href="#all_tags">All tags</a></h2>
+
+<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th>Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">voice-cygwin-108b38cf67cbb731</td><td class="nowrap">2026-09-10</td><td class="num">1,927</td><td>jif (339), Eric Traut (156), felixxia-oai (137), Benjamin Carlsson (113), Charlie Marsh (71), iceweasel-oai (56), Adam Perry @ OpenAI (53), rka-oai (49), Tamir Duberstein (43), sayan-oai (42), Dylan Hurd (40), pakrym-oai (38), Felipe Coury (32), rhan-oai (31), Owen Lin (31), Abhinav (29), viyatb-oai (19), chess (19), Winston Howes (17), Matthew Zeng (17), Channing Conger (16), zm-oai (15), willwang-openai (15), riley-oai (14), pmccrary-oai (14), Won Park (14), Sean Huang (14), Ian MacLeod (14), Celia Chen (14), joeytrasatti-openai (13), charlesgong-openai (13), andrewgu-oai (13), cooper-oai (12), Ahmed Ibrahim (12), Ankush Gupta (11), johnl-oai (10), joeflorencio-openai (10), alexsong-oai (10), Shijie Rao (10), Krish Chainani (10), Anton Panasenko (10), thomas (9), victor-openai (8), rphilizaire-openai (8), ningyi-oai (8), Eddie Chen (8), Alex Zamoshchin (8), xl-openai (7), stevenlee-oai (7), Rasmus Rygaard (7), <em>and 131 more authors</em></td></tr><tr><td class="nowrap">rusty-v8-v150.4.0</td><td class="nowrap">2026-07-28</td><td class="num">815</td><td>jif (135), Owen Lin (55), Charlie Marsh (55), Adam Perry @ OpenAI (55), Michael Bolin (46), Eric Traut (34), Felipe Coury (26), Celia Chen (26), pakrym-oai (25), felixxia-oai (24), charlesgong-openai (19), Channing Conger (18), Dylan Hurd (16), viyatb-oai (14), sayan-oai (14), iceweasel-oai (14), stevenlee-oai (13), rka-oai (11), Won Park (10), Abhinav (9), zsol-openai (8), rhan-oai (8), Matthew Zeng (8), thomas (7), Ahmed Ibrahim (7), nhamidi-oai (6), jay (6), Shijie Rao (6), richardopenai (5), jiayuhuang-openai (5), Tom (4), Francis Chalissery (4), stefanstokic-oai (3), rphilizaire-openai (3), hefuc-oai (3), Tamir Duberstein (3), Kyle Brown (3), Konstantine Kahadze (3), Greg Brisebois (3), Anton Panasenko (3), zm-oai (2), zbarsky-openai (2), xli-oai (2), xl-openai (2), tongzhou wang (2), rakan-oai (2), mandal-OAI (2), malsamiri-oai (2), lt-oai (2), keith thornhill (2), <em>and 60 more authors</em></td></tr><tr><td class="nowrap">codex-zsh-v0.1.0</td><td class="nowrap">2026-06-25</td><td class="num">87</td><td>jif (16), Adam Perry @ OpenAI (11), sayan-oai (7), rka-oai (7), Michael Bolin (7), richardopenai (4), xl-openai (3), Ahmed Ibrahim (3), pakrym-oai (2), alexsong-oai (2), Owen Lin (2), Eric Traut (2), Channing Conger (2), rphilizaire-openai (1), rhan-oai (1), iceweasel-oai (1), charlesgong-openai (1), canvrno-oai (1), Won Park (1), Winston Howes (1), Tom (1), Shuo (1), Shijie Rao (1), Drew (1), Celia Chen (1), Brooks (1), Brent Traut (1), Anton Panasenko (1), Andrey Mishchenko (1), Alex Daley (1), Adrian (1), Abhinav (1)</td></tr><tr><td class="nowrap">rust-v0.143.0-alpha.10</td><td class="nowrap">2026-06-23</td><td class="num">660</td><td>jif (101), Adam Perry @ OpenAI (77), pakrym-oai (47), Eric Traut (31), rka-oai (26), Ahmed Ibrahim (19), xl-openai (17), Channing Conger (16), canvrno-oai (15), Felipe Coury (15), sayan-oai (14), Michael Bolin (14), Celia Chen (14), Tamir Duberstein (13), viyatb-oai (11), charlesgong-openai (10), Anton Panasenko (10), iceweasel-oai (9), felixxia-oai (9), Won Park (9), Alex Daley (9), stefanstokic-oai (8), Shijie Rao (8), Owen Lin (8), Eric Ning (8), Charlie Marsh (8), rhan-oai (7), jameswt-oai (7), guinness-oai (7), Winston Howes (6), richardopenai (5), Matthew Zeng (5), Abhinav (5), mchen-oai (4), Zanie Blue (4), Tom (4), Jeremy Rose (4), Curtis &#x27;Fjord&#x27; Hawthorne (4), mpc-oai (3), marksteinbrick-oai (3), jay (3), cooper-oai (3), Boyang Niu (3), yuning-oai (2), rphilizaire-openai (2), kbazzi (2), hefuc-oai (2), alexsong-oai (2), Rasmus Rygaard (2), Peter Bakkum (2), <em>and 35 more authors</em></td></tr><tr><td class="nowrap">python-v0.1.0b3</td><td class="nowrap">2026-06-03</td><td class="num">215</td><td>jif (75), Michael Bolin (17), Adam Perry @ OpenAI (17), Eric Traut (13), xl-openai (8), joeflorencio-openai (8), Shijie Rao (7), Won Park (6), sayan-oai (5), Felipe Coury (5), Ahmed Ibrahim (5), iceweasel-oai (4), Owen Lin (4), viyatb-oai (3), starr-openai (3), Celia Chen (3), Anton Panasenko (3), Abhinav (3), pakrym-oai (2), Gabriel Peal (2), xli-oai (1), rhan-oai (1), knittel-openai (1), efrazer-oai (1), cooper-oai (1), charlesgong-openai (1), canvrno-oai (1), Winston Howes (1), Vivian Fang (1), Vaibhav Srivastav (1), Noah MacCallum (1), Jinghan Xu (1), Jeremy Rose (1), Eric Ning (1), Eric Horacek (1), Dylan Hurd (1), Charlie Marsh (1), Channing Conger (1), Brent Traut (1), Alexi Christakis (1), Alex Zamoshchin (1), Adrian (1)</td></tr><tr><td class="nowrap">python-v0.1.0b2</td><td class="nowrap">2026-05-28</td><td class="num">4</td><td>Ahmed Ibrahim (4)</td></tr><tr><td class="nowrap">python-v0.1.0b1</td><td class="nowrap">2026-05-28</td><td class="num">2,207</td><td>jif (352), Michael Bolin (292), Eric Traut (260), pakrym-oai (135), Ahmed Ibrahim (105), Felipe Coury (73), viyatb-oai (61), starr-openai (52), canvrno-oai (51), Matthew Zeng (50), xl-openai (44), Ruslan Nigmatullin (44), Dylan Hurd (43), Abhinav (41), Owen Lin (37), rhan-oai (33), iceweasel-oai (33), xli-oai (31), sayan-oai (30), Tom (27), Celia Chen (26), Won Park (25), efrazer-oai (18), alexsong-oai (17), Shijie Rao (16), evawong-oai (14), cassirer-openai (11), Charley Cunningham (11), Channing Conger (11), Andrey Mishchenko (11), Adrian (10), Curtis &#x27;Fjord&#x27; Hawthorne (9), Andrei Eternal (9), Thibault Sottiaux (8), Rasmus Rygaard (7), Casey Chow (7), richardopenai (6), guinness-oai (6), David de Regt (6), Adam Perry @ OpenAI (6), rreichel3-oai (5), mchen-oai (5), maja-openai (5), joeytrasatti-openai (5), Zanie Blue (5), Vivian Fang (5), Anton Panasenko (5), marksteinbrick-oai (4), github-actions <span class="badge" title="github-actions[bot]">bot</span> (4), Steve Coffey (4), <em>and 82 more authors</em></td></tr><tr><td class="nowrap">rusty-v8-v146.4.0</td><td class="nowrap">2026-03-20</td><td class="num">433</td><td>Ahmed Ibrahim (70), pakrym-oai (47), jif (29), viyatb-oai (26), Owen Lin (22), Michael Bolin (22), Eric Traut (21), xl-openai (19), Charley Cunningham (18), Matthew Zeng (14), sayan-oai (13), Dylan Hurd (13), iceweasel-oai (9), Celia Chen (9), Jack Mousseau (8), Curtis &#x27;Fjord&#x27; Hawthorne (8), Won Park (7), Ruslan Nigmatullin (5), Josh McKinney (5), Channing Conger (5), Andrei Eternal (5), gabec-openai (4), alexsong-oai (4), nicholasclark-openai (3), Shaqayeq (3), Rasmus Rygaard (3), Max Johnson (3), Felipe Coury (3), Anton Panasenko (3), starr-openai (2), pash-openai (2), daveaitel-openai (2), canvrno-oai (2), aaronl-openai (2), Shijie Rao (2), Colin Young (2), Andi Liu (2), zbarsky-openai (1), rhan-oai (1), maja-openai (1), joeytrasatti-openai (1), jgershen-oai (1), guinness-oai (1), friel-openai (1), Yaroslav Volovich (1), Thibault Sottiaux (1), Rohan Mehta (1), Leo Shimonaka (1), Keyan Zhang (1), Fouad Matin (1), <em>and 3 more authors</em></td></tr><tr><td class="nowrap">artifact-runtime-v2.4.0</td><td class="nowrap">2026-03-05</td><td class="num">30</td><td>pash-openai (5), dependabot <span class="badge" title="dependabot[bot]">bot</span> (4), Ahmed Ibrahim (3), sayan-oai (2), Owen Lin (2), Michael Bolin (2), xl-openai (1), joeytrasatti-openai (1), jif (1), iceweasel-oai (1), alexsong-oai (1), aaronl-openai (1), Won Park (1), Val Kharitonov (1), Matthew Zeng (1), Felipe Coury (1), Eric Traut (1), Alex Daley (1)</td></tr><tr><td class="nowrap">artifact-runtime-v2.3.4</td><td class="nowrap">2026-03-04</td><td class="num">3,763</td><td>jif (575), Michael Bolin (442), Ahmed Ibrahim (372), pakrym-oai (299), Jeremy Rose (198), Dylan Hurd (160), Eric Traut (143), dependabot <span class="badge" title="dependabot[bot]">bot</span> (120), Owen Lin (86), Gabriel Peal (82), iceweasel-oai (76), Josh McKinney (74), Charley Cunningham (74), Thibault Sottiaux (59), Celia Chen (52), sayan-oai (50), gt-oai (44), viyatb-oai (42), xl-openai (39), ae (39), Shijie Rao (38), zhao-oai (37), easong-openai (36), Matthew Zeng (36), Anton Panasenko (36), dedrisian-oai (33), Curtis &#x27;Fjord&#x27; Hawthorne (24), alexsong-oai (17), Max Johnson (14), zbarsky-openai (13), Gav Verma (13), Fouad Matin (13), Javi (10), Felipe Coury (10), Ed Bayes (10), pap-openai (9), github-actions <span class="badge" title="github-actions[bot]">bot</span> (9), zuxin-oai (8), pash-openai (8), Ruslan Nigmatullin (7), Robby He (7), Rasmus Rygaard (7), canvrno-oai (6), Won Park (6), Victor Vannara (6), rakesh-oai (5), Lionel Cheng (5), Kazuhiro Sera (5), willwang-openai (4), natea-oai (4), <em>and 221 more authors</em></td></tr><tr><td class="nowrap">codex-rs-2925136536b06a324551627468d17e959afa18d4-1-rust-v0.2.0-alpha.2</td><td class="nowrap">2025-06-29</td><td class="num">3</td><td>Michael Bolin (3)</td></tr><tr><td class="nowrap">codex-rs-b289c9207090b2e27494545d7b5404e063bd86f3-1-rust-v0.1.0-alpha.4</td><td class="nowrap">2025-06-28</td><td class="num">9</td><td>Michael Bolin (8), Gabriel Peal (1)</td></tr><tr><td class="nowrap">codex-rs-6a8a936f75ea44faf05ff4fab0c6a36fc970428d-1-rust-v0.0.2506261603</td><td class="nowrap">2025-06-26</td><td class="num">16</td><td>Michael Bolin (12), Reilly Wood (1), Govind Kamtamneni (1), Gabriel Peal (1), Eric Wright (1)</td></tr><tr><td class="nowrap">codex-rs-5fc3c3023d9f179fb416b2722d1434bac278e916-1-rust-v0.0.2506060849</td><td class="nowrap">2025-06-06</td><td class="num">2</td><td>Michael Bolin (2)</td></tr><tr><td class="nowrap">codex-rs-ac6e1b2661320a631d80aa51bdfa8f1635e0c8fa-1-rust-v0.0.2506052246</td><td class="nowrap">2025-06-06</td><td class="num">1</td><td>Michael Bolin (1)</td></tr><tr><td class="nowrap">codex-rs-121686615fd634e35f3e415896f36908cf8632f9-1-rust-v0.0.2506052203</td><td class="nowrap">2025-06-06</td><td class="num">2</td><td>Michael Bolin (2)</td></tr><tr><td class="nowrap">codex-rs-84eae7b1bc4e3b5420f2d6127b7c17e7a979a5b0-1-rust-v0.0.2506052135</td><td class="nowrap">2025-06-06</td><td class="num">3</td><td>Michael Bolin (2), Reilly Wood (1)</td></tr><tr><td class="nowrap">codex-rs-45519e12f39777b65c05ed498503ddcb60beb289-1-rust-v0.0.2506030956</td><td class="nowrap">2025-06-03</td><td class="num">9</td><td>Michael Bolin (9)</td></tr><tr><td class="nowrap">codex-rs-ca8e97fcbcb991e542b8689f2d4eab9d30c399d6-1-rust-v0.0.2505302325</td><td class="nowrap">2025-05-31</td><td class="num">2</td><td>Michael Bolin (2)</td></tr><tr><td class="nowrap">codex-rs-378d773f3af95384eef51addf560df30aa9fd15f-1-rust-v0.0.2505301630</td><td class="nowrap">2025-05-30</td><td class="num">9</td><td>Michael Bolin (9)</td></tr><tr><td class="nowrap">codex-rs-dfac02b343605ce61154ab2e075ac6c38f533916-1-rust-v0.0.2505291659</td><td class="nowrap">2025-05-29</td><td class="num">4</td><td>Michael Bolin (3), Fouad Matin (1)</td></tr><tr><td class="nowrap">codex-rs-b152435fb95e7f1ab197ae2cdde68ae29a7d219b-1-rust-v0.0.2505291458</td><td class="nowrap">2025-05-29</td><td class="num">7</td><td>Michael Bolin (7)</td></tr><tr><td class="nowrap">codex-rs-d519bd8bbd1e1fd9efdc5d68cf7bebdec0dd0f28-1-rust-v0.0.2505270918</td><td class="nowrap">2025-05-27</td><td class="num">2</td><td>Michael Bolin (2)</td></tr><tr><td class="nowrap">codex-rs-aa156ceac953c3e6f3602e6eb2f61b14ac8adaf3-1-rust-v0.0.2505231205</td><td class="nowrap">2025-05-23</td><td class="num">1</td><td>Michael Bolin (1)</td></tr><tr><td class="nowrap">codex-rs-d2eee362c1c6cdc00bcb5bf1d479823ef33c143a-1-rust-v0.0.2505231137</td><td class="nowrap">2025-05-23</td><td class="num">3</td><td>Michael Bolin (3)</td></tr><tr><td class="nowrap">codex-rs-6a77484c94956d5cd319da3f8500b178ec93fc90-1-rust-v0.0.2505220956</td><td class="nowrap">2025-05-22</td><td class="num">1</td><td>Michael Bolin (1)</td></tr><tr><td class="nowrap">codex-rs-79cb07bf70a9036200aa2b61b211fe47ea13184a-1-rust-v0.0.2505212314</td><td class="nowrap">2025-05-22</td><td class="num">2</td><td>Michael Bolin (2)</td></tr><tr><td class="nowrap">codex-rs-68e94c8c08943e1d4a53bd7987e319ba7dbffb74-1-rust-v0.0.2505191609</td><td class="nowrap">2025-05-19</td><td class="num">1</td><td>Michael Bolin (1)</td></tr><tr><td class="nowrap">codex-rs-c74d7e13e7d8daf3a2493f6216918d5e59a38bed-1-rust-v0.0.2505191518</td><td class="nowrap">2025-05-19</td><td class="num">7</td><td>Fouad Matin (5), Michael Bolin (2)</td></tr><tr><td class="nowrap">codex-rs-5ee08335ac690a69035720a798df9865bc5a4278-1-rust-v0.0.2505171051</td><td class="nowrap">2025-05-17</td><td class="num">6</td><td>Michael Bolin (3), Fouad Matin (2), Christoph K (1)</td></tr><tr><td class="nowrap">codex-rs-b5257992b06373acef8b20a4ca25ffc1b96688e2-1-rust-v0.0.2505161708</td><td class="nowrap">2025-05-17</td><td class="num">17</td><td>Michael Bolin (9), Fouad Matin (5), hanson-openai (1), Trevor Creech (1), Sebastian Lund (1)</td></tr><tr><td class="nowrap">codex-rs-8d6a8b308e7457d432564083bb2f577cd39e132b-1-rust-v0.0.2505151627</td><td class="nowrap">2025-05-15</td><td class="num">4</td><td>Michael Bolin (4)</td></tr><tr><td class="nowrap">codex-rs-cb19037ca3822e9b19b51417392f8afc046be607-1-rust-v0.0.2505141652</td><td class="nowrap">2025-05-14</td><td class="num">1</td><td>Michael Bolin (1)</td></tr><tr><td class="nowrap">codex-rs-3a70a0bc280734d09448cb08ec05b5c44f7c798e-1-rust-v0.0.2505141337</td><td class="nowrap">2025-05-14</td><td class="num">22</td><td>Michael Bolin (16), Fouad Matin (4), Yaroslav Halchenko (1), Adeeb (1)</td></tr><tr><td class="nowrap">codex-rs-94c47d69a3f92257e7f9717a2044bd55786eb999-1-rust-v0.0.2505121726</td><td class="nowrap">2025-05-13</td><td class="num">1</td><td>Michael Bolin (1)</td></tr><tr><td class="nowrap">codex-rs-9949f6404378db6f54a01bcadb1956e0535d4921-1-rust-v0.0.2505121520</td><td class="nowrap">2025-05-12</td><td class="num">7</td><td>Michael Bolin (5), jcoens-openai (1), Avi Rosenberg (1)</td></tr><tr><td class="nowrap">codex-rs-7f24ec8cae83ae22e7cc306fea4844958370827d-1-rust-v0.0.2505101753</td><td class="nowrap">2025-05-11</td><td class="num">27</td><td>Michael Bolin (16), jcoens-openai (4), Pranav (2), Corry Haines (2), Tomas Cupr (1), Govind Kamtamneni (1), Fouad Matin (1)</td></tr><tr><td class="nowrap">codex-rs-132146b6d4e133d014f763a0d8dabd853f3fc0c0-1-rust-v0.0.2505061740</td><td class="nowrap">2025-05-07</td><td class="num">18</td><td>Michael Bolin (15), Andrey Mishchenko (2), Anil Karaka (1)</td></tr><tr><td class="nowrap">codex-rs-5915a59c8290765d6097caf4074aae93a85380fa-1-rust-v0.0.2505021951</td><td class="nowrap">2025-05-03</td><td class="num">13</td><td>Michael Bolin (7), Fouad Matin (3), moppywhip (1), anup-openai (1), Kevin Alwell (1)</td></tr><tr><td class="nowrap">codex-rs-e40bc9911433bd3f942ef4604626fab5638a7a72-1-rust-v0.0.2504301327</td><td class="nowrap">2025-04-30</td><td class="num">1</td><td>Michael Bolin (1)</td></tr><tr><td class="nowrap">codex-rs-72a4c38e41bc64f5a7c8c73d52f45784cb6b7137-1-rust-v0.0.2504301219</td><td class="nowrap">2025-04-30</td><td class="num">2</td><td>Michael Bolin (2)</td></tr><tr><td class="nowrap">rust-v0.0.2504301132</td><td class="nowrap">2025-04-30</td><td class="num">6</td><td>Michael Bolin (6)</td></tr><tr><td class="nowrap">rust-v.0.0.2504292236</td><td class="nowrap">2025-04-30</td><td class="num">1</td><td>Michael Bolin (1)</td></tr><tr><td class="nowrap">rust-v.0.0.2504292006</td><td class="nowrap">2025-04-30</td><td class="num">1</td><td>Michael Bolin (1)</td></tr><tr><td class="nowrap">rust-v.0.0.2504291954</td><td class="nowrap">2025-04-30</td><td class="num">2</td><td>Michael Bolin (2)</td></tr><tr><td class="nowrap">rust-v.0.0.2504291926</td><td class="nowrap">2025-04-30</td><td class="num">1</td><td>Michael Bolin (1)</td></tr><tr><td class="nowrap">rust-v.0.0.2504291921</td><td class="nowrap">2025-04-30</td><td class="num">242</td><td>Michael Bolin (40), Fouad Matin (25), Thibault Sottiaux (21), Jon Church (9), Luci (7), Thomas (6), Abdelrhman Kamal Mahmoud Ali Slim (6), Tomas Cupr (5), Misha Davidov (5), Brayden Moon (5), Alpha Diop (5), oai-ragona (4), Scott Leibrand (4), Ilan Bigio (4), Daniel Nakov (4), Benny Yen (4), Mehmet Vecdi Gönül (3), Connor Christie (3), theg1239 (2), moppywhip (2), Sergio (2), Parker Thompson (2), Jordan Docherty (2), Aaron Casanova (2), sooraj (1), salama-openai (1), rumple (1), rohanoai (1), nvp159 (1), nerdielol (1), narenoai (1), mkusaka (1), lugui (1), kshern (1), kchro3 (1), gambhir ⚡ (1), easong-openai (1), ddgond (1), chunterb (1), autotaker (1), Yonatan Lavy (1), Yashraj Yadav (1), Varun Khalate (1), Uladzimir Yancharuk (1), Trevor Creech (1), Suyash-K (1), Shuto Otaki (1), Samin Amanat (1), Sam Verhasselt (1), Rohith Gilla (1), <em>and 44 more authors</em></td></tr><tr><td class="nowrap">rust-v0.0.2504291921</td><td class="nowrap">2025-04-30</td><td class="num">0</td><td></td></tr></table></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

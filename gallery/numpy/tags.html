@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - NumPy</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.10.0.post1.dev6">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html" class="active" aria-current="page">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Tags</h1><dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">16</dd><dd class="stat-note"><span class="nowrap">latest v2.6.0.dev0</span>&nbsp;&middot; <span class="nowrap">2026-05-24</span></dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">2649.3</dd><dd class="stat-note">42,389 commits in total</dd></div></dl>
+<h2 id="all_tags"><a href="#all_tags">All tags</a></h2>
+
+<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th>Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">v2.6.0.dev0</td><td class="nowrap">2026-05-24</td><td class="num">1,088</td><td>Joren Hammudoglu (339), Charles Harris (158), dependabot <span class="badge" title="dependabot[bot]">bot</span> (84), Matti Picus (65), Sebastian Berg (37), Nathan Goldbaum (34), Ralf Gommers (29), Kumar Aditya (22), Marten van Kerkwijk (15), Marco Edward Gorelli (14), Yaoqiao Sha (13), Pieter Eendebak (13), Christine P. Chai (13), Nandika P. T. (12), Antareep Sarkar (12), Alejandro Candioti (11), Warren Weckesser (10), Evgeni Burovski (9), Aniket Singh Yadav (8), !skyvanguard (8), Scott Shambaugh (6), Rohit Goswami (6), Rishabh Dewangan (6), Riku Sakamoto (6), Andrew Nelson (6), Nakul Krishnakumar (5), Matthieu Darbois (5), Matthias Bussonnier (5), Lucas Colley (5), Christina Dec (5), Maanas Arora (4), Kader Miyanyedi (4), Dimitri Papadopoulos Orfanos (4), Vineet Kumar (3), Maarten Baert (3), Justin Kunimune (3), Ganesh Kathiresan (3), Chanda Decker (3), Brock Mendel (3), !mdrdope (3), Wei Bo Gao (2), Sayed Awad (2), Roman Donchenko (2), Raghuveer Devulapalli (2), Peter Hawkins (2), Nathan Legendre (2), Karan Singh (2), Janosh Riebesell (2), Iason Krommydas (2), Harish E (2), <em>and 68 more authors</em></td></tr><tr><td class="nowrap">v2.5.0.dev0</td><td class="nowrap">2025-11-30</td><td class="num">1,243</td><td>Joren Hammudoglu (299), Charles Harris (161), Matti Picus (155), dependabot <span class="badge" title="dependabot[bot]">bot</span> (68), Marco Edward Gorelli (44), Ralf Gommers (34), Nathan Goldbaum (34), Sebastian Berg (31), Christine P. Chai (24), Britney Whittington (20), Sayed Awad (17), Koki Watanabe (17), Warren Weckesser (15), Pieter Eendebak (15), Mohit Deoli (13), Raghuveer Devulapalli (12), Marten van Kerkwijk (12), Anik Chand (12), Abhishek Tiwari (10), Riku Sakamoto (9), Dimitri Papadopoulos Orfanos (9), Wang Yang (杨旺) (8), Dan Raviv (8), Aniket Singh Yadav (8), Andrew Nelson (8), Maanas Arora (7), Mugundan Selvanayagam (6), Johnnie Gray (6), Amelia Thurdekoos (5), Adam Turner (5), Veit Heller (4), Michał Górny (4), Kumar Aditya (4), Kelvin Li (4), Jake VanderPlas (4), Chris Navarro (4), Yuki K (3), Varad Raj Singh (3), Swayam Singh (3), Shirong Wang (3), Sandeep Gupta (3), Paul Caprioli (3), Melissa Weber Mendonça (3), Jingu Kang (3), Evgeni Burovski (3), Dennis Van de Vorst (3), Christopher Sidebottom (3), Akhil Kannan (3), Abdu Zoghbi (3), !DWesl (3), <em>and 85 more authors</em></td></tr><tr><td class="nowrap">v2.4.0.dev0</td><td class="nowrap">2025-05-21</td><td class="num">1,364</td><td>Charles Harris (296), Joren Hammudoglu (175), Dimitri Papadopoulos Orfanos (134), Nathan Goldbaum (108), Sebastian Berg (69), Matti Picus (51), dependabot <span class="badge" title="dependabot[bot]">bot</span> (47), Marco Edward Gorelli (41), Pieter Eendebak (37), Peyton Murray (35), Ralf Gommers (19), Christine P. Chai (19), Inessa Pawson (17), Raghuveer Devulapalli (16), Mateusz Sokół (15), !fengluoqiuwu (12), Matthew Sterrett (11), Warren Weckesser (10), Shantanu Jain (10), Sayed Awad (10), Filipe Laíns (10), Antonio Rech Santos (10), Matthieu Darbois (9), Abhishek Kumar (9), GUAN MING (7), Maanas Arora (6), John Stilley (6), Guan Ming(Wesley) Chiu (6), Andrew Nelson (6), Saransh Chopra (5), Chris Navarro (5), Carlos Martin (5), !DWesl (5), Yuvraj Pradhan (4), Tyler Reddy (4), Matthias Diener (4), Lysandros Nikolaou (4), Jake VanderPlas (4), Wang Yang (杨旺) (3), Peter Hawkins (3), Marten van Kerkwijk (3), Lucas Colley (3), Hin-Tak Leung (3), Ernst Peng (3), Eric Larson (3), Christopher Sidebottom (3), Arvid Bessen (3), Agriya Khetarpal (3), Aditi Juneja (3), Simon Altrogge (2), <em>and 74 more authors</em></td></tr><tr><td class="nowrap">v2.3.0.dev0</td><td class="nowrap">2024-11-23</td><td class="num">780</td><td>Charles Harris (183), Joren Hammudoglu (103), Matti Picus (52), Sebastian Berg (45), Nathan Goldbaum (45), dependabot <span class="badge" title="dependabot[bot]">bot</span> (42), Dimitri Papadopoulos Orfanos (41), Ralf Gommers (20), !fengluoqiuwu (18), Lars Grüter (17), Pieter Eendebak (15), Rohit Goswami (14), Luiz Eduardo Amaral (13), Mateusz Sokół (12), Marten van Kerkwijk (8), Ishan Purekar (8), GUAN MING (8), Andrew Nelson (8), Stefan van der Walt (7), Yashasvi Misra (6), Matt Haberland (5), Habiba Hye (5), Raghuveer Devulapalli (4), Tyler Reddy (3), Lucas Colley (3), Evgeni Burovski (3), Christopher Sidebottom (3), Austin Ran (3), Xiao Yuan (2), Warren Weckesser (2), Shiv Katira (2), Sayed Awad (2), Santhana Mikhail Antony S (2), Peter Hawkins (2), Michael Davidsaver (2), Maximilian Weigand (2), Maryanne Wachter (2), Marcel Telka (2), Linus Sommer (2), Ishan Koradia (2), Hugo van Kemenade (2), Clément Robert (2), Agriya Khetarpal (2), Adrien Corenflos (2), Vijayakumar Z (1), Victor Herdeiro (1), Vahid Tavanashad (1), Timo Röhling (1), Tim Hoffmann (1), Stan Ulbrych (1), <em>and 48 more authors</em></td></tr><tr><td class="nowrap">v2.2.0.dev0</td><td class="nowrap">2024-08-07</td><td class="num">1,366</td><td>Nathan Goldbaum (241), Sebastian Berg (155), Charles Harris (153), Matti Picus (110), Ralf Gommers (63), Mateusz Sokół (50), Joren Hammudoglu (50), dependabot <span class="badge" title="dependabot[bot]">bot</span> (39), Luiz Eduardo Amaral (34), Evgeni Burovski (28), Agriya Khetarpal (28), Aaron Meurer (28), Raghuveer Devulapalli (27), Julia Poo (27), Warren Weckesser (24), Rohit Goswami (24), Pieter Eendebak (22), Ben Woodruff (22), Marten van Kerkwijk (17), Dimitri Papadopoulos Orfanos (16), Christopher Titchen (13), Lysandros Nikolaou (12), Jyn Spring 琴春 (11), Christopher Sidebottom (11), Andrew Nelson (10), GUAN MING (9), Melissa Weber Mendonça (8), Tuhin Sharma (6), Paul Juma Otieno (6), Leo Singer (6), Ebigide Jude (5), Arun Pa (5), Yuki K (4), Anne Gunn (4), Sam Morley (3), Ross Barnowski (3), Raquel Braunschweig (3), KIU Shueng Chuan (3), Hugo van Kemenade (3), Alex Herbert (3), Ajay Kumar Janapareddi (3), !partev (3), Yang Liu (2), Yair Chuchem (2), Tyler Reddy (2), Timo Röhling (2), Thomas Li (2), Serge Guelton (2), Patrick J. Roddy (2), Moritz Schreiber (2), <em>and 51 more authors</em></td></tr><tr><td class="nowrap">v2.1.0.dev0</td><td class="nowrap">2024-03-08</td><td class="num">2,979</td><td>Sebastian Berg (460), Charles Harris (319), Ralf Gommers (264), Nathan Goldbaum (258), Matti Picus (241), Lysandros Nikolaou (163), Mateusz Sokół (154), Rohit Goswami (131), Raghuveer Devulapalli (82), dependabot <span class="badge" title="dependabot[bot]">bot</span> (64), Linus Sommer (64), Yuki K (56), Marten van Kerkwijk (52), Stefan van der Walt (42), Matt Haberland (42), Sayed Awad (39), Bas van Beek (39), Aaron Meurer (33), Ganesh Kathiresan (32), Andrew Nelson (26), Pieter Eendebak (21), Richard Howe (19), Liang Yan (17), Brock Mendel (16), Christopher Sidebottom (15), Dimitri Papadopoulos Orfanos (14), Daval Parmar (13), Mohit Kumar (11), Melissa Weber Mendonça (11), Evgeni Burovski (11), !liang3zy22 (9), !ellaella12 (9), !undermyumbrella1 (8), Tyler Reddy (7), Ross Barnowski (7), Brigitta Sipőcz (7), Brian Walshe (7), Warren Weckesser (5), Mukulika Pahari (5), Matthias Bussonnier (5), Kevin Sheppard (5), Jake VanderPlas (5), Even Rouault (5), !stefan6419846 (5), Kristian Minchev (4), Johannes Kaisinger (4), Agriya Khetarpal (4), Zach Brugh (3), Will Ayd (3), Peter Hawkins (3), <em>and 129 more authors</em></td></tr><tr><td class="nowrap">v2.0.0.dev0</td><td class="nowrap">2023-05-24</td><td class="num">1,533</td><td>Sebastian Berg (355), Charles Harris (212), Matti Picus (211), Nathan Goldbaum (68), Raghuveer Devulapalli (55), Rohit Goswami (54), Sayed Awad (53), Ralf Gommers (48), Developer-Ecosystem-Engineering (44), Yuki K (34), dependabot <span class="badge" title="dependabot[bot]">bot</span> (31), Bas van Beek (26), Andrew Nelson (20), !DWesl (18), Matteo Raso (15), Warren Weckesser (12), Ross Barnowski (12), Robert Kern (12), Prithvi Singh (11), Philip Holzmann (10), Tyler Reddy (8), Peter Hawkins (7), Mark J. Olson (7), Ganesh Kathiresan (6), Sylvain Ferriol (5), Stefan Behnel (5), Pieter Eendebak (5), Melissa Weber Mendonça (5), Marten van Kerkwijk (5), Jules Kouatchou (5), Dimitri Papadopoulos Orfanos (5), Christopher Sidebottom (5), Stefan van der Walt (4), Mark Harfouche (4), Lee Johnston (4), Jean-François B (4), Jarrod Millman (4), Brian Soto (4), Aaron Meurer (4), Younes Sandi (3), Will Tirone (3), Stefanie Molin (3), Roy Smart (3), Mukulika Pahari (3), Leona Taric (3), Ikko Eltociear Ashimine (3), Clément Robert (3), Christian Veenhuis (3), Christian Lorentzen (3), !pmvz (3), <em>and 85 more authors</em></td></tr><tr><td class="nowrap">v1.25.0.dev0</td><td class="nowrap">2022-11-22</td><td class="num">1,178</td><td>Sebastian Berg (286), Charles Harris (161), Matti Picus (148), Miles Cranmer (52), Bas van Beek (33), Ralf Gommers (28), Sayed Awad (24), Ross Barnowski (24), Rohit Goswami (21), Melissa Weber Mendonça (21), Hood Chatham (14), Pieter Eendebak (13), Ganesh Kathiresan (13), M. Eric Irrgang (11), Warren Weckesser (10), Dimitri Papadopoulos Orfanos (10), Raghuveer Devulapalli (8), Rafael CF Sousa (8), Namami Shanker (8), Kevin Sheppard (8), Developer-Ecosystem-Engineering (8), Pamphile Roy (7), Chiara Marmo (7), Brigitta Sipőcz (7), Shoban Chiddarth (6), Greg Lucas (6), Srimukh Sripada (5), Satish Mishra (5), Matthias Bussonnier (5), João Fontes Gonçalves (5), Jason Thai (5), Bram Ton (5), Tyler Reddy (4), Thomas A Caswell (4), Noritada Kobayashi (4), Meekail Zain (4), Matthew Sterrett (4), Matteo Raso (4), Johnathon Cusick (4), Jarrod Millman (4), Felix Hirwa Nshuti (4), Aaron Meurer (4), !juztamau5 (4), Stefan van der Walt (3), Satish Kumar Mishra (3), Sachin Krishnan T V (3), Ruth Comer (3), Petar Mlinarić (3), Matthew Brett (3), Karl Otness (3), <em>and 112 more authors</em></td></tr><tr><td class="nowrap">v1.24.0.dev0</td><td class="nowrap">2022-05-23</td><td class="num">1,289</td><td>Sebastian Berg (200), Matti Picus (195), Charles Harris (172), Bas van Beek (76), Rohit Goswami (41), Ralf Gommers (39), Ross Barnowski (31), Sayed Awad (27), Melissa Weber Mendonça (26), Raghuveer Devulapalli (24), Serge Guelton (23), Warren Weckesser (18), Mars Lee (18), Thomas Li (16), Brigitta Sipőcz (16), Aaron Meurer (16), Thomas Green (14), Tirth Patel (13), Pierre de Buyl (13), Ganesh Kathiresan (12), Rafael CF Sousa (11), Bhavuk Kalra (11), Pieter Eendebak (10), Matthias Bussonnier (10), !DWesl (9), Developer-Ecosystem-Engineering (8), Mukulika Pahari (7), Matthew Barber (7), Jonathan Deng (7), Hood Chatham (7), Inessa Pawson (6), !h-vetinari (6), Pradipta Ghosh (5), Mariusz Felisiak (5), Kevin Sheppard (5), Jérôme Richard (5), Dimitri Papadopoulos Orfanos (5), Raúl Montón Pinillos (4), Matthieu Darbois (4), Marten van Kerkwijk (4), Kilian Lieret (4), Joseph Fox-Rabinovitz (4), Janus Heide (4), Devin Shanahan (4), Tim Hoffmann (3), Thomas J. Fan (3), Tania Allard (3), Stefan van der Walt (3), Namami Shanker (3), Margret Pax (3), <em>and 96 more authors</em></td></tr><tr><td class="nowrap">v1.23.0.dev0</td><td class="nowrap">2021-11-16</td><td class="num">1,879</td><td>Charles Harris (349), Bas van Beek (274), Sebastian Berg (166), Aaron Meurer (164), Matti Picus (150), Gagandeep Singh (89), dependabot <span class="badge" title="dependabot[bot]">bot</span> (36), Warren Weckesser (32), Melissa Weber Mendonça (32), Raghuveer Devulapalli (30), Mukulika Pahari (30), Dimitri Papadopoulos Orfanos (29), Rohit Goswami (27), Sayed Awad (26), Ralf Gommers (25), Pearu Peterson (23), Thomas J. Fan (19), Antony Lee (19), Ross Barnowski (18), Ganesh Kathiresan (17), Ajay DS (12), Abel Aoun (12), Sebastian Schleehauf (11), Hameer Abbasi (11), Chiara Marmo (11), !DWesl (11), Yashasvi Misra (10), Sista Seetaram (7), Matthew Barber (7), Jerry Morrison (7), Hugo Defois (7), Dima Pasechnik (7), Sayantika Banik (6), Matthew Brett (6), Jonas I. Liechti (6), Eskild Eriksen (6), Ankit Dwivedi (6), Stefan van der Walt (5), Mike Toews (5), Jérôme Kieffer (5), Yang Hau (4), Tim Hoffmann (4), Mars Lee (4), Kevin Sheppard (4), Gregory R. Lee (4), Eric Wieser (4), Alberto Rubiales (4), !h-vetinari (4), Serge Guelton (3), Matthias Bussonnier (3), <em>and 95 more authors</em></td></tr><tr><td class="nowrap">v1.22.0.dev0</td><td class="nowrap">2021-05-22</td><td class="num">1,760</td><td>Charles Harris (312), Bas van Beek (227), Sebastian Berg (184), Matti Picus (179), Ralf Gommers (92), Chunlin Fang (83), Ganesh Kathiresan (62), Sayed Awad (54), Kevin Sheppard (52), dependabot-preview <span class="badge" title="dependabot-preview[bot]">bot</span> (45), Pearu Peterson (21), Matthias Bussonnier (19), Keller Meier (19), Eric Wieser (17), Tania Allard (15), Ross Barnowski (13), Touqir Sajed (12), Robert Kern (12), Melissa Weber Mendonça (12), Christoph Gohlke (12), Michael Dubravski (10), Kasia Leszek (10), Tyler Reddy (8), Alexander Hunt (8), dependabot <span class="badge" title="dependabot[bot]">bot</span> (7), Inessa Pawson (7), Christopher Dahlin (7), Aitik Gupta (7), Yang Hau (6), Tim Hoffmann (6), Anthony Vo (6), Allan Haldane (6), Ryan Polley (5), Raghuveer Devulapalli (5), Pamphile Roy (5), Mitchell Faas (5), Mary Conley (5), Isuru Fernando (5), Abhay Raghuvanshi (5), !Patrick (5), Matthew Badin (4), Jamie Macey (4), James Gerity (4), Holly Corbett (4), Giannis Zapantis (4), Ayush Verma (4), Antony Lee (4), !Illviljan (4), Zolisa Bleki (3), Takanori Hirano (3), <em>and 113 more authors</em></td></tr><tr><td class="nowrap">v1.21.0.dev0</td><td class="nowrap">2020-11-27</td><td class="num">13,064</td><td>Charles Harris (3,159), Matti Picus (1,426), Eric Wieser (1,217), Sebastian Berg (729), Julian Taylor (494), Ralf Gommers (464), Allan Haldane (258), Jaime Fernandez (237), Marten van Kerkwijk (233), Stephan Hoyer (195), Kevin Sheppard (177), Nathaniel J. Smith (174), Pauli Virtanen (166), Tyler Reddy (146), Bas van Beek (146), Warren Weckesser (118), Ross Barnowski (73), Ben Nathanson (67), dependabot-preview <span class="badge" title="dependabot-preview[bot]">bot</span> (64), Raghuveer Devulapalli (61), Melissa Weber Mendonça (60), !xoviat (60), Michael Seifert (58), Thomas A Caswell (57), Hameer Abbasi (56), Seth Troisi (53), Sayed Awad (52), John Kirkham (50), Peter Andreas Entschev (49), Greg Young (47), Takanori Hirano (44), Matthew Brett (44), Alex Griffing (43), Joseph Fox-Rabinovitz (42), Stefan van der Walt (41), Josh Wilson (39), Lars Buitinck (37), Chunlin Fang (35), Kriti Singh (34), Robert Kern (33), Mark Harfouche (29), Bharat Raghunathan (28), Christoph Gohlke (27), Nick Papior (25), Eric Mariasis (25), Jamie Townsend (24), Anirudh Subramanian (24), Antony Lee (23), Eric Moore (22), Zolisa Bleki (21), <em>and 922 more authors</em></td></tr><tr><td class="nowrap">pre-removal-numpybook</td><td class="nowrap">2014-03-13</td><td class="num">2,503</td><td>Charles Harris (657), Julian Taylor (256), Sebastian Berg (253), Nathaniel J. Smith (137), Jay Bourque (126), Ralf Gommers (106), Pauli Virtanen (95), Óscar Villellas Guillén (69), Ondřej Čertík (52), Travis Oliphant (51), Han Genuit (36), Mark Weissman (30), !Endolith (29), Christoph Gohlke (27), Lars Buitinck (24), David Cournapeau (24), Arink Verma (23), Mark Wiebe (22), Johannes Schönberger (21), Jaime Fernandez (20), Warren Weckesser (19), David Warde-Farley (19), John Salvatier (18), Frederic Bastien (16), Yaron de Leeuw (10), Thomas Robitaille (10), Eric Fode (10), Egor Zindy (10), Stefan van der Walt (9), Blake Griffith (9), Bill Spotz (9), Alex Griffing (9), Yaroslav Halchenko (8), Matthew Brett (8), Max Sperlich (7), Marten van Kerkwijk (7), Jonathan Helmus (7), Daniel Müllner (7), Eric Moore (6), Daniel da Silva (6), Chris Kerr (6), Alexander Belopolsky (6), Thouis (Ray) Jones (5), Skipper Seabold (5), Sankarshan Mudkavi (5), Olivier Grisel (5), Frank Breitling (5), Bradley M. Froehle (5), Bago Amirbekian (5), Joseph Martinot-Lagarde (4), <em>and 125 more authors</em></td></tr><tr><td class="nowrap">with_maskna</td><td class="nowrap">2012-06-20</td><td class="num">8,438</td><td>Travis Oliphant (1,937), David Cournapeau (1,492), Charles Harris (927), Mark Wiebe (732), Pearu Peterson (653), Pauli Virtanen (555), Stefan van der Walt (414), David M Cooke (249), Ralf Gommers (218), Pierre GM (199), Robert Kern (175), Jarrod Millman (127), Alan McIntyre (81), Alexander Belopolsky (74), Bill Spotz (64), Matthew Brett (42), Ed Schofield (38), Michael Droettboom (33), David Huard (32), Tim Leslie (29), Nathaniel J. Smith (28), Christopher Hanley (25), jmiller (20), Han Genuit (20), Fernando Perez (20), Tim Hochberg (16), Aaron River (15), Chris Burns (14), Robert Cimrman (11), David Warde-Farley (11), Chris Jordan-Squire (11), Thouis (Ray) Jones (10), Christopher L. Farrow (10), Prabhu Ramachandran (8), Skipper Seabold (7), Derek Homeier (7), Darren Dale (7), Anne Archibald (7), Eric Jones (6), Joe Kington (5), Benjamin Root (5), Ben Walsh (5), Tim Cera (4), Paul Anton Letnes (4), Nicolas Pinto (4), Justin Peel (4), Geoffrey Irving (4), Christoph Gohlke (4), Bryan Van de Ven (4), Alok Singhal (4), <em>and 44 more authors</em></td></tr><tr><td class="nowrap">v0.3.0</td><td class="nowrap">2004-04-14</td><td class="num">20</td><td>Pearu Peterson (18), Travis Vaught (2)</td></tr><tr><td class="nowrap">v0.2.2</td><td class="nowrap">2004-04-02</td><td class="num">740</td><td>Pearu Peterson (390), Eric Jones (242), Travis Oliphant (75), skip (10), Pat Miller (6), Travis Vaught (5), Prabhu Ramachandran (5), dmorrill (4), nobody (1), martin (1), jswhit (1)</td></tr></table></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

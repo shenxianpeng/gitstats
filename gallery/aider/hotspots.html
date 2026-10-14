@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - Aider</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.10.0.post1.dev6">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html" class="active" aria-current="page">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Hotspots</h1><p class="section-note">Files that are both large and changed often are where bugs tend to cluster and where refactoring pays off first. Each file in the current tree is placed by its size and by the number of commits that changed it; its <strong>hotspot score</strong> is changes &times; &radic;lines. Files without counted lines, such as binary files, are left out.</p><dl class="stat-tiles" style="--cols: 4; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Files Analyzed</dt><dd class="stat-value">511</dd><dd class="stat-note">of 691 in the current tree</dd></div><div class="stat-tile"><dt>Top 10 Files</dt><dd class="stat-value">53.4%</dd><dd class="stat-note">of the total hotspot score</dd></div><div class="stat-tile"><dt>Median File Size</dt><dd class="stat-value">64 lines</dd><dd class="stat-note">half of the files are at least this large</dd></div><div class="stat-tile"><dt>Median Changes</dt><dd class="stat-value">4 commits</dd><dd class="stat-note">half of the files changed at least this often</dd></div></dl>
+<h2 id="change_frequency_by_file_size"><a href="#change_frequency_by_file_size">Change frequency by file size</a></h2>
+
+<p class="section-note">Each dot is a file; a bigger dot is a higher score. The dashed lines mark the median file size and the median number of changes, so the large files that change often are in the top right. Both axes are logarithmic.</p><div class="chart-box has-legend" style="--chart-ratio: 2.4"><canvas id="chart-hotspots"></canvas></div><script type="application/json" id="hotspot-data">{"medianLines": 64, "medianChurn": 4, "points": [["aider/coders/base_coder.py", 2485, 930, 46360.3], ["aider/commands.py", 1712, 672, 27804.9], ["aider/main.py", 1274, 729, 26020.3], ["HISTORY.md", 1533, 539, 21103.8], ["aider/models.py", 1338, 486, 17777.2], ["aider/website/HISTORY.md", 1557, 372, 14678.7], ["aider/io.py", 1191, 421, 14529.1], ["aider/website/assets/sample-analytics.jsonl", 1000, 404, 12775.6], ["benchmark/benchmark.py", 1059, 257, 8363.4], ["aider/resources/model-settings.yml", 3128, 147, 8221.5], ["aider/repomap.py", 867, 270, 7950.1], ["aider/website/docs/config/adv-model-settings.md", 3429, 131, 7671.1], ["tests/basic/test_main.py", 1483, 195, 7509.4], ["tests/basic/test_commands.py", 2226, 146, 6888.4], ["README.md", 179, 496, 6636.0], ["aider/args.py", 945, 214, 6578.5], ["aider/website/docs/faq.md", 383, 312, 6106.0], ["aider/website/_data/edit_leaderboard.yml", 2232, 97, 4582.7], ["aider/repo.py", 622, 179, 4464.2], ["aider/website/docs/leaderboards/index.md", 290, 243, 4138.1], ["aider/website/_data/polyglot_leaderboard.yml", 1856, 92, 3963.5], ["aider/utils.py", 348, 209, 3898.8], ["requirements.txt", 489, 166, 3670.8], ["tests/basic/test_coder.py", 1438, 90, 3412.9], ["aider/coders/editblock_coder.py", 657, 130, 3332.2], ["aider/watch.py", 318, 181, 3227.7], ["aider/website/_data/blame.yml", 4896, 46, 3218.7], ["aider/website/docs/config/options.md", 863, 95, 2790.8], ["aider/website/index.html", 695, 101, 2662.6], ["tests/basic/test_models.py", 600, 97, 2376.0], ["aider/website/docs/config/aider_conf.md", 536, 102, 2361.5], ["tests/basic/test_repomap.py", 510, 98, 2213.2], ["aider/website/assets/sample.aider.conf.yml", 480, 97, 2125.2], ["aider/website/docs/config/dotenv.md", 490, 94, 2080.8], ["aider/website/assets/sample.env", 448, 89, 1883.8], ["scripts/blame.py", 296, 104, 1789.3], ["aider/__init__.py", 20, 378, 1690.5], ["scripts/issues.py", 458, 78, 1669.3], ["aider/linter.py", 304, 95, 1656.4], ["requirements/common-constraints.txt", 629, 66, 1655.3], ["requirements/requirements-help.txt", 387, 82, 1613.1], ["aider/resources/model-metadata.json", 715, 59, 1577.6], ["benchmark/problem_stats.py", 355, 78, 1469.6], ["tests/basic/test_io.py", 610, 56, 1383.1], ["requirements/requirements-dev.txt", 320, 76, 1359.5], ["aider/analytics.py", 258, 82, 1317.1], ["aider/gui.py", 545, 53, 1237.3], ["aider/website/assets/home.css", 937, 38, 1163.2], ["aider/scrape.py", 284, 64, 1078.5], ["tests/basic/test_repo.py", 716, 40, 1070.3], ["tests/basic/test_reasoning.py", 609, 43, 1061.2], ["aider/coders/editblock_prompts.py", 172, 80, 1049.2], ["aider/sendchat.py", 61, 119, 929.4], ["benchmark/over_time.py", 168, 71, 920.3], ["requirements/requirements-browser.txt", 155, 69, 859.0], ["aider/mdstream.py", 243, 48, 748.2], ["aider/voice.py", 187, 54, 738.4], ["aider/onboarding.py", 428, 35, 724.1], ["aider/website/_includes/blame.md", 162, 55, 700.0], ["aider/website/docs/more/infinite-output.md", 256, 43, 688.0], ["scripts/versionbump.py", 175, 50, 661.4], ["aider/report.py", 200, 46, 650.5], ["aider/coders/wholefile_coder.py", 144, 54, 648.0], ["aider/history.py", 143, 54, 645.7], ["tests/fixtures/chat-history.md", 99961, 2, 632.3], ["aider/website/_includes/leaderboard_table.js", 520, 27, 615.7], ["aider/website/docs/usage/commands.md", 131, 52, 595.2], ["aider/website/_posts/2024-09-26-architect.md", 418, 29, 592.9], ["aider/website/_posts/2024-08-14-code-in-json.md", 254, 37, 589.7], ["aider/prompts.py", 61, 74, 578.0], ["aider/versioncheck.py", 113, 50, 531.5], ["scripts/update-history.py", 162, 41, 521.8], ["aider/website/_posts/2024-11-21-quantization.md", 194, 36, 501.4], ["aider/help.py", 163, 38, 485.2], ["aider/website/assets/models-over-time.svg", 1974, 10, 444.3], ["aider/website/_includes/recording.js", 428, 21, 434.5], ["tests/basic/test_editblock.py", 618, 17, 422.6], ["aider/website/_data/quant.yml", 322, 23, 412.7], ["aider/run_cmd.py", 132, 35, 402.1], ["aider/website/_posts/2025-01-28-deepseek-down.md", 257, 24, 384.7], ["tests/basic/test_sendchat.py", 171, 29, 379.2], ["aider/website/docs/languages.md", 262, 23, 372.3], ["aider/coders/patch_coder.py", 706, 14, 372.0], ["aider/special.py", 203, 26, 370.4], ["tests/basic/test_watch.py", 166, 28, 360.8], ["scripts/clean_metadata.py", 258, 22, 353.4], ["tests/fixtures/chat-history-search-replace-gold.txt", 27808, 2, 333.5], ["aider/website/docs/usage/watch.md", 294, 19, 325.8], ["aider/args_formatter.py", 228, 21, 317.1], ["aider/exceptions.py", 113, 29, 308.3], ["tests/basic/test_editor.py", 159, 24, 302.6], ["requirements/requirements.in", 50, 42, 297.0], ["aider/diffs.py", 128, 26, 294.2], [".github/workflows/windows-tests.yml", 51, 41, 292.8], ["tests/basic/test_onboarding.py", 437, 14, 292.7], ["aider/website/_includes/leaderboard.js", 246, 18, 282.3], ["aider/website/docs/config/model-aliases.md", 105, 27, 276.7], ["aider/website/docs/usage/modes.md", 210, 19, 275.3], ["aider/website/_includes/recording.css", 228, 18, 271.8], ["aider/coders/udiff_coder.py", 429, 13, 269.3], [".github/workflows/docker-build-test.yml", 85, 28, 258.1], ["tests/scrape/test_scrape.py", 175, 19, 251.3], ["aider/coders/search_replace.py", 757, 9, 247.6], [".github/workflows/ubuntu-tests.yml", 56, 33, 246.9], ["scripts/logo_svg.py", 174, 18, 237.4], ["benchmark/README.md", 145, 19, 228.8], ["scripts/redact-cast.py", 62, 29, 228.3], ["aider/website/_includes/head_custom.html", 143, 19, 227.2], ["aider/coders/editblock_func_coder.py", 141, 19, 225.6], ["scripts/recording_audio.py", 338, 12, 220.6], ["tests/basic/test_sanity_check_repo.py", 184, 16, 217.0], ["aider/coders/wholefile_prompts.py", 64, 27, 216.0], ["aider/website/install.sh", 1832, 5, 214.0], ["aider/website/_data/code-in-json.yml", 926, 7, 213.0], ["aider/website/docs/config/reasoning.md", 210, 14, 202.9], ["aider/website/docs/install.md", 114, 19, 202.9], ["aider/website/docs/more/analytics.md", 126, 18, 202.0], ["CONTRIBUTING.md", 240, 13, 201.4], ["scripts/homepage.py", 615, 8, 198.4], ["tests/basic/test_analytics.py", 136, 17, 198.3], [".github/workflows/pages.yml", 87, 21, 195.9], ["aider/website/_posts/2024-08-26-sonnet-seems-fine.md", 144, 16, 192.0], ["aider/website/_posts/2025-05-08-qwen3.md", 365, 10, 191.0], ["scripts/30k-image.py", 235, 12, 184.0], ["aider/editor.py", 147, 15, 181.9], ["aider/coders/base_prompts.py", 60, 23, 178.2], ["scripts/update-docs.sh", 34, 30, 174.9], ["tests/basic/test_linter.py", 84, 19, 174.1], ["aider/coders/wholefile_func_coder.py", 134, 15, 173.6], ["aider/website/docs/llms/other.md", 117, 16, 173.1], ["aider/website/docs/llms/openrouter.md", 75, 19, 164.5], ["aider/website/_includes/qwq-chart.js", 120, 15, 164.3], ["aider/website/_posts/2024-12-21-polyglot.md", 216, 11, 161.7], ["aider/coders/single_wholefile_func_coder.py", 102, 16, 161.6], ["aider/website/docs/llms/bedrock.md", 132, 14, 160.8], ["scripts/my_models.py", 98, 16, 158.4], ["aider/coders/__init__.py", 34, 27, 157.4], ["tests/basic/test_exceptions.py", 104, 15, 153.0], ["pyproject.toml", 52, 21, 151.4], ["tests/basic/test_find_or_blocks.py", 115, 14, 150.1], ["aider/coders/udiff_prompts.py", 113, 14, 148.8], ["aider/website/docs/llms/ollama.md", 74, 17, 146.2], ["scripts/tsl_pack_langs.py", 145, 12, 144.5], ["tests/basic/test_voice.py", 103, 14, 142.1], ["aider/website/_includes/code-in-json-benchmark.js", 165, 11, 141.3], [".github/workflows/release.yml", 34, 23, 134.1], ["tests/help/test_help.py", 147, 11, 133.4], ["aider/website/_includes/leaderboard_graph.html", 170, 10, 130.4], ["aider/website/_posts/2024-09-12-o1.md", 116, 12, 129.2], ["aider/website/_includes/quant-chart.js", 95, 13, 126.7], ["aider/website/docs/llms/anthropic.md", 77, 14, 122.8], ["aider/website/docs/legal/privacy.md", 104, 12, 122.4], ["aider/website/docs/install/optional.md", 98, 12, 118.8], ["aider/website/docs/usage/tips.md", 78, 13, 114.8], ["aider/website/docs/troubleshooting/edit-errors.md", 76, 13, 113.3], ["requirements/requirements-playwright.txt", 18, 26, 110.3], ["aider/website/_data/o1_results.yml", 186, 8, 109.1], ["tests/basic/test_deprecated.py", 140, 9, 106.5], ["aider/website/docs/usage/not-code.md", 177, 8, 106.4], ["scripts/pip-compile.sh", 43, 16, 104.9], ["aider/website/docs/git.md", 75, 12, 103.9], ["aider/website/docs/leaderboards/edit.md", 133, 9, 103.8], [".github/workflows/check_pypi_version.yml", 86, 11, 102.0], ["tests/basic/test_scripting.py", 39, 16, 99.9], ["aider/website/_data/qwen3_leaderboard.yml", 272, 6, 99.0], ["aider/website/docs/usage/copypaste.md", 121, 9, 99.0], ["aider/website/docs/leaderboards/refactor.md", 78, 11, 97.1], ["aider/website/docs/usage/lint-test.md", 116, 9, 96.9], ["aider/website/_posts/2024-12-03-qwq.md", 140, 8, 94.7], ["tests/basic/test_wholefile.py", 359, 5, 94.7], ["aider/website/docs/scripting.md", 100, 9, 90.0], ["aider/coders/ask_prompts.py", 41, 14, 89.6], ["aider/waiting.py", 221, 6, 89.2], ["tests/basic/test_history.py", 120, 8, 87.6], ["aider/website/_data/refactor_leaderboard.yml", 298, 5, 86.3], ["aider/website/docs/usage.md", 92, 9, 86.3], ["aider/website/_posts/2025-05-07-gemini-cost.md", 114, 8, 85.4], ["aider/website/_includes/code-in-json-syntax.js", 139, 7, 82.5], ["aider/reasoning_tags.py", 82, 9, 81.5], ["benchmark/swe_bench.py", 131, 7, 80.1], ["aider/website/docs/troubleshooting/imports.md", 62, 10, 78.7], [".pre-commit-config.yaml", 23, 16, 76.7], ["aider/website/docs/llms/openai.md", 58, 10, 76.2], ["aider/coders/patch_prompts.py", 159, 6, 75.7], ["aider/website/_config.yml", 68, 9, 74.2], ["aider/website/docs/llms/github.md", 110, 7, 73.4], ["benchmark/refactor_tools.py", 209, 5, 72.3], ["requirements/requirements-help.in", 13, 20, 72.1], ["aider/website/docs/llms/xai.md", 49, 10, 70.0], ["aider/llm.py", 47, 10, 68.6], ["aider/website/docs/troubleshooting/token-limits.md", 96, 7, 68.6], ["aider/website/_data/deepseek-down.yml", 130, 6, 68.4], ["aider/website/_data/architect.yml", 492, 3, 66.5], ["aider/website/docs/recordings/tree-sitter-language-pack.md", 69, 8, 66.5], ["benchmark/rsync.sh", 44, 10, 66.3], ["aider/website/docs/llms/gemini.md", 36, 11, 66.0], ["aider/website/_posts/2023-10-22-repomap.md", 268, 4, 65.5], ["aider/website/_posts/2025-01-24-r1-sonnet.md", 118, 6, 65.2], ["aider/website/_includes/get-started.md", 21, 14, 64.2], ["tests/basic/test_ssl_verification.py", 84, 7, 64.2], ["aider/website/docs/ctags.md", 251, 4, 63.4], ["benchmark/rungrid.py", 61, 8, 62.5], ["aider/urls.py", 17, 15, 61.8], ["aider/website/_posts/2024-07-25-new-models.md", 99, 6, 59.7], ["aider/website/docs/benchmarks.md", 368, 3, 57.5], ["benchmark/docker.sh", 19, 13, 56.7], ["aider/website/_includes/multi-line.md", 22, 12, 56.3], ["aider/website/_posts/2024-07-01-sonnet-not-lazy.md", 125, 5, 55.9], ["benchmark/install-docker-ubuntu.sh", 63, 7, 55.6], ["aider/coders/architect_coder.py", 48, 8, 55.4], ["aider/website/docs/index.md", 47, 8, 54.8], ["aider/website/docs/usage/tutorials.md", 30, 10, 54.8], ["aider/website/_posts/2024-05-13-models-over-time.md", 327, 3, 54.2], ["aider/website/docs/usage/conventions.md", 117, 5, 54.1], ["aider/website/docs/more/edit-formats.md", 116, 5, 53.9], ["aider/coders/context_coder.py", 53, 7, 51.0], ["aider/website/docs/llms/deepseek.md", 31, 9, 50.1], ["scripts/yank-old-versions.py", 51, 7, 50.0], ["aider/website/assets/swe_bench.svg", 2445, 1, 49.4], ["aider/website/assets/asciinema/asciinema-player.css", 2366, 1, 48.6], ["aider/website/docs/llms/azure.md", 48, 7, 48.5], ["aider/website/_data/o1_polyglot_leaderboard.yml", 259, 3, 48.3], ["aider/coders/chat_chunks.py", 64, 6, 48.0], ["aider/website/assets/swe_bench_lite.svg", 2306, 1, 48.0], ["aider/coders/editblock_fenced_prompts.py", 143, 4, 47.8], ["aider/website/docs/recordings/model-accepts-settings.md", 63, 6, 47.6], ["aider/website/install.ps1", 559, 2, 47.3], ["aider/website/assets/benchmarks.svg", 2198, 1, 46.9], ["aider/website/docs/usage/notifications.md", 87, 5, 46.6], ["aider/website/docs/install/docker.md", 57, 6, 45.3], ["aider/website/docs/config/editor.md", 127, 4, 45.1], ["aider/website/docs/recordings/index.md", 20, 10, 44.7], ["aider/website/assets/2024-03-07-claude-3.svg", 1987, 1, 44.6], ["aider/website/assets/benchmarks-1106.svg", 1955, 1, 44.2], ["aider/website/docs/troubleshooting/models-and-keys.md", 54, 6, 44.1], ["aider/website/docs/llms.md", 53, 6, 43.7], ["requirements/requirements-dev.in", 19, 10, 43.6], ["tests/basic/test_openrouter.py", 73, 5, 42.7], ["aider/website/_posts/2024-05-22-swe-bench-lite.md", 454, 2, 42.6], ["aider/copypaste.py", 72, 5, 42.4], ["tests/fixtures/sample-code-base/sample.js", 50, 6, 42.4], ["aider/website/docs/recordings/auto-accept-architect.md", 28, 8, 42.3], ["aider/website/docs/repomap.md", 112, 4, 42.3], ["aider/website/assets/benchmarks-speed-1106.svg", 1780, 1, 42.2], ["aider/website/assets/benchmarks-udiff.svg", 1749, 1, 41.8], ["aider/website/docs/legal/contributor-agreement.md", 109, 4, 41.8], ["aider/website/docs/usage/images-urls.md", 48, 6, 41.6], ["aider/website/assets/2024-04-09-gpt-4-turbo.svg", 1707, 1, 41.3], ["aider/website/docs/llms/cohere.md", 34, 7, 40.8], ["aider/website/assets/benchmarks-0125.svg", 1553, 1, 39.4], ["aider/website/docs/unified-diffs.md", 386, 2, 39.3], ["aider/website/assets/2024-04-09-gpt-4-turbo-laziness.svg", 1519, 1, 39.0], ["aider/website/_posts/2024-03-08-claude-3.md", 92, 4, 38.4], ["aider/dump.py", 29, 7, 37.7], ["aider/website/docs/config/api-keys.md", 89, 4, 37.7], ["aider/website/docs/usage/browser.md", 57, 5, 37.7], ["aider/website/docs/llms/openai-compat.md", 39, 6, 37.5], ["aider/website/docs/recordings/dont-drop-original-read-files.md", 28, 7, 37.0], ["aider/website/_posts/2024-05-22-linting.md", 148, 3, 36.5], ["aider/website/_posts/2024-05-02-browser.md", 53, 5, 36.4], ["MANIFEST.in", 20, 8, 35.8], ["aider/website/docs/troubleshooting/support.md", 79, 4, 35.6], ["tests/scrape/test_playwright_disable.py", 139, 3, 35.4], ["aider/website/docs/llms/groq.md", 34, 6, 35.0], ["tests/browser/test_browser.py", 34, 6, 35.0], ["scripts/jekyll_run.sh", 15, 9, 34.9], ["tests/basic/test_special.py", 76, 4, 34.9], ["aider/coders/context_prompts.py", 75, 4, 34.6], ["aider/website/_posts/2024-05-24-self-assembly.md", 75, 4, 34.6], ["aider/website/docs/usage/caching.md", 48, 5, 34.6], ["aider/openrouter.py", 128, 3, 33.9], ["aider/deprecated.py", 126, 3, 33.7], ["scripts/tmux_record.sh", 17, 8, 33.0], ["aider/website/_posts/2024-06-02-main-swe-bench.md", 266, 2, 32.6], [".github/ISSUE_TEMPLATE/issue.yml", 21, 7, 32.1], ["aider/coders/wholefile_func_prompts.py", 27, 6, 31.2], ["aider/website/docs/llms/lm-studio.md", 39, 5, 31.2], ["scripts/dl_icons.py", 59, 4, 30.7], ["scripts/history_prompts.py", 26, 6, 30.6], ["aider/website/_posts/2025-01-15-uv.md", 101, 3, 30.1], ["aider/website/share/index.md", 100, 3, 30.0], ["pytest.ini", 11, 9, 29.8], ["scripts/Dockerfile.jekyll", 18, 7, 29.7], [".github/workflows/windows_check_pypi_version.yml", 90, 3, 28.5], ["aider/website/docs/llms/vertex.md", 50, 4, 28.3], ["aider/coders/help_prompts.py", 46, 4, 27.1], ["tests/basic/test_model_info_manager.py", 80, 3, 26.8], ["aider/website/docs/config.md", 43, 4, 26.2], ["aider/website/_data/qwq.yml", 169, 2, 26.0], ["aider/website/assets/logo.svg", 27, 5, 26.0], ["aider/coders/udiff_simple_prompts.py", 25, 5, 25.0], ["tests/fixtures/sample-code-base/sample.py", 68, 3, 24.7], ["aider/website/_includes/model-warnings.md", 65, 3, 24.2], ["aider/website/_includes/recording.md", 34, 4, 23.3], ["aider/website/_data/r1_architect.yml", 135, 2, 23.2], ["aider/coders/editor_editblock_coder.py", 8, 8, 22.6], ["aider/queries/tree-sitter-language-pack/commonlisp-tags.scm", 122, 2, 22.1], ["aider/website/_data/sonnet-fine.yml", 459, 1, 21.4], ["aider/website/examples/chat-transcript-css.md", 451, 1, 21.2], ["aider/format_settings.py", 26, 4, 20.4], ["benchmark/plots.py", 417, 1, 20.4], ["aider/website/assets/audio/model-accepts-settings/metadata.json", 46, 3, 20.3], ["aider/website/_sass/custom/custom.scss", 102, 2, 20.2], ["aider/coders/help_coder.py", 16, 5, 20.0], ["aider/website/_includes/help.md", 24, 4, 19.6], ["aider/website/docs/troubleshooting/aider-not-found.md", 24, 4, 19.6], ["aider/website/examples/complex-change.md", 371, 1, 19.3], ["aider/website/docs/benchmarks-1106.md", 92, 2, 19.2], ["aider/queries/tree-sitter-language-pack/dart-tags.scm", 90, 2, 19.0], ["aider/website/_includes/nav_footer_custom.html", 7, 7, 18.5], ["tests/fixtures/watch.js", 38, 3, 18.5], ["tests/fixtures/watch.py", 21, 4, 18.3], ["aider/website/docs/leaderboards/notes.md", 37, 3, 18.2], ["aider/website/examples/census.md", 326, 1, 18.1], ["aider/website/examples/pong.md", 315, 1, 17.7], ["aider/help_pats.py", 19, 4, 17.4], ["aider/website/_posts/2024-04-09-gpt-4-turbo.md", 70, 2, 16.7], ["tests/basic/test_run_cmd.py", 11, 5, 16.6], ["aider/queries/tree-sitter-language-pack/ruby-tags.scm", 64, 2, 16.0], ["aider/website/examples/README.md", 63, 2, 15.9], ["aider/coders/editblock_fenced_coder.py", 10, 5, 15.8], ["aider/queries/tree-sitter-language-pack/rust-tags.scm", 60, 2, 15.5], ["aider/queries/tree-sitter-languages/julia-tags.scm", 60, 2, 15.5], ["aider/website/docs/benchmarks-speed-1106.md", 59, 2, 15.4], ["tests/fixtures/languages/elm/test.elm", 59, 2, 15.4], ["aider/queries/tree-sitter-language-pack/csharp-tags.scm", 26, 3, 15.3], ["aider/queries/tree-sitter-language-pack/elixir-tags.scm", 54, 2, 14.7], ["tests/fixtures/sample-code-base-repo-map.txt", 53, 2, 14.6], [".github/workflows/docker-release.yml", 52, 2, 14.4], ["aider/queries/tree-sitter-language-pack/swift-tags.scm", 51, 2, 14.3], ["aider/website/assets/audio/tree-sitter-language-pack/metadata.json", 51, 2, 14.3], ["LICENSE.txt", 201, 1, 14.2], ["aider/watch_prompts.py", 12, 4, 13.9], ["aider/website/assets/screencast.svg", 194, 1, 13.9], ["aider/website/examples/add-test.md", 181, 1, 13.5], ["benchmark/clone-exercism.sh", 20, 3, 13.4], ["benchmark/swe-bench-lite.txt", 7, 5, 13.2], ["aider/queries/tree-sitter-language-pack/solidity-tags.scm", 43, 2, 13.1], ["aider/queries/tree-sitter-language-pack/go-tags.scm", 42, 2, 13.0], ["tests/basic/test_aws_credentials.py", 169, 1, 13.0], ["aider/website/examples/no-color.md", 167, 1, 12.9], ["aider/queries/tree-sitter-language-pack/gleam-tags.scm", 41, 2, 12.8], ["aider/coders/editor_editblock_prompts.py", 18, 3, 12.7], ["aider/coders/architect_prompts.py", 40, 2, 12.6], ["aider/queries/tree-sitter-language-pack/pony-tags.scm", 39, 2, 12.5], ["aider/website/docs/install/codespaces.md", 38, 2, 12.3], ["benchmark/prompts.py", 16, 3, 12.0], ["aider/queries/tree-sitter-language-pack/lua-tags.scm", 34, 2, 11.7], ["aider/website/examples/hello-world-flask.md", 134, 1, 11.6], ["scripts/update-blame.sh", 8, 4, 11.3], ["aider/coders/udiff_simple.py", 14, 3, 11.2], ["aider/website/docs/usage/voice.md", 121, 1, 11.0], ["tests/fixtures/languages/tsx/test.tsx", 30, 2, 11.0], ["tests/basic/test_udiff.py", 119, 1, 10.9], ["aider/queries/tree-sitter-language-pack/ocaml-tags.scm", 115, 1, 10.7], ["aider/queries/tree-sitter-languages/ocaml-tags.scm", 115, 1, 10.7], ["benchmark/swe-bench.txt", 7, 4, 10.6], ["tests/fixtures/languages/python/test.py", 28, 2, 10.6], ["aider/queries/tree-sitter-language-pack/d-tags.scm", 26, 2, 10.2], ["aider/website/_includes/help-tip.md", 4, 5, 10.0], ["aider/queries/tree-sitter-language-pack/ocaml_interface-tags.scm", 98, 1, 9.9], ["aider/queries/tree-sitter-languages/ocaml_interface-tags.scm", 98, 1, 9.9], ["aider/website/docs/troubleshooting.md", 11, 3, 9.9], ["aider/website/examples/2048-game.md", 96, 1, 9.8], ["aider/queries/tree-sitter-languages/README.md", 23, 2, 9.6], ["aider/queries/tree-sitter-language-pack/javascript-tags.scm", 88, 1, 9.4], ["aider/queries/tree-sitter-languages/dart-tags.scm", 89, 1, 9.4], ["aider/queries/tree-sitter-languages/javascript-tags.scm", 88, 1, 9.4], ["tests/fixtures/languages/udev/test.rules", 22, 2, 9.4], ["aider/website/examples/css-exercises.md", 86, 1, 9.3], ["aider/queries/tree-sitter-language-pack/r-tags.scm", 21, 2, 9.2], ["tests/fixtures/languages/c/test.c", 21, 2, 9.2], ["aider/coders/ask_coder.py", 9, 3, 9.0], ["benchmark/cpp-test.sh", 9, 3, 9.0], ["aider/queries/tree-sitter-language-pack/java-tags.scm", 20, 2, 8.9], ["aider/queries/tree-sitter-language-pack/udev-tags.scm", 20, 2, 8.9], ["aider/queries/tree-sitter-languages/hcl-tags.scm", 77, 1, 8.8], ["aider/queries/tree-sitter-language-pack/elm-tags.scm", 19, 2, 8.7], ["aider/queries/tree-sitter-languages/scala-tags.scm", 65, 1, 8.1], ["aider/queries/tree-sitter-language-pack/chatito-tags.scm", 16, 2, 8.0], ["aider/queries/tree-sitter-languages/ruby-tags.scm", 64, 1, 8.0], ["tests/fixtures/languages/scala/test.scala", 61, 1, 7.8], ["aider/queries/tree-sitter-language-pack/cpp-tags.scm", 15, 2, 7.7], ["aider/queries/tree-sitter-languages/rust-tags.scm", 60, 1, 7.7], ["aider/website/examples/semantic-search-replace.md", 59, 1, 7.7], ["aider/queries/tree-sitter-language-pack/python-tags.scm", 14, 2, 7.5], ["aider/queries/tree-sitter-languages/elixir-tags.scm", 54, 1, 7.3], ["tests/fixtures/languages/hcl/test.tf", 52, 1, 7.2], [".github/workflows/pre-commit.yml", 48, 1, 6.9], ["aider/queries/tree-sitter-language-pack/racket-tags.scm", 12, 2, 6.9], ["benchmark/npm-test.sh", 12, 2, 6.9], ["benchmark/test_benchmark.py", 47, 1, 6.9], ["aider/queries/tree-sitter-languages/c_sharp-tags.scm", 46, 1, 6.8], ["aider/coders/editor_diff_fenced_prompts.py", 11, 2, 6.6], ["aider/website/assets/audio/auto-accept-architect/metadata.json", 11, 2, 6.6], ["aider/website/docs/benchmarks-0125.md", 43, 1, 6.6], ["tests/fixtures/languages/go/test.go", 42, 1, 6.5], ["tests/fixtures/languages/matlab/test.m", 42, 1, 6.5], ["aider/queries/tree-sitter-languages/typescript-tags.scm", 41, 1, 6.4], ["aider/website/examples/update-docs.md", 41, 1, 6.4], ["aider/coders/editor_whole_prompts.py", 10, 2, 6.3], ["tests/fixtures/languages/csharp/test.cs", 39, 1, 6.2], ["aider/coders/shell.py", 37, 1, 6.1], ["aider/website/blog/index.html", 37, 1, 6.1], ["aider/coders/editor_diff_fenced_coder.py", 9, 2, 6.0], ["aider/queries/tree-sitter-language-pack/c-tags.scm", 9, 2, 6.0], ["aider/website/examples/hello.md", 35, 1, 5.9], ["aider/coders/editor_whole_coder.py", 8, 2, 5.7], ["aider/website/_includes/replit-pipx.md", 8, 2, 5.7], ["aider/website/assets/icons/safari-pinned-tab.svg", 32, 1, 5.7], ["tests/fixtures/languages/rust/test.rs", 33, 1, 5.7], ["aider/queries/tree-sitter-languages/go-tags.scm", 30, 1, 5.5], [".github/workflows/issues.yml", 29, 1, 5.4], ["aider/website/examples/asciinema.md", 29, 1, 5.4], ["benchmark/plot.sh", 28, 1, 5.3], ["aider/coders/editblock_func_prompts.py", 27, 1, 5.2], ["aider/coders/single_wholefile_func_prompts.py", 27, 1, 5.2], ["aider/queries/tree-sitter-languages/kotlin-tags.scm", 27, 1, 5.2], ["aider/queries/tree-sitter-languages/php-tags.scm", 26, 1, 5.1], ["aider/queries/tree-sitter-languages/ql-tags.scm", 26, 1, 5.1], ["tests/fixtures/languages/d/test.d", 26, 1, 5.1], ["tests/fixtures/languages/javascript/test.js", 26, 1, 5.1], ["requirements/requirements-browser.in", 1, 5, 5.0], ["tests/fixtures/languages/elisp/test.el", 25, 1, 5.0], ["tests/fixtures/languages/lua/test.lua", 25, 1, 5.0], ["tests/fixtures/languages/arduino/test.ino", 21, 1, 4.6], ["tests/fixtures/languages/dart/test.dart", 21, 1, 4.6], ["tests/fixtures/languages/solidity/test.sol", 21, 1, 4.6], ["aider/queries/tree-sitter-language-pack/arduino-tags.scm", 5, 2, 4.5], ["aider/queries/tree-sitter-language-pack/elisp-tags.scm", 5, 2, 4.5], ["aider/queries/tree-sitter-language-pack/properties-tags.scm", 5, 2, 4.5], ["aider/queries/tree-sitter-languages/java-tags.scm", 20, 1, 4.5], ["tests/fixtures/languages/chatito/test.chatito", 20, 1, 4.5], ["aider/queries/tree-sitter-languages/elm-tags.scm", 19, 1, 4.4], ["aider/website/assets/icons/site.webmanifest", 19, 1, 4.4], ["tests/fixtures/languages/bash/test.sh", 19, 1, 4.4], ["tests/fixtures/languages/ocaml/test.ml", 19, 1, 4.4], ["tests/fixtures/watch.lisp", 19, 1, 4.4], ["tests/fixtures/languages/swift/test.swift", 18, 1, 4.2], ["tests/fixtures/languages/commonlisp/test.lisp", 17, 1, 4.1], ["tests/fixtures/languages/r/test.r", 17, 1, 4.1], ["aider/website/_includes/python-m-aider.md", 4, 2, 4.0], ["aider/website/_includes/works-best.md", 1, 4, 4.0], ["scripts/jekyll_build.sh", 4, 2, 4.0], ["tests/fixtures/languages/java/test.java", 16, 1, 4.0], ["tests/fixtures/languages/kotlin/test.kt", 16, 1, 4.0], ["aider/queries/tree-sitter-languages/cpp-tags.scm", 15, 1, 3.9], ["tests/basic/test_urls.py", 15, 1, 3.9], ["tests/basic/test_utils.py", 15, 1, 3.9], ["aider/queries/tree-sitter-languages/fortran-tags.scm", 14, 1, 3.7], ["aider/website/_posts/2024-05-22-draft.md", 14, 1, 3.7], ["tests/fixtures/languages/ocaml_interface/test.mli", 14, 1, 3.7], ["tests/fixtures/languages/properties/test.properties", 14, 1, 3.7], ["aider/website/docs/leaderboards/contrib.md", 13, 1, 3.6], ["aider/queries/tree-sitter-languages/python-tags.scm", 12, 1, 3.5], ["aider/website/docs/troubleshooting/warnings.md", 12, 1, 3.5], ["tests/fixtures/languages/typescript/test.ts", 3, 2, 3.5], ["aider/website/assets/audio/dont-drop-original-read-files/metadata.json", 11, 1, 3.3], ["requirements/python-compat.in", 11, 1, 3.3], ["aider/queries/tree-sitter-language-pack/matlab-tags.scm", 10, 1, 3.2], ["aider/queries/tree-sitter-languages/matlab-tags.scm", 10, 1, 3.2], ["aider/website/_layouts/redirect.html", 10, 1, 3.2], ["tests/fixtures/languages/gleam/test.gleam", 10, 1, 3.2], ["tests/fixtures/languages/zig/test.zig", 10, 1, 3.2], ["tests/fixtures/watch_question.js", 10, 1, 3.2], ["aider/queries/tree-sitter-languages/c-tags.scm", 9, 1, 3.0], ["aider/website/assets/icons/brain.svg", 1, 3, 3.0], ["aider/website/assets/icons/browserconfig.xml", 9, 1, 3.0], ["aider/website/assets/icons/code-tags.svg", 1, 3, 3.0], ["aider/website/assets/icons/content-copy.svg", 1, 3, 3.0], ["aider/website/assets/icons/microphone.svg", 1, 3, 3.0], ["aider/website/assets/icons/monitor.svg", 1, 3, 3.0], ["aider/website/docs/leaderboards/by-release-date.md", 9, 1, 3.0], ["requirements/requirements-playwright.in", 1, 3, 3.0], ["aider/queries/tree-sitter-language-pack/bash-tags.scm", 8, 1, 2.8], ["aider/queries/tree-sitter-languages/bash-tags.scm", 8, 1, 2.8], ["aider/queries/tree-sitter-languages/elisp-tags.scm", 8, 1, 2.8], ["aider/website/docs/install/replit.md", 8, 1, 2.8], ["aider/website/docs/llms/warnings.md", 8, 1, 2.8], ["aider/website/docs/more-info.md", 8, 1, 2.8], ["benchmark/docker_build.sh", 8, 1, 2.8], ["requirements/tree-sitter.in", 2, 2, 2.8], ["tests/fixtures/languages/pony/test.pony", 8, 1, 2.8], ["tests/fixtures/languages/racket/test.rkt", 8, 1, 2.8], ["aider/queries/tree-sitter-language-pack/README.md", 7, 1, 2.6], ["aider/queries/tree-sitter-language-pack/clojure-tags.scm", 7, 1, 2.6], ["tests/fixtures/languages/haskell/test.hs", 7, 1, 2.6], ["tests/fixtures/languages/clojure/test.clj", 6, 1, 2.4], ["tests/fixtures/languages/cpp/test.cpp", 6, 1, 2.4], ["tests/fixtures/languages/elixir/test.ex", 5, 1, 2.2], ["tests/fixtures/languages/php/test.php", 5, 1, 2.2], ["aider/__main__.py", 4, 1, 2.0], ["aider/website/_includes/install.md", 4, 1, 2.0], ["aider/website/_includes/keys.md", 4, 1, 2.0], ["aider/website/assets/icons/check-all.svg", 1, 2, 2.0], ["aider/website/assets/icons/image-multiple.svg", 1, 2, 2.0], ["aider/website/assets/icons/map-outline.svg", 1, 2, 2.0], ["aider/website/assets/icons/source-branch.svg", 1, 2, 2.0], ["aider/queries/tree-sitter-languages/haskell-tags.scm", 3, 1, 1.7], ["aider/queries/tree-sitter-languages/zig-tags.scm", 3, 1, 1.7], ["aider/resources/__init__.py", 3, 1, 1.7], ["tests/fixtures/languages/ql/test.ql", 3, 1, 1.7], ["tests/fixtures/languages/ruby/test.rb", 3, 1, 1.7], ["requirements/pydub.in", 2, 1, 1.4], ["aider/website/_posts/2023-05-25-ctags.md", 1, 1, 1.0], ["aider/website/_posts/2023-07-02-benchmarks.md", 1, 1, 1.0], ["aider/website/_posts/2023-11-06-benchmarks-1106.md", 1, 1, 1.0], ["aider/website/_posts/2023-11-06-benchmarks-speed-1106.md", 1, 1, 1.0], ["aider/website/_posts/2023-12-21-unified-diffs.md", 1, 1, 1.0], ["aider/website/_posts/2024-01-25-benchmarks-0125.md", 1, 1, 1.0], ["aider/website/assets/asciinema/asciinema-player.min.js", 1, 1, 1.0]]}</script><script>
+(function() {
+	const data = JSON.parse(document.getElementById('hotspot-data').textContent);
+	const points = data.points.map(function(p) {
+		return { path: p[0], x: p[1], y: p[2], score: p[3] };
+	});
+	const scores = points.map(function(p) { return p.score; });
+	const low = Math.min.apply(null, scores);
+	const range = (Math.max.apply(null, scores) - low) || 1;
+
+	// One dataset per quadrant around the medians: each gets a legend entry and
+	// a --series-N color that applyChartTheme() keeps in step with the theme.
+	const large = function(p) { return p.x >= data.medianLines; };
+	const busy = function(p) { return p.y >= data.medianChurn; };
+	const quadrants = [
+		['Large, changed often', 3, function(p) { return large(p) && busy(p); }],
+		['Small, changed often', 5, function(p) { return !large(p) && busy(p); }],
+		['Large, rarely changed', 2, function(p) { return large(p) && !busy(p); }],
+		['Small, rarely changed', 1, function(p) { return !large(p) && !busy(p); }]
+	];
+	const datasets = quadrants.map(function(q) {
+		const own = points.filter(q[2]);
+		const color = getCSSVar('--series-' + q[1]);
+		// a bigger dot is a higher score
+		const radius = own.map(function(p) { return 3 + 9 * (p.score - low) / range; });
+		return {
+			label: q[0],
+			series: q[1],
+			data: own,
+			borderColor: color,
+			backgroundColor: color + '33',
+			borderWidth: 1.5,
+			pointRadius: radius,
+			pointHoverRadius: radius.map(function(r) { return r + 2; }),
+			pointHitRadius: 6,
+			clip: 16  // dots on the axes (one line, one change) are drawn whole
+		};
+	}).filter(function(ds) { return ds.data.length; });
+
+	// Dashed lines at the median size and the median change count
+	const medianLines = {
+		id: 'gsMedianLines',
+		beforeDatasetsDraw: function(chart) {
+			const ctx = chart.ctx, area = chart.chartArea;
+			const x = chart.scales.x.getPixelForValue(data.medianLines);
+			const y = chart.scales.y.getPixelForValue(data.medianChurn);
+			ctx.save();
+			ctx.strokeStyle = getCSSVar('--border-strong');
+			ctx.setLineDash([3, 3]);
+			ctx.beginPath();
+			ctx.moveTo(x, area.top); ctx.lineTo(x, area.bottom);
+			ctx.moveTo(area.left, y); ctx.lineTo(area.right, y);
+			ctx.stroke();
+			ctx.restore();
+		}
+	};
+
+	// A logarithmic axis ticked at 1, 2, 5, 10, 20, 50, ... with room past the
+	// largest value, so the highest-scoring dots are not drawn on the frame
+	function logAxis(title) {
+		return {
+			type: 'logarithmic',
+			min: 1,
+			title: { display: true, text: title },
+			afterDataLimits: function(scale) { scale.max *= 1.3; },
+			afterBuildTicks: function(scale) {
+				scale.ticks = scale.ticks.filter(function(tick) {
+					const lead = tick.value / Math.pow(10, Math.floor(Math.log10(tick.value) + 1e-9));
+					return [1, 2, 5].some(function(n) { return Math.abs(lead - n) < 1e-6; });
+				});
+			},
+			ticks: {
+				maxRotation: 0,
+				callback: function(value) { return value.toLocaleString(); }
+			}
+		};
+	}
+
+	applyChartTheme();
+	new Chart(document.getElementById('chart-hotspots').getContext('2d'), {
+		type: 'scatter',
+		plugins: [medianLines],
+		data: { datasets: datasets },
+		options: {
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: {
+				legend: { display: true, labels: { usePointStyle: true, pointStyle: 'circle' } },
+				tooltip: {
+					callbacks: {
+						// the path on its own line: a deep one is as wide as the rest together
+						label: function(item) {
+							const p = item.raw;
+							return [p.path, p.x.toLocaleString() + (p.x === 1 ? ' line' : ' lines')
+								+ ', changed ' + p.y.toLocaleString() + (p.y === 1 ? ' time' : ' times')
+								+ ', score ' + p.score.toLocaleString()];
+						}
+					}
+				}
+			},
+			scales: {
+				x: logAxis('File size (lines)'),
+				y: logAxis('Changes (commits)')
+			}
+		}
+	});
+})();
+</script>
+<h2 id="top_hotspots"><a href="#top_hotspots">Top hotspots</a></h2>
+
+<p class="section-note">The files ranked by hotspot score: the larger a file is and the more often it changes, the higher it ranks. <strong>Authors</strong> is how many people have changed the file, bots aside, as on the <a href="ownership.html">Code Ownership</a> page: a hotspot only one person has changed is also a bus-factor risk.</p><div class="table-scroll"><table class="sortable share-table file-table" id="hotspots"><tr><th>File</th><th class="num">Lines</th><th class="num">Changes</th><th class="num">Authors</th><th class="num">Score</th><th class="unsortable"></th></tr><tr><td class="path">aider/coders/base_coder.py</td><td class="num" data-label="Lines">2,485</td><td class="num" data-label="Changes">930</td><td class="num" data-label="Authors">19</td><td class="num" data-label="Score">46,360.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td class="path">aider/commands.py</td><td class="num" data-label="Lines">1,712</td><td class="num" data-label="Changes">672</td><td class="num" data-label="Authors">31</td><td class="num" data-label="Score">27,804.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 60.0%"></span></span></td></tr><tr><td class="path">aider/main.py</td><td class="num" data-label="Lines">1,274</td><td class="num" data-label="Changes">729</td><td class="num" data-label="Authors">24</td><td class="num" data-label="Score">26,020.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 56.1%"></span></span></td></tr><tr><td class="path">HISTORY.md</td><td class="num" data-label="Lines">1,533</td><td class="num" data-label="Changes">539</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">21,103.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 45.5%"></span></span></td></tr><tr><td class="path">aider/models.py</td><td class="num" data-label="Lines">1,338</td><td class="num" data-label="Changes">486</td><td class="num" data-label="Authors">21</td><td class="num" data-label="Score">17,777.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 38.3%"></span></span></td></tr><tr><td class="path">aider/website/HISTORY.md</td><td class="num" data-label="Lines">1,557</td><td class="num" data-label="Changes">372</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">14,678.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 31.7%"></span></span></td></tr><tr><td class="path">aider/io.py</td><td class="num" data-label="Lines">1,191</td><td class="num" data-label="Changes">421</td><td class="num" data-label="Authors">18</td><td class="num" data-label="Score">14,529.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 31.3%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/website/assets/sample-analytics.jsonl</td><td class="num" data-label="Lines">1,000</td><td class="num" data-label="Changes">404</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">12,775.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 27.6%"></span></span></td></tr><tr><td class="path">benchmark/benchmark.py</td><td class="num" data-label="Lines">1,059</td><td class="num" data-label="Changes">257</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">8,363.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 18.0%"></span></span></td></tr><tr><td class="path">aider/resources/model-settings.yml</td><td class="num" data-label="Lines">3,128</td><td class="num" data-label="Changes">147</td><td class="num" data-label="Authors">18</td><td class="num" data-label="Score">8,221.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 17.7%"></span></span></td></tr></table></div><details class="table-details"><summary>Table: the 100 highest-scoring of 511 files</summary><div class="table-scroll"><table class="sortable share-table file-table" id="hotspots-all"><tr><th>File</th><th class="num">Lines</th><th class="num">Changes</th><th class="num">Authors</th><th class="num">Score</th><th class="unsortable"></th></tr><tr><td class="path">aider/coders/base_coder.py</td><td class="num" data-label="Lines">2,485</td><td class="num" data-label="Changes">930</td><td class="num" data-label="Authors">19</td><td class="num" data-label="Score">46,360.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td class="path">aider/commands.py</td><td class="num" data-label="Lines">1,712</td><td class="num" data-label="Changes">672</td><td class="num" data-label="Authors">31</td><td class="num" data-label="Score">27,804.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 60.0%"></span></span></td></tr><tr><td class="path">aider/main.py</td><td class="num" data-label="Lines">1,274</td><td class="num" data-label="Changes">729</td><td class="num" data-label="Authors">24</td><td class="num" data-label="Score">26,020.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 56.1%"></span></span></td></tr><tr><td class="path">HISTORY.md</td><td class="num" data-label="Lines">1,533</td><td class="num" data-label="Changes">539</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">21,103.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 45.5%"></span></span></td></tr><tr><td class="path">aider/models.py</td><td class="num" data-label="Lines">1,338</td><td class="num" data-label="Changes">486</td><td class="num" data-label="Authors">21</td><td class="num" data-label="Score">17,777.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 38.3%"></span></span></td></tr><tr><td class="path">aider/website/HISTORY.md</td><td class="num" data-label="Lines">1,557</td><td class="num" data-label="Changes">372</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">14,678.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 31.7%"></span></span></td></tr><tr><td class="path">aider/io.py</td><td class="num" data-label="Lines">1,191</td><td class="num" data-label="Changes">421</td><td class="num" data-label="Authors">18</td><td class="num" data-label="Score">14,529.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 31.3%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/website/assets/sample-analytics.jsonl</td><td class="num" data-label="Lines">1,000</td><td class="num" data-label="Changes">404</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">12,775.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 27.6%"></span></span></td></tr><tr><td class="path">benchmark/benchmark.py</td><td class="num" data-label="Lines">1,059</td><td class="num" data-label="Changes">257</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">8,363.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 18.0%"></span></span></td></tr><tr><td class="path">aider/resources/model-settings.yml</td><td class="num" data-label="Lines">3,128</td><td class="num" data-label="Changes">147</td><td class="num" data-label="Authors">18</td><td class="num" data-label="Score">8,221.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 17.7%"></span></span></td></tr><tr><td class="path">aider/repomap.py</td><td class="num" data-label="Lines">867</td><td class="num" data-label="Changes">270</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">7,950.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 17.1%"></span></span></td></tr><tr><td class="path">aider/website/docs/config/adv-model-settings.md</td><td class="num" data-label="Lines">3,429</td><td class="num" data-label="Changes">131</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">7,671.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 16.5%"></span></span></td></tr><tr><td class="path">tests/basic/test_main.py</td><td class="num" data-label="Lines">1,483</td><td class="num" data-label="Changes">195</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">7,509.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 16.2%"></span></span></td></tr><tr><td class="path">tests/basic/test_commands.py</td><td class="num" data-label="Lines">2,226</td><td class="num" data-label="Changes">146</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">6,888.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 14.9%"></span></span></td></tr><tr><td class="path">README.md</td><td class="num" data-label="Lines">179</td><td class="num" data-label="Changes">496</td><td class="num" data-label="Authors">11</td><td class="num" data-label="Score">6,636.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 14.3%"></span></span></td></tr><tr><td class="path">aider/args.py</td><td class="num" data-label="Lines">945</td><td class="num" data-label="Changes">214</td><td class="num" data-label="Authors">19</td><td class="num" data-label="Score">6,578.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 14.2%"></span></span></td></tr><tr><td class="path">aider/website/docs/faq.md</td><td class="num" data-label="Lines">383</td><td class="num" data-label="Changes">312</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">6,106.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 13.2%"></span></span></td></tr><tr><td class="path">aider/website/_data/edit_leaderboard.yml</td><td class="num" data-label="Lines">2,232</td><td class="num" data-label="Changes">97</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">4,582.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 9.9%"></span></span></td></tr><tr><td class="path">aider/repo.py</td><td class="num" data-label="Lines">622</td><td class="num" data-label="Changes">179</td><td class="num" data-label="Authors">11</td><td class="num" data-label="Score">4,464.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 9.6%"></span></span></td></tr><tr><td class="path">aider/website/docs/leaderboards/index.md</td><td class="num" data-label="Lines">290</td><td class="num" data-label="Changes">243</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">4,138.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 8.9%"></span></span></td></tr><tr><td class="path">aider/website/_data/polyglot_leaderboard.yml</td><td class="num" data-label="Lines">1,856</td><td class="num" data-label="Changes">92</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">3,963.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 8.5%"></span></span></td></tr><tr><td class="path">aider/utils.py</td><td class="num" data-label="Lines">348</td><td class="num" data-label="Changes">209</td><td class="num" data-label="Authors">6</td><td class="num" data-label="Score">3,898.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 8.4%"></span></span></td></tr><tr><td class="path">requirements.txt</td><td class="num" data-label="Lines">489</td><td class="num" data-label="Changes">166</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">3,670.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 7.9%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">tests/basic/test_coder.py</td><td class="num" data-label="Lines">1,438</td><td class="num" data-label="Changes">90</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">3,412.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 7.4%"></span></span></td></tr><tr><td class="path">aider/coders/editblock_coder.py</td><td class="num" data-label="Lines">657</td><td class="num" data-label="Changes">130</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">3,332.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 7.2%"></span></span></td></tr><tr><td class="path">aider/watch.py</td><td class="num" data-label="Lines">318</td><td class="num" data-label="Changes">181</td><td class="num" data-label="Authors">3</td><td class="num" data-label="Score">3,227.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 7.0%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/website/_data/blame.yml</td><td class="num" data-label="Lines">4,896</td><td class="num" data-label="Changes">46</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">3,218.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 6.9%"></span></span></td></tr><tr><td class="path">aider/website/docs/config/options.md</td><td class="num" data-label="Lines">863</td><td class="num" data-label="Changes">95</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">2,790.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 6.0%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/website/index.html</td><td class="num" data-label="Lines">695</td><td class="num" data-label="Changes">101</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">2,662.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 5.7%"></span></span></td></tr><tr><td class="path">tests/basic/test_models.py</td><td class="num" data-label="Lines">600</td><td class="num" data-label="Changes">97</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">2,376.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 5.1%"></span></span></td></tr><tr><td class="path">aider/website/docs/config/aider_conf.md</td><td class="num" data-label="Lines">536</td><td class="num" data-label="Changes">102</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">2,361.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 5.1%"></span></span></td></tr><tr><td class="path">tests/basic/test_repomap.py</td><td class="num" data-label="Lines">510</td><td class="num" data-label="Changes">98</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">2,213.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 4.8%"></span></span></td></tr><tr><td class="path">aider/website/assets/sample.aider.conf.yml</td><td class="num" data-label="Lines">480</td><td class="num" data-label="Changes">97</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">2,125.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 4.6%"></span></span></td></tr><tr><td class="path">aider/website/docs/config/dotenv.md</td><td class="num" data-label="Lines">490</td><td class="num" data-label="Changes">94</td><td class="num" data-label="Authors">3</td><td class="num" data-label="Score">2,080.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 4.5%"></span></span></td></tr><tr><td class="path">aider/website/assets/sample.env</td><td class="num" data-label="Lines">448</td><td class="num" data-label="Changes">89</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">1,883.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 4.1%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">scripts/blame.py</td><td class="num" data-label="Lines">296</td><td class="num" data-label="Changes">104</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">1,789.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.9%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/__init__.py</td><td class="num" data-label="Lines">20</td><td class="num" data-label="Changes">378</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">1,690.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.6%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">scripts/issues.py</td><td class="num" data-label="Lines">458</td><td class="num" data-label="Changes">78</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">1,669.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.6%"></span></span></td></tr><tr><td class="path">aider/linter.py</td><td class="num" data-label="Lines">304</td><td class="num" data-label="Changes">95</td><td class="num" data-label="Authors">6</td><td class="num" data-label="Score">1,656.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.6%"></span></span></td></tr><tr><td class="path">requirements/common-constraints.txt</td><td class="num" data-label="Lines">629</td><td class="num" data-label="Changes">66</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">1,655.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.6%"></span></span></td></tr><tr><td class="path">requirements/requirements-help.txt</td><td class="num" data-label="Lines">387</td><td class="num" data-label="Changes">82</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">1,613.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.5%"></span></span></td></tr><tr><td class="path">aider/resources/model-metadata.json</td><td class="num" data-label="Lines">715</td><td class="num" data-label="Changes">59</td><td class="num" data-label="Authors">12</td><td class="num" data-label="Score">1,577.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.4%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">benchmark/problem_stats.py</td><td class="num" data-label="Lines">355</td><td class="num" data-label="Changes">78</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">1,469.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.2%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">tests/basic/test_io.py</td><td class="num" data-label="Lines">610</td><td class="num" data-label="Changes">56</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">1,383.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.0%"></span></span></td></tr><tr><td class="path">requirements/requirements-dev.txt</td><td class="num" data-label="Lines">320</td><td class="num" data-label="Changes">76</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">1,359.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.9%"></span></span></td></tr><tr><td class="path">aider/analytics.py</td><td class="num" data-label="Lines">258</td><td class="num" data-label="Changes">82</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">1,317.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.8%"></span></span></td></tr><tr><td class="path">aider/gui.py</td><td class="num" data-label="Lines">545</td><td class="num" data-label="Changes">53</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">1,237.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.7%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/website/assets/home.css</td><td class="num" data-label="Lines">937</td><td class="num" data-label="Changes">38</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">1,163.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.5%"></span></span></td></tr><tr><td class="path">aider/scrape.py</td><td class="num" data-label="Lines">284</td><td class="num" data-label="Changes">64</td><td class="num" data-label="Authors">3</td><td class="num" data-label="Score">1,078.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.3%"></span></span></td></tr><tr><td class="path">tests/basic/test_repo.py</td><td class="num" data-label="Lines">716</td><td class="num" data-label="Changes">40</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">1,070.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.3%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">tests/basic/test_reasoning.py</td><td class="num" data-label="Lines">609</td><td class="num" data-label="Changes">43</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">1,061.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.3%"></span></span></td></tr><tr><td class="path">aider/coders/editblock_prompts.py</td><td class="num" data-label="Lines">172</td><td class="num" data-label="Changes">80</td><td class="num" data-label="Authors">3</td><td class="num" data-label="Score">1,049.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.3%"></span></span></td></tr><tr><td class="path">aider/sendchat.py</td><td class="num" data-label="Lines">61</td><td class="num" data-label="Changes">119</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">929.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.0%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">benchmark/over_time.py</td><td class="num" data-label="Lines">168</td><td class="num" data-label="Changes">71</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">920.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.0%"></span></span></td></tr><tr><td class="path">requirements/requirements-browser.txt</td><td class="num" data-label="Lines">155</td><td class="num" data-label="Changes">69</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">859.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.9%"></span></span></td></tr><tr><td class="path">aider/mdstream.py</td><td class="num" data-label="Lines">243</td><td class="num" data-label="Changes">48</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">748.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.6%"></span></span></td></tr><tr><td class="path">aider/voice.py</td><td class="num" data-label="Lines">187</td><td class="num" data-label="Changes">54</td><td class="num" data-label="Authors">3</td><td class="num" data-label="Score">738.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.6%"></span></span></td></tr><tr><td class="path">aider/onboarding.py</td><td class="num" data-label="Lines">428</td><td class="num" data-label="Changes">35</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">724.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.6%"></span></span></td></tr><tr><td class="path">aider/website/_includes/blame.md</td><td class="num" data-label="Lines">162</td><td class="num" data-label="Changes">55</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">700.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.5%"></span></span></td></tr><tr><td class="path">aider/website/docs/more/infinite-output.md</td><td class="num" data-label="Lines">256</td><td class="num" data-label="Changes">43</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">688.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.5%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">scripts/versionbump.py</td><td class="num" data-label="Lines">175</td><td class="num" data-label="Changes">50</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">661.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.4%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/report.py</td><td class="num" data-label="Lines">200</td><td class="num" data-label="Changes">46</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">650.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.4%"></span></span></td></tr><tr><td class="path">aider/coders/wholefile_coder.py</td><td class="num" data-label="Lines">144</td><td class="num" data-label="Changes">54</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">648.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.4%"></span></span></td></tr><tr><td class="path">aider/history.py</td><td class="num" data-label="Lines">143</td><td class="num" data-label="Changes">54</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">645.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.4%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">tests/fixtures/chat-history.md</td><td class="num" data-label="Lines">99,961</td><td class="num" data-label="Changes">2</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">632.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.4%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/website/_includes/leaderboard_table.js</td><td class="num" data-label="Lines">520</td><td class="num" data-label="Changes">27</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">615.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.3%"></span></span></td></tr><tr><td class="path">aider/website/docs/usage/commands.md</td><td class="num" data-label="Lines">131</td><td class="num" data-label="Changes">52</td><td class="num" data-label="Authors">6</td><td class="num" data-label="Score">595.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.3%"></span></span></td></tr><tr><td class="path">aider/website/_posts/2024-09-26-architect.md</td><td class="num" data-label="Lines">418</td><td class="num" data-label="Changes">29</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">592.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.3%"></span></span></td></tr><tr><td class="path">aider/website/_posts/2024-08-14-code-in-json.md</td><td class="num" data-label="Lines">254</td><td class="num" data-label="Changes">37</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">589.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.3%"></span></span></td></tr><tr><td class="path">aider/prompts.py</td><td class="num" data-label="Lines">61</td><td class="num" data-label="Changes">74</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">578.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.2%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/versioncheck.py</td><td class="num" data-label="Lines">113</td><td class="num" data-label="Changes">50</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">531.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.1%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">scripts/update-history.py</td><td class="num" data-label="Lines">162</td><td class="num" data-label="Changes">41</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">521.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.1%"></span></span></td></tr><tr><td class="path">aider/website/_posts/2024-11-21-quantization.md</td><td class="num" data-label="Lines">194</td><td class="num" data-label="Changes">36</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">501.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.1%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/help.py</td><td class="num" data-label="Lines">163</td><td class="num" data-label="Changes">38</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">485.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.0%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/website/assets/models-over-time.svg</td><td class="num" data-label="Lines">1,974</td><td class="num" data-label="Changes">10</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">444.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.0%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/website/_includes/recording.js</td><td class="num" data-label="Lines">428</td><td class="num" data-label="Changes">21</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">434.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.9%"></span></span></td></tr><tr><td class="path">tests/basic/test_editblock.py</td><td class="num" data-label="Lines">618</td><td class="num" data-label="Changes">17</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">422.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.9%"></span></span></td></tr><tr><td class="path">aider/website/_data/quant.yml</td><td class="num" data-label="Lines">322</td><td class="num" data-label="Changes">23</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">412.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.9%"></span></span></td></tr><tr><td class="path">aider/run_cmd.py</td><td class="num" data-label="Lines">132</td><td class="num" data-label="Changes">35</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">402.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.9%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/website/_posts/2025-01-28-deepseek-down.md</td><td class="num" data-label="Lines">257</td><td class="num" data-label="Changes">24</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">384.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.8%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">tests/basic/test_sendchat.py</td><td class="num" data-label="Lines">171</td><td class="num" data-label="Changes">29</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">379.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.8%"></span></span></td></tr><tr><td class="path">aider/website/docs/languages.md</td><td class="num" data-label="Lines">262</td><td class="num" data-label="Changes">23</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">372.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.8%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/coders/patch_coder.py</td><td class="num" data-label="Lines">706</td><td class="num" data-label="Changes">14</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">372.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.8%"></span></span></td></tr><tr><td class="path">aider/special.py</td><td class="num" data-label="Lines">203</td><td class="num" data-label="Changes">26</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">370.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.8%"></span></span></td></tr><tr><td class="path">tests/basic/test_watch.py</td><td class="num" data-label="Lines">166</td><td class="num" data-label="Changes">28</td><td class="num" data-label="Authors">3</td><td class="num" data-label="Score">360.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.8%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">scripts/clean_metadata.py</td><td class="num" data-label="Lines">258</td><td class="num" data-label="Changes">22</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">353.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.8%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">tests/fixtures/chat-history-search-replace-gold.txt</td><td class="num" data-label="Lines">27,808</td><td class="num" data-label="Changes">2</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">333.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.7%"></span></span></td></tr><tr><td class="path">aider/website/docs/usage/watch.md</td><td class="num" data-label="Lines">294</td><td class="num" data-label="Changes">19</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">325.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.7%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/args_formatter.py</td><td class="num" data-label="Lines">228</td><td class="num" data-label="Changes">21</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">317.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.7%"></span></span></td></tr><tr><td class="path">aider/exceptions.py</td><td class="num" data-label="Lines">113</td><td class="num" data-label="Changes">29</td><td class="num" data-label="Authors">3</td><td class="num" data-label="Score">308.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.7%"></span></span></td></tr><tr><td class="path">tests/basic/test_editor.py</td><td class="num" data-label="Lines">159</td><td class="num" data-label="Changes">24</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">302.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.7%"></span></span></td></tr><tr><td class="path">requirements/requirements.in</td><td class="num" data-label="Lines">50</td><td class="num" data-label="Changes">42</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">297.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/diffs.py</td><td class="num" data-label="Lines">128</td><td class="num" data-label="Changes">26</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">294.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path">.github/workflows/windows-tests.yml</td><td class="num" data-label="Lines">51</td><td class="num" data-label="Changes">41</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">292.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">tests/basic/test_onboarding.py</td><td class="num" data-label="Lines">437</td><td class="num" data-label="Changes">14</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">292.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/website/_includes/leaderboard.js</td><td class="num" data-label="Lines">246</td><td class="num" data-label="Changes">18</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">282.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/website/docs/config/model-aliases.md</td><td class="num" data-label="Lines">105</td><td class="num" data-label="Changes">27</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">276.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path">aider/website/docs/usage/modes.md</td><td class="num" data-label="Lines">210</td><td class="num" data-label="Changes">19</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">275.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">aider/website/_includes/recording.css</td><td class="num" data-label="Lines">228</td><td class="num" data-label="Changes">18</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">271.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path">aider/coders/udiff_coder.py</td><td class="num" data-label="Lines">429</td><td class="num" data-label="Changes">13</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">269.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr></table></div></details><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

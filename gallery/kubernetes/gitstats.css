@@ -567,6 +567,22 @@ table {
 	margin-bottom: var(--space-2);
 }
 
+/* AI-assisted commits across repositories: one hue behind the share, darker
+   for more (at most three quarters of it, so the text stays readable) */
+table.ai-grid td.share {
+	text-align: center;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+	font-weight: 600;
+	background-color: color-mix(in srgb, var(--bar-color) var(--share-strength, 0%), transparent);
+}
+
+table.ai-grid td.share small {
+	display: block;
+	font-weight: 400;
+	opacity: 0.8;
+}
+
 table.noborders {
 	border: none;
 	background: transparent;

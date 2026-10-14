@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - Aider</title>
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.10.0.post1.dev6">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html" class="active" aria-current="page">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Tags</h1><dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">261</dd><dd class="stat-note"><span class="nowrap">latest v0.86.3.dev</span>&nbsp;&middot; <span class="nowrap">2026-02-12</span></dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">50.3</dd><dd class="stat-note">13,138 commits in total</dd></div></dl>
+<h2 id="all_tags"><a href="#all_tags">All tags</a></h2>
+
+<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th>Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">v0.86.3.dev</td><td class="nowrap">2026-02-12</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.86.2</td><td class="nowrap">2026-02-12</td><td class="num">83</td><td>Paul Gauthier (48), paul-gauthier (15), Bill Dengler (4), Gian-Carlo Pascutto (3), timput (2), mubashir1osmani (2), Luke Reeves (2), muravvv (1), michal.sliwa (1), Varchas Gopalaswamy (1), Mark McDonald (1), Mario Lang (1), KhulnaSoft bot (1), Claudia Pellegrino (1)</td></tr><tr><td class="nowrap">v0.86.2.dev</td><td class="nowrap">2025-08-13</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.86.1</td><td class="nowrap">2025-08-13</td><td class="num">13</td><td>Paul Gauthier (11), paul-gauthier (1), oct4pie (1)</td></tr><tr><td class="nowrap">v0.86.1.dev</td><td class="nowrap">2025-08-09</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.86.0</td><td class="nowrap">2025-08-09</td><td class="num">9</td><td>Paul Gauthier (9)</td></tr><tr><td class="nowrap">v0.85.6.dev</td><td class="nowrap">2025-08-07</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.85.5</td><td class="nowrap">2025-08-07</td><td class="num">5</td><td>Paul Gauthier (5)</td></tr><tr><td class="nowrap">v0.85.5.dev</td><td class="nowrap">2025-08-07</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.85.4</td><td class="nowrap">2025-08-07</td><td class="num">4</td><td>Paul Gauthier (4)</td></tr><tr><td class="nowrap">v0.85.4.dev</td><td class="nowrap">2025-08-07</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.85.3</td><td class="nowrap">2025-08-07</td><td class="num">13</td><td>Paul Gauthier (10), paul-gauthier (2), liam.liu (1)</td></tr><tr><td class="nowrap">v0.85.3.dev</td><td class="nowrap">2025-07-15</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.85.2</td><td class="nowrap">2025-07-15</td><td class="num">23</td><td>Paul Gauthier (11), paul-gauthier (5), Jack Harrington (3), Zexin Yuan (1), Tamir Zahavi-Brunner (1), Kirill Vergun (1), Andrew Grigorev (1)</td></tr><tr><td class="nowrap">v0.85.2.dev</td><td class="nowrap">2025-06-30</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.85.1</td><td class="nowrap">2025-06-30</td><td class="num">7</td><td>Paul Gauthier (7)</td></tr><tr><td class="nowrap">v0.85.1.dev</td><td class="nowrap">2025-06-27</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.85.0</td><td class="nowrap">2025-06-27</td><td class="num">127</td><td>Paul Gauthier (67), paul-gauthier (27), contributor (3), Kyosuke Takayama (3), muravvv (2), jayesh thakare (2), Trung Dinh (2), Nimesh Ghelani (2), therealmarv (1), omarcinkonis (1), Wietse Venema (1), Vincent Taverna (1), Vasil Markoukin (aider) (1), Vamsi Talupula (1), Sebastian Estrella (1), Matthew Tofano (1), Matteo Landi (1), Mathis Beer (aider) (1), Makar Ivashko (1), Luke Reeves (1), Leon Mergen (1), Jess Telford (1), Garrett Hopper (1), Emmanuel Ferdman (1), Daniel Schreiber (1), Andrew Grigorev (1), Ali Ayas (claude-sonnet-4-20250514) (1)</td></tr><tr><td class="nowrap">v0.84.1.dev</td><td class="nowrap">2025-05-30</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.84.0</td><td class="nowrap">2025-05-30</td><td class="num">38</td><td>Paul Gauthier (31), paul-gauthier (3), therealmarv (2), Trung Dinh (1), Lih Chen (1)</td></tr><tr><td class="nowrap">v0.83.3.dev</td><td class="nowrap">2025-05-23</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.83.2</td><td class="nowrap">2025-05-23</td><td class="num">49</td><td>Paul Gauthier (44), paul-gauthier (2), wangboxue (1), savioursho (1), saviour (1)</td></tr><tr><td class="nowrap">v0.83.2.dev</td><td class="nowrap">2025-05-10</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.83.1</td><td class="nowrap">2025-05-10</td><td class="num">29</td><td>Paul Gauthier (29)</td></tr><tr><td class="nowrap">v0.83.1.dev</td><td class="nowrap">2025-05-09</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.83.0</td><td class="nowrap">2025-05-09</td><td class="num">293</td><td>Paul Gauthier (209), Andrew Grigorev (45), Stefan Hladnik (aider) (15), paul-gauthier (9), Titusz (6), MDW (5), cantalupo555 (1), KebobZ (1), Jon Keys (1), Andrey Popp (1)</td></tr><tr><td class="nowrap">v0.82.4.dev</td><td class="nowrap">2025-05-06</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.82.3</td><td class="nowrap">2025-05-06</td><td class="num">79</td><td>Paul Gauthier (73), paul-gauthier (3), Kay Gosho (1), Eryk Wieliczko (1), Enno Richter (1)</td></tr><tr><td class="nowrap">v0.82.3.dev</td><td class="nowrap">2025-04-20</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.82.2</td><td class="nowrap">2025-04-20</td><td class="num">27</td><td>Paul Gauthier (22), zjy1412 (2), paul-gauthier (2), Greg OmniMind (1)</td></tr><tr><td class="nowrap">v0.82.2.dev</td><td class="nowrap">2025-04-17</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.82.1</td><td class="nowrap">2025-04-17</td><td class="num">21</td><td>Paul Gauthier (21)</td></tr><tr><td class="nowrap">v0.82.1.dev</td><td class="nowrap">2025-04-14</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.82.0</td><td class="nowrap">2025-04-14</td><td class="num">181</td><td>Paul Gauthier (181)</td></tr><tr><td class="nowrap">v0.81.4.dev</td><td class="nowrap">2025-04-12</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.81.3</td><td class="nowrap">2025-04-12</td><td class="num">14</td><td>Paul Gauthier (12), paul-gauthier (1), Peter Hadlaw (1)</td></tr><tr><td class="nowrap">v0.81.3.dev</td><td class="nowrap">2025-04-10</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.81.2</td><td class="nowrap">2025-04-10</td><td class="num">40</td><td>Paul Gauthier (31), paul-gauthier (4), Trung Dinh (2), Tyler Satre (1), Felix Lisczyk (1), Anton Ödman (1)</td></tr><tr><td class="nowrap">v0.81.2.dev</td><td class="nowrap">2025-04-04</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.81.1</td><td class="nowrap">2025-04-04</td><td class="num">7</td><td>Paul Gauthier (7)</td></tr><tr><td class="nowrap">v0.81.1.dev</td><td class="nowrap">2025-04-04</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.81.0</td><td class="nowrap">2025-04-04</td><td class="num">15</td><td>Paul Gauthier (15)</td></tr><tr><td class="nowrap">v0.80.5.dev</td><td class="nowrap">2025-04-04</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.80.4</td><td class="nowrap">2025-04-04</td><td class="num">5</td><td>Paul Gauthier (5)</td></tr><tr><td class="nowrap">v0.80.4.dev</td><td class="nowrap">2025-04-03</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.80.3</td><td class="nowrap">2025-04-03</td><td class="num">9</td><td>Paul Gauthier (9)</td></tr><tr><td class="nowrap">v0.80.3.dev</td><td class="nowrap">2025-04-02</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.80.2</td><td class="nowrap">2025-04-02</td><td class="num">15</td><td>Paul Gauthier (15)</td></tr><tr><td class="nowrap">v0.80.2.dev</td><td class="nowrap">2025-04-01</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.80.1</td><td class="nowrap">2025-04-01</td><td class="num">20</td><td>Paul Gauthier (16), paul-gauthier (2), Claudia Pellegrino (1), AJ (@techfren) (1)</td></tr><tr><td class="nowrap">v0.80.1.dev</td><td class="nowrap">2025-03-31</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.80.0</td><td class="nowrap">2025-03-31</td><td class="num">164</td><td>Paul Gauthier (148), paul-gauthier (5), Peter Schilling (aider) (4), Son H. Nguyen (2), Matteo Landi (2), Vasil Markoukin (aider) (1), Mir Adnan ALI (1), Andrey Ivanov (1)</td></tr><tr><td class="nowrap">v0.79.3.dev</td><td class="nowrap">2025-03-27</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.79.2</td><td class="nowrap">2025-03-27</td><td class="num">38</td><td>Paul Gauthier (34), Matteo Landi (3), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.79.2.dev</td><td class="nowrap">2025-03-26</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.79.1</td><td class="nowrap">2025-03-26</td><td class="num">19</td><td>Paul Gauthier (19)</td></tr><tr><td class="nowrap">v0.79.1.dev</td><td class="nowrap">2025-03-25</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.79.0</td><td class="nowrap">2025-03-25</td><td class="num">107</td><td>Paul Gauthier (107)</td></tr><tr><td class="nowrap">v0.78.1.dev</td><td class="nowrap">2025-03-21</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.78.0</td><td class="nowrap">2025-03-21</td><td class="num">349</td><td>Paul Gauthier (339), paul-gauthier (4), lentil32 (aider) (2), Yutaka Matsubara (1), Marco Mayer (1), Carles Sala (aider) (1), Adrian Cole (1)</td></tr><tr><td class="nowrap">v0.77.2.dev</td><td class="nowrap">2025-03-18</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.77.1</td><td class="nowrap">2025-03-18</td><td class="num">128</td><td>Paul Gauthier (126), paul-gauthier (1), Brian Exelbierd (1)</td></tr><tr><td class="nowrap">v0.77.1.dev</td><td class="nowrap">2025-03-13</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.77.0</td><td class="nowrap">2025-03-13</td><td class="num">162</td><td>Paul Gauthier (162)</td></tr><tr><td class="nowrap">v0.76.3.dev</td><td class="nowrap">2025-03-11</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.76.2</td><td class="nowrap">2025-03-11</td><td class="num">5</td><td>Paul Gauthier (5)</td></tr><tr><td class="nowrap">v0.76.2.dev</td><td class="nowrap">2025-03-11</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.76.1</td><td class="nowrap">2025-03-11</td><td class="num">12</td><td>Paul Gauthier (8), paul-gauthier (2), Yutaka Matsubara (1), Mariusz Korzekwa (1)</td></tr><tr><td class="nowrap">v0.76.1.dev</td><td class="nowrap">2025-03-10</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.76.0</td><td class="nowrap">2025-03-10</td><td class="num">266</td><td>Paul Gauthier (254), paul-gauthier (5), gmoz22 (3), Claudia Pellegrino (3), Akira Komamura (1)</td></tr><tr><td class="nowrap">v0.75.3.dev</td><td class="nowrap">2025-03-04</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.75.2</td><td class="nowrap">2025-03-04</td><td class="num">41</td><td>Paul Gauthier (31), paul-gauthier (5), Trevor Sullivan (1), Mingde (Matthew) Zeng (1), Mattias (1), Josh Klina (1), Filip Trplan (1)</td></tr><tr><td class="nowrap">v0.75.2.dev</td><td class="nowrap">2025-02-24</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.75.1</td><td class="nowrap">2025-02-24</td><td class="num">7</td><td>Paul Gauthier (7)</td></tr><tr><td class="nowrap">v0.75.1.dev</td><td class="nowrap">2025-02-24</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.75.0</td><td class="nowrap">2025-02-24</td><td class="num">30</td><td>Paul Gauthier (30)</td></tr><tr><td class="nowrap">v0.74.4.dev</td><td class="nowrap">2025-02-23</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.74.3</td><td class="nowrap">2025-02-23</td><td class="num">40</td><td>Paul Gauthier (32), paul-gauthier (4), Lucas Shadler (1), FeepingCreature (aider) (1), Daniel de Vries (1), Antti Kaihola (1)</td></tr><tr><td class="nowrap">v0.74.3.dev</td><td class="nowrap">2025-02-09</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.74.2</td><td class="nowrap">2025-02-09</td><td class="num">23</td><td>Paul Gauthier (21), paul-gauthier (1), Warren Krewenki (1)</td></tr><tr><td class="nowrap">v0.74.2.dev</td><td class="nowrap">2025-02-07</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.74.1</td><td class="nowrap">2025-02-07</td><td class="num">16</td><td>Paul Gauthier (16)</td></tr><tr><td class="nowrap">v0.74.1.dev</td><td class="nowrap">2025-02-06</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.74.0</td><td class="nowrap">2025-02-06</td><td class="num">180</td><td>Paul Gauthier (174), paul-gauthier (3), Viktor Szépe (1), Dayyan Smith (1), Ari Roffe (1)</td></tr><tr><td class="nowrap">v0.73.1.dev</td><td class="nowrap">2025-01-31</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.73.0</td><td class="nowrap">2025-01-31</td><td class="num">170</td><td>Paul Gauthier (146), xqyz (8), paul-gauthier (8), kennyfrc (2), Yu Zhang (2), Jintao Zhang (2), hstoklosa (1), Andrea Bergamasco (1)</td></tr><tr><td class="nowrap">v0.72.4.dev</td><td class="nowrap">2025-01-25</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.72.3</td><td class="nowrap">2025-01-25</td><td class="num">40</td><td>Paul Gauthier (37), Mir Adnan ALI (2), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.72.3.dev</td><td class="nowrap">2025-01-22</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.72.2</td><td class="nowrap">2025-01-22</td><td class="num">12</td><td>Paul Gauthier (12)</td></tr><tr><td class="nowrap">v0.72.2.dev</td><td class="nowrap">2025-01-20</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.72.1</td><td class="nowrap">2025-01-20</td><td class="num">6</td><td>Paul Gauthier (6)</td></tr><tr><td class="nowrap">v0.72.1.dev</td><td class="nowrap">2025-01-20</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.72.0</td><td class="nowrap">2025-01-20</td><td class="num">70</td><td>Paul Gauthier (62), paul-gauthier (4), Titusz (2), Paul Walker (1), Max Yankov (aider) (1)</td></tr><tr><td class="nowrap">v0.71.2.dev</td><td class="nowrap">2025-01-12</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.71.1</td><td class="nowrap">2025-01-12</td><td class="num">23</td><td>Paul Gauthier (23)</td></tr><tr><td class="nowrap">v0.71.1.dev</td><td class="nowrap">2025-01-10</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.71.0</td><td class="nowrap">2025-01-10</td><td class="num">158</td><td>Paul Gauthier (132), paul-gauthier (12), Peter Schilling (aider) (3), Krazer (3), 柏枫 (1), hydai (1), apaz-cli (1), Paul Maunders (1), Nimesh Ghelani (1), Josh Vera (1), Bartek Kowalik (1), Aaron Weisberg (1)</td></tr><tr><td class="nowrap">v0.70.1.dev</td><td class="nowrap">2024-12-26</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.70.0</td><td class="nowrap">2024-12-26</td><td class="num">261</td><td>Paul Gauthier (249), paul-gauthier (7), apaz-cli (2), mdk (1), Jiawen Geng (1), Evan Johnson (1)</td></tr><tr><td class="nowrap">v0.69.2.dev</td><td class="nowrap">2024-12-16</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.69.1</td><td class="nowrap">2024-12-16</td><td class="num">58</td><td>Paul Gauthier (56), you-n-g (1), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.69.1.dev</td><td class="nowrap">2024-12-13</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.69.0</td><td class="nowrap">2024-12-13</td><td class="num">85</td><td>Paul Gauthier (79), paul-gauthier (3), Mir Adnan ALI (1), JeongJuhyeon (1), Damilola Emmanuel Olowookere (1)</td></tr><tr><td class="nowrap">v0.68.1.dev</td><td class="nowrap">2024-12-10</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.68.0</td><td class="nowrap">2024-12-10</td><td class="num">136</td><td>Paul Gauthier (136)</td></tr><tr><td class="nowrap">v0.67.1.dev</td><td class="nowrap">2024-12-06</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.67.0</td><td class="nowrap">2024-12-06</td><td class="num">303</td><td>Paul Gauthier (303)</td></tr><tr><td class="nowrap">v0.66.1.dev</td><td class="nowrap">2024-12-01</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.66.0</td><td class="nowrap">2024-12-01</td><td class="num">157</td><td>Paul Gauthier (148), paul-gauthier (3), itlackey (3), Philippe de Reynal (3)</td></tr><tr><td class="nowrap">v0.65.2.dev</td><td class="nowrap">2024-11-26</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.65.1</td><td class="nowrap">2024-11-26</td><td class="num">7</td><td>Paul Gauthier (7)</td></tr><tr><td class="nowrap">v0.65.1.dev</td><td class="nowrap">2024-11-26</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.65.0</td><td class="nowrap">2024-11-26</td><td class="num">177</td><td>Paul Gauthier (165), paul-gauthier (5), Ivan Fioravanti (5), malkoG (2)</td></tr><tr><td class="nowrap">v0.64.2.dev</td><td class="nowrap">2024-11-21</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.64.1</td><td class="nowrap">2024-11-21</td><td class="num">4</td><td>Paul Gauthier (4)</td></tr><tr><td class="nowrap">v0.64.1.dev</td><td class="nowrap">2024-11-21</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.64.0</td><td class="nowrap">2024-11-21</td><td class="num">209</td><td>Paul Gauthier (202), paul-gauthier (3), Chad Phillips (3), caetanominuzzo (1)</td></tr><tr><td class="nowrap">v0.63.3.dev</td><td class="nowrap">2024-11-18</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.63.2</td><td class="nowrap">2024-11-18</td><td class="num">24</td><td>Paul Gauthier (20), paul-gauthier (2), mw (1), José Luis Di Biase (1)</td></tr><tr><td class="nowrap">v0.63.2.dev</td><td class="nowrap">2024-11-14</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.63.1</td><td class="nowrap">2024-11-14</td><td class="num">10</td><td>Paul Gauthier (10)</td></tr><tr><td class="nowrap">v0.63.1.dev</td><td class="nowrap">2024-11-13</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.63.0</td><td class="nowrap">2024-11-13</td><td class="num">110</td><td>Paul Gauthier (102), paul-gauthier (4), 柏枫 (2), Logan Attwood (1), Jaap Buurman (1)</td></tr><tr><td class="nowrap">v0.62.2.dev</td><td class="nowrap">2024-11-05</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.62.1</td><td class="nowrap">2024-11-05</td><td class="num">24</td><td>Paul Gauthier (24)</td></tr><tr><td class="nowrap">v0.62.1.dev</td><td class="nowrap">2024-11-04</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.62.0</td><td class="nowrap">2024-11-04</td><td class="num">32</td><td>Paul Gauthier (32)</td></tr><tr><td class="nowrap">v0.61.1.dev</td><td class="nowrap">2024-11-01</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.61.0</td><td class="nowrap">2024-11-01</td><td class="num">312</td><td>Paul Gauthier (308), paul-gauthier (2), kAIto47802 (1), Konstantin L (1)</td></tr><tr><td class="nowrap">v0.60.2.dev</td><td class="nowrap">2024-10-24</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.60.1</td><td class="nowrap">2024-10-24</td><td class="num">24</td><td>Paul Gauthier (24)</td></tr><tr><td class="nowrap">v0.60.1.dev</td><td class="nowrap">2024-10-22</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.60.0</td><td class="nowrap">2024-10-22</td><td class="num">83</td><td>Paul Gauthier (64), fry69 (9), paul-gauthier (5), Manav Bokinala (2), Jonathan Ellis (2), Sven Grunewaldt (1)</td></tr><tr><td class="nowrap">v0.59.2.dev</td><td class="nowrap">2024-10-05</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.59.1</td><td class="nowrap">2024-10-05</td><td class="num">17</td><td>Paul Gauthier (15), paul-gauthier (1), fry69 (1)</td></tr><tr><td class="nowrap">v0.59.1.dev</td><td class="nowrap">2024-10-04</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.59.0</td><td class="nowrap">2024-10-04</td><td class="num">78</td><td>Paul Gauthier (66), itlackey (9), paul-gauthier (2), fry69 (1)</td></tr><tr><td class="nowrap">v0.58.2.dev</td><td class="nowrap">2024-09-30</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.58.1</td><td class="nowrap">2024-09-30</td><td class="num">14</td><td>Paul Gauthier (10), paul-gauthier (2), mario7421 (1), fry69 (1)</td></tr><tr><td class="nowrap">v0.58.1.dev</td><td class="nowrap">2024-09-29</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.58.0</td><td class="nowrap">2024-09-29</td><td class="num">382</td><td>Paul Gauthier (349), paul-gauthier (13), fry69 (9), hypn4 (3), Stein Martin Hustad (2), Jonathan Ellis (2), rti (1), itlackey (1), Mike Bailey (1), Curran Kelleher (1)</td></tr><tr><td class="nowrap">v0.57.2.dev</td><td class="nowrap">2024-09-22</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.57.1</td><td class="nowrap">2024-09-22</td><td class="num">18</td><td>Paul Gauthier (18)</td></tr><tr><td class="nowrap">v0.57.1.dev</td><td class="nowrap">2024-09-21</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.57.0</td><td class="nowrap">2024-09-21</td><td class="num">161</td><td>Paul Gauthier (141), Jay Alammar (7), paul-gauthier (6), Krazer (4), youknow (1), Christian Clauss (1), Anjor Kanekar (1)</td></tr><tr><td class="nowrap">v0.56.1.dev</td><td class="nowrap">2024-09-09</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.56.0</td><td class="nowrap">2024-09-09</td><td class="num">95</td><td>Paul Gauthier (82), paul-gauthier (6), fry69 (5), Jun Siang Cheah (2)</td></tr><tr><td class="nowrap">v0.55.1.dev</td><td class="nowrap">2024-09-04</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.55.0</td><td class="nowrap">2024-09-04</td><td class="num">60</td><td>Paul Gauthier (60)</td></tr><tr><td class="nowrap">v0.54.13.dev</td><td class="nowrap">2024-09-01</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.54.12</td><td class="nowrap">2024-09-01</td><td class="num">2</td><td>Paul Gauthier (2)</td></tr><tr><td class="nowrap">v0.54.12-dev</td><td class="nowrap">2024-09-01</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.54.11</td><td class="nowrap">2024-09-01</td><td class="num">8</td><td>Paul Gauthier (8)</td></tr><tr><td class="nowrap">v0.54.10</td><td class="nowrap">2024-09-01</td><td class="num">3</td><td>Paul Gauthier (3)</td></tr><tr><td class="nowrap">v0.54.9</td><td class="nowrap">2024-09-01</td><td class="num">104</td><td>Paul Gauthier (104)</td></tr><tr><td class="nowrap">v0.54.8</td><td class="nowrap">2024-08-30</td><td class="num">71</td><td>Paul Gauthier (68), Nikolay Sedelnikov (2), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.54.7</td><td class="nowrap">2024-08-29</td><td class="num">61</td><td>Paul Gauthier (53), Antti Kaihola (5), paul-gauthier (2), fry69 (1)</td></tr><tr><td class="nowrap">v0.54.6</td><td class="nowrap">2024-08-29</td><td class="num">17</td><td>Paul Gauthier (17)</td></tr><tr><td class="nowrap">v0.54.5</td><td class="nowrap">2024-08-29</td><td class="num">24</td><td>Paul Gauthier (24)</td></tr><tr><td class="nowrap">v0.54.4</td><td class="nowrap">2024-08-28</td><td class="num">24</td><td>Paul Gauthier (24)</td></tr><tr><td class="nowrap">v0.54.3</td><td class="nowrap">2024-08-28</td><td class="num">9</td><td>Paul Gauthier (9)</td></tr><tr><td class="nowrap">v0.54.2</td><td class="nowrap">2024-08-28</td><td class="num">36</td><td>Paul Gauthier (36)</td></tr><tr><td class="nowrap">v0.54.0</td><td class="nowrap">2024-08-28</td><td class="num">105</td><td>Paul Gauthier (100), paul-gauthier (2), Jun Siang Cheah (2), Antti Kaihola (1)</td></tr><tr><td class="nowrap">v0.53.0</td><td class="nowrap">2024-08-27</td><td class="num">155</td><td>Paul Gauthier (155)</td></tr><tr><td class="nowrap">v0.52.1</td><td class="nowrap">2024-08-23</td><td class="num">30</td><td>Paul Gauthier (30)</td></tr><tr><td class="nowrap">v0.52.0</td><td class="nowrap">2024-08-23</td><td class="num">199</td><td>Paul Gauthier (195), pcamp (2), paul-gauthier (2)</td></tr><tr><td class="nowrap">v0.51.1</td><td class="nowrap">2024-08-21</td><td class="num">17</td><td>Paul Gauthier (15), pcamp (1), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.51.0</td><td class="nowrap">2024-08-20</td><td class="num">199</td><td>Paul Gauthier (194), paul-gauthier (4), pcamp (1)</td></tr><tr><td class="nowrap">v0.50.1</td><td class="nowrap">2024-08-14</td><td class="num">22</td><td>Paul Gauthier (22)</td></tr><tr><td class="nowrap">v0.50.0</td><td class="nowrap">2024-08-13</td><td class="num">86</td><td>Paul Gauthier (82), paul-gauthier (2), Branch Vincent (1), Amir Elaguizy (aider) (1)</td></tr><tr><td class="nowrap">v0.49.1</td><td class="nowrap">2024-08-10</td><td class="num">5</td><td>Paul Gauthier (5)</td></tr><tr><td class="nowrap">v0.49.0</td><td class="nowrap">2024-08-10</td><td class="num">174</td><td>Paul Gauthier (174)</td></tr><tr><td class="nowrap">v0.48.1</td><td class="nowrap">2024-08-07</td><td class="num">37</td><td>Paul Gauthier (37)</td></tr><tr><td class="nowrap">v0.48.0</td><td class="nowrap">2024-08-06</td><td class="num">175</td><td>Paul Gauthier (167), paul-gauthier (4), deansher (2), gordonlukch (1), Thinh Nguyen (1)</td></tr><tr><td class="nowrap">v0.47.1</td><td class="nowrap">2024-07-31</td><td class="num">8</td><td>Paul Gauthier (8)</td></tr><tr><td class="nowrap">v0.47.0</td><td class="nowrap">2024-07-31</td><td class="num">99</td><td>Paul Gauthier (99)</td></tr><tr><td class="nowrap">v0.46.1</td><td class="nowrap">2024-07-29</td><td class="num">54</td><td>Paul Gauthier (54)</td></tr><tr><td class="nowrap">v0.46.0</td><td class="nowrap">2024-07-29</td><td class="num">128</td><td>Paul Gauthier (85), Paul Gauthier (aider) (35), paul-gauthier (4), Titusz (1), Steven T. Cramer (1), Johan von Tangen Sivertsen (1), Charles Joachim (1)</td></tr><tr><td class="nowrap">v0.45.1</td><td class="nowrap">2024-07-18</td><td class="num">4</td><td>Paul Gauthier (4)</td></tr><tr><td class="nowrap">v0.45.0</td><td class="nowrap">2024-07-18</td><td class="num">27</td><td>Paul Gauthier (27)</td></tr><tr><td class="nowrap">v0.44.0</td><td class="nowrap">2024-07-16</td><td class="num">77</td><td>Paul Gauthier (72), paul-gauthier (3), youknow (1), DubbleClick (1)</td></tr><tr><td class="nowrap">v0.43.4</td><td class="nowrap">2024-07-11</td><td class="num">3</td><td>Paul Gauthier (3)</td></tr><tr><td class="nowrap">v0.43.3</td><td class="nowrap">2024-07-11</td><td class="num">4</td><td>Paul Gauthier (4)</td></tr><tr><td class="nowrap">v0.43.2</td><td class="nowrap">2024-07-10</td><td class="num">17</td><td>Paul Gauthier (17)</td></tr><tr><td class="nowrap">v0.43.1</td><td class="nowrap">2024-07-10</td><td class="num">33</td><td>Paul Gauthier (33)</td></tr><tr><td class="nowrap">v0.43.0</td><td class="nowrap">2024-07-07</td><td class="num">91</td><td>Paul Gauthier (89), paul-gauthier (2)</td></tr><tr><td class="nowrap">v0.42.0</td><td class="nowrap">2024-07-04</td><td class="num">55</td><td>Paul Gauthier (50), paul-gauthier (3), jvmncs (1), Taha YASSINE (1)</td></tr><tr><td class="nowrap">v0.41.0</td><td class="nowrap">2024-07-01</td><td class="num">58</td><td>Paul Gauthier (51), paul-gauthier (3), Mitsuki Ogasahara (2), Henry Fraser (1), Amir Elaguizy (aider) (1)</td></tr><tr><td class="nowrap">v0.40.6</td><td class="nowrap">2024-06-27</td><td class="num">10</td><td>Paul Gauthier (9), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.40.5</td><td class="nowrap">2024-06-25</td><td class="num">3</td><td>Paul Gauthier (3)</td></tr><tr><td class="nowrap">v0.40.4</td><td class="nowrap">2024-06-25</td><td class="num">6</td><td>Paul Gauthier (6)</td></tr><tr><td class="nowrap">v0.40.3</td><td class="nowrap">2024-06-25</td><td class="num">4</td><td>Paul Gauthier (4)</td></tr><tr><td class="nowrap">v0.40.2</td><td class="nowrap">2024-06-25</td><td class="num">5</td><td>Paul Gauthier (5)</td></tr><tr><td class="nowrap">v0.40.1</td><td class="nowrap">2024-06-25</td><td class="num">6</td><td>Paul Gauthier (6)</td></tr><tr><td class="nowrap">v0.40.0</td><td class="nowrap">2024-06-24</td><td class="num">38</td><td>Paul Gauthier (32), paul-gauthier (3), Krazer (2), Dustin Miller (1)</td></tr><tr><td class="nowrap">v0.39.0</td><td class="nowrap">2024-06-20</td><td class="num">60</td><td>Paul Gauthier (42), Daniel Vainsencher (8), John-Mason P. Shackelford (4), paul-gauthier (3), John-Mason Shackelford (2), Nicolas Perez (1)</td></tr><tr><td class="nowrap">v0.38.0</td><td class="nowrap">2024-06-17</td><td class="num">183</td><td>Paul Gauthier (156), paul-gauthier (10), Krazer (10), youknow (2), prmbiy (1), develmusa (1), Nicolas Perez (1), Jim White (1), Ikko Eltociear Ashimine (1)</td></tr><tr><td class="nowrap">v0.37.0</td><td class="nowrap">2024-06-04</td><td class="num">208</td><td>Paul Gauthier (204), paul-gauthier (2), Aleksandr Bobrov (2)</td></tr><tr><td class="nowrap">v0.36.0</td><td class="nowrap">2024-05-22</td><td class="num">171</td><td>Paul Gauthier (170), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.35.0</td><td class="nowrap">2024-05-13</td><td class="num">44</td><td>Paul Gauthier (43), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.34.0</td><td class="nowrap">2024-05-10</td><td class="num">34</td><td>Paul Gauthier (34)</td></tr><tr><td class="nowrap">v0.33.0</td><td class="nowrap">2024-05-08</td><td class="num">9</td><td>Paul Gauthier (9)</td></tr><tr><td class="nowrap">v0.32.0</td><td class="nowrap">2024-05-07</td><td class="num">134</td><td>Paul Gauthier (123), paul-gauthier (11)</td></tr><tr><td class="nowrap">v0.31.1</td><td class="nowrap">2024-05-02</td><td class="num">14</td><td>Paul Gauthier (14)</td></tr><tr><td class="nowrap">v0.31.0</td><td class="nowrap">2024-05-02</td><td class="num">103</td><td>Paul Gauthier (101), paul-gauthier (2)</td></tr><tr><td class="nowrap">v0.30.1</td><td class="nowrap">2024-04-25</td><td class="num">5</td><td>Paul Gauthier (5)</td></tr><tr><td class="nowrap">v0.30.0</td><td class="nowrap">2024-04-24</td><td class="num">24</td><td>Paul Gauthier (17), paul-gauthier (7)</td></tr><tr><td class="nowrap">v0.29.2</td><td class="nowrap">2024-04-22</td><td class="num">16</td><td>Paul Gauthier (16)</td></tr><tr><td class="nowrap">v0.29.1</td><td class="nowrap">2024-04-22</td><td class="num">4</td><td>Paul Gauthier (4)</td></tr><tr><td class="nowrap">v0.29.0</td><td class="nowrap">2024-04-21</td><td class="num">91</td><td>Paul Gauthier (82), paul-gauthier (8), Aloha (1)</td></tr><tr><td class="nowrap">v0.28.0</td><td class="nowrap">2024-04-09</td><td class="num">5</td><td>Paul Gauthier (5)</td></tr><tr><td class="nowrap">v0.27.0</td><td class="nowrap">2024-03-22</td><td class="num">11</td><td>Paul Gauthier (8), Ryan Freckleton (2), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.26.1</td><td class="nowrap">2024-03-10</td><td class="num">6</td><td>Paul Gauthier (6)</td></tr><tr><td class="nowrap">v0.26.0</td><td class="nowrap">2024-03-08</td><td class="num">17</td><td>Paul Gauthier (16), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.25.0</td><td class="nowrap">2024-03-04</td><td class="num">86</td><td>Paul Gauthier (86)</td></tr><tr><td class="nowrap">v0.24.1</td><td class="nowrap">2024-02-11</td><td class="num">6</td><td>Paul Gauthier (6)</td></tr><tr><td class="nowrap">v0.24.0</td><td class="nowrap">2024-02-10</td><td class="num">42</td><td>Paul Gauthier (42)</td></tr><tr><td class="nowrap">v0.23.0</td><td class="nowrap">2024-02-03</td><td class="num">39</td><td>Paul Gauthier (37), paul-gauthier (1), Zachary Vorhies (1)</td></tr><tr><td class="nowrap">v0.22.0</td><td class="nowrap">2024-01-23</td><td class="num">14</td><td>Paul Gauthier (13), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.21.1</td><td class="nowrap">2024-01-10</td><td class="num">5</td><td>Paul Gauthier (5)</td></tr><tr><td class="nowrap">v0.21.0</td><td class="nowrap">2024-01-08</td><td class="num">11</td><td>Paul Gauthier (10), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.20.0</td><td class="nowrap">2024-01-04</td><td class="num">54</td><td>Paul Gauthier (24), Joshua Vial (20), paul-gauthier (7), Christopher Toth (3)</td></tr><tr><td class="nowrap">v0.19.1</td><td class="nowrap">2023-12-21</td><td class="num">13</td><td>Paul Gauthier (11), paul-gauthier (2)</td></tr><tr><td class="nowrap">v0.19.0</td><td class="nowrap">2023-12-20</td><td class="num">52</td><td>Paul Gauthier (44), paul-gauthier (8)</td></tr><tr><td class="nowrap">v0.18.1</td><td class="nowrap">2023-12-14</td><td class="num">42</td><td>Paul Gauthier (32), Paul Gauthier (aider) (5), paul-gauthier (4), Ian Brown (1)</td></tr><tr><td class="nowrap">v0.18.0</td><td class="nowrap">2023-11-17</td><td class="num">76</td><td>Paul Gauthier (68), paul-gauthier (8)</td></tr><tr><td class="nowrap">v0.17.0</td><td class="nowrap">2023-11-07</td><td class="num">52</td><td>Paul Gauthier (48), paul-gauthier (3), Omri Bloch (1)</td></tr><tr><td class="nowrap">v0.16.3</td><td class="nowrap">2023-11-01</td><td class="num">5</td><td>Paul Gauthier (5)</td></tr><tr><td class="nowrap">v0.16.2</td><td class="nowrap">2023-10-31</td><td class="num">10</td><td>Paul Gauthier (10)</td></tr><tr><td class="nowrap">v0.16.1</td><td class="nowrap">2023-10-31</td><td class="num">17</td><td>Paul Gauthier (14), paul-gauthier (2), Jack Hallam (1)</td></tr><tr><td class="nowrap">v0.16.0</td><td class="nowrap">2023-10-29</td><td class="num">90</td><td>Paul Gauthier (83), paul-gauthier (7)</td></tr><tr><td class="nowrap">v0.15.0</td><td class="nowrap">2023-10-20</td><td class="num">7</td><td>Paul Gauthier (7)</td></tr><tr><td class="nowrap">v0.14.3-dev1</td><td class="nowrap">2023-10-19</td><td class="num">32</td><td>Paul Gauthier (29), Alexander Kjeldaas (2), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.14.2</td><td class="nowrap">2023-10-18</td><td class="num">9</td><td>Paul Gauthier (9)</td></tr><tr><td class="nowrap">v0.14.2-dev3</td><td class="nowrap">2023-10-18</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.14.2-dev2</td><td class="nowrap">2023-10-18</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.14.2-dev1</td><td class="nowrap">2023-10-18</td><td class="num">10</td><td>Paul Gauthier (10)</td></tr><tr><td class="nowrap">v0.14.1</td><td class="nowrap">2023-09-30</td><td class="num">32</td><td>Paul Gauthier (20), Farhan Ahmad (5), paul-gauthier (3), Thinh Nguyen (2), Joshua Vial (2)</td></tr><tr><td class="nowrap">v0.14.0</td><td class="nowrap">2023-09-08</td><td class="num">28</td><td>Paul Gauthier (12), Joshua Vial (7), JV (6), paul-gauthier (3)</td></tr><tr><td class="nowrap">v0.13.0</td><td class="nowrap">2023-08-22</td><td class="num">66</td><td>Paul Gauthier (64), paul-gauthier (2)</td></tr><tr><td class="nowrap">v0.12.0</td><td class="nowrap">2023-08-11</td><td class="num">90</td><td>Paul Gauthier (89), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.11.1</td><td class="nowrap">2023-08-08</td><td class="num">43</td><td>Paul Gauthier (39), paul-gauthier (2), Joshua Vial (1), Arseniy Pavlenko (1)</td></tr><tr><td class="nowrap">v0.11.0</td><td class="nowrap">2023-08-02</td><td class="num">97</td><td>Paul Gauthier (95), paul-gauthier (2)</td></tr><tr><td class="nowrap">v0.10.1</td><td class="nowrap">2023-07-24</td><td class="num">24</td><td>Paul Gauthier (18), paul-gauthier (4), Joshua Vial (2)</td></tr><tr><td class="nowrap">v0.10.0</td><td class="nowrap">2023-07-22</td><td class="num">83</td><td>Paul Gauthier (80), paul-gauthier (2), Amer Amayreh (1)</td></tr><tr><td class="nowrap">v0.9.0</td><td class="nowrap">2023-07-16</td><td class="num">59</td><td>Paul Gauthier (57), paul-gauthier (2)</td></tr><tr><td class="nowrap">v0.8.3</td><td class="nowrap">2023-07-12</td><td class="num">97</td><td>Paul Gauthier (92), paul-gauthier (5)</td></tr><tr><td class="nowrap">v0.8.2</td><td class="nowrap">2023-07-08</td><td class="num">3</td><td>Paul Gauthier (3)</td></tr><tr><td class="nowrap">v0.8.1</td><td class="nowrap">2023-07-08</td><td class="num">61</td><td>Paul Gauthier (59), paul-gauthier (2)</td></tr><tr><td class="nowrap">v0.8.0</td><td class="nowrap">2023-07-06</td><td class="num">315</td><td>Paul Gauthier (293), paul-gauthier (20), kwmiebach (1), Ikko Eltociear Ashimine (1)</td></tr><tr><td class="nowrap">v0.7.2</td><td class="nowrap">2023-06-26</td><td class="num">21</td><td>Paul Gauthier (21)</td></tr><tr><td class="nowrap">v0.7.1</td><td class="nowrap">2023-06-26</td><td class="num">12</td><td>Paul Gauthier (12)</td></tr><tr><td class="nowrap">v0.7.0</td><td class="nowrap">2023-06-25</td><td class="num">197</td><td>Paul Gauthier (196), paul-gauthier (1)</td></tr><tr><td class="nowrap">v0.6.6</td><td class="nowrap">2023-06-17</td><td class="num">10</td><td>Paul Gauthier (10)</td></tr><tr><td class="nowrap">v0.6.4</td><td class="nowrap">2023-06-17</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.6.3</td><td class="nowrap">2023-06-17</td><td class="num">6</td><td>Paul Gauthier (6)</td></tr><tr><td class="nowrap">v0.6.2</td><td class="nowrap">2023-06-17</td><td class="num">1</td><td>Paul Gauthier (1)</td></tr><tr><td class="nowrap">v0.6.1</td><td class="nowrap">2023-06-17</td><td class="num">3</td><td>Paul Gauthier (3)</td></tr><tr><td class="nowrap">v0.6.0</td><td class="nowrap">2023-06-15</td><td class="num">49</td><td>Paul Gauthier (47), paul-gauthier (2)</td></tr><tr><td class="nowrap">v0.5.0</td><td class="nowrap">2023-06-07</td><td class="num">1,571</td><td>Paul Gauthier (1,515), paul-gauthier (53), Moby von Briesen (2), Jevon MacDonald (1)</td></tr></table></div><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>
