@@ -552,6 +552,15 @@ class TestAiAssistedPage:
         assert '<dd class="stat-value">0 of 1</dd>' in page
         assert "Largest Share" not in page
 
+    def test_a_quarter_without_commits_has_no_share(self, temp_dir):
+        quiet = _ai([(5, 10), (2, 4), (0, 0), (0, 0)], {"Aider": 7})
+        page = self._render(temp_dir, [_summary("alpha", 14, {}, ai_assisted=quiet)])["ai.html"]
+        assert page.count('<td class="share"><small>no commits</small></td>') == 2
+        assert "0 / 0" not in page
+        # and it names an assistant in the last four quarters all the same
+        assert '<dd class="stat-value">1 of 1</dd>' in page
+        assert "Largest Share" not in page
+
     def test_names_are_escaped(self, temp_dir):
         page = self._render(
             temp_dir,

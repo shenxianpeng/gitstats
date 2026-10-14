@@ -438,6 +438,9 @@ class AggregateReportCreator:
         if counts is None:
             return '<td class="share">&ndash;</td>'
         part, whole = counts
+        if not whole:
+            # a quarter without commits has no share, not a share of nothing
+            return '<td class="share"><small>no commits</small></td>'
         ratio = part / whole if whole else 0.0
         # one hue, darker for more; a square root, so that a few per cent still shows
         strength = 0 if ratio <= 0 else 10 + 65 * min(1.0, ratio / 0.6) ** 0.5
