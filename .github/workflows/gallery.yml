@@ -14,17 +14,28 @@ jobs:
       fail-fast: false
       matrix:
         repo:
-          - { id: cpython,    name: "CPython",      url: "python/cpython"        }
-          - { id: vscode,     name: "VS Code",      url: "microsoft/vscode"      }
-          - { id: git,        name: "Git",          url: "git/git"               }
-          - { id: nginx,      name: "nginx",        url: "nginx/nginx"           }
-          - { id: kubernetes, name: "Kubernetes",   url: "kubernetes/kubernetes" }
-          - { id: nodejs,     name: "Node.js",      url: "nodejs/node"           }
-          - { id: django,     name: "Django",       url: "django/django"         }
-          - { id: rust,       name: "Rust",         url: "rust-lang/rust"        }
-          - { id: react,      name: "React",        url: "facebook/react"        }
-          - { id: homebrew,   name: "Homebrew",     url: "Homebrew/brew"         }
-
+          - { id: cpython,      name: "CPython",      url: "python/cpython"            }
+          - { id: vscode,       name: "VS Code",      url: "microsoft/vscode"          }
+          - { id: git,          name: "Git",          url: "git/git"                   }
+          - { id: nginx,        name: "nginx",        url: "nginx/nginx"               }
+          - { id: kubernetes,   name: "Kubernetes",   url: "kubernetes/kubernetes"     }
+          - { id: nodejs,       name: "Node.js",      url: "nodejs/node"               }
+          - { id: django,       name: "Django",       url: "django/django"             }
+          - { id: rust,         name: "Rust",         url: "rust-lang/rust"            }
+          - { id: react,        name: "React",        url: "facebook/react"            }
+          - { id: homebrew,     name: "Homebrew",     url: "Homebrew/brew"             }
+          # AI coding assistants: how much their own history names one
+          - { id: codex,        name: "Codex CLI",    url: "openai/codex"              }
+          - { id: gemini-cli,   name: "Gemini CLI",   url: "google-gemini/gemini-cli"  }
+          - { id: opencode,     name: "OpenCode",     url: "anomalyco/opencode"        }
+          - { id: aider,        name: "Aider",        url: "Aider-AI/aider"            }
+          # Python and AI libraries
+          - { id: pytorch,      name: "PyTorch",      url: "pytorch/pytorch"           }
+          - { id: transformers, name: "Transformers", url: "huggingface/transformers"  }
+          - { id: langchain,    name: "LangChain",    url: "langchain-ai/langchain"    }
+          - { id: fastapi,      name: "FastAPI",      url: "fastapi/fastapi"           }
+          - { id: pandas,       name: "pandas",       url: "pandas-dev/pandas"         }
+          - { id: numpy,        name: "NumPy",        url: "numpy/numpy"               }
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
