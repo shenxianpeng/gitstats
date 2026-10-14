@@ -55,11 +55,13 @@ ACCOUNTS = [
         "gemini-code-assist[bot] <176961590+gemini-code-assist[bot]@users.noreply.github.com>",
         "Gemini",
     ),
-    ("aider (claude-sonnet-4) <aider@aider.chat>", "Aider"),
+    ("aider (gpt-5) <aider@aider.chat>", "Aider"),
+    ("aider (vertex_ai/gemini-2.5-pro-exp-03-25) <noreply@aider.dev>", "Aider"),
     ("Jane Doe (aider) <jane@example.com>", "Aider"),
     ("Amp <amp@ampcode.com>", "Amp"),
     ("openhands <openhands@all-hands.dev>", "OpenHands"),
     ("OpenCode:glm-5", "OpenCode"),
+    ("Opencode/Opus 4.6", "OpenCode"),
     ("opencode <noreply@opencode.ai>", "OpenCode"),
     ("Warp <agent@warp.dev>", "Warp"),
     ("Oz <oz-agent@warp.dev>", "Warp"),
@@ -109,6 +111,12 @@ def test_every_assistant_listed_has_an_account_tried_here():
         # a name anyone may give themselves is not enough
         "Copilot <someone@example.com>",
         "Cursor <me@example.com>",
+        # the people and the scripts of the projects behind the assistants
+        "Paul Gauthier <paul@aider.chat>",
+        "Paul Gauthier <aider@paulg.org>",
+        "opencode <opencode@sst.dev>",
+        "opencode-agent[bot] <opencode-agent[bot]@users.noreply.github.com>",
+        "opencode <me@example.com>",
         # bots that are not assistants
         "dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
         "pre-commit-ci[bot] <66853113+pre-commit-ci[bot]@users.noreply.github.com>",

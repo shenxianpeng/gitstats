@@ -39,10 +39,14 @@ IDENTITIES: tuple[tuple[str, str], ...] = (
     ("Devin", r"devin-ai-integration\[bot\]"),
     ("Jules", r"^google-labs-jules\[bot\] <"),
     ("Gemini", r"^gemini-code-assist\[bot\] <"),
-    ("Aider", r"@aider\.chat>$|\(aider\) <"),
+    # its own addresses, not every one at aider.chat: its maintainer commits from one
+    ("Aider", r"<(aider@aider\.chat|noreply@aider\.dev)>$|\(aider\) <"),
     ("Amp", r"<amp@ampcode\.com>$"),
     ("OpenHands", r"<openhands@all-hands\.dev>$"),
-    ("OpenCode", r"^opencode(:| <|$)"),
+    # Not the accounts the OpenCode project commits under: "opencode
+    # <opencode@sst.dev>" makes its releases, and opencode-agent[bot] mostly
+    # regenerates files, between the changes its agent makes.
+    ("OpenCode", r"<noreply@opencode\.ai>$|^opencode[:/]"),
     ("Warp", r"<(agent|oz-agent)@warp\.dev>$"),
     ("Factory Droid", r"^factory-droid\[bot\] <"),
     ("Amazon Q", r"^amazon-q-developer\[bot\] <"),
