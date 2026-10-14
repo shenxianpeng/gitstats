@@ -1198,6 +1198,15 @@ class TestRunIntegration:
         # Per-repo pages must not leak into the output root
         assert not os.path.exists(f"{output}/activity.html")
 
+    def test_multi_repo_portfolio_knows_its_address(self, git_repo, git_repo_minimal, temp_dir):
+        from gitstats.main import _run_multi_repo
+
+        output = os.path.join(temp_dir, "portfolio")
+        with patch("gitstats.main.AggregateReportCreator") as creator:
+            _run_multi_repo([git_repo, git_repo_minimal], output, site_url="https://example.com/p/")
+        creator.return_value.create.assert_called_once()
+        assert creator.return_value.create.call_args.kwargs["site_url"] == "https://example.com/p/"
+
     def test_run_with_site_url(self, git_repo, temp_dir, caplog):
         """site_url fills in the Badges page and prints the README badge."""
         import json

@@ -56,7 +56,16 @@ jobs:
           FONTCONFIG_FILE: /dev/null
         run: |
           git clone "https://github.com/${{ matrix.repo.url }}.git" /tmp/repo
-          gitstats -c 'project_name=${{ matrix.repo.name }}' /tmp/repo "report"
+          gitstats -c 'project_name=${{ matrix.repo.name }}' -c share_card=true \
+            --site-url "https://shenxianpeng.dev/gitstats/gallery/${{ matrix.repo.id }}/" \
+            /tmp/repo "report"
+
+      # what a link to the report shows where it is shared: the pages point to it
+      - name: Render Share Card
+        run: >-
+          google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars
+          --window-size=1200,630 --screenshot="$PWD/report/share-card.png"
+          "file://$PWD/report/share-card.html"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -95,7 +104,19 @@ jobs:
       - name: Generate Gallery Portfolio Page
         # The script only needs the gitstats modules from this checkout
         # (stdlib-only imports), so no package installation is required.
-        run: PYTHONPATH="$PWD" python scripts/generate_gallery_portfolio.py gallery
+        run: >-
+          PYTHONPATH="$PWD" python scripts/generate_gallery_portfolio.py gallery
+          --site-url https://shenxianpeng.dev/gitstats/gallery/ --share-card
+
+      - name: Render Share Cards
+        run: |
+          for card in share-card ai-share-card; do
+            if [ -f "gallery/$card.html" ]; then
+              google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars \
+                --window-size=1200,630 --screenshot="$PWD/gallery/$card.png" \
+                "file://$PWD/gallery/$card.html"
+            fi
+          done
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0

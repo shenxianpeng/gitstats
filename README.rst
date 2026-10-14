@@ -369,6 +369,7 @@ Here is a list of some features of ``gitstats``:
 * **Portfolio**: analyze several repositories at once for an aggregate overview, with a page that compares their AI-assisted commits quarter by quarter.
 * **Wrapped card**: a shareable SVG card of one year in the repository, with ``--wrapped``.
 * **Readable anywhere**: interactive charts, light and dark themes, and layouts that work on phones; long quiet periods are shaded on every timeline, and cut down to a short break when they would take up a quarter of it or more.
+* **Ready to share**: every page carries a title and a description for link previews, and with ``site_url`` and ``share_card`` a 1200×630 card with the repository's numbers (rendered from ``share-card.html``).
 * **Customizable**: config values through ``gitstats.conf``.
 * **Cross-platform**: works on Linux, Windows, and macOS.
 

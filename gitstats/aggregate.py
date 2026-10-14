@@ -27,6 +27,8 @@ from gitstats.report_creator import (
     THEME_TOGGLE_BUTTON,
     _classify_eras,
     nav_link,
+    share_card_page,
+    share_meta_html,
     share_text,
     stat_tiles_html,
 )
@@ -197,6 +199,60 @@ def last_quarters(now: datetime.datetime, count: int = 4) -> list[tuple[str, lis
     return quarters[::-1]
 
 
+# a repository's summary, its AI-assisted commits, and (commits that name an
+# assistant, all commits) in each quarter, None where the summary has no counts
+AiRow = tuple[dict[str, Any], dict[str, Any] | None, list[tuple[int, int] | None]]
+
+
+def ai_rows(
+    summaries: list[dict[str, Any]], now: datetime.datetime
+) -> tuple[list[AiRow], list[tuple[str, list[str]]]]:
+    """The rows of the AI-assisted commits page, the largest share in the last
+    quarter first, then in the quarter before it; and those quarters."""
+    quarters = last_quarters(now)
+    rows: list[AiRow] = []
+    for summary in summaries:
+        ai = summary.get("ai_assisted")
+        counts = [
+            _quarter_counts(ai, months) if isinstance(ai, dict) else None for _, months in quarters
+        ]
+        rows.append((summary, ai if isinstance(ai, dict) else None, counts))
+
+    def share(counts: tuple[int, int] | None) -> float:
+        return counts[0] / counts[1] if counts and counts[1] else -1.0
+
+    rows.sort(key=lambda row: (-share(row[2][-1]), -share(row[2][-2]), row[0].get("name", "")))
+    return rows, quarters
+
+
+def portfolio_description(summaries: list[dict[str, Any]]) -> str:
+    """One sentence about the portfolio, for its share tags."""
+    commits = sum(int(s.get("total_commits", 0) or 0) for s in summaries)
+    names = [
+        s.get("name", "")
+        for s in sorted(summaries, key=lambda s: -int(s.get("total_commits", 0) or 0))
+    ]
+    shown = ", ".join(names[:4]) + (" and more" if len(names) > 4 else "")
+    return (
+        f"Reports made with gitstats for {len(summaries)} repositories, "
+        f"{format_int(commits)} commits: {shown}."
+    )
+
+
+def ai_description(rows: list[AiRow], quarters: list[tuple[str, list[str]]]) -> str:
+    """One sentence about the AI-assisted commits page, for its share tags."""
+    text = (
+        f"The share of commits that name an AI coding assistant in {len(rows)} repositories, "
+        "quarter by quarter."
+    )
+    summary, _, counts = rows[0] if rows else ({}, None, [None])
+    latest = counts[-1]
+    if latest and latest[0]:
+        largest = share_text(*latest).replace("&lt;", "<")
+        text += f" {quarters[-1][0]}: {summary.get('name', '')}, {largest}."
+    return text
+
+
 def _quarter_counts(ai: dict[str, Any], months: list[str]) -> tuple[int, int] | None:
     """(commits that name an assistant, all commits) in these months, or None
     when the summary does not cover all of them."""
@@ -262,8 +318,12 @@ class AggregateReportCreator:
         failures: list[dict[str, str]],
         path: str,
         title: str = "GitStats Portfolio",
+        site_url: str = "",
     ) -> None:
+        """Write the portfolio's pages, and the share card of each: ``site_url``
+        is the portfolio's public address, ending in "/", or "" when unknown."""
         self._copy_assets(path)
+        self.site_url = site_url
         # the page of AI-assisted commits, when a summary counts them
         ai = any(isinstance(summary.get("ai_assisted"), dict) for summary in summaries)
         f = self._open_portfolio_file(path)
@@ -271,12 +331,25 @@ class AggregateReportCreator:
             self._write_page(f, summaries, failures, title, ai)
         finally:
             f.close()
+        f = self._open_portfolio_file(path, "share-card.html")
+        try:
+            f.write(self._share_card(summaries, title))
+        finally:
+            f.close()
         if ai:
+            rows, quarters = ai_rows(summaries, datetime.datetime.now())
             f = self._open_portfolio_file(path, "ai.html")
             try:
-                self._write_ai_page(f, summaries, title)
+                self._write_ai_page(f, summaries, title, rows, quarters)
             finally:
                 f.close()
+            f = self._open_portfolio_file(path, "ai-share-card.html")
+            try:
+                f.write(self._ai_share_card(rows, quarters))
+            finally:
+                f.close()
+
+    site_url = ""
 
     @staticmethod
     def _copy_assets(path: str) -> None:
@@ -306,7 +379,7 @@ class AggregateReportCreator:
         checking it stays under the output root guards against directory
         traversal.
         """
-        if name not in ("index.html", "ai.html"):
+        if name not in ("index.html", "ai.html", "share-card.html", "ai-share-card.html"):
             raise ValueError(f"Not a portfolio page: {name}")
         base = os.path.abspath(path)
         target = os.path.abspath(os.path.join(base, name))
@@ -322,7 +395,13 @@ class AggregateReportCreator:
         title: str,
         ai: bool = False,
     ) -> None:
-        self._print_header(f, title)
+        self._print_header(
+            f,
+            title,
+            self._share_tags(
+                title, portfolio_description(summaries), "index.html", "share-card.png"
+            ),
+        )
         self._print_nav(f, title, "index.html", ai)
 
         f.write(f"<h1>{html.escape(title)}</h1>")
@@ -354,10 +433,24 @@ class AggregateReportCreator:
         )
         f.write("</body>\n</html>")
 
-    def _write_ai_page(self, f: Any, summaries: list[dict[str, Any]], title: str) -> None:
+    def _write_ai_page(
+        self,
+        f: Any,
+        summaries: list[dict[str, Any]],
+        title: str,
+        rows: list[AiRow],
+        quarters: list[tuple[str, list[str]]],
+    ) -> None:
         """The commits that name an AI coding assistant, repository by
         repository and quarter by quarter."""
-        self._print_header(f, f"{title}: AI-assisted commits")
+        page_title = f"{title}: AI-assisted commits"
+        self._print_header(
+            f,
+            page_title,
+            self._share_tags(
+                page_title, ai_description(rows, quarters), "ai.html", "ai-share-card.png"
+            ),
+        )
         self._print_nav(f, title, "ai.html", True)
         f.write("<h1>AI-assisted commits</h1>")
         now = datetime.datetime.now()
@@ -374,21 +467,6 @@ class AggregateReportCreator:
             "mark does not say how much of the commit the assistant wrote.</p>"
         )
 
-        quarters = last_quarters(now)
-        rows = []
-        for summary in summaries:
-            ai = summary.get("ai_assisted")
-            counts = [
-                _quarter_counts(ai, months) if isinstance(ai, dict) else None
-                for _, months in quarters
-            ]
-            rows.append((summary, ai if isinstance(ai, dict) else None, counts))
-
-        def share(counts: tuple[int, int] | None) -> float:
-            return counts[0] / counts[1] if counts and counts[1] else -1.0
-
-        # the largest share in the last quarter first, then in the quarter before it
-        rows.sort(key=lambda row: (-share(row[2][-1]), -share(row[2][-2]), row[0].get("name", "")))
         self._write_ai_tiles(f, rows, quarters)
 
         f.write("<h2>By quarter</h2>")
@@ -431,6 +509,53 @@ class AggregateReportCreator:
         )
         f.write(AI_ASSISTED_COUNTED)
         self._print_footer(f)
+
+    @staticmethod
+    def _share_card(summaries: list[dict[str, Any]], title: str) -> str:
+        """The portfolio's share card: its repositories, the largest first."""
+        commits = sum(int(s.get("total_commits", 0) or 0) for s in summaries)
+        authors: set[str] = set()
+        for summary in summaries:
+            authors.update((summary.get("author_commits") or {}).keys())
+        # a line may break between two names, never inside one, and the dot
+        # between them stays with the name before it
+        names = [
+            html.escape(summary.get("name", "")).replace(" ", "&nbsp;")
+            for summary in sorted(summaries, key=lambda s: -int(s.get("total_commits", 0) or 0))
+        ]
+        sub = f"{format_int(len(summaries))} repositories &middot; {format_int(commits)} commits"
+        if authors:
+            sub += f" &middot; {format_int(len(authors))} authors"
+        return share_card_page(
+            title,
+            f'<div class="brand">// GitStats</div><h1>{html.escape(title)}</h1>'
+            f'<p class="sub">{sub}</p><p class="names">{"&nbsp;&middot; ".join(names)}</p>',
+        )
+
+    @staticmethod
+    def _ai_share_card(rows: list[AiRow], quarters: list[tuple[str, list[str]]]) -> str:
+        """The share card of the AI-assisted commits page: the largest shares
+        of the last quarter, as bars."""
+        latest = [
+            (summary.get("name", ""), counts[-1])
+            for summary, _, counts in rows
+            if counts[-1] and counts[-1][0] and counts[-1][1]
+        ][:6]
+        top = max((part / whole for _, (part, whole) in latest), default=1.0) or 1.0
+        bars = "".join(
+            f"<div><b>{html.escape(name)}</b>"
+            f'<i style="width:{100 * part / whole / top:.1f}%"></i>'
+            f"<span>{share_text(part, whole)}</span></div>"
+            for name, (part, whole) in latest
+        )
+        return share_card_page(
+            "AI-assisted commits: GitStats",
+            '<div class="brand">// AI-assisted commits</div>'
+            f"<h1>{html.escape(quarters[-1][0])}</h1>"
+            f'<p class="sub">The share of each repository&rsquo;s commits that name an AI coding '
+            f"assistant, of {format_int(len(rows))} repositories. A lower bound.</p>"
+            f'<div class="bars">{bars}</div>',
+        )
 
     @staticmethod
     def _ai_cell(counts: tuple[int, int] | None) -> str:
@@ -496,8 +621,18 @@ class AggregateReportCreator:
             )
         f.write(stat_tiles_html(tiles))
 
+    def _share_tags(self, title: str, description: str, page: str, image: str) -> str:
+        """The tags a link to one of the portfolio's pages is previewed by."""
+        return share_meta_html(
+            title,
+            description,
+            self.site_url,
+            page,
+            image if load_config().get("share_card") else "",
+        )
+
     @staticmethod
-    def _print_header(f: Any, title: str) -> None:
+    def _print_header(f: Any, title: str, share: str = "") -> None:
         f.write(
             """<!DOCTYPE html>
 <html lang="en">
@@ -505,6 +640,7 @@ class AggregateReportCreator:
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - {}</title>
+	{}
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	{}
 	<link rel="stylesheet" href="{}" type="text/css">
@@ -515,6 +651,7 @@ class AggregateReportCreator:
 <body>
 """.format(
                 html.escape(title),
+                share,
                 THEME_INIT_SCRIPT,
                 load_config()["style"],
                 get_version(),
