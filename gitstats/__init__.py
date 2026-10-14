@@ -44,6 +44,10 @@ DEFAULT_CONFIG: dict[str, Any] = {
     # Public address of the report (https://owner.github.io/repo/): fills in the
     # Badges page's snippets and prints the README badge. Also --site-url.
     "site_url": "",
+    # With site_url: let the pages point to share-card.png, the image a link to
+    # them shows where it is shared. gitstats writes the card as share-card.html
+    # (1200 x 630 pixels); turning it into the PNG is up to whoever publishes it.
+    "share_card": False,
     # AI-powered features
     "ai_enabled": False,  # Enable AI-powered summaries (requires AI provider configuration).
     "ai_provider": "openai",  # AI provider: openai, claude, gemini, ollama.

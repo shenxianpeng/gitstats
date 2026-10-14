@@ -33,6 +33,9 @@ from gitstats.report_creator import (
     months_back,
     parse_chronicle,
     quiet_months,
+    report_share_card_html,
+    report_share_description,
+    share_meta_html,
     share_text,
     stat_tiles_html,
     sum_since,
@@ -3550,3 +3553,119 @@ def test_sum_since():
 )
 def test_share_text(part, whole, expected):
     assert share_text(part, whole) == expected
+
+
+# ── share tags and cards ─────────────────────────────────────────────────
+
+
+def test_share_tags_without_an_address():
+    tags = share_meta_html(
+        "CPython: Authors", "CPython: 1 commit.", "", "authors.html", "share-card.png"
+    )
+    assert '<meta name="description" content="CPython: 1 commit.">' in tags
+    assert '<meta property="og:title" content="CPython: Authors">' in tags
+    # places that show a link want absolute addresses: with none, no image either
+    assert "og:url" not in tags
+    assert "og:image" not in tags
+    assert '<meta name="twitter:card" content="summary">' in tags
+
+
+def test_share_tags_with_an_address_and_a_card():
+    site = "https://example.com/report/"
+    tags = share_meta_html("A <b>repo</b>", 'Say "hi"', site, "authors.html", "share-card.png")
+    assert '<meta property="og:url" content="https://example.com/report/authors.html">' in tags
+    assert '<meta property="og:image" content="https://example.com/report/share-card.png">' in tags
+    assert '<meta property="og:image:width" content="1200">' in tags
+    assert '<meta name="twitter:card" content="summary_large_image">' in tags
+    assert '<meta name="twitter:image" content="https://example.com/report/share-card.png">' in tags
+    # what the page says is escaped as an attribute
+    assert 'content="A &lt;b&gt;repo&lt;/b&gt;"' in tags
+    assert 'content="Say &quot;hi&quot;"' in tags
+    # the index is the address itself
+    index = share_meta_html("t", "d", site, "index.html", "")
+    assert '<meta property="og:url" content="https://example.com/report/">' in index
+    assert "og:image" not in index
+
+
+def test_share_description(mock_data_collector):
+    assert report_share_description(mock_data_collector) == (
+        "test-project: 50 commits by 3 authors, 2022 to 2023. A report made with gitstats."
+    )
+    mock_data_collector.get_total_commits.return_value = 1
+    mock_data_collector.get_total_authors.return_value = 1
+    mock_data_collector.get_first_commit_date.return_value = datetime.datetime(2023, 1, 1)
+    assert report_share_description(mock_data_collector) == (
+        "test-project: 1 commit by 1 author, 2023. A report made with gitstats."
+    )
+    mock_data_collector.get_first_commit_date.return_value = None
+    assert report_share_description(mock_data_collector).endswith(
+        "by 1 author. A report made with gitstats."
+    )
+
+
+def test_share_card_of_a_report(mock_data_collector):
+    mock_data_collector.project_name = "<b>proj</b>"
+    mock_data_collector.commits_by_year = {2019: 5, 2021: 20, 2023: 10}
+    card = report_share_card_html(mock_data_collector)
+    assert card.startswith("<!DOCTYPE html>")
+    assert "width:1200px;height:630px" in card
+    assert "<h1>&lt;b&gt;proj&lt;/b&gt;</h1>" in card
+    assert "<dt>Commits</dt><dd>50</dd>" in card
+    assert "<dt>Lines of code</dt><dd>2,000</dd>" in card
+    assert "2022-12-01 &rarr; 2023-04-01" in card
+    # commits per year, the busiest the tallest, a year without commits flat
+    assert card.count('<i style="height:') == 5
+    assert '<i style="height:100.0%"></i>' in card
+    assert '<i style="height:0.0%"></i>' in card
+    assert "<span>2019</span><span>commits per year</span><span>2023</span>" in card
+    # no AI-assisted commits counted: no line about them
+    assert "AI coding assistant" not in card
+    assert "github.com/shenxianpeng/gitstats" in card
+
+
+def test_share_card_of_a_short_history(mock_data_collector):
+    # a history of less than three years shows its months
+    card = report_share_card_html(mock_data_collector)
+    assert "<span>2023-01</span><span>commits per month</span><span>2023-06</span>" in card
+    assert card.count('<i style="height:') == 6
+    mock_data_collector.commits_by_year = {}
+    mock_data_collector.commits_by_month = {}
+    assert "commits per" not in report_share_card_html(mock_data_collector)
+    # no dates: no span under the name
+    mock_data_collector.get_first_commit_date.return_value = None
+    assert "&rarr;" not in report_share_card_html(mock_data_collector)
+
+
+def test_share_card_says_how_many_recent_commits_name_an_assistant(mock_data_collector):
+    mock_data_collector.ai_assisted_by_month = {"2023-02": 2, "2023-05": 4}
+    card = report_share_card_html(mock_data_collector)
+    # 6 of the 50 commits of the twelve months up to the last one
+    assert "<strong>12.0%</strong> of the commits of the last 12 months" in card
+
+
+def test_report_pages_carry_their_share_tags(mock_data_collector, temp_dir, monkeypatch):
+    creator = HTMLReportCreator()
+    creator.site_url = "https://example.com/r/"
+    monkeypatch.setitem(load_config(), "share_card", True)
+    creator.create(mock_data_collector, temp_dir)
+    authors = _read_page(temp_dir, "authors.html")
+    assert '<meta property="og:title" content="test-project: Authors">' in authors
+    assert '<meta property="og:url" content="https://example.com/r/authors.html">' in authors
+    assert '<meta property="og:image" content="https://example.com/r/share-card.png">' in authors
+    assert "test-project: 50 commits by 3 authors" in authors
+    index = _read_page(temp_dir, "index.html")
+    assert '<meta property="og:title" content="test-project">' in index
+    assert '<meta property="og:url" content="https://example.com/r/">' in index
+    # the card the image is rendered from is written next to the pages
+    assert "<h1>test-project</h1>" in _read_page(temp_dir, "share-card.html")
+
+
+def test_report_pages_without_share_card(mock_data_collector, temp_dir):
+    creator = HTMLReportCreator()
+    creator.site_url = "https://example.com/r/"
+    creator.create(mock_data_collector, temp_dir)
+    authors = _read_page(temp_dir, "authors.html")
+    # a title and a description all the same, but no image the publisher may not render
+    assert '<meta property="og:title" content="test-project: Authors">' in authors
+    assert "og:image" not in authors
+    assert os.path.exists(os.path.join(temp_dir, "share-card.html"))

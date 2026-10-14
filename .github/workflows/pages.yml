@@ -33,7 +33,14 @@ jobs:
       run: |
         uv sync --frozen --no-build --no-install-project --extra dev
         uv pip install --editable .
-        uv run nox -s build
+        uv run nox -s build -- --site-url https://shenxianpeng.dev/gitstats/ -c share_card=true
+
+    # what a link to the report shows where it is shared: the pages point to it
+    - name: Render Share Card
+      run: >-
+        google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars
+        --window-size=1200,630 --screenshot="$PWD/test-report/share-card.png"
+        "file://$PWD/test-report/share-card.html"
 
     - name: Save GitStats Report
       uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2

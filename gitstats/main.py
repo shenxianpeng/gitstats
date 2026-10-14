@@ -1617,7 +1617,7 @@ def _run_multi_repo(
         return 1
 
     logger.info("Generating portfolio page...")
-    AggregateReportCreator().create(summaries, failures, outputpath)
+    AggregateReportCreator().create(summaries, failures, outputpath, site_url=site_url)
     return 0
 
 

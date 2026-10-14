@@ -24,6 +24,7 @@ You can create a ``gitstats.conf`` file in the current directory to customize th
 * ``badge_color`` - Value-segment color of the generated badges: a shields.io color name (``brightgreen``, ``green``, ``yellowgreen``, ``yellow``, ``orange``, ``red``, ``blue``, ``lightgrey``), a hex value like ``#30a14e``, or any SVG color. Default: ``""`` (gitstats brand blue).
 * ``badge_style`` - Badge style: ``flat`` (rounded corners, subtle gradient), ``flat-square`` (sharp corners), ``terminal`` (monospace and square, like the report), ``for-the-badge`` (taller, bold, uppercase) or ``light`` (white and pale blue, for white READMEs). Default: ``flat``.
 * ``site_url`` - Public address of the report, such as ``https://owner.github.io/repo/``. The snippets on the report's Badges page point at it, and the run log prints the README badge. With several repositories, each report's address is this plus its subdirectory. Same as the ``--site-url`` option. Default: ``""`` (the Badges page reads the address from its own URL).
+* ``share_card`` - With ``site_url`` set, make every page point to ``share-card.png``, the image shown with a link to the report where it is shared (X, Slack, LinkedIn, chat apps). gitstats writes the card as ``share-card.html``, 1200 by 630 pixels, and leaves the PNG to whoever publishes the report, for example ``google-chrome --headless=new --window-size=1200,630 --screenshot=share-card.png share-card.html``. Without it, the pages still carry a title and a description for such previews. Default: ``false``.
 
 Here is an example ``gitstats.conf`` file:
 

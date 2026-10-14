@@ -135,3 +135,34 @@ def test_main_writes_the_portfolio_page(gallery_script, temp_dir, monkeypatch, c
     assert 'href="cpython/index.html"' in page
     assert 'href="git/index.html"' in page
     assert "Portfolio page written for 2 repositories" in capsys.readouterr().out
+
+
+def test_main_points_to_the_share_cards(gallery_script, temp_dir, monkeypatch):
+    from gitstats import load_config
+
+    monkeypatch.setitem(load_config(), "share_card", False)
+    _write_summary(temp_dir, "cpython", name="CPython", total_commits=120)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "generate_gallery_portfolio.py",
+            temp_dir,
+            "--site-url",
+            "https://example.com/gallery",
+            "--share-card",
+        ],
+    )
+    assert gallery_script.main() == 0
+    with open(os.path.join(temp_dir, "index.html"), encoding="utf-8") as f:
+        page = f.read()
+    # the address gets its slash
+    assert '<meta property="og:image" content="https://example.com/gallery/share-card.png">' in page
+    assert os.path.exists(os.path.join(temp_dir, "share-card.html"))
+
+
+def test_main_takes_its_arguments_from_the_caller(gallery_script, temp_dir, capsys):
+    _write_summary(temp_dir, "git", name="Git", total_commits=80)
+    assert gallery_script.main([temp_dir]) == 0
+    assert gallery_script.main([temp_dir, "--no-such-option"]) == 2
+    assert "Usage:" in capsys.readouterr().err

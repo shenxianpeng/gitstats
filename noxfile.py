@@ -28,7 +28,8 @@ def build(session: nox.Session) -> None:
         shutil.rmtree(report_dir)
     session.install("--upgrade", "pip")
     session.install("-e", ".")
-    session.run("gitstats", ".", str(report_dir), "-f", "json", external=True)
+    # options for gitstats may follow "--", such as --site-url
+    session.run("gitstats", *session.posargs, ".", str(report_dir), "-f", "json", external=True)
 
 
 @nox.session

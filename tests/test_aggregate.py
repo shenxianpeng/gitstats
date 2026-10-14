@@ -582,3 +582,89 @@ class TestAiAssistedPage:
 def test_portfolio_file_opens_only_its_own_pages(tmp_path):
     with pytest.raises(ValueError):
         AggregateReportCreator._open_portfolio_file(str(tmp_path), "../elsewhere.html")
+
+
+class TestShareCards:
+    @staticmethod
+    def _render(temp_dir, summaries, site_url="", share_card=False, monkeypatch=None):
+        if monkeypatch is not None:
+            from gitstats import load_config
+
+            monkeypatch.setitem(load_config(), "share_card", share_card)
+        AggregateReportCreator().create(
+            summaries, [], temp_dir, title="GitStats Gallery", site_url=site_url
+        )
+        pages = {}
+        for name in ("index.html", "ai.html", "share-card.html", "ai-share-card.html"):
+            path = os.path.join(temp_dir, name)
+            if os.path.exists(path):
+                with open(path, encoding="utf-8") as f:
+                    pages[name] = f.read()
+        return pages
+
+    def test_pages_and_cards(self, temp_dir, monkeypatch):
+        summaries = [
+            _summary(
+                "alpha",
+                300,
+                {"Alice": 3},
+                ai_assisted=_ai([(0, 10), (1, 10), (2, 10), (5, 10)], {"Claude": 8}),
+            ),
+            _summary("beta", 200, {"Bob": 2}, ai_assisted=_ai([(0, 10)] * 4, {})),
+            _summary(
+                "<b>gamma</b>",
+                100,
+                {"Alice": 1},
+                ai_assisted=_ai([(1, 10)] * 3 + [(6, 10)], {"Aider": 9}),
+            ),
+        ]
+        pages = self._render(temp_dir, summaries, "https://example.com/g/", True, monkeypatch)
+        index, ai = pages["index.html"], pages["ai.html"]
+        assert '<meta property="og:url" content="https://example.com/g/">' in index
+        assert '<meta property="og:image" content="https://example.com/g/share-card.png">' in index
+        assert (
+            '<meta property="og:description" content="Reports made with gitstats for 3 '
+            'repositories, 600 commits: alpha, beta, &lt;b&gt;gamma&lt;/b&gt;.">'
+        ) in index
+        assert '<meta property="og:url" content="https://example.com/g/ai.html">' in ai
+        assert '<meta property="og:image" content="https://example.com/g/ai-share-card.png">' in ai
+        quarter = last_quarters(datetime.datetime.now())[-1][0]
+        assert f"{quarter}: &lt;b&gt;gamma&lt;/b&gt;, 60.0%." in ai
+
+        card = pages["share-card.html"]
+        assert "<h1>GitStats Gallery</h1>" in card
+        assert "3 repositories &middot; 600 commits &middot; 2 authors" in card
+        assert "alpha&nbsp;&middot; beta&nbsp;&middot; &lt;b&gt;gamma&lt;/b&gt;" in card
+
+        ai_card = pages["ai-share-card.html"]
+        assert f"<h1>{quarter}</h1>" in ai_card
+        # the largest shares of the last quarter, as bars; none for a share of 0
+        assert ai_card.index("&lt;b&gt;gamma&lt;/b&gt;") < ai_card.index("<b>alpha</b>")
+        assert '<i style="width:100.0%"></i><span>60.0%</span>' in ai_card
+        assert "<b>beta</b>" not in ai_card
+        assert "of 3 repositories. A lower bound." in ai_card
+
+    def test_no_address_no_image(self, temp_dir, monkeypatch):
+        pages = self._render(temp_dir, [_summary("alpha", 10, {})], "", True, monkeypatch)
+        assert "og:image" not in pages["index.html"]
+        assert '<meta property="og:title" content="GitStats Gallery">' in pages["index.html"]
+        # the card is written all the same, and there is no AI page to have one
+        assert "share-card.html" in pages
+        assert "ai-share-card.html" not in pages
+
+    def test_no_card_unless_asked(self, temp_dir, monkeypatch):
+        summaries = [_summary("alpha", 10, {}, ai_assisted=_ai([(0, 10)] * 4, {}))]
+        pages = self._render(temp_dir, summaries, "https://example.com/g/", False, monkeypatch)
+        assert "og:image" not in pages["index.html"]
+        assert "og:image" not in pages["ai.html"]
+        # no share in the last quarter: the description and the card say nothing of one
+        assert "repositories, quarter by quarter." in pages["ai.html"]
+        assert '<div class="bars"></div>' in pages["ai-share-card.html"]
+
+    def test_description_of_a_large_portfolio(self, temp_dir):
+        from gitstats.aggregate import portfolio_description
+
+        summaries = [_summary(f"r{i}", 10 - i, {}) for i in range(6)]
+        assert portfolio_description(summaries) == (
+            "Reports made with gitstats for 6 repositories, 45 commits: r0, r1, r2, r3 and more."
+        )
