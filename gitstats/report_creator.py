@@ -1622,24 +1622,7 @@ class HTMLReportCreator(ReportCreator):
                 '<p class="section-note">A commit that names two assistants is counted '
                 "under both.</p>"
             )
-        parts.append(
-            '<details class="table-details"><summary>What is counted</summary>'
-            "<ul>"
-            "<li>The author is an assistant's own account, such as the Copilot coding agent, "
-            "Devin or Cursor's agent.</li>"
-            "<li>A <code>Co-authored-by:</code> line names an assistant, as Claude Code, "
-            "Copilot, Cursor, Codex, Aider and others add when they commit for a person. A "
-            "review bot whose suggestion was applied is named the same way.</li>"
-            "<li>An <code>Assisted-by:</code> or <code>Generated-by:</code> line names an "
-            "assistant.</li>"
-            "<li>The message has the line an assistant leaves in it, such as "
-            "&ldquo;Generated with [Claude Code]&rdquo; or the link to a Devin or Codex "
-            "session.</li>"
-            "</ul>"
-            "<p>Accounts and addresses are matched, not first names: a person called Claude, "
-            "Devin or Jules is not an assistant.</p>"
-            "</details>"
-        )
+        parts.append(AI_ASSISTED_COUNTED)
         return "".join(parts)
 
     def create_authors_html(self, data: Any, path: str) -> None:
@@ -3961,6 +3944,27 @@ def month_range(months: Any) -> list[str]:
         result.append(f"{year:04d}-{month:02d}")
         year, month = (year + 1, 1) if month == 12 else (year, month + 1)
     return result
+
+
+# What makes a commit AI-assisted, folded under the numbers that count them
+AI_ASSISTED_COUNTED = (
+    '<details class="table-details"><summary>What is counted</summary>'
+    "<ul>"
+    "<li>The author is an assistant's own account, such as the Copilot coding agent, "
+    "Devin or Cursor's agent.</li>"
+    "<li>A <code>Co-authored-by:</code> line names an assistant, as Claude Code, "
+    "Copilot, Cursor, Codex, Aider and others add when they commit for a person. A "
+    "review bot whose suggestion was applied is named the same way.</li>"
+    "<li>An <code>Assisted-by:</code> or <code>Generated-by:</code> line names an "
+    "assistant.</li>"
+    "<li>The message has the line an assistant leaves in it, such as "
+    "&ldquo;Generated with [Claude Code]&rdquo; or the link to a Devin or Codex "
+    "session.</li>"
+    "</ul>"
+    "<p>Accounts and addresses are matched, not first names: a person called Claude, "
+    "Devin or Jules is not an assistant.</p>"
+    "</details>"
+)
 
 
 def ai_assisted_count(data: Any) -> int:
