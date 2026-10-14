@@ -1,0 +1,55 @@
+README.rst
+  s_f7be7338a47928::t_eee8eb68eef9fa 372
+gitstats/main.py
+  s_f7be7338a47928::t_f91e498192a145 1620
+gitstats/report_creator.py
+  s_f7be7338a47928::t_f5c0be87b18c24 4007,4010,4012-4014,4112,4124-4146
+  s_f7be7338a47928::t_2bdcfa174ea7af 825-828,848,1019,1636,1820,1963,2055,2170,2329,2711,2901,3267,3271,3275,3277-3285,3293,3306,3986-4006,4015-4111,4113-4123,4147
+  s_f7be7338a47928::t_f91e498192a145 4008-4009
+  s_f7be7338a47928::t_1c0f9a9b3f4db4 2515
+  s_f7be7338a47928::t_ef985da77000a3 4011
+  s_f7be7338a47928::t_9471a4cd1506d7 4148-4149
+noxfile.py
+  s_f7be7338a47928::t_f91e498192a145 31-32
+tests/test_report_creator.py
+  s_f7be7338a47928::t_bae8e99b9ecb22 3634-3636
+  s_f7be7338a47928::t_e7d9b7d16da383 36-38,3556-3633,3637-3671
+.github/workflows/pages.yml
+  s_f7be7338a47928::t_8ac14138b80566 36-43
+tests/test_init.py
+  s_f7be7338a47928::t_dcaa1152f0287f 54
+tests/test_generate_gallery_portfolio.py
+  s_f7be7338a47928::t_e7d9b7d16da383 138-168
+scripts/generate_gallery_portfolio.py
+  s_f7be7338a47928::t_f91e498192a145 12-16,19,24,59-66,69,73-76,83-85
+.github/workflows/gallery.yml
+  s_f7be7338a47928::t_8ac14138b80566 59-68,107-119
+gitstats/aggregate.py
+  s_f7be7338a47928::t_091cdaba5b4878 520-521,523,532
+  s_f7be7338a47928::t_e9c2fb13432390 643,654
+  s_f7be7338a47928::t_ef985da77000a3 30-31,202-255,321,323-324,326,334-338,340,343,346-352,382,398-404,436-443,446-453,513-519,522,524-531,533-559,624-633,635
+tests/test_main.py
+  s_f7be7338a47928::t_e7d9b7d16da383 1201-1209
+gitstats/__init__.py
+  s_f7be7338a47928::t_2bdcfa174ea7af 47-50
+tests/test_aggregate.py
+  s_f7be7338a47928::t_e7d9b7d16da383 585-670
+docs/source/configuration.rst
+  s_f7be7338a47928::t_eee8eb68eef9fa 27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "001de274d6350274fc50b770932ca51427abc7c4",
+  "prompts": {},
+  "sessions": {
+    "s_f7be7338a47928": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b41fad1c-3178-484f-83cd-bad405dbb5d4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
