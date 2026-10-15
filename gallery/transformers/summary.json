@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.10.0.post1.dev7",
-  "generated_at": "2026-10-15T06:33:35+00:00",
+  "generated_by": "gitstats 2.10.0.post1.dev8",
+  "generated_at": "2026-10-15T10:24:05+00:00",
   "name": "Transformers",
   "report_path": "index.html",
   "first_commit": "2018-10-29 13:56:02",
-  "last_commit": "2026-10-15 06:13:26",
+  "last_commit": "2026-10-15 09:36:40",
   "age_days": 2908,
   "active_days": 2342,
-  "total_commits": 24326,
+  "total_commits": 24330,
   "total_authors": 3910,
-  "active_authors_12mo": 652,
-  "commits_last_12mo": 3319,
+  "active_authors_12mo": 651,
+  "commits_last_12mo": 3323,
   "total_files": 6531,
-  "total_lines": 2058280,
-  "lines_added": 4519121,
-  "lines_removed": 2460841,
+  "total_lines": 2058430,
+  "lines_added": 4519372,
+  "lines_removed": 2460942,
   "total_tags": 87,
   "era": "steady",
   "top_authors": [
@@ -41,11 +41,14 @@
     }
   ],
   "author_commits": {
+    "eustlb": 75,
+    "Madeesh Kannan": 3,
+    "BADAOUI Abdennacer": 37,
+    "kaixuanliu": 117,
     "DimensionSTP": 6,
     "jiqing-feng": 119,
     "Chaofan Yu": 2,
     "Quentin Gallou\u00e9dec": 91,
-    "Madeesh Kannan": 2,
     "guarin": 25,
     "Franci Penov": 1,
     "Harry Mellor": 49,
@@ -62,7 +65,6 @@
     "Matt": 449,
     "Yavuz Murat TA\u015e": 1,
     "regisss": 30,
-    "kaixuanliu": 116,
     "Raushan Turganbay": 498,
     "Arthur": 478,
     "kunal sanga": 1,
@@ -92,11 +94,9 @@
     "R\u00e9mi Ouazan": 133,
     "Lysandre Debut": 871,
     "Edmond Abraham": 2,
-    "BADAOUI Abdennacer": 36,
     "Elad Segal": 9,
     "Cyril Vallez": 437,
     "Harshal Janjani": 39,
-    "eustlb": 74,
     "Chen Cui": 1,
     "Irakli Salia": 5,
     "Eric Wang": 1,
@@ -3961,13 +3961,13 @@
     "2023": 3144,
     "2024": 2850,
     "2025": 3909,
-    "2026": 2751
+    "2026": 2755
   },
   "ai_assisted": {
-    "commits": 257,
+    "commits": 258,
     "authored": 0,
     "assistants": {
-      "Claude": 240,
+      "Claude": 241,
       "GitHub Copilot": 8,
       "Cursor": 7,
       "OpenHands": 3,
@@ -3998,7 +3998,7 @@
       "2026-07": 27,
       "2026-08": 62,
       "2026-09": 64,
-      "2026-10": 35
+      "2026-10": 36
     },
     "commits_by_month": {
       "2024-11": 171,
@@ -4024,7 +4024,7 @@
       "2026-07": 284,
       "2026-08": 277,
       "2026-09": 341,
-      "2026-10": 161
+      "2026-10": 165
     }
   }
 }

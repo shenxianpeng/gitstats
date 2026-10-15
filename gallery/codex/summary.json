@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.10.0.post1.dev7",
-  "generated_at": "2026-10-15T06:33:21+00:00",
+  "generated_by": "gitstats 2.10.0.post1.dev8",
+  "generated_at": "2026-10-15T10:24:07+00:00",
   "name": "Codex CLI",
   "report_path": "index.html",
   "first_commit": "2025-04-16 16:56:08",
-  "last_commit": "2026-10-15 03:42:31",
+  "last_commit": "2026-10-15 09:41:59",
   "age_days": 547,
   "active_days": 505,
-  "total_commits": 12254,
+  "total_commits": 12257,
   "total_authors": 656,
   "active_authors_12mo": 512,
-  "commits_last_12mo": 10457,
-  "total_files": 9206,
-  "total_lines": 2449627,
-  "lines_added": 4098027,
-  "lines_removed": 1648400,
+  "commits_last_12mo": 10460,
+  "total_files": 9208,
+  "total_lines": 2450439,
+  "lines_added": 4098973,
+  "lines_removed": 1648534,
   "total_tags": 48,
   "era": "steady",
   "top_authors": [
     {
       "name": "jif",
-      "commits": 1866
+      "commits": 1867
     },
     {
       "name": "Michael Bolin",
@@ -29,7 +29,7 @@
     },
     {
       "name": "Eric Traut",
-      "commits": 961
+      "commits": 963
     },
     {
       "name": "pakrym-oai",
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "jif": 1867,
+    "Eric Traut": 963,
     "Benjamin Carlsson": 170,
     "lsingh-oai": 2,
     "smurching-oai": 3,
@@ -54,14 +56,12 @@
     "Charlie Marsh": 192,
     "Anthony Tafoya": 17,
     "Matthew Zeng": 138,
-    "jif": 1866,
     "iceweasel-oai": 238,
     "ben zhang": 2,
     "Owen Lin": 265,
     "duc-openai": 1,
     "swastik-oai": 13,
     "marksteinbrick-oai": 13,
-    "Eric Traut": 961,
     "vkg-oai": 16,
     "Felipe Coury": 251,
     "josh-oai": 1,
@@ -700,7 +700,7 @@
   },
   "commits_by_year": {
     "2025": 2601,
-    "2026": 9653
+    "2026": 9656
   },
   "ai_assisted": {
     "commits": 102,
@@ -760,7 +760,7 @@
       "2026-07": 879,
       "2026-08": 1266,
       "2026-09": 1617,
-      "2026-10": 571
+      "2026-10": 574
     }
   }
 }

@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.10.0.post1.dev7",
-  "generated_at": "2026-10-15T06:35:50+00:00",
+  "generated_by": "gitstats 2.10.0.post1.dev8",
+  "generated_at": "2026-10-15T10:27:36+00:00",
   "name": "PyTorch",
   "report_path": "index.html",
   "first_commit": "2012-01-25 13:55:20",
-  "last_commit": "2026-10-15 06:31:35",
+  "last_commit": "2026-10-15 08:42:42",
   "age_days": 5377,
   "active_days": 4197,
-  "total_commits": 112602,
-  "total_authors": 5923,
-  "active_authors_12mo": 1531,
-  "commits_last_12mo": 17283,
-  "total_files": 22696,
-  "total_lines": 5364196,
-  "lines_added": 14680749,
-  "lines_removed": 9316553,
-  "total_tags": 8959,
+  "total_commits": 112605,
+  "total_authors": 5924,
+  "active_authors_12mo": 1532,
+  "commits_last_12mo": 17286,
+  "total_files": 22697,
+  "total_lines": 5364446,
+  "lines_added": 14681402,
+  "lines_removed": 9316956,
+  "total_tags": 8970,
   "era": "surge",
   "top_authors": [
     {
@@ -41,8 +41,10 @@
     }
   ],
   "author_commits": {
+    "Artur K\u0142oniecki": 13,
+    "Tomasz Szulist": 19,
+    "Hakob Eloyan": 1,
     "cyy": 1418,
-    "Artur K\u0142oniecki": 12,
     "Nikita Shulga": 3414,
     "yanbing.wang": 6,
     "Angel Li": 146,
@@ -101,7 +103,6 @@
     "drisspg": 522,
     "Wei Wang": 95,
     "orangeH25": 41,
-    "Tomasz Szulist": 18,
     "luguang": 1,
     "titaiwangms": 196,
     "Lazar Stojiljkovic": 20,
@@ -5980,15 +5981,15 @@
     "2023": 12593,
     "2024": 14893,
     "2025": 14993,
-    "2026": 14865
+    "2026": 14868
   },
   "ai_assisted": {
-    "commits": 770,
+    "commits": 771,
     "authored": 5,
     "assistants": {
-      "Claude": 624,
+      "Claude": 625,
       "Cursor": 62,
-      "GitHub Copilot": 57,
+      "GitHub Copilot": 58,
       "Codex": 19,
       "ChatGPT": 15
     },
@@ -6016,7 +6017,7 @@
       "2026-07": 112,
       "2026-08": 95,
       "2026-09": 269,
-      "2026-10": 96
+      "2026-10": 97
     },
     "commits_by_month": {
       "2024-11": 1254,
@@ -6042,7 +6043,7 @@
       "2026-07": 1693,
       "2026-08": 1307,
       "2026-09": 1908,
-      "2026-10": 925
+      "2026-10": 928
     }
   }
 }
