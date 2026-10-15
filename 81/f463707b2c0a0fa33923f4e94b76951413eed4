@@ -1,0 +1,29 @@
+gitstats/aggregate.py
+  s_f7be7338a47928::t_faf0fa275d9c0a 563,612
+  s_f7be7338a47928::t_c7c11306b6e45a 274-278,321,431,434-435,438,453,467,803,825
+.github/workflows/gallery.yml
+  s_f7be7338a47928::t_b87bd0ec1e4fed 116-118,120
+tests/test_aggregate.py
+  s_f7be7338a47928::t_14d057a62854b8 711,868-878
+tests/test_generate_gallery_portfolio.py
+  s_f7be7338a47928::t_8b5e66ba143a5b 172,174-177,180
+  s_f7be7338a47928::t_14d057a62854b8 169-171,173,178-179,181-212
+scripts/generate_gallery_portfolio.py
+  s_f7be7338a47928::t_b87bd0ec1e4fed 17-20,30,64-74,99-101,103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "81f463707b2c0a0fa33923f4e94b76951413eed4",
+  "prompts": {},
+  "sessions": {
+    "s_f7be7338a47928": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b41fad1c-3178-484f-83cd-bad405dbb5d4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
