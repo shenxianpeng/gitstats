@@ -286,18 +286,8 @@ def ai_dataset(summaries: list[dict[str, Any]], now: datetime.datetime) -> dict[
         if not isinstance(ai, dict):
             continue
         by_month, all_by_month = ai.get("by_month") or {}, ai.get("commits_by_month") or {}
-        by_quarter = {}
-        for _, months in quarters:
-            counts = _quarter_counts(ai, months)
-            if counts is None:
-                continue
-            assisted, commits = counts
-            covered.add(quarter_id(months))
-            by_quarter[quarter_id(months)] = {
-                "commits": commits,
-                "ai_assisted": assisted,
-                "share": round(assisted / commits, 4) if commits else None,
-            }
+        by_quarter = _ai_quarters(ai, quarters)
+        covered.update(by_quarter)
         repositories.append(
             {
                 "name": summary.get("name", ""),
@@ -328,6 +318,23 @@ def ai_dataset(summaries: list[dict[str, Any]], now: datetime.datetime) -> dict[
         "quarters": sorted(covered),
         "repositories": repositories,
     }
+
+
+def _ai_quarters(
+    ai: dict[str, Any], quarters: list[tuple[str, list[str]]]
+) -> dict[str, dict[str, Any]]:
+    """The quarters of ``ai_dataset`` an ai_assisted block covers, by their names."""
+    by_quarter = {}
+    for _, months in quarters:
+        counts = _quarter_counts(ai, months)
+        if counts is not None:
+            assisted, commits = counts
+            by_quarter[quarter_id(months)] = {
+                "commits": commits,
+                "ai_assisted": assisted,
+                "share": round(assisted / commits, 4) if commits else None,
+            }
+    return by_quarter
 
 
 def ai_csv(dataset: dict[str, Any]) -> str:
