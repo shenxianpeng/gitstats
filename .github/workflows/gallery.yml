@@ -116,13 +116,18 @@ jobs:
         with:
           python-version: "3.10"
 
+      - name: Install uv
+        run: 'pip install --only-binary :all: uv'
+
       # Installed, gitstats knows its version; run from the checkout, it says "dev"
       - name: Install GitStats
-        run: pip install .
+        run: |
+          uv sync --frozen --no-build --no-install-project
+          uv pip install --editable .
 
       - name: Generate Gallery Portfolio Page
         run: >-
-          python scripts/generate_gallery_portfolio.py gallery
+          uv run python scripts/generate_gallery_portfolio.py gallery
           --site-url https://shenxianpeng.dev/gitstats/gallery/ --share-card
 
       - name: Render Share Cards
