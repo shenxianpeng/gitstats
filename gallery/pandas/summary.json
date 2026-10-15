@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.10.0.post1.dev6",
-  "generated_at": "2026-10-14T21:22:09+00:00",
+  "generated_by": "gitstats 2.10.0.post1.dev7",
+  "generated_at": "2026-10-15T06:33:27+00:00",
   "name": "pandas",
   "report_path": "index.html",
   "first_commit": "2009-07-31 15:07:16",
-  "last_commit": "2026-10-14 21:06:53",
+  "last_commit": "2026-10-15 05:03:29",
   "age_days": 6285,
-  "active_days": 5297,
-  "total_commits": 39467,
+  "active_days": 5298,
+  "total_commits": 39473,
   "total_authors": 4029,
   "active_authors_12mo": 395,
-  "commits_last_12mo": 2800,
+  "commits_last_12mo": 2806,
   "total_files": 2687,
-  "total_lines": 1065320,
-  "lines_added": 3303455,
-  "lines_removed": 2238135,
+  "total_lines": 1065703,
+  "lines_added": 3303867,
+  "lines_removed": 2238164,
   "total_tags": 102,
   "era": "steady",
   "top_authors": [
     {
       "name": "jbrockmendel",
-      "commits": 6376
+      "commits": 6381
     },
     {
       "name": "Jeff Reback",
@@ -41,7 +41,8 @@
     }
   ],
   "author_commits": {
-    "jbrockmendel": 6376,
+    "Fangchen Li": 178,
+    "jbrockmendel": 6381,
     "Ayush Srivastava": 1,
     "Richard Shadrach": 551,
     "H23": 2,
@@ -52,7 +53,6 @@
     "Aniruktha": 2,
     "Ishaan": 2,
     "Johnny Kao": 1,
-    "Fangchen Li": 177,
     "SamuelOndrus": 1,
     "Likhitha J": 2,
     "Johnny Wilson Dougherty": 1,
@@ -4089,13 +4089,13 @@
     "2023": 3017,
     "2024": 1769,
     "2025": 1097,
-    "2026": 2545
+    "2026": 2551
   },
   "ai_assisted": {
-    "commits": 1361,
+    "commits": 1367,
     "authored": 1,
     "assistants": {
-      "Claude": 1359,
+      "Claude": 1365,
       "Devin": 1,
       "GitHub Copilot": 1
     },
@@ -4123,7 +4123,7 @@
       "2026-07": 176,
       "2026-08": 167,
       "2026-09": 289,
-      "2026-10": 217
+      "2026-10": 223
     },
     "commits_by_month": {
       "2024-11": 115,
@@ -4149,7 +4149,7 @@
       "2026-07": 250,
       "2026-08": 275,
       "2026-09": 422,
-      "2026-10": 267
+      "2026-10": 273
     }
   }
 }

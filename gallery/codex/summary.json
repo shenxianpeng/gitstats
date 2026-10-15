@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.10.0.post1.dev6",
-  "generated_at": "2026-10-14T21:22:20+00:00",
+  "generated_by": "gitstats 2.10.0.post1.dev7",
+  "generated_at": "2026-10-15T06:33:21+00:00",
   "name": "Codex CLI",
   "report_path": "index.html",
   "first_commit": "2025-04-16 16:56:08",
-  "last_commit": "2026-10-14 21:00:03",
+  "last_commit": "2026-10-15 03:42:31",
   "age_days": 547,
-  "active_days": 504,
-  "total_commits": 12245,
+  "active_days": 505,
+  "total_commits": 12254,
   "total_authors": 656,
   "active_authors_12mo": 512,
-  "commits_last_12mo": 10448,
-  "total_files": 9207,
-  "total_lines": 2448369,
-  "lines_added": 4095672,
-  "lines_removed": 1647303,
+  "commits_last_12mo": 10457,
+  "total_files": 9206,
+  "total_lines": 2449627,
+  "lines_added": 4098027,
+  "lines_removed": 1648400,
   "total_tags": 48,
   "era": "steady",
   "top_authors": [
@@ -41,15 +41,20 @@
     }
   ],
   "author_commits": {
+    "Benjamin Carlsson": 170,
+    "lsingh-oai": 2,
+    "smurching-oai": 3,
+    "ostepanian": 5,
+    "Alex Kira": 9,
+    "Oliver Tepman": 2,
+    "Channing Conger": 74,
+    "Dmitriy Kovalenko": 28,
     "felixxia-oai": 251,
     "Ahmed Ibrahim": 620,
     "Charlie Marsh": 192,
-    "Dmitriy Kovalenko": 27,
     "Anthony Tafoya": 17,
-    "Benjamin Carlsson": 168,
     "Matthew Zeng": 138,
     "jif": 1866,
-    "smurching-oai": 2,
     "iceweasel-oai": 238,
     "ben zhang": 2,
     "Owen Lin": 265,
@@ -84,9 +89,7 @@
     "Won Park": 90,
     "Adam Perry @ OpenAI": 276,
     "Jennifer Zhao": 3,
-    "Channing Conger": 73,
     "pakrym-oai": 621,
-    "Alex Kira": 8,
     "aaronl-openai": 8,
     "Abhinav": 95,
     "Dane Schneider": 2,
@@ -107,7 +110,6 @@
     "mattj-openai": 1,
     "virajrai-oai": 1,
     "stevenlee-oai": 24,
-    "lsingh-oai": 1,
     "Leonardo Di Donato": 1,
     "reia-oai": 2,
     "mandal-OAI": 5,
@@ -155,7 +157,6 @@
     "mldangelo-oai": 1,
     "alexsong-oai": 65,
     "Raunak Daga": 1,
-    "Oliver Tepman": 1,
     "dennyku": 1,
     "npancha-openai": 1,
     "vishnu-oai": 3,
@@ -225,7 +226,6 @@
     "efrazer-oai": 28,
     "nmccormack-oai": 1,
     "gerry-oai": 1,
-    "ostepanian": 4,
     "Chris Hayduk": 1,
     "Can Sar": 1,
     "dhruvgupta-oai": 5,
@@ -700,7 +700,7 @@
   },
   "commits_by_year": {
     "2025": 2601,
-    "2026": 9644
+    "2026": 9653
   },
   "ai_assisted": {
     "commits": 102,
@@ -760,7 +760,7 @@
       "2026-07": 879,
       "2026-08": 1266,
       "2026-09": 1617,
-      "2026-10": 562
+      "2026-10": 571
     }
   }
 }
