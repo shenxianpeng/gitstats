@@ -407,6 +407,11 @@ Thanks to all contributors:
    :target: https://github.com/shenxianpeng/gitstats/graphs/contributors
    :alt: Contributors
 
+License
+-------
+
+gitstats is licensed under the GNU General Public License, version 2 or version 3, at your option (``GPL-2.0-only OR GPL-3.0-only``), as the original gitstats was: see `LICENSE-GPLv2 <https://github.com/shenxianpeng/gitstats/blob/main/LICENSE-GPLv2>`_ and `LICENSE-GPLv3 <https://github.com/shenxianpeng/gitstats/blob/main/LICENSE-GPLv3>`_. The two JavaScript files bundled into the reports, Chart.js and sortable.js, keep their MIT license (see `THIRD_PARTY_NOTICES.md <https://github.com/shenxianpeng/gitstats/blob/main/gitstats/THIRD_PARTY_NOTICES.md>`_).
+
 ----
 
-The gitstats project was originally created by `Heikki Hokkainen <https://github.com/hoxu>`_ and is currently maintained by `Xianpeng Shen <https://github.com/shenxianpeng>`_.
+The gitstats project was originally created by `Heikki Hokkanen <https://github.com/hoxu>`_ and is currently maintained by `Xianpeng Shen <https://github.com/shenxianpeng>`_.
