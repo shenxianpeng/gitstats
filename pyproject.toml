@@ -1,11 +1,13 @@
 [build-system]
-requires = ["setuptools>=62.6", "setuptools-scm"]
+requires = ["setuptools>=77.0.3", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "gitstats"
 description = "GitStats - Visualize Your Git Repositories"
 readme = "README.rst"
+license = "GPL-2.0-only OR GPL-3.0-only"
+license-files = ["LICENSE-GPLv2", "LICENSE-GPLv3"]
 keywords = ["git", "gitstats", "statistics", "git history"]
 authors = [
     { name = "Xianpeng Shen", email = "xianpeng.shen@gmail.com" },
