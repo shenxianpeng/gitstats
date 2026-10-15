@@ -1,0 +1,23 @@
+gitstats/aggregate.py
+  s_f7be7338a47928::t_ff93e48eea6a97 295-296
+tests/test_aggregate.py
+  s_f7be7338a47928::t_ff93e48eea6a97 706-707,720-721
+.github/workflows/gallery.yml
+  s_f7be7338a47928::t_b26773fe1f4fb3 84-87,119-122,125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5035175b91a3b5e722768fcee7926e82cde6e84d",
+  "prompts": {},
+  "sessions": {
+    "s_f7be7338a47928": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b41fad1c-3178-484f-83cd-bad405dbb5d4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
