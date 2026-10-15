@@ -292,6 +292,8 @@ def ai_dataset(summaries: list[dict[str, Any]], now: datetime.datetime) -> dict[
             {
                 "name": summary.get("name", ""),
                 "report": summary.get("report_path", ""),
+                # the counts are the summary's: the version that made it counted them
+                "counted_by": summary.get("generated_by", ""),
                 "all_time": {
                     "commits": int(summary.get("total_commits", 0) or 0),
                     "ai_assisted": int(ai.get("commits", 0) or 0),

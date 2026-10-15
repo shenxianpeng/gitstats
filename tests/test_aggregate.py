@@ -703,7 +703,8 @@ class TestAiDataset:
 
     def test_months_and_quarters(self):
         ai = self._ai({"2026-07": (3, 10), "2026-08": (5, 10), "2026-10": (9, 9)})
-        data = ai_dataset([_summary("vscode", 500, {}, ai_assisted=ai)], self.NOW)
+        summary = _summary("vscode", 500, {}, ai_assisted=ai, generated_by="gitstats 2.10.0")
+        data = ai_dataset([summary], self.NOW)
         assert data["schema_version"] == 1
         assert "lower bounds" in data["description"]
         assert data["generated_by"].startswith("gitstats ")
@@ -716,6 +717,8 @@ class TestAiDataset:
         [repository] = data["repositories"]
         assert repository["name"] == "vscode"
         assert repository["report"] == "vscode/index.html"
+        # the version that counted them, not the one that put the data together
+        assert repository["counted_by"] == "gitstats 2.10.0"
         assert repository["all_time"] == {
             "commits": 500,
             "ai_assisted": 42,
