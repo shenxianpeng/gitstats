@@ -1,0 +1,31 @@
+README.rst
+  s_f7be7338a47928::t_4b303aa2e25bb2 88,137-140
+gitstats/aggregate.py
+  s_f7be7338a47928::t_4b1d02d910d4d8 13,16
+  s_f7be7338a47928::t_162e9c761eb8de 579,582
+  s_f7be7338a47928::t_38531068ecd1b6 648-663
+  s_f7be7338a47928::t_920c59a835bd11 258-352
+  s_f7be7338a47928::t_c85fc8ef61e7d1 437-439,442
+  s_f7be7338a47928::t_ea1983c7483c66 453-487
+  s_f7be7338a47928::t_30de068dee930b 516-517,523
+.github/workflows/gallery.yml
+  s_f7be7338a47928::t_a7421736a2f7ac 100-110
+tests/test_aggregate.py
+  s_f7be7338a47928::t_5267647efc2d34 15-16,20-21,675-863
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5300b9225154ec3b522ca193033748a2af836adc",
+  "prompts": {},
+  "sessions": {
+    "s_f7be7338a47928": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b41fad1c-3178-484f-83cd-bad405dbb5d4",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
