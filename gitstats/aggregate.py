@@ -10,8 +10,10 @@ issue no git commands — mirroring ``compute_project_history`` and
 ``compute_code_ownership`` in ``report_creator``.
 """
 
+import csv
 import datetime
 import html
+import io
 import json
 import logging
 import os
@@ -253,6 +255,101 @@ def ai_description(rows: list[AiRow], quarters: list[tuple[str, list[str]]]) -> 
     return text
 
 
+AI_DATA_DESCRIPTION = (
+    "Commits that name an AI coding assistant: as their author, as a co-author, or in "
+    "the line it signs with. These are lower bounds: an assistant that leaves no mark in "
+    "a commit is not counted, and a mark does not say how much of the commit the "
+    "assistant wrote. A commit counts in the month it was written (its author date)."
+)
+# A snapshot of the data of a quarter, kept as it was first written: "ai/2026-Q3.json"
+_SNAPSHOT = re.compile(r"ai/(\d{4})-Q([1-4])\.json")
+
+
+def quarter_id(months: list[str]) -> str:
+    """The quarter of these months, as data names it: "2026-Q3" for July to September."""
+    year, month = months[0].split("-")
+    return f"{year}-Q{(int(month) - 1) // 3 + 1}"
+
+
+def ai_dataset(summaries: list[dict[str, Any]], now: datetime.datetime) -> dict[str, Any]:
+    """The counts of the AI-assisted commits page, as data.
+
+    For each repository whose summary counts them: its totals, and each
+    complete month and quarter the summary covers, with all the commits of it.
+    """
+    this_month = f"{now.year:04d}-{now.month:02d}"
+    quarters = last_quarters(now, _AI_MONTHS // 3)
+    covered: set[str] = set()
+    repositories = []
+    for summary in sorted(summaries, key=lambda s: str(s.get("name", "")).lower()):
+        ai = summary.get("ai_assisted")
+        if not isinstance(ai, dict):
+            continue
+        by_month, all_by_month = ai.get("by_month") or {}, ai.get("commits_by_month") or {}
+        by_quarter = {}
+        for _, months in quarters:
+            counts = _quarter_counts(ai, months)
+            if counts is None:
+                continue
+            assisted, commits = counts
+            covered.add(quarter_id(months))
+            by_quarter[quarter_id(months)] = {
+                "commits": commits,
+                "ai_assisted": assisted,
+                "share": round(assisted / commits, 4) if commits else None,
+            }
+        repositories.append(
+            {
+                "name": summary.get("name", ""),
+                "report": summary.get("report_path", ""),
+                "all_time": {
+                    "commits": int(summary.get("total_commits", 0) or 0),
+                    "ai_assisted": int(ai.get("commits", 0) or 0),
+                    "authored": int(ai.get("authored", 0) or 0),
+                    "assistants": dict(ai.get("assistants") or {}),
+                },
+                "quarters": by_quarter,
+                "months": {
+                    month: {
+                        "commits": int(all_by_month[month]),
+                        "ai_assisted": int(by_month.get(month, 0)),
+                    }
+                    for month in sorted(all_by_month)
+                    if month < this_month
+                },
+            }
+        )
+    return {
+        "schema_version": 1,
+        "title": "AI-assisted commits",
+        "description": AI_DATA_DESCRIPTION,
+        "generated_by": f"gitstats {get_version()}",
+        "generated_at": now.astimezone().isoformat(timespec="seconds"),
+        "quarters": sorted(covered),
+        "repositories": repositories,
+    }
+
+
+def ai_csv(dataset: dict[str, Any]) -> str:
+    """The months of ``ai_dataset``, one row for each repository and month."""
+    out = io.StringIO()
+    writer = csv.writer(out, lineterminator="\n")
+    writer.writerow(["repository", "month", "commits", "ai_assisted"])
+    for repository in dataset["repositories"]:
+        for month, counts in repository["months"].items():
+            writer.writerow([repository["name"], month, counts["commits"], counts["ai_assisted"]])
+    return out.getvalue()
+
+
+def snapshot_label(name: str) -> str:
+    """The quarter a snapshot holds, as the page names it: "Jul–Sep 2026"."""
+    match = _SNAPSHOT.fullmatch(name)
+    if not match:
+        return name
+    first = (int(match.group(2)) - 1) * 3
+    return f"{_MONTH_NAMES[first]}–{_MONTH_NAMES[first + 2]} {match.group(1)}"
+
+
 def _quarter_counts(ai: dict[str, Any], months: list[str]) -> tuple[int, int] | None:
     """(commits that name an assistant, all commits) in these months, or None
     when the summary does not cover all of them."""
@@ -337,10 +434,12 @@ class AggregateReportCreator:
         finally:
             f.close()
         if ai:
-            rows, quarters = ai_rows(summaries, datetime.datetime.now())
+            now = datetime.datetime.now()
+            snapshots = self._write_ai_data(path, ai_dataset(summaries, now))
+            rows, quarters = ai_rows(summaries, now)
             f = self._open_portfolio_file(path, "ai.html")
             try:
-                self._write_ai_page(f, summaries, title, rows, quarters)
+                self._write_ai_page(f, summaries, title, rows, quarters, snapshots)
             finally:
                 f.close()
             f = self._open_portfolio_file(path, "ai-share-card.html")
@@ -350,6 +449,41 @@ class AggregateReportCreator:
                 f.close()
 
     site_url = ""
+
+    def _write_ai_data(self, path: str, dataset: dict[str, Any]) -> list[str]:
+        """Write the data of the AI-assisted commits page, as ai.json and
+        ai.csv, and the snapshot of its last quarter unless there is one;
+        return the snapshots in the output root, oldest first.
+
+        A snapshot is written once, so it keeps the counts of its quarter as
+        they were first published: commits written in a quarter can still be
+        merged after it ends, and change the counts of ai.json.
+        """
+        if dataset["quarters"]:
+            name = f"ai/{dataset['quarters'][-1]}.json"
+            if not os.path.exists(os.path.join(path, name)):
+                f = self._open_portfolio_file(path, name)
+                try:
+                    json.dump(dataset, f, indent=2, ensure_ascii=False)
+                finally:
+                    f.close()
+        folder = os.path.join(path, "ai")
+        snapshots = sorted(
+            f"ai/{entry}"
+            for entry in (os.listdir(folder) if os.path.isdir(folder) else [])
+            if _SNAPSHOT.fullmatch(f"ai/{entry}")
+        )
+        f = self._open_portfolio_file(path, "ai.json")
+        try:
+            json.dump({**dataset, "snapshots": snapshots}, f, indent=2, ensure_ascii=False)
+        finally:
+            f.close()
+        f = self._open_portfolio_file(path, "ai.csv")
+        try:
+            f.write(ai_csv(dataset))
+        finally:
+            f.close()
+        return snapshots
 
     @staticmethod
     def _copy_assets(path: str) -> None:
@@ -379,12 +513,14 @@ class AggregateReportCreator:
         checking it stays under the output root guards against directory
         traversal.
         """
-        if name not in ("index.html", "ai.html", "share-card.html", "ai-share-card.html"):
+        pages = ("index.html", "ai.html", "share-card.html", "ai-share-card.html")
+        if name not in (*pages, "ai.json", "ai.csv") and not _SNAPSHOT.fullmatch(name):
             raise ValueError(f"Not a portfolio page: {name}")
         base = os.path.abspath(path)
         target = os.path.abspath(os.path.join(base, name))
         if os.path.commonpath([base, target]) != base:
             raise ValueError(f"Refusing to write outside report directory: {path}")
+        os.makedirs(os.path.dirname(target), exist_ok=True)
         return open(target, "w", encoding="utf-8")
 
     def _write_page(
@@ -440,9 +576,10 @@ class AggregateReportCreator:
         title: str,
         rows: list[AiRow],
         quarters: list[tuple[str, list[str]]],
+        snapshots: list[str] | None = None,
     ) -> None:
         """The commits that name an AI coding assistant, repository by
-        repository and quarter by quarter."""
+        repository and quarter by quarter, and where to get their data."""
         page_title = f"{title}: AI-assisted commits"
         self._print_header(
             f,
@@ -508,6 +645,22 @@ class AggregateReportCreator:
             " });</script>"
         )
         f.write(AI_ASSISTED_COUNTED)
+
+        f.write("<h2>Data</h2>")
+        note = (
+            "The counts behind this page, for each complete month and quarter the reports "
+            'cover: <a href="ai.json">ai.json</a>, <a href="ai.csv">ai.csv</a>.'
+        )
+        if snapshots:
+            links = ", ".join(
+                f'<a href="{html.escape(name, quote=True)}">{html.escape(snapshot_label(name))}</a>'
+                for name in snapshots
+            )
+            note += (
+                " Each quarter is also kept as it was first published, since commits written "
+                f"in a quarter can still be merged after it ends: {links}."
+            )
+        f.write(f'<p class="section-note">{note}</p>')
         self._print_footer(f)
 
     @staticmethod
