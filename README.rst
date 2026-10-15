@@ -85,7 +85,7 @@ Example
    :width: 100%
    :target: https://shenxianpeng.dev/gitstats/index.html
 
-Check out the `GitStats Gallery <https://shenxianpeng.dev/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly — and its `AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ai.html>`_ page: how many of each project's commits name an AI coding assistant, quarter by quarter.
+Check out the `GitStats Gallery <https://shenxianpeng.dev/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly — and its `AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ai.html>`_ page: how many of each project's commits name an AI coding assistant, quarter by quarter. Its counts can be downloaded as `JSON <https://shenxianpeng.dev/gitstats/gallery/ai.json>`_ or `CSV <https://shenxianpeng.dev/gitstats/gallery/ai.csv>`_, and each quarter is kept as it was first published.
 
 .. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/demo.gif
    :alt: gitstats terminal demo
@@ -134,7 +134,10 @@ commits, authors, recent activity, lines of code and a health label — linking
 into the individual reports. Repositories that fail to analyze are listed on
 the page without stopping the run. A second page, ``<outputpath>/ai.html``,
 compares the share of commits that name an AI coding assistant in each
-repository over the last four quarters.
+repository over the last four quarters. Its counts are written next to it as
+``ai.json`` and ``ai.csv``, month by month, and the first run after a quarter
+ends keeps a copy of ``ai.json`` in ``ai/<year>-Q<n>.json`` that later runs
+leave as it is.
 
 Add ``--serve`` to preview the generated report right away — gitstats starts a
 local web server and prints the URL (bound to ``127.0.0.1`` by default; pass

@@ -12,9 +12,13 @@ from gitstats.aggregate import (
     AggregateReportCreator,
     _slugify_repo,
     ai_assisted_summary,
+    ai_csv,
+    ai_dataset,
     compute_repo_summary,
     last_quarters,
     load_repo_summaries,
+    quarter_id,
+    snapshot_label,
     write_repo_summary,
 )
 
@@ -668,3 +672,192 @@ class TestShareCards:
         assert portfolio_description(summaries) == (
             "Reports made with gitstats for 6 repositories, 45 commits: r0, r1, r2, r3 and more."
         )
+
+
+def _months(first, last):
+    """The months from ``first`` to ``last``, as "YYYY-MM"."""
+    year, month = map(int, first.split("-"))
+    months = []
+    while f"{year:04d}-{month:02d}" <= last:
+        months.append(f"{year:04d}-{month:02d}")
+        year, month = (year + 1, 1) if month == 12 else (year, month + 1)
+    return months
+
+
+class TestAiDataset:
+    NOW = datetime.datetime(2026, 10, 15, 12, 0)
+
+    @staticmethod
+    def _ai(counts):
+        """An ai_assisted block of 24 months up to October 2026: ``counts``
+        gives (commits that name an assistant, all commits) by month, others
+        have 10 commits and none of them names one."""
+        months = _months("2024-11", "2026-10")
+        return {
+            "commits": 42,
+            "authored": 3,
+            "assistants": {"Claude": 30, "GitHub Copilot": 12},
+            "by_month": {m: counts.get(m, (0, 10))[0] for m in months},
+            "commits_by_month": {m: counts.get(m, (0, 10))[1] for m in months},
+        }
+
+    def test_months_and_quarters(self):
+        ai = self._ai({"2026-07": (3, 10), "2026-08": (5, 10), "2026-10": (9, 9)})
+        data = ai_dataset([_summary("vscode", 500, {}, ai_assisted=ai)], self.NOW)
+        assert data["schema_version"] == 1
+        assert "lower bounds" in data["description"]
+        assert data["generated_by"].startswith("gitstats ")
+        assert data["generated_at"].startswith("2026-10-15T12:00:00")
+        # the complete quarters of the 24 months: not Oct-Dec 2024, of which
+        # October is missing, nor the quarter under way
+        assert data["quarters"] == [
+            "2025-Q1", "2025-Q2", "2025-Q3", "2025-Q4", "2026-Q1", "2026-Q2", "2026-Q3"
+        ]  # fmt: skip
+        [repository] = data["repositories"]
+        assert repository["name"] == "vscode"
+        assert repository["report"] == "vscode/index.html"
+        assert repository["all_time"] == {
+            "commits": 500,
+            "ai_assisted": 42,
+            "authored": 3,
+            "assistants": {"Claude": 30, "GitHub Copilot": 12},
+        }
+        assert repository["quarters"]["2026-Q3"] == {
+            "commits": 30,
+            "ai_assisted": 8,
+            "share": 0.2667,
+        }
+        assert repository["quarters"]["2025-Q1"] == {"commits": 30, "ai_assisted": 0, "share": 0.0}
+        # complete months only: October 2026 is still under way
+        assert list(repository["months"]) == _months("2024-11", "2026-09")
+        assert repository["months"]["2026-08"] == {"commits": 10, "ai_assisted": 5}
+
+    def test_repositories_by_name_and_only_those_that_count_them(self):
+        summaries = [
+            _summary("beta", 10, {}, ai_assisted=self._ai({})),
+            _summary("alpha", 10, {}),
+            _summary("Gamma", 10, {}, ai_assisted=self._ai({})),
+            _summary("Alpha2", 10, {}, ai_assisted=self._ai({})),
+        ]
+        data = ai_dataset(summaries, self.NOW)
+        assert [r["name"] for r in data["repositories"]] == ["Alpha2", "beta", "Gamma"]
+
+    def test_a_quarter_without_commits_has_no_share(self):
+        quiet = {m: (0, 0) for m in ("2026-07", "2026-08", "2026-09")}
+        data = ai_dataset([_summary("a", 10, {}, ai_assisted=self._ai(quiet))], self.NOW)
+        assert data["repositories"][0]["quarters"]["2026-Q3"] == {
+            "commits": 0,
+            "ai_assisted": 0,
+            "share": None,
+        }
+
+    def test_a_summary_that_does_not_reach_back_that_far(self):
+        old = {"commits": 1, "by_month": {"2001-01": 1}, "commits_by_month": {"2001-01": 10}}
+        data = ai_dataset([_summary("a", 10, {}, ai_assisted=old)], self.NOW)
+        assert data["quarters"] == []
+        assert data["repositories"][0]["quarters"] == {}
+        assert data["repositories"][0]["months"] == {"2001-01": {"commits": 10, "ai_assisted": 1}}
+        assert data["repositories"][0]["all_time"]["assistants"] == {}
+
+    def test_csv(self):
+        ai = self._ai({"2026-09": (4, 8)})
+        data = ai_dataset([_summary("a, b", 10, {}, ai_assisted=ai)], self.NOW)
+        lines = ai_csv(data).splitlines()
+        assert lines[0] == "repository,month,commits,ai_assisted"
+        assert lines[1] == '"a, b",2024-11,10,0'
+        assert lines[-1] == '"a, b",2026-09,8,4'
+        assert len(lines) == 1 + 23
+
+
+@pytest.mark.parametrize(
+    ("months", "expected"),
+    [
+        (["2026-07", "2026-08", "2026-09"], "2026-Q3"),
+        (["2025-01"], "2025-Q1"),
+        (["2024-12"], "2024-Q4"),
+    ],
+)
+def test_quarter_id(months, expected):
+    assert quarter_id(months) == expected
+
+
+def test_snapshot_label():
+    assert snapshot_label("ai/2026-Q3.json") == "Jul\u2013Sep 2026"
+    assert snapshot_label("ai/2025-Q1.json") == "Jan\u2013Mar 2025"
+    assert snapshot_label("ai/notes.json") == "ai/notes.json"
+
+
+class TestAiData:
+    @staticmethod
+    def _create(path, summaries):
+        AggregateReportCreator().create(summaries, [], str(path), title="GitStats Gallery")
+
+    @staticmethod
+    def _read(path, name):
+        with open(os.path.join(path, name), encoding="utf-8") as f:
+            return f.read()
+
+    def test_data_files_and_the_snapshot_of_the_last_quarter(self, tmp_path):
+        self._create(tmp_path, [_summary("alpha", 40, {}, ai_assisted=_ai([(1, 10)] * 4, {}))])
+        last = quarter_id(last_quarters(datetime.datetime.now())[-1][1])
+        data = json.loads(self._read(tmp_path, "ai.json"))
+        assert data["snapshots"] == [f"ai/{last}.json"]
+        assert data["repositories"][0]["quarters"][last]["ai_assisted"] == 1
+        snapshot = json.loads(self._read(tmp_path, f"ai/{last}.json"))
+        assert snapshot["repositories"] == data["repositories"]
+        assert "snapshots" not in snapshot
+        assert self._read(tmp_path, "ai.csv").startswith("repository,month,commits,ai_assisted\n")
+        page = self._read(tmp_path, "ai.html")
+        assert "<h2>Data</h2>" in page
+        assert '<a href="ai.json">ai.json</a>, <a href="ai.csv">ai.csv</a>' in page
+        assert (
+            f'<a href="ai/{last}.json">{last_quarters(datetime.datetime.now())[-1][0]}</a>' in page
+        )
+
+    def test_a_snapshot_is_written_once(self, tmp_path):
+        self._create(tmp_path, [_summary("alpha", 40, {}, ai_assisted=_ai([(1, 10)] * 4, {}))])
+        last = quarter_id(last_quarters(datetime.datetime.now())[-1][1])
+        first = self._read(tmp_path, f"ai/{last}.json")
+        # a week later: a commit written in the quarter has been merged since
+        self._create(
+            tmp_path, [_summary("alpha", 41, {}, ai_assisted=_ai([(1, 10)] * 3 + [(2, 11)], {}))]
+        )
+        assert self._read(tmp_path, f"ai/{last}.json") == first
+        data = json.loads(self._read(tmp_path, "ai.json"))
+        assert data["repositories"][0]["quarters"][last]["ai_assisted"] == 2
+
+    def test_the_snapshots_already_there_are_listed(self, tmp_path):
+        (tmp_path / "ai").mkdir()
+        (tmp_path / "ai" / "2001-Q1.json").write_text("{}", encoding="utf-8")
+        (tmp_path / "ai" / "notes.json").write_text("{}", encoding="utf-8")
+        self._create(tmp_path, [_summary("alpha", 40, {}, ai_assisted=_ai([(1, 10)] * 4, {}))])
+        last = quarter_id(last_quarters(datetime.datetime.now())[-1][1])
+        data = json.loads(self._read(tmp_path, "ai.json"))
+        assert data["snapshots"] == ["ai/2001-Q1.json", f"ai/{last}.json"]
+        page = self._read(tmp_path, "ai.html")
+        assert '<a href="ai/2001-Q1.json">Jan\u2013Mar 2001</a>, ' in page
+        assert "notes.json" not in page
+
+    def test_no_snapshot_without_a_complete_quarter(self, tmp_path):
+        old = _ai([(1, 10)] * 4, {})
+        old["by_month"], old["commits_by_month"] = {"2001-01": 1}, {"2001-01": 10}
+        self._create(tmp_path, [_summary("alpha", 10, {}, ai_assisted=old)])
+        assert not (tmp_path / "ai").exists()
+        assert json.loads(self._read(tmp_path, "ai.json"))["snapshots"] == []
+        page = self._read(tmp_path, "ai.html")
+        assert '<a href="ai.csv">ai.csv</a>.</p>' in page
+        assert "as it was first published" not in page
+
+
+@pytest.mark.parametrize("name", ["ai/2026-Q3.json", "ai.json", "ai.csv"])
+def test_portfolio_file_opens_its_data(tmp_path, name):
+    AggregateReportCreator._open_portfolio_file(str(tmp_path), name).close()
+    assert (tmp_path / name).exists()
+
+
+@pytest.mark.parametrize(
+    "name", ["ai/../x.json", "ai/2026-Q5.json", "ai/2026-Q3.json.html", "data.json"]
+)
+def test_portfolio_file_refuses_other_data(tmp_path, name):
+    with pytest.raises(ValueError):
+        AggregateReportCreator._open_portfolio_file(str(tmp_path), name)
