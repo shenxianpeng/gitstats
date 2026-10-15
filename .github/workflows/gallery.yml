@@ -114,7 +114,8 @@ jobs:
 
       - name: Generate Gallery Portfolio Page
         # The script only needs the gitstats modules from this checkout
-        # (stdlib-only imports), so no package installation is required.
+        # (stdlib-only imports), so no package installation is required. The
+        # pages then say the version the reports were made with.
         run: >-
           PYTHONPATH="$PWD" python scripts/generate_gallery_portfolio.py gallery
           --site-url https://shenxianpeng.dev/gitstats/gallery/ --share-card

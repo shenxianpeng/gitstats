@@ -14,6 +14,10 @@ Usage:
 ``--site-url`` is the gallery's public address; with ``--share-card`` too, its
 pages point to their share cards as images (share-card.png and
 ai-share-card.png), which are left to render from the HTML the script writes.
+
+Run from a checkout, gitstats does not know its version. The gallery's reports
+and this page are made from the same commit, so the pages then say the version
+the reports were made with.
 """
 
 import argparse
@@ -23,6 +27,7 @@ import sys
 
 from gitstats import load_config
 from gitstats.aggregate import AggregateReportCreator
+from gitstats.utils import get_version
 
 
 def load_gallery_summaries(gallery_root: str) -> list[dict]:
@@ -56,6 +61,17 @@ def load_gallery_summaries(gallery_root: str) -> list[dict]:
     return summaries
 
 
+def reports_version(summaries: list[dict]) -> str:
+    """The version of gitstats that made the reports, when they all say the
+    same one; "" when they do not."""
+    versions = {str(summary.get("generated_by", "")) for summary in summaries}
+    if len(versions) == 1:
+        (made_by,) = versions
+        if made_by.startswith("gitstats "):
+            return made_by[len("gitstats ") :]
+    return ""
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Assemble the gallery portfolio page.")
     parser.add_argument("gallery_root")
@@ -80,8 +96,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"No summary.json found under {gallery_root}", file=sys.stderr)
         return 1
 
+    version = get_version()
+    if version == "dev":
+        version = reports_version(summaries) or version
     AggregateReportCreator().create(
-        summaries, [], gallery_root, title="GitStats Gallery", site_url=site_url
+        summaries, [], gallery_root, title="GitStats Gallery", site_url=site_url, version=version
     )
     print(f"Portfolio page written for {len(summaries)} repositories: {gallery_root}/index.html")
     return 0
