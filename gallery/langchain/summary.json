@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.10.0.post1.dev9",
-  "generated_at": "2026-10-15T11:28:24+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev1",
+  "generated_at": "2026-10-19T03:44:17+00:00",
   "name": "LangChain",
   "report_path": "index.html",
   "first_commit": "2022-10-24 21:51:15",
-  "last_commit": "2026-10-14 17:19:35",
-  "age_days": 1451,
-  "active_days": 1302,
-  "total_commits": 16978,
+  "last_commit": "2026-10-18 23:18:16",
+  "age_days": 1456,
+  "active_days": 1305,
+  "total_commits": 16988,
   "total_authors": 3593,
   "active_authors_12mo": 243,
-  "commits_last_12mo": 2298,
-  "total_files": 3190,
-  "total_lines": 553217,
-  "lines_added": 3831641,
-  "lines_removed": 3278424,
-  "total_tags": 1303,
+  "commits_last_12mo": 2308,
+  "total_files": 3191,
+  "total_lines": 554982,
+  "lines_added": 3834069,
+  "lines_removed": 3279087,
+  "total_tags": 1305,
   "era": "steady",
   "top_authors": [
     {
@@ -29,7 +29,7 @@
     },
     {
       "name": "ccurme",
-      "commits": 1169
+      "commits": 1171
     },
     {
       "name": "Erick Friis",
@@ -41,8 +41,10 @@
     }
   ],
   "author_commits": {
+    "ccurme": 1171,
+    "Christophe Bornet": 419,
+    "David Duong": 16,
     "Baihao Wang": 2,
-    "ccurme": 1169,
     "gethin-langchain": 1,
     "Richard Scarrott": 6,
     "Mason Daugherty": 963,
@@ -98,7 +100,6 @@
     "Mohith Gajjela": 1,
     "Radhakrishnan Pachyappan": 1,
     "Naomi": 1,
-    "Christophe Bornet": 418,
     "Anush": 23,
     "Mohammad Mohtashim": 98,
     "\u00dclgen Sar\u0131kavak": 2,
@@ -1490,7 +1491,6 @@
     "Jofthomas": 1,
     "adreo00": 1,
     "Wang Guan": 2,
-    "David Duong": 14,
     "Chuyuan Qu": 1,
     "Matt Florence": 2,
     "Usama Jamil": 1,
@@ -3640,7 +3640,7 @@
     "2023": 6342,
     "2024": 5701,
     "2025": 2693,
-    "2026": 1958
+    "2026": 1968
   },
   "ai_assisted": {
     "commits": 46,
@@ -3699,7 +3699,7 @@
       "2026-07": 145,
       "2026-08": 193,
       "2026-09": 187,
-      "2026-10": 104
+      "2026-10": 114
     }
   }
 }

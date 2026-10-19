@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.10.0.post1.dev9",
-  "generated_at": "2026-10-15T11:29:28+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev1",
+  "generated_at": "2026-10-19T03:44:40+00:00",
   "name": "Git",
   "report_path": "index.html",
   "first_commit": "2005-04-07 22:13:13",
-  "last_commit": "2026-10-06 17:13:31",
-  "age_days": 7852,
-  "active_days": 7334,
-  "total_commits": 82443,
-  "total_authors": 2362,
-  "active_authors_12mo": 220,
-  "commits_last_12mo": 3505,
+  "last_commit": "2026-10-16 14:47:19",
+  "age_days": 7862,
+  "active_days": 7338,
+  "total_commits": 82513,
+  "total_authors": 2366,
+  "active_authors_12mo": 222,
+  "commits_last_12mo": 3575,
   "total_files": 4856,
-  "total_lines": 1689534,
-  "lines_added": 3897070,
-  "lines_removed": 2207536,
+  "total_lines": 1690315,
+  "lines_added": 3898330,
+  "lines_removed": 2208015,
   "total_tags": 1010,
   "era": "steady",
   "top_authors": [
     {
       "name": "Junio C Hamano",
-      "commits": 28631
+      "commits": 28655
     },
     {
       "name": "Jeff King",
-      "commits": 4747
+      "commits": 4755
     },
     {
       "name": "Johannes Schindelin",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Patrick Steinhardt",
-      "commits": 2423
+      "commits": 2437
     },
     {
       "name": "\u00c6var Arnfj\u00f6r\u00f0 Bjarmason",
@@ -41,10 +41,23 @@
     }
   ],
   "author_commits": {
-    "Junio C Hamano": 28631,
-    "Khan Zimov": 1,
+    "Junio C Hamano": 28655,
+    "D. Ben Knoble": 37,
+    "Julia Evans": 35,
+    "Muhammed Dilshad A": 1,
+    "Jeff King": 4755,
+    "Kristoffer Haugsbakk": 184,
+    "Phillip Wood": 371,
+    "Todd Zullinger": 112,
+    "Grant Moyer": 1,
+    "Khan Zimov": 2,
+    "Patrick Steinhardt": 2437,
+    "Brigham Campbell": 2,
+    "Harald Nordgren": 43,
+    "Thomas Bachem": 4,
+    "Tamir Duberstein": 8,
     "Aleksei Sviridkin": 3,
-    "Jeff King": 4747,
+    "Matthias Goergens": 1,
     "jyotish kumar": 1,
     "St\u00e9fan Driaan Turvey": 2,
     "Daniel Pereira": 1,
@@ -59,8 +72,8 @@
     "Bagas Sanjaya": 51,
     "Ren\u00e9 Scharfe": 1401,
     "Jon Simons": 4,
+    "Andrew Pleeter": 4,
     "Yoichi NAKAYAMA": 12,
-    "Julia Evans": 34,
     "Johannes Schindelin": 2557,
     "Karthik Nayak": 258,
     "Pushkar Singh": 9,
@@ -68,22 +81,15 @@
     "Jiri Kuncar": 1,
     "Yongqiang Tian": 1,
     "Haokai Ding": 1,
-    "Thomas Bachem": 3,
     "Royce Remer": 1,
     "Orestis Floros": 1,
-    "Todd Zullinger": 111,
     "Kaartic Sivaraam": 44,
     "SZEDER G\u00e1bor": 589,
     "Yannik Tausch": 3,
     "Ariel Keselman": 1,
-    "D. Ben Knoble": 32,
-    "Patrick Steinhardt": 2423,
     "James Le Cuirot": 1,
-    "Brigham Campbell": 1,
     "Tuomas Ahola": 11,
-    "Harald Nordgren": 42,
     "Ted Nyman": 9,
-    "Kristoffer Haugsbakk": 181,
     "Johannes Sixt": 614,
     "Siddharth Asthana": 15,
     "Jinbao Chen": 1,
@@ -107,7 +113,6 @@
     "Kenneth Lorber": 1,
     "Lucas Zamboni Orioli": 2,
     "David Lin": 2,
-    "Phillip Wood": 370,
     "Adrian Friedli": 1,
     "Eric Ju": 4,
     "Calvin Wan": 26,
@@ -137,7 +142,6 @@
     "Philip Oakley": 100,
     "Koutian Wu": 1,
     "Dominik Loidolt": 3,
-    "Tamir Duberstein": 6,
     "Mirko Faina": 21,
     "Jayesh Daga": 3,
     "Andrew Kreimer": 42,
@@ -2426,14 +2430,15 @@
     "2023": 2835,
     "2024": 3967,
     "2025": 3491,
-    "2026": 3045
+    "2026": 3115
   },
   "ai_assisted": {
-    "commits": 61,
+    "commits": 64,
     "authored": 0,
     "assistants": {
-      "Claude": 48,
-      "ChatGPT": 15
+      "Claude": 49,
+      "ChatGPT": 15,
+      "Unnamed assistant": 2
     },
     "by_month": {
       "2024-11": 0,
@@ -2458,8 +2463,8 @@
       "2026-06": 0,
       "2026-07": 18,
       "2026-08": 12,
-      "2026-09": 17,
-      "2026-10": 0
+      "2026-09": 19,
+      "2026-10": 1
     },
     "commits_by_month": {
       "2024-11": 269,
@@ -2484,8 +2489,8 @@
       "2026-06": 308,
       "2026-07": 411,
       "2026-08": 278,
-      "2026-09": 239,
-      "2026-10": 33
+      "2026-09": 264,
+      "2026-10": 78
     }
   }
 }
