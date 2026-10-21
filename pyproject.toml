@@ -46,7 +46,7 @@ documentation = "https://gitstats.readthedocs.io/"
 
 [project.optional-dependencies]
 dev = ["nox"]
-test = ["pytest>=7.0"]
+test = ["pytest>=7.0", "pyyaml>=6.0"]  # PyYAML: the gallery scripts
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autobuild"]
 ai = [
     "openai>=1.0",
