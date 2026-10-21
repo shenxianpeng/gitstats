@@ -709,22 +709,8 @@ class AggregateReportCreator:
             + "".join(f'<th class="num">{label}</th>' for label, _ in quarters)
             + "<th>Named most</th></tr>"
         )
-        for summary, ai, counts in rows:
-            link = summary.get("report_path", "") or ""
-            if link.endswith("index.html"):
-                link = link[: -len("index.html")] + "authors.html"
-                if ai and ai.get("commits"):
-                    link += "#ai-assisted_commits"
-            cells = "".join(self._ai_cell(quarter) for quarter in counts)
-            named = ", ".join(
-                html.escape(name) for name in list((ai or {}).get("assistants") or {})[:2]
-            )
-            group = _group_attr(str(summary.get("group", "") or "")) if self.groups else ""
-            f.write(
-                f'<tr{group}><td><a href="{html.escape(link, quote=True)}">'
-                f"{html.escape(summary.get('name', ''))}</a></td>{cells}"
-                f"<td>{named or '&ndash;'}</td></tr>"
-            )
+        for row in rows:
+            f.write(self._ai_row(*row))
         f.write("</table></div>")
         if self.groups:
             f.write(GROUP_FILTER_SCRIPT)
@@ -756,6 +742,29 @@ class AggregateReportCreator:
             )
         f.write(f'<p class="section-note">{note}</p>')
         self._print_footer(f)
+
+    def _ai_row(
+        self,
+        summary: dict[str, Any],
+        ai: dict[str, Any] | None,
+        counts: list[tuple[int, int] | None],
+    ) -> str:
+        """One repository's row of the AI-assisted commits table."""
+        link = summary.get("report_path", "") or ""
+        if link.endswith("index.html"):
+            link = link[: -len("index.html")] + "authors.html"
+            if ai and ai.get("commits"):
+                link += "#ai-assisted_commits"
+        cells = "".join(self._ai_cell(quarter) for quarter in counts)
+        named = ", ".join(
+            html.escape(name) for name in list((ai or {}).get("assistants") or {})[:2]
+        )
+        group = _group_attr(str(summary.get("group", "") or "")) if self.groups else ""
+        return (
+            f'<tr{group}><td><a href="{html.escape(link, quote=True)}">'
+            f"{html.escape(summary.get('name', ''))}</a></td>{cells}"
+            f"<td>{named or '&ndash;'}</td></tr>"
+        )
 
     @staticmethod
     def _share_card(summaries: list[dict[str, Any]], title: str) -> str:

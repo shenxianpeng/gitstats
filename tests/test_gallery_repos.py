@@ -89,13 +89,14 @@ def test_parse_repos_rejects(repos_script, data, message):
 
 
 def test_parse_repos_at_most_a_matrix(repos_script):
-    repos = [_repo(f"r{i}") for i in range(repos_script.MAX_REPOS + 1)]
+    data = _list(*[_repo(f"r{i}") for i in range(repos_script.MAX_REPOS + 1)])
     with pytest.raises(repos_script.RepoListError, match="at most 256"):
-        repos_script.parse_repos(_list(*repos))
+        repos_script.parse_repos(data)
 
 
 @needs_yaml
-def test_the_gallery_list(repos_script):
+def test_the_gallery_list(repos_script, monkeypatch):
+    monkeypatch.chdir(_ROOT)
     groups, repos = repos_script.load_repos(_REPOS_YML)
     assert 90 <= len(repos) <= repos_script.MAX_REPOS
     assert groups[0].id == "python"
@@ -118,7 +119,8 @@ def test_the_gallery_list(repos_script):
 
 
 @needs_yaml
-def test_load_repos_rejects_what_is_not_yaml(repos_script, tmp_path):
+def test_load_repos_rejects_what_is_not_yaml(repos_script, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
     path = tmp_path / "repos.yml"
     path.write_text("groups: [unclosed\n", encoding="utf-8")
     with pytest.raises(repos_script.RepoListError, match="not YAML"):
@@ -126,7 +128,8 @@ def test_load_repos_rejects_what_is_not_yaml(repos_script, tmp_path):
 
 
 @needs_yaml
-def test_main_prints_the_matrix(repos_script, capsys):
+def test_main_prints_the_matrix(repos_script, capsys, monkeypatch):
+    monkeypatch.chdir(_ROOT)
     assert repos_script.main(["matrix", _REPOS_YML]) == 0
     matrix = json.loads(capsys.readouterr().out)
     assert matrix[0] == {
@@ -139,12 +142,14 @@ def test_main_prints_the_matrix(repos_script, capsys):
 
 
 @needs_yaml
-def test_main_prints_the_ids(repos_script, capsys):
+def test_main_prints_the_ids(repos_script, capsys, monkeypatch):
+    monkeypatch.chdir(_ROOT)
     assert repos_script.main(["ids", _REPOS_YML]) == 0
     assert capsys.readouterr().out.splitlines()[:2] == ["cpython", "django"]
 
 
-def test_main_usage_and_errors(repos_script, tmp_path, capsys):
+def test_main_usage_and_errors(repos_script, tmp_path, capsys, monkeypatch):
+    monkeypatch.chdir(tmp_path)
     assert repos_script.main([]) == 2
     assert repos_script.main(["list", _REPOS_YML]) == 2
     assert "Usage:" in capsys.readouterr().err
@@ -153,9 +158,12 @@ def test_main_usage_and_errors(repos_script, tmp_path, capsys):
     assert missing in capsys.readouterr().err
 
 
-def test_load_repos_reads_only_a_yml_file(repos_script, tmp_path):
-    other = tmp_path / "repos.txt"
-    other.write_text("groups: []\n", encoding="utf-8")
-    for path in (other, tmp_path / "missing.yml", tmp_path):
-        with pytest.raises(repos_script.RepoListError, match="not a .yml file"):
-            repos_script.load_repos(str(path))
+@pytest.mark.parametrize("name", ["repos.txt", "missing.yml", ".", "../outside.yml"])
+def test_load_repos_reads_only_a_yml_file_here(repos_script, tmp_path, monkeypatch, name):
+    inside = tmp_path / "checkout"
+    inside.mkdir()
+    for path in (inside / "repos.txt", tmp_path / "outside.yml"):
+        path.write_text("groups: []\n", encoding="utf-8")
+    monkeypatch.chdir(inside)
+    with pytest.raises(repos_script.RepoListError, match="under the current directory"):
+        repos_script.load_repos(name)

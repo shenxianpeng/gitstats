@@ -251,7 +251,9 @@ def _write_report(root, entry, badge=False, **summary):
             f.write("<svg/>")
 
 
-def _gallery(temp_dir):
+def _gallery(temp_dir, monkeypatch):
+    # the list is read from under the current directory, as in the checkout
+    monkeypatch.chdir(temp_dir)
     gallery = os.path.join(temp_dir, "gallery")
     os.makedirs(gallery)
     repos = os.path.join(temp_dir, "repos.yml")
@@ -266,8 +268,8 @@ def _read(*parts):
 
 
 @needs_yaml
-def test_repos_group_the_reports(gallery_script, temp_dir, capsys):
-    gallery, repos = _gallery(temp_dir)
+def test_repos_group_the_reports(gallery_script, temp_dir, capsys, monkeypatch):
+    gallery, repos = _gallery(temp_dir, monkeypatch)
     _write_report(gallery, "django", name="Django", total_commits=300)
     _write_report(gallery, "etcd", name="etcd", total_commits=200)
     # not in the list: left out
@@ -289,15 +291,15 @@ def test_repos_group_the_reports(gallery_script, temp_dir, capsys):
 
 
 @needs_yaml
-def test_repos_with_no_report_at_all(gallery_script, temp_dir, capsys):
-    gallery, repos = _gallery(temp_dir)
+def test_repos_with_no_report_at_all(gallery_script, temp_dir, capsys, monkeypatch):
+    gallery, repos = _gallery(temp_dir, monkeypatch)
     assert gallery_script.main([gallery, "--repos", repos]) == 1
     assert "No summary.json found" in capsys.readouterr().err
 
 
 @needs_yaml
-def test_repos_that_cannot_be_read(gallery_script, temp_dir, capsys):
-    gallery, _ = _gallery(temp_dir)
+def test_repos_that_cannot_be_read(gallery_script, temp_dir, capsys, monkeypatch):
+    gallery, _ = _gallery(temp_dir, monkeypatch)
     bad = os.path.join(temp_dir, "bad.yml")
     with open(bad, "w", encoding="utf-8") as f:
         f.write("groups: []\n")
@@ -325,8 +327,8 @@ def test_load_gallery_summaries_of_some_ids_in_their_order(temp_dir, gallery_scr
 
 
 @needs_yaml
-def test_every_report_page_says_how_to_make_it(gallery_script, temp_dir):
-    gallery, repos = _gallery(temp_dir)
+def test_every_report_page_says_how_to_make_it(gallery_script, temp_dir, monkeypatch):
+    gallery, repos = _gallery(temp_dir, monkeypatch)
     _write_report(gallery, "django", badge=True, name="Django", total_commits=300)
     _write_report(gallery, "etcd", name="etcd", total_commits=200)
 
@@ -368,8 +370,8 @@ def test_every_report_page_says_how_to_make_it(gallery_script, temp_dir):
 
 
 @needs_yaml
-def test_the_note_is_added_once(gallery_script, temp_dir):
-    gallery, repos = _gallery(temp_dir)
+def test_the_note_is_added_once(gallery_script, temp_dir, monkeypatch):
+    gallery, repos = _gallery(temp_dir, monkeypatch)
     _write_report(gallery, "django", badge=True, name="Django", total_commits=300)
     assert gallery_script.main([gallery, "--repos", repos]) == 0
     first = _read(gallery, "django", "index.html")

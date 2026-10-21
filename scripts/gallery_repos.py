@@ -55,42 +55,52 @@ def parse_repos(data: object) -> tuple[list[Group], list[Repo]]:
         raise RepoListError("expected a mapping with a list of groups")
     groups: list[Group] = []
     repos: list[Repo] = []
-    seen: set[str] = set()
-    group_ids: set[str] = set()
-    for group in data["groups"]:
-        if not isinstance(group, dict):
-            raise RepoListError(f"not a group: {group!r}")
-        group_id, group_name = _text(group, "id", "group"), _text(group, "name", "group")
-        if not _ID.fullmatch(group_id) or group_id in group_ids:
-            raise RepoListError(f"bad or repeated group id: {group_id!r}")
-        group_ids.add(group_id)
-        groups.append(Group(group_id, group_name))
-        entries = group.get("repos")
-        if not isinstance(entries, list) or not entries:
-            raise RepoListError(f"group {group_id!r} has no repos")
-        for entry in entries:
-            if not isinstance(entry, dict):
-                raise RepoListError(f"not a repository: {entry!r}")
-            repo_id = _text(entry, "id", "repository")
-            if not _ID.fullmatch(repo_id):
-                raise RepoListError(f"bad repository id: {repo_id!r}")
-            if repo_id in seen:
-                raise RepoListError(f"repository id used twice: {repo_id!r}")
-            seen.add(repo_id)
-            url = _text(entry, "url", repo_id)
-            if not _URL.fullmatch(url) or ".." in url:
-                raise RepoListError(f"{repo_id}: url must be owner/name on GitHub, not {url!r}")
-            timeout = entry.get("timeout", DEFAULT_TIMEOUT)
-            if not isinstance(timeout, int) or isinstance(timeout, bool):
-                raise RepoListError(f"{repo_id}: timeout must be a number of minutes")
-            if not 1 <= timeout <= MAX_TIMEOUT:
-                raise RepoListError(f"{repo_id}: timeout must be 1 to {MAX_TIMEOUT} minutes")
-            repos.append(Repo(repo_id, _text(entry, "name", repo_id), url, group_id, timeout))
+    for entry in data["groups"]:
+        group, members = _parse_group(entry, {g.id for g in groups})
+        groups.append(group)
+        seen = {repo.id for repo in repos}
+        for member in members:
+            repo = _parse_repo(member, group.id)
+            if repo.id in seen:
+                raise RepoListError(f"repository id used twice: {repo.id!r}")
+            seen.add(repo.id)
+            repos.append(repo)
     if not repos:
         raise RepoListError("no repositories")
     if len(repos) > MAX_REPOS:
         raise RepoListError(f"{len(repos)} repositories: a job matrix takes at most {MAX_REPOS}")
     return groups, repos
+
+
+def _parse_group(group: object, taken: set[str]) -> tuple[Group, list]:
+    """One group, and the entries of its repositories."""
+    if not isinstance(group, dict):
+        raise RepoListError(f"not a group: {group!r}")
+    group_id, group_name = _text(group, "id", "group"), _text(group, "name", "group")
+    if not _ID.fullmatch(group_id) or group_id in taken:
+        raise RepoListError(f"bad or repeated group id: {group_id!r}")
+    entries = group.get("repos")
+    if not isinstance(entries, list) or not entries:
+        raise RepoListError(f"group {group_id!r} has no repos")
+    return Group(group_id, group_name), entries
+
+
+def _parse_repo(entry: object, group_id: str) -> Repo:
+    """One repository of a group."""
+    if not isinstance(entry, dict):
+        raise RepoListError(f"not a repository: {entry!r}")
+    repo_id = _text(entry, "id", "repository")
+    if not _ID.fullmatch(repo_id):
+        raise RepoListError(f"bad repository id: {repo_id!r}")
+    url = _text(entry, "url", repo_id)
+    if not _URL.fullmatch(url) or ".." in url:
+        raise RepoListError(f"{repo_id}: url must be owner/name on GitHub, not {url!r}")
+    timeout = entry.get("timeout", DEFAULT_TIMEOUT)
+    if not isinstance(timeout, int) or isinstance(timeout, bool):
+        raise RepoListError(f"{repo_id}: timeout must be a number of minutes")
+    if not 1 <= timeout <= MAX_TIMEOUT:
+        raise RepoListError(f"{repo_id}: timeout must be 1 to {MAX_TIMEOUT} minutes")
+    return Repo(repo_id, _text(entry, "name", repo_id), url, group_id, timeout)
 
 
 def _text(mapping: dict, key: str, where: str) -> str:
@@ -101,10 +111,18 @@ def _text(mapping: dict, key: str, where: str) -> str:
 
 
 def load_repos(path: str) -> tuple[list[Group], list[Repo]]:
-    """Read and check repos.yml: a .yml or .yaml file, only read."""
+    """Read and check repos.yml: a .yml or .yaml file under the current
+    directory (the checkout, in the workflow), only read."""
+    base = os.path.realpath(os.getcwd())
     path = os.path.realpath(path)
-    if os.path.splitext(path)[1] not in (".yml", ".yaml") or not os.path.isfile(path):
-        raise RepoListError("not a .yml file")
+    try:
+        inside = os.path.commonpath([base, path]) == base
+    except ValueError:
+        inside = False
+    if not inside or os.path.splitext(path)[1] not in (".yml", ".yaml"):
+        raise RepoListError("not a .yml file under the current directory")
+    if not os.path.isfile(path):
+        raise RepoListError("not a .yml file under the current directory")
     import yaml  # only the gallery needs it, not gitstats
 
     with open(path, encoding="utf-8") as f:

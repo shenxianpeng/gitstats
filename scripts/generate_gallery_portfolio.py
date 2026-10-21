@@ -228,31 +228,62 @@ def add_note(base: str, page: str, note: str) -> bool:
     return True
 
 
+def _report_pages(folder: str) -> list[str]:
+    """The pages of a report to read, not its share card."""
+    return [
+        entry
+        for entry in sorted(os.listdir(folder))
+        if entry.endswith(".html") and not entry.startswith("share-card")
+    ]
+
+
+def _add_report_note(base: str, summary: dict, site_url: str) -> int:
+    """Add the note to every page of one report; how many pages got it."""
+    report_id = summary["report_path"].split("/", 1)[0]
+    folder = _inside(base, report_id)
+    if not folder or folder == base or not os.path.isdir(folder):
+        return 0
+    badge = os.path.isfile(os.path.join(folder, AI_BADGE))
+    name = str(summary.get("name", ""))
+    added = 0
+    for entry in _report_pages(folder):
+        note = report_note(report_id, name, site_url, badge and entry == "index.html")
+        added += add_note(base, os.path.join(folder, entry), note)
+    return added
+
+
 def add_report_notes(gallery_root: str, summaries: list[dict], site_url: str) -> int:
     """Add the note to every page of each report; how many pages got it."""
     base = os.path.realpath(gallery_root)
-    added = 0
-    for summary in summaries:
-        report_id = summary["report_path"].split("/", 1)[0]
-        folder = _inside(base, report_id)
-        if not folder or folder == base or not os.path.isdir(folder):
-            continue
-        badge = os.path.isfile(os.path.join(folder, AI_BADGE))
-        for entry in sorted(os.listdir(folder)):
-            if not entry.endswith(".html") or entry.startswith("share-card"):
-                continue
-            page = _inside(folder, entry)
-            if not page or not os.path.isfile(page):
-                continue
-            note = report_note(
-                report_id, str(summary.get("name", "")), site_url, badge and entry == "index.html"
-            )
-            added += add_note(base, page, note)
+    added = sum(_add_report_note(base, summary, site_url) for summary in summaries)
     for entry in ("index.html", "ai.html"):
         page = os.path.join(base, entry)
         if os.path.isfile(page):
             added += add_note(base, page, gallery_note())
     return added
+
+
+def _listed_summaries(
+    gallery_root: str, repos_file: str
+) -> tuple[list[dict], list[tuple[str, str]], list[dict[str, str]]]:
+    """The summaries of the repositories of the list, each with its group;
+    the groups; and the repositories without a report."""
+    repo_groups, repos = load_repos(repos_file)
+    summaries = load_gallery_summaries(gallery_root, [repo.id for repo in repos])
+    by_id = {repo.id: repo for repo in repos}
+    found = set()
+    for summary in summaries:
+        report_id = summary["report_path"].split("/", 1)[0]
+        found.add(report_id)
+        summary["group"] = by_id[report_id].group
+    failures = [
+        {"name": repo.name, "error": f"No report: generating it for {repo.url} failed"}
+        for repo in repos
+        if repo.id not in found
+    ]
+    for failure in failures:
+        print(f"{failure['name']}: {failure['error']}", file=sys.stderr)
+    return summaries, [(group.id, group.name) for group in repo_groups], failures
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -279,23 +310,10 @@ def main(argv: list[str] | None = None) -> int:
     failures: list[dict[str, str]] = []
     if args.repos:
         try:
-            repo_groups, repos = load_repos(args.repos)
+            summaries, groups, failures = _listed_summaries(gallery_root, args.repos)
         except (OSError, RepoListError) as error:
             print(f"{args.repos}: {error}", file=sys.stderr)
             return 1
-        groups = [(group.id, group.name) for group in repo_groups]
-        summaries = load_gallery_summaries(gallery_root, [repo.id for repo in repos])
-        found = {summary["report_path"].split("/", 1)[0] for summary in summaries}
-        by_id = {repo.id: repo for repo in repos}
-        for summary in summaries:
-            summary["group"] = by_id[summary["report_path"].split("/", 1)[0]].group
-        failures = [
-            {"name": repo.name, "error": f"No report: generating it for {repo.url} failed"}
-            for repo in repos
-            if repo.id not in found
-        ]
-        for failure in failures:
-            print(f"{failure['name']}: {failure['error']}", file=sys.stderr)
     else:
         summaries = load_gallery_summaries(gallery_root)
     if not summaries:
