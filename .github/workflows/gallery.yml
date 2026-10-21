@@ -6,36 +6,44 @@ on:
     - cron: "0 0 * * 1"
   workflow_dispatch:
 
+# one gallery build at a time: the last one to deploy wins otherwise
+concurrency:
+  group: gallery
+  cancel-in-progress: false
+
 jobs:
-  generate:
+  # The repositories and their groups are listed in gallery/repos.yml
+  plan:
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    outputs:
+      matrix: ${{ steps.repos.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.10"
+
+      - name: Read gallery/repos.yml
+        id: repos
+        run: |
+          python -m pip install --quiet pyyaml
+          echo "matrix=$(python scripts/gallery_repos.py matrix gallery/repos.yml)" >> "$GITHUB_OUTPUT"
+
+  generate:
+    needs: plan
+    runs-on: ubuntu-latest
+    # each repository says how long it may take (90 minutes unless it says);
+    # the largest histories, Rust and Kubernetes, take about five
+    timeout-minutes: ${{ matrix.repo.timeout }}
     strategy:
       fail-fast: false
+      # leave some of the account's concurrent jobs to the other workflows
+      max-parallel: 15
       matrix:
-        repo:
-          - { id: cpython,      name: "CPython",      url: "python/cpython"            }
-          - { id: vscode,       name: "VS Code",      url: "microsoft/vscode"          }
-          - { id: git,          name: "Git",          url: "git/git"                   }
-          - { id: nginx,        name: "nginx",        url: "nginx/nginx"               }
-          - { id: kubernetes,   name: "Kubernetes",   url: "kubernetes/kubernetes"     }
-          - { id: nodejs,       name: "Node.js",      url: "nodejs/node"               }
-          - { id: django,       name: "Django",       url: "django/django"             }
-          - { id: rust,         name: "Rust",         url: "rust-lang/rust"            }
-          - { id: react,        name: "React",        url: "facebook/react"            }
-          - { id: homebrew,     name: "Homebrew",     url: "Homebrew/brew"             }
-          # AI coding assistants: how much their own history names one
-          - { id: codex,        name: "Codex CLI",    url: "openai/codex"              }
-          - { id: gemini-cli,   name: "Gemini CLI",   url: "google-gemini/gemini-cli"  }
-          - { id: opencode,     name: "OpenCode",     url: "anomalyco/opencode"        }
-          - { id: aider,        name: "Aider",        url: "Aider-AI/aider"            }
-          # Python and AI libraries
-          - { id: pytorch,      name: "PyTorch",      url: "pytorch/pytorch"           }
-          - { id: transformers, name: "Transformers", url: "huggingface/transformers"  }
-          - { id: langchain,    name: "LangChain",    url: "langchain-ai/langchain"    }
-          - { id: fastapi,      name: "FastAPI",      url: "fastapi/fastapi"           }
-          - { id: pandas,       name: "pandas",       url: "pandas-dev/pandas"         }
-          - { id: numpy,        name: "NumPy",        url: "numpy/numpy"               }
+        repo: ${{ fromJSON(needs.plan.outputs.matrix) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -51,13 +59,30 @@ jobs:
       - name: Install GitStats
         run: pipx install --python "$(which python)" .
 
+      - name: Clone
+        # The whole history and every branch: the report counts every commit,
+        # and tags often sit on release branches. A blobless clone
+        # (--filter=blob:none) would fetch each file of each commit one by one
+        # when the lines are counted, which is far slower than one full clone.
+        env:
+          REPO_URL: ${{ matrix.repo.url }}
+        run: |
+          for attempt in 1 2 3; do
+            git clone --quiet "https://github.com/$REPO_URL.git" /tmp/repo && exit 0
+            rm -rf /tmp/repo
+            echo "::warning::Clone of $REPO_URL failed (attempt $attempt)"
+            sleep $((attempt * 30))
+          done
+          exit 1
+
       - name: Generate Report
         env:
           FONTCONFIG_FILE: /dev/null
+          REPO_ID: ${{ matrix.repo.id }}
+          REPO_NAME: ${{ matrix.repo.name }}
         run: |
-          git clone "https://github.com/${{ matrix.repo.url }}.git" /tmp/repo
-          gitstats -c 'project_name=${{ matrix.repo.name }}' -c share_card=true \
-            --site-url "https://shenxianpeng.dev/gitstats/gallery/${{ matrix.repo.id }}/" \
+          gitstats -c "project_name=$REPO_NAME" -c share_card=true \
+            --site-url "https://shenxianpeng.dev/gitstats/gallery/$REPO_ID/" \
             /tmp/repo "report"
 
       # what a link to the report shows where it is shared: the pages point to it
@@ -74,7 +99,10 @@ jobs:
           path: report/
 
   deploy:
-    needs: generate
+    needs: [plan, generate]
+    # also when some reports failed: the others are published, and the failed
+    # ones keep their last published report
+    if: ${{ !cancelled() && needs.plan.result == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -93,31 +121,52 @@ jobs:
           # Each artifact is in gallery/report-<id>/, rename to gallery/<id>/
           # Display names come from each report's summary.json (project_name).
           for d in gallery/report-*; do
+            [ -d "$d" ] || continue  # no report at all this week
             id="${d#gallery/report-}"
             mv "$d" "gallery/$id"
           done
 
-      - name: Fetch AI Snapshots
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.10"
+
+      - name: Install PyYAML
+        run: python -m pip install --quiet pyyaml
+
+      - name: Fetch the Published Gallery
         # Each quarter's snapshot of ai.json is written once, by the first build
         # after the quarter ends; later builds find it on the site's branch and
-        # leave it as it is.
+        # leave it as it is. A repository whose report failed this week keeps
+        # the report published before, if there is one.
         run: |
           git fetch --depth 1 origin gh-pages
           if git cat-file -e FETCH_HEAD:gallery/ai 2>/dev/null; then
             git archive FETCH_HEAD gallery/ai | tar -x
           fi
           ls gallery/ai 2>/dev/null || echo "No snapshots yet"
-
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-        with:
-          python-version: "3.10"
+          for id in $(python scripts/gallery_repos.py ids gallery/repos.yml); do
+            if [ ! -f "gallery/$id/summary.json" ]; then
+              rm -rf "gallery/$id"
+              if git cat-file -e "FETCH_HEAD:gallery/$id/summary.json" 2>/dev/null; then
+                git archive FETCH_HEAD "gallery/$id" | tar -x
+                echo "::warning::$id: no new report, keeping the one published before"
+              else
+                echo "::warning::$id: no report"
+              fi
+            fi
+          done
 
       - name: Generate Gallery Portfolio Page
         # The script only needs the gitstats modules from this checkout
-        # (stdlib-only imports), so no package installation is required. The
-        # pages then say the version the reports were made with.
+        # (stdlib-only imports) and PyYAML for the list of repositories, so
+        # gitstats is not installed. The pages then say the version the
+        # reports were made with. It groups the reports as repos.yml does,
+        # lists the repositories without one, and adds to each report the
+        # badge of its AI-assisted commits and how to make it for another
+        # repository.
         run: >-
           PYTHONPATH="$PWD" python scripts/generate_gallery_portfolio.py gallery
+          --repos gallery/repos.yml
           --site-url https://shenxianpeng.dev/gitstats/gallery/ --share-card
 
       - name: Render Share Cards
