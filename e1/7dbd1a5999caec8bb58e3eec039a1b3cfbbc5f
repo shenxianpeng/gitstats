@@ -1,0 +1,32 @@
+tests/test_generate_gallery_portfolio.py
+  s_c235a1d6c969c6::t_66e7c86716388d 213-391,393-394
+  s_c235a1d6c969c6::t_3249152b2e1c76 392
+scripts/gallery_repos.py
+  s_c235a1d6c969c6::t_bdc675dab731f5 107-111
+  s_c235a1d6c969c6::t_28b66fa255b6ee 1-106,112-140
+scripts/generate_gallery_portfolio.py
+  s_c235a1d6c969c6::t_f3057bb88a30a7 177-179
+  s_c235a1d6c969c6::t_a47aee1448ad0b 12-17,23-26,33,42-88,90-93,100-102,110-112,120-130,142-176,180-246,250,267-289,298-310
+tests/test_gallery_repos.py
+  s_c235a1d6c969c6::t_66e7c86716388d 1-143
+pyproject.toml
+  s_c235a1d6c969c6::t_7106f17322da11 49
+uv.lock
+  s_c235a1d6c969c6::t_69419a0d490882 2,480,490,1336-1399
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e17dbd1a5999caec8bb58e3eec039a1b3cfbbc5f",
+  "prompts": {},
+  "sessions": {
+    "s_c235a1d6c969c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9b05f12-9513-4cfd-b161-6ad249c4a0e1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
