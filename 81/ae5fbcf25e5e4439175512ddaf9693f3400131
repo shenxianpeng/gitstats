@@ -1,0 +1,30 @@
+pyproject.toml
+  s_c235a1d6c969c6::t_7106f17322da11 49
+tests/test_gallery_repos.py
+  s_c235a1d6c969c6::t_66e7c86716388d 1-143
+.gitignore
+  s_c235a1d6c969c6::t_ff0943f3ab0263 16-17
+scripts/gallery_repos.py
+  s_c235a1d6c969c6::t_bdc675dab731f5 107-111
+  s_c235a1d6c969c6::t_28b66fa255b6ee 1-106,112-140
+uv.lock
+  s_c235a1d6c969c6::t_69419a0d490882 2,480,490,1336-1399
+gallery/repos.yml
+  s_c235a1d6c969c6::t_d7ab0e380f4e13 1-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "81ae5fbcf25e5e4439175512ddaf9693f3400131",
+  "prompts": {},
+  "sessions": {
+    "s_c235a1d6c969c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9b05f12-9513-4cfd-b161-6ad249c4a0e1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
