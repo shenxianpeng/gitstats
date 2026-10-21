@@ -1,0 +1,29 @@
+gitstats/aggregate.py
+  s_c235a1d6c969c6::t_b56a03750a057b 712-713,746-762,764-767
+  s_c235a1d6c969c6::t_f1e50561a467cf 763
+  s_c235a1d6c969c6::t_85ff391bb44635 768
+scripts/generate_gallery_portfolio.py
+  s_c235a1d6c969c6::t_0f4ebeebfa422f 231-254,258,266-288,313
+tests/test_generate_gallery_portfolio.py
+  s_c235a1d6c969c6::t_57d46537d2c0f7 254-256,271-272,294-295,301-302,330-331,373-374
+tests/test_gallery_repos.py
+  s_c235a1d6c969c6::t_b7c67376caba6b 92,94,98-99,122-123,131-132,145-146,151-152,161-169
+scripts/gallery_repos.py
+  s_c235a1d6c969c6::t_b7c67376caba6b 58-67,75-105,114-116,118-125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "43aaccde175b8f0d5275722699d4182c06124dc7",
+  "prompts": {},
+  "sessions": {
+    "s_c235a1d6c969c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9b05f12-9513-4cfd-b161-6ad249c4a0e1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
