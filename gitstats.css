@@ -794,6 +794,7 @@ tr:hover td {
 }
 
 .badge-option-list button,
+.group-filter button,
 .badge-copy {
 	min-height: 36px;
 	padding: 0 var(--space-3);
@@ -808,12 +809,14 @@ tr:hover td {
 }
 
 .badge-option-list button:hover,
+.group-filter button:hover,
 .badge-copy:hover {
 	border-color: var(--border-strong);
 	background-color: var(--surface-color);
 }
 
-.badge-option-list button[aria-pressed="true"] {
+.badge-option-list button[aria-pressed="true"],
+.group-filter button[aria-pressed="true"] {
 	color: var(--bg-color);
 	background-color: var(--text-color);
 	border-color: var(--text-color);
@@ -821,9 +824,67 @@ tr:hover td {
 
 .badge-url input:focus-visible,
 .badge-option-list button:focus-visible,
+.group-filter button:focus-visible,
 .badge-copy:focus-visible {
 	outline: 2px solid var(--link-color);
 	outline-offset: 1px;
+}
+
+/* The portfolio's groups (a gallery's ecosystems): one button each, narrowing
+   the table after them to that group */
+.group-filter {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-1);
+	margin: 0 0 var(--space-3);
+}
+
+.group-filter button span {
+	color: var(--text-muted);
+}
+
+.group-filter button[aria-pressed="true"] span {
+	color: inherit;
+	opacity: 0.75;
+}
+
+tr[hidden] {
+	display: none;
+}
+
+/* On a phone the buttons stay on one line, and it scrolls sideways */
+@media (max-width: 560px) {
+	.group-filter {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		padding-bottom: var(--space-1);
+	}
+
+	.group-filter button {
+		flex: none;
+		white-space: nowrap;
+	}
+
+	/* the buttons say the groups: the numbers get the width */
+	.portfolio-group {
+		display: none;
+	}
+}
+
+.portfolio-group {
+	white-space: nowrap;
+}
+
+/* What a gallery adds under each of its reports: the badge, and how to make
+   the report for another repository */
+.gallery-note {
+	margin-top: var(--space-6);
+	padding-top: var(--space-4);
+	border-top: 1px dashed var(--border-strong);
+}
+
+.gallery-note pre.badge-code {
+	margin-top: var(--space-2);
 }
 
 /* One badge per row: name and preview, the snippet, the copy button */
@@ -939,6 +1000,7 @@ tr:hover td {
 
 	.badge-url input,
 	.badge-option-list button,
+	.group-filter button,
 	.badge-copy {
 		min-height: 44px;
 		height: 44px;
