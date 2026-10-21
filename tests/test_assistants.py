@@ -176,6 +176,18 @@ def _message(*lines):
         (["Assisted-by: Kimi:claude-opus-4"], ["Claude"]),
         (["Assisted-by: AI"], [UNNAMED]),
         (["Generated-by: an LLM, then edited"], [UNNAMED]),
+        # a brand left out, as Node.js suggests
+        (["Assisted-by: a closed-source coding agent"], [UNNAMED]),
+        (["Assisted-by: a frontier reasoning model"], [UNNAMED]),
+        # a model named without its maker
+        (["Assisted-by: Opus 5.5"], ["Claude"]),
+        (["Assisted-by: sonnet-4.5"], ["Claude"]),
+        (["Assisted-by: Grok"], ["Grok"]),
+        (["Assisted-by: Grok (Grok Build)"], ["Grok"]),
+        (["Assisted-by: IBM Bob"], ["IBM Bob"]),
+        (["Assisted-by: Amp"], ["Amp"]),
+        (["Assisted-by: pi"], ["Pi"]),
+        (["Assisted-by: pi-coding-agent"], ["Pi"]),
         # several marks, one commit
         (
             [
@@ -204,6 +216,13 @@ def test_a_commit_names_its_assistants(lines, assistants):
         # these trailers are used for people and for scripts as well
         ["Assisted-by: Jeff Layton <jlayton@kernel.org>"],
         ["Assisted-by: Jeff Layton"],
+        # first names, and words that are also names of assistants
+        ["Assisted-by: Devin"],
+        ["Assisted-by: Bob"],
+        ["Assisted-by: Pi Zhang"],
+        ["Generated-by: scripts/gen-pi-table.py"],
+        ["Assisted-by: amp meter readings from the lab"],
+        ["Generated-by: opus-tools"],
         ["Generated-by: make update-deps"],
         # a template, not an assistant
         ["Generated with [Copier](https://copier.readthedocs.io)"],
