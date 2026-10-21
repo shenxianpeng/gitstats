@@ -418,6 +418,68 @@ def load_repo_summaries(outputpath: str) -> list[dict[str, Any]]:
     return summaries
 
 
+def _group_attr(group: str) -> str:
+    return f' data-group="{html.escape(group, quote=True)}"' if group else ""
+
+
+def group_filter_html(summaries: list[dict[str, Any]], groups: list[tuple[str, str]]) -> str:
+    """Buttons that narrow the table after them to the repositories of one
+    group, each with how many it has. Without scripts, every row shows."""
+    counts: dict[str, int] = {}
+    for summary in summaries:
+        group = str(summary.get("group", "") or "")
+        counts[group] = counts.get(group, 0) + 1
+    buttons = [("", "All", len(summaries))] + [
+        (group_id, name, counts[group_id]) for group_id, name in groups if counts.get(group_id)
+    ]
+    return (
+        '<div class="group-filter" role="group" aria-label="Show the repositories of">'
+        + "".join(
+            f'<button type="button" data-group="{html.escape(group_id, quote=True)}" '
+            f'aria-pressed="{"true" if not group_id else "false"}">{html.escape(name)} '
+            f"<span>{count}</span></button>"
+            for group_id, name, count in buttons
+        )
+        + "</div>"
+    )
+
+
+# Narrows the rows of a page's tables to one group, and remembers it in the
+# address (#group=python), so that a link can show one group
+GROUP_FILTER_SCRIPT = """<script>
+(function () {
+	var buttons = document.querySelectorAll('.group-filter button');
+	function show(group) {
+		var known = !group;
+		buttons.forEach(function (b) {
+			if (b.getAttribute('data-group') === group) { known = true; }
+		});
+		if (!known) { group = ''; }
+		buttons.forEach(function (b) {
+			b.setAttribute('aria-pressed', String(b.getAttribute('data-group') === group));
+		});
+		document.querySelectorAll('tr[data-group]').forEach(function (row) {
+			row.hidden = !!group && row.getAttribute('data-group') !== group;
+		});
+	}
+	function fromHash() {
+		var match = /^#group=([a-z0-9-]+)$/.exec(location.hash);
+		show(match ? match[1] : '');
+	}
+	buttons.forEach(function (b) {
+		b.addEventListener('click', function () {
+			var group = b.getAttribute('data-group');
+			history.replaceState(null, '', group ? '#group=' + group : location.pathname + location.search);
+			show(group);
+		});
+	});
+	window.addEventListener('hashchange', fromHash);
+	fromHash();
+})();
+</script>
+"""
+
+
 class AggregateReportCreator:
     """Render the portfolio page for a multi-repository run."""
 
@@ -429,13 +491,23 @@ class AggregateReportCreator:
         title: str = "GitStats Portfolio",
         site_url: str = "",
         version: str = "",
+        groups: list[tuple[str, str]] | None = None,
     ) -> None:
         """Write the portfolio's pages, and the share card of each: ``site_url``
         is the portfolio's public address, ending in "/", or "" when unknown;
-        ``version``, the gitstats they say made them, when not this one."""
+        ``version``, the gitstats they say made them, when not this one.
+
+        ``groups`` are the (id, name) of the groups the repositories are in,
+        in the order the pages offer them: each summary names its group as
+        ``"group"``. With them, the pages can be narrowed to one group."""
         self._copy_assets(path)
         self.site_url = site_url
         self.version = version or get_version()
+        self.groups = [
+            (group_id, name)
+            for group_id, name in (groups or [])
+            if any(summary.get("group") == group_id for summary in summaries)
+        ]
         # the page of AI-assisted commits, when a summary counts them
         ai = any(isinstance(summary.get("ai_assisted"), dict) for summary in summaries)
         f = self._open_portfolio_file(path)
@@ -465,6 +537,7 @@ class AggregateReportCreator:
 
     site_url = ""
     version = ""
+    groups: list[tuple[str, str]] = []
 
     def _write_ai_data(self, path: str, dataset: dict[str, Any]) -> list[str]:
         """Write the data of the AI-assisted commits page, as ai.json and
@@ -569,7 +642,7 @@ class AggregateReportCreator:
                 '<p class="more-link"><a href="ai.html">AI-assisted commits, quarter by '
                 "quarter &rarr;</a></p>"
             )
-        self._write_repo_table(f, summaries)
+        self._write_repo_table(f, summaries, self.groups)
         self._write_failures(f, failures)
 
         self._print_footer(f)
@@ -628,6 +701,8 @@ class AggregateReportCreator:
             "assistant, and under it those commits and all of them. The darker, the larger "
             "the share.</p>"
         )
+        if self.groups:
+            f.write(group_filter_html(summaries, self.groups))
         f.write('<div class="table-scroll"><table class="ai-grid">')
         f.write(
             "<tr><th>Repository</th>"
@@ -644,12 +719,15 @@ class AggregateReportCreator:
             named = ", ".join(
                 html.escape(name) for name in list((ai or {}).get("assistants") or {})[:2]
             )
+            group = _group_attr(str(summary.get("group", "") or "")) if self.groups else ""
             f.write(
-                f'<tr><td><a href="{html.escape(link, quote=True)}">'
+                f'<tr{group}><td><a href="{html.escape(link, quote=True)}">'
                 f"{html.escape(summary.get('name', ''))}</a></td>{cells}"
                 f"<td>{named or '&ndash;'}</td></tr>"
             )
         f.write("</table></div>")
+        if self.groups:
+            f.write(GROUP_FILTER_SCRIPT)
         # Where the table scrolls sideways (a phone), it starts at the last
         # quarter: the column the page is about, not the oldest one
         f.write(
@@ -880,11 +958,18 @@ class AggregateReportCreator:
         )
 
     @staticmethod
-    def _write_repo_table(f: Any, summaries: list[dict[str, Any]]) -> None:
+    def _write_repo_table(
+        f: Any, summaries: list[dict[str, Any]], groups: list[tuple[str, str]] | None = None
+    ) -> None:
         f.write("<h2>Repositories</h2>")
+        names = dict(groups or [])
+        if names:
+            f.write(group_filter_html(summaries, groups or []))
         f.write('<div class="table-scroll"><table class="sortable" id="portfolio">')
         f.write(
-            '<tr><th>Repository</th><th>Health</th><th class="num">Commits</th><th class="num">Authors</th>'
+            "<tr><th>Repository</th>"
+            + ('<th class="portfolio-group">Ecosystem</th>' if names else "")
+            + '<th>Health</th><th class="num">Commits</th><th class="num">Authors</th>'
             '<th class="num">Active (12 mo)</th><th class="num">Files</th><th class="num">Lines of Code</th>'
             "<th>Last Commit</th><th>Since</th></tr>"
         )
@@ -900,8 +985,15 @@ class AggregateReportCreator:
             )
             last_commit = html.escape((summary.get("last_commit", "") or "")[:10])
             since = html.escape((summary.get("first_commit", "") or "")[:4])
+            group = str(summary.get("group", "") or "")
+            group_cell = (
+                f'<td class="portfolio-group">{html.escape(names.get(group, ""))}</td>'
+                if names
+                else ""
+            )
             f.write(
-                f'<tr><td><a href="{link}">{name}</a></td>'
+                f"<tr{_group_attr(group) if names else ''}>"
+                f'<td><a href="{link}">{name}</a></td>{group_cell}'
                 f"<td>{era_html}</td>"
                 f'<td class="num">{format_int(summary.get("total_commits", 0))}</td>'
                 f'<td class="num">{format_int(summary.get("total_authors", 0))}</td>'
@@ -912,6 +1004,8 @@ class AggregateReportCreator:
                 f"<td>{since}</td></tr>"
             )
         f.write("</table></div>")
+        if names:
+            f.write(GROUP_FILTER_SCRIPT)
 
     @staticmethod
     def _write_failures(f: Any, failures: list[dict[str, str]]) -> None:

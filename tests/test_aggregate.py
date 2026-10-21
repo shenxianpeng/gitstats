@@ -876,3 +876,64 @@ def test_portfolio_says_the_version_it_is_given(tmp_path):
         assert '<meta name="generator" content="GitStats 2.10.0">' in text
     data = json.loads((tmp_path / "ai.json").read_text(encoding="utf-8"))
     assert data["generated_by"] == "gitstats 2.10.0"
+
+
+# ── groups: a gallery's ecosystems ───────────────────────────────────────
+
+
+class TestGroups:
+    GROUPS = [("python", "Python"), ("cncf", "CNCF graduated"), ("empty", "Nobody")]
+
+    @staticmethod
+    def _render(temp_dir, summaries, groups):
+        AggregateReportCreator().create(summaries, [], temp_dir, groups=groups)
+        pages = {}
+        for name in ("index.html", "ai.html"):
+            path = os.path.join(temp_dir, name)
+            if os.path.exists(path):
+                with open(path, encoding="utf-8") as f:
+                    pages[name] = f.read()
+        return pages
+
+    def _summaries(self):
+        ai = _ai([(0, 10), (1, 10), (2, 10), (5, 10)], {"Claude": 8})
+        return [
+            _summary("django", 300, {}, group="python", ai_assisted=ai),
+            _summary("flask", 100, {}, group="python", ai_assisted=ai),
+            _summary("etcd", 200, {}, group="cncf", ai_assisted=ai),
+        ]
+
+    def test_buttons_for_the_groups_that_have_repositories(self, temp_dir):
+        page = self._render(temp_dir, self._summaries(), self.GROUPS)["index.html"]
+        assert '<div class="group-filter"' in page
+        assert '<button type="button" data-group="" aria-pressed="true">All <span>3</span>' in page
+        assert 'data-group="python" aria-pressed="false">Python <span>2</span>' in page
+        assert 'data-group="cncf" aria-pressed="false">CNCF graduated <span>1</span>' in page
+        # in the order given, and a group without repositories has no button
+        assert page.index('data-group="python"') < page.index('data-group="cncf"')
+        assert "Nobody" not in page
+
+    def test_rows_say_their_group(self, temp_dir):
+        page = self._render(temp_dir, self._summaries(), self.GROUPS)["index.html"]
+        assert '<th class="portfolio-group">Ecosystem</th>' in page
+        assert '<tr data-group="python"><td><a href="django/index.html">django</a></td>' in page
+        assert '<td class="portfolio-group">CNCF graduated</td>' in page
+        assert page.count("#group=") >= 1  # the script that narrows them
+
+    def test_ai_page_narrows_too(self, temp_dir):
+        page = self._render(temp_dir, self._summaries(), self.GROUPS)["ai.html"]
+        assert '<div class="group-filter"' in page
+        assert '<tr data-group="cncf"><td><a href="etcd/authors.html' in page
+
+    def test_no_groups_no_filter(self, temp_dir):
+        pages = self._render(temp_dir, self._summaries(), None)
+        for page in pages.values():
+            assert "group-filter" not in page
+            assert "data-group" not in page
+            assert "Ecosystem" not in page
+
+    def test_group_names_are_escaped(self, temp_dir):
+        summaries = [_summary("a", 1, {}, group="x")]
+        page = self._render(temp_dir, summaries, [("x", "<b>X</b>")])["index.html"]
+        assert "&lt;b&gt;X&lt;/b&gt;" in page
+        assert "<b>X</b>" not in page
