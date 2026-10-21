@@ -110,22 +110,36 @@ def _text(mapping: dict, key: str, where: str) -> str:
     return value.strip()
 
 
-def load_repos(path: str) -> tuple[list[Group], list[Repo]]:
-    """Read and check repos.yml: a .yml or .yaml file under the current
-    directory (the checkout, in the workflow), only read."""
+def _list_file(path: str) -> str:
+    """The file ``path`` names, as found in its directory: a .yml or .yaml
+    file under the current directory (the checkout, in the workflow).
+
+    The file opened is the directory's own entry, never the path as given."""
     base = os.path.realpath(os.getcwd())
-    path = os.path.realpath(path)
+    wanted = os.path.realpath(path)
     try:
-        inside = os.path.commonpath([base, path]) == base
+        inside = os.path.commonpath([base, wanted]) == base
     except ValueError:
         inside = False
-    if not inside or os.path.splitext(path)[1] not in (".yml", ".yaml"):
-        raise RepoListError("not a .yml file under the current directory")
-    if not os.path.isfile(path):
-        raise RepoListError("not a .yml file under the current directory")
+    folder, name = os.path.split(wanted)
+    if inside and os.path.isdir(folder):
+        with os.scandir(folder) as entries:
+            for entry in entries:
+                if (
+                    entry.name == name
+                    and entry.name.endswith((".yml", ".yaml"))
+                    and entry.is_file()
+                ):
+                    return entry.path
+    raise RepoListError("not a .yml file under the current directory")
+
+
+def load_repos(path: str) -> tuple[list[Group], list[Repo]]:
+    """Read and check repos.yml, only read."""
+    list_file = _list_file(path)
     import yaml  # only the gallery needs it, not gitstats
 
-    with open(path, encoding="utf-8") as f:
+    with open(list_file, encoding="utf-8") as f:
         try:
             data = yaml.safe_load(f)
         except yaml.YAMLError as error:
