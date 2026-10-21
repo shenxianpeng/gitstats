@@ -13,7 +13,8 @@ test-report*.json
 htmlcov/
 output/
 docs/build
-gallery
+/gallery/*
+!/gallery/repos.yml
 
 # AI generated files
 memory/

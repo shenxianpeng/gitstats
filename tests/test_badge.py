@@ -6,6 +6,8 @@ import os
 import re
 import xml.etree.ElementTree as ET
 
+import pytest
+
 from gitstats import load_config
 from gitstats.badge import (
     BADGE_FILENAME,
@@ -348,3 +350,59 @@ def test_create_badges_falls_back_on_unknown_config(mock_data_collector, temp_di
         svg = f.read()
     assert ">50 commits</text>" in svg  # fell back to commits
     assert "clip-path" in svg  # fell back to flat
+
+
+# ── ai-assisted ──────────────────────────────────────────────────────────
+
+
+def test_ai_assisted_share_is_of_the_last_twelve_months(mock_data_collector):
+    from gitstats.badge import ai_assisted_share
+
+    mock_data_collector.commits_by_month = {"2024-12": 50, "2025-01": 10, "2025-12": 30}
+    mock_data_collector.ai_assisted_by_month = {"2024-12": 9, "2025-01": 1, "2025-12": 3}
+    # 2025-01 to 2025-12: the twelve months that end with the last commit
+    assert ai_assisted_share(mock_data_collector) == (4, 40)
+
+
+def test_ai_assisted_share_without_counts(mock_data_collector):
+    from gitstats.badge import ai_assisted_share
+
+    assert ai_assisted_share(mock_data_collector) is None  # a Mock, not counts
+    mock_data_collector.ai_assisted_by_month = {}
+    mock_data_collector.commits_by_month = {}
+    assert ai_assisted_share(mock_data_collector) is None
+
+
+@pytest.mark.parametrize(
+    ("assisted", "commits", "message"),
+    [
+        (4, 40, "10.0% · last 12 mo"),
+        (0, 40, "0% · last 12 mo"),
+        (0, 0, "0% · last 12 mo"),
+        (1, 5000, "<0.1% · last 12 mo"),
+    ],
+)
+def test_ai_assisted_message(assisted, commits, message):
+    from gitstats.badge import ai_assisted_message
+
+    assert ai_assisted_message(assisted, commits) == message
+
+
+def test_create_badges_writes_the_ai_assisted_badge(mock_data_collector, temp_dir, monkeypatch):
+    monkeypatch.setitem(load_config(), "badge_label", "my project")
+    mock_data_collector.commits_by_month = {"2025-11": 10, "2025-12": 10}
+    mock_data_collector.ai_assisted_by_month = {"2025-12": 5}
+    create_badges(mock_data_collector, temp_dir)
+
+    badges_dir = os.path.join(temp_dir, BADGES_DIRNAME)
+    with open(os.path.join(badges_dir, "ai-assisted.svg"), encoding="utf-8") as f:
+        svg = f.read()
+    ET.fromstring(svg)
+    assert ">AI-assisted commits</text>" in svg  # its own label, not badge_label
+    assert ">25.0% · last 12 mo</text>" in svg
+    with open(os.path.join(badges_dir, "ai-assisted.json"), encoding="utf-8") as f:
+        endpoint = json.load(f)
+    assert endpoint["label"] == "AI-assisted commits"
+    assert endpoint["message"] == "25.0% · last 12 mo"
+    for style in STYLE_NAMES:
+        assert os.path.exists(os.path.join(badges_dir, style, "ai-assisted.svg"))

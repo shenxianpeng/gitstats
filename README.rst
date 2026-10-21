@@ -85,7 +85,7 @@ Example
    :width: 100%
    :target: https://shenxianpeng.dev/gitstats/index.html
 
-Check out the `GitStats Gallery <https://shenxianpeng.dev/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly — and its `AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ai.html>`_ page: how many of each project's commits name an AI coding assistant, quarter by quarter. Its counts can be downloaded as `JSON <https://shenxianpeng.dev/gitstats/gallery/ai.json>`_ or `CSV <https://shenxianpeng.dev/gitstats/gallery/ai.csv>`_, and each quarter is kept as it was first published.
+Check out the `GitStats Gallery <https://shenxianpeng.dev/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly — and its `AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ai.html>`_ page: how many of each project's commits name an AI coding assistant, quarter by quarter. Its counts can be downloaded as `JSON <https://shenxianpeng.dev/gitstats/gallery/ai.json>`_ or `CSV <https://shenxianpeng.dev/gitstats/gallery/ai.csv>`_, and each quarter is kept as it was first published. The repositories are listed by ecosystem in `gallery/repos.yml <https://github.com/shenxianpeng/gitstats/blob/main/gallery/repos.yml>`_; to suggest one, `open an issue <https://github.com/shenxianpeng/gitstats/issues/new?template=gallery.yml>`_.
 
 .. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/demo.gif
    :alt: gitstats terminal demo
@@ -273,6 +273,10 @@ A few badges pack more into one image:
   gray; active means a commit within 30 days, quiet within a year. It keeps
   its own label and colors, and its age counts from when the report was
   generated, so regenerate the report on a schedule to keep it honest
+- ``badges/ai-assisted.svg`` — ``AI-assisted commits | 3.2% · last 12 mo``:
+  the share of the commits of the 12 months up to the last commit that name
+  an AI coding assistant, a lower bound (see the Authors page). It keeps its
+  own label
 
 **Pick a style by URL too.** Every badge is also written in every style, as
 ``badges/<style>/<name>.svg`` (``badges/terminal/summary.svg``). A README

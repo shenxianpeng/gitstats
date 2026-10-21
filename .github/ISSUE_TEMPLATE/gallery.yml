@@ -1,0 +1,58 @@
+name: Add my project to the Gallery
+description: Suggest an open source repository for the GitStats Gallery, which publishes its report every week.
+title: "gallery: add <owner>/<name>"
+labels: ["gallery"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The [GitStats Gallery](https://shenxianpeng.dev/gitstats/gallery/) makes a gitstats report for each of its repositories every Monday, and compares their [AI-assisted commits](https://shenxianpeng.dev/gitstats/gallery/ai.html). Its list is [gallery/repos.yml](https://github.com/shenxianpeng/gitstats/blob/main/gallery/repos.yml).
+
+        Want the report for your repository now, without waiting? [gitstats-action](https://github.com/shenxianpeng/gitstats-action) publishes it to your own GitHub Pages.
+  - type: input
+    id: repository
+    attributes:
+      label: Repository
+      description: owner/name on GitHub.
+      placeholder: pallets/flask
+    validations:
+      required: true
+  - type: input
+    id: name
+    attributes:
+      label: Display name
+      description: How the Gallery should name it.
+      placeholder: Flask
+    validations:
+      required: true
+  - type: dropdown
+    id: group
+    attributes:
+      label: Ecosystem
+      options:
+        - Python
+        - AI coding assistants
+        - AI and machine learning
+        - CNCF graduated
+        - Apache
+        - Web frontend
+        - Open source from China
+        - Languages and developer tools
+        - Other (say which below)
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it belongs in the Gallery
+      description: What the project is, and who uses it. Stars, downloads or adopters help.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: The repository is public, open source and actively maintained.
+          required: true
+        - label: I maintain this project (optional, but say so if you do; it helps).
