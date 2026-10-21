@@ -3669,3 +3669,13 @@ def test_report_pages_without_share_card(mock_data_collector, temp_dir):
     assert '<meta property="og:title" content="test-project: Authors">' in authors
     assert "og:image" not in authors
     assert os.path.exists(os.path.join(temp_dir, "share-card.html"))
+
+
+def test_badges_page_offers_the_ai_assisted_badge_when_counted(mock_data_collector, temp_dir):
+    content = _badges_page(mock_data_collector, temp_dir)
+    assert 'data-badge="ai-assisted"' not in content  # a Mock does not count them
+
+    mock_data_collector.ai_assisted_by_month = {}
+    content = _badges_page(mock_data_collector, temp_dir)
+    assert 'data-kind="style" data-badge="ai-assisted"' in content
+    assert '<img src="badges/flat/ai-assisted.svg" alt="AI-assisted commits">' in content

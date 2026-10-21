@@ -14,7 +14,7 @@ import time
 from typing import Any
 
 from gitstats import WEEKDAYS, get_i18n_text, load_config
-from gitstats.badge import STYLE_NAMES, create_badges
+from gitstats.badge import AI_ASSISTED_LABEL, STYLE_NAMES, ai_assisted_share, create_badges
 from gitstats.utils import (
     format_bytes,
     format_duration,
@@ -444,6 +444,10 @@ BADGES_PAGE_SECTIONS = (
             ("summary", "Commits, authors and lines in one badge"),
             ("activity", "Commits per month over the last year"),
             ("health", "Active, quiet or dormant, by the age of the last commit"),
+            (
+                "ai-assisted",
+                "Share of the last 12 months' commits that name an AI coding assistant",
+            ),
         ),
     ),
     (
@@ -2220,9 +2224,10 @@ class HTMLReportCreator(ReportCreator):
             f.write(html_header(2, title))
             f.write(f'<p class="section-note">{note}</p><div class="badge-list">')
             for name, desc in badges:
-                f.write(
-                    row("style", name, name, desc, f"badges/{style}/{name}.svg", f"GitStats {name}")
-                )
+                if name == "ai-assisted" and ai_assisted_share(data) is None:
+                    continue  # data collected without counting them
+                alt = AI_ASSISTED_LABEL if name == "ai-assisted" else f"GitStats {name}"
+                f.write(row("style", name, name, desc, f"badges/{style}/{name}.svg", alt))
             f.write("</div>")
 
         f.write(html_header(2, "Other ways to use them"))

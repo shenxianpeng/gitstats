@@ -18,8 +18,9 @@ works through files and configuration instead:
 - ``badge.svg`` — the default badge; its metric, label, color and style are
   chosen with the ``badge_*`` config keys (``-c badge_metric=last-commit``).
 - ``badges/<name>.svg`` — every metric, plus the multi-segment
-  ``summary``, ``activity`` (sparkline) and ``health`` badges,
-  pre-rendered, so switching what the badge says is just switching the URL.
+  ``summary``, ``activity`` (sparkline) and ``health`` badges, and
+  ``ai-assisted`` (the share of the last 12 months' commits that name an
+  AI coding assistant), pre-rendered, so switching what the badge says is just switching the URL.
 - ``badges/<style>/<name>.svg`` — the same badges in every style, so
   switching the style is switching the URL too. A README that links one
   keeps its look when ``badge_style`` changes later.
@@ -465,19 +466,74 @@ def _health(data: Any, now: datetime.datetime) -> _Composite:
     )
 
 
+AI_ASSISTED_LABEL = "AI-assisted commits"
+_AI_MONTHS = 12
+
+
+def ai_assisted_share(data: Any) -> tuple[int, int] | None:
+    """(commits that name an AI coding assistant, all commits) in the 12
+    months that end with the month of the last commit, or in all of the
+    history when it is shorter; None when the data does not count them.
+
+    The same window as the "AI-assisted commits" section of the Authors page.
+    """
+    by_month = getattr(data, "ai_assisted_by_month", None)
+    all_by_month = getattr(data, "commits_by_month", None)
+    if not isinstance(by_month, dict) or not isinstance(all_by_month, dict) or not all_by_month:
+        return None
+    last = max([*all_by_month, *by_month])
+    year, month = int(last[:4]), int(last[5:7])
+    first_index = year * 12 + month - 1 - (_AI_MONTHS - 1)
+    first = f"{first_index // 12:04d}-{first_index % 12 + 1:02d}"
+    assisted = sum(int(count) for key, count in by_month.items() if key >= first)
+    commits = sum(int(count) for key, count in all_by_month.items() if key >= first)
+    return assisted, commits
+
+
+def ai_assisted_message(assisted: int, commits: int) -> str:
+    """The badge's value: "3.2% · last 12 mo"; "<0.1%" for a share too small
+    to show to one decimal, as the report shows it."""
+    if not assisted or not commits:
+        share = "0%"
+    else:
+        percent = 100.0 * assisted / commits
+        share = "<0.1%" if percent < 0.05 else f"{percent:.1f}%"
+    return f"{share} · last 12 mo"
+
+
+def _ai_assisted(data: Any, color: str) -> _Composite | None:
+    """The share of the last 12 months' commits that name an AI coding
+    assistant. Its label says what it counts, not ``badge_label``."""
+    counts = ai_assisted_share(data)
+    if counts is None:
+        return None
+    message = ai_assisted_message(*counts)
+    return _Composite(
+        [Segment(AI_ASSISTED_LABEL), Segment(message, bg=color)],
+        AI_ASSISTED_LABEL,
+        message,
+        color or _VALUE_BG,
+    )
+
+
 def composite_badges(
     data: Any, label: str, color: str, style: str, now: datetime.datetime | None = None
 ) -> dict[str, _Composite]:
-    """Return the multi-segment badges, keyed by name.
+    """Return the multi-segment badges, keyed by name, and ``ai-assisted``
+    when the data counts the commits that name an AI coding assistant.
 
     ``now`` is when the report is generated; the health badge measures the
     age of the last commit from it.
     """
-    return {
+    badges = {
         "summary": _summary(data, label, color, style),
         "activity": _activity(data, label, color, style),
         "health": _health(data, now or datetime.datetime.now()),
     }
+    ai = _ai_assisted(data, color)
+    if ai is not None:
+        badges["ai-assisted"] = ai
+    return badges
 
 
 def _endpoint_json(label: str, message: str, color: str) -> str:
@@ -501,7 +557,8 @@ def create_badges(data: Any, path: str) -> str:
     and every multi-segment badge (``summary``, ``activity``, ``health``),
     and ``badges/<style>/<name>.svg`` for every style. All but the last
     follow ``badge_style``, and all but ``health`` (whose label and
-    color say the status) follow ``badge_label`` and ``badge_color``.
+    color say the status) follow ``badge_color``; all but ``health`` and
+    ``ai-assisted`` (whose label says what it counts) follow ``badge_label``.
     Regenerating the report keeps every badge up to date automatically.
     """
     conf = load_config()
