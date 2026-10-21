@@ -11,6 +11,7 @@ Usage:
 """
 
 import json
+import os
 import re
 import sys
 from dataclasses import dataclass
@@ -100,7 +101,10 @@ def _text(mapping: dict, key: str, where: str) -> str:
 
 
 def load_repos(path: str) -> tuple[list[Group], list[Repo]]:
-    """Read and check repos.yml."""
+    """Read and check repos.yml: a .yml or .yaml file, only read."""
+    path = os.path.realpath(path)
+    if os.path.splitext(path)[1] not in (".yml", ".yaml") or not os.path.isfile(path):
+        raise RepoListError("not a .yml file")
     import yaml  # only the gallery needs it, not gitstats
 
     with open(path, encoding="utf-8") as f:

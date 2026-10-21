@@ -18,6 +18,12 @@ _SCRIPT_PATH = os.path.join(
 )
 
 
+# PyYAML reads the list; it has no wheel yet for every Python the tests run on
+needs_yaml = pytest.mark.skipif(
+    importlib.util.find_spec("yaml") is None, reason="PyYAML is not installed"
+)
+
+
 @pytest.fixture
 def gallery_script():
     spec = importlib.util.spec_from_file_location("generate_gallery_portfolio", _SCRIPT_PATH)
@@ -259,6 +265,7 @@ def _read(*parts):
         return f.read()
 
 
+@needs_yaml
 def test_repos_group_the_reports(gallery_script, temp_dir, capsys):
     gallery, repos = _gallery(temp_dir)
     _write_report(gallery, "django", name="Django", total_commits=300)
@@ -281,12 +288,14 @@ def test_repos_group_the_reports(gallery_script, temp_dir, capsys):
     assert "(1 without a report)" in captured.out
 
 
+@needs_yaml
 def test_repos_with_no_report_at_all(gallery_script, temp_dir, capsys):
     gallery, repos = _gallery(temp_dir)
     assert gallery_script.main([gallery, "--repos", repos]) == 1
     assert "No summary.json found" in capsys.readouterr().err
 
 
+@needs_yaml
 def test_repos_that_cannot_be_read(gallery_script, temp_dir, capsys):
     gallery, _ = _gallery(temp_dir)
     bad = os.path.join(temp_dir, "bad.yml")
@@ -315,6 +324,7 @@ def test_load_gallery_summaries_of_some_ids_in_their_order(temp_dir, gallery_scr
 # ── the note under each report ───────────────────────────────────────────
 
 
+@needs_yaml
 def test_every_report_page_says_how_to_make_it(gallery_script, temp_dir):
     gallery, repos = _gallery(temp_dir)
     _write_report(gallery, "django", badge=True, name="Django", total_commits=300)
@@ -357,6 +367,7 @@ def test_every_report_page_says_how_to_make_it(gallery_script, temp_dir):
     assert "issues/new?template=gallery.yml" in index
 
 
+@needs_yaml
 def test_the_note_is_added_once(gallery_script, temp_dir):
     gallery, repos = _gallery(temp_dir)
     _write_report(gallery, "django", badge=True, name="Django", total_commits=300)
@@ -388,7 +399,19 @@ def test_add_note(gallery_script, temp_dir, text, added, expected):
     with open(page, "w", encoding="utf-8") as f:
         f.write(text)
     note = gallery_script.NOTE_MARK + "NOTE"
-    assert gallery_script.add_note(page, note) is added
+    assert gallery_script.add_note(temp_dir, page, note) is added
     assert expected.replace("NOTE", note) in _read(page)
-    assert gallery_script.add_note(page, note) is False  # once at most
-    assert gallery_script.add_note(os.path.join(temp_dir, "missing.html"), note) is False
+    assert gallery_script.add_note(temp_dir, page, note) is False  # once at most
+    missing = os.path.join(temp_dir, "missing.html")
+    assert gallery_script.add_note(temp_dir, missing, note) is False
+
+
+def test_add_note_stays_in_its_directory(gallery_script, temp_dir):
+    inside = os.path.join(temp_dir, "inside")
+    os.makedirs(inside)
+    outside = os.path.join(temp_dir, "outside.html")
+    with open(outside, "w", encoding="utf-8") as f:
+        f.write("<p>a</p></body>")
+    assert gallery_script.add_note(inside, outside, "NOTE") is False
+    assert gallery_script.add_note(inside, os.path.join(inside, "..", "outside.html"), "N") is False
+    assert _read(outside) == "<p>a</p></body>"

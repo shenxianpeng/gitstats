@@ -196,9 +196,20 @@ def _cta_html(gallery_link: str) -> str:
     )
 
 
-def add_note(page: str, note: str) -> bool:
+def add_note(base: str, page: str, note: str) -> bool:
     """Put ``note`` before the footer of the HTML file ``page`` (or before
-    ``</body>``), unless it has it already. Whether it was added."""
+    ``</body>``), unless it has it already. Whether it was added.
+
+    ``page`` must resolve to an .html file under the directory ``base``:
+    nothing else is read or written."""
+    base = os.path.realpath(base)
+    page = os.path.realpath(page)
+    try:
+        inside = os.path.commonpath([base, page]) == base
+    except ValueError:
+        inside = False
+    if not inside or page == base or not page.endswith(".html"):
+        return False
     try:
         with open(page, encoding="utf-8") as f:
             text = f.read()
@@ -236,11 +247,11 @@ def add_report_notes(gallery_root: str, summaries: list[dict], site_url: str) ->
             note = report_note(
                 report_id, str(summary.get("name", "")), site_url, badge and entry == "index.html"
             )
-            added += add_note(page, note)
+            added += add_note(base, page, note)
     for entry in ("index.html", "ai.html"):
         page = os.path.join(base, entry)
         if os.path.isfile(page):
-            added += add_note(page, gallery_note())
+            added += add_note(base, page, gallery_note())
     return added
 
 

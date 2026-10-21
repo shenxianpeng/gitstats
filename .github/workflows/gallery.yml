@@ -29,7 +29,7 @@ jobs:
       - name: Read gallery/repos.yml
         id: repos
         run: |
-          python -m pip install --quiet pyyaml
+          python -m pip install --quiet --only-binary=:all: "pyyaml==6.0.3"
           echo "matrix=$(python scripts/gallery_repos.py matrix gallery/repos.yml)" >> "$GITHUB_OUTPUT"
 
   generate:
@@ -131,7 +131,9 @@ jobs:
           python-version: "3.10"
 
       - name: Install PyYAML
-        run: python -m pip install --quiet pyyaml
+        # a wheel only, at the version the tests use: no setup script runs
+        run: |
+          python -m pip install --quiet --only-binary=:all: "pyyaml==6.0.3"
 
       - name: Fetch the Published Gallery
         # Each quarter's snapshot of ai.json is written once, by the first build

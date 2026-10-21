@@ -16,6 +16,12 @@ _SCRIPT_PATH = os.path.join(_ROOT, "scripts", "gallery_repos.py")
 _REPOS_YML = os.path.join(_ROOT, "gallery", "repos.yml")
 
 
+# PyYAML reads the list; it has no wheel yet for every Python the tests run on
+needs_yaml = pytest.mark.skipif(
+    importlib.util.find_spec("yaml") is None, reason="PyYAML is not installed"
+)
+
+
 @pytest.fixture
 def repos_script():
     spec = importlib.util.spec_from_file_location("gallery_repos_under_test", _SCRIPT_PATH)
@@ -88,6 +94,7 @@ def test_parse_repos_at_most_a_matrix(repos_script):
         repos_script.parse_repos(_list(*repos))
 
 
+@needs_yaml
 def test_the_gallery_list(repos_script):
     groups, repos = repos_script.load_repos(_REPOS_YML)
     assert 90 <= len(repos) <= repos_script.MAX_REPOS
@@ -110,6 +117,7 @@ def test_the_gallery_list(repos_script):
         assert f"        - {group.name}\n" in text
 
 
+@needs_yaml
 def test_load_repos_rejects_what_is_not_yaml(repos_script, tmp_path):
     path = tmp_path / "repos.yml"
     path.write_text("groups: [unclosed\n", encoding="utf-8")
@@ -117,6 +125,7 @@ def test_load_repos_rejects_what_is_not_yaml(repos_script, tmp_path):
         repos_script.load_repos(str(path))
 
 
+@needs_yaml
 def test_main_prints_the_matrix(repos_script, capsys):
     assert repos_script.main(["matrix", _REPOS_YML]) == 0
     matrix = json.loads(capsys.readouterr().out)
@@ -129,6 +138,7 @@ def test_main_prints_the_matrix(repos_script, capsys):
     }
 
 
+@needs_yaml
 def test_main_prints_the_ids(repos_script, capsys):
     assert repos_script.main(["ids", _REPOS_YML]) == 0
     assert capsys.readouterr().out.splitlines()[:2] == ["cpython", "django"]
@@ -141,3 +151,11 @@ def test_main_usage_and_errors(repos_script, tmp_path, capsys):
     missing = str(tmp_path / "missing.yml")
     assert repos_script.main(["ids", missing]) == 1
     assert missing in capsys.readouterr().err
+
+
+def test_load_repos_reads_only_a_yml_file(repos_script, tmp_path):
+    other = tmp_path / "repos.txt"
+    other.write_text("groups: []\n", encoding="utf-8")
+    for path in (other, tmp_path / "missing.yml", tmp_path):
+        with pytest.raises(repos_script.RepoListError, match="not a .yml file"):
+            repos_script.load_repos(str(path))
