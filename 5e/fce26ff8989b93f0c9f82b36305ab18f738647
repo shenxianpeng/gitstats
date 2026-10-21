@@ -1,0 +1,33 @@
+.github/workflows/gallery.yml
+  s_c235a1d6c969c6::t_0324fc6c7174e5 134-136
+  s_c235a1d6c969c6::t_c69a4ac5657ddf 32
+tests/test_gallery_repos.py
+  s_c235a1d6c969c6::t_aab0334b49cce5 19-24,97,120,128,141,154-161
+tests/test_generate_gallery_portfolio.py
+  s_c235a1d6c969c6::t_49e6ae32fbd617 402,404-417
+  s_c235a1d6c969c6::t_aab0334b49cce5 21-26,268,291,298,327,370
+pyproject.toml
+  s_c235a1d6c969c6::t_aab0334b49cce5 49-50
+scripts/generate_gallery_portfolio.py
+  s_c235a1d6c969c6::t_49e6ae32fbd617 199,201-212,250,254
+scripts/gallery_repos.py
+  s_c235a1d6c969c6::t_49e6ae32fbd617 14,104-107
+uv.lock
+  s_c235a1d6c969c6::t_86ba2a18405afa 480,490
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5efce26ff8989b93f0c9f82b36305ab18f738647",
+  "prompts": {},
+  "sessions": {
+    "s_c235a1d6c969c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9b05f12-9513-4cfd-b161-6ad249c4a0e1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
