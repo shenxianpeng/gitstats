@@ -72,7 +72,9 @@ CO_AUTHOR = r"^co-authored-by *:"
 # used for people and for scripts, so the value has to name an assistant.
 DISCLOSURE = r"^(?:assisted|generated)-by *:"
 NAMED: tuple[tuple[str, str], ...] = (
-    ("Claude", r"claude|anthropic"),
+    # or one of its models by name and version, as in "Assisted-by: Opus 5.5":
+    # without the version, Opus is an audio codec too
+    ("Claude", r"claude|anthropic|\b(?:opus|sonnet|haiku|fable)[- ]?\d"),
     ("GitHub Copilot", r"copilot"),
     ("Cursor", r"\bcursor\b"),
     ("Codex", r"\bcodex\b"),
@@ -81,17 +83,28 @@ NAMED: tuple[tuple[str, str], ...] = (
     ("Jules", r"google[- ]labs[- ]jules"),
     ("Devin", r"\bdevin ai\b|devin\.ai"),
     ("Aider", r"\baider\b"),
-    ("Amp", r"ampcode|\bamp code\b"),
+    # "Amp" alone, but not as a word in a longer value
+    ("Amp", r"ampcode|\bamp code\b|^amp$"),
     ("OpenHands", r"openhands"),
     ("OpenCode", r"\bopencode\b"),
     ("Windsurf", r"windsurf|codeium"),
     ("Kiro", r"\bkiro\b"),
     ("Cline", r"\bcline\b"),
     ("Amazon Q", r"amazon q\b|codewhisperer"),
+    ("Grok", r"\bgrok\b"),
+    # not Bob alone, who is a person
+    ("IBM Bob", r"\bibm bob\b"),
+    # the pi coding agent: "pi" only as the whole value, never as a word in it
+    ("Pi", r"\bpi[- ]coding[- ]agent\b|^pi$"),
 )
-# An assistant the trailer admits to without naming it: "Assisted-by: AI"
+# An assistant the trailer admits to without naming it: "Assisted-by: AI", or
+# "Assisted-by: a closed-source coding agent", as Node.js suggests to those who
+# would rather not name a brand
 UNNAMED = "Unnamed assistant"
-_UNNAMED = re.compile(r"\b(?:ai|llm|genai)\b", re.I)
+_UNNAMED = re.compile(
+    r"\b(?:ai|llm|genai)\b|\bcoding (?:agent|assistant)\b|\b(?:reasoning|language) model\b",
+    re.I,
+)
 
 _IDENTITIES = [(name, re.compile(pattern, re.I)) for name, pattern in IDENTITIES]
 _SIGNATURES = [(name, re.compile(pattern, re.I | re.M)) for name, pattern in SIGNATURES]
