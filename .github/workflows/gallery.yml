@@ -6,6 +6,9 @@ on:
     - cron: "0 0 * * 1"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 # one gallery build at a time: the last one to deploy wins otherwise
 concurrency:
   group: gallery
