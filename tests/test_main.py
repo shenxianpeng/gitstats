@@ -8,6 +8,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -1489,6 +1490,10 @@ def test_main_default_outputpath(git_repo_minimal, temp_dir):
     assert os.path.isdir("gitstats-report")
 
 
+@pytest.mark.skipif(
+    sys.version_info < (3, 12),
+    reason="argparse before 3.12 rejects a positional that follows an option",
+)
 def test_main_outputpath_after_an_option(git_repo_minimal, temp_dir):
     """`gitstats repo -f json out`: argparse itself hands the last path to
     outputpath, so main() has nothing to move out of gitpath."""
@@ -1506,6 +1511,30 @@ def test_main_outputpath_after_an_option(git_repo_minimal, temp_dir):
     assert ret == 0
     assert os.path.isfile(os.path.join(output, "index.html"))
     assert os.path.isfile(f"{output}.json")  # the JSON goes next to the report
+
+
+def test_main_keeps_an_outputpath_argparse_filled(git_repo_minimal, temp_dir, monkeypatch):
+    """Same contract on every Python: when the parser already filled outputpath,
+    main() leaves gitpath alone instead of moving its last entry."""
+    import gitstats
+    import gitstats.main
+
+    cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
+    gitstats._config = cfg
+    gitstats.main.conf = cfg
+
+    output = os.path.join(temp_dir, "report")
+    args = gitstats.main.get_parser().parse_args([git_repo_minimal, "-f", "json"])
+    args.outputpath = output
+    monkeypatch.setattr(
+        gitstats.main, "get_parser", lambda: SimpleNamespace(parse_args=lambda: args)
+    )
+
+    ret = main()
+    assert ret == 0
+    assert args.gitpath == [git_repo_minimal]
+    assert os.path.isfile(os.path.join(output, "index.html"))
+    assert os.path.isfile(f"{output}.json")
 
 
 def test_main_with_config_override(git_repo_minimal, temp_dir):
