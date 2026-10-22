@@ -1,0 +1,41 @@
+.github/workflows/test.yml
+  s_808bcb54b94641::t_d1576d3537dffc 55-59
+gitstats/main.py
+  s_808bcb54b94641::t_164f55d57d18d0 1125,1157
+gitstats/utils.py
+  s_808bcb54b94641::t_6bcd2f4110626b 77
+pyproject.toml
+  s_808bcb54b94641::t_3e1ca55e7d5ead 50,75-76,82
+tests/test_ai_providers.py
+  s_808bcb54b94641::t_85abb890d74920 121-131
+tests/test_badge.py
+  s_808bcb54b94641::t_ca348714a52b13 13,274-287
+tests/test_gallery_repos.py
+  s_808bcb54b94641::t_c979514ea67152 170-187
+tests/test_generate_gallery_portfolio.py
+  s_808bcb54b94641::t_7bbb88796b46d0 420-449
+tests/test_main.py
+  s_808bcb54b94641::t_025a2407af6664 1492-1510
+tests/test_report_creator.py
+  s_808bcb54b94641::t_d64f3cd167de54 1074-1093
+tests/test_wrapped.py
+  s_808bcb54b94641::t_ef999f54713f58 34-49,386-406
+uv.lock
+  s_808bcb54b94641::t_3707b0af7ecb6a 319-587,749,760,1595-1609
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5a4744ed165fe52b9e1a4253fdf5aeff148e4ca5",
+  "prompts": {},
+  "sessions": {
+    "s_808bcb54b94641": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8f452822-7f74-42c5-8597-23c2eec5567e",
+        "model": "claude-fable-5-1"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
