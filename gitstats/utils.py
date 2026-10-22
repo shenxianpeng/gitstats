@@ -74,7 +74,7 @@ def format_duration(delta: datetime.timedelta) -> str:
 
 def format_bytes(size: float) -> str:
     """Render a byte count in binary units (161307.78 -> "157.5 KB")."""
-    for unit in ("bytes", "KB", "MB", "GB"):
+    for unit in ("bytes", "KB", "MB", "GB"):  # pragma: no branch - breaks at GB at the latest
         if abs(size) < 1024 or unit == "GB":
             break
         size /= 1024

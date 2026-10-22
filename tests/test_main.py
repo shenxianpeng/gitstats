@@ -1489,6 +1489,25 @@ def test_main_default_outputpath(git_repo_minimal, temp_dir):
     assert os.path.isdir("gitstats-report")
 
 
+def test_main_outputpath_after_an_option(git_repo_minimal, temp_dir):
+    """`gitstats repo -f json out`: argparse itself hands the last path to
+    outputpath, so main() has nothing to move out of gitpath."""
+    import gitstats
+    import gitstats.main
+
+    cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
+    gitstats._config = cfg
+    gitstats.main.conf = cfg
+
+    output = os.path.join(temp_dir, "report")
+
+    with patch.object(sys, "argv", ["gitstats", git_repo_minimal, "-f", "json", output]):
+        ret = main()
+    assert ret == 0
+    assert os.path.isfile(os.path.join(output, "index.html"))
+    assert os.path.isfile(f"{output}.json")  # the JSON goes next to the report
+
+
 def test_main_with_config_override(git_repo_minimal, temp_dir):
     """Test main() with -c overrides."""
     import gitstats
