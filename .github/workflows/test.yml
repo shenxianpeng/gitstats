@@ -13,6 +13,9 @@ on:
       - "main"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   unit-tests:
     runs-on: ${{ matrix.os }}

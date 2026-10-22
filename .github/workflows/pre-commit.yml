@@ -3,6 +3,9 @@ name: Run pre-commit
 on:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   pre-commit:
     uses: shenxianpeng/.github/.github/workflows/pre-commit.yml@main
