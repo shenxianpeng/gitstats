@@ -15,6 +15,8 @@ from typing import Any
 
 from gitstats import WEEKDAYS, get_i18n_text, load_config
 from gitstats.badge import AI_ASSISTED_LABEL, STYLE_NAMES, ai_assisted_share, create_badges
+from gitstats.employers import KIND_LABELS, KINDS, ORGANIZATION
+from gitstats.employers import summarize as summarize_organizations
 from gitstats.utils import (
     format_bytes,
     format_duration,
@@ -1633,6 +1635,75 @@ class HTMLReportCreator(ReportCreator):
         parts.append(AI_ASSISTED_COUNTED)
         return "".join(parts)
 
+    def _organizations_html(self, data: Any) -> str:
+        """The "Commits by organization" section of the Authors page: the
+        organizations whose addresses the commits come from, and by quarter
+        how many come from organizations, personal mail, hidden addresses
+        and bots. Nothing when no commit comes from an organization."""
+        overview = summarize_organizations(data, limit=load_config()["max_domains"])
+        if not overview or not overview["by_kind"][ORGANIZATION]:
+            return ""
+        total = overview["commits"]
+        from_orgs = overview["by_kind"][ORGANIZATION]
+        count = overview["organization_count"]
+        parts = [html_header(2, "Commits by organization")]
+        parts.append(
+            f'<p class="section-note">{format_int(from_orgs)} of {format_int(total)} commits '
+            f"({share_text(from_orgs, total)}) come from an address at "
+            f"{format_int(count)} organization{'' if count == 1 else 's'}, counted by the "
+            "domain of the address and committed from by two people or more. Domains of "
+            "one person (most often that person's own), personal mail providers, hidden "
+            "noreply addresses and bots are counted apart, below.</p>"
+        )
+        parts.append(
+            '<p class="section-note">The domain says where an address is, not who paid for '
+            "the work: people commit from personal addresses on paid time, and from work "
+            "addresses on their own.</p>"
+        )
+        rows = []
+        most = overview["organizations"][0]["commits"]
+        for row in overview["organizations"]:
+            first, last_day = (
+                datetime.datetime.fromtimestamp(row[key]).strftime("%Y-%m-%d")
+                for key in ("first_commit_stamp", "last_commit_stamp")
+            )
+            rows.append(
+                f"<tr><td>{html.escape(row['organization'])}</td>"
+                f'<td class="num">{format_int(row["commits"])}</td>'
+                f'<td class="num">{share_text(row["commits"], total)}</td>'
+                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
+                f'<span style="width: {100.0 * row["commits"] / most:.1f}%"></span></span></td>'
+                f'<td class="num">{format_int(row["commits_last_12mo"])}</td>'
+                f'<td class="num">{format_int(row["authors"])}</td>'
+                f'<td class="nowrap">{first}</td><td class="nowrap">{last_day}</td></tr>'
+            )
+        parts.append(
+            '<div class="table-scroll"><table class="share-table">'
+            '<tr><th>Organization</th><th class="num">Commits</th><th class="num">Share</th>'
+            '<th></th><th class="num">Last 12 months</th><th class="num">Addresses</th>'
+            "<th>First commit</th><th>Last commit</th></tr>" + "".join(rows) + "</table></div>"
+        )
+
+        header = "".join(f'<th class="num">{KIND_LABELS[kind]}</th>' for kind in KINDS)
+        quarter_rows = []
+        for quarter in reversed(overview["quarters"]):
+            cells = "".join(
+                f'<td class="num">{share_text(quarter["by_kind"][kind], quarter["commits"])}</td>'
+                for kind in KINDS
+            )
+            quarter_rows.append(
+                f'<tr><td class="nowrap">{quarter["quarter"]}</td>'
+                f'<td class="num">{format_int(quarter["commits"])}</td>{cells}</tr>'
+            )
+        parts.append(html_header(3, "Where the commits come from, by quarter"))
+        parts.append(
+            '<div class="table-scroll"><table class="share-table">'
+            f'<tr><th>Quarter</th><th class="num">Commits</th>{header}</tr>'
+            + "".join(quarter_rows)
+            + "</table></div>"
+        )
+        return "".join(parts)
+
     def create_authors_html(self, data: Any, path: str) -> None:
         ###
         # Authors
@@ -1786,6 +1857,8 @@ class HTMLReportCreator(ReportCreator):
                 annotations=time_gap_annotations(data),
             )
         )
+
+        f.write(self._organizations_html(data))
 
         # Domains: a bar table (the numbers used to be shown twice, as a table and a chart).
         # The former "Commits by Domains" anchor still lands here.

@@ -3195,6 +3195,7 @@ def test_authors_sections_order(mock_data_collector, temp_dir):
         "Contributor growth",
         "Top author per year and month",
         "Cumulative lines added per author",
+        "Commits by organization",
         "Commits by domain",
     ]
     # the old anchors still sit right before the sections that replaced them
@@ -3699,3 +3700,65 @@ def test_badges_page_offers_the_ai_assisted_badge_when_counted(mock_data_collect
     content = _badges_page(mock_data_collector, temp_dir)
     assert 'data-kind="style" data-badge="ai-assisted"' in content
     assert '<img src="badges/flat/ai-assisted.svg" alt="AI-assisted commits">' in content
+
+
+# ── commits by organization ──────────────────────────────────────────────
+
+
+def test_organizations_section(mock_data_collector):
+    section = HTMLReportCreator()._organizations_html(mock_data_collector)
+    assert '<h2 id="commits_by_organization">' in section
+    # 13 of the 20 commits, at two organizations
+    assert "13 of 20 commits (65.0%) come from an address at 2 organizations" in section
+    assert "not who paid for the work" in section
+    rows = re.findall(r"<tr><td>(.*?)</td>", section)
+    assert rows[:2] == ["example.com", "test.org"]
+    # example.com: 9 commits, 45% of all, every one in the last 12 months, two addresses
+    assert '<td>example.com</td><td class="num">9</td><td class="num">45.0%</td>' in section
+    assert '<td class="num">9</td><td class="num">2</td>' in section
+    # by quarter, the latest first, with the share of each kind of address
+    assert "Where the commits come from, by quarter" in section
+    q2 = section.index('<td class="nowrap">2023-Q2</td>')
+    q1 = section.index('<td class="nowrap">2023-Q1</td>')
+    assert q2 < q1
+    assert (
+        '<td class="nowrap">2023-Q1</td><td class="num">5</td>'
+        '<td class="num">80.0%</td><td class="num">0%</td><td class="num">20.0%</td>' in section
+    )
+    labels = (
+        "Organizations",
+        "One-person domains",
+        "Personal email",
+        "Hidden (noreply)",
+        "Unknown",
+        "Bots",
+    )
+    for label in labels:
+        assert f'<th class="num">{label}</th>' in section
+
+
+def test_organizations_section_names_one_organization(mock_data_collector):
+    del mock_data_collector.organizations["test.org"]
+    section = HTMLReportCreator()._organizations_html(mock_data_collector)
+    assert "come from an address at 1 organization," in section
+
+
+def test_organizations_section_escapes_the_domain(mock_data_collector):
+    mock_data_collector.organizations["<b>.org"] = mock_data_collector.organizations.pop("test.org")
+    section = HTMLReportCreator()._organizations_html(mock_data_collector)
+    assert "&lt;b&gt;.org" in section
+    assert "<b>.org" not in section
+
+
+def test_organizations_section_is_left_out_with_one_person_domains_only(mock_data_collector):
+    mock_data_collector.organization_authors = {"example.com": 1, "test.org": 1}
+    assert HTMLReportCreator()._organizations_html(mock_data_collector) == ""
+
+
+def test_organizations_section_is_left_out_without_any(mock_data_collector):
+    creator = HTMLReportCreator()
+    mock_data_collector.affiliation_by_month = {"2023-01": {"personal": 3}}
+    assert creator._organizations_html(mock_data_collector) == ""
+    # data collected before addresses were sorted
+    mock_data_collector.affiliation_by_month = None
+    assert creator._organizations_html(mock_data_collector) == ""

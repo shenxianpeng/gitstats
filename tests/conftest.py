@@ -336,6 +336,28 @@ def mock_data_collector():
     data.get_domains.return_value = list(data.domains.keys())
     data.get_domain_info.side_effect = lambda d: data.domains.get(d, {"commits": 0})
 
+    # Organizations, by the domain of the author's address
+    data.affiliation_by_month = {
+        "2023-01": {"organization": 4, "personal": 1},
+        "2023-04": {"organization": 6, "hidden": 2, "bot": 1},
+        "2023-06": {"organization": 3, "personal": 2, "unknown": 1},
+    }
+    data.organizations = {
+        "example.com": {
+            "commits": 9,
+            "first_commit_stamp": 1672531200,
+            "last_commit_stamp": 1686000000,
+            "by_month": {"2023-01": 4, "2023-04": 3, "2023-06": 2},
+        },
+        "test.org": {
+            "commits": 4,
+            "first_commit_stamp": 1680307200,
+            "last_commit_stamp": 1686000000,
+            "by_month": {"2023-04": 3, "2023-06": 1},
+        },
+    }
+    data.organization_authors = {"example.com": 2}
+
     # File stats
     data.files_by_stamp = {}
     data.extensions = {

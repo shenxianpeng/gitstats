@@ -17,6 +17,7 @@ from gitstats.aggregate import (
     compute_repo_summary,
     last_quarters,
     load_repo_summaries,
+    organizations_summary,
     quarter_id,
     snapshot_label,
     write_repo_summary,
@@ -937,3 +938,65 @@ class TestGroups:
         page = self._render(temp_dir, summaries, [("x", "<b>X</b>")])["index.html"]
         assert "&lt;b&gt;X&lt;/b&gt;" in page
         assert "<b>X</b>" not in page
+
+
+# ── organizations_summary ────────────────────────────────────────────────
+
+
+def _organization_data():
+    return SimpleNamespace(
+        affiliation_by_month={
+            "2025-12": {"organization": 2, "personal": 1},
+            "2026-01": {"organization": 1, "hidden": 1, "bot": 1},
+        },
+        organizations={
+            "google.com": {
+                "commits": 3,
+                "first_commit_stamp": int(datetime.datetime(2025, 12, 2, 12).timestamp()),
+                "last_commit_stamp": int(datetime.datetime(2026, 1, 5, 12).timestamp()),
+                "by_month": {"2025-12": 2, "2026-01": 1},
+            }
+        },
+        organization_authors={"google.com": 2},
+    )
+
+
+def test_organizations_summary():
+    summary = organizations_summary(_organization_data())
+    assert "not who paid for the work" in summary["description"]
+    assert summary["commits"] == 6
+    assert summary["by_kind"] == {
+        "organization": 3,
+        "one_person": 0,
+        "personal": 1,
+        "hidden": 1,
+        "unknown": 0,
+        "bot": 1,
+    }
+    assert summary["organization_count"] == 1
+    assert summary["last_12mo_from"] == "2025-02"
+    assert summary["top"] == [
+        {
+            "organization": "google.com",
+            "commits": 3,
+            "commits_last_12mo": 3,
+            "addresses": 2,
+            "first_commit": "2025-12-02",
+            "last_commit": "2026-01-05",
+        }
+    ]
+    assert list(summary["quarters"]) == ["2025-Q4", "2026-Q1"]
+    assert summary["quarters"]["2026-Q1"]["bot"] == 1
+    # domains only: no address is written
+    assert "@" not in json.dumps(summary)
+
+
+def test_organizations_summary_without_the_data():
+    assert organizations_summary(SimpleNamespace()) is None
+
+
+def test_compute_repo_summary_keeps_organizations():
+    data = _organization_data()
+    summary = compute_repo_summary(data, "index.html")
+    assert summary["organizations"]["top"][0]["organization"] == "google.com"
+    assert compute_repo_summary(SimpleNamespace(), "index.html")["organizations"] is None

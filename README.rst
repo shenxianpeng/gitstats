@@ -366,7 +366,7 @@ Here is a list of some features of ``gitstats``:
 
 * **General**: headline numbers (commits, authors, lines, files, active days, longest streak), commits per year, top contributors, latest releases.
 * **Activity**: commits by year, month and week; a punch card of day of week by hour of day; month of year; timezones.
-* **Authors**: every author's commits, lines and active span; a contributor timeline; cumulative lines added per author; the top author per year and month; commits by email domain; contributor growth; and the commits that name an AI coding assistant, by month and by assistant.
+* **Authors**: every author's commits, lines and active span; a contributor timeline; cumulative lines added per author; the top author per year and month; commits by organization, from the domain of each author's address, and by quarter how many come from organizations, personal mail, hidden addresses and bots; commits by email domain; contributor growth; and the commits that name an AI coding assistant, by month and by assistant.
 * **Files**: file count over time, extensions ranked by lines, and the most-changed files.
 * **Lines**: lines of code over time, and lines added and removed per month.
 * **Tags**: every tag with its commits and authors.
