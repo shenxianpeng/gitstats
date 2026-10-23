@@ -104,7 +104,8 @@ def test_rank_rows_by_the_last_quarter():
     assert high["last_commit"] == "2026-10-20"
     none = rows[3]
     assert none["name"] == "None"  # from the list, when the summary has none
-    assert none["quarter"] is None and none["assistants"] == []
+    assert none["quarter"] is None
+    assert none["assistants"] == []
 
 
 def test_group_summary():
@@ -133,7 +134,8 @@ def test_group_summary_when_none_names_one_or_none_has_commits():
     assert eco.group_summary(zero)["median_share"] == 0.0
     quiet = eco.rank_rows([_repo("a")], {"a": _summary("a", "A", _ai((0, 0)))}, NOW)
     summary = eco.group_summary(quiet)
-    assert summary["median_share"] is None and summary["with_commits"] == 0
+    assert summary["median_share"] is None
+    assert summary["with_commits"] == 0
 
 
 def test_summary_sentence():
@@ -233,7 +235,8 @@ def test_write_ecosystems(tmp_path):
     assert 'href="empty.html"' not in page  # no page, so no link
 
     china = _read(folder / "china.html")
-    assert "Apache &lt;Dubbo&gt;" in china and "<Dubbo>" not in china
+    assert "Apache &lt;Dubbo&gt;" in china
+    assert "<Dubbo>" not in china
     assert "none names one" in china
 
     data = json.loads(_read(folder / "python.json"))
@@ -263,7 +266,8 @@ def test_write_ecosystems(tmp_path):
     assert "index-card.png" in index_page
 
     card = _read(folder / "python-card.html")
-    assert "<b>pandas</b>" in card and "<b>Flask</b>" not in card  # bars are shares above 0
+    assert "<b>pandas</b>" in card
+    assert "<b>Flask</b>" not in card  # bars are shares above 0
     assert "<b>Python</b>" in _read(folder / "index-card.html")
 
     tree = ET.fromstring(_read(tmp_path / "sitemap.xml"))
@@ -287,7 +291,8 @@ def test_write_ecosystems_without_an_address(tmp_path):
     assert eco.write_ecosystems(str(tmp_path), groups, repos, summaries) == [PYTHON, CHINA]
     assert not (tmp_path / "sitemap.xml").exists()  # a sitemap needs addresses
     page = _read(tmp_path / "ecosystems" / "python.html")
-    assert "og:image" not in page and 'rel="canonical"' not in page
+    assert "og:image" not in page
+    assert 'rel="canonical"' not in page
     assert "og:image" not in _read(tmp_path / "ecosystems" / "index.html")
 
 

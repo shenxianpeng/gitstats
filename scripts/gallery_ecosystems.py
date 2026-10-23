@@ -42,6 +42,7 @@ from gitstats.report_creator import (
 from gitstats.utils import format_int
 
 FOLDER = "ecosystems"
+INDEX = "index.html"
 SCHEMA_VERSION = 1
 ASSISTANT = "an AI coding assistant"
 
@@ -242,7 +243,7 @@ def _nav(current: str) -> str:
         '<div class="nav"><a href="../index.html" class="nav-brand">GitStats</a><ul>'
         + nav_link("../index.html", "GitStats Gallery")
         + nav_link("../ai.html", "AI-assisted commits")
-        + nav_link("index.html", "Ecosystems", current="index.html" if current == "index" else "")
+        + nav_link(INDEX, "Ecosystems", current=INDEX if current == "index" else "")
         + f'</ul><div class="nav-right">{THEME_TOGGLE_BUTTON}</div></div>'
     )
 
@@ -327,29 +328,29 @@ def group_page(
             "projects with commits that quarter",
         ),
     ]
-    parts.append(stat_tiles_html(tiles))
-    parts.append(
-        '<div class="table-scroll"><table class="sortable" id="ecosystem">'
-        f'<tr><th class="num">#</th><th>Repository</th><th class="num">{html.escape(label)}</th>'
-        f'<th class="num">{html.escape(previous_label)}</th><th class="num">Commits (12 mo)</th>'
-        '<th class="num">Active authors (12 mo)</th><th>Health</th><th>Named most</th></tr>'
-        + "".join(_row_html(row) for row in rows)
-        + "</table></div>"
+    parts.extend(
+        [
+            stat_tiles_html(tiles),
+            '<div class="table-scroll"><table class="sortable" id="ecosystem">'
+            '<tr><th class="num">#</th><th>Repository</th>'
+            f'<th class="num">{html.escape(label)}</th>'
+            f'<th class="num">{html.escape(previous_label)}</th><th class="num">Commits (12 mo)</th>'
+            '<th class="num">Active authors (12 mo)</th><th>Health</th><th>Named most</th></tr>'
+            + "".join(_row_html(row) for row in rows)
+            + "</table></div>",
+            '<p class="section-note">The share of each quarter&rsquo;s commits that name '
+            f"{ASSISTANT}: as their author, as a co-author, or in the line it signs with. A lower "
+            "bound: an assistant that leaves no mark is not counted. Commits and active authors "
+            "are those of the last 12 months; health is the project's pace of the last year.</p>",
+            AI_ASSISTED_COUNTED,
+        ]
     )
-    parts.append(
-        '<p class="section-note">The share of each quarter&rsquo;s commits that name '
-        f"{ASSISTANT}: as their author, as a co-author, or in the line it signs with. A lower "
-        "bound: an assistant that leaves no mark is not counted. Commits and active authors "
-        "are those of the last 12 months; health is the project's pace of the last year.</p>"
-    )
-    parts.append(AI_ASSISTED_COUNTED)
     others = " &middot; ".join(
         f'<a href="{other.id}.html">{html.escape(other.name)}</a>'
         for other in groups
         if other.id != group.id
     )
-    parts.append(f'<p class="more-link">Other ecosystems: {others}</p>')
-    parts.append(_FOOTER)
+    parts.extend([f'<p class="more-link">Other ecosystems: {others}</p>', _FOOTER])
     return "".join(parts)
 
 
@@ -385,7 +386,7 @@ def index_page(
             _header(
                 f"{title} | GitStats Gallery",
                 share_meta_html(
-                    title, description, folder_url, "index.html", "index-card.png" if card else ""
+                    title, description, folder_url, INDEX, "index-card.png" if card else ""
                 ),
                 folder_url,
             ),
