@@ -102,6 +102,27 @@ MEASURES: tuple[Measure, ...] = (
 )
 MEASURE_IDS = tuple(measure.id for measure in MEASURES)
 
+# The order a sentence prefers measures in, when two places are as high: who
+# works on a project first, how much after. The AI-assisted share is named
+# only for a first place, or it would crowd out the rest: its small
+# differences put some project near the top of almost every group.
+SENTENCE_ORDER = (
+    "new_authors",
+    "half_of_commits",
+    "organizations",
+    "authors",
+    "commits",
+    "ai_share",
+)
+FIRST_ONLY = ("ai_share",)
+# Measures that rise and fall together: a second sentence about another of
+# them would say nothing new.
+FAMILIES = ({"commits", "authors", "new_authors"},)
+
+
+def _related(first: str, second: str) -> bool:
+    return any(first in family and second in family for family in FAMILIES)
+
 
 def measures_of(summary: dict[str, Any], quarters: list[list[str]]) -> dict[str, float | None]:
     """A repository's value of each measure, None where its summary doesn't
@@ -217,10 +238,22 @@ def headline(row: dict[str, Any], projects: str) -> str:
             standing.append(((place[0] - 1) / (place[1] - 1), place, measure))
     if not standing:
         return ""
-    standing.sort(key=lambda item: (item[0], MEASURE_IDS.index(item[2].id)))
-    top = [item for item in standing[:2] if item[0] <= 0.25]
+    standing.sort(key=lambda item: (item[0], SENTENCE_ORDER.index(item[2].id)))
+    high = [
+        item
+        for item in standing
+        if item[0] <= 0.25 and (item[1][0] == 1 or item[2].id not in FIRST_ONLY)
+    ]
+    top = high[:1]
+    for item in high[1:]:
+        if not _related(top[0][2].id, item[2].id):
+            top.append(item)
+            break
     if not top:
-        position, (place, of), measure = standing[0]
+        # its best place, on a measure a sentence names at any place
+        position, (place, of), measure = next(
+            (item for item in standing if item[2].id not in FIRST_ONLY), standing[0]
+        )
         if place == of:
             # last even on its best measure: say so plainly
             return f"{name} had {measure.fewer} than any other of the {of} {projects}."

@@ -128,9 +128,10 @@ def test_headline_first_and_second():
     )
     summaries[1]["people_last_12mo"] = _people(authors=99)
     rows = compare.comparisons(summaries, QUARTERS)
+    # 2nd for commits too, but commits rise with contributors: no second sentence
     assert compare.headline(rows[1], "Python open source projects") == (
         "p1 had more contributors in the last 12 months than any other of the 6 Python open "
-        "source projects. It is also 2nd for commits."
+        "source projects."
     )
 
 
@@ -143,12 +144,20 @@ def test_headline_second_place_and_also_first():
     rows = compare.comparisons(summaries, QUARTERS)
     # among all: "a" is 1st for new contributors and 2nd for commits
     assert compare.headline(rows[0], "") == (
-        "a had more new contributors in the last 12 months than any other of the 6 "
-        "repositories. It is also 2nd for commits."
+        "a had more new contributors in the last 12 months than any other of the 6 repositories."
     )
-    summaries[0]["commits_last_12mo"] = 95
+    # a second place of another kind is named
+    for n, summary in enumerate(summaries):
+        summary["people_last_12mo"]["half_of_commits"] = [7, 9, 1, 2, 3, 4][n]
     rows = compare.comparisons(summaries, QUARTERS)
-    assert compare.headline(rows[0], "").endswith("It also had the most new contributors.")
+    assert compare.headline(rows[0], "").endswith(
+        "It is also 2nd for how widely its commits are spread."
+    )
+    summaries[0]["people_last_12mo"]["half_of_commits"] = 10
+    rows = compare.comparisons(summaries, QUARTERS)
+    assert compare.headline(rows[0], "").endswith(
+        "It also had the most people behind half of its commits."
+    )
 
 
 def test_headline_second_first():
@@ -234,4 +243,48 @@ def test_headline_last_even_on_its_best_measure():
     rows = _rows([100, 90, 80, 70, 60, 50])
     assert compare.headline(rows[5], "") == (
         "p5 had fewer commits in the last 12 months than any other of the 6 repositories."
+    )
+
+
+def _ai(share):
+    return {"by_month": {"2026-01": share}, "commits_by_month": {"2026-01": 100}}
+
+
+def test_ai_share_is_named_only_for_a_first_place():
+    # p0: 2nd for commits and first for AI; p1: 1st for commits, 2nd for AI
+    summaries = [
+        _summary("p0", commits=90, ai_assisted=_ai(40)),
+        _summary("p1", commits=100, ai_assisted=_ai(30)),
+        *(_summary(f"q{n}", commits=n, ai_assisted=_ai(n)) for n in range(4)),
+    ]
+    rows = compare.comparisons(summaries, QUARTERS)
+    assert compare.headline(rows[0], "") == (
+        "p0 had a larger share of commits that name an AI coding assistant than any other "
+        "of the 6 repositories. It is also 2nd for commits."
+    )
+    # 2nd for AI is not named, not even as a second sentence
+    assert compare.headline(rows[1], "") == (
+        "p1 had more commits in the last 12 months than any other of the 6 repositories."
+    )
+
+
+def test_a_middle_sentence_names_a_people_measure_over_ai():
+    summaries = [
+        _summary(f"p{n}", commits=100 - 10 * n, ai_assisted=_ai([1, 2, 3, 8, 4, 9, 6][n]))
+        for n in range(7)
+    ]
+    rows = compare.comparisons(summaries, QUARTERS)
+    # p3 is 2nd for AI, which isn't named, and 4th for commits, which is
+    assert compare.headline(rows[3], "") == (
+        "p3 sits in the middle of the 7 repositories; its highest place is 4th, for commits."
+    )
+
+
+def test_only_ai_to_name():
+    summaries = [_summary(f"p{n}", commits=10, ai_assisted=_ai(n)) for n in range(6)]
+    rows = compare.comparisons(summaries, QUARTERS)
+    # commits all tie: the AI share is all there is, at any place
+    assert compare.headline(rows[2], "") == (
+        "p2 sits in the middle of the 6 repositories; its highest place is 4th, for "
+        "AI-assisted commits."
     )
