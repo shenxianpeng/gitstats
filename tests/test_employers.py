@@ -64,6 +64,10 @@ def test_registrable_domain(host, expected):
         ("Ann", "123+ann@users.noreply.github.com", Affiliation(HIDDEN)),
         ("Ann", "ann@users.noreply.gitlab.com", Affiliation(HIDDEN)),
         ("Ann", "ann@x.noreply.github.com", Affiliation(HIDDEN)),
+        ("Ann", "ann@noreply.gitcode.com", Affiliation(HIDDEN)),
+        ("Ann", "ann@user.noreply.gitee.com", Affiliation(HIDDEN)),
+        # "noreply" as a label, not inside one
+        ("Ann", "ann@noreplyco.com", Affiliation(ORGANIZATION, "noreplyco.com")),
         ("Ann", "noreply@example.org", Affiliation(HIDDEN)),
         # nothing to go by
         ("Ann", "ann", Affiliation(UNKNOWN)),
@@ -74,6 +78,7 @@ def test_registrable_domain(host, expected):
         ("Ann", "ann@ann-mbp.local", Affiliation(UNKNOWN)),
         ("Ann", "ann@localhost.localdomain", Affiliation(UNKNOWN)),
         ("Ann", "ann@(none)", Affiliation(UNKNOWN)),
+        ("Ann", "ann@localhost.com", Affiliation(UNKNOWN)),
         ("Ann", "ann@example.com", Affiliation(UNKNOWN)),
         ("Ann", "ann@build.example.com", Affiliation(UNKNOWN)),
         # an account named [bot] is a bot, whatever its address
@@ -84,6 +89,9 @@ def test_registrable_domain(host, expected):
         ("GitHub Action", "Action@GitHub.com", Affiliation(BOT)),
         ("Release", "release-bot@acme.org", Affiliation(BOT)),
         ("CI", "ci@acme.org", Affiliation(BOT)),
+        ("openharmony_ci", "openharmony_ci@noreply.gitcode.com", Affiliation(BOT)),
+        ("Build", "release-ci@acme.org", Affiliation(BOT)),
+        ("A. Unique TensorFlower", "gardener@tensorflow.org", Affiliation(BOT)),
         # a person at GitHub is not
         ("Ann", "ann@github.com", Affiliation(ORGANIZATION, "github.com")),
     ],
