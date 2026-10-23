@@ -201,4 +201,3 @@ history would otherwise mislead:
   vendored copy of its dependencies, committed and later removed: counted with
   them, 1% of what was written is still there; without them, 56%. The rules
   are in ``gitstats/sources.py``.
-
