@@ -68,7 +68,7 @@ MEASURES: tuple[Measure, ...] = (
         "Half the commits by",
         "more people behind half of its commits",
         "how widely its commits are spread",
-        "its commits spread the most widely",
+        "the most people behind half of its commits",
         "The fewest people whose commits add up to half of those 12 months': "
         "how far the work is spread.",
     ),
@@ -158,9 +158,7 @@ def _alone(value: float | None, values: list[float | None]) -> bool:
     return value is not None and value > 0 and not shared(value, values)
 
 
-def comparisons(
-    summaries: list[dict[str, Any]], quarters: list[list[str]]
-) -> list[dict[str, Any]]:
+def comparisons(summaries: list[dict[str, Any]], quarters: list[list[str]]) -> list[dict[str, Any]]:
     """Each repository's values, and its rank on each measure among its
     group's repositories and among all."""
     values = [measures_of(summary, quarters) for summary in summaries]
@@ -311,6 +309,10 @@ def card_rows(row: dict[str, Any], scope: str) -> list[tuple[str, float, str]]:
         place = row["ranks"][measure.id][scope]
         if place and place[1] > 1:
             rows.append(
-                (measure.label, 1 - (place[0] - 1) / (place[1] - 1), f"{ordinal(place[0])} / {place[1]}")
+                (
+                    measure.label,
+                    1 - (place[0] - 1) / (place[1] - 1),
+                    f"{ordinal(place[0])} / {place[1]}",
+                )
             )
     return rows

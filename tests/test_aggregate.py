@@ -1520,7 +1520,7 @@ class TestComparisonPages:
         page = read("repo1/compare.html")
         assert "Compared with all 7 repositories of" in page
         assert "<b>2nd of 7</b>repositories</div>" in page
-        assert "// compared" in read("repo1/compare-card.html")
+        assert "// how it compares" in read("repo1/compare-card.html")
 
     def test_too_few_repositories(self, temp_dir):
         self._render(temp_dir, self._summaries(count=4))

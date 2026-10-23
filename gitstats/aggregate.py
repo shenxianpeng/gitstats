@@ -1340,7 +1340,11 @@ class AggregateReportCreator:
             f"<span>{html.escape(rank_text)}</span></div>"
             for label, position, rank_text in compare.card_rows(row, scope)
         )
-        brand = f"// {html.escape(group_name)} projects compared" if group_name else "// compared"
+        brand = (
+            f"// {html.escape(group_name)} projects compared"
+            if group_name
+            else "// how it compares"
+        )
         return share_card_page(
             f"How {name} compares",
             f'<div class="brand">{brand}</div><h1>{html.escape(name)}</h1>'

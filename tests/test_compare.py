@@ -159,8 +159,7 @@ def test_headline_second_first():
 def test_headline_middle_and_below():
     rows = _rows([100, 90, 80, 50, 40, 30, 20, 10, 5])
     assert compare.headline(rows[4], "") == (
-        "p4 sits in the middle of the 9 repositories; its highest place is 5th, "
-        "for commits."
+        "p4 sits in the middle of the 9 repositories; its highest place is 5th, for commits."
     )
     assert compare.headline(rows[7], "") == (
         "p7 ranks below most of the 9 repositories on every measure here; its highest "
