@@ -10,9 +10,9 @@ open source from personal addresses on paid time, and from work addresses on
 their own time. Addresses at a mail provider anyone can sign up for
 (``@gmail.com``, ``@qq.com``) are grouped as personal, GitHub's private
 ``noreply`` addresses as hidden, and accounts named ``…[bot]`` as bots, so
-none of them is mistaken for an organization. A domain only one address
-commits from is most often a person's own (``@jane.dev``): a report counts
-it as a one-address domain, not as an organization.
+none of them is mistaken for an organization. A domain that only one person
+commits from is most often that person's own (``@jane.dev``): a report
+counts it as a one-person domain, not as an organization.
 
 Only domains are kept. No address or name leaves this module.
 """
@@ -22,58 +22,98 @@ from __future__ import annotations
 from typing import Any, NamedTuple
 
 ORGANIZATION = "organization"
-ONE_ADDRESS = "one_address"
+ONE_PERSON = "one_person"
 PERSONAL = "personal"
 HIDDEN = "hidden"
 UNKNOWN = "unknown"
 BOT = "bot"
 
 # The kinds in the order a report lists them.
-KINDS: tuple[str, ...] = (ORGANIZATION, ONE_ADDRESS, PERSONAL, HIDDEN, UNKNOWN, BOT)
+KINDS: tuple[str, ...] = (ORGANIZATION, ONE_PERSON, PERSONAL, HIDDEN, UNKNOWN, BOT)
 
 KIND_LABELS: dict[str, str] = {
     ORGANIZATION: "Organizations",
-    ONE_ADDRESS: "One-address domains",
+    ONE_PERSON: "One-person domains",
     PERSONAL: "Personal email",
     HIDDEN: "Hidden (noreply)",
     UNKNOWN: "Unknown",
     BOT: "Bots",
 }
 
-# Mail providers anyone can sign up for, matched on the registrable domain.
+# Mail providers anyone can sign up for, and the forwarding and alumni
+# addresses people keep for life, matched on the host or the registrable domain.
 PERSONAL_DOMAINS: frozenset[str] = frozenset(
     {
         "126.com",
         "139.com",
         "163.com",
+        "alice.it",
         "aliyun.com",
+        "alum.mit.edu",
         "aol.com",
+        "arcor.de",
+        "att.net",
+        "bigpond.com",
+        "bk.ru",
+        "bluewin.ch",
+        "btinternet.com",
+        "cantab.net",
+        "centrum.cz",
+        "comcast.net",
+        "daum.net",
+        "disroot.org",
+        "duck.com",
+        "earthlink.net",
         "fastmail.com",
         "fastmail.fm",
         "foxmail.com",
+        "free.fr",
+        "freenet.de",
         "gmail.com",
         "gmx.at",
+        "gmx.ch",
         "gmx.com",
         "gmx.de",
         "gmx.net",
         "googlemail.com",
+        "hanmail.net",
         "hey.com",
         "hotmail.co.uk",
         "hotmail.com",
         "hotmail.de",
         "hotmail.fr",
         "icloud.com",
+        "iki.fi",
+        "inbox.ru",
+        "interia.pl",
+        "laposte.net",
+        "libero.it",
+        "list.ru",
+        "live.co.uk",
         "live.com",
+        "live.de",
+        "live.fr",
+        "m4x.org",
         "mac.com",
         "mail.com",
         "mail.ru",
+        "mailbox.org",
         "me.com",
         "msn.com",
+        "nate.com",
         "naver.com",
+        "ntlworld.com",
+        "o2.pl",
+        "onet.pl",
+        "online.no",
+        "optusnet.com.au",
+        "orange.fr",
         "outlook.com",
         "outlook.de",
         "outlook.fr",
         "pm.me",
+        "pobox.com",
+        "polytechnique.org",
         "posteo.de",
         "posteo.net",
         "proton.me",
@@ -81,13 +121,31 @@ PERSONAL_DOMAINS: frozenset[str] = frozenset(
         "protonmail.com",
         "qq.com",
         "rambler.ru",
+        "rediffmail.com",
+        "riseup.net",
+        "rogers.com",
+        "sbcglobal.net",
         "seznam.cz",
+        "sfr.fr",
+        "shaw.ca",
         "sina.cn",
         "sina.com",
+        "skynet.be",
         "sohu.com",
         "t-online.de",
+        "telenet.be",
+        "tiscali.it",
         "tutanota.com",
+        "users.sourceforge.net",
+        "ukr.net",
+        "verizon.net",
+        "virgilio.it",
+        "virginmedia.com",
+        "wanadoo.fr",
         "web.de",
+        "wp.pl",
+        "xs4all.nl",
+        "ya.ru",
         "yahoo.co.jp",
         "yahoo.co.uk",
         "yahoo.com",
@@ -95,7 +153,7 @@ PERSONAL_DOMAINS: frozenset[str] = frozenset(
         "yahoo.fr",
         "yandex.com",
         "yandex.ru",
-        "ya.ru",
+        "yeah.net",
         "zoho.com",
     }
 )
@@ -146,13 +204,18 @@ TWO_LABEL_SUFFIXES: frozenset[str] = frozenset(
         "edu.tw",
         "gov.cn",
         "gov.uk",
+        "ltd.uk",
+        "me.uk",
+        "net.nz",
         "ne.jp",
         "net.au",
         "net.cn",
         "or.jp",
         "org.au",
         "org.cn",
+        "org.nz",
         "org.uk",
+        "plc.uk",
     }
 )
 
@@ -246,24 +309,26 @@ def summarize(data: object, limit: int = 20, quarters: int = 8) -> dict[str, Any
     with its commits in all and in the 12 months that end with the last
     commit, and how many addresses committed from it. ``quarters``: the last
     ``quarters`` quarters with commits, each with its commits by kind of
-    address. A domain that one address commits from counts as ONE_ADDRESS,
-    not as an organization. None for data collected before addresses were
-    sorted this way.
+    address. A domain that one person commits from (one address, or one
+    name) counts as ONE_PERSON, not as an organization. None for data
+    collected before addresses were sorted this way.
     """
     by_month = getattr(data, "affiliation_by_month", None)
     organizations = getattr(data, "organizations", None)
     authors = getattr(data, "organization_authors", None)
+    people = getattr(data, "organization_people", None)
     if not isinstance(by_month, dict) or not isinstance(organizations, dict) or not by_month:
         return None
     authors = authors if isinstance(authors, dict) else {}
-    # domains of one address: only known when the addresses were counted
-    single = {name for name in organizations if authors.get(name) == 1}
+    people = people if isinstance(people, dict) else {}
+    # domains of one person: only known when addresses or names were counted
+    single = {name for name in organizations if authors.get(name) == 1 or people.get(name) == 1}
     by_month = {month: dict(kinds) for month, kinds in by_month.items()}
     for name in single:
         for month, commits in organizations[name]["by_month"].items():
             kinds = by_month.setdefault(month, {})
             kinds[ORGANIZATION] = kinds.get(ORGANIZATION, 0) - commits
-            kinds[ONE_ADDRESS] = kinds.get(ONE_ADDRESS, 0) + commits
+            kinds[ONE_PERSON] = kinds.get(ONE_PERSON, 0) + commits
     last = max(by_month)
     year_start = _months_back(last, 11)
 

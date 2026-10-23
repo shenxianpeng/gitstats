@@ -967,7 +967,7 @@ def test_organizations_summary():
     assert summary["commits"] == 6
     assert summary["by_kind"] == {
         "organization": 3,
-        "one_address": 0,
+        "one_person": 0,
         "personal": 1,
         "hidden": 1,
         "unknown": 0,

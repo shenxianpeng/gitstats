@@ -1893,6 +1893,8 @@ class TestCollectEdgeCases:
         assert google["by_month"] == {month: 2, july: 1}
         # addresses are told apart without case, and only counted
         assert dc.organization_authors == {"google.com": 3}
+        # and names, without case or extra spaces: Ann and Bo
+        assert dc.organization_people == {"google.com": 2}
         # so the JSON output (the collector's attributes) holds no address
         kept = (dc.organizations, dc.organization_authors, dc.affiliation_by_month)
         assert "@" not in json.dumps(kept, default=str)

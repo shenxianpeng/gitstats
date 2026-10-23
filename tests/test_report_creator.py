@@ -3727,7 +3727,7 @@ def test_organizations_section(mock_data_collector):
     )
     labels = (
         "Organizations",
-        "One-address domains",
+        "One-person domains",
         "Personal email",
         "Hidden (noreply)",
         "Unknown",
@@ -3750,7 +3750,7 @@ def test_organizations_section_escapes_the_domain(mock_data_collector):
     assert "<b>.org" not in section
 
 
-def test_organizations_section_is_left_out_with_one_address_domains_only(mock_data_collector):
+def test_organizations_section_is_left_out_with_one_person_domains_only(mock_data_collector):
     mock_data_collector.organization_authors = {"example.com": 1, "test.org": 1}
     assert HTMLReportCreator()._organizations_html(mock_data_collector) == ""
 

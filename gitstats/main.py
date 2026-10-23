@@ -150,6 +150,7 @@ class DataCollector:
         # domain -> { commits, first_commit_stamp, last_commit_stamp, by_month: {YYYY-MM: commits} }
         self.organizations: dict[str, dict[str, Any]] = {}
         self.organization_authors: dict[str, int] = {}  # domain -> how many addresses
+        self.organization_people: dict[str, int] = {}  # domain -> how many author names
         # YYYY-MM -> kind of address (organization, personal, ...) -> commits
         self.affiliation_by_month: dict[str, dict[str, int]] = {}
 
@@ -494,8 +495,9 @@ class GitDataCollector(DataCollector):
         # Track email<->author mappings to automatically merge identities that share an email
         email_to_latest: dict[str, tuple[int, str]] = {}  # email -> (stamp, author_name)
         author_to_email: dict[str, str] = {}  # author_name -> primary email
-        # the addresses of each organization, to count them: only the counts are kept
+        # the addresses and names of each organization, to count them: only the counts are kept
         addresses: dict[str, set[str]] = {}
+        names: dict[str, set[str]] = {}
         for line in lines:
             # Skip empty lines (happens when there are no commits in the date range)
             if not line.strip():
@@ -542,11 +544,13 @@ class GitDataCollector(DataCollector):
             organization = self._record_affiliation(author, mail, stamp, date)
             if organization:
                 addresses.setdefault(organization, set()).add(mail.strip().lower())
+                names.setdefault(organization, set()).add(" ".join(author.lower().split()))
 
             # timezone
             self.commits_by_timezone[timezone] = self.commits_by_timezone.get(timezone, 0) + 1
 
         self.organization_authors = {name: len(found) for name, found in addresses.items()}
+        self.organization_people = {name: len(found) for name, found in names.items()}
         return email_to_latest, author_to_email
 
     def _record_affiliation(

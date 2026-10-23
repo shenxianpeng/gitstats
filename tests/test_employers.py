@@ -7,7 +7,7 @@ import pytest
 from gitstats.employers import (
     BOT,
     HIDDEN,
-    ONE_ADDRESS,
+    ONE_PERSON,
     ORGANIZATION,
     PERSONAL,
     UNKNOWN,
@@ -50,6 +50,15 @@ def test_registrable_domain(host, expected):
         ("Ann", "ann@gmail.com", Affiliation(PERSONAL)),
         ("Ann", "ann@qq.com", Affiliation(PERSONAL)),
         ("Ann", "ann@yahoo.co.uk", Affiliation(PERSONAL)),
+        # forwarding and alumni addresses, and an internet provider's mail
+        ("Ann", "ann@pobox.com", Affiliation(PERSONAL)),
+        ("Ann", "ann@alum.mit.edu", Affiliation(PERSONAL)),
+        ("Ann", "ann@free.fr", Affiliation(PERSONAL)),
+        ("Ann", "ann@users.sourceforge.net", Affiliation(PERSONAL)),
+        # but the university itself is an organization
+        ("Ann", "ann@mit.edu", Affiliation(ORGANIZATION, "mit.edu")),
+        # me.uk is a suffix for people: the domain is the name under it
+        ("Ann", "ann@ann.me.uk", Affiliation(ORGANIZATION, "ann.me.uk")),
         ("Ann", "ann@eu.mail.yahoo.com", Affiliation(PERSONAL)),
         # a code host's private address, and no-reply senders
         ("Ann", "123+ann@users.noreply.github.com", Affiliation(HIDDEN)),
@@ -135,7 +144,7 @@ def test_summarize():
     assert overview["commits"] == 11
     assert overview["by_kind"] == {
         ORGANIZATION: 6,
-        ONE_ADDRESS: 0,
+        ONE_PERSON: 0,
         PERSONAL: 1,
         HIDDEN: 1,
         UNKNOWN: 1,
@@ -167,7 +176,7 @@ def test_summarize():
     assert overview["quarters"][1] == {
         "quarter": "2026-Q1",
         "commits": 6,
-        "by_kind": {ORGANIZATION: 3, ONE_ADDRESS: 0, PERSONAL: 0, HIDDEN: 0, UNKNOWN: 1, BOT: 2},
+        "by_kind": {ORGANIZATION: 3, ONE_PERSON: 0, PERSONAL: 0, HIDDEN: 0, UNKNOWN: 1, BOT: 2},
     }
 
 
@@ -191,24 +200,24 @@ def test_summarize_without_addresses():
     assert all(row["authors"] == 0 for row in overview["organizations"])
 
 
-def test_summarize_counts_a_domain_of_one_address_apart():
+def test_summarize_counts_a_domain_of_one_person_apart():
     data = _data(organization_authors={"google.com": 2, "redhat.com": 1})
     overview = summarize(data)
     # redhat.com's two commits, in 2025-11 and 2026-02, leave the organizations
     assert overview["by_kind"][ORGANIZATION] == 4
-    assert overview["by_kind"][ONE_ADDRESS] == 2
+    assert overview["by_kind"][ONE_PERSON] == 2
     assert overview["organization_count"] == 2
     assert [row["organization"] for row in overview["organizations"]] == [
         "google.com",
         "acme.org",
     ]
     q1 = overview["quarters"][-1]["by_kind"]
-    assert (q1[ORGANIZATION], q1[ONE_ADDRESS]) == (2, 1)
+    assert (q1[ORGANIZATION], q1[ONE_PERSON]) == (2, 1)
     # the data it was given is left as it was
     assert data.affiliation_by_month["2026-02"] == {ORGANIZATION: 3, BOT: 2, UNKNOWN: 1}
 
 
-def test_summarize_one_address_month_without_other_commits():
+def test_summarize_one_person_month_without_other_commits():
     data = _data(
         affiliation_by_month={"2026-02": {ORGANIZATION: 1}},
         organizations={
@@ -223,4 +232,12 @@ def test_summarize_one_address_month_without_other_commits():
     )
     overview = summarize(data)
     assert overview["organizations"] == []
-    assert overview["by_kind"][ONE_ADDRESS] == 1
+    assert overview["by_kind"][ONE_PERSON] == 1
+
+
+def test_summarize_counts_a_domain_of_one_name_apart():
+    # two addresses, one person
+    data = _data(organization_authors={"google.com": 2}, organization_people={"google.com": 1})
+    overview = summarize(data)
+    assert "google.com" not in [row["organization"] for row in overview["organizations"]]
+    assert overview["by_kind"][ONE_PERSON] == 4
