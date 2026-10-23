@@ -168,7 +168,8 @@ jobs:
         # reports were made with. It groups the reports as repos.yml does,
         # lists the repositories without one, and adds to each report the
         # badge of its AI-assisted commits and how to make it for another
-        # repository.
+        # repository. Each ecosystem gets its ranking page and its data under
+        # ecosystems/, and the gallery its sitemap.xml.
         run: >-
           PYTHONPATH="$PWD" python scripts/generate_gallery_portfolio.py gallery
           --repos gallery/repos.yml
@@ -176,11 +177,13 @@ jobs:
 
       - name: Render Share Cards
         run: |
-          for card in share-card ai-share-card; do
-            if [ -f "gallery/$card.html" ]; then
+          # the gallery's two cards, and each ecosystem page's
+          for card in gallery/share-card.html gallery/ai-share-card.html \
+            gallery/ecosystems/*-card.html; do
+            if [ -f "$card" ]; then
               google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars \
-                --window-size=1200,630 --screenshot="$PWD/gallery/$card.png" \
-                "file://$PWD/gallery/$card.html"
+                --window-size=1200,630 --screenshot="$PWD/${card%.html}.png" \
+                "file://$PWD/$card"
             fi
           done
 
