@@ -30,6 +30,7 @@ from gitstats.aggregate import (
 )
 from gitstats.ai_summarizer import AISummarizer
 from gitstats.assistants import AssistedCommit, assisted_commits
+from gitstats.employers import ORGANIZATION, classify
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
 from gitstats.utils import (
     History,
@@ -144,6 +145,13 @@ class DataCollector:
 
         # domains
         self.domains: dict[str, dict[str, int]] = {}  # domain -> commits
+
+        # organizations, by the domain of the author's address (see gitstats.employers)
+        # domain -> { commits, first_commit_stamp, last_commit_stamp, by_month: {YYYY-MM: commits} }
+        self.organizations: dict[str, dict[str, Any]] = {}
+        self.organization_authors: dict[str, int] = {}  # domain -> how many addresses
+        # YYYY-MM -> kind of address (organization, personal, ...) -> commits
+        self.affiliation_by_month: dict[str, dict[str, int]] = {}
 
         # author of the month
         self.author_of_month: dict[str, dict[str, int]] = {}  # month -> author -> commits
@@ -486,6 +494,8 @@ class GitDataCollector(DataCollector):
         # Track email<->author mappings to automatically merge identities that share an email
         email_to_latest: dict[str, tuple[int, str]] = {}  # email -> (stamp, author_name)
         author_to_email: dict[str, str] = {}  # author_name -> primary email
+        # the addresses of each organization, to count them: only the counts are kept
+        addresses: dict[str, set[str]] = {}
         for line in lines:
             # Skip empty lines (happens when there are no commits in the date range)
             if not line.strip():
@@ -529,11 +539,37 @@ class GitDataCollector(DataCollector):
             self.domains[domain]["commits"] = self.domains[domain].get("commits", 0) + 1
 
             self._record_author_commit(author, stamp, date)
+            organization = self._record_affiliation(author, mail, stamp, date)
+            if organization:
+                addresses.setdefault(organization, set()).add(mail.strip().lower())
 
             # timezone
             self.commits_by_timezone[timezone] = self.commits_by_timezone.get(timezone, 0) + 1
 
+        self.organization_authors = {name: len(found) for name, found in addresses.items()}
         return email_to_latest, author_to_email
+
+    def _record_affiliation(
+        self, author: str, mail: str, stamp: int, date: datetime.datetime
+    ) -> str:
+        """Count a commit under the kind of its author's address, and under
+        the organization when the address belongs to one. Returns that
+        organization, or "" for an address that belongs to none."""
+        month = date.strftime("%Y-%m")
+        affiliation = classify(author, mail)
+        kinds = self.affiliation_by_month.setdefault(month, {})
+        kinds[affiliation.kind] = kinds.get(affiliation.kind, 0) + 1
+        if affiliation.kind != ORGANIZATION:
+            return ""
+        info = self.organizations.setdefault(
+            affiliation.organization,
+            {"commits": 0, "first_commit_stamp": stamp, "last_commit_stamp": stamp, "by_month": {}},
+        )
+        info["commits"] += 1
+        info["first_commit_stamp"] = min(info["first_commit_stamp"], stamp)
+        info["last_commit_stamp"] = max(info["last_commit_stamp"], stamp)
+        info["by_month"][month] = info["by_month"].get(month, 0) + 1
+        return affiliation.organization
 
     def _record_activity(
         self, date: datetime.datetime, local: datetime.datetime | None = None

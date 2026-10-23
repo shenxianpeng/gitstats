@@ -22,6 +22,7 @@ import shutil
 from typing import Any
 
 from gitstats import load_config
+from gitstats.employers import summarize as summarize_organizations
 from gitstats.report_creator import (
     AI_ASSISTED_COUNTED,
     THEME_INIT_SCRIPT,
@@ -146,6 +147,48 @@ def compute_repo_summary(data: Any, report_path: str) -> dict[str, Any]:
             str(year): commits for year, commits in sorted(commits_by_year.items())
         },
         "ai_assisted": ai_assisted_summary(data, now),
+        "organizations": organizations_summary(data),
+    }
+
+
+def organizations_summary(data: Any) -> dict[str, Any] | None:
+    """Where the commits come from, by the domain of the author's address.
+
+    The 20 organizations with the most commits, and the commits of the last
+    eight quarters by kind of address (organization, personal, hidden,
+    unknown, bot). Domains only, never an address. None for data collected
+    before addresses were sorted this way. See gitstats.employers.
+    """
+    overview = summarize_organizations(data, limit=20, quarters=8)
+    if overview is None:
+        return None
+
+    def _day(stamp: int) -> str:
+        return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
+
+    return {
+        "description": (
+            "Commits by the domain of the author's email address. Mail providers anyone can "
+            "sign up for count as personal, code hosts' private noreply addresses as hidden, "
+            "and accounts named [bot] as bots. A domain says where an address is, not who "
+            "paid for the work."
+        ),
+        "commits": overview["commits"],
+        "by_kind": overview["by_kind"],
+        "organization_count": overview["organization_count"],
+        "last_12mo_from": overview["year_start"],
+        "top": [
+            {
+                "organization": row["organization"],
+                "commits": row["commits"],
+                "commits_last_12mo": row["commits_last_12mo"],
+                "addresses": row["authors"],
+                "first_commit": _day(row["first_commit_stamp"]),
+                "last_commit": _day(row["last_commit_stamp"]),
+            }
+            for row in overview["organizations"]
+        ],
+        "quarters": {quarter["quarter"]: quarter["by_kind"] for quarter in overview["quarters"]},
     }
 
 

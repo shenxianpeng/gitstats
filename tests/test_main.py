@@ -1867,6 +1867,38 @@ class TestCollectEdgeCases:
         assert author_to_email == {"Ann": "ann@example.com", "Bo": "bo-at-nowhere"}
         assert email_to_latest["ann@example.com"] == (1700000000, "Ann")
 
+    def test_commit_stats_sort_addresses_by_organization(self, monkeypatch):
+        fake = _fake_git(
+            {
+                "git rev-list --pretty": (
+                    "1700000000 2023-11-14 22:13:20 +0000 Ann <ann@corp.google.com>\n"
+                    "1700000100 2023-11-14 22:15:00 +0000 Ann <Ann@google.com>\n"
+                    "1690000000 2023-07-22 04:26:40 +0000 Bo <bo@google.com>\n"
+                    "1700000200 2023-11-14 22:16:40 +0000 Cy <cy@gmail.com>\n"
+                    "1700000300 2023-11-14 22:18:20 +0000 dependabot[bot] <1+dependabot[bot]@users.noreply.github.com>\n"
+                )
+            }
+        )
+        monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+        dc = GitDataCollector()
+        dc._collect_commit_stats()
+
+        google = dc.organizations["google.com"]
+        assert set(dc.organizations) == {"google.com"}
+        assert google["commits"] == 3
+        assert google["first_commit_stamp"] == 1690000000
+        assert google["last_commit_stamp"] == 1700000100
+        month = datetime.datetime.fromtimestamp(1700000000).strftime("%Y-%m")
+        july = datetime.datetime.fromtimestamp(1690000000).strftime("%Y-%m")
+        assert google["by_month"] == {month: 2, july: 1}
+        # addresses are told apart without case, and only counted
+        assert dc.organization_authors == {"google.com": 3}
+        # so the JSON output (the collector's attributes) holds no address
+        kept = (dc.organizations, dc.organization_authors, dc.affiliation_by_month)
+        assert "@" not in json.dumps(kept, default=str)
+        assert dc.affiliation_by_month[month] == {"organization": 2, "personal": 1, "bot": 1}
+        assert dc.affiliation_by_month[july] == {"organization": 1}
+
     def test_commit_stats_count_hours_on_each_commits_own_clock(self, monkeypatch):
         """Not on the clock of the machine the report is generated on."""
         fake = _fake_git(
