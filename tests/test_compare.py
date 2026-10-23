@@ -228,3 +228,10 @@ def test_a_shared_place_among_all():
     rows = _rows([5, 5, 3, 2, 1])
     assert rows[0]["alone"]["commits"] is False
     assert rows[2]["alone"]["commits"] is True
+
+
+def test_headline_last_even_on_its_best_measure():
+    rows = _rows([100, 90, 80, 70, 60, 50])
+    assert compare.headline(rows[5], "") == (
+        "p5 had fewer commits in the last 12 months than any other of the 6 repositories."
+    )

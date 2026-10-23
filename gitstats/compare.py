@@ -34,6 +34,8 @@ class Measure:
     more: str
     short: str
     most: str
+    # "had <fewer> than any other ...", for a project last on its best measure
+    fewer: str
     definition: str
     share: bool = False  # a fraction, shown as a percentage, on a linear scale
 
@@ -45,6 +47,7 @@ MEASURES: tuple[Measure, ...] = (
         "more commits in the last 12 months",
         "commits",
         "the most commits",
+        "fewer commits in the last 12 months",
         "Commits in the 12 months up to the last one.",
     ),
     Measure(
@@ -53,6 +56,7 @@ MEASURES: tuple[Measure, ...] = (
         "more contributors in the last 12 months",
         "contributors",
         "the most contributors",
+        "fewer contributors in the last 12 months",
         "People who made a commit in those 12 months; bots are left out.",
     ),
     Measure(
@@ -61,6 +65,7 @@ MEASURES: tuple[Measure, ...] = (
         "more new contributors in the last 12 months",
         "new contributors",
         "the most new contributors",
+        "fewer new contributors in the last 12 months",
         "Of them, those whose first commit to the project was in those 12 months.",
     ),
     Measure(
@@ -69,6 +74,7 @@ MEASURES: tuple[Measure, ...] = (
         "more people behind half of its commits",
         "how widely its commits are spread",
         "the most people behind half of its commits",
+        "fewer people behind half of its commits",
         "The fewest people whose commits add up to half of those 12 months': "
         "how far the work is spread.",
     ),
@@ -78,6 +84,7 @@ MEASURES: tuple[Measure, ...] = (
         "more organizations committing to it",
         "organizations committing",
         "the most organizations committing",
+        "fewer organizations committing to it",
         "Organizations whose addresses committed in those 12 months, by email domain; "
         "a domain only one person uses is not one.",
     ),
@@ -87,6 +94,7 @@ MEASURES: tuple[Measure, ...] = (
         "a larger share of commits that name an AI coding assistant",
         "AI-assisted commits",
         "the largest share of AI-assisted commits",
+        "a smaller share of commits that name an AI coding assistant",
         "The share of the last four quarters' commits that name an AI coding assistant; "
         "a lower bound.",
         share=True,
@@ -213,6 +221,9 @@ def headline(row: dict[str, Any], projects: str) -> str:
     top = [item for item in standing[:2] if item[0] <= 0.25]
     if not top:
         position, (place, of), measure = standing[0]
+        if place == of:
+            # last even on its best measure: say so plainly
+            return f"{name} had {measure.fewer} than any other of the {of} {projects}."
         where = (
             f"sits in the middle of the {of} {projects}"
             if position <= 0.6
