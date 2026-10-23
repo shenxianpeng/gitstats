@@ -15,6 +15,7 @@ from gitstats.aggregate import (
     ai_csv,
     ai_dataset,
     compute_repo_summary,
+    humans_summary,
     last_quarters,
     load_repo_summaries,
     organization_badge_message,
@@ -26,6 +27,7 @@ from gitstats.aggregate import (
     people_summary,
     quarter_id,
     snapshot_label,
+    source_lines_summary,
     write_repo_summary,
 )
 
@@ -1555,3 +1557,47 @@ class TestComparisonPages:
     def test_only_comparison_files_are_written(self, tmp_path, name):
         with pytest.raises(ValueError):
             AggregateReportCreator._open_portfolio_file(str(tmp_path), name)
+
+
+# ── humans_summary and source_lines_summary ──────────────────────────────
+
+
+def test_humans_summary():
+    data = SimpleNamespace(
+        human_commits_by_year={2025: 3, 2024: 7},
+        human_active_days={"2024-01-01", "2025-02-02"},
+    )
+    assert humans_summary(data) == {
+        "commits": 10,
+        "commits_by_year": {"2024": 7, "2025": 3},
+        "active_days": 2,
+    }
+    assert humans_summary(SimpleNamespace()) is None
+
+
+def test_source_lines_summary():
+    data = SimpleNamespace(
+        source_lines_added=500,
+        hotspot_files={
+            "src/a.py": {"lines": 100},
+            "vendor/b.go": {"lines": 9000},
+            "Cargo.lock": {"lines": 50},
+            "README.md": {"lines": 20},
+        },
+    )
+    assert source_lines_summary(data) == {"added": 500, "current": 120}
+    data.source_lines_added = None  # git could not count them
+    assert source_lines_summary(data) is None
+    assert source_lines_summary(SimpleNamespace(source_lines_added=1)) is None
+
+
+def test_compute_repo_summary_keeps_humans_and_source_lines():
+    data = SimpleNamespace(
+        human_commits_by_year={2025: 1},
+        human_active_days={"2025-01-01"},
+        source_lines_added=4,
+        hotspot_files={"a.py": {"lines": 2}},
+    )
+    summary = compute_repo_summary(data, "index.html")
+    assert summary["humans"]["active_days"] == 1
+    assert summary["source_lines"] == {"added": 4, "current": 2}

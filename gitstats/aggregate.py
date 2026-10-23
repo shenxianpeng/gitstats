@@ -38,6 +38,7 @@ from gitstats.report_creator import (
     share_text,
     stat_tiles_html,
 )
+from gitstats.sources import is_source
 from gitstats.utils import format_int, get_version
 
 logger = logging.getLogger("gitstats")
@@ -152,6 +153,39 @@ def compute_repo_summary(data: Any, report_path: str) -> dict[str, Any]:
         "ai_assisted": ai_assisted_summary(data, now),
         "organizations": organizations_summary(data),
         "people_last_12mo": people_summary(data),
+        "humans": humans_summary(data),
+        "source_lines": source_lines_summary(data),
+    }
+
+
+def humans_summary(data: Any) -> dict[str, Any] | None:
+    """The commits of people, bots left out (see gitstats.employers): by year,
+    and how many days have one. None for data collected before that."""
+    by_year = getattr(data, "human_commits_by_year", None)
+    days = getattr(data, "human_active_days", None)
+    if not isinstance(by_year, dict) or not isinstance(days, set):
+        return None
+    return {
+        "commits": sum(by_year.values()),
+        "commits_by_year": {str(year): commits for year, commits in sorted(by_year.items())},
+        "active_days": len(days),
+    }
+
+
+def source_lines_summary(data: Any) -> dict[str, Any] | None:
+    """Lines of the project's own source, leaving out vendored dependencies,
+    generated files, test fixtures and lock files (see gitstats.sources):
+    ever added, and in the files of the last commit. None when they were not
+    counted."""
+    added = getattr(data, "source_lines_added", None)
+    files = getattr(data, "hotspot_files", None)
+    if not isinstance(added, int) or not isinstance(files, dict):
+        return None
+    return {
+        "added": added,
+        "current": sum(
+            int(info.get("lines", 0)) for path, info in files.items() if is_source(path)
+        ),
     }
 
 
