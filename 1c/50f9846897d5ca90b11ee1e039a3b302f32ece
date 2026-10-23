@@ -1,0 +1,21 @@
+tests/test_compare.py
+  s_976c89a083fc6d::t_4f0d26991d207a 231-237
+gitstats/compare.py
+  s_976c89a083fc6d::t_30e9f7c4c941c3 37-38,50,59,68,77,87,97,224-226
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1c50f9846897d5ca90b11ee1e039a3b302f32ece",
+  "prompts": {},
+  "sessions": {
+    "s_976c89a083fc6d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a925ce73-1267-443d-83a8-ddf08446360c",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
