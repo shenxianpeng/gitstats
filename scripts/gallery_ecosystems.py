@@ -243,6 +243,7 @@ def _nav(current: str) -> str:
         '<div class="nav"><a href="../index.html" class="nav-brand">GitStats</a><ul>'
         + nav_link("../index.html", "GitStats Gallery")
         + nav_link("../ai.html", "AI-assisted commits")
+        + nav_link("../organizations.html", "Organizations")
         + nav_link(INDEX, "Ecosystems", current=INDEX if current == "index" else "")
         + f'</ul><div class="nav-right">{THEME_TOGGLE_BUTTON}</div></div>'
     )
@@ -550,7 +551,7 @@ def write_ecosystems(
     )
     _write(gallery_root, f"{FOLDER}/index-card.html", index_card(written, label))
     if site_url:
-        urls = ["", "ai.html", f"{FOLDER}/"]
+        urls = ["", "ai.html", "organizations.html", f"{FOLDER}/"]
         urls += [f"{FOLDER}/{group.id}.html" for group in pages]
         urls += [f"{repo.id}/" for repo in repos if repo.id in by_id]
         _write(gallery_root, "sitemap.xml", sitemap(site_url, urls, generated))

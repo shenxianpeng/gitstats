@@ -115,3 +115,26 @@ of the `AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ai.html>`
 page, month by month and quarter by quarter, for every repository of the
 gallery; ``ai/<YYYY>-Q<n>.json`` keeps each quarter as it was first
 published.
+
+Organizations
+-------------
+
+`organizations.json <https://shenxianpeng.dev/gitstats/gallery/organizations.json>`_
+and `organizations.csv <https://shenxianpeng.dev/gitstats/gallery/organizations.csv>`_
+hold the counts of the
+`Organizations <https://shenxianpeng.dev/gitstats/gallery/organizations.html>`_
+page: commits by the domain of the author's email address, added up across
+the gallery's repositories. Domains and counts only, never an address.
+
+``organizations`` lists every organization, the most commits in the last 12
+months first: ``organization`` (its domain), ``commits_last_12mo`` (the 12
+months that end with each repository's last commit), ``commits`` (all of
+them) and ``repositories`` (the names of those it committed to).
+``repositories`` lists, for each repository, its ``commits`` of the last four
+complete quarters (named in ``quarters``) and ``by_kind``, how they divide
+between ``organization``, ``one_person`` (a domain only one person commits
+from, most often that person's own), ``personal`` (mail providers anyone can
+sign up for), ``hidden`` (code hosts' noreply addresses), ``unknown`` and
+``bot``; and ``organizations_last_12mo``, its five organizations with the most
+commits in the last 12 months. A domain says where an address is, not who paid
+for the work. New fields may be added at any time.

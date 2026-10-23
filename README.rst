@@ -85,7 +85,7 @@ Example
    :width: 100%
    :target: https://shenxianpeng.dev/gitstats/index.html
 
-Check out the `GitStats Gallery <https://shenxianpeng.dev/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly — and its `AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ai.html>`_ page: how many of each project's commits name an AI coding assistant, quarter by quarter. Its counts can be downloaded as `JSON <https://shenxianpeng.dev/gitstats/gallery/ai.json>`_ or `CSV <https://shenxianpeng.dev/gitstats/gallery/ai.csv>`_, and each quarter is kept as it was first published. The repositories are listed by ecosystem in `gallery/repos.yml <https://github.com/shenxianpeng/gitstats/blob/main/gallery/repos.yml>`_; to suggest one, `open an issue <https://github.com/shenxianpeng/gitstats/issues/new?template=gallery.yml>`_. Each ecosystem has its `ranking by AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ecosystems/>`_, also as JSON (`fields <https://gitstats.readthedocs.io/en/latest/gallery.html>`_).
+Check out the `GitStats Gallery <https://shenxianpeng.dev/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly — and its `AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ai.html>`_ page: how many of each project's commits name an AI coding assistant, quarter by quarter. Its counts can be downloaded as `JSON <https://shenxianpeng.dev/gitstats/gallery/ai.json>`_ or `CSV <https://shenxianpeng.dev/gitstats/gallery/ai.csv>`_, and each quarter is kept as it was first published. Its `Organizations <https://shenxianpeng.dev/gitstats/gallery/organizations.html>`_ page adds up which organizations' addresses commit to the gallery's projects. The repositories are listed by ecosystem in `gallery/repos.yml <https://github.com/shenxianpeng/gitstats/blob/main/gallery/repos.yml>`_; to suggest one, `open an issue <https://github.com/shenxianpeng/gitstats/issues/new?template=gallery.yml>`_. Each ecosystem has its `ranking by AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ecosystems/>`_, also as JSON (`fields <https://gitstats.readthedocs.io/en/latest/gallery.html>`_).
 
 .. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/demo.gif
    :alt: gitstats terminal demo
@@ -137,7 +137,13 @@ compares the share of commits that name an AI coding assistant in each
 repository over the last four quarters. Its counts are written next to it as
 ``ai.json`` and ``ai.csv``, month by month, and the first run after a quarter
 ends keeps a copy of ``ai.json`` in ``ai/<year>-Q<n>.json`` that later runs
-leave as it is.
+leave as it is. A third page, ``<outputpath>/organizations.html``, adds up the
+organizations whose addresses commit to the repositories, by the domain of
+the address, and shows for each repository how its commits of the last four
+quarters divide between organizations, one-person domains, personal mail,
+hidden addresses and bots. Its counts are written next to it as
+``organizations.json`` and ``organizations.csv``: domains and counts, never an
+address.
 
 Add ``--serve`` to preview the generated report right away — gitstats starts a
 local web server and prints the URL (bound to ``127.0.0.1`` by default; pass

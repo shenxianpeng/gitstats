@@ -301,6 +301,9 @@ dd {
 	gap: var(--space-1);
 	padding: var(--space-4);
 	background-color: var(--bg-color);
+	/* a value as long as a domain wraps inside its tile, at a <wbr> where it has one */
+	min-width: 0;
+	overflow-wrap: break-word;
 }
 
 .stat-tiles dt {

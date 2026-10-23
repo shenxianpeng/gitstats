@@ -276,6 +276,7 @@ def test_write_ecosystems(tmp_path):
     assert locs == [
         site,
         site + "ai.html",
+        site + "organizations.html",
         site + "ecosystems/",
         site + "ecosystems/python.html",
         site + "ecosystems/china.html",

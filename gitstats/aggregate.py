@@ -22,6 +22,8 @@ import shutil
 from typing import Any
 
 from gitstats import load_config
+from gitstats.employers import KIND_LABELS, ORGANIZATION
+from gitstats.employers import KINDS as ORGANIZATION_KINDS
 from gitstats.employers import summarize as summarize_organizations
 from gitstats.report_creator import (
     AI_ASSISTED_COUNTED,
@@ -154,12 +156,13 @@ def compute_repo_summary(data: Any, report_path: str) -> dict[str, Any]:
 def organizations_summary(data: Any) -> dict[str, Any] | None:
     """Where the commits come from, by the domain of the author's address.
 
-    The 20 organizations with the most commits, and the commits of the last
-    eight quarters by kind of address (organization, personal, hidden,
-    unknown, bot). Domains only, never an address. None for data collected
-    before addresses were sorted this way. See gitstats.employers.
+    Every organization, the most commits first, and the commits of the last
+    eight quarters by kind of address (organization, one-person domain,
+    personal, hidden, unknown, bot). Domains only, never an address. None for
+    data collected before addresses were sorted this way. See
+    gitstats.employers.
     """
-    overview = summarize_organizations(data, limit=20, quarters=8)
+    overview = summarize_organizations(data, limit=None, quarters=8)
     if overview is None:
         return None
 
@@ -191,6 +194,113 @@ def organizations_summary(data: Any) -> dict[str, Any] | None:
         ],
         "quarters": {quarter["quarter"]: quarter["by_kind"] for quarter in overview["quarters"]},
     }
+
+
+ORGANIZATIONS_DATA_DESCRIPTION = (
+    "Commits by the domain of the author's email address, added up across the "
+    "repositories. An organization's commits in the last 12 months are those of the 12 "
+    "months that end with each repository's last commit. A domain only one person commits "
+    "from is counted apart, as are mail providers anyone can sign up for, code hosts' "
+    "private noreply addresses and bots. A domain says where an address is, not who paid "
+    "for the work."
+)
+
+
+def organizations_dataset(
+    summaries: list[dict[str, Any]], now: datetime.datetime, version: str = ""
+) -> dict[str, Any]:
+    """The counts of the organizations page, as data, put together by gitstats
+    ``version`` (this one's, when not given).
+
+    ``organizations``: each organization of any repository, with its commits
+    added up across them, the most in the last 12 months first.
+    ``repositories``: for each repository whose summary sorts its commits
+    this way, its commits of the last four complete quarters by kind of
+    address, and its organizations with the most commits in the last 12
+    months.
+    """
+    quarters = [quarter_id(months) for _, months in last_quarters(now)]
+    totals: dict[str, dict[str, Any]] = {}
+    repositories = []
+    for summary in summaries:
+        block = summary.get("organizations")
+        if not isinstance(block, dict):
+            continue
+        name = str(summary.get("name", "") or "")
+        by_kind = dict.fromkeys(ORGANIZATION_KINDS, 0)
+        for quarter in quarters:
+            for kind, commits in (block.get("quarters") or {}).get(quarter, {}).items():
+                by_kind[kind] = by_kind.get(kind, 0) + int(commits)
+        rows = block.get("top") or []
+        for row in rows:
+            total = totals.setdefault(
+                row["organization"],
+                {"commits": 0, "commits_last_12mo": 0, "repositories": []},
+            )
+            total["commits"] += int(row["commits"])
+            total["commits_last_12mo"] += int(row["commits_last_12mo"])
+            total["repositories"].append(name)
+        recent = sorted(
+            (row for row in rows if row["commits_last_12mo"]),
+            key=lambda row: (-row["commits_last_12mo"], row["organization"]),
+        )
+        entry: dict[str, Any] = {
+            "name": name,
+            "report": summary.get("report_path", "") or "",
+            "commits": sum(by_kind.values()),
+            "by_kind": by_kind,
+            "organizations_last_12mo": [
+                {"organization": row["organization"], "commits": row["commits_last_12mo"]}
+                for row in recent[:5]
+            ],
+        }
+        if summary.get("group"):
+            entry["group"] = summary["group"]
+        repositories.append(entry)
+    organizations = [
+        {
+            "organization": name,
+            "commits_last_12mo": total["commits_last_12mo"],
+            "commits": total["commits"],
+            "repositories": sorted(total["repositories"], key=str.lower),
+        }
+        for name, total in sorted(
+            totals.items(),
+            key=lambda item: (
+                -item[1]["commits_last_12mo"],
+                -item[1]["commits"],
+                -len(item[1]["repositories"]),
+                item[0],
+            ),
+        )
+    ]
+    return {
+        "schema_version": 1,
+        "title": "Commits by organization",
+        "description": ORGANIZATIONS_DATA_DESCRIPTION,
+        "generated_by": f"gitstats {version or get_version()}",
+        "generated_at": now.astimezone().isoformat(timespec="seconds"),
+        "quarters": quarters,
+        "organizations": organizations,
+        "repositories": repositories,
+    }
+
+
+def organizations_csv(dataset: dict[str, Any]) -> str:
+    """The organizations of ``organizations_dataset``, one row each."""
+    out = io.StringIO()
+    writer = csv.writer(out, lineterminator="\n")
+    writer.writerow(["organization", "repositories", "commits_last_12mo", "commits"])
+    for row in dataset["organizations"]:
+        writer.writerow(
+            [
+                row["organization"],
+                len(row["repositories"]),
+                row["commits_last_12mo"],
+                row["commits"],
+            ]
+        )
+    return out.getvalue()
 
 
 def _months_up_to(now: datetime.datetime, count: int) -> list[str]:
@@ -524,6 +634,34 @@ GROUP_FILTER_SCRIPT = """<script>
 """
 
 
+# how many organizations the page lists; the data has them all
+_ORGANIZATIONS_SHOWN = 50
+
+
+def _organization_share_key(entry: dict[str, Any]) -> tuple[float, str]:
+    """Sorts repositories by the share of their commits from organizations, the
+    largest first, then by name."""
+    commits = entry["commits"]
+    share = entry["by_kind"].get(ORGANIZATION, 0) / commits if commits else -1.0
+    return (-share, entry["name"].lower())
+
+
+def organizations_description(dataset: dict[str, Any]) -> str:
+    """One sentence about the organizations page, for its share tags."""
+    text = (
+        f"The organizations whose addresses commit to {len(dataset['repositories'])} "
+        "repositories, by the domain of the address."
+    )
+    if dataset["organizations"]:
+        top = dataset["organizations"][0]
+        text += (
+            f" Most commits in the last 12 months: {top['organization']}, "
+            f"{format_int(top['commits_last_12mo'])} in {len(top['repositories'])} "
+            "repositories."
+        )
+    return text
+
+
 class AggregateReportCreator:
     """Render the portfolio page for a multi-repository run."""
 
@@ -554,6 +692,10 @@ class AggregateReportCreator:
         ]
         # the page of AI-assisted commits, when a summary counts them
         ai = any(isinstance(summary.get("ai_assisted"), dict) for summary in summaries)
+        # the page of organizations, when a summary names one
+        self.organizations = any(
+            (summary.get("organizations") or {}).get("top") for summary in summaries
+        )
         f = self._open_portfolio_file(path)
         try:
             self._write_page(f, summaries, failures, title, ai)
@@ -578,8 +720,25 @@ class AggregateReportCreator:
                 f.write(self._ai_share_card(rows, quarters))
             finally:
                 f.close()
+        if self.organizations:
+            dataset = organizations_dataset(summaries, datetime.datetime.now(), self.version)
+            for name, text in (
+                ("organizations.json", json.dumps(dataset, indent=2, ensure_ascii=False)),
+                ("organizations.csv", organizations_csv(dataset)),
+            ):
+                f = self._open_portfolio_file(path, name)
+                try:
+                    f.write(text)
+                finally:
+                    f.close()
+            f = self._open_portfolio_file(path, "organizations.html")
+            try:
+                self._write_organizations_page(f, summaries, title, dataset, ai)
+            finally:
+                f.close()
 
     site_url = ""
+    organizations = False
     version = ""
     groups: list[tuple[str, str]] = []
 
@@ -646,8 +805,15 @@ class AggregateReportCreator:
         checking it stays under the output root guards against directory
         traversal.
         """
-        pages = ("index.html", "ai.html", "share-card.html", "ai-share-card.html")
-        if name not in (*pages, "ai.json", "ai.csv") and not _SNAPSHOT.fullmatch(name):
+        pages = (
+            "index.html",
+            "ai.html",
+            "organizations.html",
+            "share-card.html",
+            "ai-share-card.html",
+        )
+        data = ("ai.json", "ai.csv", "organizations.json", "organizations.csv")
+        if name not in (*pages, *data) and not _SNAPSHOT.fullmatch(name):
             raise ValueError(f"Not a portfolio page: {name}")
         base = os.path.abspath(path)
         target = os.path.abspath(os.path.join(base, name))
@@ -685,6 +851,11 @@ class AggregateReportCreator:
             f.write(
                 '<p class="more-link"><a href="ai.html">AI-assisted commits, quarter by '
                 "quarter &rarr;</a></p>"
+            )
+        if self.organizations:
+            f.write(
+                '<p class="more-link"><a href="organizations.html">Organizations, by the '
+                "domains of their commit addresses &rarr;</a></p>"
             )
         self._write_repo_table(f, summaries, self.groups)
         self._write_failures(f, failures)
@@ -786,6 +957,171 @@ class AggregateReportCreator:
             )
         f.write(f'<p class="section-note">{note}</p>')
         self._print_footer(f)
+
+    def _write_organizations_page(
+        self,
+        f: Any,
+        summaries: list[dict[str, Any]],
+        title: str,
+        dataset: dict[str, Any],
+        ai: bool = False,
+    ) -> None:
+        """The organizations whose addresses the repositories' commits come
+        from, added up across them, and for each repository how its commits
+        of the last four quarters divide between kinds of address."""
+        organizations = dataset["organizations"]
+        repositories = dataset["repositories"]
+        page_title = f"{title}: Organizations"
+        self._print_header(
+            f,
+            page_title,
+            self._share_tags(
+                page_title,
+                organizations_description(dataset),
+                "organizations.html",
+                "share-card.png",
+            ),
+        )
+        self._print_nav(f, title, "organizations.html", ai)
+        f.write("<h1>Organizations</h1>")
+        f.write(
+            f'<p class="portfolio-subtitle">{len(repositories)} repositories &middot; '
+            f"generated by gitstats {html.escape(self.version or get_version())} on "
+            f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>"
+        )
+        f.write(
+            '<p class="section-note">Commits counted by the domain of the author&rsquo;s '
+            "email address: <code>corp.google.com</code> and <code>google.com</code> both "
+            "count under google.com. A domain only one person commits from is most often that "
+            "person&rsquo;s own, and is counted apart, as are mail providers anyone can sign up "
+            "for, hidden noreply addresses and bots.</p>"
+            '<p class="section-note">A domain says where an address is, not who paid for the '
+            "work: people commit from personal addresses on paid time, and from work addresses "
+            "on their own. These counts are lower bounds of what organizations do.</p>"
+        )
+        self._write_organization_tiles(f, organizations, repositories)
+
+        f.write("<h2>Across the repositories</h2>")
+        f.write(
+            '<p class="section-note">The organizations with the most commits in the last 12 '
+            "months, added up across the repositories, and the repositories they committed "
+            "to.</p>"
+        )
+        f.write('<div class="table-scroll"><table class="sortable" id="organizations">')
+        f.write(
+            '<tr><th>Organization</th><th class="num">Repositories</th>'
+            '<th class="num">Commits (12 mo)</th><th class="num">Commits</th>'
+            "<th>Committed to</th></tr>"
+        )
+        for row in organizations[:_ORGANIZATIONS_SHOWN]:
+            names = row["repositories"]
+            shown = ", ".join(html.escape(name) for name in names[:4])
+            if len(names) > 4:
+                shown += f" and {len(names) - 4} more"
+            f.write(
+                f"<tr><td>{html.escape(row['organization'])}</td>"
+                f'<td class="num">{format_int(len(names))}</td>'
+                f'<td class="num">{format_int(row["commits_last_12mo"])}</td>'
+                f'<td class="num">{format_int(row["commits"])}</td>'
+                f"<td>{shown}</td></tr>"
+            )
+        f.write("</table></div>")
+        if len(organizations) > _ORGANIZATIONS_SHOWN:
+            f.write(
+                f'<p class="section-note">The first {_ORGANIZATIONS_SHOWN} of '
+                f"{format_int(len(organizations))}; all of them are in the data below.</p>"
+            )
+
+        quarters = dataset["quarters"]
+        f.write("<h2>By repository</h2>")
+        f.write(
+            '<p class="section-note">How each repository&rsquo;s commits of the last four '
+            f"complete quarters ({html.escape(quarters[0])} to {html.escape(quarters[-1])}) "
+            "divide between kinds of address, the largest share from organizations first, "
+            "and its organizations with the most commits in the last 12 months.</p>"
+        )
+        if self.groups:
+            f.write(group_filter_html(summaries, self.groups))
+        f.write('<div class="table-scroll"><table class="sortable" id="organization-mix">')
+        f.write(
+            '<tr><th>Repository</th><th class="num">Commits</th>'
+            + "".join(f'<th class="num">{KIND_LABELS[kind]}</th>' for kind in ORGANIZATION_KINDS)
+            + "<th>Organizations, last 12 months</th></tr>"
+        )
+        for entry in sorted(repositories, key=_organization_share_key):
+            f.write(self._organization_mix_row(entry))
+        f.write("</table></div>")
+        if self.groups:
+            f.write(GROUP_FILTER_SCRIPT)
+
+        f.write("<h2>Data</h2>")
+        f.write(
+            '<p class="section-note">Every organization of every repository, and each '
+            'repository&rsquo;s counts: <a href="organizations.json">organizations.json</a>, '
+            '<a href="organizations.csv">organizations.csv</a>. Domains and counts only, never '
+            "an address.</p>"
+        )
+        self._print_footer(f)
+
+    def _organization_mix_row(self, entry: dict[str, Any]) -> str:
+        """One repository's row of the By repository table."""
+        link = entry["report"]
+        if link.endswith("index.html"):
+            link = link[: -len("index.html")] + "authors.html#commits_by_organization"
+        cells = "".join(
+            f'<td class="num">{share_text(entry["by_kind"].get(kind, 0), entry["commits"])}</td>'
+            for kind in ORGANIZATION_KINDS
+        )
+        named = ", ".join(
+            f"{html.escape(row['organization'])} ({format_int(row['commits'])})"
+            for row in entry["organizations_last_12mo"][:3]
+        )
+        group = _group_attr(str(entry.get("group", "") or "")) if self.groups else ""
+        return (
+            f'<tr{group}><td><a href="{html.escape(link, quote=True)}">'
+            f"{html.escape(entry['name'])}</a></td>"
+            f'<td class="num">{format_int(entry["commits"])}</td>{cells}'
+            f"<td>{named or '&ndash;'}</td></tr>"
+        )
+
+    @staticmethod
+    def _write_organization_tiles(
+        f: Any, organizations: list[dict[str, Any]], repositories: list[dict[str, Any]]
+    ) -> None:
+        """Headline numbers: how many organizations, the one in the most
+        repositories, and the repository whose commits come most from them."""
+        active = [row for row in organizations if row["commits_last_12mo"]]
+        tiles = [
+            (
+                "Organizations",
+                format_int(len(active)),
+                f"with commits in the last 12 months, of {format_int(len(organizations))}",
+            )
+        ]
+        # the page is only written when there is an organization
+        widest = max(
+            organizations,
+            key=lambda row: (len(row["repositories"]), row["commits_last_12mo"]),
+        )
+        tiles.append(
+            (
+                "In the Most Repositories",
+                # a narrow tile breaks a domain before a dot, not inside a name
+                html.escape(widest["organization"]).replace(".", "<wbr>."),
+                f"{len(widest['repositories'])} of {len(repositories)} repositories",
+            )
+        )
+        counted = [entry for entry in repositories if entry["commits"]]
+        if counted:
+            top = min(counted, key=_organization_share_key)
+            tiles.append(
+                (
+                    "Largest Share",
+                    share_text(top["by_kind"].get(ORGANIZATION, 0), top["commits"]),
+                    f"of {html.escape(top['name'])}&rsquo;s commits come from organizations",
+                )
+            )
+        f.write(stat_tiles_html(tiles))
 
     def _ai_row(
         self,
@@ -958,9 +1294,10 @@ class AggregateReportCreator:
             )
         )
 
-    @staticmethod
-    def _print_nav(f: Any, title: str, current: str = "index.html", ai: bool = False) -> None:
+    def _print_nav(self, f: Any, title: str, current: str = "index.html", ai: bool = False) -> None:
         ai_link = nav_link("ai.html", "AI-assisted commits", current=current) if ai else ""
+        if self.organizations:
+            ai_link += nav_link("organizations.html", "Organizations", current=current)
         f.write(
             f"""
             <div class="nav">
