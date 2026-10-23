@@ -230,7 +230,9 @@ ORGANIZATION_ALIASES: dict[str, str] = {
 
 # Host names that machines make up when git is not told an address.
 _LOCAL_SUFFIXES: tuple[str, ...] = (".local", ".localdomain", ".lan", ".home", ".internal")
-_LOCAL_HOSTS: frozenset[str] = frozenset({"localhost", "(none)", "none", "example.com"})
+_LOCAL_HOSTS: frozenset[str] = frozenset(
+    {"localhost", "localhost.com", "(none)", "none", "example.com"}
+)
 _NOREPLY_USERS: frozenset[str] = frozenset({"noreply", "no-reply", "donotreply", "do-not-reply"})
 # Addresses that CI services commit under, whatever name they give.
 BOT_ADDRESSES: frozenset[str] = frozenset(
@@ -239,6 +241,8 @@ BOT_ADDRESSES: frozenset[str] = frozenset(
         "actions@github.com",
         "github-actions@github.com",
         "bot@renovateapp.com",
+        # TensorFlow's export of Google's internal changes
+        "gardener@tensorflow.org",
     }
 )
 _BOT_USERS: frozenset[str] = frozenset({"bot", "buildbot", "ci", "jenkins"})
@@ -274,9 +278,15 @@ def classify(author: str, email: str) -> Affiliation:
     if not at or not user or not host:
         return Affiliation(UNKNOWN)
     user = user.lower()
-    if f"{user}@{host}" in BOT_ADDRESSES or user in _BOT_USERS or user.endswith("-bot"):
+    if (
+        f"{user}@{host}" in BOT_ADDRESSES
+        or user in _BOT_USERS
+        or user.endswith(("-bot", "-ci", "_ci"))
+    ):
         return Affiliation(BOT)
-    if host in HIDDEN_DOMAINS or host.endswith(".noreply.github.com"):
+    # a code host's private address: users.noreply.github.com, noreply.gitcode.com,
+    # user.noreply.gitee.com, ...
+    if host in HIDDEN_DOMAINS or "noreply" in host.split("."):
         return Affiliation(HIDDEN)
     if user in _NOREPLY_USERS:
         return Affiliation(HIDDEN)
