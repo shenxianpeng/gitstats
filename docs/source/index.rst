@@ -18,6 +18,7 @@ Welcome to GitStats documentation!
    configuration
    integration
    ai-integration
+   gallery
    faq
 
 .. toctree::

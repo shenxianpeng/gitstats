@@ -4,6 +4,9 @@
 # .github/workflows/gallery.yml makes one report for each, every Monday, and
 # scripts/generate_gallery_portfolio.py lists them by these groups.
 #
+# Each group has an id (its page: /gallery/ecosystems/<id>.html, so do not
+# rename one), a name, and the title its page's heading names its projects by.
+#
 #   id       the report's folder: https://shenxianpeng.dev/gitstats/gallery/<id>/
 #            Lower case, digits and dashes. Do not rename one: links point to it.
 #   name     how the pages name the repository
@@ -17,6 +20,7 @@
 groups:
   - id: python
     name: Python
+    title: Python open source projects
     repos:
       - { id: cpython,       name: "CPython",       url: "python/cpython" }
       - { id: django,        name: "Django",        url: "django/django" }
@@ -38,6 +42,7 @@ groups:
 
   - id: ai-coding
     name: AI coding assistants
+    title: Open source AI coding assistants
     # how much their own history names one
     repos:
       - { id: codex,         name: "Codex CLI",     url: "openai/codex" }
@@ -55,6 +60,7 @@ groups:
 
   - id: ai-ml
     name: AI and machine learning
+    title: Open source AI and machine learning projects
     repos:
       - { id: pytorch,       name: "PyTorch",       url: "pytorch/pytorch" }
       - { id: transformers,  name: "Transformers",  url: "huggingface/transformers" }
@@ -71,6 +77,7 @@ groups:
 
   - id: cncf
     name: CNCF graduated
+    title: CNCF graduated projects
     repos:
       - { id: kubernetes,    name: "Kubernetes",    url: "kubernetes/kubernetes" }
       - { id: prometheus,    name: "Prometheus",    url: "prometheus/prometheus" }
@@ -90,6 +97,7 @@ groups:
 
   - id: apache
     name: Apache
+    title: Apache projects
     repos:
       - { id: airflow,       name: "Apache Airflow",  url: "apache/airflow" }
       - { id: spark,         name: "Apache Spark",    url: "apache/spark" }
@@ -104,6 +112,7 @@ groups:
 
   - id: frontend
     name: Web frontend
+    title: Open source web frontend projects
     repos:
       - { id: react,         name: "React",         url: "react/react" }
       - { id: vue,           name: "Vue",           url: "vuejs/core" }
@@ -119,6 +128,7 @@ groups:
 
   - id: china
     name: Open source from China
+    title: Open source projects from China
     # Apache projects started in China, OpenHarmony (its GitHub mirrors) and others
     repos:
       - { id: dubbo,         name: "Apache Dubbo",  url: "apache/dubbo" }
@@ -140,6 +150,7 @@ groups:
 
   - id: devtools
     name: Languages and developer tools
+    title: Open source languages and developer tools
     repos:
       - { id: git,           name: "Git",           url: "git/git" }
       - { id: vscode,        name: "VS Code",       url: "microsoft/vscode" }

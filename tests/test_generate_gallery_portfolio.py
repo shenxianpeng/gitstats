@@ -447,3 +447,35 @@ def test_add_report_notes_skips_a_report_without_a_folder(gallery_script, temp_d
         {"report_path": "./index.html", "name": "the gallery itself"},
     ]
     assert gallery_script.add_report_notes(gallery, summaries, "") == 0
+
+
+# ── the ecosystem pages ──────────────────────────────────────────────────
+
+
+@needs_yaml
+def test_repos_write_the_ecosystem_pages_and_link_them(gallery_script, temp_dir, monkeypatch):
+    gallery, repos = _gallery(temp_dir, monkeypatch)
+    _write_report(gallery, "django", name="Django", total_commits=300)
+    _write_report(gallery, "etcd", name="etcd", total_commits=200)
+
+    site = "https://example.com/gallery/"
+    assert gallery_script.main([gallery, "--repos", repos, "--site-url", site]) == 0
+
+    for page in ("python.html", "python.json", "cncf.html", "index.html", "index.json"):
+        assert os.path.isfile(os.path.join(gallery, "ecosystems", page))
+    assert "<loc>https://example.com/gallery/ecosystems/cncf.html</loc>" in _read(
+        gallery, "sitemap.xml"
+    )
+    # the gallery's pages link to every ranking, and each report to its own
+    index = _read(gallery, "index.html")
+    assert '<a href="ecosystems/index.html">Ecosystems ranked by AI-assisted commits' in index
+    assert '<a href="ecosystems/python.html">Python</a>' in index
+    assert (
+        '<a href="../ecosystems/python.html">How Django ranks among Python projects by '
+        "AI-assisted commits &rarr;</a>"
+    ) in _read(gallery, "django", "authors.html")
+
+
+def test_notes_without_groups_have_no_ranking_links(gallery_script):
+    assert "ecosystems/" not in gallery_script.gallery_note()
+    assert "ecosystems/" not in gallery_script.report_note("x", "X", "", badge=False)
