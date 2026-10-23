@@ -14,7 +14,9 @@ Usage:
 
 ``--repos`` is the gallery's list of repositories (gallery/repos.yml): the
 pages then group the reports by ecosystem, and list the repositories that
-have no report, so one that failed does not stop the others.
+have no report, so one that failed does not stop the others. Each ecosystem
+also gets its ranking page under ecosystems/ (see gallery_ecosystems.py),
+and the gallery its sitemap.xml when ``--site-url`` is given.
 
 ``--site-url`` is the gallery's public address; with ``--share-card`` too, its
 pages point to their share cards as images (share-card.png and
@@ -40,7 +42,8 @@ from gitstats.aggregate import AggregateReportCreator
 from gitstats.utils import get_version
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from gallery_repos import RepoListError, load_repos  # noqa: E402
+from gallery_ecosystems import FOLDER, in_a_sentence, write_ecosystems  # noqa: E402
+from gallery_repos import Group, Repo, RepoListError, load_repos  # noqa: E402
 
 ACTION_URL = "https://github.com/shenxianpeng/gitstats-action"
 REQUEST_URL = "https://github.com/shenxianpeng/gitstats/issues/new?template=gallery.yml"
@@ -145,10 +148,19 @@ def badge_markdown(report_id: str, name: str, site_url: str) -> str:
     return f"[![AI-assisted commits: {name}]({report}{AI_BADGE})]({report or 'index.html'})"
 
 
-def report_note(report_id: str, name: str, site_url: str, badge: bool) -> str:
-    """The note at the end of a report page: the badge, when ``badge``, and
-    how to make the report for another repository."""
+def report_note(
+    report_id: str, name: str, site_url: str, badge: bool, group: Group | None = None
+) -> str:
+    """The note at the end of a report page: the badge, when ``badge``, how
+    the repository ranks in its ``group``, and how to make the report for
+    another repository."""
     parts = [NOTE_MARK, '<section class="gallery-note" id="gallery-note">']
+    if group is not None:
+        parts.append(
+            f'<p class="more-link"><a href="../{FOLDER}/{group.id}.html">How {html.escape(name)} '
+            f"ranks among {html.escape(in_a_sentence(group.title))} by AI-assisted commits "
+            "&rarr;</a></p>"
+        )
     if badge:
         code = badge_markdown(report_id, name, site_url)
         parts.append(
@@ -168,12 +180,23 @@ def report_note(report_id: str, name: str, site_url: str, badge: bool) -> str:
     return "".join(parts)
 
 
-def gallery_note() -> str:
-    """The note at the end of the gallery's own pages."""
+def gallery_note(groups: list[Group] | None = None) -> str:
+    """The note at the end of the gallery's own pages, with a link to each
+    ecosystem's ranking."""
+    ranked = ""
+    if groups:
+        links = " &middot; ".join(
+            f'<a href="{FOLDER}/{group.id}.html">{html.escape(group.name)}</a>' for group in groups
+        )
+        ranked = (
+            f'<p class="more-link"><a href="{FOLDER}/index.html">Ecosystems ranked by '
+            f"AI-assisted commits &rarr;</a> {links}</p>"
+        )
     return "".join(
         [
             NOTE_MARK,
             '<section class="gallery-note" id="gallery-note">',
+            ranked,
             f'<p class="more-link"><a href="{REQUEST_URL}" target="_blank" rel="noopener">'
             "Add your project to the Gallery &rarr;</a> Open source, on GitHub: suggest it "
             "in an issue.</p>",
@@ -237,7 +260,9 @@ def _report_pages(folder: str) -> list[str]:
     ]
 
 
-def _add_report_note(base: str, summary: dict, site_url: str) -> int:
+def _add_report_note(
+    base: str, summary: dict, site_url: str, groups: dict[str, Group] | None = None
+) -> int:
     """Add the note to every page of one report; how many pages got it."""
     report_id = summary["report_path"].split("/", 1)[0]
     folder = _inside(base, report_id)
@@ -245,29 +270,33 @@ def _add_report_note(base: str, summary: dict, site_url: str) -> int:
         return 0
     badge = os.path.isfile(os.path.join(folder, AI_BADGE))
     name = str(summary.get("name", ""))
+    group = (groups or {}).get(str(summary.get("group", "")))
     added = 0
     for entry in _report_pages(folder):
-        note = report_note(report_id, name, site_url, badge and entry == "index.html")
+        note = report_note(report_id, name, site_url, badge and entry == "index.html", group)
         added += add_note(base, os.path.join(folder, entry), note)
     return added
 
 
-def add_report_notes(gallery_root: str, summaries: list[dict], site_url: str) -> int:
+def add_report_notes(
+    gallery_root: str, summaries: list[dict], site_url: str, groups: list[Group] | None = None
+) -> int:
     """Add the note to every page of each report; how many pages got it."""
     base = os.path.realpath(gallery_root)
-    added = sum(_add_report_note(base, summary, site_url) for summary in summaries)
+    by_id = {group.id: group for group in groups or []}
+    added = sum(_add_report_note(base, summary, site_url, by_id) for summary in summaries)
     for entry in ("index.html", "ai.html"):
         page = os.path.join(base, entry)
         if os.path.isfile(page):
-            added += add_note(base, page, gallery_note())
+            added += add_note(base, page, gallery_note(groups))
     return added
 
 
 def _listed_summaries(
     gallery_root: str, repos_file: str
-) -> tuple[list[dict], list[tuple[str, str]], list[dict[str, str]]]:
+) -> tuple[list[dict], list[Group], list[Repo], list[dict[str, str]]]:
     """The summaries of the repositories of the list, each with its group;
-    the groups; and the repositories without a report."""
+    the groups and the repositories of the list; and those without a report."""
     repo_groups, repos = load_repos(repos_file)
     summaries = load_gallery_summaries(gallery_root, [repo.id for repo in repos])
     by_id = {repo.id: repo for repo in repos}
@@ -283,7 +312,7 @@ def _listed_summaries(
     ]
     for failure in failures:
         print(f"{failure['name']}: {failure['error']}", file=sys.stderr)
-    return summaries, [(group.id, group.name) for group in repo_groups], failures
+    return summaries, repo_groups, repos, failures
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -306,11 +335,12 @@ def main(argv: list[str] | None = None) -> int:
         site_url += "/"
     load_config()["share_card"] = args.share_card
 
-    groups: list[tuple[str, str]] = []
+    groups: list[Group] = []
+    repos: list[Repo] = []
     failures: list[dict[str, str]] = []
     if args.repos:
         try:
-            summaries, groups, failures = _listed_summaries(gallery_root, args.repos)
+            summaries, groups, repos, failures = _listed_summaries(gallery_root, args.repos)
         except (OSError, RepoListError) as error:
             print(f"{args.repos}: {error}", file=sys.stderr)
             return 1
@@ -330,12 +360,16 @@ def main(argv: list[str] | None = None) -> int:
         title="GitStats Gallery",
         site_url=site_url,
         version=version,
-        groups=groups,
+        groups=[(group.id, group.name) for group in groups],
     )
-    pages = add_report_notes(gallery_root, summaries, site_url)
+    ecosystems = write_ecosystems(
+        gallery_root, groups, repos, summaries, site_url, args.share_card, version
+    )
+    pages = add_report_notes(gallery_root, summaries, site_url, ecosystems)
     print(
         f"Portfolio page written for {len(summaries)} repositories: {gallery_root}/index.html"
         + (f" ({len(failures)} without a report)" if failures else "")
+        + (f"; {len(ecosystems)} ecosystem pages" if ecosystems else "")
         + f"; notes added to {pages} pages"
     )
     return 0

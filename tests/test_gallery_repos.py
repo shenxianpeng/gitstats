@@ -53,6 +53,8 @@ def test_parse_repos(repos_script):
     }
     groups, repos = repos_script.parse_repos(data)
     assert [(g.id, g.name) for g in groups] == [("python", "Python"), ("cncf", "CNCF")]
+    # a group without a title is named by its name
+    assert groups[0].title == "Python projects"
     assert [(r.id, r.group, r.timeout) for r in repos] == [
         ("flask", "python", 90),
         ("pip", "python", 90),
@@ -80,6 +82,8 @@ def test_parse_repos(repos_script):
         (_list(_repo(timeout="90")), "number of minutes"),
         (_list(_repo(timeout=True)), "number of minutes"),
         (_list(_repo(timeout=361)), "1 to 360"),
+        ({"groups": [{"id": "a", "name": "A", "title": 3, "repos": [_repo()]}]}, "title"),
+        ({"groups": [{"id": "a", "name": "A", "title": " ", "repos": [_repo()]}]}, "title"),
         ({"groups": []}, "no repositories"),
     ],
 )

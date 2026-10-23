@@ -29,6 +29,8 @@ MAX_TIMEOUT = 360
 class Group:
     id: str
     name: str
+    # how a page title names its projects: "Python open source projects"
+    title: str = ""
 
 
 @dataclass(frozen=True)
@@ -79,10 +81,13 @@ def _parse_group(group: object, taken: set[str]) -> tuple[Group, list]:
     group_id, group_name = _text(group, "id", "group"), _text(group, "name", "group")
     if not _ID.fullmatch(group_id) or group_id in taken:
         raise RepoListError(f"bad or repeated group id: {group_id!r}")
+    title = group.get("title", f"{group_name} projects")
+    if not isinstance(title, str) or not title.strip():
+        raise RepoListError(f"group {group_id!r}: title must be text")
     entries = group.get("repos")
     if not isinstance(entries, list) or not entries:
         raise RepoListError(f"group {group_id!r} has no repos")
-    return Group(group_id, group_name), entries
+    return Group(group_id, group_name, title.strip()), entries
 
 
 def _parse_repo(entry: object, group_id: str) -> Repo:
