@@ -1,0 +1,36 @@
+tests/test_gallery_repos.py
+  s_c235a1d6c969c6::t_553e29bb0b818b 56-57,85-86
+scripts/gallery_repos.py
+  s_c235a1d6c969c6::t_815c4986e9e313 32-33,84-86,90
+tests/test_gallery_ecosystems.py
+  s_c235a1d6c969c6::t_e1fc99a30ba075 1-198,200-221,223-230,232,234-286,288-294,296-311
+  s_c235a1d6c969c6::t_ac4efd009f66cf 199,222,231,233,287,295
+scripts/gallery_ecosystems.py
+  s_c235a1d6c969c6::t_e8b9bb45e7b345 227-229,304-306,368-370,387-389,410-412,524-526,533-540,545-549
+  s_c235a1d6c969c6::t_f7c1fdc4d42320 1-153,161,164,166,169-171,173,176-226,230-275,278-303,307-367,371-386,390-409,413-495,497-498,501-510,512-514,523,528-532,541-544,550-551
+  s_c235a1d6c969c6::t_0e67a024ec96ae 155-160,162,165,168,172,174-175
+  s_c235a1d6c969c6::t_4babc6f8cf37d8 154,163,167,276-277,496,499-500,511,515-522,527,552-556
+tests/test_generate_gallery_portfolio.py
+  s_c235a1d6c969c6::t_553e29bb0b818b 450-481
+scripts/generate_gallery_portfolio.py
+  s_c235a1d6c969c6::t_e8b9bb45e7b345 17-19,46,151-156,158-160,163,183-194,199,263-265,273,276,281-283,286-287,291,297,299,315,338-339,343,363-366
+  s_c235a1d6c969c6::t_745d80e72eb13d 45,161-162,368,372
+gallery/repos.yml
+  s_c235a1d6c969c6::t_815c4986e9e313 7-9,23,45,63,80,100,115,131,153
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e8f77c70ead393394f8924311624d75d839040c1",
+  "prompts": {},
+  "sessions": {
+    "s_c235a1d6c969c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9b05f12-9513-4cfd-b161-6ad249c4a0e1",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "Xianpeng Shen <xianpeng.shen@gmail.com>"
+    }
+  }
+}
