@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev6",
-  "generated_at": "2026-10-23T04:24:48+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev7",
+  "generated_at": "2026-10-23T08:44:49+00:00",
   "name": "gitstats",
   "report_path": "index.html",
   "first_commit": "2007-07-30 14:54:43",
-  "last_commit": "2026-10-23 04:24:11",
+  "last_commit": "2026-10-23 08:44:03",
   "age_days": 7025,
   "active_days": 243,
-  "total_commits": 601,
+  "total_commits": 602,
   "total_authors": 38,
   "active_authors_12mo": 7,
-  "commits_last_12mo": 167,
-  "total_files": 72,
-  "total_lines": 31444,
-  "lines_added": 43293,
-  "lines_removed": 11849,
+  "commits_last_12mo": 168,
+  "total_files": 74,
+  "total_lines": 32405,
+  "lines_added": 44255,
+  "lines_removed": 11850,
   "total_tags": 51,
   "era": "peak",
   "top_authors": [
     {
       "name": "Xianpeng Shen",
-      "commits": 248
+      "commits": 249
     },
     {
       "name": "Heikki Hokkanen",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Xianpeng Shen": 248,
+    "Xianpeng Shen": 249,
     "Devraj Pal": 10,
     "harsh8968": 1,
     "tomatotomata": 1,
@@ -92,7 +92,7 @@
     "2015": 2,
     "2024": 68,
     "2025": 90,
-    "2026": 149
+    "2026": 150
   },
   "ai_assisted": {
     "commits": 13,
@@ -151,7 +151,105 @@
       "2026-07": 18,
       "2026-08": 15,
       "2026-09": 31,
-      "2026-10": 36
+      "2026-10": 37
+    }
+  },
+  "organizations": {
+    "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
+    "commits": 602,
+    "by_kind": {
+      "organization": 249,
+      "one_person": 29,
+      "personal": 269,
+      "hidden": 21,
+      "unknown": 0,
+      "bot": 34
+    },
+    "organization_count": 2,
+    "last_12mo_from": "2025-11",
+    "top": [
+      {
+        "organization": "sf.net",
+        "commits": 242,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2007-07-30",
+        "last_commit": "2014-11-07"
+      },
+      {
+        "organization": "exherbo.org",
+        "commits": 7,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2010-01-08",
+        "last_commit": "2011-01-02"
+      }
+    ],
+    "quarters": {
+      "2025-Q1": {
+        "organization": 0,
+        "one_person": 0,
+        "personal": 27,
+        "hidden": 0,
+        "unknown": 0,
+        "bot": 6
+      },
+      "2025-Q2": {
+        "organization": 0,
+        "one_person": 0,
+        "personal": 20,
+        "hidden": 0,
+        "unknown": 0,
+        "bot": 5
+      },
+      "2025-Q3": {
+        "organization": 0,
+        "one_person": 0,
+        "personal": 5,
+        "hidden": 1,
+        "unknown": 0,
+        "bot": 3
+      },
+      "2025-Q4": {
+        "organization": 0,
+        "one_person": 0,
+        "personal": 19,
+        "hidden": 0,
+        "unknown": 0,
+        "bot": 4
+      },
+      "2026-Q1": {
+        "organization": 0,
+        "one_person": 1,
+        "personal": 13,
+        "hidden": 6,
+        "unknown": 0,
+        "bot": 4
+      },
+      "2026-Q2": {
+        "organization": 0,
+        "one_person": 0,
+        "personal": 19,
+        "hidden": 3,
+        "unknown": 0,
+        "bot": 3
+      },
+      "2026-Q3": {
+        "organization": 0,
+        "one_person": 0,
+        "personal": 51,
+        "hidden": 10,
+        "unknown": 0,
+        "bot": 3
+      },
+      "2026-Q4": {
+        "organization": 0,
+        "one_person": 0,
+        "personal": 33,
+        "hidden": 1,
+        "unknown": 0,
+        "bot": 3
+      }
     }
   }
 }
