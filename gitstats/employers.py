@@ -10,7 +10,9 @@ open source from personal addresses on paid time, and from work addresses on
 their own time. Addresses at a mail provider anyone can sign up for
 (``@gmail.com``, ``@qq.com``) are grouped as personal, GitHub's private
 ``noreply`` addresses as hidden, and accounts named ``…[bot]`` as bots, so
-none of them is mistaken for an organization.
+none of them is mistaken for an organization. A domain only one address
+commits from is most often a person's own (``@jane.dev``): a report counts
+it as a one-address domain, not as an organization.
 
 Only domains are kept. No address or name leaves this module.
 """
@@ -20,16 +22,18 @@ from __future__ import annotations
 from typing import Any, NamedTuple
 
 ORGANIZATION = "organization"
+ONE_ADDRESS = "one_address"
 PERSONAL = "personal"
 HIDDEN = "hidden"
 UNKNOWN = "unknown"
 BOT = "bot"
 
 # The kinds in the order a report lists them.
-KINDS: tuple[str, ...] = (ORGANIZATION, PERSONAL, HIDDEN, UNKNOWN, BOT)
+KINDS: tuple[str, ...] = (ORGANIZATION, ONE_ADDRESS, PERSONAL, HIDDEN, UNKNOWN, BOT)
 
 KIND_LABELS: dict[str, str] = {
     ORGANIZATION: "Organizations",
+    ONE_ADDRESS: "One-address domains",
     PERSONAL: "Personal email",
     HIDDEN: "Hidden (noreply)",
     UNKNOWN: "Unknown",
@@ -165,6 +169,16 @@ ORGANIZATION_ALIASES: dict[str, str] = {
 _LOCAL_SUFFIXES: tuple[str, ...] = (".local", ".localdomain", ".lan", ".home", ".internal")
 _LOCAL_HOSTS: frozenset[str] = frozenset({"localhost", "(none)", "none", "example.com"})
 _NOREPLY_USERS: frozenset[str] = frozenset({"noreply", "no-reply", "donotreply", "do-not-reply"})
+# Addresses that CI services commit under, whatever name they give.
+BOT_ADDRESSES: frozenset[str] = frozenset(
+    {
+        "action@github.com",
+        "actions@github.com",
+        "github-actions@github.com",
+        "bot@renovateapp.com",
+    }
+)
+_BOT_USERS: frozenset[str] = frozenset({"bot", "buildbot", "ci", "jenkins"})
 
 
 class Affiliation(NamedTuple):
@@ -196,9 +210,12 @@ def classify(author: str, email: str) -> Affiliation:
     host = host.strip().strip(".").lower()
     if not at or not user or not host:
         return Affiliation(UNKNOWN)
+    user = user.lower()
+    if f"{user}@{host}" in BOT_ADDRESSES or user in _BOT_USERS or user.endswith("-bot"):
+        return Affiliation(BOT)
     if host in HIDDEN_DOMAINS or host.endswith(".noreply.github.com"):
         return Affiliation(HIDDEN)
-    if user.lower() in _NOREPLY_USERS:
+    if user in _NOREPLY_USERS:
         return Affiliation(HIDDEN)
     if "." not in host or host in _LOCAL_HOSTS or host.endswith(_LOCAL_SUFFIXES):
         return Affiliation(UNKNOWN)
@@ -229,7 +246,9 @@ def summarize(data: object, limit: int = 20, quarters: int = 8) -> dict[str, Any
     with its commits in all and in the 12 months that end with the last
     commit, and how many addresses committed from it. ``quarters``: the last
     ``quarters`` quarters with commits, each with its commits by kind of
-    address. None for data collected before addresses were sorted this way.
+    address. A domain that one address commits from counts as ONE_ADDRESS,
+    not as an organization. None for data collected before addresses were
+    sorted this way.
     """
     by_month = getattr(data, "affiliation_by_month", None)
     organizations = getattr(data, "organizations", None)
@@ -237,6 +256,14 @@ def summarize(data: object, limit: int = 20, quarters: int = 8) -> dict[str, Any
     if not isinstance(by_month, dict) or not isinstance(organizations, dict) or not by_month:
         return None
     authors = authors if isinstance(authors, dict) else {}
+    # domains of one address: only known when the addresses were counted
+    single = {name for name in organizations if authors.get(name) == 1}
+    by_month = {month: dict(kinds) for month, kinds in by_month.items()}
+    for name in single:
+        for month, commits in organizations[name]["by_month"].items():
+            kinds = by_month.setdefault(month, {})
+            kinds[ORGANIZATION] = kinds.get(ORGANIZATION, 0) - commits
+            kinds[ONE_ADDRESS] = kinds.get(ONE_ADDRESS, 0) + commits
     last = max(by_month)
     year_start = _months_back(last, 11)
 
@@ -248,7 +275,10 @@ def summarize(data: object, limit: int = 20, quarters: int = 8) -> dict[str, Any
             by_kind[kind] = by_kind.get(kind, 0) + commits
             quarter[kind] = quarter.get(kind, 0) + commits
 
-    ranked = sorted(organizations.items(), key=lambda item: (-item[1]["commits"], item[0]))
+    ranked = sorted(
+        ((name, info) for name, info in organizations.items() if name not in single),
+        key=lambda item: (-item[1]["commits"], item[0]),
+    )
     rows = [
         {
             "organization": name,
@@ -265,7 +295,7 @@ def summarize(data: object, limit: int = 20, quarters: int = 8) -> dict[str, Any
     return {
         "commits": sum(by_kind.values()),
         "by_kind": by_kind,
-        "organization_count": len(organizations),
+        "organization_count": len(organizations) - len(single),
         "year_start": year_start,
         "last_month": last,
         "organizations": rows,

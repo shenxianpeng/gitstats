@@ -170,8 +170,9 @@ def organizations_summary(data: Any) -> dict[str, Any] | None:
         "description": (
             "Commits by the domain of the author's email address. Mail providers anyone can "
             "sign up for count as personal, code hosts' private noreply addresses as hidden, "
-            "and accounts named [bot] as bots. A domain says where an address is, not who "
-            "paid for the work."
+            "CI accounts and accounts named [bot] as bots, and a domain only one address "
+            "commits from as one_address. A domain says where an address is, not who paid "
+            "for the work."
         ),
         "commits": overview["commits"],
         "by_kind": overview["by_kind"],

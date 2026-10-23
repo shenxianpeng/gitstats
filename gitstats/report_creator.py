@@ -1651,8 +1651,9 @@ class HTMLReportCreator(ReportCreator):
             f'<p class="section-note">{format_int(from_orgs)} of {format_int(total)} commits '
             f"({share_text(from_orgs, total)}) come from an address at "
             f"{format_int(count)} organization{'' if count == 1 else 's'}, counted by the "
-            "domain of the address. Personal mail providers, hidden noreply addresses and "
-            "bots are counted apart, below.</p>"
+            "domain of the address and committed from by two addresses or more. Domains of "
+            "one address (most often a person's own), personal mail providers, hidden "
+            "noreply addresses and bots are counted apart, below.</p>"
         )
         parts.append(
             '<p class="section-note">The domain says where an address is, not who paid for '

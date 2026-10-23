@@ -7,6 +7,7 @@ import pytest
 from gitstats.employers import (
     BOT,
     HIDDEN,
+    ONE_ADDRESS,
     ORGANIZATION,
     PERSONAL,
     UNKNOWN,
@@ -69,6 +70,13 @@ def test_registrable_domain(host, expected):
         # an account named [bot] is a bot, whatever its address
         ("dependabot[bot]", "49699333+dependabot[bot]@users.noreply.github.com", Affiliation(BOT)),
         ("renovate[bot] ", "bot@renovateapp.com", Affiliation(BOT)),
+        # CI services, whatever name they commit under
+        ("github-actions", "github-actions@github.com", Affiliation(BOT)),
+        ("GitHub Action", "Action@GitHub.com", Affiliation(BOT)),
+        ("Release", "release-bot@acme.org", Affiliation(BOT)),
+        ("CI", "ci@acme.org", Affiliation(BOT)),
+        # a person at GitHub is not
+        ("Ann", "ann@github.com", Affiliation(ORGANIZATION, "github.com")),
     ],
 )
 def test_classify(author, email, expected):
@@ -77,7 +85,12 @@ def test_classify(author, email, expected):
 
 @pytest.mark.parametrize(
     ("month", "quarter"),
-    [("2026-01", "2026-Q1"), ("2026-03", "2026-Q1"), ("2026-07", "2026-Q3"), ("2025-12", "2025-Q4")],
+    [
+        ("2026-01", "2026-Q1"),
+        ("2026-03", "2026-Q1"),
+        ("2026-07", "2026-Q3"),
+        ("2025-12", "2025-Q4"),
+    ],
 )
 def test_quarter_of(month, quarter):
     assert quarter_of(month) == quarter
@@ -122,6 +135,7 @@ def test_summarize():
     assert overview["commits"] == 11
     assert overview["by_kind"] == {
         ORGANIZATION: 6,
+        ONE_ADDRESS: 0,
         PERSONAL: 1,
         HIDDEN: 1,
         UNKNOWN: 1,
@@ -153,7 +167,7 @@ def test_summarize():
     assert overview["quarters"][1] == {
         "quarter": "2026-Q1",
         "commits": 6,
-        "by_kind": {ORGANIZATION: 3, PERSONAL: 0, HIDDEN: 0, UNKNOWN: 1, BOT: 2},
+        "by_kind": {ORGANIZATION: 3, ONE_ADDRESS: 0, PERSONAL: 0, HIDDEN: 0, UNKNOWN: 1, BOT: 2},
     }
 
 
@@ -175,3 +189,38 @@ def test_summarize_without_the_data():
 def test_summarize_without_addresses():
     overview = summarize(_data(organization_authors=None))
     assert all(row["authors"] == 0 for row in overview["organizations"])
+
+
+def test_summarize_counts_a_domain_of_one_address_apart():
+    data = _data(organization_authors={"google.com": 2, "redhat.com": 1})
+    overview = summarize(data)
+    # redhat.com's two commits, in 2025-11 and 2026-02, leave the organizations
+    assert overview["by_kind"][ORGANIZATION] == 4
+    assert overview["by_kind"][ONE_ADDRESS] == 2
+    assert overview["organization_count"] == 2
+    assert [row["organization"] for row in overview["organizations"]] == [
+        "google.com",
+        "acme.org",
+    ]
+    q1 = overview["quarters"][-1]["by_kind"]
+    assert (q1[ORGANIZATION], q1[ONE_ADDRESS]) == (2, 1)
+    # the data it was given is left as it was
+    assert data.affiliation_by_month["2026-02"] == {ORGANIZATION: 3, BOT: 2, UNKNOWN: 1}
+
+
+def test_summarize_one_address_month_without_other_commits():
+    data = _data(
+        affiliation_by_month={"2026-02": {ORGANIZATION: 1}},
+        organizations={
+            "jane.dev": {
+                "commits": 1,
+                "first_commit_stamp": 1,
+                "last_commit_stamp": 1,
+                "by_month": {"2026-01": 1},
+            }
+        },
+        organization_authors={"jane.dev": 1},
+    )
+    overview = summarize(data)
+    assert overview["organizations"] == []
+    assert overview["by_kind"][ONE_ADDRESS] == 1

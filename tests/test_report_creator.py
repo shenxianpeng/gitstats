@@ -3723,9 +3723,17 @@ def test_organizations_section(mock_data_collector):
     assert q2 < q1
     assert (
         '<td class="nowrap">2023-Q1</td><td class="num">5</td>'
-        '<td class="num">80.0%</td><td class="num">20.0%</td><td class="num">0%</td>' in section
+        '<td class="num">80.0%</td><td class="num">0%</td><td class="num">20.0%</td>' in section
     )
-    for label in ("Organizations", "Personal email", "Hidden (noreply)", "Unknown", "Bots"):
+    labels = (
+        "Organizations",
+        "One-address domains",
+        "Personal email",
+        "Hidden (noreply)",
+        "Unknown",
+        "Bots",
+    )
+    for label in labels:
         assert f'<th class="num">{label}</th>' in section
 
 
@@ -3740,6 +3748,11 @@ def test_organizations_section_escapes_the_domain(mock_data_collector):
     section = HTMLReportCreator()._organizations_html(mock_data_collector)
     assert "&lt;b&gt;.org" in section
     assert "<b>.org" not in section
+
+
+def test_organizations_section_is_left_out_with_one_address_domains_only(mock_data_collector):
+    mock_data_collector.organization_authors = {"example.com": 1, "test.org": 1}
+    assert HTMLReportCreator()._organizations_html(mock_data_collector) == ""
 
 
 def test_organizations_section_is_left_out_without_any(mock_data_collector):
