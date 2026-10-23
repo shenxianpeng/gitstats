@@ -21,7 +21,7 @@ import re
 import shutil
 from typing import Any
 
-from gitstats import load_config
+from gitstats import compare, load_config
 from gitstats.badge import compact_count, endpoint_json, render_badge
 from gitstats.employers import KIND_LABELS, ORGANIZATION
 from gitstats.employers import KINDS as ORGANIZATION_KINDS
@@ -151,7 +151,56 @@ def compute_repo_summary(data: Any, report_path: str) -> dict[str, Any]:
         },
         "ai_assisted": ai_assisted_summary(data, now),
         "organizations": organizations_summary(data),
+        "people_last_12mo": people_summary(data),
     }
+
+
+def people_summary(data: Any) -> dict[str, Any] | None:
+    """Who made the commits of the 12 months that end with the last commit:
+    how many people, how many of them made their first commit in those
+    months, and how few people made half of the commits. Bots, by their
+    ``[bot]`` names, are left out. None without commits by month."""
+    by_month = getattr(data, "author_of_month", None)
+    if not isinstance(by_month, dict) or not by_month:
+        return None
+    last = max(by_month)
+    first = _months_up_to_month(last, 12)[0]
+    commits: dict[str, int] = {}
+    for month, authors in by_month.items():
+        if month >= first:
+            for name, count in authors.items():
+                if not _is_bot(name):
+                    commits[name] = commits.get(name, 0) + int(count)
+    year, month = map(int, first.split("-"))
+    since = datetime.datetime(year, month, 1).timestamp()
+    info = getattr(data, "authors", {}) or {}
+    new = sum(
+        1
+        for name in commits
+        if isinstance(info.get(name), dict)
+        and int(info[name].get("first_commit_stamp", 0)) >= since
+    )
+    # the fewest people whose commits add up to half of them, the busiest first
+    half, made = 0, 0
+    for count in sorted(commits.values(), reverse=True):
+        if made * 2 >= sum(commits.values()):
+            break
+        made += count
+        half += 1
+    return {
+        "from": first,
+        "to": last,
+        "commits": sum(commits.values()),
+        "authors": len(commits),
+        "new_authors": new,
+        "half_of_commits": half,
+    }
+
+
+def _months_up_to_month(last: str, count: int) -> list[str]:
+    """The ``count`` "YYYY-MM" months that end with ``last``, oldest first."""
+    year, month = map(int, last.split("-"))
+    return _months_up_to(datetime.datetime(year, month, 1), count)
 
 
 def organizations_summary(data: Any) -> dict[str, Any] | None:
@@ -658,6 +707,8 @@ _ORGANIZATION_PAGES = 200
 # a domain, as an organization's page is named after it: "orgs/google.com.html"
 _DOMAIN = r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+"
 _ORGANIZATION_FILE = re.compile(rf"orgs/{_DOMAIN}\.(?:html|svg|json)")
+# a repository's comparison page and card, in its report's folder
+_COMPARE_FILE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*/compare(?:-card)?\.html")
 
 
 def organization_pages(dataset: dict[str, Any]) -> list[dict[str, Any]]:
@@ -718,6 +769,7 @@ class AggregateReportCreator:
         site_url: str = "",
         version: str = "",
         groups: list[tuple[str, str]] | None = None,
+        group_titles: dict[str, str] | None = None,
     ) -> None:
         """Write the portfolio's pages, and the share card of each: ``site_url``
         is the portfolio's public address, ending in "/", or "" when unknown;
@@ -725,7 +777,10 @@ class AggregateReportCreator:
 
         ``groups`` are the (id, name) of the groups the repositories are in,
         in the order the pages offer them: each summary names its group as
-        ``"group"``. With them, the pages can be narrowed to one group."""
+        ``"group"``. With them, the pages can be narrowed to one group.
+        ``group_titles`` name each group's projects inside a sentence
+        ("Python open source projects"), for the comparison pages."""
+        self.group_titles = dict(group_titles or {})
         self._copy_assets(path)
         self.site_url = site_url
         self.version = version or get_version()
@@ -784,10 +839,13 @@ class AggregateReportCreator:
                 f.close()
             for row in pages:
                 self._write_organization_files(path, row, title, len(summaries), ai)
+        if len(summaries) >= compare.MIN_REPOSITORIES:
+            self._write_comparisons(path, summaries, title, ai)
 
     site_url = ""
     organizations = False
     organization_page_names: set[str] = set()
+    group_titles: dict[str, str] = {}
     version = ""
     groups: list[tuple[str, str]] = []
 
@@ -866,6 +924,8 @@ class AggregateReportCreator:
             name not in (*pages, *data)
             and not _SNAPSHOT.fullmatch(name)
             and not _ORGANIZATION_FILE.fullmatch(name)
+            and not _COMPARE_FILE.fullmatch(name)
+            and name != "compare.json"
         ):
             raise ValueError(f"Not a portfolio page: {name}")
         base = os.path.abspath(path)
@@ -1115,6 +1175,185 @@ class AggregateReportCreator:
             "an address.</p>"
         )
         self._print_footer(f)
+
+    def _write_comparisons(
+        self, path: str, summaries: list[dict[str, Any]], title: str, ai: bool
+    ) -> None:
+        """For each repository with a report folder, a page of how it compares
+        with the others and a share card; and the numbers, as compare.json."""
+        now = datetime.datetime.now()
+        quarters = [months for _, months in last_quarters(now)]
+        rows = compare.comparisons(summaries, quarters)
+        names = dict(self.groups)
+        data = []
+        for row in rows:
+            summary = row["summary"]
+            report = str(summary.get("report_path", "") or "")
+            folder = report[: -len("/index.html")] if report.endswith("/index.html") else ""
+            group = str(summary.get("group", "") or "")
+            entry: dict[str, Any] = {
+                "name": summary.get("name", ""),
+                "values": row["values"],
+                "ranks": {
+                    measure: {
+                        scope: list(place) if place else None for scope, place in ranks.items()
+                    }
+                    for measure, ranks in row["ranks"].items()
+                },
+            }
+            if group:
+                entry["group"] = group
+            if not _COMPARE_FILE.fullmatch(f"{folder}/compare.html"):
+                data.append(entry)
+                continue
+            entry["page"] = f"{folder}/compare.html"
+            entry["headline"] = compare.headline(row, self._group_projects(group))
+            data.append(entry)
+            f = self._open_portfolio_file(path, f"{folder}/compare.html")
+            try:
+                self._write_comparison_page(f, row, rows, title, folder, entry["headline"], ai)
+            finally:
+                f.close()
+            f = self._open_portfolio_file(path, f"{folder}/compare-card.html")
+            try:
+                f.write(self._comparison_card(row, names.get(group, ""), entry["headline"]))
+            finally:
+                f.close()
+        f = self._open_portfolio_file(path, "compare.json")
+        try:
+            json.dump(
+                {
+                    "schema_version": 1,
+                    "title": "How each repository compares",
+                    "generated_by": f"gitstats {self.version or get_version()}",
+                    "generated_at": now.astimezone().isoformat(timespec="seconds"),
+                    "quarters": [quarter_id(months) for months in quarters],
+                    "measures": [
+                        {"id": m.id, "label": m.label, "definition": m.definition}
+                        for m in compare.MEASURES
+                    ],
+                    "repositories": data,
+                },
+                f,
+                indent=2,
+                ensure_ascii=False,
+            )
+        finally:
+            f.close()
+
+    def _write_comparison_page(
+        self,
+        f: Any,
+        row: dict[str, Any],
+        rows: list[dict[str, Any]],
+        title: str,
+        folder: str,
+        headline: str,
+        ai: bool,
+    ) -> None:
+        """One repository next to the others: a sentence on where it stands
+        out, then each measure with every repository on a strip and its rank."""
+        summary = row["summary"]
+        name = str(summary.get("name", "") or "")
+        group = str(summary.get("group", "") or "")
+        group_name = dict(self.groups).get(group, "")
+        peers = [other for other in rows if group and other["summary"].get("group") == group]
+        others = [other for other in rows if other not in peers]
+        page_title = f"How {name} compares"
+        description = headline or f"{name} next to the other repositories of {title}."
+        self._print_header(
+            f,
+            page_title,
+            self._share_tags(
+                page_title, description, f"{folder}/compare.html", f"{folder}/compare-card.png"
+            ),
+            "../",
+        )
+        self._print_nav(f, title, "", ai, prefix="../")
+        f.write(f"<h1>{html.escape(name)}</h1>")
+        compared = f"all {len(rows)} repositories of"
+        if peers:
+            compared = f"{len(peers)} {html.escape(group_name)} projects, and all {len(rows)} of"
+        f.write(
+            f'<p class="portfolio-subtitle">Compared with {compared} '
+            f'<a href="../index.html">{html.escape(title)}</a> &middot; the 12 months up to '
+            "each one&rsquo;s last commit</p>"
+        )
+        if headline:
+            f.write(f'<p class="compare-headline">{html.escape(headline)}</p>')
+        legend = [f'<span><i class="own"></i>{html.escape(name)}</span>']
+        if peers:
+            legend.append(f'<span><i class="group"></i>{html.escape(group_name)}</span>')
+        legend.append(f'<span><i class="all"></i>{"others" if peers else "all"}</span>')
+        f.write(f'<p class="compare-legend">{"".join(legend)}</p>')
+        f.write('<div class="compare-list">')
+        for measure in compare.MEASURES:
+            own = row["values"][measure.id]
+            if own is None:
+                # a measure this repository's summary has nothing for
+                continue
+            ranks = row["ranks"][measure.id]
+            strip = compare.strip_svg(
+                measure,
+                own,
+                [peer["values"][measure.id] for peer in peers if peer is not row],
+                [other["values"][measure.id] for other in others],
+            )
+            # a measure with a value has a rank among all, and among its peers
+            place = ranks["group"] if peers else ranks["all"]
+            where = f"{html.escape(group_name)} projects" if peers else "repositories"
+            rank_html = f"<b>{compare.ordinal(place[0])} of {place[1]}</b>{where}"
+            if peers:
+                overall = ranks["all"]
+                rank_html += f"<br>{compare.ordinal(overall[0])} of {overall[1]} overall"
+            f.write(
+                '<div class="compare-row">'
+                f'<div><span class="compare-name">{html.escape(measure.label)}</span>'
+                f'<span class="compare-value">{compare.show(own, measure)}</span></div>'
+                f"{strip or '<span></span>'}"
+                f'<div class="compare-rank">{rank_html}</div>'
+                f'<p class="compare-definition">{html.escape(measure.definition)}</p>'
+                "</div>"
+            )
+        f.write("</div>")
+        f.write(
+            '<p class="section-note">Counts sit on a logarithmic scale, so that projects of '
+            "every size have room; shares on a straight one. A rank is a position among "
+            "these projects, not a score: more is not better. Every number is in "
+            '<a href="../compare.json">compare.json</a>.</p>'
+        )
+        f.write(
+            f'<p class="more-link"><a href="index.html">The full report of {html.escape(name)} '
+            "&rarr;</a></p>"
+        )
+        self._print_footer(f)
+
+    @staticmethod
+    def _comparison_card(row: dict[str, Any], group_name: str, headline: str) -> str:
+        """The comparison's share card: the sentence, and each measure's rank
+        as a bar, longer the nearer the top."""
+        name = str(row["summary"].get("name", "") or "")
+        scope = "group" if group_name else "all"
+        bars = "".join(
+            f"<div><b>{html.escape(label)}</b>"
+            f'<i style="width:{max(2.0, 100 * position):.1f}%"></i>'
+            f"<span>{html.escape(rank_text)}</span></div>"
+            for label, position, rank_text in compare.card_rows(row, scope)
+        )
+        brand = f"// {html.escape(group_name)} projects compared" if group_name else "// compared"
+        return share_card_page(
+            f"How {name} compares",
+            f'<div class="brand">{brand}</div><h1>{html.escape(name)}</h1>'
+            f'<p class="sub clamp">{html.escape(headline)}</p>'
+            f'<div class="bars ranks">{bars}</div>',
+        )
+
+    def _group_projects(self, group: str) -> str:
+        """How a sentence names a group's projects: its title, or "<name>
+        projects"; "" without a group."""
+        if not group or group not in dict(self.groups):
+            return ""
+        return self.group_titles.get(group) or f"{dict(self.groups)[group]} projects"
 
     def _organization_link(self, name: str, prefix: str = "") -> str:
         """An organization's name, linked to its page when it has one."""

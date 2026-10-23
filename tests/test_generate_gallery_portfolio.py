@@ -479,3 +479,47 @@ def test_repos_write_the_ecosystem_pages_and_link_them(gallery_script, temp_dir,
 def test_notes_without_groups_have_no_ranking_links(gallery_script):
     assert "ecosystems/" not in gallery_script.gallery_note()
     assert "ecosystems/" not in gallery_script.report_note("x", "X", "", badge=False)
+
+
+_FIVE_REPOS_YML = """\
+groups:
+  - id: python
+    name: Python
+    title: Python open source projects
+    repos:
+      - { id: django, name: "Django", url: "django/django" }
+      - { id: flask, name: "Flask", url: "pallets/flask" }
+      - { id: pandas, name: "pandas", url: "pandas-dev/pandas" }
+      - { id: numpy, name: "NumPy", url: "numpy/numpy" }
+      - { id: pip, name: "pip", url: "pypa/pip" }
+"""
+
+
+@needs_yaml
+def test_comparison_pages_are_linked_and_listed(gallery_script, temp_dir, monkeypatch):
+    gallery, repos = _gallery(temp_dir, monkeypatch)
+    with open(repos, "w", encoding="utf-8") as f:
+        f.write(_FIVE_REPOS_YML)
+    for n, entry in enumerate(("django", "flask", "pandas", "numpy", "pip")):
+        _write_report(gallery, entry, name=entry, total_commits=100, commits_last_12mo=10 * n)
+    site = "https://example.com/gallery/"
+    assert gallery_script.main([gallery, "--repos", repos, "--site-url", site]) == 0
+
+    # each report links to its comparison, which says so in the group's words
+    assert (
+        '<a href="compare.html">How pandas compares with other Python open source projects '
+        "&rarr;</a>"
+    ) in _read(gallery, "pandas", "authors.html")
+    assert (
+        "pip had more commits in the last 12 months than any other of the 5 Python open "
+        "source projects." in _read(gallery, "pip", "compare.html")
+    )
+    # the comparison and its card get no note of their own
+    assert gallery_script.NOTE_MARK not in _read(gallery, "pandas", "compare.html")
+    assert gallery_script.NOTE_MARK not in _read(gallery, "pandas", "compare-card.html")
+    assert f"<loc>{site}pandas/compare.html</loc>" in _read(gallery, "sitemap.xml")
+
+
+def test_note_links_to_the_comparison(gallery_script):
+    note = gallery_script.report_note("x", "X", "", badge=False, compared=True)
+    assert ('<a href="compare.html">How X compares with the Gallery&#x27;s other projects') in note

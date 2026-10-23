@@ -23,6 +23,7 @@ from gitstats.aggregate import (
     organizations_dataset,
     organizations_description,
     organizations_summary,
+    people_summary,
     quarter_id,
     snapshot_label,
     write_repo_summary,
@@ -1386,5 +1387,171 @@ class TestOrganizationPages:
         "name", ["orgs/../index.html", "orgs/a.com.exe", "orgs/sub/a.com.html", "orgs/.com.html"]
     )
     def test_only_organization_files_are_written(self, tmp_path, name):
+        with pytest.raises(ValueError):
+            AggregateReportCreator._open_portfolio_file(str(tmp_path), name)
+
+
+# ── people_summary ───────────────────────────────────────────────────────
+
+
+def test_people_summary():
+    def stamp(*day):
+        return datetime.datetime(*day).timestamp()
+
+    data = SimpleNamespace(
+        author_of_month={
+            "2025-01": {"Ann": 5},  # before the 12 months
+            "2025-11": {"Ann": 6, "Bo": 3, "dependabot[bot]": 9},
+            "2026-02": {"Cy": 1, "Bo": 2},
+        },
+        authors={
+            "Ann": {"first_commit_stamp": stamp(2024, 1, 1)},
+            "Bo": {"first_commit_stamp": stamp(2025, 6, 1)},
+            "Cy": {"first_commit_stamp": stamp(2026, 2, 3)},
+        },
+    )
+    assert people_summary(data) == {
+        "from": "2025-03",
+        "to": "2026-02",
+        "commits": 12,
+        "authors": 3,
+        "new_authors": 2,  # Bo and Cy; the bot is left out
+        "half_of_commits": 1,  # Ann made 6 of 12
+    }
+
+
+def test_people_summary_spread():
+    data = SimpleNamespace(
+        author_of_month={"2026-01": {"A": 3, "B": 3, "C": 3, "D": 1}}, authors={"A": "?"}
+    )
+    summary = people_summary(data)
+    assert summary["half_of_commits"] == 2  # 6 of 10
+    assert summary["new_authors"] == 0  # no first commit known
+
+
+def test_people_summary_without_months():
+    assert people_summary(SimpleNamespace()) is None
+    assert people_summary(SimpleNamespace(author_of_month={})) is None
+
+
+# ── comparison pages ─────────────────────────────────────────────────────
+
+
+class TestComparisonPages:
+    @staticmethod
+    def _summaries(count=7, group="python"):
+        return [
+            _summary(
+                f"repo{n}",
+                100,
+                {},
+                commits_last_12mo=1000 - 100 * n,
+                active_authors_12mo=10 + n,
+                group=group if n < 5 else "",
+                people_last_12mo={
+                    "from": "2025-10",
+                    "to": "2026-09",
+                    "commits": 1000 - 100 * n,
+                    "authors": 10 + n,
+                    "new_authors": n,
+                    "half_of_commits": 1 + n % 3,
+                },
+            )
+            for n in range(count)
+        ]
+
+    @staticmethod
+    def _render(temp_dir, summaries, groups=None, titles=None, site_url=""):
+        AggregateReportCreator().create(
+            summaries, [], temp_dir, site_url=site_url, groups=groups, group_titles=titles
+        )
+
+        def read(name):
+            with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
+                return f.read()
+
+        return read
+
+    def test_page(self, temp_dir):
+        read = self._render(
+            temp_dir,
+            self._summaries(),
+            [("python", "Python")],
+            {"python": "Python open source projects"},
+            "https://example.org/g/",
+        )
+        page = read("repo0/compare.html")
+        assert "<h1>repo0</h1>" in page
+        assert "Compared with 5 Python projects, and all 7 of" in page
+        # the sentence: alone at the top of its group for commits
+        assert (
+            '<p class="compare-headline">repo0 had more commits in the last 12 months than '
+            "any other of the 5 Python open source projects."
+        ) in page
+        assert page.count('<div class="compare-row">') == 4  # no organizations, no AI data
+        assert "<b>1st of 5</b>Python projects<br>1st of 7 overall" in page
+        assert 'class="strip-own"' in page
+        assert '<span><i class="group"></i>Python</span>' in page
+        assert 'href="../gitstats.css"' in page
+        assert '<a href="index.html">The full report of repo0' in page
+        assert 'content="https://example.org/g/repo0/compare.html"' in page
+        card = read("repo0/compare-card.html")
+        assert "// Python projects compared" in card
+        assert "1st / 5" in card
+
+    def test_data(self, temp_dir):
+        read = self._render(temp_dir, self._summaries(), [("python", "Python")])
+        data = json.loads(read("compare.json"))
+        assert [m["id"] for m in data["measures"]] == [
+            "commits", "authors", "new_authors", "half_of_commits", "organizations", "ai_share",
+        ]  # fmt: skip
+        first = data["repositories"][0]
+        assert first["page"] == "repo0/compare.html"
+        assert first["group"] == "python"
+        assert first["values"]["commits"] == 1000.0
+        assert first["ranks"]["commits"] == {"group": [1, 5], "all": [1, 7]}
+        assert first["ranks"]["organizations"] == {"group": None, "all": None}
+        # without a group title, its name
+        assert first["headline"].endswith("of the 5 Python projects.")
+        assert "group" not in data["repositories"][6]
+
+    def test_without_groups(self, temp_dir):
+        read = self._render(temp_dir, self._summaries(group=""))
+        page = read("repo1/compare.html")
+        assert "Compared with all 7 repositories of" in page
+        assert "<b>2nd of 7</b>repositories</div>" in page
+        assert "// compared" in read("repo1/compare-card.html")
+
+    def test_too_few_repositories(self, temp_dir):
+        self._render(temp_dir, self._summaries(count=4))
+        assert not os.path.exists(os.path.join(temp_dir, "compare.json"))
+        assert not os.path.exists(os.path.join(temp_dir, "repo0", "compare.html"))
+
+    def test_a_report_without_a_folder(self, temp_dir):
+        summaries = self._summaries()
+        summaries[0]["report_path"] = "index.html"  # a single report at the root
+        read = self._render(temp_dir, summaries)
+        data = json.loads(read("compare.json"))
+        assert "page" not in data["repositories"][0]
+        assert data["repositories"][1]["page"] == "repo1/compare.html"
+
+    def test_a_middle_place_on_a_measure_without_values(self, temp_dir):
+        summaries = self._summaries()
+        for summary in summaries:
+            summary["people_last_12mo"]["new_authors"] = None
+        page = self._render(temp_dir, summaries)("repo2/compare.html")
+        assert "New contributors" not in page
+
+    def test_unknown_rank_is_a_dash(self, temp_dir):
+        # one repository's commits are unknown: no rank, no strip
+        summaries = self._summaries()
+        for summary in summaries[1:]:
+            summary["people_last_12mo"] = None
+            summary.pop("active_authors_12mo")
+        page = self._render(temp_dir, summaries)("repo0/compare.html")
+        assert "<b>1st of 1</b>" in page
+
+    @pytest.mark.parametrize("name", ["../compare.html", "a/b/compare.html", "a/compare.htm"])
+    def test_only_comparison_files_are_written(self, tmp_path, name):
         with pytest.raises(ValueError):
             AggregateReportCreator._open_portfolio_file(str(tmp_path), name)

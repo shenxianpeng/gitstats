@@ -554,6 +554,13 @@ def write_ecosystems(
         urls = ["", "ai.html", "organizations.html", f"{FOLDER}/"]
         urls += [f"{FOLDER}/{group.id}.html" for group in pages]
         urls += [f"{repo.id}/" for repo in repos if repo.id in by_id]
+        # each repository's comparison, as the portfolio wrote it
+        urls += [
+            f"{repo.id}/compare.html"
+            for repo in repos
+            if repo.id in by_id
+            and os.path.isfile(os.path.join(gallery_root, repo.id, "compare.html"))
+        ]
         # the organizations' own pages, as the portfolio wrote them
         orgs = os.path.join(gallery_root, "orgs")
         if os.path.isdir(orgs):

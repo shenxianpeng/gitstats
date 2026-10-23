@@ -152,3 +152,33 @@ badge that is made again with every build: ``orgs/<domain>.svg``, and
 In ``organizations.json``, each organization's ``by_repository`` lists the
 repositories it committed to, each with its ``commits``, ``commits_last_12mo``,
 ``addresses``, ``first_commit`` and ``last_commit``.
+
+How each project compares
+-------------------------
+
+Each project has a page, ``<id>/compare.html``, that puts it next to the
+other projects of its ecosystem and of the whole Gallery, on six measures of
+the 12 months up to its last commit:
+
+- **Commits**.
+- **Contributors**: people who made a commit; bots are left out.
+- **New contributors**: of them, those whose first commit to the project was
+  in those months.
+- **Half the commits by**: the fewest people whose commits add up to half of
+  them, or how widely the work is spread.
+- **Organizations**: organizations whose addresses committed, by email domain.
+- **AI-assisted**: the share of the last four quarters' commits that name an AI
+  coding assistant, a lower bound.
+
+Every project is a dot on a strip for each measure, its own in the accent
+color, with its rank in its ecosystem and overall. A sentence at the top says
+where it stands out: only a place it holds alone, above zero, is named. A rank
+is a position, not a score: more is not better.
+
+`compare.json <https://shenxianpeng.dev/gitstats/gallery/compare.json>`_ has
+the numbers: ``measures`` (``id``, ``label``, ``definition``), and for each
+repository its ``values``, its ``ranks`` (``group`` and ``all``, each
+``[rank, of how many]`` or ``null``), its ``page`` and its ``headline``.
+Equal values share a rank. Each repository's ``summary.json`` has the people
+measures as ``people_last_12mo``: ``from`` and ``to`` (months), ``commits``,
+``authors``, ``new_authors`` and ``half_of_commits``.

@@ -177,9 +177,10 @@ jobs:
 
       - name: Render Share Cards
         run: |
-          # the gallery's two cards, and each ecosystem page's
+          # the gallery's two cards, each ecosystem page's and each
+          # repository's comparison
           for card in gallery/share-card.html gallery/ai-share-card.html \
-            gallery/ecosystems/*-card.html; do
+            gallery/ecosystems/*-card.html gallery/*/compare-card.html; do
             if [ -f "$card" ]; then
               google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars \
                 --window-size=1200,630 --screenshot="$PWD/${card%.html}.png" \

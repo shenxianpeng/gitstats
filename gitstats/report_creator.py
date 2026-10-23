@@ -4095,6 +4095,12 @@ font:16px {_CARD_MONO}}}
 .bars b{{font:600 26px {_CARD_MONO};white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
 .bars i{{display:block;height:26px;background:#4a7ab5;border-radius:0 4px 4px 0}}
 .bars span{{font:700 28px {_CARD_MONO};text-align:right}}
+.sub.clamp{{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+.bars.ranks{{gap:10px}}
+.bars.ranks div{{grid-template-columns:300px 1fr 160px}}
+.bars.ranks b{{font-size:23px;font-weight:500;color:#716b6b}}
+.bars.ranks i{{height:20px}}
+.bars.ranks span{{font-size:24px;white-space:nowrap}}
 footer{{margin-top:auto;display:flex;justify-content:space-between;color:#716b6b;
 font:20px {_CARD_MONO}}}
 """
