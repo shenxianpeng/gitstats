@@ -871,13 +871,19 @@ class TestCollectPhases:
 
         # eight processes: seven for the diffs, one left to the phases
         spread.assert_called_once()
-        passes, log_range, workers, waiting, names = spread.call_args.args
+        passes, log_range, workers, waiting, names, source, source_lines = spread.call_args.args
         assert (passes, log_range, workers, names) == (
             [("--first-parent", True), ("--date-order", False)],
             "HEAD",
             7,
             "COMMIT:%aN",
         )
+        # the same diffs count the lines of the source, file by file
+        from gitstats.sources import is_source
+
+        assert source is is_source
+        assert source_lines == [dc.source_lines_added]
+        assert dc._source_lines_command() not in ran
         # and the phases said so when they had nothing left to do but wait
         assert waiting.is_set()
         assert dc._line_stats_command() not in ran
@@ -922,11 +928,13 @@ class TestCollectPhases:
             "_collect_ai_assisted": None,
         }
         assert side_by_side == in_turn
-        # in turn, the three passes are the three last commands, in the order of their phases
-        assert ran[-3:] == [
+        # in turn, the passes are the last commands, in the order of their phases;
+        # the lines of the source last, by a walk of their own
+        assert ran[-4:] == [
             dc._line_stats_command(),
             dc._author_line_stats_command(),
             dc._churn_command(),
+            dc._source_lines_command(),
         ]
 
     def test_collect_runs_the_commands_when_the_counts_cannot_be_spread(self, git_repo):
@@ -934,7 +942,7 @@ class TestCollectPhases:
         three phases run their commands, as they would in turn."""
         side_by_side, _, _, _, _ = self._collect_recording(git_repo, processes=8)
 
-        def failing(passes, log_range, workers, waiting, names):
+        def failing(passes, log_range, workers, waiting, names, source, source_lines):
             raise subprocess.CalledProcessError(128, ["git", "log"])
 
         fallen_back, ran, handed, dc, _ = self._collect_recording(
@@ -950,6 +958,7 @@ class TestCollectPhases:
         assert ran.count(dc._line_stats_command()) == 1
         assert ran.count(dc._author_line_stats_command()) == 1
         assert ran.count(dc._churn_command()) == 1
+        assert ran.count(dc._source_lines_command()) == 1
         assert fallen_back == side_by_side
 
     # ── commits that name an AI coding assistant ────────────────────────
@@ -1900,6 +1909,12 @@ class TestCollectEdgeCases:
         assert "@" not in json.dumps(kept, default=str)
         assert dc.affiliation_by_month[month] == {"organization": 2, "personal": 1, "bot": 1}
         assert dc.affiliation_by_month[july] == {"organization": 1}
+        # the bot is left out of the people's commits and days
+        assert dc.human_commits_by_year == {2023: 4}
+        assert dc.human_active_days == {
+            datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
+            for stamp in (1700000000, 1700000100, 1690000000, 1700000200)
+        }
 
     def test_commit_stats_count_hours_on_each_commits_own_clock(self, monkeypatch):
         """Not on the clock of the machine the report is generated on."""
@@ -2665,3 +2680,24 @@ class TestMainArguments:
         serve.assert_called_once_with(str(out), "127.0.0.1", 0)
         assert gitstats.main.conf["site_url"] == "https://example.com/stats"
         assert "https://example.com/stats/" in (out / "badges.html").read_text(encoding="utf-8")
+
+
+def test_source_lines_when_git_fails(monkeypatch):
+    def failing(cmds, quiet=False):
+        raise subprocess.CalledProcessError(128, cmds)
+
+    monkeypatch.setattr("gitstats.main.get_pipe_output", failing)
+    assert GitDataCollector()._source_lines() is None
+
+
+def test_source_lines_count_insertions(monkeypatch):
+    printed = (
+        " 2 files changed, 10 insertions(+), 3 deletions(-)\n\n"
+        " 1 file changed, 1 insertion(+)\n\n 1 file changed, 4 deletions(-)\n"
+    )
+    seen = []
+    monkeypatch.setattr(
+        "gitstats.main.get_pipe_output", lambda cmds, quiet=False: seen.append(cmds) or printed
+    )
+    assert GitDataCollector()._source_lines() == 11
+    assert "':(exclude,glob)**/vendor/**'" in seen[0][0]

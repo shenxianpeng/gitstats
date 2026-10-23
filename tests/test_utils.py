@@ -31,6 +31,7 @@ from gitstats.utils import (
     get_stat_summary_counts,
     get_version,
     history_graph,
+    numstat_path,
     shortstat_logs,
     should_exclude_file,
 )
@@ -1356,3 +1357,91 @@ def test_commits_reached_stop_where_the_base_takes_over():
 
     assert commits_reached(Counting(chain), 0, 3) == [0, 1, 2]
     assert Counting.asked < 10
+
+
+# ── the lines of the source, counted with the diffs ─────────────────────
+
+
+@pytest.mark.parametrize(
+    ("printed", "path"),
+    [
+        ("src/a.py", "src/a.py"),
+        ("old.py => new.py", "new.py"),
+        ("src/{old => new}/a.py", "src/new/a.py"),
+        ("src/{ => vendor}/a.py", "src/vendor/a.py"),
+        ("{vendor => src}/a.py", "src/a.py"),
+    ],
+)
+def test_numstat_path(printed, path):
+    assert numstat_path(printed) == path
+
+
+@pytest.fixture
+def vendored_repo(tmp_path, monkeypatch):
+    """A history whose lines are mostly vendored: own code, a vendored
+    library added and removed, a binary file, a file moved into vendor/,
+    and a merge."""
+
+    def git(*args):
+        subprocess.run(["git", *args], cwd=tmp_path, check=True, capture_output=True)
+
+    def write(path, lines):
+        target = tmp_path / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("".join(f"{n}\n" for n in range(lines)))
+
+    git("init", "-q", "-b", "main")
+    git("config", "user.name", "Ann")
+    git("config", "user.email", "ann@example.com")
+    write("src/a.py", 10)
+    git("add", "-A")
+    git("commit", "-q", "-m", "a")
+    write("vendor/lib/big.go", 1000)
+    (tmp_path / "logo.png").write_bytes(bytes(range(256)))
+    git("add", "-A")
+    git("commit", "-q", "-m", "vendor")
+    git("rm", "-q", "-r", "vendor")
+    write("src/b.py", 5)
+    git("add", "-A")
+    git("commit", "-q", "-m", "unvendor")
+    git("checkout", "-q", "-b", "side")
+    write("src/c.py", 3)
+    git("add", "-A")
+    git("commit", "-q", "-m", "c")
+    git("checkout", "-q", "main")
+    write("src/d.py", 2)
+    git("add", "-A")
+    git("commit", "-q", "-m", "d")
+    git("merge", "-q", "--no-edit", "side")
+    monkeypatch.chdir(tmp_path)
+    return tmp_path
+
+
+def test_shortstat_logs_count_the_lines_of_the_source(vendored_repo):
+    from gitstats.sources import is_source
+
+    found: list[int] = []
+    texts, _, names = shortstat_logs(LINEAR, "HEAD", 3, None, "COMMIT:%aN", is_source, found)
+    # src/a.py, b.py, c.py and d.py: 10 + 5 + 3 + 2; not the 1,000 vendored
+    # lines, nor the merge, which adds nothing of its own
+    assert found == [20]
+    # the counts of the walks are those they would be without
+    assert texts == shortstat_logs(LINEAR, "HEAD", 3, None, "COMMIT:%aN")[0]
+    assert "\nsrc/a.py" in names
+
+
+def test_shortstat_logs_count_the_lines_of_the_source_without_names(vendored_repo):
+    from gitstats.sources import is_source
+
+    found: list[int] = []
+    shortstat_logs(EVERY_COMMIT, "HEAD", 2, None, None, is_source, found)
+    assert found == [20]
+
+
+def test_shortstat_logs_count_no_source_lines_unless_asked(vendored_repo):
+    from gitstats.sources import is_source
+
+    found: list[int] = []
+    shortstat_logs(LINEAR, "HEAD", 2, None, None, is_source)  # nowhere to put them
+    shortstat_logs(LINEAR, "HEAD", 2, None, None, None, found)  # no rule
+    assert found == []

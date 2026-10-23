@@ -182,3 +182,23 @@ repository its ``values``, its ``ranks`` (``group`` and ``all``, each
 Equal values share a rank. Each repository's ``summary.json`` has the people
 measures as ``people_last_12mo``: ``from`` and ``to`` (months), ``commits``,
 ``authors``, ``new_authors`` and ``half_of_commits``.
+
+Measures that leave things out
+------------------------------
+
+Two blocks of each ``summary.json`` count what people wrote, for measures a
+history would otherwise mislead:
+
+- ``humans``: ``commits``, ``commits_by_year`` and ``active_days`` without the
+  bots' commits (accounts named ``[bot]`` and CI addresses). A bot that merges
+  or syncs every day fills a calendar and makes a year look busier than it was:
+  35% of CoreDNS' commits are bots'.
+- ``source_lines``: ``added`` (ever) and ``current`` (in the files of the last
+  commit) for the project's own source, leaving out vendored dependencies
+  (``vendor/``, ``third_party/``, ``node_modules/``…), generated files and
+  test data (``fixtures/``, ``testdata/``, ``__snapshots__/``, ``*.min.js``,
+  ``*.pb.go``…) and lock files. In CoreDNS 97% of the lines ever added are a
+  vendored copy of its dependencies, committed and later removed: counted with
+  them, 1% of what was written is still there; without them, 56%. The rules
+  are in ``gitstats/sources.py``.
+

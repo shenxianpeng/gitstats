@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import re
+import shlex
 import socket
 import subprocess
 import sys
@@ -30,8 +31,9 @@ from gitstats.aggregate import (
 )
 from gitstats.ai_summarizer import AISummarizer
 from gitstats.assistants import AssistedCommit, assisted_commits
-from gitstats.employers import ORGANIZATION, classify
+from gitstats.employers import BOT, ORGANIZATION, Affiliation, classify
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
+from gitstats.sources import is_source, pathspecs
 from gitstats.utils import (
     History,
     commit_local_time,
@@ -153,6 +155,15 @@ class DataCollector:
         self.organization_people: dict[str, int] = {}  # domain -> how many author names
         # YYYY-MM -> kind of address (organization, personal, ...) -> commits
         self.affiliation_by_month: dict[str, dict[str, int]] = {}
+
+        # the commits of people, bots left out: year -> commits, and the days
+        # with one (bots that merge or sync every day fill a calendar)
+        self.human_commits_by_year: dict[int, int] = {}
+        self.human_active_days: set[str] = set()
+
+        # lines of the project's own source (see gitstats.sources): ever added,
+        # and in the last commit's files; None when they were not counted
+        self.source_lines_added: int | None = None
 
         # author of the month
         self.author_of_month: dict[str, dict[str, int]] = {}  # month -> author -> commits
@@ -309,6 +320,9 @@ class GitDataCollector(DataCollector):
         processes = min(int(conf["processes"]), os.cpu_count() or 1)
         line_stats: Future[tuple[list[str], dict[str, int], str | None]] | None = None
         assisted: Future[list[AssistedCommit]] | None = None
+        # the lines ever added to the project's own source, which the same
+        # diffs count file by file
+        source_lines: list[int] = []
         # set when the phases have nothing left to do but wait for the line counts
         waiting = threading.Event()
         with ThreadPoolExecutor(max_workers=2, thread_name_prefix="git-log") as pool:
@@ -322,6 +336,8 @@ class GitDataCollector(DataCollector):
                     processes - 1,
                     waiting,
                     self.CHURN_FORMAT,
+                    is_source,
+                    source_lines,
                 )
 
             # The history that leads to the end of the range, read once and
@@ -370,6 +386,8 @@ class GitDataCollector(DataCollector):
             outputs[1] = None
             self._collect_file_churn_and_ownership(name_to_canonical, names)
             self._collect_ai_assisted(assisted.result() if assisted is not None else None)
+            # counted with the others, or, without them, by a walk of its own
+            self.source_lines_added = source_lines[0] if source_lines else self._source_lines()
         if conf["ai_enabled"]:
             self._collect_commit_subjects()
 
@@ -541,7 +559,13 @@ class GitDataCollector(DataCollector):
             self.domains[domain]["commits"] = self.domains[domain].get("commits", 0) + 1
 
             self._record_author_commit(author, stamp, date)
-            organization = self._record_affiliation(author, mail, stamp, date)
+            affiliation = self._record_affiliation(author, mail, stamp, date)
+            if affiliation.kind != BOT:
+                self.human_commits_by_year[date.year] = (
+                    self.human_commits_by_year.get(date.year, 0) + 1
+                )
+                self.human_active_days.add(date.strftime("%Y-%m-%d"))
+            organization = affiliation.organization
             if organization:
                 addresses.setdefault(organization, set()).add(mail.strip().lower())
                 names.setdefault(organization, set()).add(" ".join(author.lower().split()))
@@ -555,16 +579,16 @@ class GitDataCollector(DataCollector):
 
     def _record_affiliation(
         self, author: str, mail: str, stamp: int, date: datetime.datetime
-    ) -> str:
+    ) -> Affiliation:
         """Count a commit under the kind of its author's address, and under
-        the organization when the address belongs to one. Returns that
-        organization, or "" for an address that belongs to none."""
+        the organization when the address belongs to one. Returns where the
+        address belongs."""
         month = date.strftime("%Y-%m")
         affiliation = classify(author, mail)
         kinds = self.affiliation_by_month.setdefault(month, {})
         kinds[affiliation.kind] = kinds.get(affiliation.kind, 0) + 1
         if affiliation.kind != ORGANIZATION:
-            return ""
+            return affiliation
         info = self.organizations.setdefault(
             affiliation.organization,
             {"commits": 0, "first_commit_stamp": stamp, "last_commit_stamp": stamp, "by_month": {}},
@@ -573,7 +597,7 @@ class GitDataCollector(DataCollector):
         info["first_commit_stamp"] = min(info["first_commit_stamp"], stamp)
         info["last_commit_stamp"] = max(info["last_commit_stamp"], stamp)
         info["by_month"][month] = info["by_month"].get(month, 0) + 1
-        return affiliation.organization
+        return affiliation
 
     def _record_activity(
         self, date: datetime.datetime, local: datetime.datetime | None = None
@@ -1103,6 +1127,24 @@ class GitDataCollector(DataCollector):
             if current_author:
                 author_map = self.author_files.setdefault(current_author, {})
                 author_map[line] = author_map.get(line, 0) + 1
+
+    @staticmethod
+    def _source_lines_command() -> str:
+        """What counts the lines ever added to the project's own source, when
+        the diffs of the line counts did not (see shortstat_logs())."""
+        return "git log --no-merges --shortstat --format= {} -- {}".format(
+            get_log_range("HEAD", False), " ".join(shlex.quote(spec) for spec in pathspecs())
+        )
+
+    def _source_lines(self) -> int | None:
+        """The lines ever added to the project's own source, leaving out
+        vendored dependencies, generated files, test fixtures and lock files
+        (see gitstats.sources); None when git could not count them."""
+        try:
+            output = get_pipe_output([self._source_lines_command()])
+        except (OSError, subprocess.CalledProcessError):
+            return None
+        return sum(int(found) for found in re.findall(r"(\d+) insertions?\(\+\)", output))
 
     @staticmethod
     def _assisted_commits() -> list[AssistedCommit]:

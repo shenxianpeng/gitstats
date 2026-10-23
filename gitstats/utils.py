@@ -12,7 +12,7 @@ import subprocess
 import tempfile
 import threading
 import time
-from collections.abc import Iterable, Iterator
+from collections.abc import Callable, Iterable, Iterator
 from concurrent.futures import ThreadPoolExecutor
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any, NamedTuple
@@ -468,6 +468,8 @@ def shortstat_logs(
     workers: int,
     waiting: threading.Event | None = None,
     names: str | None = None,
+    source: Callable[[str], bool] | None = None,
+    source_lines: list[int] | None = None,
 ) -> tuple[list[str], dict[str, int], str | None]:
     """Write what `git log --shortstat` prints for several walks of one history.
 
@@ -513,9 +515,15 @@ def shortstat_logs(
     Python as can be: the caller is parsing other output meanwhile, and the
     two would take turns.
 
+    With ``source`` and ``source_lines``, the plain diffs also count, file by
+    file (``--numstat``), the lines added to the files ``source`` takes for
+    the project's own, and their sum is appended to ``source_lines``: the
+    lines ever added to its source, every commit but the merges once.
+
     Raises OSError or subprocess.CalledProcessError when git fails.
     """
     workers = max(workers, 1)
+    with_numstat = source is not None and source_lines is not None
     # git fills its buffer before it writes, where it would write after every commit
     env = {**os.environ, "GIT_FLUSH": "0"}
 
@@ -566,7 +574,7 @@ def shortstat_logs(
 
     def counts(
         job: tuple[list[str], bool],
-    ) -> tuple[dict[str, str], dict[str, int], dict[str, str]]:
+    ) -> tuple[dict[str, str], dict[str, int], dict[str, str], int]:
         """For one process's share of the commits: commit -> the count git
         prints under it, commit -> the files it adds less those it deletes,
         where that is not nothing, and, when the names are asked for,
@@ -574,6 +582,7 @@ def shortstat_logs(
         commits, first_parent = job
         # the names are those of the plain diff, as `git log --name-only` shows it
         with_names = names is not None and not first_parent
+        numstat = with_numstat and not first_parent
         with allowed:
             began = time.monotonic()
             text = _git_text(
@@ -586,6 +595,8 @@ def shortstat_logs(
                     # and nothing else; a raw line ends with the name, quoted
                     # the same way, and full hashes cost git nothing to print
                     *(["--raw", "--no-abbrev"] if with_names else []),
+                    # and, file by file, the lines added and removed
+                    *(["--numstat"] if numstat else []),
                     *(["--first-parent", "-m"] if first_parent else []),
                     "--no-walk",
                     # from its input: a thousand hashes are more than a
@@ -609,6 +620,7 @@ def shortstat_logs(
         found: dict[str, str] = {}
         files: dict[str, int] = {}
         changed: dict[str, str] = {}
+        source_added = 0
         # [what comes before the first commit, "<commit>\n<what is under it>", ...]
         for block in text.split(_COMMIT_MARK)[1:]:
             commit, _, under = block.partition("\n")
@@ -637,6 +649,13 @@ def shortstat_logs(
                     if change:
                         files[commit] = change
                 raw = under[:count_at]
+            if numstat:
+                # "<added>\t<removed>\t<path>", "-" for a binary file
+                for line in raw.split("\n"):
+                    if line[:1].isdigit():
+                        lines, _, rest = line.partition("\t")
+                        if source(numstat_path(rest.partition("\t")[2])):  # type: ignore[misc]
+                            source_added += int(lines)
             if with_names:
                 # the name is what follows the last tab: for a renamed file,
                 # the new name, which comes after the old one
@@ -647,7 +666,7 @@ def shortstat_logs(
                         if line.startswith(":")
                     ]
                 )
-        return found, files, changed
+        return found, files, changed, source_added
 
     with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="git-shortstat") as pool:
         walks = list(
@@ -707,8 +726,12 @@ def shortstat_logs(
         added.update(dict.fromkeys(merge_commits, 0))
         timer = threading.Thread(target=allow_more, name="git-shortstat-more", daemon=True)
         timer.start()
+        source_added = 0
         try:
-            for (_, first_parent), (found, files, their_names) in zip(jobs, pool.map(counts, jobs)):
+            for (_, first_parent), (found, files, their_names, source_count) in zip(
+                jobs, pool.map(counts, jobs)
+            ):
+                source_added += source_count
                 if first_parent:
                     merges.update(found)
                     added.update(files)
@@ -728,6 +751,8 @@ def shortstat_logs(
             counted.set()
             timer.join()
 
+    if with_numstat:
+        source_lines.append(source_added)  # type: ignore[union-attr]
     texts = []
     names_text = None
     try:
@@ -742,6 +767,19 @@ def shortstat_logs(
             1, ["git", "log", "--shortstat", "--no-walk"], f"nothing printed for {missing}"
         ) from None
     return texts, added, names_text
+
+
+# a renamed file as --numstat names it: "a/{old => new}/b" or "old => new"
+_RENAMED_PART = re.compile(r"\{[^{}]* => ([^{}]*)\}")
+
+
+def numstat_path(path: str) -> str:
+    """The path a file has after a commit, from what --numstat prints."""
+    if " => " not in path:
+        return path
+    if "{" in path:
+        return _RENAMED_PART.sub(r"\1", path).replace("//", "/")
+    return path.rpartition(" => ")[2]
 
 
 # "<commit>\t<tree>\t<parents>\t<stamp> <author>", a commit of the history
