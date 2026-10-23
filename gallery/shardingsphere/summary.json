@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:26:31+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:16:28+00:00",
   "name": "Apache ShardingSphere",
   "report_path": "index.html",
   "first_commit": "2016-01-18 12:49:26",
-  "last_commit": "2026-10-23 07:00:58",
-  "age_days": 3931,
+  "last_commit": "2026-10-23 13:56:38",
+  "age_days": 3932,
   "active_days": 3424,
-  "total_commits": 50060,
+  "total_commits": 50061,
   "total_authors": 744,
   "active_authors_12mo": 65,
-  "commits_last_12mo": 2887,
+  "commits_last_12mo": 2888,
   "total_files": 17837,
-  "total_lines": 1511692,
-  "lines_added": 4817864,
-  "lines_removed": 3306172,
+  "total_lines": 1511700,
+  "lines_added": 4817922,
+  "lines_removed": 3306222,
   "total_tags": 37,
   "era": "steady",
   "top_authors": [
     {
       "name": "Liang Zhang",
-      "commits": 18860
+      "commits": 18861
     },
     {
       "name": "tristaZero",
@@ -41,8 +41,8 @@
     }
   ],
   "author_commits": {
+    "Liang Zhang": 18861,
     "Zhengqiang Duan": 1571,
-    "Liang Zhang": 18860,
     "Maxim Igoshin": 45,
     "Rain.": 1,
     "Divyansh Yadav": 1,
@@ -797,7 +797,7 @@
     "2023": 4028,
     "2024": 3620,
     "2025": 2956,
-    "2026": 2348
+    "2026": 2349
   },
   "ai_assisted": {
     "commits": 60,
@@ -856,14 +856,14 @@
       "2026-07": 263,
       "2026-08": 339,
       "2026-09": 298,
-      "2026-10": 252
+      "2026-10": 253
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 50060,
+    "commits": 50061,
     "by_kind": {
-      "organization": 15806,
+      "organization": 15807,
       "one_person": 526,
       "personal": 30557,
       "hidden": 3079,
@@ -875,8 +875,8 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 15341,
-        "commits_last_12mo": 2227,
+        "commits": 15342,
+        "commits_last_12mo": 2228,
         "addresses": 21,
         "first_commit": "2018-03-02",
         "last_commit": "2026-10-23"
@@ -980,7 +980,7 @@
         "bot": 4
       },
       "2026-Q4": {
-        "organization": 199,
+        "organization": 200,
         "one_person": 0,
         "personal": 8,
         "hidden": 45,

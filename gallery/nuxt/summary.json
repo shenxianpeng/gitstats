@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:25:26+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:15:28+00:00",
   "name": "Nuxt",
   "report_path": "index.html",
   "first_commit": "2016-10-26 11:18:47",
-  "last_commit": "2026-10-22 10:52:54",
-  "age_days": 3648,
-  "active_days": 2622,
-  "total_commits": 15841,
+  "last_commit": "2026-10-23 14:49:51",
+  "age_days": 3650,
+  "active_days": 2623,
+  "total_commits": 15843,
   "total_authors": 1300,
   "active_authors_12mo": 181,
-  "commits_last_12mo": 1587,
+  "commits_last_12mo": 1589,
   "total_files": 2470,
-  "total_lines": 216677,
-  "lines_added": 1010066,
-  "lines_removed": 793389,
+  "total_lines": 216712,
+  "lines_added": 1010104,
+  "lines_removed": 793392,
   "total_tags": 269,
   "era": "steady",
   "top_authors": [
     {
       "name": "Daniel Roe",
-      "commits": 3716
+      "commits": 3717
     },
     {
       "name": "Pooya Parsa",
@@ -29,7 +29,7 @@
     },
     {
       "name": "S\u00e9bastien Chopin",
-      "commits": 1314
+      "commits": 1315
     },
     {
       "name": "Xin Du (Clark)",
@@ -41,14 +41,14 @@
     }
   ],
   "author_commits": {
-    "Daniel Roe": 3716,
+    "Daniel Roe": 3717,
+    "S\u00e9bastien Chopin": 1315,
     "Baptiste Leproux": 4,
     "Hugo": 8,
     "Eduardo San Martin Morote": 15,
     "Jonas Thelemann": 7,
     "Yunus Ozen": 1,
     "Vladislav": 1,
-    "S\u00e9bastien Chopin": 1314,
     "Kazbek Askarov": 2,
     "Nicholas": 2,
     "Peter": 2,
@@ -1353,7 +1353,7 @@
     "2023": 2123,
     "2024": 1825,
     "2025": 1398,
-    "2026": 1429
+    "2026": 1431
   },
   "ai_assisted": {
     "commits": 19,
@@ -1413,16 +1413,16 @@
       "2026-07": 284,
       "2026-08": 182,
       "2026-09": 215,
-      "2026-10": 117
+      "2026-10": 119
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15841,
+    "commits": 15843,
     "by_kind": {
       "organization": 243,
-      "one_person": 6812,
-      "personal": 4779,
+      "one_person": 6813,
+      "personal": 4780,
       "hidden": 948,
       "unknown": 0,
       "bot": 3059
@@ -1530,8 +1530,8 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 80,
-        "personal": 18,
+        "one_person": 81,
+        "personal": 19,
         "hidden": 12,
         "unknown": 0,
         "bot": 7

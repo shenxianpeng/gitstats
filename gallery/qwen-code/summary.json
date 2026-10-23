@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:22:15+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:11:27+00:00",
   "name": "Qwen Code",
   "report_path": "index.html",
   "first_commit": "2025-04-16 04:41:08",
-  "last_commit": "2026-10-23 11:05:46",
+  "last_commit": "2026-10-23 14:54:16",
   "age_days": 556,
   "active_days": 514,
-  "total_commits": 11363,
+  "total_commits": 11370,
   "total_authors": 610,
   "active_authors_12mo": 324,
-  "commits_last_12mo": 8861,
-  "total_files": 12738,
-  "total_lines": 6115885,
-  "lines_added": 7991492,
-  "lines_removed": 1875607,
+  "commits_last_12mo": 8868,
+  "total_files": 12746,
+  "total_lines": 6122114,
+  "lines_added": 7997884,
+  "lines_removed": 1875770,
   "total_tags": 98,
   "era": "steady",
   "top_authors": [
     {
       "name": "\u6613\u826f",
-      "commits": 1532
+      "commits": 1535
     },
     {
       "name": "Shaojin Wen",
-      "commits": 1454
+      "commits": 1457
     },
     {
       "name": "tanzhenxin",
@@ -41,11 +41,12 @@
     }
   ],
   "author_commits": {
+    "\u6613\u826f": 1535,
+    "Qiu": 5,
+    "Shaojin Wen": 1457,
     "jinye": 591,
-    "Shaojin Wen": 1454,
     "qqqys": 519,
     "ytahdn": 249,
-    "\u6613\u826f": 1532,
     "qwen-code-dev-bot": 243,
     "ChiGao": 121,
     "Heyang Wang": 19,
@@ -60,7 +61,6 @@
     "\u70fd\u5b81": 6,
     "\u987e\u76fc": 376,
     "Edenman": 28,
-    "Qiu": 4,
     "Sergey Bessonov": 1,
     "Lilian0122": 6,
     "ZedingZhang": 2,
@@ -654,7 +654,7 @@
   },
   "commits_by_year": {
     "2025": 3155,
-    "2026": 8208
+    "2026": 8215
   },
   "ai_assisted": {
     "commits": 625,
@@ -718,27 +718,27 @@
       "2026-07": 1315,
       "2026-08": 1068,
       "2026-09": 1181,
-      "2026-10": 1021
+      "2026-10": 1028
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11363,
+    "commits": 11370,
     "by_kind": {
-      "organization": 3082,
-      "one_person": 241,
-      "personal": 6855,
+      "organization": 2772,
+      "one_person": 484,
+      "personal": 6859,
       "hidden": 1133,
       "unknown": 31,
-      "bot": 21
+      "bot": 91
     },
-    "organization_count": 4,
+    "organization_count": 3,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "alibaba-inc.com",
-        "commits": 1908,
-        "commits_last_12mo": 1873,
+        "commits": 1911,
+        "commits_last_12mo": 1876,
         "addresses": 19,
         "first_commit": "2025-06-26",
         "last_commit": "2026-10-23"
@@ -750,14 +750,6 @@
         "addresses": 51,
         "first_commit": "2025-04-16",
         "last_commit": "2025-09-06"
-      },
-      {
-        "organization": "alibaba.com",
-        "commits": 313,
-        "commits_last_12mo": 313,
-        "addresses": 2,
-        "first_commit": "2026-01-12",
-        "last_commit": "2026-10-23"
       },
       {
         "organization": "github.com",
@@ -794,36 +786,36 @@
         "bot": 0
       },
       "2026-Q1": {
-        "organization": 285,
+        "organization": 272,
         "one_person": 25,
         "personal": 1571,
         "hidden": 18,
         "unknown": 23,
-        "bot": 6
+        "bot": 19
       },
       "2026-Q2": {
-        "organization": 352,
-        "one_person": 28,
+        "organization": 328,
+        "one_person": 29,
         "personal": 925,
         "hidden": 390,
         "unknown": 0,
-        "bot": 0
+        "bot": 23
       },
       "2026-Q3": {
-        "organization": 991,
-        "one_person": 38,
+        "organization": 800,
+        "one_person": 196,
         "personal": 2221,
         "hidden": 314,
         "unknown": 0,
-        "bot": 0
+        "bot": 33
       },
       "2026-Q4": {
-        "organization": 457,
-        "one_person": 2,
-        "personal": 527,
+        "organization": 375,
+        "one_person": 86,
+        "personal": 531,
         "hidden": 35,
         "unknown": 0,
-        "bot": 0
+        "bot": 1
       }
     }
   }

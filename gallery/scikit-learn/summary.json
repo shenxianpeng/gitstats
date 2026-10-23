@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:20:00+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:09:38+00:00",
   "name": "scikit-learn",
   "report_path": "index.html",
   "first_commit": "2010-01-05 13:26:32",
-  "last_commit": "2026-10-23 08:54:42",
-  "age_days": 6135,
+  "last_commit": "2026-10-23 13:36:06",
+  "age_days": 6136,
   "active_days": 5127,
-  "total_commits": 34084,
+  "total_commits": 34086,
   "total_authors": 3370,
   "active_authors_12mo": 193,
-  "commits_last_12mo": 987,
+  "commits_last_12mo": 989,
   "total_files": 1859,
-  "total_lines": 576837,
-  "lines_added": 2934224,
-  "lines_removed": 2357387,
+  "total_lines": 576867,
+  "lines_added": 2934260,
+  "lines_removed": 2357393,
   "total_tags": 25,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Mohd Maaz Khan": 2,
+    "Arthur Lacote": 55,
     "Virgil Chan": 24,
     "Loic Esteve": 653,
     "Fran\u00e7ois Paugam": 45,
@@ -57,13 +59,11 @@
     "Punyak": 2,
     "Arya Topale": 1,
     "Tony Bagnall": 1,
-    "Arthur Lacote": 54,
     "antoinebaker": 20,
     "Tim Head": 123,
     "Olivier Grisel": 2584,
     "Pranav Negi": 1,
     "Dea Mar\u00eda L\u00e9on": 71,
-    "Mohd Maaz Khan": 1,
     "Itamar Turner-Trauring": 14,
     "Mohammad Hamza": 1,
     "Adrin Jalali": 305,
@@ -3429,7 +3429,7 @@
     "2023": 1349,
     "2024": 1268,
     "2025": 1237,
-    "2026": 819
+    "2026": 821
   },
   "ai_assisted": {
     "commits": 9,
@@ -3489,19 +3489,19 @@
       "2026-07": 96,
       "2026-08": 77,
       "2026-09": 62,
-      "2026-10": 52
+      "2026-10": 54
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 34084,
+    "commits": 34086,
     "by_kind": {
       "organization": 9442,
       "one_person": 8391,
-      "personal": 12805,
+      "personal": 12806,
       "hidden": 3390,
       "unknown": 38,
-      "bot": 18
+      "bot": 19
     },
     "organization_count": 57,
     "last_12mo_from": "2025-11",
@@ -4023,7 +4023,7 @@
       "2026-Q4": {
         "organization": 3,
         "one_person": 6,
-        "personal": 33,
+        "personal": 35,
         "hidden": 10,
         "unknown": 0,
         "bot": 0

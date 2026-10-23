@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:21:06+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:10:52+00:00",
   "name": "OpenCode",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-10-23 11:19:47",
+  "last_commit": "2026-10-23 15:06:35",
   "age_days": 581,
   "active_days": 568,
-  "total_commits": 20799,
+  "total_commits": 20804,
   "total_authors": 1026,
   "active_authors_12mo": 849,
-  "commits_last_12mo": 17195,
-  "total_files": 8597,
-  "total_lines": 1387409,
-  "lines_added": 4373580,
-  "lines_removed": 2986171,
+  "commits_last_12mo": 17200,
+  "total_files": 8599,
+  "total_lines": 1387821,
+  "lines_added": 4374020,
+  "lines_removed": 2986199,
   "total_tags": 917,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Aiden Cline",
-      "commits": 2367
+      "commits": 2368
     },
     {
       "name": "Kit Langton",
@@ -41,11 +41,11 @@
     }
   ],
   "author_commits": {
-    "Filip": 118,
+    "Aiden Cline": 2368,
+    "Filip": 120,
     "opencode": 633,
     "Luke Parker": 621,
     "Simon Klee": 131,
-    "Aiden Cline": 2367,
     "Brendan Allan": 542,
     "DS": 23,
     "Imamuzzaki Abu Salam": 1,
@@ -1070,7 +1070,7 @@
   },
   "commits_by_year": {
     "2025": 6529,
-    "2026": 14270
+    "2026": 14275
   },
   "ai_assisted": {
     "commits": 136,
@@ -1132,19 +1132,19 @@
       "2026-07": 1581,
       "2026-08": 1996,
       "2026-09": 1496,
-      "2026-10": 985
+      "2026-10": 990
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20799,
+    "commits": 20804,
     "by_kind": {
       "organization": 1703,
       "one_person": 3979,
       "personal": 5526,
-      "hidden": 6008,
+      "hidden": 6011,
       "unknown": 1,
-      "bot": 3582
+      "bot": 3584
     },
     "organization_count": 4,
     "last_12mo_from": "2025-11",
@@ -1243,9 +1243,9 @@
         "organization": 46,
         "one_person": 63,
         "personal": 276,
-        "hidden": 411,
+        "hidden": 414,
         "unknown": 0,
-        "bot": 189
+        "bot": 191
       }
     }
   }

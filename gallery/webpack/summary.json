@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:25:54+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:15:38+00:00",
   "name": "webpack",
   "report_path": "index.html",
   "first_commit": "2012-03-10 12:11:23",
-  "last_commit": "2026-10-23 10:46:23",
-  "age_days": 5340,
+  "last_commit": "2026-10-23 14:01:52",
+  "age_days": 5341,
   "active_days": 3255,
-  "total_commits": 20137,
+  "total_commits": 20143,
   "total_authors": 938,
   "active_authors_12mo": 48,
-  "commits_last_12mo": 1989,
-  "total_files": 21634,
-  "total_lines": 1096225,
-  "lines_added": 2066784,
-  "lines_removed": 970559,
-  "total_tags": 653,
+  "commits_last_12mo": 1995,
+  "total_files": 21644,
+  "total_lines": 1101130,
+  "lines_added": 2072311,
+  "lines_removed": 971181,
+  "total_tags": 654,
   "era": "surge",
   "top_authors": [
     {
@@ -25,7 +25,7 @@
     },
     {
       "name": "Alexander Akait",
-      "commits": 1859
+      "commits": 1864
     },
     {
       "name": "alexander-akait",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Alexander Akait": 1859,
+    "Alexander Akait": 1864,
     "Xiao": 160,
     "Sebastian Beltran": 89,
     "Siddharth S": 1,
@@ -995,13 +995,13 @@
     "2023": 1153,
     "2024": 1152,
     "2025": 681,
-    "2026": 1858
+    "2026": 1864
   },
   "ai_assisted": {
-    "commits": 226,
+    "commits": 228,
     "authored": 2,
     "assistants": {
-      "Claude": 215,
+      "Claude": 217,
       "CodeRabbit": 8,
       "GitHub Copilot": 4
     },
@@ -1029,7 +1029,7 @@
       "2026-07": 7,
       "2026-08": 2,
       "2026-09": 30,
-      "2026-10": 161
+      "2026-10": 163
     },
     "commits_by_month": {
       "2024-11": 130,
@@ -1055,19 +1055,19 @@
       "2026-07": 203,
       "2026-08": 238,
       "2026-09": 383,
-      "2026-10": 412
+      "2026-10": 418
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20137,
+    "commits": 20143,
     "by_kind": {
       "organization": 331,
       "one_person": 1503,
       "personal": 14225,
-      "hidden": 2461,
+      "hidden": 2466,
       "unknown": 6,
-      "bot": 1611
+      "bot": 1612
     },
     "organization_count": 15,
     "last_12mo_from": "2025-11",
@@ -1254,9 +1254,9 @@
         "organization": 0,
         "one_person": 1,
         "personal": 50,
-        "hidden": 333,
+        "hidden": 338,
         "unknown": 0,
-        "bot": 28
+        "bot": 29
       }
     }
   }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:27:20+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:17:07+00:00",
   "name": "Apache Doris",
   "report_path": "index.html",
   "first_commit": "2017-08-11 09:51:21",
-  "last_commit": "2026-10-23 10:36:40",
+  "last_commit": "2026-10-23 13:27:29",
   "age_days": 3361,
   "active_days": 2652,
-  "total_commits": 32760,
+  "total_commits": 32761,
   "total_authors": 776,
   "active_authors_12mo": 166,
-  "commits_last_12mo": 4456,
+  "commits_last_12mo": 4457,
   "total_files": 43561,
-  "total_lines": 11069332,
-  "lines_added": 16969722,
-  "lines_removed": 5900390,
+  "total_lines": 11069490,
+  "lines_added": 16969884,
+  "lines_removed": 5900394,
   "total_tags": 3,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Socrates": 210,
     "Jack": 413,
     "lihangyu": 483,
     "Gavin Chou": 195,
@@ -53,7 +54,6 @@
     "meiyi": 369,
     "linrrarity": 160,
     "Chenyang Sun": 250,
-    "Socrates": 209,
     "minghong": 628,
     "bobhan1": 354,
     "Calvin Kirs": 442,
@@ -828,7 +828,7 @@
     "2023": 8087,
     "2024": 7748,
     "2025": 5271,
-    "2026": 3703
+    "2026": 3704
   },
   "ai_assisted": {
     "commits": 225,
@@ -888,14 +888,14 @@
       "2026-07": 431,
       "2026-08": 379,
       "2026-09": 513,
-      "2026-10": 387
+      "2026-10": 388
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 32760,
+    "commits": 32761,
     "by_kind": {
-      "organization": 9557,
+      "organization": 9558,
       "one_person": 179,
       "personal": 15468,
       "hidden": 7555,
@@ -907,8 +907,8 @@
     "top": [
       {
         "organization": "selectdb.com",
-        "commits": 8406,
-        "commits_last_12mo": 3600,
+        "commits": 8407,
+        "commits_last_12mo": 3601,
         "addresses": 71,
         "first_commit": "2023-01-22",
         "last_commit": "2026-10-23"
@@ -1012,7 +1012,7 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 270,
+        "organization": 271,
         "one_person": 5,
         "personal": 95,
         "hidden": 17,

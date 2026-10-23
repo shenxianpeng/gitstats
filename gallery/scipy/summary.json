@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:20:04+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:09:40+00:00",
   "name": "SciPy",
   "report_path": "index.html",
   "first_commit": "2001-02-01 08:32:30",
-  "last_commit": "2026-10-21 21:23:37",
-  "age_days": 9394,
-  "active_days": 6827,
-  "total_commits": 38477,
+  "last_commit": "2026-10-23 13:25:04",
+  "age_days": 9396,
+  "active_days": 6828,
+  "total_commits": 38478,
   "total_authors": 1944,
   "active_authors_12mo": 224,
-  "commits_last_12mo": 2229,
+  "commits_last_12mo": 2230,
   "total_files": 2929,
-  "total_lines": 1137572,
-  "lines_added": 5258622,
-  "lines_removed": 4121050,
+  "total_lines": 1137609,
+  "lines_added": 5258677,
+  "lines_removed": 4121068,
   "total_tags": 5,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Dietrich Brunn": 76,
     "Martin Schuck": 44,
     "Evgeni Burovski": 2179,
     "Jash Ambaliya": 3,
@@ -69,7 +70,6 @@
     "Abhirav Gholba": 2,
     "Sangeetha Grama Srinivasan": 1,
     "CJ Carey": 208,
-    "Dietrich Brunn": 75,
     "RYAN AKMAL PASYA": 1,
     "Daniel S\u00e1nchez Pag\u00e1n": 1,
     "Alex Mitre": 1,
@@ -2012,7 +2012,7 @@
     "2023": 2061,
     "2024": 2957,
     "2025": 2335,
-    "2026": 1791
+    "2026": 1792
   },
   "ai_assisted": {
     "commits": 52,
@@ -2073,17 +2073,17 @@
       "2026-07": 171,
       "2026-08": 228,
       "2026-09": 171,
-      "2026-10": 80
+      "2026-10": 81
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38477,
+    "commits": 38478,
     "by_kind": {
       "organization": 3833,
-      "one_person": 3074,
+      "one_person": 3073,
       "personal": 27077,
-      "hidden": 2673,
+      "hidden": 2675,
       "unknown": 1820,
       "bot": 0
     },
@@ -2648,7 +2648,7 @@
         "organization": 1,
         "one_person": 2,
         "personal": 45,
-        "hidden": 32,
+        "hidden": 33,
         "unknown": 0,
         "bot": 0
       }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:23:03+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:13:03+00:00",
   "name": "Envoy",
   "report_path": "index.html",
   "first_commit": "2016-08-08 15:07:25",
-  "last_commit": "2026-10-23 09:46:02",
+  "last_commit": "2026-10-23 14:48:48",
   "age_days": 3728,
   "active_days": 3185,
-  "total_commits": 29322,
-  "total_authors": 1527,
-  "active_authors_12mo": 347,
-  "commits_last_12mo": 3775,
-  "total_files": 14827,
-  "total_lines": 2847689,
-  "lines_added": 4914667,
-  "lines_removed": 2066978,
+  "total_commits": 29332,
+  "total_authors": 1529,
+  "active_authors_12mo": 349,
+  "commits_last_12mo": 3785,
+  "total_files": 14835,
+  "total_lines": 2848192,
+  "lines_added": 4915454,
+  "lines_removed": 2067262,
   "total_tags": 43,
   "era": "steady",
   "top_authors": [
@@ -37,19 +37,23 @@
     },
     {
       "name": "code",
-      "commits": 807
+      "commits": 811
     }
   ],
   "author_commits": {
+    "dangle1": 1,
+    "code": 811,
+    "Antonio V. Leonti": 98,
+    "Alejandro R. Sede\u00f1o": 70,
+    "Matheus Sousa": 1,
+    "William Dauchy": 62,
+    "Jonh Wendell": 183,
     "Kateryna Nezdolii": 96,
     "phlax": 2249,
-    "code": 807,
     "Ethan Truong": 41,
     "ump45nose": 1,
     "Alejandro": 2,
-    "Antonio V. Leonti": 97,
     "Derek Argueta": 141,
-    "William Dauchy": 61,
     "bingqi": 1,
     "Wenwei-Zhao": 16,
     "Sean Maloney": 23,
@@ -60,14 +64,12 @@
     "Benni Rogge": 3,
     "Paul Ogilby": 51,
     "Alex Bakon": 12,
-    "Jonh Wendell": 182,
     "NetanelPersikGoogle": 1,
     "Johanan Liebermann": 1,
     "Natalia Kaczor": 1,
     "Jonathan Wu": 17,
     "Harry Bagdi": 1,
     "Ethan Zhao": 3,
-    "Alejandro R. Sede\u00f1o": 69,
     "Nguyen Thanh Tin": 1,
     "Biren Roy": 102,
     "Adrian Cole": 10,
@@ -1580,7 +1582,7 @@
     "2023": 3626,
     "2024": 3360,
     "2025": 2506,
-    "2026": 3182
+    "2026": 3192
   },
   "ai_assisted": {
     "commits": 147,
@@ -1641,17 +1643,17 @@
       "2026-07": 359,
       "2026-08": 305,
       "2026-09": 554,
-      "2026-10": 351
+      "2026-10": 361
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 29322,
+    "commits": 29332,
     "by_kind": {
-      "organization": 11846,
+      "organization": 11849,
       "one_person": 1835,
-      "personal": 4657,
-      "hidden": 8058,
+      "personal": 4663,
+      "hidden": 8059,
       "unknown": 0,
       "bot": 2926
     },
@@ -1660,8 +1662,8 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 5064,
-        "commits_last_12mo": 705,
+        "commits": 5065,
+        "commits_last_12mo": 706,
         "addresses": 154,
         "first_commit": "2016-10-12",
         "last_commit": "2026-10-23"
@@ -1732,11 +1734,11 @@
       },
       {
         "organization": "redhat.com",
-        "commits": 238,
-        "commits_last_12mo": 169,
+        "commits": 239,
+        "commits_last_12mo": 170,
         "addresses": 12,
         "first_commit": "2018-04-24",
-        "last_commit": "2026-10-21"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "apple.com",
@@ -1764,11 +1766,11 @@
       },
       {
         "organization": "datadoghq.com",
-        "commits": 100,
-        "commits_last_12mo": 63,
+        "commits": 101,
+        "commits_last_12mo": 64,
         "addresses": 8,
         "first_commit": "2019-07-26",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "synca.io",
@@ -2197,10 +2199,10 @@
         "bot": 65
       },
       "2026-Q4": {
-        "organization": 122,
+        "organization": 125,
         "one_person": 16,
-        "personal": 76,
-        "hidden": 79,
+        "personal": 82,
+        "hidden": 80,
         "unknown": 0,
         "bot": 58
       }

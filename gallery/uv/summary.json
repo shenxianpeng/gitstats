@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:20:07+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:09:32+00:00",
   "name": "uv",
   "report_path": "index.html",
   "first_commit": "2023-10-04 19:33:47",
-  "last_commit": "2026-10-23 09:55:33",
+  "last_commit": "2026-10-23 14:55:49",
   "age_days": 1115,
   "active_days": 1023,
-  "total_commits": 11207,
-  "total_authors": 599,
-  "active_authors_12mo": 185,
-  "commits_last_12mo": 3457,
+  "total_commits": 11215,
+  "total_authors": 600,
+  "active_authors_12mo": 186,
+  "commits_last_12mo": 3465,
   "total_files": 1875,
-  "total_lines": 884411,
-  "lines_added": 1814915,
-  "lines_removed": 930504,
+  "total_lines": 884660,
+  "lines_added": 1815312,
+  "lines_removed": 930652,
   "total_tags": 327,
   "era": "steady",
   "top_authors": [
     {
       "name": "Charlie Marsh",
-      "commits": 3451
+      "commits": 3455
     },
     {
       "name": "Zanie Blue",
@@ -29,7 +29,7 @@
     },
     {
       "name": "konsti",
-      "commits": 1211
+      "commits": 1213
     },
     {
       "name": "Andrew Gallant",
@@ -37,20 +37,21 @@
     },
     {
       "name": "William Woodruff",
-      "commits": 196
+      "commits": 197
     }
   ],
   "author_commits": {
-    "konsti": 1211,
+    "Charlie Marsh": 3455,
+    "William Woodruff": 197,
+    "Pasit Nusso": 1,
+    "konsti": 1213,
     "Alex Waygood": 19,
-    "Charlie Marsh": 3451,
     "zaniebot": 147,
     "Zsolt Dollenstein": 127,
     "Zanie Blue": 2165,
     "Josh Cazalas": 2,
     "Tomasz Kramkowski": 126,
     "ethernet": 1,
-    "William Woodruff": 196,
     "Laurent Cheylus": 1,
     "Mateusz Hajder": 1,
     "ChiLin Chiu": 2,
@@ -645,7 +646,7 @@
     "2023": 496,
     "2024": 4780,
     "2025": 2770,
-    "2026": 3161
+    "2026": 3169
   },
   "ai_assisted": {
     "commits": 155,
@@ -706,16 +707,16 @@
       "2026-07": 505,
       "2026-08": 317,
       "2026-09": 422,
-      "2026-10": 492
+      "2026-10": 500
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11207,
+    "commits": 11215,
     "by_kind": {
-      "organization": 634,
+      "organization": 635,
       "one_person": 2629,
-      "personal": 5508,
+      "personal": 5515,
       "hidden": 529,
       "unknown": 0,
       "bot": 1907
@@ -725,11 +726,11 @@
     "top": [
       {
         "organization": "astral.sh",
-        "commits": 614,
-        "commits_last_12mo": 332,
+        "commits": 615,
+        "commits_last_12mo": 333,
         "addresses": 5,
         "first_commit": "2023-11-07",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "prefix.dev",
@@ -814,9 +815,9 @@
         "bot": 461
       },
       "2026-Q4": {
-        "organization": 24,
+        "organization": 25,
         "one_person": 72,
-        "personal": 172,
+        "personal": 179,
         "hidden": 6,
         "unknown": 0,
         "bot": 218

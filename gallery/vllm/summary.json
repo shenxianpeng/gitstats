@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:22:09+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:11:52+00:00",
   "name": "vLLM",
   "report_path": "index.html",
   "first_commit": "2023-02-09 11:24:15",
-  "last_commit": "2026-10-23 10:55:45",
-  "age_days": 1352,
+  "last_commit": "2026-10-23 15:09:40",
+  "age_days": 1353,
   "active_days": 1222,
-  "total_commits": 23674,
+  "total_commits": 23681,
   "total_authors": 3482,
-  "active_authors_12mo": 2313,
-  "commits_last_12mo": 12773,
-  "total_files": 8416,
-  "total_lines": 2683130,
-  "lines_added": 4275380,
-  "lines_removed": 1592250,
+  "active_authors_12mo": 2312,
+  "commits_last_12mo": 12780,
+  "total_files": 8418,
+  "total_lines": 2683472,
+  "lines_added": 4276248,
+  "lines_removed": 1592776,
   "total_tags": 110,
   "era": "peak",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "Misha Goin",
-      "commits": 651
+      "commits": 652
     },
     {
       "name": "Harry Mellor",
@@ -41,7 +41,13 @@
     }
   ],
   "author_commits": {
-    "Bugen Zhao": 171,
+    "Misha Goin": 652,
+    "Andreas Karatzas": 437,
+    "Isotr0py": 459,
+    "Bugen Zhao": 172,
+    "Fanli Lin": 21,
+    "Ziyang Ma": 4,
+    "aoshen02": 100,
     "YukioZzz": 8,
     "Akash kaothalkar": 17,
     "xaguilar-amd": 10,
@@ -78,7 +84,6 @@
     "CAICAII": 1,
     "fxmarty-amd": 47,
     "Thirumaran": 1,
-    "Andreas Karatzas": 436,
     "Kfir Toledo": 4,
     "Jay Yen": 1,
     "Woosuk Kwon": 875,
@@ -113,7 +118,6 @@
     "Aaron Hao": 34,
     "Lazurite": 3,
     "Patryk Mikulski": 1,
-    "Isotr0py": 458,
     "Matteo ATKINSON": 1,
     "Hangrui Cao": 3,
     "Juan P\u00e9rez de Algaba": 58,
@@ -152,14 +156,11 @@
     "Hao Wang": 1,
     "Kapil Arya": 4,
     "Muti Chung": 1,
-    "Misha Goin": 651,
     "wenjinhust": 3,
     "Kevin H. Luu": 309,
     "djramic": 34,
     "Mir Mustafa Ali": 1,
-    "Ziyang Ma": 3,
     "linitra24": 24,
-    "aoshen02": 99,
     "roigarnettNvidia": 1,
     "Chaitanya Sri Krishna Lolla": 7,
     "Peyman Razaghi": 1,
@@ -604,7 +605,6 @@
     "Daniel M. Garc\u00eda-Oca\u00f1a Hern\u00e1ndez": 1,
     "Muhammad Ahmed": 1,
     "Spandan Tiwari": 3,
-    "Fanli Lin": 20,
     "Abhinandan": 1,
     "Xiaoshuang Wang": 9,
     "xiaohuguo2023": 4,
@@ -3528,13 +3528,13 @@
     "2023": 614,
     "2024": 3354,
     "2025": 8634,
-    "2026": 11072
+    "2026": 11079
   },
   "ai_assisted": {
-    "commits": 2287,
+    "commits": 2292,
     "authored": 6,
     "assistants": {
-      "Claude": 1454,
+      "Claude": 1459,
       "Codex": 375,
       "Gemini": 309,
       "Cursor": 160,
@@ -3568,7 +3568,7 @@
       "2026-07": 224,
       "2026-08": 279,
       "2026-09": 467,
-      "2026-10": 622
+      "2026-10": 627
     },
     "commits_by_month": {
       "2024-11": 430,
@@ -3594,16 +3594,16 @@
       "2026-07": 1139,
       "2026-08": 1224,
       "2026-09": 1637,
-      "2026-10": 1397
+      "2026-10": 1404
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 23674,
+    "commits": 23681,
     "by_kind": {
-      "organization": 7920,
-      "one_person": 1843,
-      "personal": 6952,
+      "organization": 7924,
+      "one_person": 1844,
+      "personal": 6954,
       "hidden": 6935,
       "unknown": 0,
       "bot": 24
@@ -3613,8 +3613,8 @@
     "top": [
       {
         "organization": "amd.com",
-        "commits": 1328,
-        "commits_last_12mo": 1243,
+        "commits": 1329,
+        "commits_last_12mo": 1244,
         "addresses": 165,
         "first_commit": "2024-04-03",
         "last_commit": "2026-10-23"
@@ -3629,8 +3629,8 @@
       },
       {
         "organization": "intel.com",
-        "commits": 833,
-        "commits_last_12mo": 584,
+        "commits": 835,
+        "commits_last_12mo": 586,
         "addresses": 84,
         "first_commit": "2024-02-01",
         "last_commit": "2026-10-23"
@@ -3685,11 +3685,11 @@
       },
       {
         "organization": "inferact.ai",
-        "commits": 279,
-        "commits_last_12mo": 279,
+        "commits": 280,
+        "commits_last_12mo": 280,
         "addresses": 11,
         "first_commit": "2026-04-01",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "daocloud.io",
@@ -4230,9 +4230,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 499,
-        "one_person": 97,
-        "personal": 393,
+        "organization": 503,
+        "one_person": 98,
+        "personal": 395,
         "hidden": 408,
         "unknown": 0,
         "bot": 0

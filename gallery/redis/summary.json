@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:29:09+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:18:49+00:00",
   "name": "Redis",
   "report_path": "index.html",
   "first_commit": "2009-03-22 09:30:00",
-  "last_commit": "2026-10-23 04:49:21",
-  "age_days": 6424,
+  "last_commit": "2026-10-23 13:13:12",
+  "age_days": 6425,
   "active_days": 3841,
-  "total_commits": 13374,
+  "total_commits": 13375,
   "total_authors": 910,
   "active_authors_12mo": 120,
-  "commits_last_12mo": 583,
-  "total_files": 1939,
-  "total_lines": 655489,
-  "lines_added": 1044379,
-  "lines_removed": 388890,
+  "commits_last_12mo": 584,
+  "total_files": 1941,
+  "total_lines": 664204,
+  "lines_added": 1053303,
+  "lines_removed": 389099,
   "total_tags": 28,
   "era": "steady",
   "top_authors": [
     {
       "name": "Salvatore Sanfilippo",
-      "commits": 7213
+      "commits": 7214
     },
     {
       "name": "Oran Agra",
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Salvatore Sanfilippo": 7214,
     "Lazizbek Ergashev": 3,
     "hristostaykov-del": 13,
     "Slavomir Kaslev": 31,
@@ -123,7 +124,6 @@
     "Scott Lasley": 1,
     "dannysheyn": 1,
     "ofiryanai": 2,
-    "Salvatore Sanfilippo": 7213,
     "raffertyyu": 2,
     "Leenear": 1,
     "Nhan (Nolan) Huynh": 1,
@@ -970,13 +970,13 @@
     "2023": 453,
     "2024": 321,
     "2025": 549,
-    "2026": 518
+    "2026": 519
   },
   "ai_assisted": {
-    "commits": 42,
+    "commits": 43,
     "authored": 0,
     "assistants": {
-      "Claude": 33,
+      "Claude": 34,
       "GitHub Copilot": 9,
       "Cursor": 1
     },
@@ -1004,7 +1004,7 @@
       "2026-07": 6,
       "2026-08": 1,
       "2026-09": 5,
-      "2026-10": 14
+      "2026-10": 15
     },
     "commits_by_month": {
       "2024-11": 13,
@@ -1030,16 +1030,16 @@
       "2026-07": 64,
       "2026-08": 53,
       "2026-09": 45,
-      "2026-10": 55
+      "2026-10": 56
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 13374,
+    "commits": 13375,
     "by_kind": {
       "organization": 1914,
       "one_person": 633,
-      "personal": 10259,
+      "personal": 10260,
       "hidden": 546,
       "unknown": 5,
       "bot": 17
@@ -1228,7 +1228,7 @@
       "2026-Q4": {
         "organization": 16,
         "one_person": 0,
-        "personal": 26,
+        "personal": 27,
         "hidden": 11,
         "unknown": 0,
         "bot": 2

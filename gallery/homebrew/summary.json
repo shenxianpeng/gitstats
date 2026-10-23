@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:28:42+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:18:23+00:00",
   "name": "Homebrew",
   "report_path": "index.html",
   "first_commit": "2009-05-20 23:04:11",
-  "last_commit": "2026-10-23 08:19:08",
+  "last_commit": "2026-10-23 14:48:50",
   "age_days": 6365,
   "active_days": 5601,
-  "total_commits": 53302,
+  "total_commits": 53313,
   "total_authors": 1319,
   "active_authors_12mo": 192,
-  "commits_last_12mo": 6310,
-  "total_files": 3429,
-  "total_lines": 533665,
-  "lines_added": 1960151,
-  "lines_removed": 1426486,
+  "commits_last_12mo": 6321,
+  "total_files": 3431,
+  "total_lines": 534105,
+  "lines_added": 1960905,
+  "lines_removed": 1426800,
   "total_tags": 538,
   "era": "peak",
   "top_authors": [
     {
       "name": "Mike McQuaid",
-      "commits": 14564
+      "commits": 14570
     },
     {
       "name": "BrewTestBot",
@@ -41,9 +41,9 @@
     }
   ],
   "author_commits": {
+    "Mike McQuaid": 14570,
     "Anton Melnikov": 197,
     "BrewTestBot": 3343,
-    "Mike McQuaid": 14564,
     "Izaak Beekman": 14,
     "Patrick Linnane": 1550,
     "Bevan Kay": 302,
@@ -1379,7 +1379,7 @@
     "2023": 4255,
     "2024": 5411,
     "2025": 4570,
-    "2026": 5553
+    "2026": 5564
   },
   "ai_assisted": {
     "commits": 218,
@@ -1440,19 +1440,19 @@
       "2026-07": 971,
       "2026-08": 640,
       "2026-09": 761,
-      "2026-10": 328
+      "2026-10": 339
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 53302,
+    "commits": 53313,
     "by_kind": {
       "organization": 1125,
-      "one_person": 26912,
+      "one_person": 26918,
       "personal": 15799,
       "hidden": 6867,
       "unknown": 49,
-      "bot": 2550
+      "bot": 2555
     },
     "organization_count": 19,
     "last_12mo_from": "2025-11",
@@ -1669,11 +1669,11 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 238,
+        "one_person": 244,
         "personal": 47,
         "hidden": 33,
         "unknown": 0,
-        "bot": 10
+        "bot": 15
       }
     }
   }

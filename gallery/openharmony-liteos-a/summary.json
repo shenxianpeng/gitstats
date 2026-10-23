@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:27:13+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:17:27+00:00",
   "name": "OpenHarmony LiteOS-A",
   "report_path": "index.html",
   "first_commit": "2020-08-25 11:04:20",
@@ -215,14 +215,14 @@
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
     "commits": 1516,
     "by_kind": {
-      "organization": 992,
+      "organization": 500,
       "one_person": 70,
       "personal": 454,
-      "hidden": 0,
+      "hidden": 18,
       "unknown": 0,
-      "bot": 0
+      "bot": 474
     },
-    "organization_count": 6,
+    "organization_count": 4,
     "last_12mo_from": "2025-08",
     "top": [
       {
@@ -232,22 +232,6 @@
         "addresses": 56,
         "first_commit": "2020-08-25",
         "last_commit": "2025-02-07"
-      },
-      {
-        "organization": "gitee.com",
-        "commits": 453,
-        "commits_last_12mo": 0,
-        "addresses": 7,
-        "first_commit": "2020-09-11",
-        "last_commit": "2021-11-18"
-      },
-      {
-        "organization": "gitcode.com",
-        "commits": 39,
-        "commits_last_12mo": 39,
-        "addresses": 2,
-        "first_commit": "2025-09-16",
-        "last_commit": "2026-07-28"
       },
       {
         "organization": "hust.edu.cn",
@@ -300,44 +284,44 @@
         "bot": 0
       },
       "2025-Q3": {
-        "organization": 6,
+        "organization": 0,
         "one_person": 0,
         "personal": 7,
-        "hidden": 0,
+        "hidden": 6,
         "unknown": 0,
         "bot": 0
       },
       "2025-Q4": {
-        "organization": 4,
+        "organization": 0,
         "one_person": 5,
         "personal": 3,
         "hidden": 0,
         "unknown": 0,
-        "bot": 0
+        "bot": 4
       },
       "2026-Q1": {
-        "organization": 5,
+        "organization": 0,
         "one_person": 10,
         "personal": 0,
         "hidden": 0,
         "unknown": 0,
-        "bot": 0
+        "bot": 5
       },
       "2026-Q2": {
-        "organization": 18,
+        "organization": 0,
         "one_person": 19,
         "personal": 0,
         "hidden": 0,
         "unknown": 0,
-        "bot": 0
+        "bot": 18
       },
       "2026-Q3": {
-        "organization": 6,
+        "organization": 0,
         "one_person": 16,
         "personal": 0,
         "hidden": 0,
         "unknown": 0,
-        "bot": 0
+        "bot": 6
       }
     }
   }

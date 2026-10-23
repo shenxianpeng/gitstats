@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:28:27+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:18:15+00:00",
   "name": "nginx",
   "report_path": "index.html",
   "first_commit": "2002-08-06 16:39:45",
   "last_commit": "2026-10-22 11:55:01",
   "age_days": 8843,
-  "active_days": 3152,
-  "total_commits": 8769,
+  "active_days": 3153,
+  "total_commits": 8770,
   "total_authors": 143,
   "active_authors_12mo": 45,
-  "commits_last_12mo": 287,
+  "commits_last_12mo": 288,
   "total_files": 544,
-  "total_lines": 306985,
-  "lines_added": 508456,
-  "lines_removed": 201471,
+  "total_lines": 306994,
+  "lines_added": 508467,
+  "lines_removed": 201473,
   "total_tags": 502,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Vadim Zhestikov": 23,
     "Maxim Dounin": 1706,
     "Roman Arutyunyan": 661,
     "Sergey Kandaurov": 758,
@@ -51,7 +52,6 @@
     "Evgeny Shirykalov": 2,
     "nishat shabbir": 1,
     "Aleksei Bavshin": 17,
-    "Vadim Zhestikov": 22,
     "Oskar Eichler": 1,
     "dgprivate": 1,
     "Ivan Ovchinnikov": 2,
@@ -210,7 +210,7 @@
     "2023": 186,
     "2024": 134,
     "2025": 164,
-    "2026": 256
+    "2026": 257
   },
   "ai_assisted": {
     "commits": 5,
@@ -268,14 +268,14 @@
       "2026-07": 29,
       "2026-08": 27,
       "2026-09": 35,
-      "2026-10": 13
+      "2026-10": 14
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8769,
+    "commits": 8770,
     "by_kind": {
-      "organization": 3204,
+      "organization": 3205,
       "one_person": 5472,
       "personal": 85,
       "hidden": 7,
@@ -295,11 +295,11 @@
       },
       {
         "organization": "f5.com",
-        "commits": 87,
-        "commits_last_12mo": 66,
+        "commits": 88,
+        "commits_last_12mo": 67,
         "addresses": 24,
         "first_commit": "2020-08-28",
-        "last_commit": "2026-10-05"
+        "last_commit": "2026-10-09"
       },
       {
         "organization": "cloudflare.com",
@@ -400,7 +400,7 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 10,
+        "organization": 11,
         "one_person": 3,
         "personal": 0,
         "hidden": 0,

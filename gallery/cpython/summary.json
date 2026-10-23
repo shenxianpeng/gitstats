@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:21:46+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:10:32+00:00",
   "name": "CPython",
   "report_path": "index.html",
   "first_commit": "1990-08-09 14:25:15",
-  "last_commit": "2026-10-23 08:33:57",
-  "age_days": 13224,
+  "last_commit": "2026-10-23 15:01:57",
+  "age_days": 13225,
   "active_days": 11064,
-  "total_commits": 133914,
+  "total_commits": 133915,
   "total_authors": 3730,
-  "active_authors_12mo": 782,
-  "commits_last_12mo": 4964,
+  "active_authors_12mo": 781,
+  "commits_last_12mo": 4965,
   "total_files": 5693,
-  "total_lines": 3249103,
-  "lines_added": 11106304,
-  "lines_removed": 7857201,
+  "total_lines": 3249113,
+  "lines_added": 11106369,
+  "lines_removed": 7857256,
   "total_tags": 312,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Hugo van Kemenade": 498,
     "Kumar Aditya": 450,
     "Stan Ulbrych": 394,
     "Gregory P. Smith": 1469,
@@ -104,7 +105,6 @@
     "Zachary Ware": 763,
     "Lo\u00efc Simon": 13,
     "Rafid Aslam": 1,
-    "Hugo van Kemenade": 497,
     "Aniket": 16,
     "Tomas R.": 104,
     "Jonathan J. Helmus": 3,
@@ -3809,7 +3809,7 @@
     "2023": 4459,
     "2024": 4743,
     "2025": 4871,
-    "2026": 4181
+    "2026": 4182
   },
   "ai_assisted": {
     "commits": 383,
@@ -3868,17 +3868,17 @@
       "2026-07": 503,
       "2026-08": 384,
       "2026-09": 466,
-      "2026-10": 474
+      "2026-10": 475
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 133914,
+    "commits": 133915,
     "by_kind": {
       "organization": 43200,
       "one_person": 40189,
       "personal": 43856,
-      "hidden": 6508,
+      "hidden": 6509,
       "unknown": 82,
       "bot": 79
     },
@@ -4347,7 +4347,7 @@
         "organization": 121,
         "one_person": 102,
         "personal": 154,
-        "hidden": 93,
+        "hidden": 94,
         "unknown": 0,
         "bot": 4
       }

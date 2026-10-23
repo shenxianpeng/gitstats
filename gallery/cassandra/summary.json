@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:25:03+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:14:43+00:00",
   "name": "Apache Cassandra",
   "report_path": "index.html",
   "first_commit": "2009-03-02 07:57:22",
-  "last_commit": "2026-10-23 11:09:50",
+  "last_commit": "2026-10-23 14:27:20",
   "age_days": 6445,
   "active_days": 4870,
-  "total_commits": 32478,
+  "total_commits": 32481,
   "total_authors": 597,
   "active_authors_12mo": 92,
-  "commits_last_12mo": 992,
+  "commits_last_12mo": 995,
   "total_files": 8792,
-  "total_lines": 2022412,
-  "lines_added": 3698286,
-  "lines_removed": 1675874,
+  "total_lines": 2022426,
+  "lines_added": 3698309,
+  "lines_removed": 1675883,
   "total_tags": 246,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Bernardo Botella": 7,
     "Brandon Williams": 3036,
     "Stefan Miklosovic": 1136,
     "Arvind Kandpal": 23,
@@ -48,7 +49,6 @@
     "prithvi": 1,
     "Francisco Guerrero": 92,
     "Yuqi Yan": 4,
-    "Bernardo Botella": 4,
     "Dmitry Konstantinov": 171,
     "Artur Malchanau": 1,
     "Alan Wang": 10,
@@ -657,7 +657,7 @@
     "2023": 1367,
     "2024": 944,
     "2025": 1007,
-    "2026": 888
+    "2026": 891
   },
   "ai_assisted": {
     "commits": 24,
@@ -718,15 +718,15 @@
       "2026-07": 111,
       "2026-08": 139,
       "2026-09": 123,
-      "2026-10": 77
+      "2026-10": 80
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 32478,
+    "commits": 32481,
     "by_kind": {
       "organization": 25454,
-      "one_person": 2505,
+      "one_person": 2508,
       "personal": 4425,
       "hidden": 84,
       "unknown": 10,
@@ -1035,7 +1035,7 @@
       },
       "2026-Q4": {
         "organization": 62,
-        "one_person": 1,
+        "one_person": 4,
         "personal": 14,
         "hidden": 0,
         "unknown": 0,

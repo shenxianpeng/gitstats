@@ -1,34 +1,34 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:24:53+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:14:23+00:00",
   "name": "Apache Spark",
   "report_path": "index.html",
   "first_commit": "2010-03-29 23:17:55",
-  "last_commit": "2026-10-23 09:10:09",
+  "last_commit": "2026-10-23 12:52:57",
   "age_days": 6052,
   "active_days": 5305,
-  "total_commits": 50673,
+  "total_commits": 50679,
   "total_authors": 3083,
   "active_authors_12mo": 427,
-  "commits_last_12mo": 4777,
+  "commits_last_12mo": 4783,
   "total_files": 27598,
-  "total_lines": 4382047,
-  "lines_added": 7824138,
-  "lines_removed": 3442091,
+  "total_lines": 4382536,
+  "lines_added": 7824652,
+  "lines_removed": 3442116,
   "total_tags": 11,
   "era": "steady",
   "top_authors": [
     {
       "name": "Dongjoon Hyun",
-      "commits": 2617
-    },
-    {
-      "name": "Hyukjin Kwon",
-      "commits": 2030
+      "commits": 2621
     },
     {
       "name": "Ruifeng Zheng",
+      "commits": 2031
+    },
+    {
+      "name": "Hyukjin Kwon",
       "commits": 2030
     },
     {
@@ -41,11 +41,12 @@
     }
   ],
   "author_commits": {
+    "Luka Zdravi\u0107": 18,
+    "Dongjoon Hyun": 2621,
+    "Ruifeng Zheng": 2031,
     "Yicong Huang": 236,
     "Hyukjin Kwon": 2030,
     "Peter Toth": 185,
-    "Ruifeng Zheng": 2030,
-    "Dongjoon Hyun": 2617,
     "Daniel Tenedorio": 127,
     "Dejan Krakovic": 13,
     "Gengliang Wang": 633,
@@ -74,7 +75,6 @@
     "Stevo Mitric": 88,
     "aleksandar-trajkovic-db": 5,
     "Sebastian Hillig": 4,
-    "Luka Zdravi\u0107": 17,
     "David Hsieh": 1,
     "Tim Hsiung": 1,
     "Vito Lin": 1,
@@ -3142,15 +3142,15 @@
     "2023": 4113,
     "2024": 3762,
     "2025": 3411,
-    "2026": 4129
+    "2026": 4135
   },
   "ai_assisted": {
-    "commits": 2251,
+    "commits": 2257,
     "authored": 0,
     "assistants": {
-      "Claude": 1685,
-      "Codex": 369,
-      "ChatGPT": 367,
+      "Claude": 1690,
+      "Codex": 370,
+      "ChatGPT": 368,
       "Cursor": 215,
       "Gemini": 51,
       "GitHub Copilot": 40,
@@ -3184,7 +3184,7 @@
       "2026-07": 332,
       "2026-08": 359,
       "2026-09": 320,
-      "2026-10": 254
+      "2026-10": 260
     },
     "commits_by_month": {
       "2024-11": 250,
@@ -3210,16 +3210,16 @@
       "2026-07": 531,
       "2026-08": 536,
       "2026-09": 455,
-      "2026-10": 307
+      "2026-10": 313
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 50673,
+    "commits": 50679,
     "by_kind": {
-      "organization": 31003,
+      "organization": 31008,
       "one_person": 2303,
-      "personal": 16401,
+      "personal": 16402,
       "hidden": 797,
       "unknown": 169,
       "bot": 0
@@ -3237,8 +3237,8 @@
       },
       {
         "organization": "apache.org",
-        "commits": 8332,
-        "commits_last_12mo": 1384,
+        "commits": 8337,
+        "commits_last_12mo": 1389,
         "addresses": 98,
         "first_commit": "2013-07-08",
         "last_commit": "2026-10-23"
@@ -4358,9 +4358,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 152,
+        "organization": 157,
         "one_person": 21,
-        "personal": 101,
+        "personal": 102,
         "hidden": 33,
         "unknown": 0,
         "bot": 0

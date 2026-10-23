@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:28:27+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:18:33+00:00",
   "name": "Next.js",
   "report_path": "index.html",
   "first_commit": "2016-10-05 23:35:00",
-  "last_commit": "2026-10-23 11:21:29",
+  "last_commit": "2026-10-23 14:32:44",
   "age_days": 3670,
   "active_days": 3328,
-  "total_commits": 36422,
+  "total_commits": 36428,
   "total_authors": 3969,
-  "active_authors_12mo": 248,
-  "commits_last_12mo": 4852,
-  "total_files": 34466,
-  "total_lines": 3137345,
-  "lines_added": 13060266,
-  "lines_removed": 9922921,
+  "active_authors_12mo": 247,
+  "commits_last_12mo": 4858,
+  "total_files": 34468,
+  "total_lines": 3138563,
+  "lines_added": 13061642,
+  "lines_removed": 9923079,
   "total_tags": 3905,
   "era": "steady",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "Tobias Koppers",
-      "commits": 2674
+      "commits": 2678
     },
     {
       "name": "nextjs-bot",
@@ -41,15 +41,15 @@
     }
   ],
   "author_commits": {
+    "Tobias Koppers": 2678,
+    "Sebastian \"Sebbie\" Silbermann": 881,
+    "Niklas Mischkulnig": 847,
     "Hendrik Liebau": 620,
     "Jan Kassens": 19,
     "Jiachi Liu": 1347,
     "digasic": 1,
-    "Tobias Koppers": 2674,
-    "Niklas Mischkulnig": 846,
     "Will Binns-Smith": 603,
     "Jimmy Miller": 35,
-    "Sebastian \"Sebbie\" Silbermann": 880,
     "Jamiboy Mohammad": 45,
     "zydo": 1,
     "Luke Sandberg": 464,
@@ -4022,13 +4022,13 @@
     "2023": 5710,
     "2024": 5744,
     "2025": 5619,
-    "2026": 4294
+    "2026": 4300
   },
   "ai_assisted": {
-    "commits": 273,
+    "commits": 274,
     "authored": 5,
     "assistants": {
-      "Claude": 211,
+      "Claude": 212,
       "Cursor": 53,
       "GitHub Copilot": 7,
       "Devin": 3
@@ -4057,7 +4057,7 @@
       "2026-07": 14,
       "2026-08": 28,
       "2026-09": 27,
-      "2026-10": 29
+      "2026-10": 30
     },
     "commits_by_month": {
       "2024-11": 518,
@@ -4083,17 +4083,17 @@
       "2026-07": 454,
       "2026-08": 490,
       "2026-09": 478,
-      "2026-10": 443
+      "2026-10": 449
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 36422,
+    "commits": 36428,
     "by_kind": {
-      "organization": 5478,
+      "organization": 5479,
       "one_person": 12535,
-      "personal": 11638,
-      "hidden": 5087,
+      "personal": 11642,
+      "hidden": 5088,
       "unknown": 0,
       "bot": 1684
     },
@@ -4102,8 +4102,8 @@
     "top": [
       {
         "organization": "vercel.com",
-        "commits": 4190,
-        "commits_last_12mo": 859,
+        "commits": 4191,
+        "commits_last_12mo": 860,
         "addresses": 42,
         "first_commit": "2020-05-08",
         "last_commit": "2026-10-23"
@@ -4327,10 +4327,10 @@
         "bot": 163
       },
       "2026-Q4": {
-        "organization": 76,
+        "organization": 77,
         "one_person": 45,
-        "personal": 150,
-        "hidden": 125,
+        "personal": 154,
+        "hidden": 126,
         "unknown": 0,
         "bot": 47
       }

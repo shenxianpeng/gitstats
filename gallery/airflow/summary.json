@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:24:29+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:14:25+00:00",
   "name": "Apache Airflow",
   "report_path": "index.html",
   "first_commit": "2014-10-06 21:29:38",
-  "last_commit": "2026-10-23 11:04:37",
+  "last_commit": "2026-10-23 15:08:17",
   "age_days": 4400,
   "active_days": 4022,
-  "total_commits": 42385,
-  "total_authors": 4356,
-  "active_authors_12mo": 906,
-  "commits_last_12mo": 8466,
-  "total_files": 15090,
-  "total_lines": 2928426,
-  "lines_added": 6296476,
-  "lines_removed": 3368050,
+  "total_commits": 42400,
+  "total_authors": 4358,
+  "active_authors_12mo": 908,
+  "commits_last_12mo": 8481,
+  "total_files": 15092,
+  "total_lines": 2929893,
+  "lines_added": 6298720,
+  "lines_removed": 3368827,
   "total_tags": 9785,
   "era": "surge",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Kaxil Naik",
-      "commits": 2244
+      "commits": 2249
     },
     {
       "name": "Maxime Beauchemin",
@@ -41,16 +41,21 @@
     }
   ],
   "author_commits": {
-    "Jason(Zhe-You) Liu": 357,
+    "Kaxil Naik": 2249,
+    "Kacper Muda": 239,
+    "\uae40\ub09c\ud76c": 1,
+    "Zhen-Lun (Kevin) Hong": 49,
+    "CA": 6,
+    "Jason(Zhe-You) Liu": 360,
+    "Rahul Vats": 204,
+    "Mohamed Laghdaf Dadda": 1,
     "Jeff(Wei-Hao) Lu": 10,
     "Jed Cunningham": 816,
     "Alejandro Morgante": 20,
     "Niko Oliveira": 271,
     "Vincent Hsiao": 27,
-    "Kaxil Naik": 2244,
     "Jarek Potiuk": 5173,
     "Andrey Karazhev": 1,
-    "Zhen-Lun (Kevin) Hong": 48,
     "Zach": 13,
     "Brent Bovenzi": 647,
     "stephen-bracken": 23,
@@ -76,10 +81,7 @@
     "W. H. Wang": 8,
     "Andrew Chang": 61,
     "krisztiansala": 1,
-    "Kacper Muda": 238,
     "Ash Berlin-Taylor": 998,
-    "Rahul Vats": 202,
-    "CA": 5,
     "wiasliaw": 2,
     "Julian LaNeve": 12,
     "Pushkal Gupta": 8,
@@ -4411,13 +4413,13 @@
     "2023": 4159,
     "2024": 4857,
     "2025": 7583,
-    "2026": 7337
+    "2026": 7352
   },
   "ai_assisted": {
-    "commits": 451,
+    "commits": 453,
     "authored": 0,
     "assistants": {
-      "Claude": 376,
+      "Claude": 378,
       "GitHub Copilot": 55,
       "Cursor": 22,
       "ChatGPT": 3,
@@ -4448,7 +4450,7 @@
       "2026-07": 27,
       "2026-08": 25,
       "2026-09": 83,
-      "2026-10": 129
+      "2026-10": 131
     },
     "commits_by_month": {
       "2024-11": 552,
@@ -4474,17 +4476,17 @@
       "2026-07": 788,
       "2026-08": 614,
       "2026-09": 829,
-      "2026-10": 785
+      "2026-10": 800
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 42385,
+    "commits": 42400,
     "by_kind": {
-      "organization": 8728,
-      "one_person": 8490,
-      "personal": 12043,
-      "hidden": 12381,
+      "organization": 8733,
+      "one_person": 8491,
+      "personal": 12046,
+      "hidden": 12387,
       "unknown": 40,
       "bot": 703
     },
@@ -4493,11 +4495,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 5826,
-        "commits_last_12mo": 661,
+        "commits": 5831,
+        "commits_last_12mo": 666,
         "addresses": 27,
         "first_commit": "2014-10-06",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "astronomer.io",
@@ -5238,10 +5240,10 @@
         "bot": 158
       },
       "2026-Q4": {
-        "organization": 240,
-        "one_person": 89,
-        "personal": 160,
-        "hidden": 244,
+        "organization": 245,
+        "one_person": 90,
+        "personal": 163,
+        "hidden": 250,
         "unknown": 0,
         "bot": 52
       }

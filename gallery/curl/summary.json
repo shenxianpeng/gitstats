@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:28:49+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:18:36+00:00",
   "name": "curl",
   "report_path": "index.html",
   "first_commit": "1999-12-29 14:20:26",
   "last_commit": "2026-10-23 01:47:06",
   "age_days": 9795,
   "active_days": 7812,
-  "total_commits": 40236,
-  "total_authors": 1538,
-  "active_authors_12mo": 188,
-  "commits_last_12mo": 3528,
+  "total_commits": 40237,
+  "total_authors": 1539,
+  "active_authors_12mo": 189,
+  "commits_last_12mo": 3529,
   "total_files": 4599,
-  "total_lines": 630967,
-  "lines_added": 1947884,
-  "lines_removed": 1316917,
+  "total_lines": 630988,
+  "lines_added": 1947910,
+  "lines_removed": 1316922,
   "total_tags": 217,
   "era": "surge",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Derek Martin": 1,
     "Michiel van Slobbe": 1,
     "Viktor Szakats": 3564,
     "matty69v": 3,
@@ -1608,7 +1609,7 @@
     "2023": 1905,
     "2024": 2436,
     "2025": 3477,
-    "2026": 2787
+    "2026": 2788
   },
   "ai_assisted": {
     "commits": 2,
@@ -1667,17 +1668,17 @@
       "2026-07": 173,
       "2026-08": 259,
       "2026-09": 355,
-      "2026-10": 272
+      "2026-10": 273
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 40236,
+    "commits": 40237,
     "by_kind": {
       "organization": 22023,
       "one_person": 10639,
       "personal": 6889,
-      "hidden": 312,
+      "hidden": 313,
       "unknown": 60,
       "bot": 313
     },
@@ -2202,7 +2203,7 @@
         "organization": 51,
         "one_person": 173,
         "personal": 23,
-        "hidden": 14,
+        "hidden": 15,
         "unknown": 0,
         "bot": 11
       }

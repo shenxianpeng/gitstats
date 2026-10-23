@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:23:26+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:12:41+00:00",
   "name": "Ray",
   "report_path": "index.html",
   "first_commit": "2016-02-07 22:18:40",
-  "last_commit": "2026-10-23 04:46:36",
+  "last_commit": "2026-10-23 13:59:26",
   "age_days": 3911,
   "active_days": 3500,
-  "total_commits": 32233,
+  "total_commits": 32234,
   "total_authors": 1624,
   "active_authors_12mo": 486,
-  "commits_last_12mo": 4390,
+  "commits_last_12mo": 4391,
   "total_files": 10482,
-  "total_lines": 2608028,
-  "lines_added": 6313675,
-  "lines_removed": 3705647,
+  "total_lines": 2608037,
+  "lines_added": 6313687,
+  "lines_removed": 3705650,
   "total_tags": 20,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Douglas Strodtman": 292,
     "abhishekverma-ray": 16,
     "Ding-Xin Chen": 16,
     "Kunchen (David) Dai": 65,
@@ -57,7 +58,6 @@
     "Goutam": 180,
     "Junwang Zhao": 5,
     "Edward Oakes": 1197,
-    "Douglas Strodtman": 291,
     "Thunderkeg": 8,
     "Celina Yang": 3,
     "johntaylor-cell": 79,
@@ -1677,13 +1677,13 @@
     "2023": 4766,
     "2024": 3194,
     "2025": 5137,
-    "2026": 3650
+    "2026": 3651
   },
   "ai_assisted": {
-    "commits": 1026,
+    "commits": 1027,
     "authored": 0,
     "assistants": {
-      "Claude": 730,
+      "Claude": 731,
       "Gemini": 269,
       "GitHub Copilot": 37,
       "Cursor": 29
@@ -1712,7 +1712,7 @@
       "2026-07": 129,
       "2026-08": 60,
       "2026-09": 131,
-      "2026-10": 172
+      "2026-10": 173
     },
     "commits_by_month": {
       "2024-11": 236,
@@ -1738,14 +1738,14 @@
       "2026-07": 344,
       "2026-08": 321,
       "2026-09": 387,
-      "2026-10": 301
+      "2026-10": 302
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 32233,
+    "commits": 32234,
     "by_kind": {
-      "organization": 8131,
+      "organization": 8132,
       "one_person": 721,
       "personal": 14238,
       "hidden": 9073,
@@ -1757,8 +1757,8 @@
     "top": [
       {
         "organization": "anyscale.com",
-        "commits": 4990,
-        "commits_last_12mo": 1812,
+        "commits": 4991,
+        "commits_last_12mo": 1813,
         "addresses": 82,
         "first_commit": "2020-05-20",
         "last_commit": "2026-10-23"
@@ -2094,7 +2094,7 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 160,
+        "organization": 161,
         "one_person": 16,
         "personal": 54,
         "hidden": 71,

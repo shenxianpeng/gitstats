@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:25:44+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:15:04+00:00",
   "name": "Apache Superset",
   "report_path": "index.html",
   "first_commit": "2015-07-02 22:16:59",
-  "last_commit": "2026-10-23 10:04:42",
+  "last_commit": "2026-10-23 15:01:04",
   "age_days": 4131,
   "active_days": 3318,
-  "total_commits": 23950,
+  "total_commits": 23952,
   "total_authors": 1728,
   "active_authors_12mo": 471,
-  "commits_last_12mo": 5998,
-  "total_files": 11436,
-  "total_lines": 3036981,
-  "lines_added": 8703189,
-  "lines_removed": 5666208,
+  "commits_last_12mo": 6000,
+  "total_files": 11444,
+  "total_lines": 3040937,
+  "lines_added": 8707344,
+  "lines_removed": 5666407,
   "total_tags": 232,
   "era": "peak",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Rafael Benitez": 37,
     "Amogh Atreya": 7,
     "Enzo Martellucci": 124,
     "Evan Rusackas": 1330,
@@ -60,7 +61,6 @@
     "Zhang Muyuan": 1,
     "Isaac": 1,
     "Dhruv P.": 1,
-    "Rafael Benitez": 35,
     "Lukas": 1,
     "Francesco Castaldi": 16,
     "veriiix": 1,
@@ -1782,7 +1782,7 @@
     "2023": 1594,
     "2024": 2068,
     "2025": 1996,
-    "2026": 5580
+    "2026": 5582
   },
   "ai_assisted": {
     "commits": 2109,
@@ -1843,16 +1843,16 @@
       "2026-07": 808,
       "2026-08": 728,
       "2026-09": 841,
-      "2026-10": 573
+      "2026-10": 575
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 23950,
+    "commits": 23952,
     "by_kind": {
       "organization": 3962,
       "one_person": 1377,
-      "personal": 9072,
+      "personal": 9074,
       "hidden": 5776,
       "unknown": 0,
       "bot": 3763
@@ -2049,7 +2049,7 @@
       "2026-Q4": {
         "organization": 195,
         "one_person": 16,
-        "personal": 132,
+        "personal": 134,
         "hidden": 76,
         "unknown": 0,
         "bot": 154

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:23:02+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:12:27+00:00",
   "name": "SGLang",
   "report_path": "index.html",
   "first_commit": "2023-10-09 22:41:15",
-  "last_commit": "2026-10-23 11:12:05",
+  "last_commit": "2026-10-23 15:09:30",
   "age_days": 1110,
   "active_days": 934,
-  "total_commits": 20751,
+  "total_commits": 20763,
   "total_authors": 1924,
   "active_authors_12mo": 1465,
-  "commits_last_12mo": 14322,
-  "total_files": 11225,
-  "total_lines": 3625300,
-  "lines_added": 5404676,
-  "lines_removed": 1779376,
+  "commits_last_12mo": 14334,
+  "total_files": 11229,
+  "total_lines": 3628501,
+  "lines_added": 5408221,
+  "lines_removed": 1779720,
   "total_tags": 144,
   "era": "peak",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "Mick",
-      "commits": 858
+      "commits": 863
     },
     {
       "name": "fzyzcjy",
@@ -41,15 +41,19 @@
     }
   ],
   "author_commits": {
+    "Avaya Aggarwal": 16,
+    "Byron Hsu": 154,
+    "Mick": 863,
+    "pllimax": 30,
+    "shun8686": 5,
+    "Trevor Morris": 73,
+    "Jimmy Shong": 64,
     "chuyeh": 13,
-    "shun8686": 3,
     "Sage": 16,
-    "Mick": 858,
     "Xinyuan Tong": 262,
     "Michael": 159,
     "Shuwen Wang": 199,
     "Ziru": 9,
-    "Avaya Aggarwal": 15,
     "Po-Han Huang (NVIDIA)": 45,
     "Yao Matrix": 2,
     "Yihao Wang": 47,
@@ -57,7 +61,6 @@
     "Banruo Liu": 3,
     "Liangsheng Yin": 1249,
     "ashwini rathi": 56,
-    "Jimmy Shong": 63,
     "Chetan Kumar Verma": 12,
     "vikram singh shekhawat": 10,
     "Pinjie Xu": 1,
@@ -90,7 +93,6 @@
     "trebladev": 3,
     "Song Bian": 4,
     "gjsheu": 13,
-    "Trevor Morris": 72,
     "Jzz1943": 11,
     "Monishver": 3,
     "qiye": 1,
@@ -124,7 +126,6 @@
     "Huang Long": 4,
     "Peng Xingchen": 8,
     "kpjeeja": 3,
-    "pllimax": 29,
     "Shawn Yang": 1,
     "unclezhou": 3,
     "amote-i": 83,
@@ -339,7 +340,6 @@
     "Yash Akhauri": 8,
     "Eddie A. Tsai": 1,
     "Jan Bernl\u00f6hr": 13,
-    "Byron Hsu": 153,
     "Emil Bogomolov": 2,
     "Xiaoshuai Zhang": 1,
     "WMC": 2,
@@ -1970,18 +1970,18 @@
     "2023": 1,
     "2024": 1619,
     "2025": 6794,
-    "2026": 12337
+    "2026": 12349
   },
   "ai_assisted": {
-    "commits": 1612,
+    "commits": 1619,
     "authored": 0,
     "assistants": {
-      "Claude": 1310,
+      "Claude": 1317,
       "Gemini": 177,
       "Cursor": 135,
       "GitHub Copilot": 16,
       "Devin": 4,
-      "Codex": 2,
+      "Codex": 3,
       "CodeRabbit": 1,
       "OpenHands": 1
     },
@@ -2009,7 +2009,7 @@
       "2026-07": 141,
       "2026-08": 260,
       "2026-09": 238,
-      "2026-10": 320
+      "2026-10": 327
     },
     "commits_by_month": {
       "2024-11": 268,
@@ -2035,17 +2035,17 @@
       "2026-07": 1237,
       "2026-08": 1615,
       "2026-09": 1645,
-      "2026-10": 1576
+      "2026-10": 1588
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20751,
+    "commits": 20763,
     "by_kind": {
-      "organization": 3106,
+      "organization": 3107,
       "one_person": 1325,
-      "personal": 9334,
-      "hidden": 6985,
+      "personal": 9343,
+      "hidden": 6987,
       "unknown": 0,
       "bot": 1
     },
@@ -2061,20 +2061,20 @@
         "last_commit": "2026-10-23"
       },
       {
+        "organization": "nvidia.com",
+        "commits": 356,
+        "commits_last_12mo": 268,
+        "addresses": 53,
+        "first_commit": "2024-08-07",
+        "last_commit": "2026-10-23"
+      },
+      {
         "organization": "intel.com",
         "commits": 355,
         "commits_last_12mo": 293,
         "addresses": 50,
         "first_commit": "2024-10-11",
         "last_commit": "2026-10-23"
-      },
-      {
-        "organization": "nvidia.com",
-        "commits": 355,
-        "commits_last_12mo": 267,
-        "addresses": 53,
-        "first_commit": "2024-08-07",
-        "last_commit": "2026-10-22"
       },
       {
         "organization": "oracle.com",
@@ -2487,10 +2487,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 280,
+        "organization": 281,
         "one_person": 15,
-        "personal": 681,
-        "hidden": 600,
+        "personal": 690,
+        "hidden": 602,
         "unknown": 0,
         "bot": 0
       }

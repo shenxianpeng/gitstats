@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:20:51+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:10:20+00:00",
   "name": "Ruff",
   "report_path": "index.html",
   "first_commit": "2022-08-09 17:19:19",
-  "last_commit": "2026-10-23 00:40:15",
+  "last_commit": "2026-10-23 14:42:14",
   "age_days": 1536,
   "active_days": 1469,
-  "total_commits": 17768,
+  "total_commits": 17771,
   "total_authors": 948,
-  "active_authors_12mo": 315,
-  "commits_last_12mo": 5126,
+  "active_authors_12mo": 314,
+  "commits_last_12mo": 5129,
   "total_files": 11263,
-  "total_lines": 2231351,
-  "lines_added": 4450597,
-  "lines_removed": 2219246,
+  "total_lines": 2231462,
+  "lines_added": 4451231,
+  "lines_removed": 2219769,
   "total_tags": 432,
   "era": "steady",
   "top_authors": [
@@ -33,7 +33,7 @@
     },
     {
       "name": "David Peter",
-      "commits": 720
+      "commits": 722
     },
     {
       "name": "Dhruv Manilawala",
@@ -41,7 +41,8 @@
     }
   ],
   "author_commits": {
-    "David Peter": 720,
+    "David Peter": 722,
+    "Brent Westbrook": 511,
     "zaniebot": 32,
     "Zanie Blue": 301,
     "Alex Waygood": 1309,
@@ -62,7 +63,6 @@
     "Dani Bodor": 2,
     "Luke Friedrichs": 1,
     "Ibraheem Ahmed": 144,
-    "Brent Westbrook": 510,
     "Marcos Max": 1,
     "Seunghyun Park": 1,
     "Shantanu Pradhan": 1,
@@ -995,7 +995,7 @@
     "2023": 4573,
     "2024": 2969,
     "2025": 4478,
-    "2026": 4343
+    "2026": 4346
   },
   "ai_assisted": {
     "commits": 70,
@@ -1054,17 +1054,17 @@
       "2026-07": 563,
       "2026-08": 488,
       "2026-09": 464,
-      "2026-10": 305
+      "2026-10": 308
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17768,
+    "commits": 17771,
     "by_kind": {
       "organization": 972,
       "one_person": 3293,
       "personal": 8909,
-      "hidden": 2737,
+      "hidden": 2740,
       "unknown": 0,
       "bot": 1857
     },
@@ -1157,7 +1157,7 @@
         "organization": 37,
         "one_person": 58,
         "personal": 126,
-        "hidden": 39,
+        "hidden": 42,
         "unknown": 0,
         "bot": 45
       }

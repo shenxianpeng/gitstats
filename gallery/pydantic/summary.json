@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:20:03+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:09:40+00:00",
   "name": "Pydantic",
   "report_path": "index.html",
   "first_commit": "2017-05-03 21:23:41",
-  "last_commit": "2026-10-22 13:45:59",
-  "age_days": 3459,
-  "active_days": 1415,
-  "total_commits": 5841,
+  "last_commit": "2026-10-23 14:27:40",
+  "age_days": 3460,
+  "active_days": 1416,
+  "total_commits": 5845,
   "total_authors": 803,
-  "active_authors_12mo": 129,
-  "commits_last_12mo": 607,
+  "active_authors_12mo": 128,
+  "commits_last_12mo": 611,
   "total_files": 851,
-  "total_lines": 259544,
-  "lines_added": 451399,
-  "lines_removed": 191855,
+  "total_lines": 259536,
+  "lines_added": 451626,
+  "lines_removed": 192090,
   "total_tags": 143,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Victorien",
-      "commits": 745
+      "commits": 747
     },
     {
       "name": "Sydney Runkle",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Victorien": 745,
+    "Victorien": 747,
     "Wentao Tong": 1,
     "Chirag Patankar": 1,
     "Sofia Bergstr\u00f6m": 1,
@@ -855,7 +855,7 @@
     "2023": 1775,
     "2024": 1029,
     "2025": 644,
-    "2026": 514
+    "2026": 518
   },
   "ai_assisted": {
     "commits": 4,
@@ -914,19 +914,19 @@
       "2026-07": 63,
       "2026-08": 82,
       "2026-09": 64,
-      "2026-10": 68
+      "2026-10": 72
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5841,
+    "commits": 5845,
     "by_kind": {
       "organization": 260,
       "one_person": 1402,
       "personal": 1161,
-      "hidden": 2415,
+      "hidden": 2417,
       "unknown": 0,
-      "bot": 603
+      "bot": 605
     },
     "organization_count": 2,
     "last_12mo_from": "2025-11",
@@ -1009,9 +1009,9 @@
         "organization": 1,
         "one_person": 3,
         "personal": 3,
-        "hidden": 53,
+        "hidden": 55,
         "unknown": 0,
-        "bot": 8
+        "bot": 10
       }
     }
   }

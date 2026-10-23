@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:20:04+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:09:33+00:00",
   "name": "Django",
   "report_path": "index.html",
   "first_commit": "2005-07-13 01:25:57",
-  "last_commit": "2026-10-22 16:03:08",
+  "last_commit": "2026-10-22 16:09:30",
   "age_days": 7772,
   "active_days": 6663,
-  "total_commits": 35045,
-  "total_authors": 3181,
-  "active_authors_12mo": 215,
-  "commits_last_12mo": 993,
+  "total_commits": 35049,
+  "total_authors": 3182,
+  "active_authors_12mo": 217,
+  "commits_last_12mo": 997,
   "total_files": 7089,
-  "total_lines": 1121171,
-  "lines_added": 3417538,
-  "lines_removed": 2296367,
+  "total_lines": 1121287,
+  "lines_added": 3417826,
+  "lines_removed": 2296539,
   "total_tags": 8,
   "era": "steady",
   "top_authors": [
@@ -41,11 +41,13 @@
     }
   ],
   "author_commits": {
+    "Jacob Rief": 8,
+    "Gerry Mcbride": 1,
+    "Jacob Walls": 430,
     "Natalia": 288,
     "Sanskar Kharya": 1,
     "Sarah Boyce": 216,
     "Adam Johnson": 355,
-    "Jacob Walls": 429,
     "HelmiDev03": 1,
     "Clifford Gama": 79,
     "Aman Kumar Jain": 1,
@@ -424,7 +426,6 @@
     "Laurence Mercer": 1,
     "sai-ganesh-03": 3,
     "yatami38": 1,
-    "Jacob Rief": 6,
     "David Winiecki": 2,
     "ssanger": 2,
     "maddrum": 1,
@@ -3245,7 +3246,7 @@
     "2023": 952,
     "2024": 939,
     "2025": 954,
-    "2026": 822
+    "2026": 826
   },
   "ai_assisted": {
     "commits": 0,
@@ -3300,17 +3301,17 @@
       "2026-06": 98,
       "2026-07": 79,
       "2026-08": 57,
-      "2026-09": 56,
-      "2026-10": 61
+      "2026-09": 57,
+      "2026-10": 64
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 35045,
+    "commits": 35049,
     "by_kind": {
       "organization": 943,
-      "one_person": 13544,
-      "personal": 19348,
+      "one_person": 13545,
+      "personal": 19351,
       "hidden": 1171,
       "unknown": 39,
       "bot": 0
@@ -3915,15 +3916,15 @@
       "2026-Q3": {
         "organization": 8,
         "one_person": 18,
-        "personal": 115,
+        "personal": 116,
         "hidden": 50,
         "unknown": 1,
         "bot": 0
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 1,
-        "personal": 37,
+        "one_person": 2,
+        "personal": 39,
         "hidden": 23,
         "unknown": 0,
         "bot": 0

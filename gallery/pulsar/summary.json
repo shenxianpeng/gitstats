@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:24:56+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:14:28+00:00",
   "name": "Apache Pulsar",
   "report_path": "index.html",
   "first_commit": "2016-09-07 04:17:28",
-  "last_commit": "2026-10-23 05:40:18",
+  "last_commit": "2026-10-23 14:32:06",
   "age_days": 3699,
   "active_days": 2944,
-  "total_commits": 15203,
+  "total_commits": 15207,
   "total_authors": 772,
   "active_authors_12mo": 119,
-  "commits_last_12mo": 1427,
-  "total_files": 6334,
-  "total_lines": 1327506,
-  "lines_added": 6315637,
-  "lines_removed": 4988131,
+  "commits_last_12mo": 1431,
+  "total_files": 6335,
+  "total_lines": 1327819,
+  "lines_added": 6315964,
+  "lines_removed": 4988145,
   "total_tags": 6,
   "era": "steady",
   "top_authors": [
     {
       "name": "Matteo Merli",
-      "commits": 1478
+      "commits": 1480
     },
     {
       "name": "Lari Hotari",
@@ -41,6 +41,9 @@
     }
   ],
   "author_commits": {
+    "Zixuan Liu": 240,
+    "Matteo Merli": 1480,
+    "Cong Zhao": 163,
     "Lari Hotari": 1439,
     "P_K": 1,
     "SeungTaek Lim": 9,
@@ -56,7 +59,6 @@
     "void-ptr974": 53,
     "Yike Xiao": 34,
     "Thomas Bousquet": 1,
-    "Zixuan Liu": 239,
     "jiangpengcheng": 41,
     "shetty": 1,
     "kaminski-dev": 2,
@@ -65,7 +67,6 @@
     "dev_Hakaze": 1,
     "QIAOZHENYU": 1,
     "water": 1,
-    "Matteo Merli": 1478,
     "B\u00e4m": 3,
     "ken": 29,
     "David Kjerrumgaard": 39,
@@ -110,7 +111,6 @@
     "\u9648\u5bb6\u540d": 5,
     "Ruimin MA": 35,
     "crossoverJie": 26,
-    "Cong Zhao": 162,
     "Yong Zhang": 141,
     "somil jain": 1,
     "sbourkeostk": 4,
@@ -825,7 +825,7 @@
     "2023": 1165,
     "2024": 931,
     "2025": 719,
-    "2026": 1314
+    "2026": 1318
   },
   "ai_assisted": {
     "commits": 31,
@@ -885,16 +885,16 @@
       "2026-07": 81,
       "2026-08": 82,
       "2026-09": 256,
-      "2026-10": 262
+      "2026-10": 266
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15203,
+    "commits": 15207,
     "by_kind": {
-      "organization": 5668,
+      "organization": 5671,
       "one_person": 249,
-      "personal": 5568,
+      "personal": 5569,
       "hidden": 3689,
       "unknown": 0,
       "bot": 29
@@ -904,8 +904,8 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 4392,
-        "commits_last_12mo": 424,
+        "commits": 4395,
+        "commits_last_12mo": 427,
         "addresses": 33,
         "first_commit": "2016-09-22",
         "last_commit": "2026-10-23"
@@ -1033,9 +1033,9 @@
         "bot": 4
       },
       "2026-Q4": {
-        "organization": 82,
+        "organization": 85,
         "one_person": 3,
-        "personal": 76,
+        "personal": 77,
         "hidden": 100,
         "unknown": 0,
         "bot": 1

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:23:50+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:14:53+00:00",
   "name": "TensorFlow",
   "report_path": "index.html",
   "first_commit": "2015-11-07 00:27:58",
-  "last_commit": "2026-10-23 11:09:32",
+  "last_commit": "2026-10-23 12:11:48",
   "age_days": 4004,
   "active_days": 3993,
-  "total_commits": 201885,
+  "total_commits": 201927,
   "total_authors": 4617,
   "active_authors_12mo": 688,
-  "commits_last_12mo": 15363,
-  "total_files": 37478,
-  "total_lines": 11111653,
-  "lines_added": 28995065,
-  "lines_removed": 17883412,
+  "commits_last_12mo": 15405,
+  "total_files": 37481,
+  "total_lines": 11112778,
+  "lines_added": 28996356,
+  "lines_removed": 17883578,
   "total_tags": 53,
   "era": "steady",
   "top_authors": [
     {
       "name": "TensorFlower Gardener",
-      "commits": 61373
+      "commits": 61381
     },
     {
       "name": "Eugene Zhulenev",
@@ -41,12 +41,21 @@
     }
   ],
   "author_commits": {
-    "TensorFlower Gardener": 61373,
+    "Keshav": 3,
+    "Mikhail Goncharov": 257,
+    "Dimitar (Mitko) Asenov": 170,
+    "Christian Sigg": 914,
+    "Alexandros Theodoridis": 125,
+    "Alexander Lyashuk": 178,
+    "TensorFlower Gardener": 61381,
+    "Enver Kayaaslan": 149,
+    "Praveen Batra": 14,
     "Parker Schuh": 551,
     "Changming Sun CA": 80,
     "Junwhan Ahn": 412,
     "Subhankar Shah": 114,
     "Majid Dadashi": 134,
+    "bodapatisaikrishna": 47,
     "Alex Y. Chan": 2,
     "Li Liu": 2,
     "Weiyi Wang": 189,
@@ -54,7 +63,7 @@
     "Aditya Sharma": 15,
     "Dillon Sharlet": 110,
     "Tori Baker": 215,
-    "Christian Sigg": 913,
+    "Daniel Liu": 19,
     "Ilya Biryukov": 34,
     "Alex Pivovarov": 174,
     "Henning Becker": 602,
@@ -63,9 +72,8 @@
     "Vladimir Belitskiy": 71,
     "Peter Hawkins": 1667,
     "Oleg Shyshkov": 597,
-    "Vishwak Thatikonda": 146,
+    "Vishwak Thatikonda": 154,
     "Dmitri Latushko": 221,
-    "Alexander Lyashuk": 177,
     "Levon Ter-Grigoryan": 145,
     "Sohaib Iftikhar": 221,
     "Ilia Sergachev": 489,
@@ -75,9 +83,8 @@
     "Alexander Belyaev": 1006,
     "Sergei Lebedev": 292,
     "nishad shabbir": 29,
-    "Mikhail Goncharov": 256,
     "Olli Lupton": 40,
-    "Maddipatla Chatan": 143,
+    "Maddipatla Chatan": 150,
     "gaurides": 99,
     "Akhil Goel": 70,
     "Aleksei Nurmukhametov": 59,
@@ -88,7 +95,6 @@
     "Michael Kuperstein": 295,
     "Bixia Zheng": 518,
     "Terry Heo": 503,
-    "Daniel Liu": 15,
     "Seher Ellis": 77,
     "Maxim Ermilov": 180,
     "Joshua Lang": 107,
@@ -108,7 +114,6 @@
     "Ankit Vishwakarma": 13,
     "Adrian Kuegel": 1989,
     "Vladimir Suvorov": 3,
-    "Alexandros Theodoridis": 124,
     "Vlad Sytchenko": 86,
     "Dan Gnanapragasam": 1,
     "Hyeontaek Lim": 272,
@@ -123,7 +128,6 @@
     "destro4evr-rgb": 4,
     "Quoc Truong CA": 75,
     "Pablo Zimmermann": 40,
-    "Enver Kayaaslan": 148,
     "Hasrat Ali": 12,
     "Ashish Rao": 13,
     "TJ Xu": 112,
@@ -149,7 +153,6 @@
     "Esun Kim": 10,
     "Louis Lechevalier": 2,
     "Dragan Mladjenovic": 90,
-    "bodapatisaikrishna": 41,
     "Zyad Haddad": 1,
     "Terry Sun": 42,
     "Jian Li": 280,
@@ -170,7 +173,6 @@
     "Kostiantyn Liepieshov": 36,
     "Luca Bruni": 2,
     "jdymitarai": 5,
-    "Keshav": 2,
     "y198nt": 5,
     "Venkat6871": 39,
     "David Dunleavy": 736,
@@ -199,7 +201,6 @@
     "Harsha H S": 68,
     "Sai Ganesh Muthuraman": 3,
     "Aditya Gaurav": 38,
-    "Praveen Batra": 13,
     "Saurabh Singh": 7,
     "Volodymyr Kysenko": 30,
     "Ricky Zhou": 4,
@@ -367,7 +368,6 @@
     "Xuefei Jiang": 20,
     "Arpit Khandelwal": 2,
     "Pat Notz": 54,
-    "Dimitar (Mitko) Asenov": 169,
     "Cocoa": 9,
     "Max Riffi-Aslett": 5,
     "Yun Peng": 141,
@@ -4671,13 +4671,13 @@
     "2023": 16742,
     "2024": 16193,
     "2025": 14683,
-    "2026": 13120
+    "2026": 13162
   },
   "ai_assisted": {
-    "commits": 48,
+    "commits": 50,
     "authored": 0,
     "assistants": {
-      "Gemini": 37,
+      "Gemini": 39,
       "Claude": 10,
       "Cursor": 1
     },
@@ -4705,7 +4705,7 @@
       "2026-07": 3,
       "2026-08": 10,
       "2026-09": 3,
-      "2026-10": 9
+      "2026-10": 11
     },
     "commits_by_month": {
       "2024-11": 1115,
@@ -4730,47 +4730,39 @@
       "2026-06": 1265,
       "2026-07": 1294,
       "2026-08": 1423,
-      "2026-09": 1358,
-      "2026-10": 1871
+      "2026-09": 1361,
+      "2026-10": 1910
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 201885,
+    "commits": 201927,
     "by_kind": {
-      "organization": 180237,
+      "organization": 120212,
       "one_person": 2708,
-      "personal": 14088,
+      "personal": 14113,
       "hidden": 4644,
       "unknown": 5,
-      "bot": 203
+      "bot": 60245
     },
     "organization_count": 101,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "google.com",
-        "commits": 105683,
-        "commits_last_12mo": 7464,
+        "commits": 105689,
+        "commits_last_12mo": 7470,
         "addresses": 1238,
         "first_commit": "2015-11-07",
         "last_commit": "2026-10-23"
       },
       {
-        "organization": "tensorflow.org",
-        "commits": 61496,
-        "commits_last_12mo": 4530,
-        "addresses": 3,
-        "first_commit": "2015-12-15",
-        "last_commit": "2026-10-23"
-      },
-      {
         "organization": "nvidia.com",
-        "commits": 4368,
-        "commits_last_12mo": 329,
+        "commits": 4369,
+        "commits_last_12mo": 330,
         "addresses": 83,
         "first_commit": "2017-06-06",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "intel.com",
@@ -4779,6 +4771,14 @@
         "addresses": 100,
         "first_commit": "2016-07-20",
         "last_commit": "2026-10-22"
+      },
+      {
+        "organization": "tensorflow.org",
+        "commits": 1463,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2015-12-15",
+        "last_commit": "2016-08-10"
       },
       {
         "organization": "arm.com",
@@ -4798,11 +4798,11 @@
       },
       {
         "organization": "amd.com",
-        "commits": 938,
-        "commits_last_12mo": 353,
+        "commits": 939,
+        "commits_last_12mo": 354,
         "addresses": 49,
         "first_commit": "2018-01-26",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "huawei.com",
@@ -5559,68 +5559,68 @@
     ],
     "quarters": {
       "2025-Q1": {
-        "organization": 3863,
+        "organization": 2521,
         "one_person": 5,
         "personal": 46,
         "hidden": 46,
         "unknown": 0,
-        "bot": 8
+        "bot": 1350
       },
       "2025-Q2": {
-        "organization": 3753,
+        "organization": 2381,
         "one_person": 4,
         "personal": 25,
         "hidden": 19,
         "unknown": 0,
-        "bot": 23
+        "bot": 1395
       },
       "2025-Q3": {
-        "organization": 3280,
+        "organization": 1939,
         "one_person": 13,
         "personal": 28,
         "hidden": 24,
         "unknown": 0,
-        "bot": 21
+        "bot": 1362
       },
       "2025-Q4": {
-        "organization": 3416,
+        "organization": 2167,
         "one_person": 13,
         "personal": 26,
         "hidden": 41,
         "unknown": 0,
-        "bot": 29
+        "bot": 1278
       },
       "2026-Q1": {
-        "organization": 3018,
+        "organization": 2116,
         "one_person": 86,
         "personal": 104,
         "hidden": 23,
         "unknown": 0,
-        "bot": 30
+        "bot": 932
       },
       "2026-Q2": {
-        "organization": 3556,
+        "organization": 2305,
         "one_person": 107,
         "personal": 155,
         "hidden": 78,
         "unknown": 0,
-        "bot": 17
+        "bot": 1268
       },
       "2026-Q3": {
-        "organization": 2921,
+        "organization": 1853,
         "one_person": 84,
-        "personal": 811,
+        "personal": 814,
         "hidden": 235,
         "unknown": 0,
-        "bot": 24
+        "bot": 1092
       },
       "2026-Q4": {
-        "organization": 1314,
+        "organization": 844,
         "one_person": 24,
-        "personal": 421,
+        "personal": 443,
         "hidden": 102,
         "unknown": 0,
-        "bot": 10
+        "bot": 497
       }
     }
   }

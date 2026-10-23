@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:26:15+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:15:20+00:00",
   "name": "Kubernetes",
   "report_path": "index.html",
   "first_commit": "2014-06-06 23:40:48",
-  "last_commit": "2026-10-23 10:39:53",
+  "last_commit": "2026-10-23 14:45:16",
   "age_days": 4522,
   "active_days": 4481,
-  "total_commits": 142482,
+  "total_commits": 142496,
   "total_authors": 4905,
   "active_authors_12mo": 619,
-  "commits_last_12mo": 8488,
+  "commits_last_12mo": 8502,
   "total_files": 31500,
-  "total_lines": 7311425,
-  "lines_added": 28013055,
-  "lines_removed": 20701630,
+  "total_lines": 7312051,
+  "lines_added": 28013898,
+  "lines_removed": 20701847,
   "total_tags": 215,
   "era": "steady",
   "top_authors": [
@@ -41,22 +41,24 @@
     }
   ],
   "author_commits": {
+    "Jaros\u0142aw Dzikowski": 33,
+    "iomarsayed": 20,
     "Dominik Marci\u0144ski": 39,
-    "Jaros\u0142aw Dzikowski": 32,
+    "Wojciech Tyczy\u0144ski": 1916,
     "Sascha Grunert": 204,
+    "Ciprian Hacman": 19,
     "Joe Betz": 535,
     "Jefftree": 409,
-    "Marek Siarkowicz": 392,
+    "Marek Siarkowicz": 394,
     "upodroid": 47,
     "Jordan Liggitt": 2221,
     "Ryan Brewster": 15,
-    "Wojciech Tyczy\u0144ski": 1914,
     "Divyanshu Prakash": 5,
     "Francesco Romani": 214,
     "danki-hong": 2,
     "Antonio Ojea": 733,
+    "Nabarun Pal": 37,
     "Doramarothy": 2,
-    "iomarsayed": 19,
     "ashishpatel26": 3,
     "Praveen Krishna": 91,
     "Sean Sullivan": 264,
@@ -71,7 +73,6 @@
     "Matt Boersma": 5,
     "Rishabh Raj": 1,
     "Dan Winship": 656,
-    "Ciprian Hacman": 18,
     "Davanum Srinivas": 1129,
     "Yongrui Lin": 351,
     "Marly Salazar": 5,
@@ -346,7 +347,6 @@
     "elmiko": 6,
     "Kunalbehbud": 1,
     "Ania Borowiec": 31,
-    "Nabarun Pal": 36,
     "RyanLin5967": 1,
     "rithwik-01": 7,
     "uditDewan": 2,
@@ -4960,7 +4960,7 @@
     "2023": 7533,
     "2024": 7044,
     "2025": 7152,
-    "2026": 7607
+    "2026": 7621
   },
   "ai_assisted": {
     "commits": 10,
@@ -5020,28 +5020,28 @@
       "2026-06": 860,
       "2026-07": 1115,
       "2026-08": 397,
-      "2026-09": 854,
-      "2026-10": 664
+      "2026-09": 855,
+      "2026-10": 677
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 142482,
+    "commits": 142496,
     "by_kind": {
-      "organization": 65662,
-      "one_person": 5026,
-      "personal": 24866,
+      "organization": 65668,
+      "one_person": 5027,
+      "personal": 24867,
       "hidden": 45562,
       "unknown": 2,
-      "bot": 1364
+      "bot": 1370
     },
     "organization_count": 156,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "google.com",
-        "commits": 35200,
-        "commits_last_12mo": 1554,
+        "commits": 35206,
+        "commits_last_12mo": 1560,
         "addresses": 498,
         "first_commit": "2014-06-07",
         "last_commit": "2026-10-23"
@@ -6337,7 +6337,7 @@
         "bot": 103
       },
       "2026-Q3": {
-        "organization": 743,
+        "organization": 744,
         "one_person": 60,
         "personal": 487,
         "hidden": 143,
@@ -6345,12 +6345,12 @@
         "bot": 933
       },
       "2026-Q4": {
-        "organization": 175,
-        "one_person": 24,
-        "personal": 118,
+        "organization": 180,
+        "one_person": 25,
+        "personal": 119,
         "hidden": 19,
         "unknown": 0,
-        "bot": 328
+        "bot": 334
       }
     }
   }

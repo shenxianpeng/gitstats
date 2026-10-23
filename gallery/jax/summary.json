@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:22:15+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:12:01+00:00",
   "name": "JAX",
   "report_path": "index.html",
   "first_commit": "2018-11-18 02:03:33",
-  "last_commit": "2026-10-23 09:22:18",
+  "last_commit": "2026-10-23 15:08:52",
   "age_days": 2897,
   "active_days": 2745,
-  "total_commits": 39366,
-  "total_authors": 1067,
+  "total_commits": 39372,
+  "total_authors": 1068,
   "active_authors_12mo": 315,
-  "commits_last_12mo": 7755,
+  "commits_last_12mo": 7761,
   "total_files": 2031,
-  "total_lines": 896892,
-  "lines_added": 1999507,
-  "lines_removed": 1102615,
+  "total_lines": 896827,
+  "lines_added": 2000650,
+  "lines_removed": 1103823,
   "total_tags": 263,
   "era": "surge",
   "top_authors": [
     {
       "name": "jax authors",
-      "commits": 11069
+      "commits": 11071
     },
     {
       "name": "Peter Hawkins",
-      "commits": 3898
+      "commits": 3899
     },
     {
       "name": "Matthew Johnson",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Jake VanderPlas CA",
-      "commits": 2983
+      "commits": 2984
     },
     {
       "name": "Yash Katariya",
@@ -41,18 +41,19 @@
     }
   ],
   "author_commits": {
+    "Jake VanderPlas CA": 2984,
+    "jax authors": 11071,
+    "Allan Renucci": 396,
+    "Ilya Biryukov": 1,
     "Sergei Lebedev": 1175,
-    "jax authors": 11069,
     "Adrian Kuegel": 19,
     "Zviki Nozadze": 3,
     "Sharad Vikram": 477,
-    "Jake VanderPlas CA": 2983,
     "Anxhelo Xhebraj": 2,
+    "Peter Hawkins": 3899,
     "Yash Katariya": 2359,
     "Sam Ginzburg": 9,
     "Yue Sheng": 101,
-    "Peter Hawkins": 3898,
-    "Allan Renucci": 395,
     "George Necula": 1312,
     "Anselm Levskaya": 82,
     "guptaishaan": 1,
@@ -1118,7 +1119,7 @@
     "2023": 4502,
     "2024": 6118,
     "2025": 7667,
-    "2026": 6788
+    "2026": 6794
   },
   "ai_assisted": {
     "commits": 8,
@@ -1176,14 +1177,14 @@
       "2026-07": 696,
       "2026-08": 625,
       "2026-09": 692,
-      "2026-10": 622
+      "2026-10": 628
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39366,
+    "commits": 39372,
     "by_kind": {
-      "organization": 29717,
+      "organization": 29723,
       "one_person": 269,
       "personal": 2552,
       "hidden": 6745,
@@ -1195,9 +1196,9 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 28304,
-        "commits_last_12mo": 7024,
-        "addresses": 464,
+        "commits": 28310,
+        "commits_last_12mo": 7030,
+        "addresses": 465,
         "first_commit": "2018-11-18",
         "last_commit": "2026-10-23"
       },
@@ -1404,7 +1405,7 @@
         "bot": 7
       },
       "2026-Q4": {
-        "organization": 592,
+        "organization": 598,
         "one_person": 1,
         "personal": 24,
         "hidden": 5,

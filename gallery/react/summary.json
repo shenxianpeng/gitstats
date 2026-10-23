@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:26:01+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:14:59+00:00",
   "name": "React",
   "report_path": "index.html",
   "first_commit": "2013-05-28 17:04:45",
-  "last_commit": "2026-10-21 17:50:17",
-  "age_days": 4895,
-  "active_days": 3810,
-  "total_commits": 21738,
-  "total_authors": 1938,
+  "last_commit": "2026-10-23 15:00:24",
+  "age_days": 4896,
+  "active_days": 3811,
+  "total_commits": 21740,
+  "total_authors": 1939,
   "active_authors_12mo": 100,
-  "commits_last_12mo": 607,
-  "total_files": 7260,
-  "total_lines": 1173971,
-  "lines_added": 3044196,
-  "lines_removed": 1870225,
+  "commits_last_12mo": 609,
+  "total_files": 7268,
+  "total_lines": 1174355,
+  "lines_added": 3044593,
+  "lines_removed": 1870238,
   "total_tags": 73,
   "era": "quiet",
   "top_authors": [
@@ -41,11 +41,12 @@
     }
   ],
   "author_commits": {
+    "Gourav Kumar Dhiman": 1,
+    "The number one sword cultivator in the south of the sky": 3,
     "Cheng": 2,
     "Sebastian \"Sebbie\" Silbermann": 478,
     "Hendrik Liebau": 69,
     "Josh Story": 260,
-    "The number one sword cultivator in the south of the sky": 2,
     "Minho Yoo": 2,
     "\u8d64\u5742\u7406\u5b50": 1,
     "Konstantin Adzer": 1,
@@ -1994,13 +1995,13 @@
     "2023": 1955,
     "2024": 2173,
     "2025": 1434,
-    "2026": 487
+    "2026": 489
   },
   "ai_assisted": {
-    "commits": 36,
+    "commits": 37,
     "authored": 0,
     "assistants": {
-      "Claude": 33,
+      "Claude": 34,
       "Cursor": 3,
       "Amp": 1
     },
@@ -2028,7 +2029,7 @@
       "2026-07": 14,
       "2026-08": 13,
       "2026-09": 5,
-      "2026-10": 2
+      "2026-10": 3
     },
     "commits_by_month": {
       "2024-11": 88,
@@ -2054,16 +2055,16 @@
       "2026-07": 69,
       "2026-08": 45,
       "2026-09": 48,
-      "2026-10": 29
+      "2026-10": 31
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 21738,
+    "commits": 21740,
     "by_kind": {
       "organization": 4451,
       "one_person": 7603,
-      "personal": 7337,
+      "personal": 7339,
       "hidden": 2242,
       "unknown": 7,
       "bot": 98
@@ -2236,7 +2237,7 @@
       "2026-Q4": {
         "organization": 4,
         "one_person": 9,
-        "personal": 13,
+        "personal": 15,
         "hidden": 3,
         "unknown": 0,
         "bot": 0

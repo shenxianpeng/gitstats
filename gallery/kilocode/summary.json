@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:22:09+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:11:32+00:00",
   "name": "Kilo Code",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-10-23 11:12:58",
+  "last_commit": "2026-10-23 14:03:41",
   "age_days": 581,
   "active_days": 566,
-  "total_commits": 33794,
+  "total_commits": 33807,
   "total_authors": 1208,
   "active_authors_12mo": 1025,
-  "commits_last_12mo": 30002,
-  "total_files": 11015,
-  "total_lines": 1907275,
-  "lines_added": 4252635,
-  "lines_removed": 2345360,
+  "commits_last_12mo": 30015,
+  "total_files": 11029,
+  "total_lines": 1911722,
+  "lines_added": 4257253,
+  "lines_removed": 2345531,
   "total_tags": 250,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "kirillk",
-      "commits": 2139
+      "commits": 2145
     },
     {
       "name": "Dax Raad",
@@ -41,15 +41,16 @@
     }
   ],
   "author_commits": {
-    "Andrea Giammarchi": 166,
+    "arrrkady": 24,
+    "Kirill Kalishev": 691,
+    "Andrea Giammarchi": 169,
+    "kirillk": 2145,
     "Bruno Agat\u00e3o": 290,
     "Joshua Lambert": 296,
     "Marius": 4364,
     "Josh Lambert": 394,
     "Igor \u0160\u0107eki\u0107": 526,
-    "Kirill Kalishev": 690,
     "Evgeny Shurakov": 90,
-    "kirillk": 2139,
     "Emilie Lima Schario": 80,
     "Mihaela Stoica": 3,
     "Christiaan Arnoldus": 479,
@@ -124,7 +125,6 @@
     "OpeOginni": 76,
     "Nathan Thomassin": 2,
     "Charlie Gleason": 2,
-    "arrrkady": 23,
     "Ryan Loney": 2,
     "Matt Van Horn": 5,
     "Brendan Allan": 419,
@@ -1252,7 +1252,7 @@
   },
   "commits_by_year": {
     "2025": 6919,
-    "2026": 26875
+    "2026": 26888
   },
   "ai_assisted": {
     "commits": 171,
@@ -1316,30 +1316,30 @@
       "2026-07": 2275,
       "2026-08": 2481,
       "2026-09": 2277,
-      "2026-10": 921
+      "2026-10": 934
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 33794,
+    "commits": 33807,
     "by_kind": {
-      "organization": 11839,
+      "organization": 11846,
       "one_person": 3444,
-      "personal": 8561,
-      "hidden": 5514,
+      "personal": 8564,
+      "hidden": 5515,
       "unknown": 53,
-      "bot": 4383
+      "bot": 4385
     },
     "organization_count": 11,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "kilocode.ai",
-        "commits": 9464,
-        "commits_last_12mo": 9434,
+        "commits": 9470,
+        "commits_last_12mo": 9440,
         "addresses": 15,
         "first_commit": "2025-08-27",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "sst.dev",
@@ -1351,11 +1351,11 @@
       },
       {
         "organization": "anaconda.com",
-        "commits": 642,
-        "commits_last_12mo": 642,
+        "commits": 643,
+        "commits_last_12mo": 643,
         "addresses": 9,
         "first_commit": "2026-07-21",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "anoma.ly",
@@ -1480,12 +1480,12 @@
         "bot": 761
       },
       "2026-Q4": {
-        "organization": 449,
+        "organization": 456,
         "one_person": 12,
-        "personal": 188,
-        "hidden": 175,
+        "personal": 191,
+        "hidden": 176,
         "unknown": 15,
-        "bot": 82
+        "bot": 84
       }
     }
   }

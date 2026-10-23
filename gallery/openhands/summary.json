@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:21:18+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:10:51+00:00",
   "name": "OpenHands",
   "report_path": "index.html",
   "first_commit": "2024-03-13 03:36:30",
-  "last_commit": "2026-10-23 10:45:26",
+  "last_commit": "2026-10-23 13:26:23",
   "age_days": 955,
   "active_days": 905,
-  "total_commits": 8726,
+  "total_commits": 8730,
   "total_authors": 572,
   "active_authors_12mo": 212,
-  "commits_last_12mo": 3265,
-  "total_files": 2846,
-  "total_lines": 563057,
-  "lines_added": 2174229,
-  "lines_removed": 1611172,
-  "total_tags": 103,
+  "commits_last_12mo": 3269,
+  "total_files": 2772,
+  "total_lines": 563138,
+  "lines_added": 2174365,
+  "lines_removed": 1611227,
+  "total_tags": 104,
   "era": "steady",
   "top_authors": [
     {
@@ -41,12 +41,13 @@
     }
   ],
   "author_commits": {
+    "OpenHands Bot": 61,
+    "Graham Neubig": 492,
+    "John-Mason P. Shackelford": 22,
     "Engel Nyst": 539,
     "\ud83d\udc3e smolpaws": 32,
     "FraterCCCLXIII": 35,
     "Artem Altukhov": 2,
-    "OpenHands Bot": 60,
-    "Graham Neubig": 491,
     "Alona": 86,
     "Abhay Mishra": 7,
     "Hiep Le": 703,
@@ -57,7 +58,6 @@
     "Zihan Xu": 1,
     "Henrique Hirako": 4,
     "Admin Cipansor": 1,
-    "John-Mason P. Shackelford": 21,
     "Rohit Malhotra": 520,
     "Devin": 14,
     "sk09-dev": 1,
@@ -617,13 +617,13 @@
   "commits_by_year": {
     "2024": 2995,
     "2025": 2790,
-    "2026": 2941
+    "2026": 2945
   },
   "ai_assisted": {
-    "commits": 2534,
+    "commits": 2536,
     "authored": 17,
     "assistants": {
-      "OpenHands": 2339,
+      "OpenHands": 2341,
       "Claude": 182,
       "Cursor": 38,
       "GitHub Copilot": 5,
@@ -655,7 +655,7 @@
       "2026-07": 108,
       "2026-08": 63,
       "2026-09": 161,
-      "2026-10": 131
+      "2026-10": 133
     },
     "commits_by_month": {
       "2024-11": 245,
@@ -681,27 +681,27 @@
       "2026-07": 258,
       "2026-08": 179,
       "2026-09": 250,
-      "2026-10": 353
+      "2026-10": 357
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8726,
+    "commits": 8730,
     "by_kind": {
-      "organization": 966,
+      "organization": 967,
       "one_person": 1176,
-      "personal": 3227,
+      "personal": 3229,
       "hidden": 2236,
       "unknown": 0,
-      "bot": 1121
+      "bot": 1122
     },
     "organization_count": 3,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "all-hands.dev",
-        "commits": 676,
-        "commits_last_12mo": 162,
+        "commits": 677,
+        "commits_last_12mo": 163,
         "addresses": 6,
         "first_commit": "2024-08-28",
         "last_commit": "2026-10-23"
@@ -781,12 +781,12 @@
         "bot": 88
       },
       "2026-Q4": {
-        "organization": 27,
+        "organization": 28,
         "one_person": 28,
-        "personal": 224,
+        "personal": 226,
         "hidden": 63,
         "unknown": 0,
-        "bot": 11
+        "bot": 12
       }
     }
   }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:23:29+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:13:06+00:00",
   "name": "Istio",
   "report_path": "index.html",
   "first_commit": "2016-11-18 23:57:24",
-  "last_commit": "2026-10-22 18:50:23",
-  "age_days": 3625,
-  "active_days": 3348,
-  "total_commits": 26793,
+  "last_commit": "2026-10-23 13:01:35",
+  "age_days": 3626,
+  "active_days": 3349,
+  "total_commits": 26794,
   "total_authors": 1283,
   "active_authors_12mo": 164,
-  "commits_last_12mo": 1225,
+  "commits_last_12mo": 1226,
   "total_files": 6767,
   "total_lines": 987066,
-  "lines_added": 8124115,
-  "lines_removed": 7137049,
+  "lines_added": 8124116,
+  "lines_removed": 7137050,
   "total_tags": 54,
   "era": "steady",
   "top_authors": [
     {
       "name": "Istio Automation",
-      "commits": 4183
+      "commits": 4184
     },
     {
       "name": "John Howard",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Istio Automation": 4183,
+    "Istio Automation": 4184,
     "Michael Fraenkel": 24,
     "Petr McAllister": 89,
     "Junho Baek": 4,
@@ -1336,7 +1336,7 @@
     "2023": 2538,
     "2024": 2341,
     "2025": 1459,
-    "2026": 1066
+    "2026": 1067
   },
   "ai_assisted": {
     "commits": 22,
@@ -1396,19 +1396,19 @@
       "2026-07": 95,
       "2026-08": 122,
       "2026-09": 137,
-      "2026-10": 107
+      "2026-10": 108
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 26793,
+    "commits": 26794,
     "by_kind": {
       "organization": 12975,
       "one_person": 918,
       "personal": 4499,
       "hidden": 4462,
       "unknown": 0,
-      "bot": 3939
+      "bot": 3940
     },
     "organization_count": 30,
     "last_12mo_from": "2025-11",
@@ -1717,7 +1717,7 @@
         "personal": 26,
         "hidden": 6,
         "unknown": 0,
-        "bot": 39
+        "bot": 40
       }
     }
   }

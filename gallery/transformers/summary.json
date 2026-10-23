@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:21:54+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:11:45+00:00",
   "name": "Transformers",
   "report_path": "index.html",
   "first_commit": "2018-10-29 13:56:02",
-  "last_commit": "2026-10-23 09:40:42",
+  "last_commit": "2026-10-23 13:22:36",
   "age_days": 2916,
   "active_days": 2349,
-  "total_commits": 24484,
+  "total_commits": 24486,
   "total_authors": 3939,
-  "active_authors_12mo": 665,
-  "commits_last_12mo": 3477,
-  "total_files": 6643,
-  "total_lines": 2092897,
-  "lines_added": 4562839,
-  "lines_removed": 2469942,
+  "active_authors_12mo": 662,
+  "commits_last_12mo": 3479,
+  "total_files": 6644,
+  "total_lines": 2092911,
+  "lines_added": 4562893,
+  "lines_removed": 2469982,
   "total_tags": 87,
   "era": "steady",
   "top_authors": [
@@ -41,13 +41,14 @@
     }
   ],
   "author_commits": {
+    "Ilyas Moutawwakil": 74,
+    "eustlb": 84,
     "kaixuanliu": 125,
     "R\u00e9mi Ouazan": 144,
     "Sai-Suraj-27": 92,
     "Raushan Turganbay": 502,
     "nrenvo": 1,
     "himani27301": 1,
-    "eustlb": 83,
     "IvanFan-Van": 1,
     "Shreyas Mudholkar": 1,
     "Abhijeet Sharma": 1,
@@ -56,7 +57,6 @@
     "Anton Vlasjuk": 173,
     "Kayvan Zahiri": 2,
     "Rahul": 3,
-    "Ilyas Moutawwakil": 73,
     "jiqing-feng": 121,
     "Alex Esteban Folch": 1,
     "jp": 10,
@@ -3990,13 +3990,13 @@
     "2023": 3144,
     "2024": 2850,
     "2025": 3909,
-    "2026": 2909
+    "2026": 2911
   },
   "ai_assisted": {
-    "commits": 284,
+    "commits": 285,
     "authored": 0,
     "assistants": {
-      "Claude": 267,
+      "Claude": 268,
       "GitHub Copilot": 8,
       "Cursor": 7,
       "OpenHands": 3,
@@ -4027,7 +4027,7 @@
       "2026-07": 27,
       "2026-08": 62,
       "2026-09": 64,
-      "2026-10": 62
+      "2026-10": 63
     },
     "commits_by_month": {
       "2024-11": 171,
@@ -4053,17 +4053,17 @@
       "2026-07": 284,
       "2026-08": 277,
       "2026-09": 341,
-      "2026-10": 319
+      "2026-10": 321
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 24484,
+    "commits": 24486,
     "by_kind": {
       "organization": 2608,
       "one_person": 1945,
       "personal": 8874,
-      "hidden": 10851,
+      "hidden": 10853,
       "unknown": 14,
       "bot": 192
     },
@@ -4596,7 +4596,7 @@
         "organization": 53,
         "one_person": 18,
         "personal": 39,
-        "hidden": 204,
+        "hidden": 206,
         "unknown": 0,
         "bot": 5
       }

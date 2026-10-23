@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:24:07+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:13:38+00:00",
   "name": "PyTorch",
   "report_path": "index.html",
   "first_commit": "2012-01-25 13:55:20",
-  "last_commit": "2026-10-23 10:23:43",
-  "age_days": 5385,
+  "last_commit": "2026-10-23 14:14:30",
+  "age_days": 5386,
   "active_days": 4205,
-  "total_commits": 112973,
+  "total_commits": 112975,
   "total_authors": 5941,
   "active_authors_12mo": 1540,
-  "commits_last_12mo": 17654,
+  "commits_last_12mo": 17656,
   "total_files": 22740,
-  "total_lines": 5391148,
-  "lines_added": 14730777,
-  "lines_removed": 9339629,
-  "total_tags": 9453,
+  "total_lines": 5391041,
+  "lines_added": 14730799,
+  "lines_removed": 9339758,
+  "total_tags": 9458,
   "era": "peak",
   "top_authors": [
     {
       "name": "PyTorch MergeBot",
-      "commits": 5798
+      "commits": 5799
     },
     {
       "name": "Edward Z. Yang",
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "PyTorch MergeBot": 5799,
+    "pytorchbot": 8,
     "xuejing": 1,
     "QHarshil": 1,
     "Nikita Shulga": 3425,
@@ -52,7 +54,6 @@
     "edmundshieh": 1,
     "Ryan Zhang": 72,
     "Ivan Zaitsev": 105,
-    "PyTorch MergeBot": 5798,
     "gabrielfruet": 7,
     "Guilherme Leobas": 567,
     "Janani Sriram": 63,
@@ -314,7 +315,6 @@
     "Debasis Mandal": 1,
     "NayanNagabhushana-28": 4,
     "raymond": 3,
-    "pytorchbot": 7,
     "Grayson Derossi": 55,
     "Michael Lazos": 689,
     "Johnson Wong": 4,
@@ -5998,7 +5998,7 @@
     "2023": 12593,
     "2024": 14893,
     "2025": 14993,
-    "2026": 15236
+    "2026": 15238
   },
   "ai_assisted": {
     "commits": 832,
@@ -6060,17 +6060,17 @@
       "2026-07": 1693,
       "2026-08": 1307,
       "2026-09": 1908,
-      "2026-10": 1296
+      "2026-10": 1298
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 112973,
+    "commits": 112975,
     "by_kind": {
       "organization": 71223,
-      "one_person": 3075,
+      "one_person": 3076,
       "personal": 26894,
-      "hidden": 11434,
+      "hidden": 11435,
       "unknown": 125,
       "bot": 222
     },
@@ -7137,9 +7137,9 @@
       },
       "2026-Q4": {
         "organization": 727,
-        "one_person": 81,
+        "one_person": 82,
         "personal": 327,
-        "hidden": 159,
+        "hidden": 160,
         "unknown": 0,
         "bot": 2
       }

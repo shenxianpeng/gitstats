@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:28:38+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:18:37+00:00",
   "name": "Go",
   "report_path": "index.html",
   "first_commit": "1972-07-19 00:05:45",
-  "last_commit": "2026-10-21 18:06:57",
-  "age_days": 19818,
-  "active_days": 6421,
-  "total_commits": 68180,
+  "last_commit": "2026-10-22 21:26:36",
+  "age_days": 19819,
+  "active_days": 6422,
+  "total_commits": 68181,
   "total_authors": 2768,
   "active_authors_12mo": 336,
-  "commits_last_12mo": 3450,
+  "commits_last_12mo": 3451,
   "total_files": 16120,
-  "total_lines": 3972557,
-  "lines_added": 9954723,
-  "lines_removed": 5982166,
+  "total_lines": 3972570,
+  "lines_added": 9954739,
+  "lines_removed": 5982169,
   "total_tags": 141,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "David Chase": 749,
     "vshulcz": 2,
     "Stian Halseth": 1,
     "Cuong Manh Le": 793,
@@ -92,7 +93,6 @@
     "Ting-Han Hou": 1,
     "Keith Smiley": 2,
     "Mark Freeman": 169,
-    "David Chase": 748,
     "George Adams": 13,
     "Florian Lehner": 5,
     "Shuang Zhang": 2,
@@ -2832,7 +2832,7 @@
     "2023": 3724,
     "2024": 3125,
     "2025": 3138,
-    "2026": 2852
+    "2026": 2853
   },
   "ai_assisted": {
     "commits": 15,
@@ -2891,14 +2891,14 @@
       "2026-07": 268,
       "2026-08": 316,
       "2026-09": 409,
-      "2026-10": 208
+      "2026-10": 209
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 68180,
+    "commits": 68181,
     "by_kind": {
-      "organization": 47351,
+      "organization": 47352,
       "one_person": 6064,
       "personal": 14656,
       "hidden": 102,
@@ -2918,11 +2918,11 @@
       },
       {
         "organization": "google.com",
-        "commits": 14526,
-        "commits_last_12mo": 931,
+        "commits": 14527,
+        "commits_last_12mo": 932,
         "addresses": 233,
         "first_commit": "2008-10-08",
-        "last_commit": "2026-10-21"
+        "last_commit": "2026-10-22"
       },
       {
         "organization": "ibm.com",
@@ -3383,7 +3383,7 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 140,
+        "organization": 141,
         "one_person": 14,
         "personal": 52,
         "hidden": 2,

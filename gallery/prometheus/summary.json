@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:23:02+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:12:32+00:00",
   "name": "Prometheus",
   "report_path": "index.html",
   "first_commit": "2012-11-24 11:14:12",
-  "last_commit": "2026-10-23 09:33:28",
-  "age_days": 5081,
+  "last_commit": "2026-10-23 14:30:15",
+  "age_days": 5082,
   "active_days": 3774,
-  "total_commits": 19086,
+  "total_commits": 19092,
   "total_authors": 1342,
   "active_authors_12mo": 275,
-  "commits_last_12mo": 2684,
+  "commits_last_12mo": 2690,
   "total_files": 1713,
-  "total_lines": 617954,
-  "lines_added": 4509886,
-  "lines_removed": 3891932,
+  "total_lines": 618030,
+  "lines_added": 4510094,
+  "lines_removed": 3892064,
   "total_tags": 480,
   "era": "surge",
   "top_authors": [
@@ -41,18 +41,18 @@
     }
   ],
   "author_commits": {
-    "Arve Knudsen": 260,
+    "Bartlomiej Plotka": 489,
+    "Arve Knudsen": 261,
+    "Bartek Plotka": 83,
     "Julien": 1754,
     "Julius Hinze": 11,
-    "Bartlomiej Plotka": 487,
     "Bryan Boreham": 1000,
     "George Krajcsovits": 319,
     "shilohlee98": 11,
     "Julius Volz": 1616,
     "zenador": 28,
     "Owen Williams": 44,
-    "Arthur Silva Sens": 126,
-    "Bartek Plotka": 81,
+    "Arthur Silva Sens": 127,
     "Serhiy Bzhezytskyy": 3,
     "Minh Vu": 8,
     "Jo\u00e3o Vitor Bomfim de Souza": 1,
@@ -1399,7 +1399,7 @@
     "2023": 1401,
     "2024": 2727,
     "2025": 1788,
-    "2026": 2394
+    "2026": 2400
   },
   "ai_assisted": {
     "commits": 69,
@@ -1461,16 +1461,16 @@
       "2026-07": 231,
       "2026-08": 302,
       "2026-09": 260,
-      "2026-10": 279
+      "2026-10": 285
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 19086,
+    "commits": 19092,
     "by_kind": {
-      "organization": 5384,
+      "organization": 5386,
       "one_person": 1704,
-      "personal": 8501,
+      "personal": 8505,
       "hidden": 2218,
       "unknown": 8,
       "bot": 1271
@@ -1536,11 +1536,11 @@
       },
       {
         "organization": "google.com",
-        "commits": 131,
-        "commits_last_12mo": 65,
+        "commits": 133,
+        "commits_last_12mo": 67,
         "addresses": 14,
         "first_commit": "2017-02-15",
-        "last_commit": "2026-10-21"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "fujitsu.com",
@@ -1905,9 +1905,9 @@
         "bot": 149
       },
       "2026-Q4": {
-        "organization": 53,
+        "organization": 55,
         "one_person": 12,
-        "personal": 115,
+        "personal": 119,
         "hidden": 69,
         "unknown": 0,
         "bot": 30

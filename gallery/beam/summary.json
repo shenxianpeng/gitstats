@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:25:53+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:15:02+00:00",
   "name": "Apache Beam",
   "report_path": "index.html",
   "first_commit": "2014-07-11 01:59:48",
-  "last_commit": "2026-10-23 10:03:28",
+  "last_commit": "2026-10-23 13:38:27",
   "age_days": 4488,
   "active_days": 3882,
-  "total_commits": 48635,
+  "total_commits": 48638,
   "total_authors": 1628,
-  "active_authors_12mo": 217,
-  "commits_last_12mo": 2666,
+  "active_authors_12mo": 216,
+  "commits_last_12mo": 2669,
   "total_files": 15867,
-  "total_lines": 3415100,
-  "lines_added": 5232542,
-  "lines_removed": 1817442,
+  "total_lines": 3415091,
+  "lines_added": 5232578,
+  "lines_removed": 1817487,
   "total_tags": 46,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Jack McCluskey": 461,
+    "Derrick Williams": 195,
     "Vitaly Terentyev": 467,
     "ddebowczyk92": 3,
     "Danish Amjad": 2,
@@ -50,14 +52,12 @@
     "Divyansh Yadav": 7,
     "Danny McCormick": 908,
     "Ahmed Abualsaud": 339,
-    "Derrick Williams": 194,
     "Bruno Volpato": 87,
     "Yi Hu": 873,
     "Reuven Lax": 682,
     "Ganesh Sivakumar": 4,
     "Tobias Kaymak": 37,
     "Abdelrahman Ibrahim": 149,
-    "Jack McCluskey": 460,
     "Florent Biville": 4,
     "GAURAV THAKUR": 3,
     "tvalentyn": 521,
@@ -1683,7 +1683,7 @@
     "2023": 3260,
     "2024": 2456,
     "2025": 2429,
-    "2026": 2354
+    "2026": 2357
   },
   "ai_assisted": {
     "commits": 77,
@@ -1744,30 +1744,30 @@
       "2026-07": 304,
       "2026-08": 255,
       "2026-09": 297,
-      "2026-10": 287
+      "2026-10": 290
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 48635,
+    "commits": 48638,
     "by_kind": {
-      "organization": 26606,
+      "organization": 26607,
       "one_person": 1367,
       "personal": 12172,
-      "hidden": 6979,
+      "hidden": 6980,
       "unknown": 65,
-      "bot": 1446
+      "bot": 1447
     },
     "organization_count": 45,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "google.com",
-        "commits": 20310,
-        "commits_last_12mo": 908,
+        "commits": 20311,
+        "commits_last_12mo": 909,
         "addresses": 363,
         "first_commit": "2014-12-13",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "apache.org",
@@ -2180,12 +2180,12 @@
         "bot": 221
       },
       "2026-Q4": {
-        "organization": 113,
+        "organization": 114,
         "one_person": 2,
         "personal": 90,
-        "hidden": 54,
+        "hidden": 55,
         "unknown": 2,
-        "bot": 26
+        "bot": 27
       }
     }
   }

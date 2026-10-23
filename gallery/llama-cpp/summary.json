@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:22:25+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:11:59+00:00",
   "name": "llama.cpp",
   "report_path": "index.html",
   "first_commit": "2023-03-10 18:40:58",
-  "last_commit": "2026-10-23 07:34:20",
+  "last_commit": "2026-10-23 14:46:53",
   "age_days": 1323,
   "active_days": 1295,
-  "total_commits": 11836,
+  "total_commits": 11840,
   "total_authors": 2046,
-  "active_authors_12mo": 943,
-  "commits_last_12mo": 4929,
-  "total_files": 3896,
-  "total_lines": 1626859,
-  "lines_added": 3383313,
-  "lines_removed": 1756454,
-  "total_tags": 8080,
+  "active_authors_12mo": 942,
+  "commits_last_12mo": 4933,
+  "total_files": 3897,
+  "total_lines": 1628882,
+  "lines_added": 3391099,
+  "lines_removed": 1762217,
+  "total_tags": 8081,
   "era": "peak",
   "top_authors": [
     {
@@ -33,7 +33,7 @@
     },
     {
       "name": "Sigbj\u00f8rn Skj\u00e6ret",
-      "commits": 387
+      "commits": 388
     },
     {
       "name": "Diego Devesa",
@@ -41,11 +41,14 @@
     }
   ],
   "author_commits": {
+    "Max Krasnyansky": 75,
+    "Aleksander Grygier": 281,
+    "Kartik Gulia": 8,
+    "Sigbj\u00f8rn Skj\u00e6ret": 388,
     "Raul Torres": 9,
     "Titaniumtown": 25,
     "Pranesh Gonegandla": 8,
     "Takamichi Ohara": 3,
-    "Max Krasnyansky": 74,
     "Todd Malsbary": 11,
     "pzhu": 1,
     "Xuan-Son Nguyen": 506,
@@ -64,7 +67,6 @@
     "Charles Xu": 26,
     "Chanho Lee": 2,
     "Hrishith Thadicherla": 5,
-    "Aleksander Grygier": 280,
     "Hoang Vien Duy": 1,
     "alexey-rsi": 2,
     "Tarek Dakhran": 42,
@@ -87,7 +89,6 @@
     "TANGBUDU": 1,
     "Me42019": 1,
     "Renzis": 1,
-    "Sigbj\u00f8rn Skj\u00e6ret": 387,
     "Bernard Ladenthin": 3,
     "uvos": 58,
     "Aaron Teo": 80,
@@ -134,7 +135,6 @@
     "Nigel Jones": 1,
     "Matt Rutkowski": 1,
     "Said Taghadouini": 1,
-    "Kartik Gulia": 7,
     "William Tan": 2,
     "losewayy": 2,
     "Simone Iacomino": 1,
@@ -2092,7 +2092,7 @@
     "2023": 1743,
     "2024": 2662,
     "2025": 3193,
-    "2026": 4238
+    "2026": 4242
   },
   "ai_assisted": {
     "commits": 283,
@@ -2159,16 +2159,16 @@
       "2026-07": 365,
       "2026-08": 513,
       "2026-09": 582,
-      "2026-10": 525
+      "2026-10": 529
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11836,
+    "commits": 11840,
     "by_kind": {
-      "organization": 2190,
+      "organization": 2193,
       "one_person": 1992,
-      "personal": 5571,
+      "personal": 5572,
       "hidden": 2075,
       "unknown": 0,
       "bot": 8
@@ -2178,24 +2178,24 @@
     "top": [
       {
         "organization": "huggingface.co",
-        "commits": 765,
-        "commits_last_12mo": 616,
+        "commits": 766,
+        "commits_last_12mo": 617,
         "addresses": 5,
         "first_commit": "2024-03-26",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "nvidia.com",
-        "commits": 434,
-        "commits_last_12mo": 250,
+        "commits": 435,
+        "commits_last_12mo": 251,
         "addresses": 17,
         "first_commit": "2024-08-17",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "qualcomm.com",
-        "commits": 286,
-        "commits_last_12mo": 260,
+        "commits": 287,
+        "commits_last_12mo": 261,
         "addresses": 20,
         "first_commit": "2025-07-22",
         "last_commit": "2026-10-23"
@@ -2435,9 +2435,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 173,
+        "organization": 176,
         "one_person": 71,
-        "personal": 184,
+        "personal": 185,
         "hidden": 97,
         "unknown": 0,
         "bot": 0

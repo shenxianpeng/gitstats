@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:24:39+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:14:09+00:00",
   "name": "Apache Kafka",
   "report_path": "index.html",
   "first_commit": "2011-08-01 23:41:24",
-  "last_commit": "2026-10-23 08:44:17",
+  "last_commit": "2026-10-23 13:39:40",
   "age_days": 5562,
   "active_days": 4188,
-  "total_commits": 18500,
+  "total_commits": 18502,
   "total_authors": 1547,
   "active_authors_12mo": 254,
-  "commits_last_12mo": 1983,
-  "total_files": 7632,
-  "total_lines": 1850485,
-  "lines_added": 3481757,
-  "lines_removed": 1631272,
+  "commits_last_12mo": 1985,
+  "total_files": 7633,
+  "total_lines": 1850502,
+  "lines_added": 3482005,
+  "lines_removed": 1631503,
   "total_tags": 2,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Evan Zhou": 18,
+    "Apoorv Mittal": 168,
     "Sean Quah": 103,
     "Federico Valeri": 71,
     "David Jacot": 480,
@@ -97,7 +99,6 @@
     "Shekhar Rajak": 10,
     "Truc Nguyen": 1,
     "cui fliter": 1,
-    "Apoorv Mittal": 167,
     "Botond Kurdi": 1,
     "Matthias J. Sax": 753,
     "peterhyliao": 4,
@@ -153,7 +154,6 @@
     "Shivamrut": 1,
     "Ga\u00e9tan Collaud": 1,
     "Uladzislau Blok": 22,
-    "Evan Zhou": 17,
     "Gimin Kim": 1,
     "Zhiyan Tang": 5,
     "Nick Telford": 66,
@@ -1605,13 +1605,13 @@
     "2023": 1474,
     "2024": 2451,
     "2025": 2182,
-    "2026": 1699
+    "2026": 1701
   },
   "ai_assisted": {
-    "commits": 84,
+    "commits": 85,
     "authored": 0,
     "assistants": {
-      "Claude": 68,
+      "Claude": 69,
       "GitHub Copilot": 15,
       "ChatGPT": 1,
       "Codex": 1,
@@ -1641,7 +1641,7 @@
       "2026-07": 11,
       "2026-08": 6,
       "2026-09": 14,
-      "2026-10": 28
+      "2026-10": 29
     },
     "commits_by_month": {
       "2024-11": 246,
@@ -1667,17 +1667,17 @@
       "2026-07": 201,
       "2026-08": 171,
       "2026-09": 212,
-      "2026-10": 138
+      "2026-10": 140
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 18500,
+    "commits": 18502,
     "by_kind": {
       "organization": 6961,
       "one_person": 1624,
-      "personal": 7396,
-      "hidden": 2499,
+      "personal": 7397,
+      "hidden": 2500,
       "unknown": 17,
       "bot": 3
     },
@@ -2049,8 +2049,8 @@
       "2026-Q4": {
         "organization": 59,
         "one_person": 2,
-        "personal": 50,
-        "hidden": 27,
+        "personal": 51,
+        "hidden": 28,
         "unknown": 0,
         "bot": 0
       }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:32:41+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:22:45+00:00",
   "name": "Rust",
   "report_path": "index.html",
   "first_commit": "2010-06-16 21:30:45",
-  "last_commit": "2026-10-23 04:15:34",
+  "last_commit": "2026-10-23 11:51:44",
   "age_days": 5973,
   "active_days": 5915,
-  "total_commits": 344362,
-  "total_authors": 7775,
+  "total_commits": 344400,
+  "total_authors": 7776,
   "active_authors_12mo": 1321,
-  "commits_last_12mo": 33216,
-  "total_files": 63888,
-  "total_lines": 6192367,
-  "lines_added": 14896466,
-  "lines_removed": 8704099,
+  "commits_last_12mo": 33254,
+  "total_files": 63893,
+  "total_lines": 6192982,
+  "lines_added": 14898974,
+  "lines_removed": 8705992,
   "total_tags": 23,
   "era": "steady",
   "top_authors": [
     {
       "name": "bors",
-      "commits": 48869
+      "commits": 48871
     },
     {
       "name": "Matthias Kr\u00fcger",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Guillaume Gomez",
-      "commits": 8464
+      "commits": 8465
     },
     {
       "name": "Oliver Scherer",
@@ -41,8 +41,16 @@
     }
   ],
   "author_commits": {
-    "bors": 48869,
-    "Jonathan Brouwer": 4293,
+    "bors": 48871,
+    "Jonathan Brouwer": 4303,
+    "Matyas Susits": 15,
+    "opale": 1,
+    "N1ark": 27,
+    "Esteban K\u00fcber": 3055,
+    "Guillaume Gomez": 8465,
+    "mejrs": 404,
+    "Jamie Hill-Daniel": 45,
+    "Li-yao Xia": 5,
     "aerooneqq": 96,
     "Nikita Popov": 418,
     "Zalathar": 2869,
@@ -67,24 +75,21 @@
     "Josh Triplett": 509,
     "Jakob Koschel": 23,
     "Travis Cross": 18,
-    "mejrs": 401,
     "cyrgani": 287,
     "malezjaa": 40,
-    "Esteban K\u00fcber": 3050,
     "Amanieu d'Antras": 958,
     "Weihang Lo": 365,
-    "Matyas Susits": 11,
     "Jules Bertholet": 163,
     "bjorn3": 5892,
     "kianalikasana": 6,
     "Tess4552": 1,
     "Charlie Marsh": 11,
+    "dianne": 185,
     "Walnut": 113,
     "Jakub Ber\u00e1nek": 1756,
     "arvindkhoisnam": 1,
     "ywxt": 20,
     "THARUN": 3,
-    "Guillaume Gomez": 8464,
     "rustbot": 163,
     "Yu": 8,
     "Augie Fackler": 147,
@@ -216,7 +221,6 @@
     "Oli Scherer": 209,
     "Clar Fon": 206,
     "Tropical": 7,
-    "dianne": 183,
     "wasd243": 3,
     "Wesley Matos": 2,
     "Gri-ffin": 33,
@@ -394,7 +398,6 @@
     "Jethro Beekman": 137,
     "sleepycatcoding": 1,
     "Huzaifa Abdul Rehman": 1,
-    "Jamie Hill-Daniel": 44,
     "HigherOrderLogic": 2,
     "pbkx": 13,
     "Daedalus": 2,
@@ -432,7 +435,6 @@
     "Scott McMurray": 849,
     "Stefan Lankes": 109,
     "Kevin Sailema": 1,
-    "N1ark": 19,
     "Marco Ieni": 128,
     "Yosh": 6,
     "ivmarkov": 12,
@@ -614,7 +616,6 @@
     "SangHun Kim": 3,
     "zjp": 4,
     "Alona Enraght-Moony": 256,
-    "Li-yao Xia": 4,
     "sagar": 2,
     "uditjainstjis": 1,
     "WaterWhisperer": 12,
@@ -7834,7 +7835,7 @@
     "2023": 28833,
     "2024": 33227,
     "2025": 32840,
-    "2026": 28727
+    "2026": 28765
   },
   "ai_assisted": {
     "commits": 15,
@@ -7893,20 +7894,20 @@
       "2026-04": 3093,
       "2026-05": 2705,
       "2026-06": 2837,
-      "2026-07": 3620,
+      "2026-07": 3622,
       "2026-08": 3749,
-      "2026-09": 2967,
-      "2026-10": 1789
+      "2026-09": 2975,
+      "2026-10": 1817
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 344362,
+    "commits": 344400,
     "by_kind": {
       "organization": 17207,
-      "one_person": 166774,
-      "personal": 126387,
-      "hidden": 29957,
+      "one_person": 166784,
+      "personal": 126412,
+      "hidden": 29960,
       "unknown": 3324,
       "bot": 713
     },
@@ -9277,17 +9278,17 @@
       },
       "2026-Q3": {
         "organization": 707,
-        "one_person": 3527,
-        "personal": 4901,
+        "one_person": 3529,
+        "personal": 4909,
         "hidden": 1124,
         "unknown": 9,
         "bot": 68
       },
       "2026-Q4": {
         "organization": 87,
-        "one_person": 666,
-        "personal": 872,
-        "hidden": 149,
+        "one_person": 674,
+        "personal": 889,
+        "hidden": 152,
         "unknown": 1,
         "bot": 14
       }

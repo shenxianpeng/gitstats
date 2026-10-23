@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:26:30+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:16:14+00:00",
   "name": "Apache DolphinScheduler",
   "report_path": "index.html",
   "first_commit": "2019-03-01 16:39:25",
-  "last_commit": "2026-10-23 09:47:29",
+  "last_commit": "2026-10-23 12:01:45",
   "age_days": 2793,
   "active_days": 1900,
-  "total_commits": 9108,
+  "total_commits": 9109,
   "total_authors": 675,
   "active_authors_12mo": 69,
-  "commits_last_12mo": 351,
+  "commits_last_12mo": 352,
   "total_files": 4874,
-  "total_lines": 450063,
-  "lines_added": 1679626,
-  "lines_removed": 1229563,
+  "total_lines": 450099,
+  "lines_added": 1679663,
+  "lines_removed": 1229564,
   "total_tags": 8,
   "era": "quiet",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "mengzhe gan": 5,
     "Kerwin": 207,
     "Ethan": 1,
     "suyc": 58,
@@ -48,7 +49,6 @@
     "ThreeFire1": 2,
     "xiangzihao": 310,
     "Yanjun Qiu": 3,
-    "mengzhe gan": 4,
     "huangsheng": 13,
     "chovygo": 3,
     "csurong": 2,
@@ -725,7 +725,7 @@
     "2023": 571,
     "2024": 429,
     "2025": 224,
-    "2026": 299
+    "2026": 300
   },
   "ai_assisted": {
     "commits": 1,
@@ -783,16 +783,16 @@
       "2026-07": 11,
       "2026-08": 23,
       "2026-09": 26,
-      "2026-10": 24
+      "2026-10": 25
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9108,
+    "commits": 9109,
     "by_kind": {
       "organization": 1582,
       "one_person": 417,
-      "personal": 5327,
+      "personal": 5328,
       "hidden": 1779,
       "unknown": 1,
       "bot": 2
@@ -893,7 +893,7 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 1,
-        "personal": 15,
+        "personal": 16,
         "hidden": 8,
         "unknown": 0,
         "bot": 0

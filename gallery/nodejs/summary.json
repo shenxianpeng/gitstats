@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev10",
-  "generated_at": "2026-10-23T11:29:37+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev11",
+  "generated_at": "2026-10-23T15:19:31+00:00",
   "name": "Node.js",
   "report_path": "index.html",
   "first_commit": "2009-02-16 00:02:00",
-  "last_commit": "2026-10-23 10:35:37",
+  "last_commit": "2026-10-23 13:23:50",
   "age_days": 6459,
   "active_days": 6110,
-  "total_commits": 49201,
+  "total_commits": 49203,
   "total_authors": 4375,
   "active_authors_12mo": 433,
-  "commits_last_12mo": 3811,
+  "commits_last_12mo": 3813,
   "total_files": 56554,
-  "total_lines": 17921606,
-  "lines_added": 41966653,
-  "lines_removed": 24045047,
+  "total_lines": 17921575,
+  "lines_added": 41966663,
+  "lines_removed": 24045088,
   "total_tags": 245,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Lazizbek Ergashev": 18,
+    "Yuya Inoue": 26,
     "Antoine du Hamel": 1211,
     "Filip Skokan": 622,
     "StefanStojanovic": 77,
@@ -54,7 +56,6 @@
     "Tamir Duberstein": 1,
     "Matteo Collina": 350,
     "Ved Chaudhari": 4,
-    "Yuya Inoue": 25,
     "Robert Nagy": 353,
     "Evgenii Kliuchnikov": 1,
     "James M Snell": 1412,
@@ -70,7 +71,6 @@
     "Murat Kirazkaya": 1,
     "Roberto Bianchi": 5,
     "Tim Perry": 77,
-    "Lazizbek Ergashev": 17,
     "Marco": 14,
     "Harjoth Khara": 3,
     "David Babenko-Sanders": 11,
@@ -4435,15 +4435,15 @@
     "2023": 2700,
     "2024": 2606,
     "2025": 2556,
-    "2026": 3421
+    "2026": 3423
   },
   "ai_assisted": {
-    "commits": 614,
+    "commits": 616,
     "authored": 0,
     "assistants": {
-      "Codex": 216,
+      "Codex": 217,
       "OpenCode": 181,
-      "Claude": 97,
+      "Claude": 98,
       "ChatGPT": 81,
       "Pi": 16,
       "Unnamed assistant": 15,
@@ -4478,7 +4478,7 @@
       "2026-07": 39,
       "2026-08": 125,
       "2026-09": 217,
-      "2026-10": 122
+      "2026-10": 124
     },
     "commits_by_month": {
       "2024-11": 212,
@@ -4504,17 +4504,17 @@
       "2026-07": 341,
       "2026-08": 623,
       "2026-09": 600,
-      "2026-10": 296
+      "2026-10": 298
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 49201,
+    "commits": 49203,
     "by_kind": {
       "organization": 3234,
       "one_person": 17654,
-      "personal": 25592,
-      "hidden": 1235,
+      "personal": 25593,
+      "hidden": 1236,
       "unknown": 23,
       "bot": 1463
     },
@@ -5254,8 +5254,8 @@
       "2026-Q4": {
         "organization": 3,
         "one_person": 42,
-        "personal": 196,
-        "hidden": 22,
+        "personal": 197,
+        "hidden": 23,
         "unknown": 0,
         "bot": 33
       }
