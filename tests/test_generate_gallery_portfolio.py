@@ -417,3 +417,33 @@ def test_add_note_stays_in_its_directory(gallery_script, temp_dir):
     assert gallery_script.add_note(inside, outside, "NOTE") is False
     assert gallery_script.add_note(inside, os.path.join(inside, "..", "outside.html"), "N") is False
     assert _read(outside) == "<p>a</p></body>"
+
+
+def test_add_note_skips_a_page_commonpath_cannot_compare(gallery_script, temp_dir, monkeypatch):
+    # A page whose real path lands somewhere commonpath() cannot compare to
+    # the gallery (another drive on Windows) is not inside it:
+    # os.path.commonpath() raises ValueError for that case.
+    page = os.path.join(temp_dir, "page.html")
+    with open(page, "w", encoding="utf-8") as f:
+        f.write("<p>a</p></body>")
+    real_realpath = os.path.realpath
+
+    def fake_realpath(path):
+        if path.endswith("page.html"):
+            return r"D:\outside\page.html"
+        return real_realpath(path)
+
+    monkeypatch.setattr(gallery_script.os.path, "realpath", fake_realpath)
+    assert gallery_script.add_note(temp_dir, page, "NOTE") is False
+    assert _read(page) == "<p>a</p></body>"
+
+
+def test_add_report_notes_skips_a_report_without_a_folder(gallery_script, temp_dir):
+    gallery = os.path.join(temp_dir, "gallery")
+    os.makedirs(gallery)
+    summaries = [
+        {"report_path": "missing/index.html", "name": "no folder"},
+        {"report_path": "../index.html", "name": "outside the gallery"},
+        {"report_path": "./index.html", "name": "the gallery itself"},
+    ]
+    assert gallery_script.add_report_notes(gallery, summaries, "") == 0

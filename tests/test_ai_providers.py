@@ -118,6 +118,17 @@ def test_retry_gives_up_after_the_last_attempt():
     assert isinstance(error.value.__cause__, RuntimeError)
 
 
+def test_retry_with_no_attempts_never_calls_the_function():
+    """``max_retries`` counts the attempts: with none, the function is not
+    called at all and nothing comes back."""
+    provider = _EchoProvider({"max_retries": 0, "retry_delay": 0})
+    func = MagicMock(return_value="ok")
+    with patch("gitstats.ai_providers.time.sleep") as sleep:
+        assert provider._retry_with_backoff(func) is None
+    func.assert_not_called()
+    sleep.assert_not_called()
+
+
 # ── OpenAI ───────────────────────────────────────────────────────────────
 
 

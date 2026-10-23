@@ -167,3 +167,21 @@ def test_load_repos_reads_only_a_yml_file_here(repos_script, tmp_path, monkeypat
     monkeypatch.chdir(inside)
     with pytest.raises(repos_script.RepoListError, match="under the current directory"):
         repos_script.load_repos(name)
+
+
+def test_load_repos_rejects_a_file_commonpath_cannot_compare(repos_script, tmp_path, monkeypatch):
+    # A list whose real path lands somewhere commonpath() cannot compare to
+    # the current directory (another drive on Windows) is not under it:
+    # os.path.commonpath() raises ValueError for that case.
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "repos.yml").write_text("groups: []\n", encoding="utf-8")
+    real_realpath = os.path.realpath
+
+    def fake_realpath(path):
+        if str(path).endswith("repos.yml"):
+            return r"D:\elsewhere\repos.yml"
+        return real_realpath(path)
+
+    monkeypatch.setattr(repos_script.os.path, "realpath", fake_realpath)
+    with pytest.raises(repos_script.RepoListError, match="under the current directory"):
+        repos_script.load_repos("repos.yml")

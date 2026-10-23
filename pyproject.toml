@@ -47,7 +47,7 @@ documentation = "https://gitstats.readthedocs.io/"
 [project.optional-dependencies]
 dev = ["nox"]
 # PyYAML: the gallery scripts' tests, where it has a wheel (not yet on 3.15)
-test = ["pytest>=7.0", "pyyaml>=6.0; python_version < '3.15'"]
+test = ["pytest>=7.0", "pytest-cov", "pyyaml>=6.0; python_version < '3.15'"]
 docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autobuild"]
 ai = [
     "openai>=1.0",
@@ -72,13 +72,14 @@ fallback_version = "0.0.0"
 testpaths = ["tests"]
 pythonpath = ["."]
 
-# Coverage is not installed by the test extra; measure it with, for example,
-#   uv run --extra test --with pytest-cov python -m pytest --cov
+# The test extra installs pytest-cov: `python -m pytest --cov` measures line
+# and branch coverage, and fails under 100% (CI runs it so)
 [tool.coverage.run]
 source = ["gitstats", "scripts"]
 branch = true
 
 [tool.coverage.report]
+fail_under = 100
 show_missing = true
 skip_covered = true
 exclude_also = ['if __name__ == "__main__":', '@(abc\.)?abstractmethod']

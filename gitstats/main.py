@@ -1122,7 +1122,7 @@ class GitDataCollector(DataCollector):
             except ValueError:
                 continue
             subject = line[pos + 1 :].strip()
-            if subject:
+            if subject:  # pragma: no branch - a stripped line has text after its space
                 by_year.setdefault(year, []).append(subject[:100])
 
         self.commit_subjects_by_year = {
@@ -1154,7 +1154,7 @@ class GitDataCollector(DataCollector):
         # Compute new contributors per month from author first-commit stamps
         for name in self.authors:
             a = self.authors[name]
-            if "first_commit_stamp" in a:
+            if "first_commit_stamp" in a:  # pragma: no branch - every author has one by now
                 first_month = datetime.datetime.fromtimestamp(a["first_commit_stamp"]).strftime(
                     "%Y-%m"
                 )

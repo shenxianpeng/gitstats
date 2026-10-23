@@ -1071,6 +1071,26 @@ def test_contributor_timeline_years_and_bots(mock_data_collector):
     assert "width: 0.000%" in html
 
 
+def test_contributor_timeline_places_a_month_inside_the_collapsed_stretch(mock_data_collector):
+    """The stretch is squeezed into its slot, not cut out: a month inside it
+    lands inside the band, in proportion, never past it."""
+    months = {f"2010-{m:02d}": 2 for m in range(1, 13)}
+    months.update({f"2013-{m:02d}": 3 for m in range(1, 13)})
+    mock_data_collector.commits_by_month = months
+    mock_data_collector.author_of_month = {m: {"Alice Smith": n} for m, n in months.items()}
+    # a commit the monthly totals do not have, in the quiet 2011-01 .. 2012-12
+    mock_data_collector.author_of_month["2011-07"] = {"Bob Jones": 1}
+    html = HTMLReportCreator()._contributor_timeline_html(
+        mock_data_collector, ["Alice Smith", "Bob Jones"]
+    )
+    # 48 months, the 24 quiet ones in one slot of 25: the band is at 48%, 4% wide
+    assert '<span class="timeline-gap is-collapsed" style="left: 48.000%; width: 4.000%" ' in html
+    # 2011-07 is 6.5 months into the 24 of the stretch: that far into the slot,
+    # (12 + 6.5 / 24) / 25 of the axis
+    assert 'aria-label="Bob Jones: 15 commits, 2011-07 to 2011-07"' in html
+    assert 'class="timeline-mark" style="left: 49.083%;' in html
+
+
 # ── HTMLReportCreator.create_files_html ──────────────────────────────────
 
 

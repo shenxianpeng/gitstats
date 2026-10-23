@@ -10,6 +10,7 @@ import pytest
 
 from gitstats import load_config
 from gitstats.badge import (
+    _HEALTH,
     BADGE_FILENAME,
     BADGES_DIRNAME,
     STYLE_NAMES,
@@ -268,6 +269,20 @@ def test_health_badge_dot_replaces_terminal_prefix(mock_data_collector):
     svg = render_segments(health.segments, "terminal")
     assert "<circle" in svg
     assert ">//</text>" not in svg
+
+
+def test_health_last_tier_takes_what_no_limit_covers(mock_data_collector, monkeypatch):
+    """The last tier is the catch-all: even without its open limit, an age
+    past every limit still falls to it."""
+    monkeypatch.setattr("gitstats.badge._HEALTH", _HEALTH[:2])
+    health = composite_badges(
+        mock_data_collector, "gitstats", "", "flat", now=datetime.datetime(2025, 6, 1)
+    )["health"]
+    assert (health.label, health.message, health.color) == (
+        "quiet",
+        "last commit 2 years ago",
+        "#9a6700",
+    )
 
 
 # ── create_badges ────────────────────────────────────────────────────────

@@ -31,6 +31,22 @@ def test_write_within_strips_traversal(tmp_path):
     assert not os.path.exists(os.path.join(os.path.dirname(base), "escape.svg"))
 
 
+@pytest.mark.parametrize("name", ["", ".", "..", "cards/"])
+def test_write_within_refuses_a_name_that_is_no_file(tmp_path, name):
+    with pytest.raises(ValueError, match="Invalid output file name"):
+        _write_within(str(tmp_path), name, "<svg/>")
+    assert os.listdir(tmp_path) == []
+
+
+def test_write_within_checks_the_path_it_built(tmp_path, monkeypatch):
+    """Should a name ever keep a directory, the path built from it is
+    still checked before anything is written."""
+    monkeypatch.setattr(os.path, "basename", lambda name: name)
+    with pytest.raises(ValueError, match="Refusing to write outside"):
+        _write_within(str(tmp_path), "../escape.svg", "<svg/>")
+    assert not os.path.exists(os.path.join(os.path.dirname(str(tmp_path)), "escape.svg"))
+
+
 def _stamp(year, month, day):
     return int(datetime.datetime(year, month, day, 12).timestamp())
 
@@ -366,6 +382,27 @@ class TestWrappedCardSvg:
         # the nine months without commits keep their place
         assert len(re.findall(r'width="58" height="2"', card)) == 9
         assert ">30</text>" not in card
+
+    def test_facts_and_chart_wait_for_their_numbers(self):
+        """Without the year's authors, months and hours: no top contributor,
+        busiest month or weekday, and no bars; the card still stands."""
+        data = _make_data(author_of_year={2025: {}}, commits_by_month={})
+        del data.activity_by_hour_of_week_by_year
+        generator = WrappedCardGenerator(data, year=2025)
+        stats = generator._collect_stats()
+        assert (stats["top_author"], stats["busiest_month"], stats["busiest_weekday"]) == (
+            "",
+            "",
+            "",
+        )
+        assert stats["monthly_commits"] == [0] * 12
+        assert generator._render_facts(stats) == ""
+        assert generator._render_mini_bar_chart(stats["monthly_commits"]) == ""
+        card = generator._render_card(stats)
+        ET.fromstring(card)
+        assert "Top contributor" not in card
+        assert "MONTHLY COMMITS" not in card
+        assert 'width="58"' not in card
 
     def test_layout_fills_the_content_column(self):
         root = ET.fromstring(_card())
