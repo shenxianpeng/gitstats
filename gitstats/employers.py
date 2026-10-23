@@ -302,10 +302,11 @@ def _months_back(month: str, count: int) -> str:
     return f"{year:04d}-{number + 1:02d}"
 
 
-def summarize(data: object, limit: int = 20, quarters: int = 8) -> dict[str, Any] | None:
+def summarize(data: object, limit: int | None = 20, quarters: int = 8) -> dict[str, Any] | None:
     """What a report and a summary show of where the commits come from.
 
-    ``organizations``: the ``limit`` organizations with the most commits, each
+    ``organizations``: the ``limit`` organizations with the most commits (all
+    of them when ``limit`` is None), each
     with its commits in all and in the 12 months that end with the last
     commit, and how many addresses committed from it. ``quarters``: the last
     ``quarters`` quarters with commits, each with its commits by kind of

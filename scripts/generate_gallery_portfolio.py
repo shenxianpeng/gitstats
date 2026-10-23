@@ -285,7 +285,7 @@ def add_report_notes(
     base = os.path.realpath(gallery_root)
     by_id = {group.id: group for group in groups or []}
     added = sum(_add_report_note(base, summary, site_url, by_id) for summary in summaries)
-    for entry in ("index.html", "ai.html"):
+    for entry in ("index.html", "ai.html", "organizations.html"):
         page = os.path.join(base, entry)
         if os.path.isfile(page):
             added += add_note(base, page, gallery_note(groups))

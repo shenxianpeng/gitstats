@@ -17,6 +17,9 @@ from gitstats.aggregate import (
     compute_repo_summary,
     last_quarters,
     load_repo_summaries,
+    organizations_csv,
+    organizations_dataset,
+    organizations_description,
     organizations_summary,
     quarter_id,
     snapshot_label,
@@ -1000,3 +1003,259 @@ def test_compute_repo_summary_keeps_organizations():
     summary = compute_repo_summary(data, "index.html")
     assert summary["organizations"]["top"][0]["organization"] == "google.com"
     assert compute_repo_summary(SimpleNamespace(), "index.html")["organizations"] is None
+
+
+# ── organizations page ───────────────────────────────────────────────────
+
+_KINDS = ("organization", "one_person", "personal", "hidden", "unknown", "bot")
+
+
+def _recent_quarters(now=None):
+    return [quarter_id(months) for _, months in last_quarters(now or datetime.datetime.now())]
+
+
+def _orgs(top, by_quarter=None, now=None):
+    """An organizations block of a summary: ``top`` as (domain, commits,
+    commits in the last 12 months); ``by_quarter``, the commits of each of
+    the last four quarters as {kind: commits}."""
+    quarters = _recent_quarters(now)
+    by_quarter = by_quarter or [{"organization": 1, "personal": 1}] * 4
+    return {
+        "commits": 100,
+        "top": [
+            {
+                "organization": name,
+                "commits": commits,
+                "commits_last_12mo": recent,
+                "addresses": 2,
+                "first_commit": "2020-01-01",
+                "last_commit": "2026-01-01",
+            }
+            for name, commits, recent in top
+        ],
+        "quarters": {
+            quarter: {kind: kinds.get(kind, 0) for kind in _KINDS}
+            for quarter, kinds in zip(quarters, by_quarter)
+        },
+    }
+
+
+class TestOrganizationsDataset:
+    NOW = datetime.datetime(2026, 10, 23, 12)
+
+    def _summaries(self):
+        return [
+            _summary(
+                "kubernetes",
+                1000,
+                {},
+                group="cncf",
+                organizations=_orgs(
+                    [("google.com", 500, 40), ("redhat.com", 300, 60)],
+                    [{"organization": 30, "personal": 10}] * 4,
+                    self.NOW,
+                ),
+            ),
+            _summary(
+                "django",
+                500,
+                {},
+                organizations=_orgs(
+                    [("redhat.com", 5, 0), ("acme.org", 10, 3)],
+                    [{"organization": 1, "personal": 9, "bot": 2}] * 4,
+                    self.NOW,
+                ),
+            ),
+            # data from before organizations were counted
+            _summary("old", 10, {}),
+            _summary("none", 10, {}, organizations=None),
+        ]
+
+    def test_organizations_added_up(self):
+        data = organizations_dataset(self._summaries(), self.NOW, "9.9")
+        assert data["generated_by"] == "gitstats 9.9"
+        assert data["quarters"] == ["2025-Q4", "2026-Q1", "2026-Q2", "2026-Q3"]
+        assert "not who paid for the work" in data["description"]
+        # the most commits in the last 12 months first
+        assert data["organizations"] == [
+            {
+                "organization": "redhat.com",
+                "commits_last_12mo": 60,
+                "commits": 305,
+                "repositories": ["django", "kubernetes"],
+            },
+            {
+                "organization": "google.com",
+                "commits_last_12mo": 40,
+                "commits": 500,
+                "repositories": ["kubernetes"],
+            },
+            {
+                "organization": "acme.org",
+                "commits_last_12mo": 3,
+                "commits": 10,
+                "repositories": ["django"],
+            },
+        ]
+
+    def test_repositories_by_kind(self):
+        data = organizations_dataset(self._summaries(), self.NOW)
+        assert [entry["name"] for entry in data["repositories"]] == ["kubernetes", "django"]
+        kubernetes, django = data["repositories"]
+        assert kubernetes["group"] == "cncf"
+        assert "group" not in django
+        assert kubernetes["report"] == "kubernetes/index.html"
+        assert kubernetes["commits"] == 160
+        assert kubernetes["by_kind"]["organization"] == 120
+        assert django["by_kind"] == {
+            "organization": 4,
+            "one_person": 0,
+            "personal": 36,
+            "hidden": 0,
+            "unknown": 0,
+            "bot": 8,
+        }
+        # by their commits in the last 12 months; none for an organization without
+        assert kubernetes["organizations_last_12mo"] == [
+            {"organization": "redhat.com", "commits": 60},
+            {"organization": "google.com", "commits": 40},
+        ]
+        assert django["organizations_last_12mo"] == [{"organization": "acme.org", "commits": 3}]
+
+    def test_quarters_outside_the_last_four_are_left_out(self):
+        block = _orgs([("acme.org", 1, 1)], now=self.NOW)
+        block["quarters"]["2020-Q1"] = {"organization": 99}
+        data = organizations_dataset([_summary("a", 1, {}, organizations=block)], self.NOW)
+        assert data["repositories"][0]["by_kind"]["organization"] == 4
+
+    def test_csv(self):
+        data = organizations_dataset(self._summaries(), self.NOW)
+        assert organizations_csv(data).splitlines() == [
+            "organization,repositories,commits_last_12mo,commits",
+            "redhat.com,2,60,305",
+            "google.com,1,40,500",
+            "acme.org,1,3,10",
+        ]
+
+    def test_description(self):
+        data = organizations_dataset(self._summaries(), self.NOW)
+        assert organizations_description(data) == (
+            "The organizations whose addresses commit to 2 repositories, by the domain of "
+            "the address. Most commits in the last 12 months: redhat.com, 60 in 2 "
+            "repositories."
+        )
+        data["organizations"] = []
+        assert organizations_description(data).endswith("by the domain of the address.")
+
+
+class TestOrganizationsPage:
+    @staticmethod
+    def _render(temp_dir, summaries, groups=None):
+        AggregateReportCreator().create(summaries, [], temp_dir, groups=groups)
+        pages = {}
+        for name in ("index.html", "ai.html", "organizations.html"):
+            path = os.path.join(temp_dir, name)
+            if os.path.exists(path):
+                with open(path, encoding="utf-8") as f:
+                    pages[name] = f.read()
+        return pages
+
+    @staticmethod
+    def _summaries():
+        return [
+            _summary(
+                "kubernetes",
+                1000,
+                {},
+                group="cncf",
+                organizations=_orgs(
+                    [("google.com", 500, 40), ("redhat.com", 300, 60)],
+                    [{"organization": 30, "personal": 10}] * 4,
+                ),
+            ),
+            _summary(
+                "django",
+                500,
+                {},
+                group="python",
+                organizations=_orgs([("acme.org", 10, 0)], [{"personal": 9, "bot": 1}] * 4),
+            ),
+        ]
+
+    def test_page_and_data(self, temp_dir):
+        pages = self._render(temp_dir, self._summaries())
+        page = pages["organizations.html"]
+        assert "<h1>Organizations</h1>" in page
+        assert "not who paid for the" in page
+        assert '<table class="sortable" id="organizations">' in page
+        assert (
+            '<tr><td>redhat.com</td><td class="num">1</td><td class="num">60</td>'
+            '<td class="num">300</td><td>kubernetes</td></tr>'
+        ) in page
+        # tiles: organizations with commits in the last 12 months, the widest, the largest share
+        assert "with commits in the last 12 months, of 3" in page
+        # all in one repository: the one with the most recent commits
+        assert "redhat<wbr>.com" in page
+        assert "75.0%" in page and "of kubernetes&rsquo;s commits" in page
+        # each repository: links to its organizations, the largest share first
+        mix = page[page.index('id="organization-mix"') :]
+        assert 'href="kubernetes/authors.html#commits_by_organization"' in mix
+        assert mix.index("kubernetes") < mix.index("django")
+        assert "redhat.com (60), google.com (40)" in mix
+        assert "<td>&ndash;</td>" in mix  # django: none in the last 12 months
+        assert '<a href="organizations.json">' in page
+        with open(os.path.join(temp_dir, "organizations.json"), encoding="utf-8") as f:
+            data = json.load(f)
+        assert data["organizations"][0]["organization"] == "redhat.com"
+        with open(os.path.join(temp_dir, "organizations.csv"), encoding="utf-8") as f:
+            assert f.readline().startswith("organization,")
+        # linked from the portfolio page and the nav of every page
+        assert '<a href="organizations.html">Organizations, by the' in pages["index.html"]
+        assert 'href="organizations.html"' in pages["index.html"].split("</div>")[0] + page
+
+    def test_no_page_without_organizations(self, temp_dir):
+        summaries = [_summary("a", 1, {}), _summary("b", 1, {}, organizations=_orgs([]))]
+        pages = self._render(temp_dir, summaries)
+        assert "organizations.html" not in pages
+        assert not os.path.exists(os.path.join(temp_dir, "organizations.json"))
+        assert "organizations.html" not in pages["index.html"]
+
+    def test_groups_narrow_the_repositories(self, temp_dir):
+        groups = [("python", "Python"), ("cncf", "CNCF graduated")]
+        page = self._render(temp_dir, self._summaries(), groups)["organizations.html"]
+        assert '<div class="group-filter"' in page
+        assert '<tr data-group="cncf"><td><a href="kubernetes/authors.html' in page
+
+    def test_long_list_is_cut(self, temp_dir):
+        top = [(f"org{n:03d}.com", 100 - n % 50, 1) for n in range(60)]
+        page = self._render(temp_dir, [_summary("a", 1, {}, organizations=_orgs(top))])[
+            "organizations.html"
+        ]
+        table = page[page.index('id="organizations"') : page.index('id="organization-mix"')]
+        assert table.count("<tr><td>") == 50
+        assert "The first 50 of 60; all of them are in the data below." in page
+
+    def test_many_repositories_are_summed_up(self, temp_dir):
+        summaries = [
+            _summary(f"r{n}", 1, {}, organizations=_orgs([("acme.org", 1, 1)])) for n in range(6)
+        ]
+        page = self._render(temp_dir, summaries)["organizations.html"]
+        assert "<td>r0, r1, r2, r3 and 2 more</td>" in page
+        assert "6 of 6 repositories" in page
+
+    def test_escapes(self, temp_dir):
+        summary = _summary("<i>x</i>", 1, {}, organizations=_orgs([("<b>.org", 1, 1)]))
+        summary["report_path"] = "elsewhere.html"
+        page = self._render(temp_dir, [summary])["organizations.html"]
+        assert "<b>.org" not in page and "&lt;b&gt;" in page
+        assert "<i>x</i>" not in page
+        # a report that is not an index page is linked as it is
+        assert 'href="elsewhere.html"' in page
+
+    def test_repositories_without_commits_in_the_quarters(self, temp_dir):
+        quiet = _orgs([("acme.org", 5, 0)], [{}] * 4)
+        page = self._render(temp_dir, [_summary("a", 1, {}, organizations=quiet)])[
+            "organizations.html"
+        ]
+        assert "Largest Share" not in page
+        assert '<td class="num">0</td><td class="num">0%</td>' in page
