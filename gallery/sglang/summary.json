@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:12:27+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:47:20+00:00",
   "name": "SGLang",
   "report_path": "index.html",
   "first_commit": "2023-10-09 22:41:15",
-  "last_commit": "2026-10-23 15:09:30",
+  "last_commit": "2026-10-23 16:26:52",
   "age_days": 1110,
   "active_days": 934,
-  "total_commits": 20763,
+  "total_commits": 20767,
   "total_authors": 1924,
   "active_authors_12mo": 1465,
-  "commits_last_12mo": 14334,
+  "commits_last_12mo": 14338,
   "total_files": 11229,
-  "total_lines": 3628501,
-  "lines_added": 5408221,
-  "lines_removed": 1779720,
+  "total_lines": 3628798,
+  "lines_added": 5408549,
+  "lines_removed": 1779751,
   "total_tags": 144,
   "era": "peak",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "metamergebot": 134,
     "Avaya Aggarwal": 16,
     "Byron Hsu": 154,
     "Mick": 863,
@@ -72,7 +73,6 @@
     "chenyang08056032": 4,
     "Lianmin Zheng": 1260,
     "YAMY": 134,
-    "metamergebot": 130,
     "zijiexia": 118,
     "JohnZhao01": 1,
     "HEJIAN SANG": 3,
@@ -1970,7 +1970,7 @@
     "2023": 1,
     "2024": 1619,
     "2025": 6794,
-    "2026": 12349
+    "2026": 12353
   },
   "ai_assisted": {
     "commits": 1619,
@@ -2035,16 +2035,16 @@
       "2026-07": 1237,
       "2026-08": 1615,
       "2026-09": 1645,
-      "2026-10": 1588
+      "2026-10": 1592
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20763,
+    "commits": 20767,
     "by_kind": {
       "organization": 3107,
       "one_person": 1325,
-      "personal": 9343,
+      "personal": 9347,
       "hidden": 6987,
       "unknown": 0,
       "bot": 1
@@ -2489,11 +2489,19 @@
       "2026-Q4": {
         "organization": 281,
         "one_person": 15,
-        "personal": 690,
+        "personal": 694,
         "hidden": 602,
         "unknown": 0,
         "bot": 0
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 14338,
+    "authors": 1447,
+    "new_authors": 1197,
+    "half_of_commits": 25
   }
 }

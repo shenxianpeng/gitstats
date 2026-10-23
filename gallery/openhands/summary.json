@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:10:51+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:45:18+00:00",
   "name": "OpenHands",
   "report_path": "index.html",
   "first_commit": "2024-03-13 03:36:30",
-  "last_commit": "2026-10-23 13:26:23",
+  "last_commit": "2026-10-23 15:23:34",
   "age_days": 955,
   "active_days": 905,
-  "total_commits": 8730,
-  "total_authors": 572,
-  "active_authors_12mo": 212,
-  "commits_last_12mo": 3269,
+  "total_commits": 8731,
+  "total_authors": 573,
+  "active_authors_12mo": 213,
+  "commits_last_12mo": 3270,
   "total_files": 2772,
-  "total_lines": 563138,
-  "lines_added": 2174365,
-  "lines_removed": 1611227,
+  "total_lines": 563179,
+  "lines_added": 2174456,
+  "lines_removed": 1611277,
   "total_tags": 104,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "dymux": 1,
     "OpenHands Bot": 61,
     "Graham Neubig": 492,
     "John-Mason P. Shackelford": 22,
@@ -617,13 +618,13 @@
   "commits_by_year": {
     "2024": 2995,
     "2025": 2790,
-    "2026": 2945
+    "2026": 2946
   },
   "ai_assisted": {
-    "commits": 2536,
+    "commits": 2537,
     "authored": 17,
     "assistants": {
-      "OpenHands": 2341,
+      "OpenHands": 2342,
       "Claude": 182,
       "Cursor": 38,
       "GitHub Copilot": 5,
@@ -655,7 +656,7 @@
       "2026-07": 108,
       "2026-08": 63,
       "2026-09": 161,
-      "2026-10": 133
+      "2026-10": 134
     },
     "commits_by_month": {
       "2024-11": 245,
@@ -681,17 +682,17 @@
       "2026-07": 258,
       "2026-08": 179,
       "2026-09": 250,
-      "2026-10": 357
+      "2026-10": 358
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8730,
+    "commits": 8731,
     "by_kind": {
       "organization": 967,
       "one_person": 1176,
       "personal": 3229,
-      "hidden": 2236,
+      "hidden": 2237,
       "unknown": 0,
       "bot": 1122
     },
@@ -784,10 +785,18 @@
         "organization": 28,
         "one_person": 28,
         "personal": 226,
-        "hidden": 63,
+        "hidden": 64,
         "unknown": 0,
         "bot": 12
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 3051,
+    "authors": 204,
+    "new_authors": 178,
+    "half_of_commits": 5
   }
 }

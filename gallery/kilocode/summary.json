@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:11:32+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:46:00+00:00",
   "name": "Kilo Code",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-10-23 14:03:41",
+  "last_commit": "2026-10-23 15:43:55",
   "age_days": 581,
   "active_days": 566,
-  "total_commits": 33807,
+  "total_commits": 33813,
   "total_authors": 1208,
   "active_authors_12mo": 1025,
-  "commits_last_12mo": 30015,
-  "total_files": 11029,
-  "total_lines": 1911722,
-  "lines_added": 4257253,
-  "lines_removed": 2345531,
+  "commits_last_12mo": 30021,
+  "total_files": 11030,
+  "total_lines": 1911821,
+  "lines_added": 4257399,
+  "lines_removed": 2345578,
   "total_tags": 250,
   "era": "steady",
   "top_authors": [
@@ -41,9 +41,9 @@
     }
   ],
   "author_commits": {
+    "Andrea Giammarchi": 174,
     "arrrkady": 24,
     "Kirill Kalishev": 691,
-    "Andrea Giammarchi": 169,
     "kirillk": 2145,
     "Bruno Agat\u00e3o": 290,
     "Joshua Lambert": 296,
@@ -1252,7 +1252,7 @@
   },
   "commits_by_year": {
     "2025": 6919,
-    "2026": 26888
+    "2026": 26894
   },
   "ai_assisted": {
     "commits": 171,
@@ -1316,19 +1316,19 @@
       "2026-07": 2275,
       "2026-08": 2481,
       "2026-09": 2277,
-      "2026-10": 934
+      "2026-10": 940
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 33807,
+    "commits": 33813,
     "by_kind": {
       "organization": 11846,
       "one_person": 3444,
-      "personal": 8564,
+      "personal": 8569,
       "hidden": 5515,
       "unknown": 53,
-      "bot": 4385
+      "bot": 4386
     },
     "organization_count": 11,
     "last_12mo_from": "2025-11",
@@ -1482,11 +1482,19 @@
       "2026-Q4": {
         "organization": 456,
         "one_person": 12,
-        "personal": 191,
+        "personal": 196,
         "hidden": 176,
         "unknown": 15,
-        "bot": 84
+        "bot": 85
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 26638,
+    "authors": 1008,
+    "new_authors": 935,
+    "half_of_commits": 8
   }
 }

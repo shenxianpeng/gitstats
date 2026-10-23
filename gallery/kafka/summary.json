@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:14:09+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:48:49+00:00",
   "name": "Apache Kafka",
   "report_path": "index.html",
   "first_commit": "2011-08-01 23:41:24",
-  "last_commit": "2026-10-23 13:39:40",
+  "last_commit": "2026-10-23 16:11:13",
   "age_days": 5562,
   "active_days": 4188,
-  "total_commits": 18502,
+  "total_commits": 18504,
   "total_authors": 1547,
   "active_authors_12mo": 254,
-  "commits_last_12mo": 1985,
+  "commits_last_12mo": 1987,
   "total_files": 7633,
-  "total_lines": 1850502,
-  "lines_added": 3482005,
-  "lines_removed": 1631503,
+  "total_lines": 1850852,
+  "lines_added": 3482367,
+  "lines_removed": 1631515,
   "total_tags": 2,
   "era": "steady",
   "top_authors": [
@@ -41,8 +41,9 @@
     }
   ],
   "author_commits": {
+    "Apoorv Mittal": 169,
+    "Kevin Wu": 34,
     "Evan Zhou": 18,
-    "Apoorv Mittal": 168,
     "Sean Quah": 103,
     "Federico Valeri": 71,
     "David Jacot": 480,
@@ -141,7 +142,6 @@
     "Kori": 1,
     "Shantanu Shukla": 3,
     "Yu-Chia Ma": 9,
-    "Kevin Wu": 33,
     "sstremler": 4,
     "Xi": 2,
     "CHUN-MING(Jimmy)": 1,
@@ -1605,7 +1605,7 @@
     "2023": 1474,
     "2024": 2451,
     "2025": 2182,
-    "2026": 1701
+    "2026": 1703
   },
   "ai_assisted": {
     "commits": 85,
@@ -1667,16 +1667,16 @@
       "2026-07": 201,
       "2026-08": 171,
       "2026-09": 212,
-      "2026-10": 140
+      "2026-10": 142
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 18502,
+    "commits": 18504,
     "by_kind": {
-      "organization": 6961,
+      "organization": 6962,
       "one_person": 1624,
-      "personal": 7397,
+      "personal": 7398,
       "hidden": 2500,
       "unknown": 17,
       "bot": 3
@@ -1686,8 +1686,8 @@
     "top": [
       {
         "organization": "confluent.io",
-        "commits": 4255,
-        "commits_last_12mo": 444,
+        "commits": 4256,
+        "commits_last_12mo": 445,
         "addresses": 109,
         "first_commit": "2015-06-12",
         "last_commit": "2026-10-23"
@@ -2047,13 +2047,21 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 59,
+        "organization": 60,
         "one_person": 2,
-        "personal": 51,
+        "personal": 52,
         "hidden": 28,
         "unknown": 0,
         "bot": 0
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 1985,
+    "authors": 252,
+    "new_authors": 149,
+    "half_of_commits": 19
   }
 }

@@ -1,0 +1,8178 @@
+{
+  "schema_version": 1,
+  "title": "How each repository compares",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:58:37+00:00",
+  "quarters": [
+    "2025-Q4",
+    "2026-Q1",
+    "2026-Q2",
+    "2026-Q3"
+  ],
+  "measures": [
+    {
+      "id": "commits",
+      "label": "Commits",
+      "definition": "Commits in the 12 months up to the last one."
+    },
+    {
+      "id": "authors",
+      "label": "Contributors",
+      "definition": "People who made a commit in those 12 months; bots are left out."
+    },
+    {
+      "id": "new_authors",
+      "label": "New contributors",
+      "definition": "Of them, those whose first commit to the project was in those 12 months."
+    },
+    {
+      "id": "half_of_commits",
+      "label": "Half the commits by",
+      "definition": "The fewest people whose commits add up to half of those 12 months': how far the work is spread."
+    },
+    {
+      "id": "organizations",
+      "label": "Organizations",
+      "definition": "Organizations whose addresses committed in those 12 months, by email domain; a domain only one person uses is not one."
+    },
+    {
+      "id": "ai_share",
+      "label": "AI-assisted",
+      "definition": "The share of the last four quarters' commits that name an AI coding assistant; a lower bound."
+    }
+  ],
+  "repositories": [
+    {
+      "name": "CPython",
+      "values": {
+        "commits": 4969.0,
+        "authors": 775.0,
+        "new_authors": 487.0,
+        "half_of_commits": 18.0,
+        "organizations": 24.0,
+        "ai_share": 0.07501027538018906
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            3,
+            17
+          ],
+          "all": [
+            21,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            2,
+            17
+          ],
+          "all": [
+            11,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            2,
+            17
+          ],
+          "all": [
+            12,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            2,
+            17
+          ],
+          "all": [
+            9,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            1,
+            17
+          ],
+          "all": [
+            8,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            4,
+            17
+          ],
+          "all": [
+            24,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "cpython/compare.html",
+      "headline": "CPython had more organizations committing to it than any other of the 17 Python open source projects. It is also 2nd for contributors."
+    },
+    {
+      "name": "Django",
+      "values": {
+        "commits": 997.0,
+        "authors": 215.0,
+        "new_authors": 148.0,
+        "half_of_commits": 6.0,
+        "organizations": 6.0,
+        "ai_share": 0.0
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            10,
+            17
+          ],
+          "all": [
+            75,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            7,
+            17
+          ],
+          "all": [
+            46,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            7,
+            17
+          ],
+          "all": [
+            48,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            4,
+            17
+          ],
+          "all": [
+            42,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            7,
+            17
+          ],
+          "all": [
+            39,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            15,
+            17
+          ],
+          "all": [
+            99,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "django/compare.html",
+      "headline": "Django sits in the middle of the 17 Python open source projects; its highest place is 7th, for contributors."
+    },
+    {
+      "name": "Flask",
+      "values": {
+        "commits": 94.0,
+        "authors": 6.0,
+        "new_authors": 4.0,
+        "half_of_commits": 1.0,
+        "organizations": 0.0,
+        "ai_share": 0.0
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            17,
+            17
+          ],
+          "all": [
+            106,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            17,
+            17
+          ],
+          "all": [
+            106,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            17,
+            17
+          ],
+          "all": [
+            105,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            12,
+            17
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            15,
+            17
+          ],
+          "all": [
+            102,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            15,
+            17
+          ],
+          "all": [
+            99,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "flask/compare.html",
+      "headline": "Flask had fewer commits in the last 12 months than any other of the 17 Python open source projects."
+    },
+    {
+      "name": "FastAPI",
+      "values": {
+        "commits": 1750.0,
+        "authors": 68.0,
+        "new_authors": 54.0,
+        "half_of_commits": 1.0,
+        "organizations": 0.0,
+        "ai_share": 0.0018404907975460123
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            9,
+            17
+          ],
+          "all": [
+            61,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            14,
+            17
+          ],
+          "all": [
+            86,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            14,
+            17
+          ],
+          "all": [
+            85,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            12,
+            17
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            15,
+            17
+          ],
+          "all": [
+            102,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            14,
+            17
+          ],
+          "all": [
+            90,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "fastapi/compare.html",
+      "headline": "FastAPI sits in the middle of the 17 Python open source projects; its highest place is 9th, for commits."
+    },
+    {
+      "name": "Requests",
+      "values": {
+        "commits": 115.0,
+        "authors": 22.0,
+        "new_authors": 18.0,
+        "half_of_commits": 1.0,
+        "organizations": 0.0,
+        "ai_share": 0.008547008547008548
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            16,
+            17
+          ],
+          "all": [
+            104,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            16,
+            17
+          ],
+          "all": [
+            104,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            16,
+            17
+          ],
+          "all": [
+            102,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            12,
+            17
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            15,
+            17
+          ],
+          "all": [
+            102,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            9,
+            17
+          ],
+          "all": [
+            75,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "requests/compare.html",
+      "headline": "Requests sits in the middle of the 17 Python open source projects; its highest place is 9th, for AI-assisted commits."
+    },
+    {
+      "name": "pandas",
+      "values": {
+        "commits": 2936.0,
+        "authors": 384.0,
+        "new_authors": 317.0,
+        "half_of_commits": 1.0,
+        "organizations": 10.0,
+        "ai_share": 0.42223864056150723
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            5,
+            17
+          ],
+          "all": [
+            42,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            3,
+            17
+          ],
+          "all": [
+            24,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            3,
+            17
+          ],
+          "all": [
+            21,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            12,
+            17
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            5,
+            17
+          ],
+          "all": [
+            31,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            1,
+            17
+          ],
+          "all": [
+            2,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "pandas/compare.html",
+      "headline": "pandas had a larger share of commits that name an AI coding assistant than any other of the 17 Python open source projects. It is also 3rd for contributors."
+    },
+    {
+      "name": "NumPy",
+      "values": {
+        "commits": 2470.0,
+        "authors": 234.0,
+        "new_authors": 171.0,
+        "half_of_commits": 3.0,
+        "organizations": 13.0,
+        "ai_share": 0.012476370510396975
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            6,
+            17
+          ],
+          "all": [
+            48,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            5,
+            17
+          ],
+          "all": [
+            38,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            5,
+            17
+          ],
+          "all": [
+            39,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            7,
+            17
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            4,
+            17
+          ],
+          "all": [
+            23,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            8,
+            17
+          ],
+          "all": [
+            71,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "numpy/compare.html",
+      "headline": "NumPy is 4th of the 17 Python open source projects for organizations committing. It is also 5th for contributors."
+    },
+    {
+      "name": "SciPy",
+      "values": {
+        "commits": 2230.0,
+        "authors": 222.0,
+        "new_authors": 159.0,
+        "half_of_commits": 6.0,
+        "organizations": 17.0,
+        "ai_share": 0.02045929018789144
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            7,
+            17
+          ],
+          "all": [
+            54,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            6,
+            17
+          ],
+          "all": [
+            41,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            6,
+            17
+          ],
+          "all": [
+            42,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            4,
+            17
+          ],
+          "all": [
+            42,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            2,
+            17
+          ],
+          "all": [
+            17,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            6,
+            17
+          ],
+          "all": [
+            59,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "scipy/compare.html",
+      "headline": "SciPy is 2nd of the 17 Python open source projects for organizations committing."
+    },
+    {
+      "name": "scikit-learn",
+      "values": {
+        "commits": 989.0,
+        "authors": 187.0,
+        "new_authors": 129.0,
+        "half_of_commits": 7.0,
+        "organizations": 6.0,
+        "ai_share": 0.00441306266548985
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            11,
+            17
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            8,
+            17
+          ],
+          "all": [
+            53,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            9,
+            17
+          ],
+          "all": [
+            54,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            3,
+            17
+          ],
+          "all": [
+            35,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            7,
+            17
+          ],
+          "all": [
+            39,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            12,
+            17
+          ],
+          "all": [
+            80,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "scikit-learn/compare.html",
+      "headline": "scikit-learn is 3rd of the 17 Python open source projects for how widely its commits are spread."
+    },
+    {
+      "name": "Matplotlib",
+      "values": {
+        "commits": 2048.0,
+        "authors": 162.0,
+        "new_authors": 121.0,
+        "half_of_commits": 3.0,
+        "organizations": 10.0,
+        "ai_share": 0.00400600901352028
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            8,
+            17
+          ],
+          "all": [
+            56,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            10,
+            17
+          ],
+          "all": [
+            61,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            10,
+            17
+          ],
+          "all": [
+            56,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            7,
+            17
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            5,
+            17
+          ],
+          "all": [
+            31,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            13,
+            17
+          ],
+          "all": [
+            81,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "matplotlib/compare.html",
+      "headline": "Matplotlib sits in the middle of the 17 Python open source projects; its highest place is 8th, for commits."
+    },
+    {
+      "name": "pip",
+      "values": {
+        "commits": 734.0,
+        "authors": 67.0,
+        "new_authors": 45.0,
+        "half_of_commits": 2.0,
+        "organizations": 3.0,
+        "ai_share": 0.00522875816993464
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            13,
+            17
+          ],
+          "all": [
+            84,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            15,
+            17
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            15,
+            17
+          ],
+          "all": [
+            88,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            17
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            11,
+            17
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            11,
+            17
+          ],
+          "all": [
+            79,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "pip/compare.html",
+      "headline": "pip ranks below most of the 17 Python open source projects on every measure here; its highest place is 11th, for organizations committing."
+    },
+    {
+      "name": "pytest",
+      "values": {
+        "commits": 886.0,
+        "authors": 120.0,
+        "new_authors": 99.0,
+        "half_of_commits": 2.0,
+        "organizations": 4.0,
+        "ai_share": 0.09927611168562564
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            12,
+            17
+          ],
+          "all": [
+            79,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            12,
+            17
+          ],
+          "all": [
+            69,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            12,
+            17
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            17
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            9,
+            17
+          ],
+          "all": [
+            51,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            3,
+            17
+          ],
+          "all": [
+            19,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "pytest/compare.html",
+      "headline": "pytest is 3rd of the 17 Python open source projects for AI-assisted commits."
+    },
+    {
+      "name": "SQLAlchemy",
+      "values": {
+        "commits": 658.0,
+        "authors": 90.0,
+        "new_authors": 73.0,
+        "half_of_commits": 1.0,
+        "organizations": 4.0,
+        "ai_share": 0.0
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            14,
+            17
+          ],
+          "all": [
+            86,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            13,
+            17
+          ],
+          "all": [
+            80,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            13,
+            17
+          ],
+          "all": [
+            76,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            12,
+            17
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            9,
+            17
+          ],
+          "all": [
+            51,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            15,
+            17
+          ],
+          "all": [
+            99,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "sqlalchemy/compare.html",
+      "headline": "SQLAlchemy ranks below most of the 17 Python open source projects on every measure here; its highest place is 13th, for contributors."
+    },
+    {
+      "name": "Pydantic",
+      "values": {
+        "commits": 611.0,
+        "authors": 123.0,
+        "new_authors": 110.0,
+        "half_of_commits": 1.0,
+        "organizations": 2.0,
+        "ai_share": 0.006006006006006006
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            15,
+            17
+          ],
+          "all": [
+            89,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            11,
+            17
+          ],
+          "all": [
+            67,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            11,
+            17
+          ],
+          "all": [
+            60,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            12,
+            17
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            12,
+            17
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            10,
+            17
+          ],
+          "all": [
+            78,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "pydantic/compare.html",
+      "headline": "Pydantic sits in the middle of the 17 Python open source projects; its highest place is 10th, for AI-assisted commits."
+    },
+    {
+      "name": "uv",
+      "values": {
+        "commits": 3466.0,
+        "authors": 178.0,
+        "new_authors": 136.0,
+        "half_of_commits": 3.0,
+        "organizations": 2.0,
+        "ai_share": 0.047208931419457735
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            4,
+            17
+          ],
+          "all": [
+            36,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            9,
+            17
+          ],
+          "all": [
+            56,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            8,
+            17
+          ],
+          "all": [
+            52,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            7,
+            17
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            12,
+            17
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            5,
+            17
+          ],
+          "all": [
+            32,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "uv/compare.html",
+      "headline": "uv is 4th of the 17 Python open source projects for commits. It is also 5th for AI-assisted commits."
+    },
+    {
+      "name": "Ruff",
+      "values": {
+        "commits": 5131.0,
+        "authors": 311.0,
+        "new_authors": 230.0,
+        "half_of_commits": 4.0,
+        "organizations": 2.0,
+        "ai_share": 0.013413685847589424
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            2,
+            17
+          ],
+          "all": [
+            20,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            4,
+            17
+          ],
+          "all": [
+            31,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            4,
+            17
+          ],
+          "all": [
+            27,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            6,
+            17
+          ],
+          "all": [
+            55,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            12,
+            17
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            7,
+            17
+          ],
+          "all": [
+            69,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "ruff/compare.html",
+      "headline": "Ruff is 2nd of the 17 Python open source projects for commits. It is also 4th for contributors."
+    },
+    {
+      "name": "Home Assistant",
+      "values": {
+        "commits": 20463.0,
+        "authors": 1401.0,
+        "new_authors": 931.0,
+        "half_of_commits": 19.0,
+        "organizations": 16.0,
+        "ai_share": 0.14041592777688217
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            1,
+            17
+          ],
+          "all": [
+            4,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            1,
+            17
+          ],
+          "all": [
+            4,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            1,
+            17
+          ],
+          "all": [
+            6,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            1,
+            17
+          ],
+          "all": [
+            6,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            3,
+            17
+          ],
+          "all": [
+            20,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            2,
+            17
+          ],
+          "all": [
+            13,
+            107
+          ]
+        }
+      },
+      "group": "python",
+      "page": "home-assistant/compare.html",
+      "headline": "Home Assistant had more commits in the last 12 months than any other of the 17 Python open source projects. It also had the most contributors."
+    },
+    {
+      "name": "Codex CLI",
+      "values": {
+        "commits": 10780.0,
+        "authors": 503.0,
+        "new_authors": 465.0,
+        "half_of_commits": 9.0,
+        "organizations": 2.0,
+        "ai_share": 0.006811326262527975
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            3,
+            12
+          ],
+          "all": [
+            11,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            3,
+            12
+          ],
+          "all": [
+            16,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            3,
+            12
+          ],
+          "all": [
+            13,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            3,
+            12
+          ],
+          "all": [
+            28,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            6,
+            12
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            10,
+            12
+          ],
+          "all": [
+            77,
+            107
+          ]
+        }
+      },
+      "group": "ai-coding",
+      "page": "codex/compare.html",
+      "headline": "Codex CLI is 3rd of the 12 open source AI coding assistants for commits. It is also 3rd for contributors."
+    },
+    {
+      "name": "Gemini CLI",
+      "values": {
+        "commits": 3378.0,
+        "authors": 407.0,
+        "new_authors": 342.0,
+        "half_of_commits": 15.0,
+        "organizations": 1.0,
+        "ai_share": 0.04626982063945932
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            6,
+            12
+          ],
+          "all": [
+            38,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            5,
+            12
+          ],
+          "all": [
+            23,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            5,
+            12
+          ],
+          "all": [
+            19,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            1,
+            12
+          ],
+          "all": [
+            14,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            7,
+            12
+          ],
+          "all": [
+            33,
+            107
+          ]
+        }
+      },
+      "group": "ai-coding",
+      "page": "gemini-cli/compare.html",
+      "headline": "Gemini CLI had more people behind half of its commits than any other of the 12 open source AI coding assistants."
+    },
+    {
+      "name": "Claude Code",
+      "values": {
+        "commits": 629.0,
+        "authors": 37.0,
+        "new_authors": 24.0,
+        "half_of_commits": 1.0,
+        "organizations": 1.0,
+        "ai_share": 0.06037151702786378
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            11,
+            12
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            12,
+            12
+          ],
+          "all": [
+            100,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            12,
+            12
+          ],
+          "all": [
+            100,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            11,
+            12
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            6,
+            12
+          ],
+          "all": [
+            28,
+            107
+          ]
+        }
+      },
+      "group": "ai-coding",
+      "page": "claude-code/compare.html",
+      "headline": "Claude Code sits in the middle of the 12 open source AI coding assistants; its highest place is 6th, for AI-assisted commits."
+    },
+    {
+      "name": "OpenCode",
+      "values": {
+        "commits": 17210.0,
+        "authors": 834.0,
+        "new_authors": 780.0,
+        "half_of_commits": 5.0,
+        "organizations": 4.0,
+        "ai_share": 0.0033102796004019627
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            2,
+            12
+          ],
+          "all": [
+            6,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            2,
+            12
+          ],
+          "all": [
+            10,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            2,
+            12
+          ],
+          "all": [
+            8,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            5,
+            12
+          ],
+          "all": [
+            49,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            3,
+            12
+          ],
+          "all": [
+            51,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            11,
+            12
+          ],
+          "all": [
+            84,
+            107
+          ]
+        }
+      },
+      "group": "ai-coding",
+      "page": "opencode/compare.html",
+      "headline": "OpenCode is 2nd of the 12 open source AI coding assistants for commits. It is also 2nd for contributors."
+    },
+    {
+      "name": "Aider",
+      "values": {
+        "commits": 108.0,
+        "authors": 43.0,
+        "new_authors": 34.0,
+        "half_of_commits": 1.0,
+        "organizations": 1.0,
+        "ai_share": 0.2956521739130435
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            12,
+            12
+          ],
+          "all": [
+            105,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            11,
+            12
+          ],
+          "all": [
+            98,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            11,
+            12
+          ],
+          "all": [
+            95,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            11,
+            12
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            2,
+            12
+          ],
+          "all": [
+            6,
+            107
+          ]
+        }
+      },
+      "group": "ai-coding",
+      "page": "aider/compare.html",
+      "headline": "Aider is 2nd of the 12 open source AI coding assistants for AI-assisted commits."
+    },
+    {
+      "name": "Cline",
+      "values": {
+        "commits": 3753.0,
+        "authors": 148.0,
+        "new_authors": 117.0,
+        "half_of_commits": 3.0,
+        "organizations": 5.0,
+        "ai_share": 0.036941358822009815
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            5,
+            12
+          ],
+          "all": [
+            32,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            8,
+            12
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            8,
+            12
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            8,
+            12
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            2,
+            12
+          ],
+          "all": [
+            44,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            8,
+            12
+          ],
+          "all": [
+            41,
+            107
+          ]
+        }
+      },
+      "group": "ai-coding",
+      "page": "cline/compare.html",
+      "headline": "Cline is 2nd of the 12 open source AI coding assistants for organizations committing."
+    },
+    {
+      "name": "Continue",
+      "values": {
+        "commits": 1663.0,
+        "authors": 118.0,
+        "new_authors": 85.0,
+        "half_of_commits": 3.0,
+        "organizations": 3.0,
+        "ai_share": 0.08059432687978388
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            10,
+            12
+          ],
+          "all": [
+            64,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            10,
+            12
+          ],
+          "all": [
+            68,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            8,
+            12
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            5,
+            12
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            3,
+            12
+          ],
+          "all": [
+            22,
+            107
+          ]
+        }
+      },
+      "group": "ai-coding",
+      "page": "continue/compare.html",
+      "headline": "Continue is 3rd of the 12 open source AI coding assistants for AI-assisted commits."
+    },
+    {
+      "name": "OpenHands",
+      "values": {
+        "commits": 3270.0,
+        "authors": 204.0,
+        "new_authors": 178.0,
+        "half_of_commits": 5.0,
+        "organizations": 2.0,
+        "ai_share": 0.5163061026800129
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            7,
+            12
+          ],
+          "all": [
+            40,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            7,
+            12
+          ],
+          "all": [
+            49,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            7,
+            12
+          ],
+          "all": [
+            36,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            5,
+            12
+          ],
+          "all": [
+            49,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            6,
+            12
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            1,
+            12
+          ],
+          "all": [
+            1,
+            107
+          ]
+        }
+      },
+      "group": "ai-coding",
+      "page": "openhands/compare.html",
+      "headline": "OpenHands had a larger share of commits that name an AI coding assistant than any other of the 12 open source AI coding assistants."
+    },
+    {
+      "name": "goose",
+      "values": {
+        "commits": 3202.0,
+        "authors": 417.0,
+        "new_authors": 360.0,
+        "half_of_commits": 10.0,
+        "organizations": 4.0,
+        "ai_share": 0.07748752568241855
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            8,
+            12
+          ],
+          "all": [
+            41,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            4,
+            12
+          ],
+          "all": [
+            22,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            4,
+            12
+          ],
+          "all": [
+            17,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            2,
+            12
+          ],
+          "all": [
+            25,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            3,
+            12
+          ],
+          "all": [
+            51,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            4,
+            12
+          ],
+          "all": [
+            23,
+            107
+          ]
+        }
+      },
+      "group": "ai-coding",
+      "page": "goose/compare.html",
+      "headline": "goose is 2nd of the 12 open source AI coding assistants for how widely its commits are spread."
+    },
+    {
+      "name": "Qwen Code",
+      "values": {
+        "commits": 8875.0,
+        "authors": 320.0,
+        "new_authors": 310.0,
+        "half_of_commits": 4.0,
+        "organizations": 2.0,
+        "ai_share": 0.06818757921419519
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            4,
+            12
+          ],
+          "all": [
+            12,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            6,
+            12
+          ],
+          "all": [
+            29,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            6,
+            12
+          ],
+          "all": [
+            22,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            7,
+            12
+          ],
+          "all": [
+            55,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            6,
+            12
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            5,
+            12
+          ],
+          "all": [
+            25,
+            107
+          ]
+        }
+      },
+      "group": "ai-coding",
+      "page": "qwen-code/compare.html",
+      "headline": "Qwen Code sits in the middle of the 12 open source AI coding assistants; its highest place is 4th, for commits."
+    },
+    {
+      "name": "Kilo Code",
+      "values": {
+        "commits": 30021.0,
+        "authors": 1008.0,
+        "new_authors": 935.0,
+        "half_of_commits": 8.0,
+        "organizations": 11.0,
+        "ai_share": 0.0029415697285733386
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            1,
+            12
+          ],
+          "all": [
+            2,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            1,
+            12
+          ],
+          "all": [
+            7,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            1,
+            12
+          ],
+          "all": [
+            5,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            4,
+            12
+          ],
+          "all": [
+            32,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            1,
+            12
+          ],
+          "all": [
+            28,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            12,
+            12
+          ],
+          "all": [
+            85,
+            107
+          ]
+        }
+      },
+      "group": "ai-coding",
+      "page": "kilocode/compare.html",
+      "headline": "Kilo Code had more commits in the last 12 months than any other of the 12 open source AI coding assistants. It also had the most contributors."
+    },
+    {
+      "name": "Crush",
+      "values": {
+        "commits": 2438.0,
+        "authors": 106.0,
+        "new_authors": 90.0,
+        "half_of_commits": 3.0,
+        "organizations": 0.0,
+        "ai_share": 0.015934706568208317
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            49,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            10,
+            12
+          ],
+          "all": [
+            75,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            65,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            8,
+            12
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            12,
+            12
+          ],
+          "all": [
+            102,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            64,
+            107
+          ]
+        }
+      },
+      "group": "ai-coding",
+      "page": "crush/compare.html",
+      "headline": "Crush ranks below most of the 12 open source AI coding assistants on every measure here; its highest place is 9th, for commits."
+    },
+    {
+      "name": "PyTorch",
+      "values": {
+        "commits": 17657.0,
+        "authors": 1517.0,
+        "new_authors": 993.0,
+        "half_of_commits": 31.0,
+        "organizations": 46.0,
+        "ai_share": 0.036713678083725096
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            1,
+            12
+          ],
+          "all": [
+            5,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            2,
+            12
+          ],
+          "all": [
+            2,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            3,
+            12
+          ],
+          "all": [
+            3,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            3,
+            12
+          ],
+          "all": [
+            3,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            2,
+            12
+          ],
+          "all": [
+            3,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            7,
+            12
+          ],
+          "all": [
+            42,
+            107
+          ]
+        }
+      },
+      "group": "ai-ml",
+      "page": "pytorch/compare.html",
+      "headline": "PyTorch had more commits in the last 12 months than any other of the 12 open source AI and machine learning projects. It is also 2nd for contributors."
+    },
+    {
+      "name": "Transformers",
+      "values": {
+        "commits": 3479.0,
+        "authors": 657.0,
+        "new_authors": 520.0,
+        "half_of_commits": 15.0,
+        "organizations": 24.0,
+        "ai_share": 0.06097560975609756
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            8,
+            12
+          ],
+          "all": [
+            35,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            6,
+            12
+          ],
+          "all": [
+            13,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            5,
+            12
+          ],
+          "all": [
+            11,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            7,
+            12
+          ],
+          "all": [
+            14,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            4,
+            12
+          ],
+          "all": [
+            8,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            5,
+            12
+          ],
+          "all": [
+            27,
+            107
+          ]
+        }
+      },
+      "group": "ai-ml",
+      "page": "transformers/compare.html",
+      "headline": "Transformers sits in the middle of the 12 open source AI and machine learning projects; its highest place is 4th, for organizations committing."
+    },
+    {
+      "name": "LangChain",
+      "values": {
+        "commits": 2378.0,
+        "authors": 234.0,
+        "new_authors": 192.0,
+        "half_of_commits": 2.0,
+        "organizations": 3.0,
+        "ai_share": 0.009838646202282565
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            50,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            10,
+            12
+          ],
+          "all": [
+            38,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            33,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            12,
+            12
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            12,
+            12
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            73,
+            107
+          ]
+        }
+      },
+      "group": "ai-ml",
+      "page": "langchain/compare.html",
+      "headline": "LangChain ranks below most of the 12 open source AI and machine learning projects on every measure here; its highest place is 9th, for commits."
+    },
+    {
+      "name": "TensorFlow",
+      "values": {
+        "commits": 15410.0,
+        "authors": 685.0,
+        "new_authors": 371.0,
+        "half_of_commits": 18.0,
+        "organizations": 18.0,
+        "ai_share": 0.0026392366515530894
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            2,
+            12
+          ],
+          "all": [
+            8,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            5,
+            12
+          ],
+          "all": [
+            12,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            6,
+            12
+          ],
+          "all": [
+            15,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            6,
+            12
+          ],
+          "all": [
+            9,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            6,
+            12
+          ],
+          "all": [
+            16,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            10,
+            12
+          ],
+          "all": [
+            87,
+            107
+          ]
+        }
+      },
+      "group": "ai-ml",
+      "page": "tensorflow/compare.html",
+      "headline": "TensorFlow is 2nd of the 12 open source AI and machine learning projects for commits."
+    },
+    {
+      "name": "JAX",
+      "values": {
+        "commits": 7766.0,
+        "authors": 313.0,
+        "new_authors": 154.0,
+        "half_of_commits": 5.0,
+        "organizations": 9.0,
+        "ai_share": 0.0010143273741600102
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            5,
+            12
+          ],
+          "all": [
+            16,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            8,
+            12
+          ],
+          "all": [
+            30,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            11,
+            12
+          ],
+          "all": [
+            45,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            49,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            34,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            12,
+            12
+          ],
+          "all": [
+            95,
+            107
+          ]
+        }
+      },
+      "group": "ai-ml",
+      "page": "jax/compare.html",
+      "headline": "JAX sits in the middle of the 12 open source AI and machine learning projects; its highest place is 5th, for commits."
+    },
+    {
+      "name": "vLLM",
+      "values": {
+        "commits": 12785.0,
+        "authors": 2294.0,
+        "new_authors": 1880.0,
+        "half_of_commits": 78.0,
+        "organizations": 63.0,
+        "ai_share": 0.12826583932070543
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            4,
+            12
+          ],
+          "all": [
+            10,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            1,
+            12
+          ],
+          "all": [
+            1,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            1,
+            12
+          ],
+          "all": [
+            1,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            1,
+            12
+          ],
+          "all": [
+            1,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            1,
+            12
+          ],
+          "all": [
+            1,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            2,
+            12
+          ],
+          "all": [
+            15,
+            107
+          ]
+        }
+      },
+      "group": "ai-ml",
+      "page": "vllm/compare.html",
+      "headline": "vLLM had more contributors in the last 12 months than any other of the 12 open source AI and machine learning projects. It also had the most new contributors."
+    },
+    {
+      "name": "llama.cpp",
+      "values": {
+        "commits": 4934.0,
+        "authors": 933.0,
+        "new_authors": 783.0,
+        "half_of_commits": 15.0,
+        "organizations": 20.0,
+        "ai_share": 0.03971661657363675
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            6,
+            12
+          ],
+          "all": [
+            22,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            4,
+            12
+          ],
+          "all": [
+            8,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            4,
+            12
+          ],
+          "all": [
+            7,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            7,
+            12
+          ],
+          "all": [
+            14,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            5,
+            12
+          ],
+          "all": [
+            13,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            6,
+            12
+          ],
+          "all": [
+            36,
+            107
+          ]
+        }
+      },
+      "group": "ai-ml",
+      "page": "llama-cpp/compare.html",
+      "headline": "llama.cpp sits in the middle of the 12 open source AI and machine learning projects; its highest place is 4th, for contributors."
+    },
+    {
+      "name": "Ollama",
+      "values": {
+        "commits": 1212.0,
+        "authors": 110.0,
+        "new_authors": 86.0,
+        "half_of_commits": 3.0,
+        "organizations": 5.0,
+        "ai_share": 0.0024691358024691358
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            10,
+            12
+          ],
+          "all": [
+            72,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            12,
+            12
+          ],
+          "all": [
+            73,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            12,
+            12
+          ],
+          "all": [
+            67,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            11,
+            12
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            11,
+            12
+          ],
+          "all": [
+            44,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            11,
+            12
+          ],
+          "all": [
+            88,
+            107
+          ]
+        }
+      },
+      "group": "ai-ml",
+      "page": "ollama/compare.html",
+      "headline": "Ollama ranks below most of the 12 open source AI and machine learning projects on every measure here; its highest place is 10th, for commits."
+    },
+    {
+      "name": "Diffusers",
+      "values": {
+        "commits": 1056.0,
+        "authors": 213.0,
+        "new_authors": 160.0,
+        "half_of_commits": 5.0,
+        "organizations": 7.0,
+        "ai_share": 0.08372530573847602
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            11,
+            12
+          ],
+          "all": [
+            73,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            11,
+            12
+          ],
+          "all": [
+            47,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            10,
+            12
+          ],
+          "all": [
+            41,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            49,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            10,
+            12
+          ],
+          "all": [
+            37,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            4,
+            12
+          ],
+          "all": [
+            21,
+            107
+          ]
+        }
+      },
+      "group": "ai-ml",
+      "page": "diffusers/compare.html",
+      "headline": "Diffusers sits in the middle of the 12 open source AI and machine learning projects; its highest place is 4th, for AI-assisted commits."
+    },
+    {
+      "name": "LlamaIndex",
+      "values": {
+        "commits": 718.0,
+        "authors": 290.0,
+        "new_authors": 241.0,
+        "half_of_commits": 39.0,
+        "organizations": 10.0,
+        "ai_share": 0.01680672268907563
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            12,
+            12
+          ],
+          "all": [
+            85,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            9,
+            12
+          ],
+          "all": [
+            32,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            8,
+            12
+          ],
+          "all": [
+            26,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            2,
+            12
+          ],
+          "all": [
+            2,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            8,
+            12
+          ],
+          "all": [
+            31,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            8,
+            12
+          ],
+          "all": [
+            62,
+            107
+          ]
+        }
+      },
+      "group": "ai-ml",
+      "page": "llama-index/compare.html",
+      "headline": "LlamaIndex is 2nd of the 12 open source AI and machine learning projects for how widely its commits are spread."
+    },
+    {
+      "name": "Ray",
+      "values": {
+        "commits": 4391.0,
+        "authors": 474.0,
+        "new_authors": 343.0,
+        "half_of_commits": 19.0,
+        "organizations": 17.0,
+        "ai_share": 0.1667381974248927
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            7,
+            12
+          ],
+          "all": [
+            27,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            7,
+            12
+          ],
+          "all": [
+            17,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            7,
+            12
+          ],
+          "all": [
+            18,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            5,
+            12
+          ],
+          "all": [
+            6,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            7,
+            12
+          ],
+          "all": [
+            17,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            1,
+            12
+          ],
+          "all": [
+            11,
+            107
+          ]
+        }
+      },
+      "group": "ai-ml",
+      "page": "ray/compare.html",
+      "headline": "Ray had a larger share of commits that name an AI coding assistant than any other of the 12 open source AI and machine learning projects."
+    },
+    {
+      "name": "SGLang",
+      "values": {
+        "commits": 14338.0,
+        "authors": 1447.0,
+        "new_authors": 1197.0,
+        "half_of_commits": 25.0,
+        "organizations": 45.0,
+        "ai_share": 0.09359097278560366
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            3,
+            12
+          ],
+          "all": [
+            9,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            3,
+            12
+          ],
+          "all": [
+            3,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            2,
+            12
+          ],
+          "all": [
+            2,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            4,
+            12
+          ],
+          "all": [
+            4,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            3,
+            12
+          ],
+          "all": [
+            4,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            3,
+            12
+          ],
+          "all": [
+            20,
+            107
+          ]
+        }
+      },
+      "group": "ai-ml",
+      "page": "sglang/compare.html",
+      "headline": "SGLang is 2nd of the 12 open source AI and machine learning projects for new contributors. It is also 3rd for commits."
+    },
+    {
+      "name": "Kubernetes",
+      "values": {
+        "commits": 8505.0,
+        "authors": 608.0,
+        "new_authors": 362.0,
+        "half_of_commits": 15.0,
+        "organizations": 36.0,
+        "ai_share": 0.0010362694300518134
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            1,
+            15
+          ],
+          "all": [
+            13,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            1,
+            15
+          ],
+          "all": [
+            14,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            1,
+            15
+          ],
+          "all": [
+            16,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            1,
+            15
+          ],
+          "all": [
+            14,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            1,
+            15
+          ],
+          "all": [
+            5,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            13,
+            15
+          ],
+          "all": [
+            94,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "kubernetes/compare.html",
+      "headline": "Kubernetes had more commits in the last 12 months than any other of the 15 CNCF graduated projects. It also had the most contributors."
+    },
+    {
+      "name": "Prometheus",
+      "values": {
+        "commits": 2690.0,
+        "authors": 271.0,
+        "new_authors": 196.0,
+        "half_of_commits": 7.0,
+        "organizations": 13.0,
+        "ai_share": 0.023059185242121444
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            4,
+            15
+          ],
+          "all": [
+            45,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            5,
+            15
+          ],
+          "all": [
+            35,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            5,
+            15
+          ],
+          "all": [
+            31,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            5,
+            15
+          ],
+          "all": [
+            35,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            5,
+            15
+          ],
+          "all": [
+            23,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            7,
+            15
+          ],
+          "all": [
+            55,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "prometheus/compare.html",
+      "headline": "Prometheus is 4th of the 15 CNCF graduated projects for commits."
+    },
+    {
+      "name": "Envoy",
+      "values": {
+        "commits": 3792.0,
+        "authors": 348.0,
+        "new_authors": 214.0,
+        "half_of_commits": 7.0,
+        "organizations": 28.0,
+        "ai_share": 0.03634872916097295
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            3,
+            15
+          ],
+          "all": [
+            31,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            3,
+            15
+          ],
+          "all": [
+            26,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            3,
+            15
+          ],
+          "all": [
+            28,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            5,
+            15
+          ],
+          "all": [
+            35,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            2,
+            15
+          ],
+          "all": [
+            6,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            4,
+            15
+          ],
+          "all": [
+            43,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "envoy/compare.html",
+      "headline": "Envoy is 2nd of the 15 CNCF graduated projects for organizations committing. It is also 3rd for commits."
+    },
+    {
+      "name": "etcd",
+      "values": {
+        "commits": 1313.0,
+        "authors": 88.0,
+        "new_authors": 62.0,
+        "half_of_commits": 3.0,
+        "organizations": 6.0,
+        "ai_share": 0.0007209805335255948
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            7,
+            15
+          ],
+          "all": [
+            69,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            11,
+            15
+          ],
+          "all": [
+            81,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            12,
+            15
+          ],
+          "all": [
+            79,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            15
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            8,
+            15
+          ],
+          "all": [
+            39,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            14,
+            15
+          ],
+          "all": [
+            96,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "etcd/compare.html",
+      "headline": "etcd sits in the middle of the 15 CNCF graduated projects; its highest place is 7th, for commits."
+    },
+    {
+      "name": "containerd",
+      "values": {
+        "commits": 1682.0,
+        "authors": 127.0,
+        "new_authors": 81.0,
+        "half_of_commits": 4.0,
+        "organizations": 20.0,
+        "ai_share": 0.013745704467353952
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            6,
+            15
+          ],
+          "all": [
+            63,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            7,
+            15
+          ],
+          "all": [
+            66,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            8,
+            15
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            9,
+            15
+          ],
+          "all": [
+            55,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            4,
+            15
+          ],
+          "all": [
+            13,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            10,
+            15
+          ],
+          "all": [
+            68,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "containerd/compare.html",
+      "headline": "containerd is 4th of the 15 CNCF graduated projects for organizations committing."
+    },
+    {
+      "name": "Helm",
+      "values": {
+        "commits": 965.0,
+        "authors": 87.0,
+        "new_authors": 67.0,
+        "half_of_commits": 3.0,
+        "organizations": 5.0,
+        "ai_share": 0.024163568773234202
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            10,
+            15
+          ],
+          "all": [
+            78,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            12,
+            15
+          ],
+          "all": [
+            83,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            11,
+            15
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            15
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            9,
+            15
+          ],
+          "all": [
+            44,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            6,
+            15
+          ],
+          "all": [
+            51,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "helm/compare.html",
+      "headline": "Helm sits in the middle of the 15 CNCF graduated projects; its highest place is 6th, for AI-assisted commits."
+    },
+    {
+      "name": "Istio",
+      "values": {
+        "commits": 1228.0,
+        "authors": 164.0,
+        "new_authors": 101.0,
+        "half_of_commits": 6.0,
+        "organizations": 11.0,
+        "ai_share": 0.014705882352941176
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            8,
+            15
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            6,
+            15
+          ],
+          "all": [
+            59,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            6,
+            15
+          ],
+          "all": [
+            61,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            7,
+            15
+          ],
+          "all": [
+            42,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            6,
+            15
+          ],
+          "all": [
+            28,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            8,
+            15
+          ],
+          "all": [
+            66,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "istio/compare.html",
+      "headline": "Istio sits in the middle of the 15 CNCF graduated projects; its highest place is 6th, for contributors."
+    },
+    {
+      "name": "Argo CD",
+      "values": {
+        "commits": 2266.0,
+        "authors": 378.0,
+        "new_authors": 284.0,
+        "half_of_commits": 14.0,
+        "organizations": 11.0,
+        "ai_share": 0.024965955515206535
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            5,
+            15
+          ],
+          "all": [
+            53,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            2,
+            15
+          ],
+          "all": [
+            25,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            2,
+            15
+          ],
+          "all": [
+            23,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            2,
+            15
+          ],
+          "all": [
+            20,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            6,
+            15
+          ],
+          "all": [
+            28,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            5,
+            15
+          ],
+          "all": [
+            49,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "argo-cd/compare.html",
+      "headline": "Argo CD is 2nd of the 15 CNCF graduated projects for contributors. It is also 2nd for new contributors."
+    },
+    {
+      "name": "Cilium",
+      "values": {
+        "commits": 5233.0,
+        "authors": 340.0,
+        "new_authors": 203.0,
+        "half_of_commits": 13.0,
+        "organizations": 25.0,
+        "ai_share": 0.0003658313517468447
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            2,
+            15
+          ],
+          "all": [
+            19,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            4,
+            15
+          ],
+          "all": [
+            27,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            4,
+            15
+          ],
+          "all": [
+            30,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            3,
+            15
+          ],
+          "all": [
+            22,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            3,
+            15
+          ],
+          "all": [
+            7,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            15,
+            15
+          ],
+          "all": [
+            98,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "cilium/compare.html",
+      "headline": "Cilium is 2nd of the 15 CNCF graduated projects for commits. It is also 3rd for how widely its commits are spread."
+    },
+    {
+      "name": "CoreDNS",
+      "values": {
+        "commits": 771.0,
+        "authors": 93.0,
+        "new_authors": 77.0,
+        "half_of_commits": 3.0,
+        "organizations": 1.0,
+        "ai_share": 0.00922266139657444
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            12,
+            15
+          ],
+          "all": [
+            81,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            9,
+            15
+          ],
+          "all": [
+            78,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            9,
+            15
+          ],
+          "all": [
+            72,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            15
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            13,
+            15
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            11,
+            15
+          ],
+          "all": [
+            74,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "coredns/compare.html",
+      "headline": "CoreDNS sits in the middle of the 15 CNCF graduated projects; its highest place is 9th, for contributors."
+    },
+    {
+      "name": "Jaeger",
+      "values": {
+        "commits": 1055.0,
+        "authors": 114.0,
+        "new_authors": 95.0,
+        "half_of_commits": 2.0,
+        "organizations": 1.0,
+        "ai_share": 0.2869481765834933
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            9,
+            15
+          ],
+          "all": [
+            74,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            8,
+            15
+          ],
+          "all": [
+            72,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            7,
+            15
+          ],
+          "all": [
+            64,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            14,
+            15
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            13,
+            15
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            1,
+            15
+          ],
+          "all": [
+            7,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "jaeger/compare.html",
+      "headline": "Jaeger had a larger share of commits that name an AI coding assistant than any other of the 15 CNCF graduated projects."
+    },
+    {
+      "name": "Linkerd",
+      "values": {
+        "commits": 776.0,
+        "authors": 32.0,
+        "new_authors": 24.0,
+        "half_of_commits": 3.0,
+        "organizations": 1.0,
+        "ai_share": 0.0011792452830188679
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            11,
+            15
+          ],
+          "all": [
+            80,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            15,
+            15
+          ],
+          "all": [
+            101,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            15,
+            15
+          ],
+          "all": [
+            100,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            15
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            13,
+            15
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            12,
+            15
+          ],
+          "all": [
+            93,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "linkerd/compare.html",
+      "headline": "Linkerd ranks below most of the 15 CNCF graduated projects on every measure here; its highest place is 11th, for commits."
+    },
+    {
+      "name": "Harbor",
+      "values": {
+        "commits": 411.0,
+        "authors": 91.0,
+        "new_authors": 75.0,
+        "half_of_commits": 5.0,
+        "organizations": 3.0,
+        "ai_share": 0.038461538461538464
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            13,
+            15
+          ],
+          "all": [
+            93,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            10,
+            15
+          ],
+          "all": [
+            79,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            10,
+            15
+          ],
+          "all": [
+            73,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            8,
+            15
+          ],
+          "all": [
+            49,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            10,
+            15
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            3,
+            15
+          ],
+          "all": [
+            38,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "harbor/compare.html",
+      "headline": "Harbor is 3rd of the 15 CNCF graduated projects for AI-assisted commits."
+    },
+    {
+      "name": "Flux",
+      "values": {
+        "commits": 356.0,
+        "authors": 48.0,
+        "new_authors": 40.0,
+        "half_of_commits": 2.0,
+        "organizations": 2.0,
+        "ai_share": 0.06134969325153374
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            14,
+            15
+          ],
+          "all": [
+            95,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            14,
+            15
+          ],
+          "all": [
+            94,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            13,
+            15
+          ],
+          "all": [
+            90,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            14,
+            15
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            11,
+            15
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            2,
+            15
+          ],
+          "all": [
+            26,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "flux/compare.html",
+      "headline": "Flux is 2nd of the 15 CNCF graduated projects for AI-assisted commits."
+    },
+    {
+      "name": "TiKV",
+      "values": {
+        "commits": 216.0,
+        "authors": 66.0,
+        "new_authors": 29.0,
+        "half_of_commits": 11.0,
+        "organizations": 2.0,
+        "ai_share": 0.013761467889908258
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            15,
+            15
+          ],
+          "all": [
+            103,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            13,
+            15
+          ],
+          "all": [
+            89,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            14,
+            15
+          ],
+          "all": [
+            99,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            4,
+            15
+          ],
+          "all": [
+            23,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            11,
+            15
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            9,
+            15
+          ],
+          "all": [
+            67,
+            107
+          ]
+        }
+      },
+      "group": "cncf",
+      "page": "tikv/compare.html",
+      "headline": "TiKV is 4th of the 15 CNCF graduated projects for how widely its commits are spread."
+    },
+    {
+      "name": "Apache Airflow",
+      "values": {
+        "commits": 8485.0,
+        "authors": 895.0,
+        "new_authors": 697.0,
+        "half_of_commits": 21.0,
+        "organizations": 21.0,
+        "ai_share": 0.03763183125599233
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            1,
+            10
+          ],
+          "all": [
+            14,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            1,
+            10
+          ],
+          "all": [
+            9,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            1,
+            10
+          ],
+          "all": [
+            10,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            1,
+            10
+          ],
+          "all": [
+            5,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            2,
+            10
+          ],
+          "all": [
+            11,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            5,
+            10
+          ],
+          "all": [
+            40,
+            107
+          ]
+        }
+      },
+      "group": "apache",
+      "page": "airflow/compare.html",
+      "headline": "Apache Airflow had more commits in the last 12 months than any other of the 10 Apache projects. It also had the most contributors."
+    },
+    {
+      "name": "Apache Spark",
+      "values": {
+        "commits": 4787.0,
+        "authors": 422.0,
+        "new_authors": 255.0,
+        "half_of_commits": 11.0,
+        "organizations": 24.0,
+        "ai_share": 0.41289640591966176
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            3,
+            10
+          ],
+          "all": [
+            24,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            3,
+            10
+          ],
+          "all": [
+            21,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            3,
+            10
+          ],
+          "all": [
+            25,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            4,
+            10
+          ],
+          "all": [
+            23,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            1,
+            10
+          ],
+          "all": [
+            8,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            1,
+            10
+          ],
+          "all": [
+            3,
+            107
+          ]
+        }
+      },
+      "group": "apache",
+      "page": "spark/compare.html",
+      "headline": "Apache Spark had more organizations committing to it than any other of the 10 Apache projects. It also had the largest share of AI-assisted commits."
+    },
+    {
+      "name": "Apache Kafka",
+      "values": {
+        "commits": 1987.0,
+        "authors": 252.0,
+        "new_authors": 149.0,
+        "half_of_commits": 19.0,
+        "organizations": 12.0,
+        "ai_share": 0.02636916835699797
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            5,
+            10
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            5,
+            10
+          ],
+          "all": [
+            36,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            6,
+            10
+          ],
+          "all": [
+            47,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            2,
+            10
+          ],
+          "all": [
+            6,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            4,
+            10
+          ],
+          "all": [
+            25,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            6,
+            10
+          ],
+          "all": [
+            48,
+            107
+          ]
+        }
+      },
+      "group": "apache",
+      "page": "kafka/compare.html",
+      "headline": "Apache Kafka is 2nd of the 10 Apache projects for how widely its commits are spread."
+    },
+    {
+      "name": "Apache Flink",
+      "values": {
+        "commits": 1448.0,
+        "authors": 169.0,
+        "new_authors": 90.0,
+        "half_of_commits": 8.0,
+        "organizations": 12.0,
+        "ai_share": 0.10594130279169649
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            7,
+            10
+          ],
+          "all": [
+            66,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            8,
+            10
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            8,
+            10
+          ],
+          "all": [
+            65,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            5,
+            10
+          ],
+          "all": [
+            32,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            4,
+            10
+          ],
+          "all": [
+            25,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            3,
+            10
+          ],
+          "all": [
+            18,
+            107
+          ]
+        }
+      },
+      "group": "apache",
+      "page": "flink/compare.html",
+      "headline": "Apache Flink is 3rd of the 10 Apache projects for AI-assisted commits."
+    },
+    {
+      "name": "Apache Arrow",
+      "values": {
+        "commits": 1347.0,
+        "authors": 217.0,
+        "new_authors": 153.0,
+        "half_of_commits": 7.0,
+        "organizations": 12.0,
+        "ai_share": 0.023792357606344627
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            9,
+            10
+          ],
+          "all": [
+            68,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            6,
+            10
+          ],
+          "all": [
+            44,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            5,
+            10
+          ],
+          "all": [
+            46,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            7,
+            10
+          ],
+          "all": [
+            35,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            4,
+            10
+          ],
+          "all": [
+            25,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            7,
+            10
+          ],
+          "all": [
+            52,
+            107
+          ]
+        }
+      },
+      "group": "apache",
+      "page": "arrow/compare.html",
+      "headline": "Apache Arrow sits in the middle of the 10 Apache projects; its highest place is 5th, for new contributors."
+    },
+    {
+      "name": "Apache Superset",
+      "values": {
+        "commits": 6002.0,
+        "authors": 468.0,
+        "new_authors": 391.0,
+        "half_of_commits": 6.0,
+        "organizations": 8.0,
+        "ai_share": 0.32270634077222815
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            2,
+            10
+          ],
+          "all": [
+            18,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            2,
+            10
+          ],
+          "all": [
+            18,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            2,
+            10
+          ],
+          "all": [
+            14,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            8,
+            10
+          ],
+          "all": [
+            42,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            8,
+            10
+          ],
+          "all": [
+            36,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            2,
+            10
+          ],
+          "all": [
+            5,
+            107
+          ]
+        }
+      },
+      "group": "apache",
+      "page": "superset/compare.html",
+      "headline": "Apache Superset is 2nd of the 10 Apache projects for commits. It is also 2nd for contributors."
+    },
+    {
+      "name": "Apache Cassandra",
+      "values": {
+        "commits": 995.0,
+        "authors": 88.0,
+        "new_authors": 34.0,
+        "half_of_commits": 4.0,
+        "organizations": 9.0,
+        "ai_share": 0.02268041237113402
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            10,
+            10
+          ],
+          "all": [
+            76,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            10,
+            10
+          ],
+          "all": [
+            81,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            10,
+            10
+          ],
+          "all": [
+            95,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            9,
+            10
+          ],
+          "all": [
+            55,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            7,
+            10
+          ],
+          "all": [
+            34,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            9,
+            10
+          ],
+          "all": [
+            56,
+            107
+          ]
+        }
+      },
+      "group": "apache",
+      "page": "cassandra/compare.html",
+      "headline": "Apache Cassandra ranks below most of the 10 Apache projects on every measure here; its highest place is 7th, for organizations committing."
+    },
+    {
+      "name": "Apache Beam",
+      "values": {
+        "commits": 2672.0,
+        "authors": 217.0,
+        "new_authors": 141.0,
+        "half_of_commits": 8.0,
+        "organizations": 6.0,
+        "ai_share": 0.023273273273273273
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            4,
+            10
+          ],
+          "all": [
+            46,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            6,
+            10
+          ],
+          "all": [
+            44,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            7,
+            10
+          ],
+          "all": [
+            51,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            5,
+            10
+          ],
+          "all": [
+            32,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            9,
+            10
+          ],
+          "all": [
+            39,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            8,
+            10
+          ],
+          "all": [
+            54,
+            107
+          ]
+        }
+      },
+      "group": "apache",
+      "page": "beam/compare.html",
+      "headline": "Apache Beam sits in the middle of the 10 Apache projects; its highest place is 4th, for commits."
+    },
+    {
+      "name": "Apache Iceberg",
+      "values": {
+        "commits": 1858.0,
+        "authors": 273.0,
+        "new_authors": 179.0,
+        "half_of_commits": 17.0,
+        "organizations": 16.0,
+        "ai_share": 0.05161998901702362
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            6,
+            10
+          ],
+          "all": [
+            59,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            4,
+            10
+          ],
+          "all": [
+            34,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            4,
+            10
+          ],
+          "all": [
+            35,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            3,
+            10
+          ],
+          "all": [
+            11,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            3,
+            10
+          ],
+          "all": [
+            20,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            4,
+            10
+          ],
+          "all": [
+            29,
+            107
+          ]
+        }
+      },
+      "group": "apache",
+      "page": "iceberg/compare.html",
+      "headline": "Apache Iceberg is 3rd of the 10 Apache projects for how widely its commits are spread. It is also 3rd for organizations committing."
+    },
+    {
+      "name": "Apache Pulsar",
+      "values": {
+        "commits": 1437.0,
+        "authors": 121.0,
+        "new_authors": 54.0,
+        "half_of_commits": 2.0,
+        "organizations": 5.0,
+        "ai_share": 0.01800327332242226
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            8,
+            10
+          ],
+          "all": [
+            67,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            9,
+            10
+          ],
+          "all": [
+            68,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            9,
+            10
+          ],
+          "all": [
+            85,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            10
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            10,
+            10
+          ],
+          "all": [
+            44,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            10,
+            10
+          ],
+          "all": [
+            60,
+            107
+          ]
+        }
+      },
+      "group": "apache",
+      "page": "pulsar/compare.html",
+      "headline": "Apache Pulsar ranks below most of the 10 Apache projects on every measure here; its highest place is 8th, for commits."
+    },
+    {
+      "name": "React",
+      "values": {
+        "commits": 609.0,
+        "authors": 99.0,
+        "new_authors": 65.0,
+        "half_of_commits": 5.0,
+        "organizations": 3.0,
+        "ai_share": 0.04582210242587601
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            9,
+            11
+          ],
+          "all": [
+            90,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            9,
+            11
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            9,
+            11
+          ],
+          "all": [
+            78,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            4,
+            11
+          ],
+          "all": [
+            49,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            3,
+            11
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            3,
+            11
+          ],
+          "all": [
+            34,
+            107
+          ]
+        }
+      },
+      "group": "frontend",
+      "page": "react/compare.html",
+      "headline": "React is 3rd of the 11 open source web frontend projects for AI-assisted commits."
+    },
+    {
+      "name": "Vue",
+      "values": {
+        "commits": 428.0,
+        "authors": 108.0,
+        "new_authors": 81.0,
+        "half_of_commits": 7.0,
+        "organizations": 1.0,
+        "ai_share": 0.0
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            10,
+            11
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            8,
+            11
+          ],
+          "all": [
+            74,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            8,
+            11
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            1,
+            11
+          ],
+          "all": [
+            35,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            7,
+            11
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            10,
+            11
+          ],
+          "all": [
+            99,
+            107
+          ]
+        }
+      },
+      "group": "frontend",
+      "page": "vue/compare.html",
+      "headline": "Vue ranks below most of the 11 open source web frontend projects on every measure here; its highest place is 8th, for contributors."
+    },
+    {
+      "name": "Angular",
+      "values": {
+        "commits": 3860.0,
+        "authors": 234.0,
+        "new_authors": 156.0,
+        "half_of_commits": 6.0,
+        "organizations": 4.0,
+        "ai_share": 0.0
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            2,
+            11
+          ],
+          "all": [
+            29,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            2,
+            11
+          ],
+          "all": [
+            38,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            4,
+            11
+          ],
+          "all": [
+            43,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            3,
+            11
+          ],
+          "all": [
+            42,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            2,
+            11
+          ],
+          "all": [
+            51,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            10,
+            11
+          ],
+          "all": [
+            99,
+            107
+          ]
+        }
+      },
+      "group": "frontend",
+      "page": "angular/compare.html",
+      "headline": "Angular is 2nd of the 11 open source web frontend projects for commits. It is also 2nd for contributors."
+    },
+    {
+      "name": "Svelte",
+      "values": {
+        "commits": 764.0,
+        "authors": 142.0,
+        "new_authors": 115.0,
+        "half_of_commits": 2.0,
+        "organizations": 1.0,
+        "ai_share": 0.02784503631961259
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            8,
+            11
+          ],
+          "all": [
+            83,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            6,
+            11
+          ],
+          "all": [
+            63,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            6,
+            11
+          ],
+          "all": [
+            59,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            7,
+            11
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            7,
+            11
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            7,
+            11
+          ],
+          "all": [
+            47,
+            107
+          ]
+        }
+      },
+      "group": "frontend",
+      "page": "svelte/compare.html",
+      "headline": "Svelte sits in the middle of the 11 open source web frontend projects; its highest place is 6th, for contributors."
+    },
+    {
+      "name": "Next.js",
+      "values": {
+        "commits": 4859.0,
+        "authors": 241.0,
+        "new_authors": 177.0,
+        "half_of_commits": 7.0,
+        "organizations": 3.0,
+        "ai_share": 0.04803054662379421
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            1,
+            11
+          ],
+          "all": [
+            23,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            1,
+            11
+          ],
+          "all": [
+            37,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            1,
+            11
+          ],
+          "all": [
+            37,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            1,
+            11
+          ],
+          "all": [
+            35,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            3,
+            11
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            2,
+            11
+          ],
+          "all": [
+            31,
+            107
+          ]
+        }
+      },
+      "group": "frontend",
+      "page": "nextjs/compare.html",
+      "headline": "Next.js had more commits in the last 12 months than any other of the 11 open source web frontend projects. It also had the most contributors."
+    },
+    {
+      "name": "Nuxt",
+      "values": {
+        "commits": 1590.0,
+        "authors": 178.0,
+        "new_authors": 119.0,
+        "half_of_commits": 1.0,
+        "organizations": 1.0,
+        "ai_share": 0.008201892744479496
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            6,
+            11
+          ],
+          "all": [
+            65,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            5,
+            11
+          ],
+          "all": [
+            56,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            5,
+            11
+          ],
+          "all": [
+            57,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            9,
+            11
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            7,
+            11
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            9,
+            11
+          ],
+          "all": [
+            76,
+            107
+          ]
+        }
+      },
+      "group": "frontend",
+      "page": "nuxt/compare.html",
+      "headline": "Nuxt sits in the middle of the 11 open source web frontend projects; its highest place is 5th, for contributors."
+    },
+    {
+      "name": "Vite",
+      "values": {
+        "commits": 1213.0,
+        "authors": 221.0,
+        "new_authors": 175.0,
+        "half_of_commits": 2.0,
+        "organizations": 2.0,
+        "ai_share": 0.03805668016194332
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            7,
+            11
+          ],
+          "all": [
+            71,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            3,
+            11
+          ],
+          "all": [
+            42,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            2,
+            11
+          ],
+          "all": [
+            38,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            7,
+            11
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            5,
+            11
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            5,
+            11
+          ],
+          "all": [
+            39,
+            107
+          ]
+        }
+      },
+      "group": "frontend",
+      "page": "vite/compare.html",
+      "headline": "Vite is 2nd of the 11 open source web frontend projects for new contributors. It is also 3rd for contributors."
+    },
+    {
+      "name": "Astro",
+      "values": {
+        "commits": 2313.0,
+        "authors": 211.0,
+        "new_authors": 167.0,
+        "half_of_commits": 4.0,
+        "organizations": 5.0,
+        "ai_share": 0.010902747492368076
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            3,
+            11
+          ],
+          "all": [
+            52,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            4,
+            11
+          ],
+          "all": [
+            48,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            3,
+            11
+          ],
+          "all": [
+            40,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            5,
+            11
+          ],
+          "all": [
+            55,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            1,
+            11
+          ],
+          "all": [
+            44,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            8,
+            11
+          ],
+          "all": [
+            72,
+            107
+          ]
+        }
+      },
+      "group": "frontend",
+      "page": "astro/compare.html",
+      "headline": "Astro had more organizations committing to it than any other of the 11 open source web frontend projects. It is also 3rd for commits."
+    },
+    {
+      "name": "Tailwind CSS",
+      "values": {
+        "commits": 379.0,
+        "authors": 66.0,
+        "new_authors": 58.0,
+        "half_of_commits": 1.0,
+        "organizations": 0.0,
+        "ai_share": 0.03155339805825243
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            11,
+            11
+          ],
+          "all": [
+            94,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            10,
+            11
+          ],
+          "all": [
+            89,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            10,
+            11
+          ],
+          "all": [
+            82,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            9,
+            11
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            11,
+            11
+          ],
+          "all": [
+            102,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            6,
+            11
+          ],
+          "all": [
+            45,
+            107
+          ]
+        }
+      },
+      "group": "frontend",
+      "page": "tailwindcss/compare.html",
+      "headline": "Tailwind CSS sits in the middle of the 11 open source web frontend projects; its highest place is 6th, for AI-assisted commits."
+    },
+    {
+      "name": "webpack",
+      "values": {
+        "commits": 2000.0,
+        "authors": 48.0,
+        "new_authors": 36.0,
+        "half_of_commits": 1.0,
+        "organizations": 1.0,
+        "ai_share": 0.03910950661853189
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            4,
+            11
+          ],
+          "all": [
+            57,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            11,
+            11
+          ],
+          "all": [
+            94,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            11,
+            11
+          ],
+          "all": [
+            93,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            9,
+            11
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            7,
+            11
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            4,
+            11
+          ],
+          "all": [
+            37,
+            107
+          ]
+        }
+      },
+      "group": "frontend",
+      "page": "webpack/compare.html",
+      "headline": "webpack sits in the middle of the 11 open source web frontend projects; its highest place is 4th, for commits."
+    },
+    {
+      "name": "TypeScript",
+      "values": {
+        "commits": 1795.0,
+        "authors": 137.0,
+        "new_authors": 98.0,
+        "half_of_commits": 3.0,
+        "organizations": 2.0,
+        "ai_share": 0.212882096069869
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            5,
+            11
+          ],
+          "all": [
+            60,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            7,
+            11
+          ],
+          "all": [
+            65,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            7,
+            11
+          ],
+          "all": [
+            63,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            6,
+            11
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            5,
+            11
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            1,
+            11
+          ],
+          "all": [
+            10,
+            107
+          ]
+        }
+      },
+      "group": "frontend",
+      "page": "typescript/compare.html",
+      "headline": "TypeScript had a larger share of commits that name an AI coding assistant than any other of the 11 open source web frontend projects."
+    },
+    {
+      "name": "Apache Dubbo",
+      "values": {
+        "commits": 334.0,
+        "authors": 46.0,
+        "new_authors": 38.0,
+        "half_of_commits": 4.0,
+        "organizations": 2.0,
+        "ai_share": 0.023668639053254437
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            11,
+            16
+          ],
+          "all": [
+            97,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            12,
+            16
+          ],
+          "all": [
+            96,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            10,
+            16
+          ],
+          "all": [
+            91,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            7,
+            16
+          ],
+          "all": [
+            55,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            8,
+            16
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            6,
+            16
+          ],
+          "all": [
+            53,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "dubbo/compare.html",
+      "headline": "Apache Dubbo sits in the middle of the 16 open source projects from China; its highest place is 6th, for AI-assisted commits."
+    },
+    {
+      "name": "Apache ShardingSphere",
+      "values": {
+        "commits": 2891.0,
+        "authors": 65.0,
+        "new_authors": 44.0,
+        "half_of_commits": 1.0,
+        "organizations": 1.0,
+        "ai_share": 0.020530973451327435
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            3,
+            16
+          ],
+          "all": [
+            44,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            9,
+            16
+          ],
+          "all": [
+            91,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            9,
+            16
+          ],
+          "all": [
+            89,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            13,
+            16
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            13,
+            16
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            8,
+            16
+          ],
+          "all": [
+            58,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "shardingsphere/compare.html",
+      "headline": "Apache ShardingSphere is 3rd of the 16 open source projects from China for commits."
+    },
+    {
+      "name": "Apache Doris",
+      "values": {
+        "commits": 4457.0,
+        "authors": 164.0,
+        "new_authors": 74.0,
+        "half_of_commits": 17.0,
+        "organizations": 3.0,
+        "ai_share": 0.04358626919602529
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            2,
+            16
+          ],
+          "all": [
+            26,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            4,
+            16
+          ],
+          "all": [
+            59,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            3,
+            16
+          ],
+          "all": [
+            74,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            1,
+            16
+          ],
+          "all": [
+            11,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            4,
+            16
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            5,
+            16
+          ],
+          "all": [
+            35,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "doris/compare.html",
+      "headline": "Apache Doris had more people behind half of its commits than any other of the 16 open source projects from China. It is also 2nd for commits."
+    },
+    {
+      "name": "Apache ECharts",
+      "values": {
+        "commits": 240.0,
+        "authors": 22.0,
+        "new_authors": 16.0,
+        "half_of_commits": 1.0,
+        "organizations": 1.0,
+        "ai_share": 0.0
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            15,
+            16
+          ],
+          "all": [
+            102,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            15,
+            16
+          ],
+          "all": [
+            104,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            14,
+            16
+          ],
+          "all": [
+            103,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            13,
+            16
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            13,
+            16
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            15,
+            16
+          ],
+          "all": [
+            99,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "echarts/compare.html",
+      "headline": "Apache ECharts ranks below most of the 16 open source projects from China on every measure here; its highest place is 14th, for new contributors."
+    },
+    {
+      "name": "Apache DolphinScheduler",
+      "values": {
+        "commits": 352.0,
+        "authors": 67.0,
+        "new_authors": 52.0,
+        "half_of_commits": 2.0,
+        "organizations": 2.0,
+        "ai_share": 0.0029411764705882353
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            10,
+            16
+          ],
+          "all": [
+            96,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            8,
+            16
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            8,
+            16
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            16
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            8,
+            16
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            11,
+            16
+          ],
+          "all": [
+            86,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "dolphinscheduler/compare.html",
+      "headline": "Apache DolphinScheduler sits in the middle of the 16 open source projects from China; its highest place is 8th, for contributors."
+    },
+    {
+      "name": "Apache SkyWalking",
+      "values": {
+        "commits": 273.0,
+        "authors": 25.0,
+        "new_authors": 15.0,
+        "half_of_commits": 1.0,
+        "organizations": 2.0,
+        "ai_share": 0.0037593984962406013
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            14,
+            16
+          ],
+          "all": [
+            101,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            14,
+            16
+          ],
+          "all": [
+            103,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            15,
+            16
+          ],
+          "all": [
+            104,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            13,
+            16
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            8,
+            16
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            10,
+            16
+          ],
+          "all": [
+            83,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "skywalking/compare.html",
+      "headline": "Apache SkyWalking sits in the middle of the 16 open source projects from China; its highest place is 10th, for AI-assisted commits."
+    },
+    {
+      "name": "Apache RocketMQ",
+      "values": {
+        "commits": 322.0,
+        "authors": 64.0,
+        "new_authors": 37.0,
+        "half_of_commits": 6.0,
+        "organizations": 2.0,
+        "ai_share": 0.021806853582554516
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            12,
+            16
+          ],
+          "all": [
+            98,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            10,
+            16
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            11,
+            16
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            6,
+            16
+          ],
+          "all": [
+            42,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            8,
+            16
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            7,
+            16
+          ],
+          "all": [
+            57,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "rocketmq/compare.html",
+      "headline": "Apache RocketMQ sits in the middle of the 16 open source projects from China; its highest place is 6th, for how widely its commits are spread."
+    },
+    {
+      "name": "Apache APISIX",
+      "values": {
+        "commits": 615.0,
+        "authors": 58.0,
+        "new_authors": 36.0,
+        "half_of_commits": 2.0,
+        "organizations": 2.0,
+        "ai_share": 0.0016366612111292963
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            9,
+            16
+          ],
+          "all": [
+            88,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            11,
+            16
+          ],
+          "all": [
+            93,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            12,
+            16
+          ],
+          "all": [
+            93,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            16
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            8,
+            16
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            13,
+            16
+          ],
+          "all": [
+            91,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "apisix/compare.html",
+      "headline": "Apache APISIX sits in the middle of the 16 open source projects from China; its highest place is 9th, for commits."
+    },
+    {
+      "name": "TiDB",
+      "values": {
+        "commits": 1707.0,
+        "authors": 138.0,
+        "new_authors": 55.0,
+        "half_of_commits": 9.0,
+        "organizations": 4.0,
+        "ai_share": 0.002280501710376283
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            7,
+            16
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            5,
+            16
+          ],
+          "all": [
+            64,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            7,
+            16
+          ],
+          "all": [
+            84,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            4,
+            16
+          ],
+          "all": [
+            28,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            3,
+            16
+          ],
+          "all": [
+            51,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            12,
+            16
+          ],
+          "all": [
+            89,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "tidb/compare.html",
+      "headline": "TiDB is 3rd of the 16 open source projects from China for organizations committing. It is also 4th for how widely its commits are spread."
+    },
+    {
+      "name": "Milvus",
+      "values": {
+        "commits": 2499.0,
+        "authors": 102.0,
+        "new_authors": 56.0,
+        "half_of_commits": 10.0,
+        "organizations": 3.0,
+        "ai_share": 0.2663702506063056
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            4,
+            16
+          ],
+          "all": [
+            47,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            6,
+            16
+          ],
+          "all": [
+            76,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            6,
+            16
+          ],
+          "all": [
+            83,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            2,
+            16
+          ],
+          "all": [
+            25,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            4,
+            16
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            2,
+            16
+          ],
+          "all": [
+            8,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "milvus/compare.html",
+      "headline": "Milvus is 2nd of the 16 open source projects from China for AI-assisted commits. It is also 4th for commits."
+    },
+    {
+      "name": "Nacos",
+      "values": {
+        "commits": 767.0,
+        "authors": 81.0,
+        "new_authors": 60.0,
+        "half_of_commits": 3.0,
+        "organizations": 3.0,
+        "ai_share": 0.36723910171730517
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            8,
+            16
+          ],
+          "all": [
+            82,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            7,
+            16
+          ],
+          "all": [
+            85,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            5,
+            16
+          ],
+          "all": [
+            81,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            9,
+            16
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            4,
+            16
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            1,
+            16
+          ],
+          "all": [
+            4,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "nacos/compare.html",
+      "headline": "Nacos had a larger share of commits that name an AI coding assistant than any other of the 16 open source projects from China."
+    },
+    {
+      "name": "Ant Design",
+      "values": {
+        "commits": 2348.0,
+        "authors": 192.0,
+        "new_authors": 143.0,
+        "half_of_commits": 4.0,
+        "organizations": 1.0,
+        "ai_share": 0.11433108376339818
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            5,
+            16
+          ],
+          "all": [
+            51,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            2,
+            16
+          ],
+          "all": [
+            51,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            2,
+            16
+          ],
+          "all": [
+            50,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            7,
+            16
+          ],
+          "all": [
+            55,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            13,
+            16
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            3,
+            16
+          ],
+          "all": [
+            16,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "ant-design/compare.html",
+      "headline": "Ant Design is 2nd of the 16 open source projects from China for contributors. It is also 2nd for new contributors."
+    },
+    {
+      "name": "PaddlePaddle",
+      "values": {
+        "commits": 2084.0,
+        "authors": 184.0,
+        "new_authors": 74.0,
+        "half_of_commits": 10.0,
+        "organizations": 5.0,
+        "ai_share": 0.04928989139515455
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            6,
+            16
+          ],
+          "all": [
+            55,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            3,
+            16
+          ],
+          "all": [
+            55,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            3,
+            16
+          ],
+          "all": [
+            74,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            2,
+            16
+          ],
+          "all": [
+            25,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            2,
+            16
+          ],
+          "all": [
+            44,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            4,
+            16
+          ],
+          "all": [
+            30,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "paddle/compare.html",
+      "headline": "PaddlePaddle is 2nd of the 16 open source projects from China for organizations committing. It is also 3rd for contributors."
+    },
+    {
+      "name": "KubeEdge",
+      "values": {
+        "commits": 294.0,
+        "authors": 41.0,
+        "new_authors": 31.0,
+        "half_of_commits": 2.0,
+        "organizations": 3.0,
+        "ai_share": 0.015822784810126583
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            13,
+            16
+          ],
+          "all": [
+            99,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            13,
+            16
+          ],
+          "all": [
+            99,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            13,
+            16
+          ],
+          "all": [
+            98,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            16
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            4,
+            16
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            9,
+            16
+          ],
+          "all": [
+            65,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "kubeedge/compare.html",
+      "headline": "KubeEdge sits in the middle of the 16 open source projects from China; its highest place is 9th, for AI-assisted commits."
+    },
+    {
+      "name": "OpenHarmony ArkUI",
+      "values": {
+        "commits": 17098.0,
+        "authors": 509.0,
+        "new_authors": 194.0,
+        "half_of_commits": 7.0,
+        "organizations": 6.0,
+        "ai_share": 0.0013453378867846425
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            1,
+            16
+          ],
+          "all": [
+            7,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            1,
+            16
+          ],
+          "all": [
+            15,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            1,
+            16
+          ],
+          "all": [
+            32,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            5,
+            16
+          ],
+          "all": [
+            35,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            1,
+            16
+          ],
+          "all": [
+            39,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            14,
+            16
+          ],
+          "all": [
+            92,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "openharmony-arkui/compare.html",
+      "headline": "OpenHarmony ArkUI had more commits in the last 12 months than any other of the 16 open source projects from China. It also had the most contributors."
+    },
+    {
+      "name": "OpenHarmony LiteOS-A",
+      "values": {
+        "commits": 84.0,
+        "authors": 2.0,
+        "new_authors": 0.0,
+        "half_of_commits": 1.0,
+        "organizations": 0.0,
+        "ai_share": 0.0
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            16,
+            16
+          ],
+          "all": [
+            107,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            16,
+            16
+          ],
+          "all": [
+            107,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            16,
+            16
+          ],
+          "all": [
+            106,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            13,
+            16
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            16,
+            16
+          ],
+          "all": [
+            102,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            15,
+            16
+          ],
+          "all": [
+            99,
+            107
+          ]
+        }
+      },
+      "group": "china",
+      "page": "openharmony-liteos-a/compare.html",
+      "headline": "OpenHarmony LiteOS-A had fewer commits in the last 12 months than any other of the 16 open source projects from China."
+    },
+    {
+      "name": "Git",
+      "values": {
+        "commits": 3625.0,
+        "authors": 219.0,
+        "new_authors": 134.0,
+        "half_of_commits": 3.0,
+        "organizations": 14.0,
+        "ai_share": 0.02441531739912619
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            8,
+            14
+          ],
+          "all": [
+            33,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            7,
+            14
+          ],
+          "all": [
+            43,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            9,
+            14
+          ],
+          "all": [
+            53,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            8,
+            14
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            5,
+            14
+          ],
+          "all": [
+            22,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            7,
+            14
+          ],
+          "all": [
+            50,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "git/compare.html",
+      "headline": "Git sits in the middle of the 14 open source languages and developer tools; its highest place is 5th, for organizations committing."
+    },
+    {
+      "name": "VS Code",
+      "values": {
+        "commits": 27366.0,
+        "authors": 457.0,
+        "new_authors": 338.0,
+        "half_of_commits": 14.0,
+        "organizations": 7.0,
+        "ai_share": 0.2553989919429013
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            2,
+            14
+          ],
+          "all": [
+            3,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            3,
+            14
+          ],
+          "all": [
+            19,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            3,
+            14
+          ],
+          "all": [
+            20,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            4,
+            14
+          ],
+          "all": [
+            20,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            6,
+            14
+          ],
+          "all": [
+            37,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            1,
+            14
+          ],
+          "all": [
+            9,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "vscode/compare.html",
+      "headline": "VS Code had a larger share of commits that name an AI coding assistant than any other of the 14 open source languages and developer tools. It is also 2nd for commits."
+    },
+    {
+      "name": "Node.js",
+      "values": {
+        "commits": 3815.0,
+        "authors": 427.0,
+        "new_authors": 269.0,
+        "half_of_commits": 9.0,
+        "organizations": 19.0,
+        "ai_share": 0.13148049171566006
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            7,
+            14
+          ],
+          "all": [
+            30,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            4,
+            14
+          ],
+          "all": [
+            20,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            4,
+            14
+          ],
+          "all": [
+            24,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            5,
+            14
+          ],
+          "all": [
+            28,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            3,
+            14
+          ],
+          "all": [
+            15,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            3,
+            14
+          ],
+          "all": [
+            14,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "nodejs/compare.html",
+      "headline": "Node.js is 3rd of the 14 open source languages and developer tools for organizations committing. It is also 3rd for AI-assisted commits."
+    },
+    {
+      "name": "Rust",
+      "values": {
+        "commits": 33254.0,
+        "authors": 1310.0,
+        "new_authors": 778.0,
+        "half_of_commits": 15.0,
+        "organizations": 62.0,
+        "ai_share": 0.00041575102452931045
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            1,
+            14
+          ],
+          "all": [
+            1,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            1,
+            14
+          ],
+          "all": [
+            5,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            2,
+            14
+          ],
+          "all": [
+            9,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            2,
+            14
+          ],
+          "all": [
+            14,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            1,
+            14
+          ],
+          "all": [
+            2,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            12,
+            14
+          ],
+          "all": [
+            97,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "rust/compare.html",
+      "headline": "Rust had more commits in the last 12 months than any other of the 14 open source languages and developer tools. It also had the most contributors."
+    },
+    {
+      "name": "Go",
+      "values": {
+        "commits": 3453.0,
+        "authors": 330.0,
+        "new_authors": 181.0,
+        "half_of_commits": 15.0,
+        "organizations": 21.0,
+        "ai_share": 0.0039303761931499155
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            10,
+            14
+          ],
+          "all": [
+            37,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            5,
+            14
+          ],
+          "all": [
+            28,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            6,
+            14
+          ],
+          "all": [
+            34,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            2,
+            14
+          ],
+          "all": [
+            14,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            2,
+            14
+          ],
+          "all": [
+            11,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            11,
+            14
+          ],
+          "all": [
+            82,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "go/compare.html",
+      "headline": "Go is 2nd of the 14 open source languages and developer tools for organizations committing."
+    },
+    {
+      "name": "Deno",
+      "values": {
+        "commits": 2934.0,
+        "authors": 196.0,
+        "new_authors": 155.0,
+        "half_of_commits": 2.0,
+        "organizations": 3.0,
+        "ai_share": 0.14262023217247097
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            12,
+            14
+          ],
+          "all": [
+            43,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            8,
+            14
+          ],
+          "all": [
+            50,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            7,
+            14
+          ],
+          "all": [
+            44,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            14
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            9,
+            14
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            2,
+            14
+          ],
+          "all": [
+            12,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "deno/compare.html",
+      "headline": "Deno is 2nd of the 14 open source languages and developer tools for AI-assisted commits."
+    },
+    {
+      "name": "Bun",
+      "values": {
+        "commits": 4599.0,
+        "authors": 85.0,
+        "new_authors": 62.0,
+        "half_of_commits": 1.0,
+        "organizations": 2.0,
+        "ai_share": 0.10662080825451418
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            5,
+            14
+          ],
+          "all": [
+            25,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            12,
+            14
+          ],
+          "all": [
+            84,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            12,
+            14
+          ],
+          "all": [
+            79,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            14,
+            14
+          ],
+          "all": [
+            92,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            11,
+            14
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            4,
+            14
+          ],
+          "all": [
+            17,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "bun/compare.html",
+      "headline": "Bun is 4th of the 14 open source languages and developer tools for AI-assisted commits."
+    },
+    {
+      "name": "Zed",
+      "values": {
+        "commits": 8194.0,
+        "authors": 1169.0,
+        "new_authors": 990.0,
+        "half_of_commits": 17.0,
+        "organizations": 5.0,
+        "ai_share": 0.016639889832453524
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            3,
+            14
+          ],
+          "all": [
+            15,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            2,
+            14
+          ],
+          "all": [
+            6,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            1,
+            14
+          ],
+          "all": [
+            4,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            1,
+            14
+          ],
+          "all": [
+            11,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            7,
+            14
+          ],
+          "all": [
+            44,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            9,
+            14
+          ],
+          "all": [
+            63,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "zed/compare.html",
+      "headline": "Zed had more new contributors in the last 12 months than any other of the 14 open source languages and developer tools. It also had the most people behind half of its commits."
+    },
+    {
+      "name": "Neovim",
+      "values": {
+        "commits": 4198.0,
+        "authors": 285.0,
+        "new_authors": 205.0,
+        "half_of_commits": 2.0,
+        "organizations": 1.0,
+        "ai_share": 0.013038416763678696
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            6,
+            14
+          ],
+          "all": [
+            28,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            6,
+            14
+          ],
+          "all": [
+            33,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            5,
+            14
+          ],
+          "all": [
+            29,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            14
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            13,
+            14
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            10,
+            14
+          ],
+          "all": [
+            70,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "neovim/compare.html",
+      "headline": "Neovim sits in the middle of the 14 open source languages and developer tools; its highest place is 5th, for new contributors."
+    },
+    {
+      "name": "Homebrew",
+      "values": {
+        "commits": 6323.0,
+        "authors": 191.0,
+        "new_authors": 125.0,
+        "half_of_commits": 2.0,
+        "organizations": 3.0,
+        "ai_share": 0.02973445698839243
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            4,
+            14
+          ],
+          "all": [
+            17,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            9,
+            14
+          ],
+          "all": [
+            52,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            10,
+            14
+          ],
+          "all": [
+            55,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            14
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            9,
+            14
+          ],
+          "all": [
+            58,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            6,
+            14
+          ],
+          "all": [
+            46,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "homebrew/compare.html",
+      "headline": "Homebrew is 4th of the 14 open source languages and developer tools for commits."
+    },
+    {
+      "name": "nginx",
+      "values": {
+        "commits": 288.0,
+        "authors": 45.0,
+        "new_authors": 32.0,
+        "half_of_commits": 3.0,
+        "organizations": 2.0,
+        "ai_share": 0.017421602787456445
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            14,
+            14
+          ],
+          "all": [
+            100,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            13,
+            14
+          ],
+          "all": [
+            97,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            13,
+            14
+          ],
+          "all": [
+            97,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            8,
+            14
+          ],
+          "all": [
+            62,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            11,
+            14
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            8,
+            14
+          ],
+          "all": [
+            61,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "nginx/compare.html",
+      "headline": "nginx sits in the middle of the 14 open source languages and developer tools; its highest place is 8th, for AI-assisted commits."
+    },
+    {
+      "name": "curl",
+      "values": {
+        "commits": 3529.0,
+        "authors": 187.0,
+        "new_authors": 144.0,
+        "half_of_commits": 2.0,
+        "organizations": 17.0,
+        "ai_share": 0.0
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            9,
+            14
+          ],
+          "all": [
+            34,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            10,
+            14
+          ],
+          "all": [
+            53,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            8,
+            14
+          ],
+          "all": [
+            49,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            10,
+            14
+          ],
+          "all": [
+            77,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            4,
+            14
+          ],
+          "all": [
+            17,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            13,
+            14
+          ],
+          "all": [
+            99,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "curl/compare.html",
+      "headline": "curl is 4th of the 14 open source languages and developer tools for organizations committing."
+    },
+    {
+      "name": "Redis",
+      "values": {
+        "commits": 584.0,
+        "authors": 118.0,
+        "new_authors": 83.0,
+        "half_of_commits": 9.0,
+        "organizations": 4.0,
+        "ai_share": 0.03633217993079585
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            13,
+            14
+          ],
+          "all": [
+            91,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            11,
+            14
+          ],
+          "all": [
+            70,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            11,
+            14
+          ],
+          "all": [
+            69,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            5,
+            14
+          ],
+          "all": [
+            28,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            8,
+            14
+          ],
+          "all": [
+            51,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            5,
+            14
+          ],
+          "all": [
+            44,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "redis/compare.html",
+      "headline": "Redis sits in the middle of the 14 open source languages and developer tools; its highest place is 5th, for AI-assisted commits."
+    },
+    {
+      "name": "PostgreSQL",
+      "values": {
+        "commits": 3271.0,
+        "authors": 30.0,
+        "new_authors": 0.0,
+        "half_of_commits": 6.0,
+        "organizations": 1.0,
+        "ai_share": 0.0
+      },
+      "ranks": {
+        "commits": {
+          "group": [
+            11,
+            14
+          ],
+          "all": [
+            39,
+            107
+          ]
+        },
+        "authors": {
+          "group": [
+            14,
+            14
+          ],
+          "all": [
+            102,
+            107
+          ]
+        },
+        "new_authors": {
+          "group": [
+            14,
+            14
+          ],
+          "all": [
+            106,
+            107
+          ]
+        },
+        "half_of_commits": {
+          "group": [
+            7,
+            14
+          ],
+          "all": [
+            42,
+            107
+          ]
+        },
+        "organizations": {
+          "group": [
+            13,
+            14
+          ],
+          "all": [
+            87,
+            107
+          ]
+        },
+        "ai_share": {
+          "group": [
+            13,
+            14
+          ],
+          "all": [
+            99,
+            107
+          ]
+        }
+      },
+      "group": "devtools",
+      "page": "postgres/compare.html",
+      "headline": "PostgreSQL sits in the middle of the 14 open source languages and developer tools; its highest place is 7th, for how widely its commits are spread."
+    }
+  ]
+}

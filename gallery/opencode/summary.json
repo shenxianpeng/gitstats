@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:10:52+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:45:16+00:00",
   "name": "OpenCode",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-10-23 15:06:35",
+  "last_commit": "2026-10-23 16:11:22",
   "age_days": 581,
   "active_days": 568,
-  "total_commits": 20804,
+  "total_commits": 20814,
   "total_authors": 1026,
   "active_authors_12mo": 849,
-  "commits_last_12mo": 17200,
-  "total_files": 8599,
-  "total_lines": 1387821,
-  "lines_added": 4374020,
-  "lines_removed": 2986199,
+  "commits_last_12mo": 17210,
+  "total_files": 8616,
+  "total_lines": 1389175,
+  "lines_added": 4375656,
+  "lines_removed": 2986481,
   "total_tags": 917,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Aiden Cline",
-      "commits": 2368
+      "commits": 2375
     },
     {
       "name": "Kit Langton",
@@ -41,7 +41,9 @@
     }
   ],
   "author_commits": {
-    "Aiden Cline": 2368,
+    "Aiden Cline": 2375,
+    "Dax": 438,
+    "Victor Navarro": 105,
     "Filip": 120,
     "opencode": 633,
     "Luke Parker": 621,
@@ -50,7 +52,6 @@
     "DS": 23,
     "Imamuzzaki Abu Salam": 1,
     "James Long": 355,
-    "Dax": 437,
     "Adam": 1471,
     "ANSH SINGH": 1,
     "ANIRUDDHA ADAK": 1,
@@ -58,7 +59,6 @@
     "Kit Langton": 2165,
     "MohammadAlMasalmeh": 1,
     "Frank": 924,
-    "Victor Navarro": 104,
     "Rhys Sullivan": 5,
     "Aarav Sareen": 86,
     "Rich Rauenzahn": 1,
@@ -1070,7 +1070,7 @@
   },
   "commits_by_year": {
     "2025": 6529,
-    "2026": 14275
+    "2026": 14285
   },
   "ai_assisted": {
     "commits": 136,
@@ -1132,19 +1132,19 @@
       "2026-07": 1581,
       "2026-08": 1996,
       "2026-09": 1496,
-      "2026-10": 990
+      "2026-10": 1000
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20804,
+    "commits": 20814,
     "by_kind": {
       "organization": 1703,
-      "one_person": 3979,
-      "personal": 5526,
-      "hidden": 6011,
+      "one_person": 3980,
+      "personal": 5527,
+      "hidden": 6018,
       "unknown": 1,
-      "bot": 3584
+      "bot": 3585
     },
     "organization_count": 4,
     "last_12mo_from": "2025-11",
@@ -1241,12 +1241,20 @@
       },
       "2026-Q4": {
         "organization": 46,
-        "one_person": 63,
-        "personal": 276,
-        "hidden": 414,
+        "one_person": 64,
+        "personal": 277,
+        "hidden": 421,
         "unknown": 0,
-        "bot": 191
+        "bot": 192
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 14611,
+    "authors": 834,
+    "new_authors": 780,
+    "half_of_commits": 5
   }
 }

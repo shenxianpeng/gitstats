@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:15:46+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:50:23+00:00",
   "name": "Angular",
   "report_path": "index.html",
   "first_commit": "2014-09-18 16:12:01",
-  "last_commit": "2026-10-23 05:33:41",
+  "last_commit": "2026-10-23 12:44:27",
   "age_days": 4418,
   "active_days": 4190,
-  "total_commits": 39033,
+  "total_commits": 39035,
   "total_authors": 2483,
   "active_authors_12mo": 239,
-  "commits_last_12mo": 3858,
+  "commits_last_12mo": 3860,
   "total_files": 11725,
-  "total_lines": 1951463,
-  "lines_added": 8978027,
-  "lines_removed": 7026564,
+  "total_lines": 1951701,
+  "lines_added": 8978395,
+  "lines_removed": 7026694,
   "total_tags": 494,
   "era": "steady",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "Angular Robot",
-      "commits": 1565
+      "commits": 1566
     },
     {
       "name": "Kristiyan Kostadinov",
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Angular Robot": 1566,
+    "Charles Lyding": 147,
     "Kam": 249,
     "Matthieu Riegler": 1315,
     "Matthew Beck": 94,
@@ -50,7 +52,6 @@
     "Andrew Scott": 1415,
     "aparziale": 76,
     "jaybell": 5,
-    "Angular Robot": 1565,
     "\u041c\u0430\u043a\u0441\u0438\u043c \u0418\u0432\u0430\u043d\u043e\u0432": 29,
     "Kristiyan Kostadinov": 1564,
     "Minho Yoo": 3,
@@ -59,7 +60,6 @@
     "lazerg": 12,
     "Doug Parker": 252,
     "Naveed Khan": 6,
-    "Charles Lyding": 146,
     "diegoinost02": 5,
     "Michael Small": 28,
     "Alon Mishne": 17,
@@ -2538,7 +2538,7 @@
     "2023": 2978,
     "2024": 2880,
     "2025": 4050,
-    "2026": 3039
+    "2026": 3041
   },
   "ai_assisted": {
     "commits": 3,
@@ -2596,17 +2596,17 @@
       "2026-07": 233,
       "2026-08": 236,
       "2026-09": 358,
-      "2026-10": 312
+      "2026-10": 314
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39033,
+    "commits": 39035,
     "by_kind": {
-      "organization": 9213,
+      "organization": 9214,
       "one_person": 8737,
       "personal": 18108,
-      "hidden": 2324,
+      "hidden": 2325,
       "unknown": 1,
       "bot": 650
     },
@@ -2615,11 +2615,11 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 7777,
-        "commits_last_12mo": 884,
+        "commits": 7778,
+        "commits_last_12mo": 885,
         "addresses": 137,
         "first_commit": "2014-10-28",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "angular.io",
@@ -2856,13 +2856,21 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 43,
+        "organization": 44,
         "one_person": 122,
         "personal": 125,
-        "hidden": 22,
+        "hidden": 23,
         "unknown": 0,
         "bot": 0
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 3860,
+    "authors": 234,
+    "new_authors": 156,
+    "half_of_commits": 6
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:18:53+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:53:44+00:00",
   "name": "Neovim",
   "report_path": "index.html",
   "first_commit": "2014-01-31 13:39:15",
-  "last_commit": "2026-10-22 03:00:01",
-  "age_days": 4647,
-  "active_days": 4499,
-  "total_commits": 38551,
-  "total_authors": 1504,
-  "active_authors_12mo": 288,
-  "commits_last_12mo": 4197,
+  "last_commit": "2026-10-23 14:37:40",
+  "age_days": 4649,
+  "active_days": 4500,
+  "total_commits": 38552,
+  "total_authors": 1505,
+  "active_authors_12mo": 289,
+  "commits_last_12mo": 4198,
   "total_files": 3940,
-  "total_lines": 1738754,
-  "lines_added": 3708181,
-  "lines_removed": 1969427,
+  "total_lines": 1738792,
+  "lines_added": 3708221,
+  "lines_removed": 1969429,
   "total_tags": 26,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Douglas Camata": 1,
     "zeertzjq": 7145,
     "Andrea Covelli": 1,
     "Justin M. Keyes": 5057,
@@ -1559,7 +1560,7 @@
     "2023": 3985,
     "2024": 3283,
     "2025": 3384,
-    "2026": 3672
+    "2026": 3673
   },
   "ai_assisted": {
     "commits": 57,
@@ -1618,17 +1619,17 @@
       "2026-07": 420,
       "2026-08": 428,
       "2026-09": 404,
-      "2026-10": 214
+      "2026-10": 215
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38551,
+    "commits": 38552,
     "by_kind": {
       "organization": 34,
       "one_person": 6593,
       "personal": 29892,
-      "hidden": 1856,
+      "hidden": 1857,
       "unknown": 17,
       "bot": 159
     },
@@ -1761,10 +1762,18 @@
         "organization": 0,
         "one_person": 35,
         "personal": 162,
-        "hidden": 10,
+        "hidden": 11,
         "unknown": 0,
         "bot": 7
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 4089,
+    "authors": 285,
+    "new_authors": 205,
+    "half_of_commits": 2
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:14:23+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:49:28+00:00",
   "name": "Apache Spark",
   "report_path": "index.html",
   "first_commit": "2010-03-29 23:17:55",
-  "last_commit": "2026-10-23 12:52:57",
+  "last_commit": "2026-10-23 16:24:26",
   "age_days": 6052,
   "active_days": 5305,
-  "total_commits": 50679,
-  "total_authors": 3083,
-  "active_authors_12mo": 427,
-  "commits_last_12mo": 4783,
+  "total_commits": 50683,
+  "total_authors": 3084,
+  "active_authors_12mo": 428,
+  "commits_last_12mo": 4787,
   "total_files": 27598,
-  "total_lines": 4382536,
-  "lines_added": 7824652,
-  "lines_removed": 3442116,
+  "total_lines": 4383219,
+  "lines_added": 7825527,
+  "lines_removed": 3442308,
   "total_tags": 11,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,10 @@
     }
   ],
   "author_commits": {
+    "Chiran Ravani": 3,
+    "Wenchen Fan": 1424,
+    "bojana-db": 14,
+    "hu hengrui": 1,
     "Luka Zdravi\u0107": 18,
     "Dongjoon Hyun": 2621,
     "Ruifeng Zheng": 2031,
@@ -89,7 +93,6 @@
     "Boyang Jerry Peng": 54,
     "Pavan51": 1,
     "Ganesha S": 30,
-    "Wenchen Fan": 1423,
     "Alek Jarmov": 16,
     "Yongbin Miao": 1,
     "Cheng Pan": 352,
@@ -102,7 +105,6 @@
     "richardc-db": 17,
     "qianlan717": 7,
     "DB Tsai": 97,
-    "Chiran Ravani": 2,
     "Zifei Feng": 14,
     "Yuchen Liu": 17,
     "Mihailo Aleksic": 81,
@@ -141,7 +143,6 @@
     "Szehon Ho": 142,
     "Anshul Baliga": 6,
     "Yossi Eliaz": 2,
-    "bojana-db": 13,
     "Constantin-Tiberiu Craiu": 2,
     "Varun Bhandary": 1,
     "Ziqi Liu": 25,
@@ -3142,13 +3143,13 @@
     "2023": 4113,
     "2024": 3762,
     "2025": 3411,
-    "2026": 4135
+    "2026": 4139
   },
   "ai_assisted": {
-    "commits": 2257,
+    "commits": 2260,
     "authored": 0,
     "assistants": {
-      "Claude": 1690,
+      "Claude": 1693,
       "Codex": 370,
       "ChatGPT": 368,
       "Cursor": 215,
@@ -3184,7 +3185,7 @@
       "2026-07": 332,
       "2026-08": 359,
       "2026-09": 320,
-      "2026-10": 260
+      "2026-10": 263
     },
     "commits_by_month": {
       "2024-11": 250,
@@ -3210,16 +3211,16 @@
       "2026-07": 531,
       "2026-08": 536,
       "2026-09": 455,
-      "2026-10": 313
+      "2026-10": 317
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 50679,
+    "commits": 50683,
     "by_kind": {
-      "organization": 31008,
+      "organization": 31011,
       "one_person": 2303,
-      "personal": 16402,
+      "personal": 16403,
       "hidden": 797,
       "unknown": 169,
       "bot": 0
@@ -3229,11 +3230,11 @@
     "top": [
       {
         "organization": "databricks.com",
-        "commits": 11158,
-        "commits_last_12mo": 868,
+        "commits": 11160,
+        "commits_last_12mo": 870,
         "addresses": 336,
         "first_commit": "2013-09-04",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "apache.org",
@@ -3285,11 +3286,11 @@
       },
       {
         "organization": "intel.com",
-        "commits": 656,
-        "commits_last_12mo": 0,
-        "addresses": 42,
+        "commits": 657,
+        "commits_last_12mo": 1,
+        "addresses": 43,
         "first_commit": "2013-01-08",
-        "last_commit": "2022-05-28"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "ebay.com",
@@ -4358,13 +4359,21 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 157,
+        "organization": 160,
         "one_person": 21,
-        "personal": 102,
+        "personal": 103,
         "hidden": 33,
         "unknown": 0,
         "bot": 0
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 4787,
+    "authors": 422,
+    "new_authors": 255,
+    "half_of_commits": 11
   }
 }

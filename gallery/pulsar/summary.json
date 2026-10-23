@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:14:28+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:49:41+00:00",
   "name": "Apache Pulsar",
   "report_path": "index.html",
   "first_commit": "2016-09-07 04:17:28",
-  "last_commit": "2026-10-23 14:32:06",
+  "last_commit": "2026-10-23 16:18:03",
   "age_days": 3699,
   "active_days": 2944,
-  "total_commits": 15207,
+  "total_commits": 15213,
   "total_authors": 772,
-  "active_authors_12mo": 119,
-  "commits_last_12mo": 1431,
+  "active_authors_12mo": 122,
+  "commits_last_12mo": 1437,
   "total_files": 6335,
-  "total_lines": 1327819,
-  "lines_added": 6315964,
-  "lines_removed": 4988145,
+  "total_lines": 1328530,
+  "lines_added": 6316785,
+  "lines_removed": 4988255,
   "total_tags": 6,
   "era": "steady",
   "top_authors": [
     {
       "name": "Matteo Merli",
-      "commits": 1480
+      "commits": 1481
     },
     {
       "name": "Lari Hotari",
@@ -29,7 +29,7 @@
     },
     {
       "name": "Rajan Dhabalia",
-      "commits": 666
+      "commits": 667
     },
     {
       "name": "Sijie Guo",
@@ -41,14 +41,17 @@
     }
   ],
   "author_commits": {
+    "Matteo Merli": 1481,
+    "HuangZeGui": 16,
+    "Alexander Preu\u00df": 10,
+    "Rajan Dhabalia": 667,
+    "fengyubiao": 388,
+    "SeungTaek Lim": 10,
     "Zixuan Liu": 240,
-    "Matteo Merli": 1480,
     "Cong Zhao": 163,
     "Lari Hotari": 1439,
     "P_K": 1,
-    "SeungTaek Lim": 9,
     "Ozan Gunalp": 1,
-    "fengyubiao": 387,
     "lifepuzzlefun": 31,
     "grayson": 4,
     "\u9053\u541b- Tao Jiuming": 57,
@@ -185,7 +188,6 @@
     "Heesung Sohn": 91,
     "Shuta Kondo": 2,
     "Huibert": 1,
-    "Rajan Dhabalia": 666,
     "Santanu Kar": 1,
     "guan46": 4,
     "feynmanlin": 205,
@@ -245,7 +247,6 @@
     "vraulji567": 2,
     "kecona": 2,
     "tison": 142,
-    "Alexander Preu\u00df": 9,
     "Diego Salvi": 2,
     "hzh0425": 2,
     "Guangning E": 125,
@@ -287,7 +288,6 @@
     "Tu\u1ea5n V\u01b0\u01a1ng": 1,
     "Nihar Rathod": 1,
     "laminar": 4,
-    "HuangZeGui": 15,
     "Anonymitaet": 178,
     "YANGLiiN": 19,
     "Andras Beni": 19,
@@ -825,7 +825,7 @@
     "2023": 1165,
     "2024": 931,
     "2025": 719,
-    "2026": 1318
+    "2026": 1324
   },
   "ai_assisted": {
     "commits": 31,
@@ -885,17 +885,17 @@
       "2026-07": 81,
       "2026-08": 82,
       "2026-09": 256,
-      "2026-10": 266
+      "2026-10": 272
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15207,
+    "commits": 15213,
     "by_kind": {
-      "organization": 5671,
+      "organization": 5674,
       "one_person": 249,
-      "personal": 5569,
-      "hidden": 3689,
+      "personal": 5571,
+      "hidden": 3690,
       "unknown": 0,
       "bot": 29
     },
@@ -904,16 +904,16 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 4395,
-        "commits_last_12mo": 427,
+        "commits": 4397,
+        "commits_last_12mo": 429,
         "addresses": 33,
         "first_commit": "2016-09-22",
         "last_commit": "2026-10-23"
       },
       {
         "organization": "streamnative.io",
-        "commits": 675,
-        "commits_last_12mo": 48,
+        "commits": 676,
+        "commits_last_12mo": 49,
         "addresses": 24,
         "first_commit": "2020-02-10",
         "last_commit": "2026-10-23"
@@ -1033,13 +1033,21 @@
         "bot": 4
       },
       "2026-Q4": {
-        "organization": 85,
+        "organization": 88,
         "one_person": 3,
-        "personal": 77,
-        "hidden": 100,
+        "personal": 79,
+        "hidden": 101,
         "unknown": 0,
         "bot": 1
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 1423,
+    "authors": 121,
+    "new_authors": 54,
+    "half_of_commits": 2
   }
 }

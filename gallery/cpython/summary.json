@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:10:32+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:45:49+00:00",
   "name": "CPython",
   "report_path": "index.html",
   "first_commit": "1990-08-09 14:25:15",
-  "last_commit": "2026-10-23 15:01:57",
+  "last_commit": "2026-10-23 15:51:10",
   "age_days": 13225,
   "active_days": 11064,
-  "total_commits": 133915,
+  "total_commits": 133919,
   "total_authors": 3730,
   "active_authors_12mo": 781,
-  "commits_last_12mo": 4965,
-  "total_files": 5693,
-  "total_lines": 3249113,
-  "lines_added": 11106369,
-  "lines_removed": 7857256,
+  "commits_last_12mo": 4969,
+  "total_files": 5789,
+  "total_lines": 3253328,
+  "lines_added": 11110832,
+  "lines_removed": 7857504,
   "total_tags": 312,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,10 @@
     }
   ],
   "author_commits": {
+    "Michele Angrisano": 5,
+    "Petr Viktorin": 409,
+    "Russell Keith-Magee": 98,
+    "Paul Ganssle": 49,
     "Hugo van Kemenade": 498,
     "Kumar Aditya": 450,
     "Stan Ulbrych": 394,
@@ -66,7 +70,6 @@
     "Jason R. Coombs": 298,
     "Shamil": 33,
     "Vasiliy Kiryanov": 9,
-    "Russell Keith-Magee": 97,
     "Edward Xu": 8,
     "sobolevn": 841,
     "Savannah Ostrowski": 109,
@@ -82,7 +85,6 @@
     "Peter Bierma": 182,
     "Advit Arora": 2,
     "Jason G": 3,
-    "Petr Viktorin": 408,
     "Grant Herman": 3,
     "Yury Selivanov": 996,
     "Filipe La\u00edns": 85,
@@ -100,7 +102,6 @@
     "Nathan Goldbaum": 17,
     "Tony": 3,
     "Christian Aurich Zanettini Martins": 5,
-    "Paul Ganssle": 48,
     "Bern\u00e1t G\u00e1bor": 16,
     "Zachary Ware": 763,
     "Lo\u00efc Simon": 13,
@@ -268,7 +269,6 @@
     "Kirill Podoprigora": 133,
     "Steve Stagg": 4,
     "dzaramelcone": 1,
-    "Michele Angrisano": 4,
     "Andrej730": 2,
     "\u0141ukasz": 6,
     "Sangmin Lee": 1,
@@ -3809,7 +3809,7 @@
     "2023": 4459,
     "2024": 4743,
     "2025": 4871,
-    "2026": 4182
+    "2026": 4186
   },
   "ai_assisted": {
     "commits": 383,
@@ -3868,17 +3868,17 @@
       "2026-07": 503,
       "2026-08": 384,
       "2026-09": 466,
-      "2026-10": 475
+      "2026-10": 479
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 133915,
+    "commits": 133919,
     "by_kind": {
       "organization": 43200,
-      "one_person": 40189,
-      "personal": 43856,
-      "hidden": 6509,
+      "one_person": 40190,
+      "personal": 43858,
+      "hidden": 6510,
       "unknown": 82,
       "bot": 79
     },
@@ -4345,12 +4345,20 @@
       },
       "2026-Q4": {
         "organization": 121,
-        "one_person": 102,
-        "personal": 154,
-        "hidden": 94,
+        "one_person": 103,
+        "personal": 156,
+        "hidden": 95,
         "unknown": 0,
         "bot": 4
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 4959,
+    "authors": 775,
+    "new_authors": 487,
+    "half_of_commits": 18
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:15:38+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:50:59+00:00",
   "name": "webpack",
   "report_path": "index.html",
   "first_commit": "2012-03-10 12:11:23",
-  "last_commit": "2026-10-23 14:01:52",
+  "last_commit": "2026-10-23 16:31:24",
   "age_days": 5341,
   "active_days": 3255,
-  "total_commits": 20143,
+  "total_commits": 20148,
   "total_authors": 938,
   "active_authors_12mo": 48,
-  "commits_last_12mo": 1995,
-  "total_files": 21644,
-  "total_lines": 1101130,
-  "lines_added": 2072311,
-  "lines_removed": 971181,
+  "commits_last_12mo": 2000,
+  "total_files": 21693,
+  "total_lines": 1103702,
+  "lines_added": 2075250,
+  "lines_removed": 971548,
   "total_tags": 654,
   "era": "surge",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Alexander Akait",
-      "commits": 1864
+      "commits": 1869
     },
     {
       "name": "alexander-akait",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Alexander Akait": 1864,
+    "Alexander Akait": 1869,
     "Xiao": 160,
     "Sebastian Beltran": 89,
     "Siddharth S": 1,
@@ -995,13 +995,13 @@
     "2023": 1153,
     "2024": 1152,
     "2025": 681,
-    "2026": 1864
+    "2026": 1869
   },
   "ai_assisted": {
-    "commits": 228,
+    "commits": 232,
     "authored": 2,
     "assistants": {
-      "Claude": 217,
+      "Claude": 221,
       "CodeRabbit": 8,
       "GitHub Copilot": 4
     },
@@ -1029,7 +1029,7 @@
       "2026-07": 7,
       "2026-08": 2,
       "2026-09": 30,
-      "2026-10": 163
+      "2026-10": 167
     },
     "commits_by_month": {
       "2024-11": 130,
@@ -1055,17 +1055,17 @@
       "2026-07": 203,
       "2026-08": 238,
       "2026-09": 383,
-      "2026-10": 418
+      "2026-10": 423
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20143,
+    "commits": 20148,
     "by_kind": {
       "organization": 331,
       "one_person": 1503,
       "personal": 14225,
-      "hidden": 2466,
+      "hidden": 2471,
       "unknown": 6,
       "bot": 1612
     },
@@ -1254,10 +1254,18 @@
         "organization": 0,
         "one_person": 1,
         "personal": 50,
-        "hidden": 338,
+        "hidden": 343,
         "unknown": 0,
         "bot": 29
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 1761,
+    "authors": 48,
+    "new_authors": 36,
+    "half_of_commits": 1
   }
 }

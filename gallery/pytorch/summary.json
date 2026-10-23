@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:13:38+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:47:11+00:00",
   "name": "PyTorch",
   "report_path": "index.html",
   "first_commit": "2012-01-25 13:55:20",
   "last_commit": "2026-10-23 14:14:30",
   "age_days": 5386,
   "active_days": 4205,
-  "total_commits": 112975,
+  "total_commits": 112976,
   "total_authors": 5941,
   "active_authors_12mo": 1540,
-  "commits_last_12mo": 17656,
+  "commits_last_12mo": 17657,
   "total_files": 22740,
-  "total_lines": 5391041,
-  "lines_added": 14730799,
-  "lines_removed": 9339758,
-  "total_tags": 9458,
+  "total_lines": 5390734,
+  "lines_added": 14730951,
+  "lines_removed": 9340217,
+  "total_tags": 9459,
   "era": "peak",
   "top_authors": [
     {
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Isalia20": 333,
     "PyTorch MergeBot": 5799,
     "pytorchbot": 8,
     "xuejing": 1,
@@ -62,7 +63,6 @@
     "Marko Radosavljevic": 5,
     "Lakshay Garg": 110,
     "Chi Zhang": 1,
-    "Isalia20": 332,
     "Tu\u011frahan Karakad\u0131o\u011flu": 5,
     "jzluo": 1,
     "KarhouTam": 103,
@@ -5998,7 +5998,7 @@
     "2023": 12593,
     "2024": 14893,
     "2025": 14993,
-    "2026": 15238
+    "2026": 15239
   },
   "ai_assisted": {
     "commits": 832,
@@ -6060,16 +6060,16 @@
       "2026-07": 1693,
       "2026-08": 1307,
       "2026-09": 1908,
-      "2026-10": 1298
+      "2026-10": 1299
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 112975,
+    "commits": 112976,
     "by_kind": {
       "organization": 71223,
       "one_person": 3076,
-      "personal": 26894,
+      "personal": 26895,
       "hidden": 11435,
       "unknown": 125,
       "bot": 222
@@ -7138,11 +7138,19 @@
       "2026-Q4": {
         "organization": 727,
         "one_person": 82,
-        "personal": 327,
+        "personal": 328,
         "hidden": 160,
         "unknown": 0,
         "bot": 2
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 17616,
+    "authors": 1517,
+    "new_authors": 993,
+    "half_of_commits": 31
   }
 }

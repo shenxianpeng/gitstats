@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:18:33+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:53:09+00:00",
   "name": "Next.js",
   "report_path": "index.html",
   "first_commit": "2016-10-05 23:35:00",
-  "last_commit": "2026-10-23 14:32:44",
+  "last_commit": "2026-10-23 15:50:32",
   "age_days": 3670,
   "active_days": 3328,
-  "total_commits": 36428,
+  "total_commits": 36429,
   "total_authors": 3969,
   "active_authors_12mo": 247,
-  "commits_last_12mo": 4858,
+  "commits_last_12mo": 4859,
   "total_files": 34468,
-  "total_lines": 3138563,
+  "total_lines": 3138520,
   "lines_added": 13061642,
-  "lines_removed": 9923079,
+  "lines_removed": 9923122,
   "total_tags": 3905,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Jamiboy Mohammad": 46,
     "Tobias Koppers": 2678,
     "Sebastian \"Sebbie\" Silbermann": 881,
     "Niklas Mischkulnig": 847,
@@ -50,7 +51,6 @@
     "digasic": 1,
     "Will Binns-Smith": 603,
     "Jimmy Miller": 35,
-    "Jamiboy Mohammad": 45,
     "zydo": 1,
     "Luke Sandberg": 464,
     "Janka Uryga": 269,
@@ -4022,7 +4022,7 @@
     "2023": 5710,
     "2024": 5744,
     "2025": 5619,
-    "2026": 4300
+    "2026": 4301
   },
   "ai_assisted": {
     "commits": 274,
@@ -4083,16 +4083,16 @@
       "2026-07": 454,
       "2026-08": 490,
       "2026-09": 478,
-      "2026-10": 449
+      "2026-10": 450
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 36428,
+    "commits": 36429,
     "by_kind": {
       "organization": 5479,
       "one_person": 12535,
-      "personal": 11642,
+      "personal": 11643,
       "hidden": 5088,
       "unknown": 0,
       "bot": 1684
@@ -4329,11 +4329,19 @@
       "2026-Q4": {
         "organization": 77,
         "one_person": 45,
-        "personal": 154,
+        "personal": 155,
         "hidden": 126,
         "unknown": 0,
         "bot": 47
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 4593,
+    "authors": 241,
+    "new_authors": 177,
+    "half_of_commits": 7
   }
 }

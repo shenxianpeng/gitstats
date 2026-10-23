@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:14:33+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:49:15+00:00",
   "name": "Apache Flink",
   "report_path": "index.html",
   "first_commit": "2010-12-15 16:02:01",
-  "last_commit": "2026-10-23 06:46:25",
-  "age_days": 5791,
+  "last_commit": "2026-10-23 16:28:55",
+  "age_days": 5792,
   "active_days": 4884,
-  "total_commits": 38701,
+  "total_commits": 38703,
   "total_authors": 1772,
   "active_authors_12mo": 171,
-  "commits_last_12mo": 1446,
+  "commits_last_12mo": 1448,
   "total_files": 27292,
-  "total_lines": 4045533,
-  "lines_added": 10662324,
-  "lines_removed": 6616791,
+  "total_lines": 4045552,
+  "lines_added": 10662380,
+  "lines_removed": 6616828,
   "total_tags": 2,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Sergey Nuyanzin": 604,
+    "Gustavo de Morais": 88,
     "Efrat Levitan": 22,
     "Purushottam Sinha": 40,
     "Rion Williams": 5,
@@ -50,7 +52,6 @@
     "Sankalp Thakur": 1,
     "Rui Fan": 284,
     "Muhammad Junaid Muzammil": 1,
-    "Sergey Nuyanzin": 603,
     "florianvazelle": 7,
     "Isaac Montenegro Jimenez": 1,
     "Gabor Somogyi": 103,
@@ -85,7 +86,6 @@
     "juanvisoler": 1,
     "Kim Gr\u00e4sman": 1,
     "Alexandru Stefanica": 1,
-    "Gustavo de Morais": 87,
     "Shekhar Rajak": 6,
     "Han You": 1,
     "Aleksandr Savonin": 19,
@@ -1831,7 +1831,7 @@
     "2023": 2085,
     "2024": 1658,
     "2025": 1064,
-    "2026": 1313
+    "2026": 1315
   },
   "ai_assisted": {
     "commits": 194,
@@ -1895,16 +1895,16 @@
       "2026-07": 205,
       "2026-08": 120,
       "2026-09": 158,
-      "2026-10": 118
+      "2026-10": 120
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38701,
+    "commits": 38703,
     "by_kind": {
       "organization": 20793,
       "one_person": 1245,
-      "personal": 15417,
+      "personal": 15419,
       "hidden": 1121,
       "unknown": 109,
       "bot": 16
@@ -2525,11 +2525,19 @@
       "2026-Q4": {
         "organization": 31,
         "one_person": 4,
-        "personal": 48,
+        "personal": 50,
         "hidden": 34,
         "unknown": 0,
         "bot": 1
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 1445,
+    "authors": 169,
+    "new_authors": 90,
+    "half_of_commits": 8
   }
 }

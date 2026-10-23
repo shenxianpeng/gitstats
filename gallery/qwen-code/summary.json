@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:11:27+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:46:20+00:00",
   "name": "Qwen Code",
   "report_path": "index.html",
   "first_commit": "2025-04-16 04:41:08",
-  "last_commit": "2026-10-23 14:54:16",
+  "last_commit": "2026-10-23 16:44:20",
   "age_days": 556,
   "active_days": 514,
-  "total_commits": 11370,
+  "total_commits": 11377,
   "total_authors": 610,
   "active_authors_12mo": 324,
-  "commits_last_12mo": 8868,
-  "total_files": 12746,
-  "total_lines": 6122114,
-  "lines_added": 7997884,
-  "lines_removed": 1875770,
+  "commits_last_12mo": 8875,
+  "total_files": 12769,
+  "total_lines": 6130421,
+  "lines_added": 8006582,
+  "lines_removed": 1876161,
   "total_tags": 98,
   "era": "steady",
   "top_authors": [
     {
       "name": "\u6613\u826f",
-      "commits": 1535
+      "commits": 1539
     },
     {
       "name": "Shaojin Wen",
-      "commits": 1457
+      "commits": 1458
     },
     {
       "name": "tanzhenxin",
@@ -33,19 +33,19 @@
     },
     {
       "name": "jinye",
-      "commits": 591
+      "commits": 592
     },
     {
       "name": "qqqys",
-      "commits": 519
+      "commits": 520
     }
   ],
   "author_commits": {
-    "\u6613\u826f": 1535,
+    "qqqys": 520,
+    "\u6613\u826f": 1539,
+    "jinye": 592,
+    "Shaojin Wen": 1458,
     "Qiu": 5,
-    "Shaojin Wen": 1457,
-    "jinye": 591,
-    "qqqys": 519,
     "ytahdn": 249,
     "qwen-code-dev-bot": 243,
     "ChiGao": 121,
@@ -654,7 +654,7 @@
   },
   "commits_by_year": {
     "2025": 3155,
-    "2026": 8215
+    "2026": 8222
   },
   "ai_assisted": {
     "commits": 625,
@@ -718,16 +718,16 @@
       "2026-07": 1315,
       "2026-08": 1068,
       "2026-09": 1181,
-      "2026-10": 1028
+      "2026-10": 1035
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11370,
+    "commits": 11377,
     "by_kind": {
-      "organization": 2772,
+      "organization": 2773,
       "one_person": 484,
-      "personal": 6859,
+      "personal": 6865,
       "hidden": 1133,
       "unknown": 31,
       "bot": 91
@@ -737,8 +737,8 @@
     "top": [
       {
         "organization": "alibaba-inc.com",
-        "commits": 1911,
-        "commits_last_12mo": 1876,
+        "commits": 1912,
+        "commits_last_12mo": 1877,
         "addresses": 19,
         "first_commit": "2025-06-26",
         "last_commit": "2026-10-23"
@@ -810,13 +810,21 @@
         "bot": 33
       },
       "2026-Q4": {
-        "organization": 375,
+        "organization": 376,
         "one_person": 86,
-        "personal": 531,
+        "personal": 537,
         "hidden": 35,
         "unknown": 0,
         "bot": 1
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 8871,
+    "authors": 320,
+    "new_authors": 310,
+    "half_of_commits": 4
   }
 }

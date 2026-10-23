@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:19:31+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:54:25+00:00",
   "name": "Node.js",
   "report_path": "index.html",
   "first_commit": "2009-02-16 00:02:00",
   "last_commit": "2026-10-23 13:23:50",
   "age_days": 6459,
   "active_days": 6110,
-  "total_commits": 49203,
+  "total_commits": 49205,
   "total_authors": 4375,
   "active_authors_12mo": 433,
-  "commits_last_12mo": 3813,
-  "total_files": 56554,
-  "total_lines": 17921575,
-  "lines_added": 41966663,
-  "lines_removed": 24045088,
+  "commits_last_12mo": 3815,
+  "total_files": 56553,
+  "total_lines": 17921486,
+  "lines_added": 41966669,
+  "lines_removed": 24045183,
   "total_tags": 245,
   "era": "steady",
   "top_authors": [
@@ -41,10 +41,10 @@
     }
   ],
   "author_commits": {
+    "Filip Skokan": 624,
     "Lazizbek Ergashev": 18,
     "Yuya Inoue": 26,
     "Antoine du Hamel": 1211,
-    "Filip Skokan": 622,
     "StefanStojanovic": 77,
     "Mert Can Altin": 55,
     "joao-oliveira-softtor": 2,
@@ -4435,7 +4435,7 @@
     "2023": 2700,
     "2024": 2606,
     "2025": 2556,
-    "2026": 3423
+    "2026": 3425
   },
   "ai_assisted": {
     "commits": 616,
@@ -4504,16 +4504,16 @@
       "2026-07": 341,
       "2026-08": 623,
       "2026-09": 600,
-      "2026-10": 298
+      "2026-10": 300
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 49203,
+    "commits": 49205,
     "by_kind": {
       "organization": 3234,
       "one_person": 17654,
-      "personal": 25593,
+      "personal": 25595,
       "hidden": 1236,
       "unknown": 23,
       "bot": 1463
@@ -5254,11 +5254,19 @@
       "2026-Q4": {
         "organization": 3,
         "one_person": 42,
-        "personal": 197,
+        "personal": 199,
         "hidden": 23,
         "unknown": 0,
         "bot": 33
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 3653,
+    "authors": 427,
+    "new_authors": 269,
+    "half_of_commits": 9
   }
 }

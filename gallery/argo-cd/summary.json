@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:13:13+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:48:09+00:00",
   "name": "Argo CD",
   "report_path": "index.html",
   "first_commit": "2018-02-15 00:53:07",
-  "last_commit": "2026-10-23 09:22:35",
+  "last_commit": "2026-10-23 15:30:25",
   "age_days": 3173,
   "active_days": 2443,
-  "total_commits": 11776,
-  "total_authors": 2024,
-  "active_authors_12mo": 379,
-  "commits_last_12mo": 2265,
-  "total_files": 6159,
-  "total_lines": 3270639,
-  "lines_added": 8255638,
-  "lines_removed": 4984999,
+  "total_commits": 11777,
+  "total_authors": 2025,
+  "active_authors_12mo": 380,
+  "commits_last_12mo": 2266,
+  "total_files": 6160,
+  "total_lines": 3270864,
+  "lines_added": 8255877,
+  "lines_removed": 4985013,
   "total_tags": 21,
   "era": "peak",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "shimagrawal": 1,
     "George Ga\u00e1l": 1,
     "berce": 1,
     "Timothy Griffiths": 2,
@@ -2075,7 +2076,7 @@
     "2023": 1237,
     "2024": 1639,
     "2025": 1759,
-    "2026": 1980
+    "2026": 1981
   },
   "ai_assisted": {
     "commits": 67,
@@ -2135,14 +2136,14 @@
       "2026-07": 206,
       "2026-08": 179,
       "2026-09": 252,
-      "2026-10": 167
+      "2026-10": 168
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11776,
+    "commits": 11777,
     "by_kind": {
-      "organization": 2173,
+      "organization": 2174,
       "one_person": 1278,
       "personal": 2838,
       "hidden": 3117,
@@ -2210,11 +2211,11 @@
       },
       {
         "organization": "akuity.io",
-        "commits": 11,
-        "commits_last_12mo": 3,
-        "addresses": 2,
+        "commits": 12,
+        "commits_last_12mo": 4,
+        "addresses": 3,
         "first_commit": "2023-10-31",
-        "last_commit": "2026-04-30"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "ibm.com",
@@ -2379,7 +2380,7 @@
         "bot": 269
       },
       "2026-Q4": {
-        "organization": 6,
+        "organization": 7,
         "one_person": 7,
         "personal": 32,
         "hidden": 57,
@@ -2387,5 +2388,13 @@
         "bot": 65
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 1352,
+    "authors": 378,
+    "new_authors": 284,
+    "half_of_commits": 14
   }
 }

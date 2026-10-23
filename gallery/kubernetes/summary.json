@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:15:20+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:50:52+00:00",
   "name": "Kubernetes",
   "report_path": "index.html",
   "first_commit": "2014-06-06 23:40:48",
-  "last_commit": "2026-10-23 14:45:16",
+  "last_commit": "2026-10-23 16:13:25",
   "age_days": 4522,
   "active_days": 4481,
-  "total_commits": 142496,
+  "total_commits": 142499,
   "total_authors": 4905,
   "active_authors_12mo": 619,
-  "commits_last_12mo": 8502,
+  "commits_last_12mo": 8505,
   "total_files": 31500,
-  "total_lines": 7312051,
-  "lines_added": 28013898,
-  "lines_removed": 20701847,
+  "total_lines": 7312090,
+  "lines_added": 28014011,
+  "lines_removed": 20701921,
   "total_tags": 215,
   "era": "steady",
   "top_authors": [
@@ -41,7 +41,9 @@
     }
   ],
   "author_commits": {
+    "Danki Hong": 3,
     "Jaros\u0142aw Dzikowski": 33,
+    "Marek Siarkowicz": 395,
     "iomarsayed": 20,
     "Dominik Marci\u0144ski": 39,
     "Wojciech Tyczy\u0144ski": 1916,
@@ -49,13 +51,11 @@
     "Ciprian Hacman": 19,
     "Joe Betz": 535,
     "Jefftree": 409,
-    "Marek Siarkowicz": 394,
     "upodroid": 47,
     "Jordan Liggitt": 2221,
     "Ryan Brewster": 15,
     "Divyanshu Prakash": 5,
     "Francesco Romani": 214,
-    "danki-hong": 2,
     "Antonio Ojea": 733,
     "Nabarun Pal": 37,
     "Doramarothy": 2,
@@ -4960,7 +4960,7 @@
     "2023": 7533,
     "2024": 7044,
     "2025": 7152,
-    "2026": 7621
+    "2026": 7624
   },
   "ai_assisted": {
     "commits": 10,
@@ -5021,27 +5021,27 @@
       "2026-07": 1115,
       "2026-08": 397,
       "2026-09": 855,
-      "2026-10": 677
+      "2026-10": 680
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 142496,
+    "commits": 142499,
     "by_kind": {
-      "organization": 65668,
+      "organization": 65669,
       "one_person": 5027,
-      "personal": 24867,
+      "personal": 24868,
       "hidden": 45562,
       "unknown": 2,
-      "bot": 1370
+      "bot": 1371
     },
     "organization_count": 156,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "google.com",
-        "commits": 35206,
-        "commits_last_12mo": 1560,
+        "commits": 35207,
+        "commits_last_12mo": 1561,
         "addresses": 498,
         "first_commit": "2014-06-07",
         "last_commit": "2026-10-23"
@@ -6345,13 +6345,21 @@
         "bot": 933
       },
       "2026-Q4": {
-        "organization": 180,
+        "organization": 181,
         "one_person": 25,
-        "personal": 119,
+        "personal": 120,
         "hidden": 19,
         "unknown": 0,
-        "bot": 334
+        "bot": 335
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 7134,
+    "authors": 608,
+    "new_authors": 362,
+    "half_of_commits": 15
   }
 }

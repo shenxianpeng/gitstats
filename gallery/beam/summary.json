@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:15:02+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:50:29+00:00",
   "name": "Apache Beam",
   "report_path": "index.html",
   "first_commit": "2014-07-11 01:59:48",
-  "last_commit": "2026-10-23 13:38:27",
+  "last_commit": "2026-10-23 16:28:54",
   "age_days": 4488,
   "active_days": 3882,
-  "total_commits": 48638,
-  "total_authors": 1628,
-  "active_authors_12mo": 216,
-  "commits_last_12mo": 2669,
+  "total_commits": 48641,
+  "total_authors": 1629,
+  "active_authors_12mo": 217,
+  "commits_last_12mo": 2672,
   "total_files": 15867,
-  "total_lines": 3415091,
-  "lines_added": 5232578,
-  "lines_removed": 1817487,
+  "total_lines": 3415264,
+  "lines_added": 5232890,
+  "lines_removed": 1817626,
   "total_tags": 46,
   "era": "steady",
   "top_authors": [
@@ -41,8 +41,9 @@
     }
   ],
   "author_commits": {
-    "Jack McCluskey": 461,
-    "Derrick Williams": 195,
+    "Derrick Williams": 196,
+    "alisha-1000": 1,
+    "Jack McCluskey": 462,
     "Vitaly Terentyev": 467,
     "ddebowczyk92": 3,
     "Danish Amjad": 2,
@@ -1683,7 +1684,7 @@
     "2023": 3260,
     "2024": 2456,
     "2025": 2429,
-    "2026": 2357
+    "2026": 2360
   },
   "ai_assisted": {
     "commits": 77,
@@ -1744,17 +1745,17 @@
       "2026-07": 304,
       "2026-08": 255,
       "2026-09": 297,
-      "2026-10": 290
+      "2026-10": 293
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 48638,
+    "commits": 48641,
     "by_kind": {
-      "organization": 26607,
+      "organization": 26608,
       "one_person": 1367,
-      "personal": 12172,
-      "hidden": 6980,
+      "personal": 12173,
+      "hidden": 6981,
       "unknown": 65,
       "bot": 1447
     },
@@ -1763,8 +1764,8 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 20311,
-        "commits_last_12mo": 909,
+        "commits": 20312,
+        "commits_last_12mo": 910,
         "addresses": 363,
         "first_commit": "2014-12-13",
         "last_commit": "2026-10-23"
@@ -2180,13 +2181,21 @@
         "bot": 221
       },
       "2026-Q4": {
-        "organization": 114,
+        "organization": 115,
         "one_person": 2,
-        "personal": 90,
-        "hidden": 55,
+        "personal": 91,
+        "hidden": 56,
         "unknown": 2,
         "bot": 27
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 2179,
+    "authors": 217,
+    "new_authors": 141,
+    "half_of_commits": 8
   }
 }

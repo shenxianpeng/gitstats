@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:15:04+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:50:14+00:00",
   "name": "Apache Superset",
   "report_path": "index.html",
   "first_commit": "2015-07-02 22:16:59",
-  "last_commit": "2026-10-23 15:01:04",
+  "last_commit": "2026-10-23 15:58:46",
   "age_days": 4131,
   "active_days": 3318,
-  "total_commits": 23952,
+  "total_commits": 23954,
   "total_authors": 1728,
   "active_authors_12mo": 471,
-  "commits_last_12mo": 6000,
-  "total_files": 11444,
-  "total_lines": 3040937,
-  "lines_added": 8707344,
-  "lines_removed": 5666407,
+  "commits_last_12mo": 6002,
+  "total_files": 11446,
+  "total_lines": 3041206,
+  "lines_added": 8707624,
+  "lines_removed": 5666418,
   "total_tags": 232,
   "era": "peak",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Evan Rusackas",
-      "commits": 1330
+      "commits": 1331
     },
     {
       "name": "Ville Brofeldt",
@@ -41,10 +41,11 @@
     }
   ],
   "author_commits": {
+    "Evan Rusackas": 1331,
+    "SBIN2010": 58,
     "Rafael Benitez": 37,
     "Amogh Atreya": 7,
     "Enzo Martellucci": 124,
-    "Evan Rusackas": 1330,
     "Joe Li": 313,
     "Amin Ghadersohi": 378,
     "Elizabeth Thompson": 400,
@@ -72,7 +73,6 @@
     "Maxime Beauchemin": 2361,
     "Divyansh Yadav": 4,
     "rlei": 9,
-    "SBIN2010": 57,
     "Shubhanshu Soni": 1,
     "\u0110\u1ed7 Tr\u1ecdng H\u1ea3i": 202,
     "Deepak Jain (DJ)": 10,
@@ -1782,13 +1782,13 @@
     "2023": 1594,
     "2024": 2068,
     "2025": 1996,
-    "2026": 5582
+    "2026": 5584
   },
   "ai_assisted": {
-    "commits": 2109,
+    "commits": 2110,
     "authored": 0,
     "assistants": {
-      "Claude": 2077,
+      "Claude": 2078,
       "GitHub Copilot": 34,
       "Cursor": 12,
       "Devin": 7
@@ -1817,7 +1817,7 @@
       "2026-07": 301,
       "2026-08": 258,
       "2026-09": 347,
-      "2026-10": 205
+      "2026-10": 206
     },
     "commits_by_month": {
       "2024-11": 191,
@@ -1843,16 +1843,16 @@
       "2026-07": 808,
       "2026-08": 728,
       "2026-09": 841,
-      "2026-10": 575
+      "2026-10": 577
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 23952,
+    "commits": 23954,
     "by_kind": {
-      "organization": 3962,
+      "organization": 3963,
       "one_person": 1377,
-      "personal": 9074,
+      "personal": 9075,
       "hidden": 5776,
       "unknown": 0,
       "bot": 3763
@@ -1862,8 +1862,8 @@
     "top": [
       {
         "organization": "preset.io",
-        "commits": 2104,
-        "commits_last_12mo": 1287,
+        "commits": 2105,
+        "commits_last_12mo": 1288,
         "addresses": 12,
         "first_commit": "2019-06-09",
         "last_commit": "2026-10-23"
@@ -2047,13 +2047,21 @@
         "bot": 778
       },
       "2026-Q4": {
-        "organization": 195,
+        "organization": 196,
         "one_person": 16,
-        "personal": 134,
+        "personal": 135,
         "hidden": 76,
         "unknown": 0,
         "bot": 154
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 3911,
+    "authors": 468,
+    "new_authors": 391,
+    "half_of_commits": 6
   }
 }

@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:11:59+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:46:34+00:00",
   "name": "llama.cpp",
   "report_path": "index.html",
   "first_commit": "2023-03-10 18:40:58",
-  "last_commit": "2026-10-23 14:46:53",
+  "last_commit": "2026-10-23 16:26:16",
   "age_days": 1323,
   "active_days": 1295,
-  "total_commits": 11840,
+  "total_commits": 11841,
   "total_authors": 2046,
   "active_authors_12mo": 942,
-  "commits_last_12mo": 4933,
+  "commits_last_12mo": 4934,
   "total_files": 3897,
-  "total_lines": 1628882,
-  "lines_added": 3391099,
-  "lines_removed": 1762217,
-  "total_tags": 8081,
+  "total_lines": 1628914,
+  "lines_added": 3391163,
+  "lines_removed": 1762249,
+  "total_tags": 8083,
   "era": "peak",
   "top_authors": [
     {
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Aman Gupta": 186,
     "Max Krasnyansky": 75,
     "Aleksander Grygier": 281,
     "Kartik Gulia": 8,
@@ -71,7 +72,6 @@
     "alexey-rsi": 2,
     "Tarek Dakhran": 42,
     "Maphist0": 1,
-    "Aman Gupta": 185,
     "92es": 1,
     "David Garcia": 1,
     "Alessandro de Oliveira Faria (A.K.A.CABELO)": 37,
@@ -2092,7 +2092,7 @@
     "2023": 1743,
     "2024": 2662,
     "2025": 3193,
-    "2026": 4242
+    "2026": 4243
   },
   "ai_assisted": {
     "commits": 283,
@@ -2159,16 +2159,16 @@
       "2026-07": 365,
       "2026-08": 513,
       "2026-09": 582,
-      "2026-10": 529
+      "2026-10": 530
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11840,
+    "commits": 11841,
     "by_kind": {
       "organization": 2193,
       "one_person": 1992,
-      "personal": 5572,
+      "personal": 5573,
       "hidden": 2075,
       "unknown": 0,
       "bot": 8
@@ -2437,11 +2437,19 @@
       "2026-Q4": {
         "organization": 176,
         "one_person": 71,
-        "personal": 185,
+        "personal": 186,
         "hidden": 97,
         "unknown": 0,
         "bot": 0
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 4934,
+    "authors": 933,
+    "new_authors": 783,
+    "half_of_commits": 15
   }
 }

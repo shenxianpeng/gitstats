@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:14:53+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:48:58+00:00",
   "name": "TensorFlow",
   "report_path": "index.html",
   "first_commit": "2015-11-07 00:27:58",
-  "last_commit": "2026-10-23 12:11:48",
+  "last_commit": "2026-10-23 13:49:37",
   "age_days": 4004,
   "active_days": 3993,
-  "total_commits": 201927,
+  "total_commits": 201932,
   "total_authors": 4617,
   "active_authors_12mo": 688,
-  "commits_last_12mo": 15405,
+  "commits_last_12mo": 15410,
   "total_files": 37481,
-  "total_lines": 11112778,
-  "lines_added": 28996356,
-  "lines_removed": 17883578,
+  "total_lines": 11113780,
+  "lines_added": 28997483,
+  "lines_removed": 17883703,
   "total_tags": 53,
   "era": "steady",
   "top_authors": [
@@ -33,7 +33,7 @@
     },
     {
       "name": "Peter Hawkins",
-      "commits": 1667
+      "commits": 1668
     },
     {
       "name": "Mihai Maruseac",
@@ -41,12 +41,15 @@
     }
   ],
   "author_commits": {
+    "Christian Sigg": 915,
+    "Peter Hawkins": 1668,
+    "Alexander Lyashuk": 179,
+    "Aliia Khasanova": 191,
+    "Ce Zheng CA": 175,
     "Keshav": 3,
     "Mikhail Goncharov": 257,
     "Dimitar (Mitko) Asenov": 170,
-    "Christian Sigg": 914,
     "Alexandros Theodoridis": 125,
-    "Alexander Lyashuk": 178,
     "TensorFlower Gardener": 61381,
     "Enver Kayaaslan": 149,
     "Praveen Batra": 14,
@@ -67,10 +70,8 @@
     "Ilya Biryukov": 34,
     "Alex Pivovarov": 174,
     "Henning Becker": 602,
-    "Aliia Khasanova": 190,
     "Theotime Combes": 96,
     "Vladimir Belitskiy": 71,
-    "Peter Hawkins": 1667,
     "Oleg Shyshkov": 597,
     "Vishwak Thatikonda": 154,
     "Dmitri Latushko": 221,
@@ -89,7 +90,6 @@
     "Akhil Goel": 70,
     "Aleksei Nurmukhametov": 59,
     "Swachhand Lokhande": 94,
-    "Ce Zheng": 174,
     "Sam Ginzburg": 31,
     "Yulia Baturina": 64,
     "Michael Kuperstein": 295,
@@ -4671,7 +4671,7 @@
     "2023": 16742,
     "2024": 16193,
     "2025": 14683,
-    "2026": 13162
+    "2026": 13167
   },
   "ai_assisted": {
     "commits": 50,
@@ -4731,14 +4731,14 @@
       "2026-07": 1294,
       "2026-08": 1423,
       "2026-09": 1361,
-      "2026-10": 1910
+      "2026-10": 1915
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 201927,
+    "commits": 201932,
     "by_kind": {
-      "organization": 120212,
+      "organization": 120217,
       "one_person": 2708,
       "personal": 14113,
       "hidden": 4644,
@@ -4750,8 +4750,8 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 105689,
-        "commits_last_12mo": 7470,
+        "commits": 105694,
+        "commits_last_12mo": 7475,
         "addresses": 1238,
         "first_commit": "2015-11-07",
         "last_commit": "2026-10-23"
@@ -5615,7 +5615,7 @@
         "bot": 1092
       },
       "2026-Q4": {
-        "organization": 844,
+        "organization": 849,
         "one_person": 24,
         "personal": 443,
         "hidden": 102,
@@ -5623,5 +5623,13 @@
         "bot": 497
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 15308,
+    "authors": 685,
+    "new_authors": 371,
+    "half_of_commits": 18
   }
 }

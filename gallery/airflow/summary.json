@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:14:25+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:49:18+00:00",
   "name": "Apache Airflow",
   "report_path": "index.html",
   "first_commit": "2014-10-06 21:29:38",
-  "last_commit": "2026-10-23 15:08:17",
+  "last_commit": "2026-10-23 16:18:55",
   "age_days": 4400,
   "active_days": 4022,
-  "total_commits": 42400,
+  "total_commits": 42404,
   "total_authors": 4358,
   "active_authors_12mo": 908,
-  "commits_last_12mo": 8481,
+  "commits_last_12mo": 8485,
   "total_files": 15092,
-  "total_lines": 2929893,
-  "lines_added": 6298720,
-  "lines_removed": 3368827,
+  "total_lines": 2930090,
+  "lines_added": 6298937,
+  "lines_removed": 3368847,
   "total_tags": 9785,
   "era": "surge",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Kaxil Naik",
-      "commits": 2249
+      "commits": 2250
     },
     {
       "name": "Maxime Beauchemin",
@@ -41,7 +41,9 @@
     }
   ],
   "author_commits": {
-    "Kaxil Naik": 2249,
+    "Parv Goyal": 2,
+    "Kaxil Naik": 2250,
+    "Jingi Kim": 4,
     "Kacper Muda": 239,
     "\uae40\ub09c\ud76c": 1,
     "Zhen-Lun (Kevin) Hong": 49,
@@ -77,7 +79,6 @@
     "Hussein Awala": 376,
     "Y-C": 58,
     "Baha Bouali": 11,
-    "Parv Goyal": 1,
     "W. H. Wang": 8,
     "Andrew Chang": 61,
     "krisztiansala": 1,
@@ -175,7 +176,6 @@
     "Shikhar Goel": 3,
     "Vincent": 618,
     "X33834": 1,
-    "jingi723": 2,
     "Firas Bouzazi": 1,
     "olegkachur-e": 57,
     "JelyFishhhhhh": 1,
@@ -4413,7 +4413,7 @@
     "2023": 4159,
     "2024": 4857,
     "2025": 7583,
-    "2026": 7352
+    "2026": 7356
   },
   "ai_assisted": {
     "commits": 453,
@@ -4476,17 +4476,17 @@
       "2026-07": 788,
       "2026-08": 614,
       "2026-09": 829,
-      "2026-10": 800
+      "2026-10": 804
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 42400,
+    "commits": 42404,
     "by_kind": {
-      "organization": 8733,
+      "organization": 8734,
       "one_person": 8491,
-      "personal": 12046,
-      "hidden": 12387,
+      "personal": 12047,
+      "hidden": 12389,
       "unknown": 40,
       "bot": 703
     },
@@ -4495,8 +4495,8 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 5831,
-        "commits_last_12mo": 666,
+        "commits": 5832,
+        "commits_last_12mo": 667,
         "addresses": 27,
         "first_commit": "2014-10-06",
         "last_commit": "2026-10-23"
@@ -5240,13 +5240,21 @@
         "bot": 158
       },
       "2026-Q4": {
-        "organization": 245,
+        "organization": 246,
         "one_person": 90,
-        "personal": 163,
-        "hidden": 250,
+        "personal": 164,
+        "hidden": 252,
         "unknown": 0,
         "bot": 52
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 8012,
+    "authors": 895,
+    "new_authors": 697,
+    "half_of_commits": 21
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:15:28+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:50:16+00:00",
   "name": "Nuxt",
   "report_path": "index.html",
   "first_commit": "2016-10-26 11:18:47",
-  "last_commit": "2026-10-23 14:49:51",
+  "last_commit": "2026-10-23 15:03:33",
   "age_days": 3650,
   "active_days": 2623,
-  "total_commits": 15843,
+  "total_commits": 15844,
   "total_authors": 1300,
   "active_authors_12mo": 181,
-  "commits_last_12mo": 1589,
+  "commits_last_12mo": 1590,
   "total_files": 2470,
-  "total_lines": 216712,
-  "lines_added": 1010104,
-  "lines_removed": 793392,
+  "total_lines": 216739,
+  "lines_added": 1010132,
+  "lines_removed": 793393,
   "total_tags": 269,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Gareth": 4,
     "Daniel Roe": 3717,
     "S\u00e9bastien Chopin": 1315,
     "Baptiste Leproux": 4,
@@ -57,7 +58,6 @@
     "lokyiec": 1,
     "Jess": 1,
     "Amulet Kerria": 31,
-    "Gareth": 3,
     "Alex Liu": 79,
     "Florian Heuberger": 49,
     "okueng": 1,
@@ -1353,13 +1353,13 @@
     "2023": 2123,
     "2024": 1825,
     "2025": 1398,
-    "2026": 1431
+    "2026": 1432
   },
   "ai_assisted": {
-    "commits": 19,
+    "commits": 20,
     "authored": 0,
     "assistants": {
-      "Claude": 13,
+      "Claude": 14,
       "CodeRabbit": 3,
       "GitHub Copilot": 3
     },
@@ -1387,7 +1387,7 @@
       "2026-07": 4,
       "2026-08": 2,
       "2026-09": 2,
-      "2026-10": 5
+      "2026-10": 6
     },
     "commits_by_month": {
       "2024-11": 110,
@@ -1413,17 +1413,17 @@
       "2026-07": 284,
       "2026-08": 182,
       "2026-09": 215,
-      "2026-10": 119
+      "2026-10": 120
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15843,
+    "commits": 15844,
     "by_kind": {
       "organization": 243,
       "one_person": 6813,
       "personal": 4780,
-      "hidden": 948,
+      "hidden": 949,
       "unknown": 0,
       "bot": 3059
     },
@@ -1532,10 +1532,18 @@
         "organization": 0,
         "one_person": 81,
         "personal": 19,
-        "hidden": 12,
+        "hidden": 13,
         "unknown": 0,
         "bot": 7
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 1367,
+    "authors": 178,
+    "new_authors": 119,
+    "half_of_commits": 1
   }
 }

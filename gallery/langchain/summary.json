@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:11:30+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:45:58+00:00",
   "name": "LangChain",
   "report_path": "index.html",
   "first_commit": "2022-10-24 21:51:15",
-  "last_commit": "2026-10-23 03:51:10",
+  "last_commit": "2026-10-23 15:24:14",
   "age_days": 1460,
   "active_days": 1310,
-  "total_commits": 17057,
+  "total_commits": 17058,
   "total_authors": 3594,
   "active_authors_12mo": 240,
-  "commits_last_12mo": 2377,
+  "commits_last_12mo": 2378,
   "total_files": 3192,
-  "total_lines": 558683,
-  "lines_added": 3843181,
-  "lines_removed": 3284498,
+  "total_lines": 558591,
+  "lines_added": 3843330,
+  "lines_removed": 3284739,
   "total_tags": 1309,
   "era": "steady",
   "top_authors": [
@@ -3641,7 +3641,7 @@
     "2023": 6342,
     "2024": 5701,
     "2025": 2693,
-    "2026": 2037
+    "2026": 2038
   },
   "ai_assisted": {
     "commits": 46,
@@ -3700,19 +3700,19 @@
       "2026-07": 145,
       "2026-08": 193,
       "2026-09": 187,
-      "2026-10": 183
+      "2026-10": 184
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17057,
+    "commits": 17058,
     "by_kind": {
       "organization": 2492,
       "one_person": 830,
       "personal": 7439,
       "hidden": 5431,
       "unknown": 0,
-      "bot": 865
+      "bot": 866
     },
     "organization_count": 35,
     "last_12mo_from": "2025-11",
@@ -4061,8 +4061,16 @@
         "personal": 32,
         "hidden": 4,
         "unknown": 0,
-        "bot": 137
+        "bot": 138
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 1532,
+    "authors": 234,
+    "new_authors": 192,
+    "half_of_commits": 2
   }
 }

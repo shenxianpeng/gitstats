@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev11",
-  "generated_at": "2026-10-23T15:13:03+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev12",
+  "generated_at": "2026-10-23T16:47:38+00:00",
   "name": "Envoy",
   "report_path": "index.html",
   "first_commit": "2016-08-08 15:07:25",
-  "last_commit": "2026-10-23 14:48:48",
-  "age_days": 3728,
+  "last_commit": "2026-10-23 16:27:40",
+  "age_days": 3729,
   "active_days": 3185,
-  "total_commits": 29332,
-  "total_authors": 1529,
-  "active_authors_12mo": 349,
-  "commits_last_12mo": 3785,
-  "total_files": 14835,
-  "total_lines": 2848192,
-  "lines_added": 4915454,
-  "lines_removed": 2067262,
+  "total_commits": 29339,
+  "total_authors": 1530,
+  "active_authors_12mo": 350,
+  "commits_last_12mo": 3792,
+  "total_files": 14852,
+  "total_lines": 2851726,
+  "lines_added": 4919060,
+  "lines_removed": 2067334,
   "total_tags": 43,
   "era": "steady",
   "top_authors": [
@@ -37,12 +37,16 @@
     },
     {
       "name": "code",
-      "commits": 811
+      "commits": 814
     }
   ],
   "author_commits": {
+    "code": 814,
+    "Alejandro": 3,
+    "yanavlasov": 568,
+    "Takeshi Yoneda": 198,
+    "Rayan-and-beyond": 1,
     "dangle1": 1,
-    "code": 811,
     "Antonio V. Leonti": 98,
     "Alejandro R. Sede\u00f1o": 70,
     "Matheus Sousa": 1,
@@ -52,7 +56,6 @@
     "phlax": 2249,
     "Ethan Truong": 41,
     "ump45nose": 1,
-    "Alejandro": 2,
     "Derek Argueta": 141,
     "bingqi": 1,
     "Wenwei-Zhao": 16,
@@ -81,10 +84,8 @@
     "aakugan": 32,
     "Bruno Palermo": 15,
     "Kamal Al Marhubi": 2,
-    "Takeshi Yoneda": 197,
     "Greg Greenway": 296,
     "Rohit Agrawal": 676,
-    "yanavlasov": 567,
     "zirain": 66,
     "Joe Kralicky": 13,
     "Michael Behr": 24,
@@ -1582,7 +1583,7 @@
     "2023": 3626,
     "2024": 3360,
     "2025": 2506,
-    "2026": 3192
+    "2026": 3199
   },
   "ai_assisted": {
     "commits": 147,
@@ -1643,16 +1644,16 @@
       "2026-07": 359,
       "2026-08": 305,
       "2026-09": 554,
-      "2026-10": 361
+      "2026-10": 368
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 29332,
+    "commits": 29339,
     "by_kind": {
-      "organization": 11849,
-      "one_person": 1835,
-      "personal": 4663,
+      "organization": 11850,
+      "one_person": 1836,
+      "personal": 4668,
       "hidden": 8059,
       "unknown": 0,
       "bot": 2926
@@ -1662,8 +1663,8 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 5065,
-        "commits_last_12mo": 706,
+        "commits": 5066,
+        "commits_last_12mo": 707,
         "addresses": 154,
         "first_commit": "2016-10-12",
         "last_commit": "2026-10-23"
@@ -2199,13 +2200,21 @@
         "bot": 65
       },
       "2026-Q4": {
-        "organization": 125,
-        "one_person": 16,
-        "personal": 82,
+        "organization": 126,
+        "one_person": 17,
+        "personal": 87,
         "hidden": 80,
         "unknown": 0,
         "bot": 58
       }
     }
+  },
+  "people_last_12mo": {
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 3446,
+    "authors": 348,
+    "new_authors": 214,
+    "half_of_commits": 7
   }
 }
