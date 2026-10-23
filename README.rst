@@ -85,7 +85,7 @@ Example
    :width: 100%
    :target: https://shenxianpeng.dev/gitstats/index.html
 
-Check out the `GitStats Gallery <https://shenxianpeng.dev/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly — and its `AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ai.html>`_ page: how many of each project's commits name an AI coding assistant, quarter by quarter. Its counts can be downloaded as `JSON <https://shenxianpeng.dev/gitstats/gallery/ai.json>`_ or `CSV <https://shenxianpeng.dev/gitstats/gallery/ai.csv>`_, and each quarter is kept as it was first published. Its `Organizations <https://shenxianpeng.dev/gitstats/gallery/organizations.html>`_ page adds up which organizations' addresses commit to the gallery's projects. The repositories are listed by ecosystem in `gallery/repos.yml <https://github.com/shenxianpeng/gitstats/blob/main/gallery/repos.yml>`_; to suggest one, `open an issue <https://github.com/shenxianpeng/gitstats/issues/new?template=gallery.yml>`_. Each ecosystem has its `ranking by AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ecosystems/>`_, also as JSON (`fields <https://gitstats.readthedocs.io/en/latest/gallery.html>`_).
+Check out the `GitStats Gallery <https://shenxianpeng.dev/gitstats/gallery/>`_ for live reports on the world's largest open-source projects — auto-generated weekly — and its `AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ai.html>`_ page: how many of each project's commits name an AI coding assistant, quarter by quarter. Its counts can be downloaded as `JSON <https://shenxianpeng.dev/gitstats/gallery/ai.json>`_ or `CSV <https://shenxianpeng.dev/gitstats/gallery/ai.csv>`_, and each quarter is kept as it was first published. Its `Organizations <https://shenxianpeng.dev/gitstats/gallery/organizations.html>`_ page adds up which organizations' addresses commit to the gallery's projects, and each organization has a page and a badge, such as `google.com <https://shenxianpeng.dev/gitstats/gallery/orgs/google.com.html>`_. The repositories are listed by ecosystem in `gallery/repos.yml <https://github.com/shenxianpeng/gitstats/blob/main/gallery/repos.yml>`_; to suggest one, `open an issue <https://github.com/shenxianpeng/gitstats/issues/new?template=gallery.yml>`_. Each ecosystem has its `ranking by AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ecosystems/>`_, also as JSON (`fields <https://gitstats.readthedocs.io/en/latest/gallery.html>`_).
 
 .. image:: https://raw.githubusercontent.com/shenxianpeng/gitstats/main/docs/source/demo.gif
    :alt: gitstats terminal demo
@@ -143,7 +143,10 @@ the address, and shows for each repository how its commits of the last four
 quarters divide between organizations, one-person domains, personal mail,
 hidden addresses and bots. Its counts are written next to it as
 ``organizations.json`` and ``organizations.csv``: domains and counts, never an
-address.
+address. The 200 organizations with the most commits in the last 12 months
+each get a page, ``<outputpath>/orgs/<domain>.html``, with their commits to
+each repository and a badge to show them (``orgs/<domain>.svg``, and a
+shields.io endpoint, ``orgs/<domain>.json``).
 
 Add ``--serve`` to preview the generated report right away — gitstats starts a
 local web server and prints the URL (bound to ``127.0.0.1`` by default; pass

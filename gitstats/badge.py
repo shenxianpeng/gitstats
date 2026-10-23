@@ -388,6 +388,10 @@ def _compact(value: int, noun: str) -> str:
     return f"{value} {noun}{suffix}"
 
 
+# for badges made elsewhere, such as a portfolio's organization badges
+compact_count = _compact
+
+
 @dataclass(frozen=True)
 class _Composite:
     """A badge built from several segments, and its shields.io endpoint data."""
@@ -547,6 +551,9 @@ def _endpoint_json(label: str, message: str, color: str) -> str:
         },
         indent=2,
     )
+
+
+endpoint_json = _endpoint_json
 
 
 def create_badges(data: Any, path: str) -> str:

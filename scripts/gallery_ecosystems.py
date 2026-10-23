@@ -554,5 +554,9 @@ def write_ecosystems(
         urls = ["", "ai.html", "organizations.html", f"{FOLDER}/"]
         urls += [f"{FOLDER}/{group.id}.html" for group in pages]
         urls += [f"{repo.id}/" for repo in repos if repo.id in by_id]
+        # the organizations' own pages, as the portfolio wrote them
+        orgs = os.path.join(gallery_root, "orgs")
+        if os.path.isdir(orgs):
+            urls += sorted(f"orgs/{entry}" for entry in os.listdir(orgs) if entry.endswith(".html"))
         _write(gallery_root, "sitemap.xml", sitemap(site_url, urls, generated))
     return pages

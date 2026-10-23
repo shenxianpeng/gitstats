@@ -138,3 +138,17 @@ sign up for), ``hidden`` (code hosts' noreply addresses), ``unknown`` and
 ``bot``; and ``organizations_last_12mo``, its five organizations with the most
 commits in the last 12 months. A domain says where an address is, not who paid
 for the work. New fields may be added at any time.
+
+Each of the 200 organizations with the most commits in the last 12 months has
+a page, ``orgs/<domain>.html``, with its commits to each repository, and a
+badge that is made again with every build: ``orgs/<domain>.svg``, and
+``orgs/<domain>.json`` for a `shields.io endpoint badge
+<https://shields.io/badges/endpoint-badge>`_. In Markdown:
+
+.. code-block:: markdown
+
+   [![GitStats Gallery](https://shenxianpeng.dev/gitstats/gallery/orgs/google.com.svg)](https://shenxianpeng.dev/gitstats/gallery/orgs/google.com.html)
+
+In ``organizations.json``, each organization's ``by_repository`` lists the
+repositories it committed to, each with its ``commits``, ``commits_last_12mo``,
+``addresses``, ``first_commit`` and ``last_commit``.

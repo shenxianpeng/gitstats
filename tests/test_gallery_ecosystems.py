@@ -315,3 +315,18 @@ def test_index_without_any_share(tmp_path):
 def test_write_stays_in_the_gallery(tmp_path, name):
     with pytest.raises(ValueError, match="outside the gallery"):
         eco._write(str(tmp_path / "gallery"), name, "x")
+
+
+def test_sitemap_lists_the_organizations_pages(tmp_path):
+    groups, repos, summaries = _gallery(tmp_path)
+    orgs = tmp_path / "orgs"
+    orgs.mkdir()
+    for name in ("google.com.html", "google.com.svg", "acme.org.html"):
+        (orgs / name).write_text("x", encoding="utf-8")
+    site = "https://example.com/gallery/"
+    eco.write_ecosystems(str(tmp_path), groups, repos, summaries, site, now=NOW)
+    sitemap = _read(tmp_path / "sitemap.xml")
+    assert f"<loc>{site}orgs/acme.org.html</loc>" in sitemap
+    assert f"<loc>{site}orgs/google.com.html</loc>" in sitemap
+    assert "google.com.svg" not in sitemap
+    assert sitemap.index("acme.org") < sitemap.index("google.com")

@@ -22,6 +22,7 @@ import shutil
 from typing import Any
 
 from gitstats import load_config
+from gitstats.badge import compact_count, endpoint_json, render_badge
 from gitstats.employers import KIND_LABELS, ORGANIZATION
 from gitstats.employers import KINDS as ORGANIZATION_KINDS
 from gitstats.employers import summarize as summarize_organizations
@@ -235,11 +236,22 @@ def organizations_dataset(
         for row in rows:
             total = totals.setdefault(
                 row["organization"],
-                {"commits": 0, "commits_last_12mo": 0, "repositories": []},
+                {"commits": 0, "commits_last_12mo": 0, "repositories": [], "by_repository": []},
             )
             total["commits"] += int(row["commits"])
             total["commits_last_12mo"] += int(row["commits_last_12mo"])
             total["repositories"].append(name)
+            total["by_repository"].append(
+                {
+                    "name": name,
+                    "report": summary.get("report_path", "") or "",
+                    "commits": int(row["commits"]),
+                    "commits_last_12mo": int(row["commits_last_12mo"]),
+                    "addresses": int(row.get("addresses", 0) or 0),
+                    "first_commit": row.get("first_commit", ""),
+                    "last_commit": row.get("last_commit", ""),
+                }
+            )
         recent = sorted(
             (row for row in rows if row["commits_last_12mo"]),
             key=lambda row: (-row["commits_last_12mo"], row["organization"]),
@@ -263,6 +275,10 @@ def organizations_dataset(
             "commits_last_12mo": total["commits_last_12mo"],
             "commits": total["commits"],
             "repositories": sorted(total["repositories"], key=str.lower),
+            "by_repository": sorted(
+                total["by_repository"],
+                key=lambda row: (-row["commits_last_12mo"], -row["commits"], row["name"].lower()),
+            ),
         }
         for name, total in sorted(
             totals.items(),
@@ -636,6 +652,34 @@ GROUP_FILTER_SCRIPT = """<script>
 
 # how many organizations the page lists; the data has them all
 _ORGANIZATIONS_SHOWN = 50
+# how many organizations get a page and a badge of their own: the first of
+# organizations_dataset, the most commits in the last 12 months first
+_ORGANIZATION_PAGES = 200
+# a domain, as an organization's page is named after it: "orgs/google.com.html"
+_DOMAIN = r"[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)+"
+_ORGANIZATION_FILE = re.compile(rf"orgs/{_DOMAIN}\.(?:html|svg|json)")
+
+
+def organization_pages(dataset: dict[str, Any]) -> list[dict[str, Any]]:
+    """The organizations of ``organizations_dataset`` that get a page and a
+    badge: the first _ORGANIZATION_PAGES whose domain can name a file."""
+    return [row for row in dataset["organizations"] if re.fullmatch(_DOMAIN, row["organization"])][
+        :_ORGANIZATION_PAGES
+    ]
+
+
+def organization_badge_message(row: dict[str, Any]) -> str:
+    """What an organization's badge says: its commits and projects in the last
+    12 months, or in all, when it has none in them."""
+    recent = [repo for repo in row["by_repository"] if repo["commits_last_12mo"]]
+    if recent:
+        commits, projects, when = row["commits_last_12mo"], len(recent), " in 12 months"
+    else:
+        commits, projects, when = row["commits"], len(row["by_repository"]), ""
+    return (
+        f"{compact_count(commits, 'commit')} to {projects} "
+        f"project{'' if projects == 1 else 's'}{when}"
+    )
 
 
 def _organization_share_key(entry: dict[str, Any]) -> tuple[float, str]:
@@ -731,14 +775,19 @@ class AggregateReportCreator:
                     f.write(text)
                 finally:
                     f.close()
+            pages = organization_pages(dataset)
+            self.organization_page_names = {row["organization"] for row in pages}
             f = self._open_portfolio_file(path, "organizations.html")
             try:
                 self._write_organizations_page(f, summaries, title, dataset, ai)
             finally:
                 f.close()
+            for row in pages:
+                self._write_organization_files(path, row, title, len(summaries), ai)
 
     site_url = ""
     organizations = False
+    organization_page_names: set[str] = set()
     version = ""
     groups: list[tuple[str, str]] = []
 
@@ -813,7 +862,11 @@ class AggregateReportCreator:
             "ai-share-card.html",
         )
         data = ("ai.json", "ai.csv", "organizations.json", "organizations.csv")
-        if name not in (*pages, *data) and not _SNAPSHOT.fullmatch(name):
+        if (
+            name not in (*pages, *data)
+            and not _SNAPSHOT.fullmatch(name)
+            and not _ORGANIZATION_FILE.fullmatch(name)
+        ):
             raise ValueError(f"Not a portfolio page: {name}")
         base = os.path.abspath(path)
         target = os.path.abspath(os.path.join(base, name))
@@ -1019,7 +1072,7 @@ class AggregateReportCreator:
             if len(names) > 4:
                 shown += f" and {len(names) - 4} more"
             f.write(
-                f"<tr><td>{html.escape(row['organization'])}</td>"
+                f"<tr><td>{self._organization_link(row['organization'])}</td>"
                 f'<td class="num">{format_int(len(names))}</td>'
                 f'<td class="num">{format_int(row["commits_last_12mo"])}</td>'
                 f'<td class="num">{format_int(row["commits"])}</td>'
@@ -1063,6 +1116,129 @@ class AggregateReportCreator:
         )
         self._print_footer(f)
 
+    def _organization_link(self, name: str, prefix: str = "") -> str:
+        """An organization's name, linked to its page when it has one."""
+        if name not in self.organization_page_names:
+            return html.escape(name)
+        href = html.escape(f"{prefix}orgs/{name}.html", quote=True)
+        return f'<a href="{href}">{html.escape(name)}</a>'
+
+    def _write_organization_files(
+        self, path: str, row: dict[str, Any], title: str, repositories: int, ai: bool
+    ) -> None:
+        """An organization's page, its badge, and the badge's shields.io endpoint."""
+        name = row["organization"]
+        message = organization_badge_message(row)
+        files = (
+            ("svg", render_badge(title, message)),
+            ("json", endpoint_json(title, message, "#4a7ab5")),
+        )
+        for extension, text in files:
+            f = self._open_portfolio_file(path, f"orgs/{name}.{extension}")
+            try:
+                f.write(text)
+            finally:
+                f.close()
+        f = self._open_portfolio_file(path, f"orgs/{name}.html")
+        try:
+            self._write_organization_page(f, row, title, repositories, message, ai)
+        finally:
+            f.close()
+
+    def _write_organization_page(
+        self,
+        f: Any,
+        row: dict[str, Any],
+        title: str,
+        repositories: int,
+        message: str,
+        ai: bool = False,
+    ) -> None:
+        """One organization: its commits to each repository of the portfolio,
+        and its badge with the markup to show it."""
+        name = row["organization"]
+        page = f"orgs/{name}.html"
+        page_title = f"{name} in {title}"
+        description = (
+            f"{name} in {title}: {message}, counted by the domain of its commit addresses."
+        )
+        self._print_header(
+            f, page_title, self._share_tags(page_title, description, page, "share-card.png"), "../"
+        )
+        self._print_nav(f, title, "organizations.html", ai, prefix="../")
+        f.write(f"<h1>{html.escape(name)}</h1>")
+        f.write(
+            f'<p class="portfolio-subtitle"><a href="../index.html">{html.escape(title)}</a>, '
+            f"{format_int(repositories)} repositories &middot; generated by gitstats "
+            f"{html.escape(self.version or get_version())} on "
+            f"{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>"
+        )
+        f.write(
+            '<p class="section-note">How it is counted: a commit counts here when the '
+            f"author&rsquo;s email address is at {html.escape(name)} or under it, and at "
+            "least two people commit from the domain. A domain says where an address is, "
+            "not who paid for the work, so these are lower bounds.</p>"
+        )
+        recent = [repo for repo in row["by_repository"] if repo["commits_last_12mo"]]
+        first = min((repo["first_commit"] for repo in row["by_repository"]), default="")
+        f.write(
+            stat_tiles_html(
+                [
+                    (
+                        "Commits (12 mo)",
+                        format_int(row["commits_last_12mo"]),
+                        f"to {len(recent)} of these repositories",
+                    ),
+                    (
+                        "Repositories",
+                        format_int(len(row["by_repository"])),
+                        "it has committed to",
+                    ),
+                    ("Commits", format_int(row["commits"]), f"since {html.escape(first)}"),
+                ]
+            )
+        )
+
+        f.write("<h2>Repositories</h2>")
+        f.write('<div class="table-scroll"><table class="sortable" id="organization-repos">')
+        f.write(
+            '<tr><th>Repository</th><th class="num">Commits (12 mo)</th>'
+            '<th class="num">Commits</th><th class="num">Addresses</th>'
+            "<th>First commit</th><th>Last commit</th></tr>"
+        )
+        for repo in row["by_repository"]:
+            link = repo["report"]
+            if link.endswith("index.html"):
+                link = link[: -len("index.html")] + "authors.html#commits_by_organization"
+            f.write(
+                f'<tr><td><a href="../{html.escape(link, quote=True)}">'
+                f"{html.escape(repo['name'])}</a></td>"
+                f'<td class="num">{format_int(repo["commits_last_12mo"])}</td>'
+                f'<td class="num">{format_int(repo["commits"])}</td>'
+                f'<td class="num">{format_int(repo["addresses"])}</td>'
+                f'<td class="nowrap">{html.escape(repo["first_commit"])}</td>'
+                f'<td class="nowrap">{html.escape(repo["last_commit"])}</td></tr>'
+            )
+        f.write("</table></div>")
+
+        f.write("<h2>Badge</h2>")
+        site = self.site_url
+        image = f"{site}orgs/{name}.svg" if site else f"orgs/{name}.svg"
+        target = f"{site}orgs/{name}.html" if site else f"orgs/{name}.html"
+        markdown = f"[![{title}]({image})]({target})"
+        f.write(
+            '<p class="section-note">For a README or an open source program&rsquo;s page. It '
+            "is made again with the portfolio, so it stays current. A shields.io "
+            f'<a href="{html.escape(name, quote=True)}.json">endpoint</a> is next to it, for '
+            "badges in other styles.</p>"
+        )
+        f.write(
+            f'<p><img src="{html.escape(name, quote=True)}.svg" '
+            f'alt="{html.escape(title, quote=True)}: {html.escape(message, quote=True)}"></p>'
+        )
+        f.write(f'<pre class="badge-code">{html.escape(markdown)}</pre>')
+        self._print_footer(f)
+
     def _organization_mix_row(self, entry: dict[str, Any]) -> str:
         """One repository's row of the By repository table."""
         link = entry["report"]
@@ -1073,7 +1249,7 @@ class AggregateReportCreator:
             for kind in ORGANIZATION_KINDS
         )
         named = ", ".join(
-            f"{html.escape(row['organization'])} ({format_int(row['commits'])})"
+            f"{self._organization_link(row['organization'])} ({format_int(row['commits'])})"
             for row in entry["organizations_last_12mo"][:3]
         )
         group = _group_attr(str(entry.get("group", "") or "")) if self.groups else ""
@@ -1267,7 +1443,9 @@ class AggregateReportCreator:
             image if load_config().get("share_card") else "",
         )
 
-    def _print_header(self, f: Any, title: str, share: str = "") -> None:
+    def _print_header(self, f: Any, title: str, share: str = "", prefix: str = "") -> None:
+        """The head of a portfolio page; ``prefix`` leads from the page's
+        folder to the output root ("../" for a page in a folder)."""
         f.write(
             """<!DOCTYPE html>
 <html lang="en">
@@ -1278,9 +1456,9 @@ class AggregateReportCreator:
 	{}
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	{}
-	<link rel="stylesheet" href="{}" type="text/css">
+	<link rel="stylesheet" href="{}{}" type="text/css">
 	<meta name="generator" content="GitStats {}">
-	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="{}sortable.js"></script>
 	{}
 </head>
 <body>
@@ -1288,22 +1466,34 @@ class AggregateReportCreator:
                 html.escape(title),
                 share,
                 THEME_INIT_SCRIPT,
+                prefix,
                 load_config()["style"],
                 html.escape(self.version or get_version()),
+                prefix,
                 THEME_SCRIPT,
             )
         )
 
-    def _print_nav(self, f: Any, title: str, current: str = "index.html", ai: bool = False) -> None:
-        ai_link = nav_link("ai.html", "AI-assisted commits", current=current) if ai else ""
+    def _print_nav(
+        self,
+        f: Any,
+        title: str,
+        current: str = "index.html",
+        ai: bool = False,
+        prefix: str = "",
+    ) -> None:
+        """The nav bar; ``current`` is the page it marks, and ``prefix`` leads
+        from the page's folder to the output root."""
+        current = prefix + current
+        ai_link = nav_link(f"{prefix}ai.html", "AI-assisted commits", current=current) if ai else ""
         if self.organizations:
-            ai_link += nav_link("organizations.html", "Organizations", current=current)
+            ai_link += nav_link(f"{prefix}organizations.html", "Organizations", current=current)
         f.write(
             f"""
             <div class="nav">
-            <a href="index.html" class="nav-brand">GitStats</a>
+            <a href="{prefix}index.html" class="nav-brand">GitStats</a>
             <ul>
-            {nav_link("index.html", html.escape(title), current=current)}
+            {nav_link(f"{prefix}index.html", html.escape(title), current=current)}
             {ai_link}
             </ul>
             <div class="nav-right">

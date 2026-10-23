@@ -17,6 +17,8 @@ from gitstats.aggregate import (
     compute_repo_summary,
     last_quarters,
     load_repo_summaries,
+    organization_badge_message,
+    organization_pages,
     organizations_csv,
     organizations_dataset,
     organizations_description,
@@ -1077,25 +1079,13 @@ class TestOrganizationsDataset:
         assert data["quarters"] == ["2025-Q4", "2026-Q1", "2026-Q2", "2026-Q3"]
         assert "not who paid for the work" in data["description"]
         # the most commits in the last 12 months first
-        assert data["organizations"] == [
-            {
-                "organization": "redhat.com",
-                "commits_last_12mo": 60,
-                "commits": 305,
-                "repositories": ["django", "kubernetes"],
-            },
-            {
-                "organization": "google.com",
-                "commits_last_12mo": 40,
-                "commits": 500,
-                "repositories": ["kubernetes"],
-            },
-            {
-                "organization": "acme.org",
-                "commits_last_12mo": 3,
-                "commits": 10,
-                "repositories": ["django"],
-            },
+        assert [
+            (row["organization"], row["commits_last_12mo"], row["commits"], row["repositories"])
+            for row in data["organizations"]
+        ] == [
+            ("redhat.com", 60, 305, ["django", "kubernetes"]),
+            ("google.com", 40, 500, ["kubernetes"]),
+            ("acme.org", 3, 10, ["django"]),
         ]
 
     def test_repositories_by_kind(self):
@@ -1189,7 +1179,8 @@ class TestOrganizationsPage:
         assert "not who paid for the" in page
         assert '<table class="sortable" id="organizations">' in page
         assert (
-            '<tr><td>redhat.com</td><td class="num">1</td><td class="num">60</td>'
+            '<tr><td><a href="orgs/redhat.com.html">redhat.com</a></td>'
+            '<td class="num">1</td><td class="num">60</td>'
             '<td class="num">300</td><td>kubernetes</td></tr>'
         ) in page
         # tiles: organizations with commits in the last 12 months, the widest, the largest share
@@ -1201,7 +1192,10 @@ class TestOrganizationsPage:
         mix = page[page.index('id="organization-mix"') :]
         assert 'href="kubernetes/authors.html#commits_by_organization"' in mix
         assert mix.index("kubernetes") < mix.index("django")
-        assert "redhat.com (60), google.com (40)" in mix
+        assert (
+            '<a href="orgs/redhat.com.html">redhat.com</a> (60), '
+            '<a href="orgs/google.com.html">google.com</a> (40)'
+        ) in mix
         assert "<td>&ndash;</td>" in mix  # django: none in the last 12 months
         assert '<a href="organizations.json">' in page
         with open(os.path.join(temp_dir, "organizations.json"), encoding="utf-8") as f:
@@ -1259,3 +1253,138 @@ class TestOrganizationsPage:
         ]
         assert "Largest Share" not in page
         assert '<td class="num">0</td><td class="num">0%</td>' in page
+
+
+class TestOrganizationPages:
+    NOW = datetime.datetime(2026, 10, 23, 12)
+
+    @staticmethod
+    def _row(name, repos):
+        """An organization of organizations_dataset: ``repos`` as (name,
+        commits, commits in the last 12 months)."""
+        return {
+            "organization": name,
+            "commits": sum(commits for _, commits, _ in repos),
+            "commits_last_12mo": sum(recent for _, _, recent in repos),
+            "repositories": [repo for repo, _, _ in repos],
+            "by_repository": [
+                {
+                    "name": repo,
+                    "report": f"{repo}/index.html",
+                    "commits": commits,
+                    "commits_last_12mo": recent,
+                    "addresses": 2,
+                    "first_commit": "2020-01-01",
+                    "last_commit": "2026-01-01",
+                }
+                for repo, commits, recent in repos
+            ],
+        }
+
+    def test_dataset_keeps_each_repository(self):
+        summaries = TestOrganizationsDataset()._summaries()
+        redhat = organizations_dataset(summaries, self.NOW)["organizations"][0]
+        assert redhat["by_repository"] == [
+            {
+                "name": "kubernetes",
+                "report": "kubernetes/index.html",
+                "commits": 300,
+                "commits_last_12mo": 60,
+                "addresses": 2,
+                "first_commit": "2020-01-01",
+                "last_commit": "2026-01-01",
+            },
+            {
+                "name": "django",
+                "report": "django/index.html",
+                "commits": 5,
+                "commits_last_12mo": 0,
+                "addresses": 2,
+                "first_commit": "2020-01-01",
+                "last_commit": "2026-01-01",
+            },
+        ]
+
+    def test_which_organizations_get_a_page(self):
+        rows = [self._row(f"org{n}.com", [("a", 1, 1)]) for n in range(205)]
+        rows.insert(0, self._row("not a domain", [("a", 1, 1)]))
+        rows.insert(1, self._row("../up.com", [("a", 1, 1)]))
+        rows.insert(2, self._row("localhost", [("a", 1, 1)]))
+        pages = organization_pages({"organizations": rows})
+        assert len(pages) == 200
+        assert pages[0]["organization"] == "org0.com"
+
+    def test_badge_message(self):
+        assert (
+            organization_badge_message(self._row("a.com", [("x", 1500, 1200), ("y", 9, 0)]))
+            == "1.2k commits to 1 project in 12 months"
+        )
+        assert (
+            organization_badge_message(self._row("a.com", [("x", 5, 1), ("y", 9, 3)]))
+            == "4 commits to 2 projects in 12 months"
+        )
+        # none in the last 12 months: all of them
+        assert (
+            organization_badge_message(self._row("a.com", [("x", 1, 0)])) == "1 commit to 1 project"
+        )
+
+    @staticmethod
+    def _render(temp_dir, summaries, site_url=""):
+        AggregateReportCreator().create(summaries, [], temp_dir, site_url=site_url)
+
+        def read(name):
+            with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
+                return f.read()
+
+        return read
+
+    def test_files_and_page(self, temp_dir):
+        read = self._render(temp_dir, TestOrganizationsPage._summaries())
+        page = read("orgs/redhat.com.html")
+        # the page, its badge and the badge's shields.io endpoint
+        assert "<h1>redhat.com</h1>" in page
+        assert read("orgs/redhat.com.svg").startswith("<svg")
+        endpoint = json.loads(read("orgs/redhat.com.json"))
+        assert endpoint["label"] == "GitStats Portfolio"
+        assert endpoint["message"] == "60 commits to 1 project in 12 months"
+        # it reaches the portfolio's files from its folder
+        assert 'href="../gitstats.css"' in page
+        assert 'src="../sortable.js"' in page
+        assert '<a href="../index.html" class="nav-brand">' in page
+        assert 'href="../organizations.html" class="active"' in page
+        assert '<a href="../kubernetes/authors.html#commits_by_organization">kubernetes</a>' in page
+        assert "How it is counted:" in page
+        assert "since 2020-01-01" in page
+        # without the portfolio's address, the markup is relative
+        assert "[![GitStats Portfolio](orgs/redhat.com.svg)](orgs/redhat.com.html)" in page
+        # the organizations page links to it
+        assert '<a href="orgs/redhat.com.html">redhat.com</a>' in read("organizations.html")
+
+    def test_markup_with_the_portfolio_address(self, temp_dir):
+        site = "https://example.org/gallery/"
+        read = self._render(temp_dir, TestOrganizationsPage._summaries(), site)
+        page = read("orgs/google.com.html")
+        assert (
+            f"[![GitStats Portfolio]({site}orgs/google.com.svg)]({site}orgs/google.com.html)"
+            in (page)
+        )
+        assert f'content="{site}orgs/google.com.html"' in page
+
+    def test_an_organization_without_a_page_is_not_linked(self, temp_dir):
+        summary = _summary("a", 1, {}, organizations=_orgs([("odd_name", 3, 3)]))
+        read = self._render(temp_dir, [summary])
+        assert "<tr><td>odd_name</td>" in read("organizations.html")
+        assert not os.path.exists(os.path.join(temp_dir, "orgs"))
+
+    def test_report_that_is_not_an_index_page(self, temp_dir):
+        summary = _summary("a", 1, {}, organizations=_orgs([("acme.org", 3, 3)]))
+        summary["report_path"] = "elsewhere.html"
+        read = self._render(temp_dir, [summary])
+        assert 'href="../elsewhere.html"' in read("orgs/acme.org.html")
+
+    @pytest.mark.parametrize(
+        "name", ["orgs/../index.html", "orgs/a.com.exe", "orgs/sub/a.com.html", "orgs/.com.html"]
+    )
+    def test_only_organization_files_are_written(self, tmp_path, name):
+        with pytest.raises(ValueError):
+            AggregateReportCreator._open_portfolio_file(str(tmp_path), name)
