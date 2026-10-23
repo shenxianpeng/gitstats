@@ -149,12 +149,27 @@ def badge_markdown(report_id: str, name: str, site_url: str) -> str:
 
 
 def report_note(
-    report_id: str, name: str, site_url: str, badge: bool, group: Group | None = None
+    report_id: str,
+    name: str,
+    site_url: str,
+    badge: bool,
+    group: Group | None = None,
+    compared: bool = False,
 ) -> str:
-    """The note at the end of a report page: the badge, when ``badge``, how
-    the repository ranks in its ``group``, and how to make the report for
-    another repository."""
+    """The note at the end of a report page: how the repository compares with
+    the others, when ``compared``, the badge, when ``badge``, how it ranks in
+    its ``group``, and how to make the report for another repository."""
     parts = [NOTE_MARK, '<section class="gallery-note" id="gallery-note">']
+    if compared:
+        peers = (
+            f"other {in_a_sentence(group.title)}"
+            if group is not None
+            else "the Gallery's other projects"
+        )
+        parts.append(
+            f'<p class="more-link"><a href="compare.html">How {html.escape(name)} compares '
+            f"with {html.escape(peers)} &rarr;</a></p>"
+        )
     if group is not None:
         parts.append(
             f'<p class="more-link"><a href="../{FOLDER}/{group.id}.html">How {html.escape(name)} '
@@ -252,11 +267,12 @@ def add_note(base: str, page: str, note: str) -> bool:
 
 
 def _report_pages(folder: str) -> list[str]:
-    """The pages of a report to read, not its share card."""
+    """The pages of a report to read: not its share card, nor the comparison
+    page and card the portfolio wrote next to them."""
     return [
         entry
         for entry in sorted(os.listdir(folder))
-        if entry.endswith(".html") and not entry.startswith("share-card")
+        if entry.endswith(".html") and not entry.startswith(("share-card", "compare"))
     ]
 
 
@@ -269,11 +285,14 @@ def _add_report_note(
     if not folder or folder == base or not os.path.isdir(folder):
         return 0
     badge = os.path.isfile(os.path.join(folder, AI_BADGE))
+    compared = os.path.isfile(os.path.join(folder, "compare.html"))
     name = str(summary.get("name", ""))
     group = (groups or {}).get(str(summary.get("group", "")))
     added = 0
     for entry in _report_pages(folder):
-        note = report_note(report_id, name, site_url, badge and entry == "index.html", group)
+        note = report_note(
+            report_id, name, site_url, badge and entry == "index.html", group, compared
+        )
         added += add_note(base, os.path.join(folder, entry), note)
     return added
 
@@ -361,6 +380,7 @@ def main(argv: list[str] | None = None) -> int:
         site_url=site_url,
         version=version,
         groups=[(group.id, group.name) for group in groups],
+        group_titles={group.id: in_a_sentence(group.title) for group in groups},
     )
     ecosystems = write_ecosystems(
         gallery_root, groups, repos, summaries, site_url, args.share_card, version
