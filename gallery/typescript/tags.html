@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - TypeScript</title>
+	<meta name="description" content="TypeScript: 39,591 commits by 997 authors, 2014 to 2026. A report made with gitstats.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="TypeScript: Tags">
+	<meta property="og:description" content="TypeScript: 39,591 commits by 997 authors, 2014 to 2026. A report made with gitstats.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/typescript/tags.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/typescript/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="TypeScript: Tags">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="TypeScript: Tags">
+	<meta name="twitter:description" content="TypeScript: 39,591 commits by 997 authors, 2014 to 2026. A report made with gitstats.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/typescript/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html" class="active" aria-current="page">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Tags</h1><dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">16</dd><dd class="stat-note"><span class="nowrap">latest vscode-typescript/v1.0.1</span>&nbsp;&middot; <span class="nowrap">2026-09-29</span></dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">2474.4</dd><dd class="stat-note">39,591 commits in total</dd></div></dl>
+<h2 id="all_tags"><a href="#all_tags">All tags</a></h2>
+
+<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th>Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">vscode-typescript/v1.0.1</td><td class="nowrap">2026-09-29</td><td class="num">14</td><td>Mateusz Burzyński (3), Jake Bailey (3), typescript-automation <span class="badge" title="typescript-automation[bot]">bot</span> (1), lsh4711 (1), auvred (1), Oleksandr Tarasiuk (1), Max Schwenk (1), Copilot (1), Andrew Branch (1), Anders Hejlsberg (1)</td></tr><tr><td class="nowrap">vscode-typescript/v1.0.0</td><td class="nowrap">2026-09-28</td><td class="num">12,373</td><td>Jake Bailey (1,394), Anders Hejlsberg (1,020), TypeScript Bot (931), Sheetal Nandi (859), Andrew Branch (853), Wesley Wigham (750), CSIGS@microsoft.com (696), Oleksandr Tarasiuk (581), Mateusz Burzyński (566), Nathan Shively-Sanders (546), Ron Buckton (358), Copilot (337), Daniel Rosenwasser (330), Alex T (271), Gabriela Araujo Britto (220), Orta Therox (171), Andrew Casey (159), dependabot <span class="badge" title="dependabot[bot]">bot</span> (130), Ryan Cavanaugh (120), Wenlu Wang (97), Eli Barzilay (86), Isabel Duan (80), BigAru (76), Armando Aguirre (70), navya9singh (62), Josh Goldberg ✨ (60), Jesse Trinity (58), Zzzen (51), Titian Cernicova-Dragomir (48), Alexander (44), John Favret (41), Ben Lichtman (40), Klaus Meinhardt (39), Jack Works (34), Song Gao (21), Jack Bates (21), Florian Regensburger (19), typescript-bot (17), Maria José Solano (16), Jack Williams (15), uhyo (14), Zixiang Li (14), Kagami Sascha Rosylight (14), Cameron (14), graphemecluster (13), ExE Boss (13), auvred (12), Vitaly (12), xu0o0 (11), Tom Mrazauskas (11), <em>and 585 more authors</em></td></tr><tr><td class="nowrap">v3.3.4000</td><td class="nowrap">2019-03-19</td><td class="num">1,096</td><td>Sheetal Nandi (303), Anders Hejlsberg (256), Gabriela Araujo Britto (73), Wesley Wigham (61), Daniel Rosenwasser (54), Ron Buckton (46), Ryan Cavanaugh (43), Klaus Meinhardt (32), Ben Lichtman (22), TypeScript Bot (18), Kagami Sascha Rosylight (18), Wenlu Wang (13), Nathan Shively-Sanders (12), Alex T (12), kpreisser (11), Jack Williams (11), Andrew Casey (10), Andy Hanson (9), Alexander (9), Jordi Oliveras Rovira (7), Titian Cernicova-Dragomir (6), Benedikt Meurer (6), Collins Abitekaniza (5), Zixiang Li (4), Masahiro Wakame (4), Martin Probst (4), Josh Goldberg ✨ (4), Alan Pierce (4), xl1 (3), Matt McCutchen (3), AnyhowStep (3), Andrey Roenko (3), Ali Sabzevari (3), Joseph Wunderlich (2), Jesse Trinity (2), CSIGS@microsoft.com (2), superkd37 (1), ispedals (1), fullheightcoding (1), Yang Cao (1), Tom J (1), Siddharth Singh (1), Sanket Mishra (1), Pranav Senthilnathan (1), Philip Pesca (1), Pete Bacon Darwin (1), Mine Starks (1), Matthew Aynalem (1), Matt (1), Manish Bansal (1), <em>and 4 more authors</em></td></tr><tr><td class="nowrap">v3.2.2</td><td class="nowrap">2018-12-06</td><td class="num">12,737</td><td>Andy Hanson (1,773), Anders Hejlsberg (1,550), Nathan Shively-Sanders (1,342), Ron Buckton (1,154), Sheetal Nandi (1,025), Mohamed Hegazy (791), CSIGS@microsoft.com (546), Wesley Wigham (535), Arthur Ozga (488), Daniel Rosenwasser (460), Ryan Cavanaugh (399), Kanchalai Tanglertsampan (381), Andrew Casey (331), Vladimir Matveev (186), Klaus Meinhardt (109), Yui (101), uniqueiniquity (98), Ben Lichtman (97), Wenlu Wang (96), Armando Aguirre (64), Paul van Brenk (60), Zhengbo Li (59), TypeScript Bot (52), Kagami Sascha Rosylight (42), Jason Ramsay (42), Herrington Darkholme (40), Mine Starks (36), Josh Goldberg ✨ (35), Richard Knoll (31), Yuichi Nukiyama (30), Alex T (23), Bill Ticehurst (21), Tingan Ho (20), Jack Williams (19), falsandtru (18), about-code (17), Charles Pierce (15), Caleb Sander (15), Andrej Baran (15), Matt McCutchen (14), Martin Probst (14), rbuckton (12), jramsay (12), Justin Bay (12), Henry Mercer (12), cedvdb (11), Matt Bierner (11), John Doe (11), iliashkolyar (10), anubmat (10), <em>and 213 more authors</em></td></tr><tr><td class="nowrap">v2.0.5</td><td class="nowrap">2016-09-22</td><td class="num">403</td><td>Vladimir Matveev (203), Richard Knoll (50), Nathan Shively-Sanders (34), Mohamed Hegazy (24), Jason Ramsay (19), Ryan Cavanaugh (18), Zhengbo Li (12), Anders Hejlsberg (12), Daniel Rosenwasser (9), Kanchalai Tanglertsampan (7), Andy Hanson (6), Yui (5), jramsay (3), Rostislav Galimsky (1)</td></tr><tr><td class="nowrap">v2.0-rc</td><td class="nowrap">2016-08-25</td><td class="num">594</td><td>Anders Hejlsberg (121), Nathan Shively-Sanders (94), Andy Hanson (91), Wesley Wigham (40), Mohamed Hegazy (37), Ryan Cavanaugh (34), Yui (31), Zhengbo Li (30), Daniel Rosenwasser (19), Bill Ticehurst (16), Sheetal Nandi (13), Richard Knoll (11), Yuichi Nukiyama (9), Vladimir Matveev (9), Ron Buckton (8), yortus (5), Kanchalai Tanglertsampan (5), Alex Eagle (4), joshaber (3), Jason Ramsay (2), Anatoly Ressin (2), jramsay (1), gcnew (1), falsandtru (1), Tingan Ho (1), Tetsuharu OHZEKI (1), Sudheesh Singanamalla (1), Kagami Sascha Rosylight (1), Jakub Młokosiewicz (1), Herrington Darkholme (1), Godfrey Chan (1)</td></tr><tr><td class="nowrap">v2.0.2</td><td class="nowrap">2016-08-25</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">v2.0.0-beta</td><td class="nowrap">2016-07-07</td><td class="num">4,379</td><td>Anders Hejlsberg (489), Daniel Rosenwasser (488), Vladimir Matveev (447), Mohamed Hegazy (396), Wesley Wigham (362), Nathan Shively-Sanders (329), Ryan Cavanaugh (258), Sheetal Nandi (257), Zhengbo Li (250), Kanchalai Tanglertsampan (211), Andy Hanson (182), Kagami Sascha Rosylight (120), Ron Buckton (107), Bill Ticehurst (72), Yui (51), Paul van Brenk (31), Jason Ramsay (25), AbubakerB (23), Tingan Ho (19), Richard Knoll (17), Evan Sebastian (16), shyyko.serhiy@gmail.com (15), Asad Saeeduddin (11), vilicvane (9), Nathan Yee (8), york yao (7), Martin Všetička (7), Herrington Darkholme (7), Arnavion (7), Oleg Mihailik (6), Noj Vek (6), Erik Edrosa (6), jbondc (5), Yuichi Nukiyama (5), York Yao (5), Sébastien Arod (5), Julian Williams (5), Josh Soref (5), Basarat Ali Syed (5), jramsay (4), Ryohei Ikegami (4), Jason Killian (4), Dick van den Brink (4), Dan Corder (4), yaoyao (3), guybedford (3), falsandtru (3), Zev Spitz (3), Rowan Wyborn (3), Oskar Segersvärd (3), <em>and 47 more authors</em></td></tr><tr><td class="nowrap">v1.6.2</td><td class="nowrap">2015-09-11</td><td class="num">55</td><td>Daniel Rosenwasser (20), Vladimir Matveev (17), Mohamed Hegazy (11), Kagami Sascha Rosylight (3), Sheetal Nandi (2), Zhengbo Li (1), Wesley Wigham (1)</td></tr><tr><td class="nowrap">v1.6.0-beta</td><td class="nowrap">2015-08-29</td><td class="num">1,952</td><td>Daniel Rosenwasser (340), Arthur Ozga (191), Anders Hejlsberg (187), Jason Freeman (170), Vladimir Matveev (138), CyrusNajmabadi (132), Mohamed Hegazy (123), Ryan Cavanaugh (115), Zhengbo Li (105), Kanchalai Tanglertsampan (90), Ron Buckton (81), Tingan Ho (56), Dan Quirk (32), Wesley Wigham (22), Kagami Sascha Rosylight (20), Dick van den Brink (18), Sheetal Nandi (17), Tien Nguyen (16), shyyko.serhiy@gmail.com (12), Yui (12), Paul van Brenk (12), Basarat Ali Syed (8), Masahiro Wakame (6), Jason Ramsay (6), tien (5), jbondc (5), pcan (4), jramsay (2), ToddThomson (2), Schmavery (2), Oleg Mihailik (2), Dirk Bäumer (2), David Souther (2), David Li (2), Adi Dahiya (2), piloopin (1), kimamula (1), impinball (1), The Gitter Badger (1), Tarik (1), Oleksandr Chekhovskyi (1), Micah Zoltu (1), Kyle Kelley (1), JBerger (1), Ivo Gabe de Wolff (1), Gilad Peleg (1), Colby Russell (1), Ben Duffield (1)</td></tr><tr><td class="nowrap">v1.5.3</td><td class="nowrap">2015-07-15</td><td class="num">413</td><td>Vladimir Matveev (89), Mohamed Hegazy (77), Jason Freeman (40), Kanchalai Tanglertsampan (35), Anders Hejlsberg (32), Ron Buckton (30), CyrusNajmabadi (24), Daniel Rosenwasser (22), Paul van Brenk (18), Zhengbo Li (10), kmashint (9), Yui (8), Masahiro Wakame (6), Tien Nguyen (3), Dirk Bäumer (2), Tingan Ho (1), Pedro Maltez (1), James Whitney (1), Frank Wallis (1), Dan Quirk (1), Colin Snover (1), Bryan Forbes (1), Basarat Ali Syed (1)</td></tr><tr><td class="nowrap">v1.5.4</td><td class="nowrap">2015-07-15</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">v1.5.0-beta</td><td class="nowrap">2015-04-27</td><td class="num">464</td><td>Mohamed Hegazy (98), CyrusNajmabadi (81), Daniel Rosenwasser (75), Jason Freeman (59), Ron Buckton (51), Kanchalai Tanglertsampan (32), ahmad-farid (20), Zhengbo Li (11), Tien Nguyen (8), Zev Spitz (5), Anders Hejlsberg (5), Yui (4), steveluc (3), Paul van Brenk (3), Kagami Sascha Rosylight (2), Dirk Bäumer (2), TruongSinh Tran-Nguyen (1), Steve Lucco (1), Johannes Rieken (1), Guillaume Salles (1), Arnavion (1)</td></tr><tr><td class="nowrap">v1.5.0-alpha</td><td class="nowrap">2015-04-01</td><td class="num">3,519</td><td>CyrusNajmabadi (968), Mohamed Hegazy (417), Daniel Rosenwasser (375), Vladimir Matveev (339), Anders Hejlsberg (315), Kanchalai Tanglertsampan (272), Jason Freeman (257), Sheetal Nandi (240), Paul van Brenk (43), Ron Buckton (33), steveluc (31), Ivo Gabe de Wolff (30), Dick van den Brink (26), Yui (24), Caitlin Potter (15), Arnavion (13), Ryan Cavanaugh (11), Chris Bubernak (11), jbondc (10), Zev Spitz (10), Tien Nguyen (10), Bill Ticehurst (9), Dan Quirk (8), Steve Lucco (7), Jason Ramsay (7), togru (6), Stan Thomas (5), Dirk Bäumer (4), Colin Snover (4), jramsay (3), Gabriel Isenberg (3), Tingan Ho (2), Jed Mao (2), zhongsp (1), Solal Pirelli (1), Shengping Zhong (1), Oleg Mihailik (1), Masahiro Wakame (1), Lorant Pinter (1), Josh Kalderimis (1), Jonathan Park (1), Johannes Rieken (1)</td></tr><tr><td class="nowrap">v1.3</td><td class="nowrap">2014-10-27</td><td class="num">616</td><td>Daniel Rosenwasser (114), Mohamed Hegazy (101), Kanchalai Tanglertsampan (92), CyrusNajmabadi (78), Sheetal Nandi (57), Jason Freeman (55), Anders Hejlsberg (43), Vladimir Matveev (33), Chris Bubernak (27), Yui (8), Dan Quirk (2), Adam Freidin (2), v2m (1), Tien Nguyen (1), Ingvar Stepanyan (1), Dick van den Brink (1)</td></tr><tr><td class="nowrap">v1.1</td><td class="nowrap">2014-09-17</td><td class="num">846</td><td>Mohamed Hegazy (233), Sheetal Nandi (157), Daniel Rosenwasser (111), Jason Freeman (93), Anders Hejlsberg (90), Vladimir Matveev (72), Dan Quirk (27), CyrusNajmabadi (21), Ryan Cavanaugh (12), Dick van den Brink (10), Adam Freidin (7), Jonathan Turner (3), Tien Nguyen (2), Ivo Gabe de Wolff (2), Ingvar Stepanyan (2), milkisevil (1), Simon Hürlimann (1), Max Deepfield (1), Harald Niesche (1)</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="../ecosystems/frontend.html">How TypeScript ranks among open source web frontend projects by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+name: GitStats Report
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  gitstats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: shenxianpeng/gitstats-action@v1
+        with:
+          deploy-to-pages: true
+</pre></details></section><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

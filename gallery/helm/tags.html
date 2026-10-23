@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - Helm</title>
+	<meta name="description" content="Helm: 10,017 commits by 950 authors, 2015 to 2026. A report made with gitstats.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="Helm: Tags">
+	<meta property="og:description" content="Helm: 10,017 commits by 950 authors, 2015 to 2026. A report made with gitstats.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/helm/tags.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/helm/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="Helm: Tags">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Helm: Tags">
+	<meta name="twitter:description" content="Helm: 10,017 commits by 950 authors, 2015 to 2026. A report made with gitstats.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/helm/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html" class="active" aria-current="page">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Tags</h1><dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">43</dd><dd class="stat-note"><span class="nowrap">latest v4.3.0-rc.1</span>&nbsp;&middot; <span class="nowrap">2026-08-31</span></dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">233.0</dd><dd class="stat-note">10,017 commits in total</dd></div></dl>
+<h2 id="all_tags"><a href="#all_tags">All tags</a></h2>
+
+<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th>Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">v4.3.0-rc.1</td><td class="nowrap">2026-08-31</td><td class="num">714</td><td>Terry Howe (168), George Jenkins (102), dependabot <span class="badge" title="dependabot[bot]">bot</span> (101), Matthieu MOREL (90), MrJack (38), Evans Mungai (28), Matt Farina (20), Matheus Pimenta (14), Joe Julian (14), Robert Sirchia (13), Manuel Alonso (10), Benoit Tigeot (9), kimsm28 (8), Mujib Ahasan (8), kimsungmin1 (7), Scott Rigby (6), Sumit Solanki (5), Sebastien Tardif (4), Johannes Lohmer (4), Jeaeun Kim (4), Ilya Kiselev (4), Solomon Wakhungu (3), Austin Abro (3), Akanksha Trehun (3), abhay1999 (2), Will Noble (2), Pedro Tôrres (2), Ogulcan Aydogan (2), LarytheLord (2), Dean Chen (2), 秀吉 (1), tsinglua (1), s3onghyun (1), rohansood10 (1), devShaik010 (1), box4wangjing (1), Zhaofeng Miao (1), Travis Leeden (1), Tom Wieczorek (1), Ruslan Shaydullin (1), Rhys McNeill (1), Philipp Born (1), Orgad Shaneh (1), Nikolaus Schuetz (1), MsfPablo (1), Mohit (1), Mohammad Abdolirad (1), Mahesh Sadupalli (1), Mads Jensen (1), Lohit Kolluri (1), <em>and 16 more authors</em></td></tr><tr><td class="nowrap">v4.1.0</td><td class="nowrap">2026-01-12</td><td class="num">253</td><td>George Jenkins (34), Benoit Tigeot (32), dependabot <span class="badge" title="dependabot[bot]">bot</span> (31), Matt Farina (26), Robert Sirchia (24), Terry Howe (21), Scott Rigby (11), Evans Mungai (11), tison (6), Stephanie Hohenberg (5), Michelle Fernandez Bieber (5), Mads Jensen (5), Artem Vdovin (5), Mohsen Mottaghi (4), zyfy29 (2), yxxhero (2), Zadkiel AHARONIAN (2), Sarfraj Khan (2), Hidde Beydals (2), Deepak Chethan (2), Brenden Ehlers (2), wangjingcun (1), shuv0id (1), saimanojk1 (1), promalert (1), megha1906 (1), majiayu000 (1), laervn (1), jylenhof (1), Yarden Shoham (1), Tom Wieczorek (1), Paul Van Laer (1), Michael Crenshaw (1), Matheus Pimenta (1), Marcin Owsiany (1), LinPr (1), Gergely Brautigam (1), Fish-pro (1), Calvin Bui (1), Branch Vincent (1)</td></tr><tr><td class="nowrap">v4.1.0-rc.1</td><td class="nowrap">2026-01-12</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">v4.0.0</td><td class="nowrap">2025-11-03</td><td class="num">27</td><td>Evans Mungai (15), Matt Farina (5), Scott Rigby (2), George Jenkins (2), dependabot <span class="badge" title="dependabot[bot]">bot</span> (1), Terry Howe (1), Matheus Pimenta (1)</td></tr><tr><td class="nowrap">v4.0.0-rc.1</td><td class="nowrap">2025-11-03</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">v4.0.0-beta.2</td><td class="nowrap">2025-10-22</td><td class="num">36</td><td>Matt Farina (10), Benoit Tigeot (5), Terry Howe (4), Robert Sirchia (4), George Jenkins (4), Jesse Simpson (2), yzewei (1), wyrapeseed (1), reddaisyy (1), dependabot <span class="badge" title="dependabot[bot]">bot</span> (1), Rachel Weber (1), Fábio Carneiro (1), Andreas Sommer (1)</td></tr><tr><td class="nowrap">v4.0.0-beta.1</td><td class="nowrap">2025-10-13</td><td class="num">146</td><td>Matt Farina (30), Terry Howe (27), George Jenkins (22), Robert Sirchia (16), dependabot <span class="badge" title="dependabot[bot]">bot</span> (15), Scott Rigby (8), Benoit Tigeot (5), Siew Kam Onn (3), Kamil Swiechowski (3), copilot-swe-agent <span class="badge" title="copilot-swe-agent[bot]">bot</span> (2), Stephanie Hohenberg (2), Jesse Simpson (2), yajianggroup (1), tzchenxixi (1), reddaisyy (1), juejinyuxitu (1), bennsimon (1), Mile Druzijanic (1), Joe Julian (1), Felix Breidenstein (1), Evans Mungai (1), Evan Anderson (1), Dirk Müller (1)</td></tr><tr><td class="nowrap">v4.0.0-alpha.1</td><td class="nowrap">2025-09-02</td><td class="num">1,977</td><td>Matt Farina (380), dependabot <span class="badge" title="dependabot[bot]">bot</span> (221), Robert Sirchia (177), Joe Julian (142), George Jenkins (141), Austin Abro (116), Scott Rigby (64), Benoit Tigeot (61), Evans Mungai (46), Jesse Simpson (36), Terry Howe (28), Andrew Block (26), Zach Burgess (24), Dmitry Chepurovskiy (24), Justen Stall (22), Tapas Kapadia (14), Mayank Shah (12), Graham Reed (12), Mohammadreza Asadollahifard (10), Bhargavkonidena (10), Yarden Shoham (9), Jeff van Dam (9), Carlos Lima (9), Mikhail Kopylov (8), Matthieu MOREL (8), Felipe Santos (8), Chris Berry (8), dongjiang (7), Laszlo Uveges (7), Henrik Gerdes (7), Antonio Gamez Diaz (7), lubingtan (6), MichaelMorris (6), wujunwei (5), muang0 (5), ithrael (5), Suleiman Dibirov (5), Payal Godhani (5), Maxim Trofimov (5), James Oden (5), Ian Zink (5), Hidde Beydals (5), Edward Miller (5), Adam Korczynski (5), Stephane Jeandeaux (4), Stepan Paksashvili (4), Ryan Hockstad (4), Mike Delucchi (4), Marcin Owsiany (4), Khwaja Faraz Ahmed (4), <em>and 170 more authors</em></td></tr><tr><td class="nowrap">v3.12.0-dev.1</td><td class="nowrap">2023-03-02</td><td class="num">212</td><td>Matt Farina (53), Martin Hickey (34), dependabot <span class="badge" title="dependabot[bot]">bot</span> (22), Matthew Fisher (13), Soujanya Mangipudi (10), Andrew Block (10), Scott Rigby (8), yxxhero (6), CI (6), stan-sz (4), Jakub Warczarek (4), wujunwei (3), Cenk Alti (3), Wonyeong Choi (2), Philipp Stehle (2), Luca Comellini (2), Joe Julian (2), yanggang (1), satoru (1), longkai (1), d-d-up (1), cuishuang (1), cpanato (1), caixisheng (1), Zuhair AlSader (1), Vaibhav Sharma (1), Teo Klestrup Röijezon (1), Soule BA (1), Ryan Drew (1), Qifan Shen (1), Peter Leong (1), Mikhail Mazurskiy (1), Mayank Thakur (1), Mathieu Parent (1), Marcin Owsiany (1), Luca Di Rocco (1), Justen Walker (1), Igor Sutton (1), Guilherme Macedo (1), Fish-pro (1), Dominic Evans (1), Davanum Srinivas (1), Daniel Strobusch (1), Cyril Jouve (1), Arvid E. Picciani (1)</td></tr><tr><td class="nowrap">v3.9.0-rc.1</td><td class="nowrap">2022-05-09</td><td class="num">122</td><td>Matt Farina (21), Martin Hickey (19), Matthew Fisher (13), dependabot <span class="badge" title="dependabot[bot]">bot</span> (7), guofutan (6), Josh Dolitsky (6), Matthias Fehr (5), Aram Zegerius (5), Andrew Block (5), Simon Alling (4), Tomas Pizarro Moreno (3), Sourik Ghosh (3), Guy Bolton King (3), Theo Chupp (2), Eng Zer Jun (2), stephanECD (1), root (1), cndoit18 (1), Zoran Krleza (1), Timofey Kirillov (1), Shubham Sharma (1), Scott Rigby (1), Samuel Maftoul (1), Piotr Resztak (1), Neven Miculinic (1), Markus Lehtonen (1), Marc Khouzam (1), Kay Yan (1), Graham Reed (1), Damien Nozay (1), Colleen Murphy (1), Ashley Davis (1), Andrew Seigner (1)</td></tr><tr><td class="nowrap">v3.8.0-rc.1</td><td class="nowrap">2022-01-13</td><td class="num">375</td><td>Josh Dolitsky (56), Matt Farina (55), Matthew Fisher (36), Martin Hickey (32), Scott Rigby (23), dependabot <span class="badge" title="dependabot[bot]">bot</span> (16), Stephane Moser (12), Andrew Block (10), yxxhero (8), Scaat Feng (8), Marc Khouzam (8), Dmitrii Ermakov (8), Mike Ng (7), Marcus Speight (6), Josh Wolf (5), Adam Reese (5), Leon Bentrup (4), David Peraza (4), Bridget Kromhout (4), longkai (3), cndoit18 (3), Kai Takac (3), David Mládek (3), André Schröder (3), Allen Bai (3), jayonlau (2), Thomas Runyon (2), Shoubhik Bose (2), Mathieu Parent (2), John Howard (2), Jerome Küttner (2), Iaroslav Sheptykin (2), Dan Russell (2), Bernd Gutjahr (2), mengjiao.liu (1), lsowen (1), Víctor Cuadrado Juan (1), Vic Iglesias (1), Valentin Flaux (1), Tyler Auerbeck (1), Timofey Kirillov (1), Sverre Boschman (1), Stuart Drennan (1), Nicolas De Loof (1), Matt Butcher (1), Mario Valderrama (1), LochanRn (1), Kally Fox (1), Johannes Hertenstein (1), Ioan Indreias (1), <em>and 16 more authors</em></td></tr><tr><td class="nowrap">v3.6.0</td><td class="nowrap">2021-05-18</td><td class="num">843</td><td>Matthew Fisher (141), Matt Farina (140), Martin Hickey (82), Matt Butcher (40), Marc Khouzam (38), Adam Reese (33), Liu Ming (19), dependabot <span class="badge" title="dependabot[bot]">bot</span> (18), Zhou Hao (13), Bridget Kromhout (13), Josh Dolitsky (10), Dong Gang (10), Li Zhijian (8), Peter Engelbert (7), Dmitry Chepurovskiy (7), wawa0210 (6), Ma Xinjian (6), Eitan Yarmush (6), Abhilash Gnan (6), zwwhdls (5), yxxhero (5), Song Shukun (5), Shoubhik Bose (5), Jon Leonard (5), Jacob LeGrone (5), Anshul Verma (5), zouyu (4), zh168654 (4), Taylor Thomas (4), Simon Croome (4), Hidde Beydals (4), Vibhav Bobade (3), Torsten Walter (3), Thomas Dy (3), Scott Rigby (3), Naseem (3), Matthias Riegler (3), Juned Memon (3), Joe Lanford (3), James McElwain (3), Jack Weldon (3), Hu Shuai (3), Guangwen Feng (3), Federico Bevione (3), Daniel Lipovetsky (3), Cristian Klein (3), Christophe VILA (3), zhangye15 (2), vitt-bagal (2), tiendc (2), <em>and 103 more authors</em></td></tr><tr><td class="nowrap">v3.6.0-rc.1</td><td class="nowrap">2021-05-18</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">v3.1.0-rc.1</td><td class="nowrap">2020-02-07</td><td class="num">342</td><td>Matthew Fisher (102), Marc Khouzam (41), Taylor Thomas (28), Matt Farina (28), raffaelespazzoli (9), Thilak Somasundaram (7), Martin Hickey (6), Matt Butcher (5), Andreas Stenius (5), 海的澜色 (4), Yusuke Kuoka (4), Hang Park (4), Scott Morgan (3), Nick Lee (3), Mike Tougeron (3), Karuppiah Natarajan (3), Jonathan Meyers (3), Guangwen Feng (3), Dean Coakley (3), Adam Reese (3), Aaron Mell (3), zwwhdls (2), bakito (2), Yagnesh Mistry (2), Mateusz Szostok (2), Josh Dolitsky (2), Jon Huhn (2), Joe Lanford (2), Jakub Bielecki (2), Hu Shuai (2), Fabian Ruff (2), Daniel Strobusch (2), Ahmad Kazemi (2), yuxiaobo (1), sayboras (1), kvendingoldo (1), jabielecki (1), flynnduism (1), etashsingh (1), chloel (1), Yaakov Selkowitz (1), Xiang Dai (1), Vivian Kong (1), Vibhav Bobade (1), Simon Alling (1), Shota Nakamura (1), Romain Grenet (1), Robert Brennan (1), Rimas Mocevicius (1), Remco Haszing (1), <em>and 31 more authors</em></td></tr><tr><td class="nowrap">v3.0.0-beta.5</td><td class="nowrap">2019-10-22</td><td class="num">111</td><td>Matthew Fisher (35), Taylor Thomas (19), Aaron Mell (9), Marc Khouzam (8), Adam Reese (6), Jacob LeGrone (5), Dean Coakley (5), Yusuke Kuoka (4), Martin Hickey (4), fengxsong (3), Simon Alling (3), Sidharth Surana (2), Ken Perkins (2), Karuppiah Natarajan (2), Matt Farina (1), Jonas Rutishauser (1), John Howard (1), Dmitry Tokarev (1)</td></tr><tr><td class="nowrap">v3.0.0-beta.4</td><td class="nowrap">2019-10-08</td><td class="num">130</td><td>Taylor Thomas (34), Matthew Fisher (27), Matt Farina (18), Marc Khouzam (12), Martin Hickey (5), Charlie Getzen (5), Karuppiah Natarajan (4), Efrat19 (3), Bhavesh Sethi (3), Yusuke Kuoka (2), Simon Alling (2), Reinhard Nägele (2), Cagatay Gurturk (2), Adam Reese (2), wxdao (1), derkoe (1), Thomas O&#x27;Donnell (1), Rimas Mocevicius (1), Per Hermansson (1), Jonas Rutishauser (1), Efrat Levitan (1), Cindy O&#x27;Neill (1), Andreas Sommer (1)</td></tr><tr><td class="nowrap">v3.0.0-beta.3</td><td class="nowrap">2019-09-05</td><td class="num">30</td><td>Matt Farina (6), Vibhav Bobade (5), Taylor Thomas (4), Adam Reese (4), Marc Khouzam (3), Thomas O&#x27;Donnell (2), Matt Butcher (2), Matthew Fisher (1), Ivan Towlson (1), Ashley Schuett (1), Anton (1)</td></tr><tr><td class="nowrap">v3.0.0-beta.2</td><td class="nowrap">2019-08-28</td><td class="num">9</td><td>Adam Reese (6), Marc Khouzam (2), Akash Shinde (1)</td></tr><tr><td class="nowrap">v3.0.0-beta.1</td><td class="nowrap">2019-08-26</td><td class="num">129</td><td>Matthew Fisher (30), Taylor Thomas (20), Matt Farina (15), Adam Reese (14), Martin Hickey (13), Jacob LeGrone (11), Vibhav Bobade (5), Josh Dolitsky (5), Ian Howell (4), hd-rk (3), Joe Lanford (3), Karuppiah Natarajan (2), Tine Jozelj (1), Seb Ospina (1), Matt Butcher (1), Marc Khouzam (1)</td></tr><tr><td class="nowrap">v3.0.0-alpha.2</td><td class="nowrap">2019-07-23</td><td class="num">117</td><td>Matthew Fisher (40), Taylor Thomas (12), Adam Reese (11), Abhilash Gnan (11), Matt Farina (10), Torsten Walter (7), Martin Hickey (7), Marc Khouzam (3), rokii (2), Thomas O&#x27;Donnell (2), Oleg Sidorov (2), Josh Dolitsky (2), steven-sheehy (1), cpanato (1), Tariq Ibrahim (1), Liu Liqiang (1), Ian Howell (1), Da Yin (1), Constantin Bugneac (1), Andrew Rudoi (1)</td></tr><tr><td class="nowrap">v3.0.0-alpha.1</td><td class="nowrap">2019-05-15</td><td class="num">650</td><td>Matthew Fisher (203), Adam Reese (180), Martin Hickey (24), Arash Deshmeh (21), Taylor Thomas (19), Matt Farina (17), Michelle Noorali (14), Justin Scott (8), Matt Butcher (7), AdamDang (6), Reinhard Nägele (5), Johnny Bergström (5), Ian Howell (5), lihuang (4), Rajat Jindal (4), Josh Dolitsky (4), Erik Sundell (4), scriptonist (3), oilbeater (3), Nikhil Manchanda (3), Jonathan Hall (3), rocky-nupt (2), roc (2), muhongwei (2), fibonacci1729 (2), eyalbe4 (2), Stuart Leeks (2), Shredgar (2), Sebastien Plisson (2), Ryan Hartje (2), Pure White (2), Paolo Mainardi (2), Marc Khouzam (2), Luis Davim (2), James Strachan (2), Frederik Carlier (2), Florian Zysset (2), Evans Castonguay (2), Bin Liu (2), Ben Langfeld (2), Akshai Parthasarathy (2), Adnan Abdulhussein (2), xianlubird (1), liaoj (1), jonathan.striebel (1), fqsghostcloud (1), derkoe (1), bryangunn (1), adshmh (1), Zack Williams (1), <em>and 58 more authors</em></td></tr><tr><td class="nowrap">v2.8.0-rc.1</td><td class="nowrap">2018-01-08</td><td class="num">192</td><td>Matthew Fisher (61), Taylor Thomas (13), Brad Bowman (9), Matt Farina (6), Christoph Hösler (6), Adam Reese (6), Joan Rieu (5), Sam Leavens (4), Marcin Kłopotek (4), Federico Gimenez (4), Pietro Menna (3), Neil Moore (3), Mitchel Humpherys (3), Lukas Eichler (3), Justin Scott (3), Johan Lyheden (3), Gabriel Miretti (3), Tim H (2), Ralph Squillace (2), Michelle Noorali (2), Michael Venezia (2), Matt Butcher (2), Johnny Bergström (2), Helgi Þorbjörnsson (2), Alexander Lukyanchenko (2), rocky-nupt (1), omkensey (1), gardlt (1), Yecheng Fu (1), Yagnesh Mistry (1), Valentin Tjoncke (1), Timofey Kirillov (1), Tim Hockin (1), Tim Dumol (1), Stephen McQuaid (1), Simon Schmidt (1), Sebastien Plisson (1), Rajat Jindal (1), Nauris Sadovskis (1), Morgan Parry (1), Maxime Guyot (1), Matt Tucker (1), Matt Cholick (1), Mark Gibaud (1), Luk Burchard (1), Luis Cordova (1), Kai Chen (1), Julian (1), John Iacona (1), Jacob Tomlinson (1), <em>and 12 more authors</em></td></tr><tr><td class="nowrap">v2.7.0</td><td class="nowrap">2017-10-23</td><td class="num">12</td><td>Matthew Fisher (6), Michael Venezia (2), Marcin Brański (1), Edward Medvedev (1), Drew Hunt (1), Adam Reese (1)</td></tr><tr><td class="nowrap">v2.7.0-rc1</td><td class="nowrap">2017-10-13</td><td class="num">135</td><td>Matthew Fisher (37), Taylor Thomas (14), Justin Scott (10), Matt Butcher (8), rocky-nupt (6), Adam Reese (6), Neil Moore (5), Maxim Ivanov (5), Maciej Kwiek (4), flyer103 (3), carlory (2), Tamal Saha (2), Matt Farina (2), Kazuki Suda (2), Ergin Babani (2), DoctorZK (2), Adnan Abdulhussein (2), llsheldon (1), lichuqiang (1), kfirstri (1), devinyan (1), Tim H (1), Steven E. Harris (1), Sharno (1), Sean Slattery (1), Scott Rigby (1), Remington Reackhof (1), ReSearchITEng (1), NauxLiu (1), Nandor Kracser (1), Michelle Noorali (1), Michal Cwienczek (1), Michael Venezia (1), Kira (1), Josh Dolitsky (1), Hui Chen (1), Frederi Mandin (1), Dhilip (1), Barrett K. Harber (1), Amanda Cameron (1)</td></tr><tr><td class="nowrap">v2.6.0</td><td class="nowrap">2017-08-16</td><td class="num">157</td><td>Taylor Thomas (21), Justin Scott (16), Adam Reese (16), Matt Butcher (13), Michelle Noorali (12), Sam Leavens (9), Steven E. Harris (8), Aishwarya Thangappa (6), Tony Fahrion (3), Sushil Kumar (3), Scott Rigby (3), Reinhard Nägele (3), Maxime Guyot (3), Matthew Fisher (3), Maciej Strzelecki (3), Maciej Kwiek (3), Yuvi Panda (2), Santiago Suarez Ordoñez (2), Nandor Kracser (2), Mohammad Asif Siddiqui (2), Eugene Pirogov (2), Aaron Schlesinger (2), jiaweizhou (1), gardlt (1), flynnduism (1), devinyan (1), carlory (1), William Denniss (1), Tamal Saha (1), Patrick Mahoney (1), Miguel David (1), Matt Farina (1), Malepati Bala Siva Sai Akhil (1), Laurens Vanderhoven (1), Karolis Labrencis (1), Jerry Zhou (1), Ilya Semenov (1), Gary Lucas (1), Fabian Ruff (1), Dan O&#x27;Brien (1), Brian (1), Alon Lavi (1)</td></tr><tr><td class="nowrap">v2.5.0</td><td class="nowrap">2017-06-19</td><td class="num">216</td><td>Matt Butcher (40), Sushil Kumar (27), Adam Reese (27), Taylor Thomas (25), Michelle Noorali (16), Brian (11), fibonacci1729 (8), Maciej Kwiek (7), Lukas Eichler (6), Dmitry Shulyak (5), fengyun.pan (3), willise (2), peay (2), Seth Goings (2), Reinhard Nägele (2), Lachlan Evenson (2), Kent Rancourt (2), Justin Scott (2), Cory Smith (2), vdice (1), tyrannasaurusbanks (1), spiddy (1), lead4good (1), devinyan (1), William Martin Stewart (1), Steven E. Harris (1), Slawomir Skowron (1), Rod Cloutier (1), Rober Morales-Chaparro (1), ReSearchITEng (1), Raphael Badin (1), Pierre Ozoux (1), Oli Lalonde (1), Nikhil Manchanda (1), Maxim Ivanov (1), Matt Farina (1), Julien Balestra (1), Hoat Le (1), Fabian Ruff (1), Eduardo Baitello (1), Dan Bode (1), Christoph Blecker (1), Brandon B. Jozsa (1), Andrew Koroluk (1)</td></tr><tr><td class="nowrap">v2.4.0</td><td class="nowrap">2017-05-02</td><td class="num">122</td><td>Matt Butcher (40), Adam Reese (26), Taylor Thomas (10), Sushil Kumar (6), Michelle Noorali (6), Scott Rigby (5), Jorge Marin (4), fibonacci1729 (2), Reinhard Nägele (2), Justin Scott (2), Christoph Blecker (2), Brian (2), spiddy (1), sadlil (1), Trevor Hartman (1), Shane Starcher (1), Serguei Bezverkhi (1), Nikhil Manchanda (1), Matthias Thubauville (1), Matthew Fisher (1), Maciej Kwiek (1), Kiichiro Okano (1), Jimmy Zelinskie (1), Gergo Huszty (1), Fabian Ruff (1), Dan Bode (1), Adnan Abdulhussein (1)</td></tr><tr><td class="nowrap">v2.3.0</td><td class="nowrap">2017-04-06</td><td class="num">220</td><td>Matt Butcher (74), Taylor Thomas (22), Adam Reese (22), Justin Scott (11), Anubhav Mishra (9), Matthew Fisher (5), Fabian Ruff (5), Qin Wang (4), Michelle Noorali (4), Jonathan Chauncey (4), Jack Zampolin (4), Gergo Huszty (4), Brian (4), fibonacci1729 (3), Yuvi Panda (3), Steven E. Harris (3), Ladicle (3), Christoph Blecker (3), Tao Zhou (2), Sushil Kumar (2), Miguel Ángel Martínez Triviño (2), Luiz Bezerra (2), Kiichiro Okano (2), John Welsh (2), Eduardo Baitello (2), Adnan Abdulhussein (2), Adam Stankiewicz (2), Steve Wilkerson (1), Maxim Ivanov (1), Mario Lamontagne (1), Luke Kysow (1), Louis Taylor (1), Leszek Charkiewicz (1), Kyle Guthrie (1), Jose Aguirre (1), Jian Qiu (1), Dmitry Monakhov (1), Derek Perkins (1), David Wittman (1), Brandon DuRette (1), Adam Hawkins (1), Aaron Roydhouse (1)</td></tr><tr><td class="nowrap">v2.2.0</td><td class="nowrap">2017-02-14</td><td class="num">312</td><td>Matt Butcher (109), Adam Reese (61), Michelle Noorali (15), Taylor Thomas (13), Nikolay Mahotkin (12), Tony Hsu (10), Justin Scott (9), Anton Galitsyn (7), Steve Wilkerson (6), Matthew Fisher (5), Larry Rensing (5), Ferran Rodenas (5), Tao Zhou (4), Qin Wang (4), Nicolas Lamirault (4), Christoph Blecker (4), Vaughn Dice (3), Lachlan Evenson (3), Christopher Pauley (3), Rod Cloutier (2), Miyurz (2), Matt Farina (2), Matt Boersma (2), Manjunath A Kumatagi (2), Maciej Kwiek (2), Gergo Huszty (2), rmehra (1), dongziming (1), Yota Toyama (1), William Martin Stewart (1), Tamal Saha (1), Sean Knox (1), Morten Lied Johansen (1), Marius Grigoriu (1), Long Nguyen (1), Keerthan Reddy Mala (kmala) (1), José Armesto (1), Greg Taylor (1), Euan Kemp (1), Eli Mallon (1), Brandon Philips (1), Brandon B. Jozsa (1)</td></tr><tr><td class="nowrap">v2.1.0</td><td class="nowrap">2016-12-13</td><td class="num">126</td><td>Matt Butcher (61), Adam Reese (34), Andrew Stuart (10), Matt Farina (3), Rollulus (2), Michelle Noorali (2), José Armesto (2), Fabian Ruff (2), Yuvi Panda (1), Vaughn Dice (1), Taylor Thomas (1), Serge Catudal (1), Rod Cloutier (1), Morten Lied Johansen (1), Lachlan Evenson (1), Keerthan Reddy Mala (kmala) (1), John Hofman (1), Adam Hawkins (1)</td></tr><tr><td class="nowrap">v2.0.0</td><td class="nowrap">2016-11-16</td><td class="num">40</td><td>Matt Butcher (21), Adam Reese (12), Matt Farina (3), Wayne Brantley (1), Sebastian Mandrean (1), Rollulus (1), Anthony Yeh (1)</td></tr><tr><td class="nowrap">v2.0.0-rc.2</td><td class="nowrap">2016-11-04</td><td class="num">11</td><td>Matt Butcher (6), Adam Reese (5)</td></tr><tr><td class="nowrap">v2.0.0-rc.1</td><td class="nowrap">2016-11-02</td><td class="num">55</td><td>Matt Butcher (28), Vic Iglesias (10), Adam Reese (8), Adnan Abdulhussein (3), Jim (2), joe2far (1), fibonacci1729 (1), adieu (1), Brian (1)</td></tr><tr><td class="nowrap">v2.0.0-beta.2</td><td class="nowrap">2016-10-25</td><td class="num">42</td><td>Matt Butcher (26), Jim (5), Adnan Abdulhussein (4), Michelle Noorali (2), Fabian Ruff (2), Vaughn Dice (1), Javier Cuevas (1), Adam Reese (1)</td></tr><tr><td class="nowrap">v2.0.0-beta.1</td><td class="nowrap">2016-10-19</td><td class="num">121</td><td>Matt Butcher (52), Adam Reese (35), Michelle Noorali (10), Adnan Abdulhussein (6), fibonacci1729 (3), Jim (3), Brian (3), Nic Roland (2), Ken Wronkiewicz (2), Javier Cuevas (2), Michal Rostecki (1), Jason Hansen (1), Erik Christensen (1)</td></tr><tr><td class="nowrap">v2.0.0-alpha.5</td><td class="nowrap">2016-10-07</td><td class="num">165</td><td>Matt Butcher (70), Adam Reese (35), fibonacci1729 (17), Michelle Noorali (11), Brian (10), Brandon Philips (8), Ville Aikas (6), rimas (2), Keerthan Reddy Mala (kmala) (2), Mark Petrovic (1), Kent Rancourt (1), Jonathan Boulle (1), Adnan Abdulhussein (1)</td></tr><tr><td class="nowrap">v2.0.0-alpha.4</td><td class="nowrap">2016-09-06</td><td class="num">374</td><td>Matt Butcher (124), Adam Reese (103), Michelle Noorali (38), fibonacci1729 (32), Ville Aikas (16), Adnan Abdulhussein (13), Miguel Martinez (8), joe2far (6), Miguel Ángel Martínez Triviño (5), ngtuna (4), Trevor Hartman (3), Brian (3), Seth Goings (2), Jess Frazelle (2), Ebrahim Byagowi (2), Yusuke Kuoka (1), Travis Cline (1), Till Backhaus (1), Phillip Wittrock (1), Nic Roland (1), Naveen Srinivasan (1), Michael Stapelberg (1), Keerthan Mala (1), Jeremy Brown (1), Jeff Zellner (1), James Strachan (1), Grantseltzer (1), Aaron Crickenberger (1)</td></tr><tr><td class="nowrap">v2.0.0-alpha.2</td><td class="nowrap">2016-06-23</td><td class="num">146</td><td>Matt Butcher (74), Adam Reese (29), Michelle Noorali (13), fibonacci1729 (7), Brian (6), Aaron Schlesinger (5), Miguel Martinez (4), Ville Aikas (2), Naveen Srinivasan (2), Seigo Uchida (1), MouseRage (1), Martin Linkhorst (1), Ladicle (1)</td></tr><tr><td class="nowrap">v2.0.0-alpha.1</td><td class="nowrap">2016-05-25</td><td class="num">329</td><td>Matt Butcher (169), Michelle Noorali (58), Adam Reese (58), Ville Aikas (29), Brian (7), Ken Wronkiewicz (3), fibonacci1729 (2), runseb (1), Nicholas Young (1), Brian Hardock (1)</td></tr><tr><td class="nowrap">1.999.0</td><td class="nowrap">2016-04-11</td><td class="num">592</td><td>Matt Butcher (158), Adam Reese (149), jackgr (95), Michelle Noorali (93), Jack Greenfield (45), Dave Cunningham (26), runseb (9), Ville Aikas (6), Seth Goings (3), Matt Farina (2), goltermann (1), Tim St. Clair (1), Shimin Guo (1), Shawn Smith (1), Matthias Schmitz (1), Gabe Monroy (1)</td></tr><tr><td class="nowrap">v1.2</td><td class="nowrap">2016-03-01</td><td class="num">3</td><td>jackgr (2), Jack Greenfield (1)</td></tr><tr><td class="nowrap">v1.1</td><td class="nowrap">2016-02-29</td><td class="num">2</td><td>jackgr (1), Jack Greenfield (1)</td></tr><tr><td class="nowrap">v1.0</td><td class="nowrap">2016-02-23</td><td class="num">365</td><td>Ville Aikas (120), Brendan Melville (87), jackgr (45), Jack Greenfield (45), Michelle Noorali (14), Matt Butcher (12), runseb (7), Shawn Smith (6), goltermann (5), Graham Welch (4), Victor Agababov (3), Seth Goings (3), Robert Leenders (2), Gaoce (2), Brandon Philips (2), vaikas (1), jiangyaoguo (1), iantw89 (1), Zach Loafman (1), Jerome Touffe-Blin (1), Eric Ho (1), Dave Cunningham (1), Adam Reese (1)</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="../ecosystems/cncf.html">How Helm ranks among CNCF graduated projects by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+name: GitStats Report
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  gitstats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: shenxianpeng/gitstats-action@v1
+        with:
+          deploy-to-pages: true
+</pre></details></section><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

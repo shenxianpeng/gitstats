@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev1",
-  "generated_at": "2026-10-19T03:44:17+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:21:54+00:00",
   "name": "LangChain",
   "report_path": "index.html",
   "first_commit": "2022-10-24 21:51:15",
-  "last_commit": "2026-10-18 23:18:16",
-  "age_days": 1456,
-  "active_days": 1305,
-  "total_commits": 16988,
-  "total_authors": 3593,
-  "active_authors_12mo": 243,
-  "commits_last_12mo": 2308,
-  "total_files": 3191,
-  "total_lines": 554982,
-  "lines_added": 3834069,
-  "lines_removed": 3279087,
-  "total_tags": 1305,
+  "last_commit": "2026-10-23 03:51:10",
+  "age_days": 1460,
+  "active_days": 1310,
+  "total_commits": 17057,
+  "total_authors": 3594,
+  "active_authors_12mo": 240,
+  "commits_last_12mo": 2377,
+  "total_files": 3192,
+  "total_lines": 558683,
+  "lines_added": 3843181,
+  "lines_removed": 3284498,
+  "total_tags": 1309,
   "era": "steady",
   "top_authors": [
     {
@@ -29,7 +29,7 @@
     },
     {
       "name": "ccurme",
-      "commits": 1171
+      "commits": 1173
     },
     {
       "name": "Erick Friis",
@@ -37,17 +37,19 @@
     },
     {
       "name": "Mason Daugherty",
-      "commits": 963
+      "commits": 964
     }
   ],
   "author_commits": {
-    "ccurme": 1171,
+    "Mason Daugherty": 964,
+    "Richard Scarrott": 11,
+    "ccurme": 1173,
+    "Vladislav Nechakhin": 1,
+    "Ant White": 2,
     "Christophe Bornet": 419,
     "David Duong": 16,
     "Baihao Wang": 2,
     "gethin-langchain": 1,
-    "Richard Scarrott": 6,
-    "Mason Daugherty": 963,
     "nm-fireworks": 1,
     "Hunter Lovell": 25,
     "Emil F": 2,
@@ -942,7 +944,6 @@
     "Duy Huynh": 1,
     "ono-hiroki": 1,
     "Jun Yamog": 1,
-    "Ant White": 1,
     "Neli Hateva": 5,
     "L": 1,
     "putao520": 1,
@@ -3640,7 +3641,7 @@
     "2023": 6342,
     "2024": 5701,
     "2025": 2693,
-    "2026": 1968
+    "2026": 2037
   },
   "ai_assisted": {
     "commits": 46,
@@ -3699,7 +3700,369 @@
       "2026-07": 145,
       "2026-08": 193,
       "2026-09": 187,
-      "2026-10": 114
+      "2026-10": 183
+    }
+  },
+  "organizations": {
+    "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
+    "commits": 17057,
+    "by_kind": {
+      "organization": 2492,
+      "one_person": 830,
+      "personal": 7439,
+      "hidden": 5432,
+      "unknown": 0,
+      "bot": 864
+    },
+    "organization_count": 35,
+    "last_12mo_from": "2025-11",
+    "top": [
+      {
+        "organization": "langchain.dev",
+        "commits": 2187,
+        "commits_last_12mo": 588,
+        "addresses": 18,
+        "first_commit": "2023-07-25",
+        "last_commit": "2026-10-22"
+      },
+      {
+        "organization": "unstructuredai.io",
+        "commits": 31,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2023-02-16",
+        "last_commit": "2023-08-01"
+      },
+      {
+        "organization": "intel.com",
+        "commits": 26,
+        "commits_last_12mo": 0,
+        "addresses": 10,
+        "first_commit": "2024-02-15",
+        "last_commit": "2025-02-21"
+      },
+      {
+        "organization": "amazon.com",
+        "commits": 22,
+        "commits_last_12mo": 0,
+        "addresses": 6,
+        "first_commit": "2023-02-21",
+        "last_commit": "2025-07-16"
+      },
+      {
+        "organization": "microsoft.com",
+        "commits": 21,
+        "commits_last_12mo": 0,
+        "addresses": 10,
+        "first_commit": "2023-03-21",
+        "last_commit": "2024-09-02"
+      },
+      {
+        "organization": "oracle.com",
+        "commits": 21,
+        "commits_last_12mo": 0,
+        "addresses": 8,
+        "first_commit": "2023-12-20",
+        "last_commit": "2025-08-28"
+      },
+      {
+        "organization": "zilliz.com",
+        "commits": 19,
+        "commits_last_12mo": 0,
+        "addresses": 7,
+        "first_commit": "2023-03-24",
+        "last_commit": "2025-06-03"
+      },
+      {
+        "organization": "google.com",
+        "commits": 17,
+        "commits_last_12mo": 0,
+        "addresses": 9,
+        "first_commit": "2023-05-23",
+        "last_commit": "2025-08-11"
+      },
+      {
+        "organization": "mongodb.com",
+        "commits": 16,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2023-11-17",
+        "last_commit": "2025-06-10"
+      },
+      {
+        "organization": "apache.org",
+        "commits": 12,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2023-05-04",
+        "last_commit": "2024-10-24"
+      },
+      {
+        "organization": "databricks.com",
+        "commits": 12,
+        "commits_last_12mo": 0,
+        "addresses": 5,
+        "first_commit": "2023-05-26",
+        "last_commit": "2024-08-16"
+      },
+      {
+        "organization": "baidu.com",
+        "commits": 8,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2023-09-13",
+        "last_commit": "2024-02-06"
+      },
+      {
+        "organization": "elastic.co",
+        "commits": 8,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2023-08-15",
+        "last_commit": "2024-01-22"
+      },
+      {
+        "organization": "redis.com",
+        "commits": 8,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2023-04-02",
+        "last_commit": "2023-11-30"
+      },
+      {
+        "organization": "sap.com",
+        "commits": 8,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2024-01-24",
+        "last_commit": "2025-04-30"
+      },
+      {
+        "organization": "parkerfolk.net",
+        "commits": 7,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2023-07-13",
+        "last_commit": "2023-09-04"
+      },
+      {
+        "organization": "snowflake.com",
+        "commits": 7,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2023-06-27",
+        "last_commit": "2024-07-25"
+      },
+      {
+        "organization": "perplexity.ai",
+        "commits": 6,
+        "commits_last_12mo": 6,
+        "addresses": 3,
+        "first_commit": "2026-04-29",
+        "last_commit": "2026-08-21"
+      },
+      {
+        "organization": "github.com",
+        "commits": 5,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2023-05-24",
+        "last_commit": "2024-02-05"
+      },
+      {
+        "organization": "berkeley.edu",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 4,
+        "first_commit": "2023-04-05",
+        "last_commit": "2024-04-30"
+      },
+      {
+        "organization": "jina.ai",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2023-02-20",
+        "last_commit": "2024-06-03"
+      },
+      {
+        "organization": "rockset.com",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2023-08-06",
+        "last_commit": "2024-03-29"
+      },
+      {
+        "organization": "umich.edu",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2022-12-04",
+        "last_commit": "2024-06-12"
+      },
+      {
+        "organization": "xata.io",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2023-08-25",
+        "last_commit": "2024-03-15"
+      },
+      {
+        "organization": "yahoo.in",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2024-06-18",
+        "last_commit": "2025-03-14"
+      },
+      {
+        "organization": "alibaba-inc.com",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2024-12-13",
+        "last_commit": "2025-03-18"
+      },
+      {
+        "organization": "columbia.edu",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2023-04-28",
+        "last_commit": "2025-10-15"
+      },
+      {
+        "organization": "fireworks.ai",
+        "commits": 3,
+        "commits_last_12mo": 1,
+        "addresses": 3,
+        "first_commit": "2023-11-10",
+        "last_commit": "2026-10-07"
+      },
+      {
+        "organization": "friendli.ai",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2024-03-08",
+        "last_commit": "2025-01-02"
+      },
+      {
+        "organization": "gatech.edu",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2025-08-30",
+        "last_commit": "2025-09-10"
+      },
+      {
+        "organization": "mayflower.de",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2023-04-22",
+        "last_commit": "2023-05-09"
+      },
+      {
+        "organization": "oxylabs.io",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2025-04-02",
+        "last_commit": "2025-08-15"
+      },
+      {
+        "organization": "nyu.edu",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2023-07-24",
+        "last_commit": "2023-12-03"
+      },
+      {
+        "organization": "techjays.com",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2024-06-04",
+        "last_commit": "2024-06-06"
+      },
+      {
+        "organization": "utexas.edu",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2023-06-29",
+        "last_commit": "2024-05-08"
+      }
+    ],
+    "quarters": {
+      "2025-Q1": {
+        "organization": 87,
+        "one_person": 45,
+        "personal": 411,
+        "hidden": 168,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2025-Q2": {
+        "organization": 32,
+        "one_person": 20,
+        "personal": 389,
+        "hidden": 151,
+        "unknown": 0,
+        "bot": 4
+      },
+      "2025-Q3": {
+        "organization": 253,
+        "one_person": 43,
+        "personal": 245,
+        "hidden": 148,
+        "unknown": 0,
+        "bot": 10
+      },
+      "2025-Q4": {
+        "organization": 267,
+        "one_person": 11,
+        "personal": 264,
+        "hidden": 138,
+        "unknown": 0,
+        "bot": 7
+      },
+      "2026-Q1": {
+        "organization": 156,
+        "one_person": 12,
+        "personal": 212,
+        "hidden": 94,
+        "unknown": 0,
+        "bot": 135
+      },
+      "2026-Q2": {
+        "organization": 248,
+        "one_person": 2,
+        "personal": 89,
+        "hidden": 26,
+        "unknown": 0,
+        "bot": 355
+      },
+      "2026-Q3": {
+        "organization": 59,
+        "one_person": 4,
+        "personal": 161,
+        "hidden": 87,
+        "unknown": 0,
+        "bot": 214
+      },
+      "2026-Q4": {
+        "organization": 8,
+        "one_person": 2,
+        "personal": 32,
+        "hidden": 4,
+        "unknown": 0,
+        "bot": 137
+      }
     }
   }
 }

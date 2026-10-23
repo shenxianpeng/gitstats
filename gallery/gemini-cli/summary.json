@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev1",
-  "generated_at": "2026-10-19T03:43:59+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:20:40+00:00",
   "name": "Gemini CLI",
   "report_path": "index.html",
   "first_commit": "2025-04-16 04:41:08",
-  "last_commit": "2026-10-16 19:58:52",
-  "age_days": 549,
-  "active_days": 476,
-  "total_commits": 6509,
-  "total_authors": 685,
-  "active_authors_12mo": 426,
-  "commits_last_12mo": 3357,
-  "total_files": 3027,
-  "total_lines": 1657676,
-  "lines_added": 2130665,
-  "lines_removed": 472989,
+  "last_commit": "2026-10-22 22:14:36",
+  "age_days": 555,
+  "active_days": 480,
+  "total_commits": 6529,
+  "total_authors": 686,
+  "active_authors_12mo": 421,
+  "commits_last_12mo": 3377,
+  "total_files": 3032,
+  "total_lines": 1664467,
+  "lines_added": 2138238,
+  "lines_removed": 473771,
   "total_tags": 13,
   "era": "steady",
   "top_authors": [
@@ -41,18 +41,19 @@
     }
   ],
   "author_commits": {
-    "villahernandez-coder": 10,
-    "urielefrenvirtusa": 10,
-    "jvargassanchez-dot": 16,
+    "villahernandez-coder": 12,
+    "urielefrenvirtusa": 13,
+    "amelidev": 20,
+    "jvargassanchez-dot": 17,
+    "elberthc-byte": 9,
+    "Diego Godinez": 16,
+    "jesussamuel-byte": 21,
+    "luisfelipe-alt": 26,
+    "gemini-cli-robot": 181,
+    "gurusai-voleti": 1,
     "ugorla-dev": 5,
     "Srinath Padmanabhan": 17,
-    "jesussamuel-byte": 18,
-    "elberthc-byte": 7,
-    "Diego Godinez": 14,
-    "gemini-cli-robot": 178,
     "David Pierce": 43,
-    "amelidev": 19,
-    "luisfelipe-alt": 24,
     "Sandy Tao": 230,
     "Jose Garcia-Balius": 2,
     "joneba-google": 18,
@@ -729,7 +730,7 @@
   },
   "commits_by_year": {
     "2025": 3744,
-    "2026": 2765
+    "2026": 2785
   },
   "ai_assisted": {
     "commits": 272,
@@ -789,7 +790,97 @@
       "2026-07": 48,
       "2026-08": 60,
       "2026-09": 62,
-      "2026-10": 56
+      "2026-10": 76
+    }
+  },
+  "organizations": {
+    "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
+    "commits": 6529,
+    "by_kind": {
+      "organization": 2465,
+      "one_person": 302,
+      "personal": 2234,
+      "hidden": 1510,
+      "unknown": 0,
+      "bot": 18
+    },
+    "organization_count": 2,
+    "last_12mo_from": "2025-11",
+    "top": [
+      {
+        "organization": "google.com",
+        "commits": 2456,
+        "commits_last_12mo": 1385,
+        "addresses": 112,
+        "first_commit": "2025-04-16",
+        "last_commit": "2026-10-22"
+      },
+      {
+        "organization": "github.com",
+        "commits": 9,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2025-05-31",
+        "last_commit": "2025-06-29"
+      }
+    ],
+    "quarters": {
+      "2025-Q2": {
+        "organization": 587,
+        "one_person": 22,
+        "personal": 385,
+        "hidden": 111,
+        "unknown": 0,
+        "bot": 1
+      },
+      "2025-Q3": {
+        "organization": 345,
+        "one_person": 130,
+        "personal": 664,
+        "hidden": 349,
+        "unknown": 0,
+        "bot": 12
+      },
+      "2025-Q4": {
+        "organization": 351,
+        "one_person": 45,
+        "personal": 456,
+        "hidden": 285,
+        "unknown": 0,
+        "bot": 1
+      },
+      "2026-Q1": {
+        "organization": 688,
+        "one_person": 94,
+        "personal": 574,
+        "hidden": 521,
+        "unknown": 0,
+        "bot": 1
+      },
+      "2026-Q2": {
+        "organization": 278,
+        "one_person": 11,
+        "personal": 148,
+        "hidden": 221,
+        "unknown": 0,
+        "bot": 3
+      },
+      "2026-Q3": {
+        "organization": 150,
+        "one_person": 0,
+        "personal": 7,
+        "hidden": 13,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2026-Q4": {
+        "organization": 66,
+        "one_person": 0,
+        "personal": 0,
+        "hidden": 10,
+        "unknown": 0,
+        "bot": 0
+      }
     }
   }
 }

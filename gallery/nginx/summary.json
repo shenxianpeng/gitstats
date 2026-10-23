@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev1",
-  "generated_at": "2026-10-19T03:43:52+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:28:27+00:00",
   "name": "nginx",
   "report_path": "index.html",
   "first_commit": "2002-08-06 16:39:45",
-  "last_commit": "2026-10-15 14:45:37",
-  "age_days": 8836,
-  "active_days": 3147,
-  "total_commits": 8758,
-  "total_authors": 142,
-  "active_authors_12mo": 42,
-  "commits_last_12mo": 278,
-  "total_files": 543,
-  "total_lines": 306837,
-  "lines_added": 508282,
-  "lines_removed": 201445,
-  "total_tags": 501,
+  "last_commit": "2026-10-22 11:55:01",
+  "age_days": 8843,
+  "active_days": 3152,
+  "total_commits": 8769,
+  "total_authors": 143,
+  "active_authors_12mo": 45,
+  "commits_last_12mo": 287,
+  "total_files": 544,
+  "total_lines": 306985,
+  "lines_added": 508456,
+  "lines_removed": 201471,
+  "total_tags": 502,
   "era": "steady",
   "top_authors": [
     {
@@ -25,15 +25,15 @@
     },
     {
       "name": "Maxim Dounin",
-      "commits": 1704
+      "commits": 1706
     },
     {
       "name": "Sergey Kandaurov",
-      "commits": 754
+      "commits": 758
     },
     {
       "name": "Roman Arutyunyan",
-      "commits": 660
+      "commits": 661
     },
     {
       "name": "Ruslan Ermilov",
@@ -41,17 +41,20 @@
     }
   ],
   "author_commits": {
+    "Maxim Dounin": 1706,
+    "Roman Arutyunyan": 661,
+    "Sergey Kandaurov": 758,
+    "\ucd5c\ub300\uc6b0 (Daewoo Choi)": 1,
+    "Konstantin Pavlov": 4,
+    "Sai Krishna Kumar Reddy YADAMAKANTI": 3,
+    "Sergey A. Osokin": 2,
     "Evgeny Shirykalov": 2,
     "nishat shabbir": 1,
     "Aleksei Bavshin": 17,
     "Vadim Zhestikov": 22,
     "Oskar Eichler": 1,
     "dgprivate": 1,
-    "Sergey Kandaurov": 754,
-    "Roman Arutyunyan": 660,
-    "Maxim Dounin": 1704,
     "Ivan Ovchinnikov": 2,
-    "Sai Krishna Kumar Reddy YADAMAKANTI": 2,
     "Andrew Clayton": 32,
     "Sourav Bhowmik": 3,
     "Eugene Grebenschikov": 6,
@@ -105,7 +108,6 @@
     "tzssangglass": 1,
     "Michael Vernik": 1,
     "Shaikh Yaser": 1,
-    "Konstantin Pavlov": 3,
     "Maryna Herasimovich": 4,
     "Kasei Wang": 1,
     "J Carter": 2,
@@ -130,7 +132,6 @@
     "Quantum": 1,
     "Jinhua Tan": 1,
     "Daniil Bondarev": 1,
-    "Sergey A. Osokin": 1,
     "Ilya Leoshkevich": 1,
     "Niklas Keller": 1,
     "Nikolay Morozov": 1,
@@ -207,9 +208,9 @@
     "2021": 484,
     "2022": 217,
     "2023": 186,
-    "2024": 133,
-    "2025": 163,
-    "2026": 247
+    "2024": 134,
+    "2025": 164,
+    "2026": 256
   },
   "ai_assisted": {
     "commits": 5,
@@ -252,7 +253,7 @@
       "2025-04": 12,
       "2025-05": 17,
       "2025-06": 12,
-      "2025-07": 23,
+      "2025-07": 24,
       "2025-08": 10,
       "2025-09": 9,
       "2025-10": 13,
@@ -266,8 +267,146 @@
       "2026-06": 33,
       "2026-07": 29,
       "2026-08": 27,
-      "2026-09": 33,
-      "2026-10": 6
+      "2026-09": 35,
+      "2026-10": 13
+    }
+  },
+  "organizations": {
+    "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
+    "commits": 8769,
+    "by_kind": {
+      "organization": 3204,
+      "one_person": 5472,
+      "personal": 85,
+      "hidden": 7,
+      "unknown": 1,
+      "bot": 0
+    },
+    "organization_count": 7,
+    "last_12mo_from": "2025-11",
+    "top": [
+      {
+        "organization": "nginx.com",
+        "commits": 3018,
+        "commits_last_12mo": 177,
+        "addresses": 13,
+        "first_commit": "2011-08-09",
+        "last_commit": "2026-10-22"
+      },
+      {
+        "organization": "f5.com",
+        "commits": 87,
+        "commits_last_12mo": 66,
+        "addresses": 24,
+        "first_commit": "2020-08-28",
+        "last_commit": "2026-10-05"
+      },
+      {
+        "organization": "cloudflare.com",
+        "commits": 46,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2013-05-02",
+        "last_commit": "2016-04-11"
+      },
+      {
+        "organization": "google.com",
+        "commits": 41,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2015-10-02",
+        "last_commit": "2017-12-01"
+      },
+      {
+        "organization": "alibaba-inc.com",
+        "commits": 5,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2022-11-25",
+        "last_commit": "2025-04-18"
+      },
+      {
+        "organization": "wbsrv.ru",
+        "commits": 5,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2022-12-18",
+        "last_commit": "2024-04-10"
+      },
+      {
+        "organization": "amazon.com",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2020-01-14",
+        "last_commit": "2021-10-08"
+      }
+    ],
+    "quarters": {
+      "2025-Q1": {
+        "organization": 33,
+        "one_person": 3,
+        "personal": 0,
+        "hidden": 0,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2025-Q2": {
+        "organization": 39,
+        "one_person": 1,
+        "personal": 1,
+        "hidden": 0,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2025-Q3": {
+        "organization": 37,
+        "one_person": 3,
+        "personal": 2,
+        "hidden": 1,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2025-Q4": {
+        "organization": 38,
+        "one_person": 5,
+        "personal": 0,
+        "hidden": 1,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2026-Q1": {
+        "organization": 53,
+        "one_person": 2,
+        "personal": 7,
+        "hidden": 1,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2026-Q2": {
+        "organization": 72,
+        "one_person": 7,
+        "personal": 9,
+        "hidden": 1,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2026-Q3": {
+        "organization": 83,
+        "one_person": 5,
+        "personal": 1,
+        "hidden": 2,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2026-Q4": {
+        "organization": 10,
+        "one_person": 3,
+        "personal": 0,
+        "hidden": 0,
+        "unknown": 0,
+        "bot": 0
+      }
     }
   }
 }

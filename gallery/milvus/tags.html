@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - Milvus</title>
+	<meta name="description" content="Milvus: 25,869 commits by 386 authors, 2019 to 2026. A report made with gitstats.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="Milvus: Tags">
+	<meta property="og:description" content="Milvus: 25,869 commits by 386 authors, 2019 to 2026. A report made with gitstats.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/milvus/tags.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/milvus/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="Milvus: Tags">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Milvus: Tags">
+	<meta name="twitter:description" content="Milvus: 25,869 commits by 386 authors, 2019 to 2026. A report made with gitstats.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/milvus/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html" class="active" aria-current="page">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Tags</h1><dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">35</dd><dd class="stat-note"><span class="nowrap">latest codex-mac-after-50576-7f1492f</span>&nbsp;&middot; <span class="nowrap">2026-06-26</span></dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">739.1</dd><dd class="stat-note">25,869 commits in total</dd></div></dl>
+<h2 id="all_tags"><a href="#all_tags">All tags</a></h2>
+
+<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th>Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">codex-mac-after-50576-7f1492f</td><td class="nowrap">2026-06-26</td><td class="num">1</td><td>Gao (1)</td></tr><tr><td class="nowrap">codex-mac-before-50576-e05e50e</td><td class="nowrap">2026-06-26</td><td class="num">1,739</td><td>congqixia (206), Zhen Ye (126), wei liu (106), yihao.dai (90), Buqian Zheng (84), Spade  A (78), James (77), yanliang567 (72), zhuwenxing (68), cai.zhang (67), aoiasd (66), Chun Han (53), sparknack (51), zhagnlu (49), XuanYang-cn (42), Li Liu (42), Bingyi Sun (40), sijie-ni-0214 (37), Feilong Hou (34), nico (28), sre-ci-robot (26), junjiejiangjjj (25), Gao (25), marcelo-cjl (24), zhikunyao (22), zhenshan.cao (21), jiaqizho (18), sthuang (17), jiamingli-maker (16), tinswzy (14), foxspy (14), Ted Xu (11), Li Yiyang (10), pymilvus-bot (7), groot (7), cqy123456 (6), wt (5), Lanqing Yang (5), ChenLiqing (4), Jingsong Yin (3), qixuan (2), lif (2), jac (2), Yiqing Lu (2), Xinyi7 (2), Xiaowei Shi (2), Letu Ren (2), 7y-9 (2), yellow-shine (1), wgcn (1), <em>and 25 more authors</em></td></tr><tr><td class="nowrap">pkg/v2.6.3</td><td class="nowrap">2025-09-30</td><td class="num">72</td><td>congqixia (11), XuanYang-cn (5), Gao (5), Bingyi Sun (5), yihao.dai (4), sparknack (4), Zhen Ye (4), zhagnlu (3), yanliang567 (3), wei liu (3), cai.zhang (3), aoiasd (3), tinswzy (2), junjiejiangjjj (2), Tianx (2), Buqian Zheng (2), zhikunyao (1), sthuang (1), sre-ci-robot (1), sangheee (1), nico (1), jiaqizho (1), foxspy (1), James (1), Feilong Hou (1), Chun Han (1), Agnes George (1)</td></tr><tr><td class="nowrap">v2.6.3</td><td class="nowrap">2025-09-30</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">pkg/v2.6.2</td><td class="nowrap">2025-09-18</td><td class="num">123</td><td>congqixia (20), Bingyi Sun (12), zhagnlu (9), Spade  A (8), aoiasd (7), XuanYang-cn (7), Zhen Ye (6), wei liu (5), sthuang (5), cai.zhang (4), Buqian Zheng (4), zhikunyao (3), sre-ci-robot (3), sparknack (3), cqy123456 (3), 9Eurydice9 (3), zhuwenxing (2), yihao.dai (2), qixuan (2), nico (2), zhenshan.cao (1), yanliang567 (1), nish112022 (1), groot (1), foxspy (1), dependabot <span class="badge" title="dependabot[bot]">bot</span> (1), Xiaoguang Zhu (1), Xianhui Lin (1), Jean-Francois Weber-Marx (1), James (1), Gao (1), Feilong Hou (1), Chun Han (1)</td></tr><tr><td class="nowrap">v2.6.2</td><td class="nowrap">2025-09-18</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">pkg/v2.6.1</td><td class="nowrap">2025-08-29</td><td class="num">20</td><td>congqixia (3), cai.zhang (3), XuanYang-cn (3), Zhen Ye (2), Buqian Zheng (2), zhuwenxing (1), wei liu (1), sparknack (1), marcelo-cjl (1), cqy123456 (1), Chun Han (1), 9Eurydice9 (1)</td></tr><tr><td class="nowrap">v2.6.1</td><td class="nowrap">2025-08-29</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">client/v2.6.0</td><td class="nowrap">2025-08-27</td><td class="num">115</td><td>congqixia (18), Zhen Ye (10), wei liu (7), 9Eurydice9 (7), zhuwenxing (6), zhagnlu (6), aoiasd (6), Spade  A (4), tinswzy (3), sthuang (3), sre-ci-robot (3), sparknack (3), nico (3), Gao (3), Alexander Guzhva (3), zhikunyao (2), yihao.dai (2), yanliang567 (2), junjiejiangjjj (2), groot (2), XuanYang-cn (2), Xianhui Lin (2), Tianx (2), ThreadDao (2), Feilong Hou (2), presburger (1), foxspy (1), cqy123456 (1), cai.zhang (1), ZhuXi (1), WAR10CK (1), PjJinchen (1), Linkwei (1), Li Liu (1), Chun Han (1)</td></tr><tr><td class="nowrap">pkg/v2.6.0</td><td class="nowrap">2025-08-05</td><td class="num">339</td><td>congqixia (54), Zhen Ye (37), cai.zhang (20), sthuang (19), zhagnlu (16), wei liu (16), Bingyi Sun (16), yihao.dai (15), Spade  A (15), zhuwenxing (14), aoiasd (13), Buqian Zheng (12), zhikunyao (10), tinswzy (10), sre-ci-robot (8), XuanYang-cn (7), sparknack (6), Chun Han (6), yanliang567 (5), nico (5), foxspy (5), Ted Xu (5), junjiejiangjjj (4), Xianhui Lin (4), qixuan (3), ThreadDao (2), 9Eurydice9 (2), zhenshan.cao (1), rhys (1), groot (1), SimFG (1), Shuyoou (1), PjJinchen (1), Li Liu (1), Jean-Francois Weber-Marx (1), James (1), Alexander Guzhva (1)</td></tr><tr><td class="nowrap">v2.6.0</td><td class="nowrap">2025-08-05</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">client/v2.6.0-rc.1</td><td class="nowrap">2025-06-13</td><td class="num">2,358</td><td>congqixia (340), Zhen Ye (191), wei liu (140), yihao.dai (137), sre-ci-robot (128), cai.zhang (118), Bingyi Sun (79), zhuwenxing (78), aoiasd (72), SimFG (72), smellthemoon (69), zhagnlu (67), XuanYang-cn (64), jaime (56), Ted Xu (51), yellow-shine (49), sthuang (47), Chun Han (44), Buqian Zheng (37), Xianhui Lin (34), yanliang567 (32), Spade  A (32), ThreadDao (31), nico (30), wayblink (29), foxspy (27), James (20), Gao (19), tinswzy (18), Patrick Weizhi Xu (17), junjiejiangjjj (16), binbin (16), cqy123456 (15), wt (14), CharlesFeng (13), Cai Yudong (13), Jiquan Long (12), MimoN (11), zhenshan.cao (10), qixuan (8), groot (8), zhikunyao (6), shaoyue (5), presburger (5), Yinzuo Jiang (5), laurazhao0611 (4), Linkwei (4), Jiang Chen (4), sparknack (3), Xiaowei Shi (3), <em>and 36 more authors</em></td></tr><tr><td class="nowrap">v2.6.0-rc1</td><td class="nowrap">2025-06-13</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">v2.2-testing-20240702</td><td class="nowrap">2024-07-02</td><td class="num">376</td><td>congqixia (59), yihao.dai (28), wei liu (27), sre-ci-robot (22), zhuwenxing (20), cai.zhang (15), XuanYang-cn (12), zhagnlu (11), jaime (11), Zhen Ye (11), SimFG (11), yellow-shine (10), aoiasd (10), wayblink (9), smellthemoon (9), sthuang (8), cqy123456 (8), Ted Xu (7), Cai Yudong (7), nico (6), ThreadDao (6), Jiquan Long (6), Buqian Zheng (6), Bingyi Sun (6), James (5), Gao (4), Chun Han (4), elstic (3), edward.zeng (3), ArenaSu (3), Alexander Guzhva (3), zhikunyao (2), zhenshan.cao (2), yiwangdr (2), yanliang567 (2), presburger (2), pingliu (2), coldWater (2), Yinzuo Jiang (2), PowderLi (2), GenkenWei (2), xige-16 (1), foxspy (1), binbin (1), Patrick Weizhi Xu (1), Francis (1), Aldrin (1)</td></tr><tr><td class="nowrap">v2.4.2</td><td class="nowrap">2024-05-15</td><td class="num">1,995</td><td>congqixia (320), yah01 (133), wei liu (130), sre-ci-robot (115), yihao.dai (95), XuanYang-cn (95), zhuwenxing (93), yellow-shine (74), nico (67), aoiasd (62), Jiquan Long (58), SimFG (55), cai.zhang (54), Bingyi Sun (53), PowderLi (47), Zhen Ye (46), Chun Han (44), zhagnlu (40), smellthemoon (40), jaime (33), James (33), wayblink (26), Enwei Jiao (23), Cai Yudong (20), xige-16 (18), Gao (18), zhenshan.cao (17), yanliang567 (15), Buqian Zheng (15), binbin (14), yiwangdr (13), cqy123456 (13), Bennu (13), Ted Xu (12), foxspy (11), groot (10), elstic (8), pingliu (6), Alexander Guzhva (5), shaoyue (4), presburger (4), Xu Tong (4), Sheldon (4), sthuang (3), dependabot <span class="badge" title="dependabot[bot]">bot</span> (3), ThreadDao (3), Patrick Weizhi Xu (3), Aldrin (3), ryjiang (2), KumaJie (2), <em>and 15 more authors</em></td></tr><tr><td class="nowrap">v2.3.0</td><td class="nowrap">2023-08-23</td><td class="num">132</td><td>yah01 (18), congqixia (14), wei liu (10), zhagnlu (7), nico (7), Enwei Jiao (7), Bennu (7), xige-16 (6), cai.zhang (6), SimFG (5), sre-ci-robot (4), Jiquan Long (4), yihao.dai (3), wayblink (3), cqy123456 (3), XuanYang-cn (3), James (3), Gao (3), zhuwenxing (2), smellthemoon (2), jaime (2), Zhen Ye (2), Li Liu (2), Chun Han (2), zhenshan.cao (1), groot (1), binbin (1), aoiasd (1), ThreadDao (1), Patrick Weizhi Xu (1), Cai Yudong (1)</td></tr><tr><td class="nowrap">pkg/v0.0.1</td><td class="nowrap">2023-08-09</td><td class="num">958</td><td>congqixia (140), yah01 (92), wei liu (75), sre-ci-robot (72), yihao.dai (63), nico (49), zhuwenxing (47), Enwei Jiao (40), Jiquan Long (36), cai.zhang (33), smellthemoon (32), Cai Yudong (22), Bingyi Sun (22), wayblink (17), aoiasd (17), Chun Han (17), Bennu (17), James (16), SimFG (13), XuanYang-cn (12), xige-16 (11), zhenshan.cao (10), groot (10), zhagnlu (9), Gao (9), binbin (8), Zhen Ye (8), ThreadDao (8), jaime (6), yiwangdr (5), foxspy (4), dependabot <span class="badge" title="dependabot[bot]">bot</span> (4), Preetham (4), presburger (3), cqy123456 (3), yanliang567 (2), fan yang (2), Zhihong Yu (2), PowderLi (2), Ikko Eltociear Ashimine (2), shaoyue (1), jjyaoao (1), hulk (1), cui fliter (1), chen (1), Zhao Shunjie (1), Ten Thousand Leaves (1), LiuHanCheng (1), LeoReeYang (1), Ji Bin (1), <em>and 4 more authors</em></td></tr><tr><td class="nowrap">v2.3.0-beta</td><td class="nowrap">2023-03-20</td><td class="num">2,522</td><td>congqixia (230), yah01 (203), zhuwenxing (196), sre-ci-robot (116), Jiquan Long (116), James (116), Jenny Li (104), cai.zhang (101), yihao.dai (97), XuanYang-cn (88), Ten Thousand Leaves (85), SimFG (80), jaime (78), nico (76), Enwei Jiao (69), xige-16 (66), binbin (61), Cai Yudong (53), zhenshan.cao (47), groot (47), wei liu (44), ThreadDao (41), Bingyi Sun (39), Bennu (36), wayblink (34), smellthemoon (31), edward.zeng (29), jingkl (27), Letian Jiang (27), aoiasd (26), yanliang567 (20), shaoyue (18), codeman (16), Li Liu (10), zhagnlu (9), Chun Han (8), wgcn (7), Ji Bin (7), godchen (6), presburger (5), exia (5), xing.zhao (4), elstic (4), huangjincheng2022 (3), Zach (3), Jeng.Gwan (3), yongpengli-z (2), john-h-luo (2), datenhahn (2), Su Yang (2), <em>and 20 more authors</em></td></tr><tr><td class="nowrap">v2.0.1</td><td class="nowrap">2022-02-22</td><td class="num">112</td><td>Jenny Li (20), sre-ci-robot (14), congqixia (8), jingkl (6), binbin (6), XuanYang-cn (6), James (5), Cai Yudong (5), zhuwenxing (4), jaime (4), edward.zeng (4), xige-16 (3), guoxiangzhou (3), Min Tian (3), Bingyi Sun (3), yah01 (2), huangjincheng2022 (2), ThreadDao (2), Ten Thousand Leaves (2), zhenshan.cao (1), yanliang567 (1), cai.zhang (1), Volodymyr Stoiko (1), LocoRichard (1), Kate Shao (1), JunSung Park (1), Ji Bin (1), Ibrahim Haddad (1), Filipe Caixeta (1)</td></tr><tr><td class="nowrap">v2.0.0</td><td class="nowrap">2022-01-25</td><td class="num">515</td><td>Jenny Li (33), Cai Yudong (27), zhuwenxing (25), xige-16 (25), XuanYang-cn (24), Jiquan Long (24), yihao.dai (23), ThreadDao (23), congqixia (21), guoxiangzhou (20), godchen (20), edward.zeng (20), cai.zhang (20), yanliang567 (19), Bennu (19), zwd1208 (18), zhenshan.cao (18), shaoyue (18), binbin (18), Xieql (18), wt (16), jingkl (15), jaime (15), groot (9), Bingyi Sun (8), sre-ci-robot (6), Min Tian (6), yukun (3), James (2), yah01 (1), Xiangyu Wang (1)</td></tr><tr><td class="nowrap">v2.0.0-pre-ga</td><td class="nowrap">2021-12-30</td><td class="num">4,088</td><td>Cai Yudong (208), yihao.dai (198), zhuwenxing (189), Jiquan Long (186), cai.zhang (185), edward.zeng (182), ThreadDao (178), XuanYang-cn (175), binbin (172), zwd1208 (171), yanliang567 (167), wt (167), Jenny Li (167), congqixia (160), xige-16 (157), yukun (151), godchen (125), zhenshan.cao (105), shaoyue (103), Xiangyu Wang (91), groot (90), ryjiang (89), Bennu (83), Bingyi Sun (66), jingkl (65), jaime (63), sunby (48), Min Tian (47), Chenglong.li (44), James (35), SS (30), Xieql (28), guoxiangzhou (27), Tumao (23), shiyu22 (22), cxytz01 (22), sre-ci-robot (15), Jael Gu (15), milvus-ci-robot (11), nameczz (8), BIKI DAS (6), ThyeeZz (3), Ji Bin (3), xiangzhouguo (2), NotRyan (2), quicksilver (1), ZhiShen (1), Baiqiang Zhao (1), BUPTAnderson (1)</td></tr><tr><td class="nowrap">v2.0.0-rc7</td><td class="nowrap">2021-10-11</td><td class="num">1,568</td><td>yihao.dai (80), Jiquan Long (77), yanliang567 (76), edward.zeng (76), binbin (74), zhuwenxing (73), groot (73), zwd1208 (72), wt (72), Cai Yudong (72), ThreadDao (70), congqixia (69), yukun (66), sunby (65), cai.zhang (65), XuanYang-cn (60), godchen (59), xige-16 (55), Xiangyu Wang (55), zhenshan.cao (50), James (47), ryjiang (37), Chenglong.li (14), shiyu22 (13), sre-ci-robot (12), Min Tian (12), Tumao (10), SS (9), Jael Gu (9), Bennu (8), milvus-ci-robot (6), NotRyan (6), nameczz (5), Yusup (4), Siddharth Mishra (3), jingkl (2), elfisworking (2), ZhiShen (2), LocoRichard (2), zhuanghong.chen (1), quicksilver (1), Mehdi ABAAKOUK (1), Elisha Hollander (1), BUPTAnderson (1), 0xflotus (1)</td></tr><tr><td class="nowrap">v2.0.0-rc6</td><td class="nowrap">2021-09-10</td><td class="num">167</td><td>groot (14), Jiquan Long (11), congqixia (10), sunby (9), binbin (9), Cai Yudong (9), yukun (8), edward.zeng (8), XuanYang-cn (8), zhuwenxing (7), yihao.dai (7), ryjiang (7), Xiangyu Wang (7), yanliang567 (5), godchen (5), ThreadDao (5), zhenshan.cao (4), cai.zhang (4), zwd1208 (3), zhuanghong.chen (3), wt (3), Min Tian (3), shiyu22 (2), quicksilver (2), milvus-ci-robot (2), Tumao (2), LocoRichard (2), xige-16 (1), nameczz (1), jingkl (1), ThyeeZz (1), SS (1), James (1), Jael Gu (1), Bennu (1)</td></tr><tr><td class="nowrap">v2.0.0-rc5</td><td class="nowrap">2021-08-30</td><td class="num">126</td><td>congqixia (14), quicksilver (10), sunby (9), godchen (8), Cai Yudong (8), wt (6), cai.zhang (6), binbin (6), neza2017 (5), XuanYang-cn (5), Jiquan Long (5), yihao.dai (4), xige-16 (4), groot (4), ThreadDao (4), zhuwenxing (3), yukun (3), milvus-ci-robot (3), Xiangyu Wang (3), zhenshan.cao (2), edward.zeng (2), del-zhenwu (2), LocoRichard (2), James (2), yanliang567 (1), shengjun.li (1), Ting Sun (1), Starlord (1), Lari Hotari (1), Bennu (1)</td></tr><tr><td class="nowrap">v2.0.0-rc4</td><td class="nowrap">2021-08-10</td><td class="num">164</td><td>quicksilver (35), Jiquan Long (16), ThreadDao (11), yihao.dai (9), sunby (9), sre-ci-robot (7), Cai Yudong (7), wt (6), cai.zhang (6), xige-16 (5), binbin (5), LocoRichard (5), zhenshan.cao (4), yanliang567 (4), neza2017 (4), godchen (4), congqixia (4), XuanYang-cn (4), milvus-ci-robot (3), Xiangyu Wang (3), Jeng.Gwan (3), groot (2), del-zhenwu (2), FluorineDog (2), zwd1208 (1), zhuwenxing (1), James (1), Bennu (1)</td></tr><tr><td class="nowrap">v2.0.0-rc2</td><td class="nowrap">2021-07-12</td><td class="num">107</td><td>quicksilver (17), neza2017 (8), Xiangyu Wang (8), Cai Yudong (7), sre-ci-robot (6), congqixia (6), FluorineDog (6), sunby (5), yanliang567 (4), godchen (4), binbin (4), ThreadDao (4), zhenshan.cao (3), yukun (3), xige-16 (3), wt (3), del-zhenwu (3), XuanYang-cn (3), Jiquan Long (3), shengjun.li (2), groot (2), LocoRichard (2), James (1)</td></tr><tr><td class="nowrap">v2.0.0-rc1</td><td class="nowrap">2021-06-28</td><td class="num">1,873</td><td>neza2017 (179), yihao.dai (177), sunby (156), zhenshan.cao (150), quicksilver (149), Jiquan Long (117), XuanYang-cn (110), xige-16 (106), FluorineDog (103), cai.zhang (98), godchen (77), Xiangyu Wang (65), Cai Yudong (65), yukun (62), ThreadDao (39), congqixia (33), GuoRentong (23), shengjh (22), del-zhenwu (22), wt (21), yanliang567 (19), rain (15), LocoRichard (11), binbin (10), shengjun.li (8), groot (8), BossZou (8), become-nice (6), sre-ci-robot (5), ophunter233 (5), zwd1208 (1), jinhai (1), break2017 (1), MXDA (1)</td></tr><tr><td class="nowrap">v0.10.2</td><td class="nowrap">2020-08-15</td><td class="num">18</td><td>shengjun.li (6), del-zhenwu (4), BossZou (4), jinhai (1), cqy123456 (1), Xiaohai Xu (1), Tinkerrr (1)</td></tr><tr><td class="nowrap">v0.10.1</td><td class="nowrap">2020-07-20</td><td class="num">57</td><td>groot (14), quicksilver (8), shengjun.li (6), del-zhenwu (6), BossZou (4), jinhai (3), op-hunter (2), godchen0212 (2), cqy123456 (2), XuanYang-cn (2), Wang XiangYu (2), Tinkerrr (2), yukun (1), Xiaohai Xu (1), ThreadDao (1), Cai Yudong (1)</td></tr><tr><td class="nowrap">v0.10.0</td><td class="nowrap">2020-06-15</td><td class="num">61</td><td>del-zhenwu (14), groot (13), Cai Yudong (8), jinhai (7), BossZou (6), shengjun.li (4), Wang XiangYu (4), op-hunter (2), yukun (1), quicksilver (1), Xiaohai Xu (1)</td></tr><tr><td class="nowrap">v0.9.0</td><td class="nowrap">2020-05-15</td><td class="num">396</td><td>jinhai (58), Cai Yudong (56), groot (39), del-zhenwu (28), BossZou (26), Wang XiangYu (15), quicksilver (13), shengjun.li (11), zw (10), op-hunter (9), Xiaohai Xu (8), Snyk bot (8), Lutkin Wang (8), XuPeng-SH (7), yukun (6), Zhiru Zhu (4), feisiyicl (3), Tinkerrr (3), peng.xu (2), mergify <span class="badge" title="mergify[bot]">bot</span> (2), dongwei (2), SkyYang (2), HesterG (2), Cupchen (2), AzAz (2), Allen Zhang (2), 格雷大大 (1), zxf2017 (1), zhoubo0317 (1), zhenshan.cao (1), zhangchen (1), zaqwsxqwer111 (1), yxm1536 (1), yihao.dai (1), xudalin0609 (1), xige-16 (1), xiaocai2333 (1), wscxyey (1), weishuo (1), water32 (1), smiling849 (1), shiyu09 (1), shana0325 (1), ryjiang (1), phantom (1), nezha2017 (1), nameczz (1), moe-of-faith (1), mileyzjq (1), lwglgy (1), <em>and 44 more authors</em></td></tr><tr><td class="nowrap">v0.7.0</td><td class="nowrap">2020-03-11</td><td class="num">427</td><td>quicksilver (122), jinhai (58), groot (34), Cai Yudong (31), BossZou (30), Lutkin Wang (29), starlord (22), Zhiru Zhu (21), Xiaohai Xu (14), Tinkerrr (13), del-zhenwu (9), zilliz (6), jielinxu (6), Snyk bot (5), allcontributors <span class="badge" title="allcontributors[bot]">bot</span> (3), Yukikaze-CZR (3), yukun (2), shiyu22 (2), shengjun.li (2), shengjh (2), XuPeng-SH (2), Nicky (2), rain (1), milvus-ci-robot (1), milvus (1), aaronjin2010 (1), Wang XiangYu (1), The Codacy Badger (1), Heisenberg-Y (1), Chenglong.li (1), ABNER-1 (1)</td></tr><tr><td class="nowrap">v0.6.0</td><td class="nowrap">2019-12-07</td><td class="num">833</td><td>jinhai (168), peng.xu (140), quicksilver (121), groot (100), Yukikaze-CZR (46), yhz (37), yukun (34), Zhiru Zhu (34), jielinxu (30), del-zhenwu (25), Tinkerrr (24), Cai Yudong (23), Wang XiangYu (10), youny626 (8), Lutkin Wang (6), allcontributors <span class="badge" title="allcontributors[bot]">bot</span> (4), G.Y Feng (4), erdustiggen (3), Lizhou Gao (3), zerowe-seven (2), bugfixer (2), Nicky (2), Heisenberg (2), 赖龙 (1), sjh (1), chengjinchen (1), XuPeng-SH (1), Shouyu Luo (1)</td></tr><tr><td class="nowrap">v0.5.3</td><td class="nowrap">2019-11-13</td><td class="num">51</td><td>jinhai (19), groot (9), yukun (8), Cai Yudong (6), quicksilver (3), del-zhenwu (3), jielinxu (2), Lutkin Wang (1)</td></tr><tr><td class="nowrap">v0.5.2</td><td class="nowrap">2019-11-07</td><td class="num">3,637</td><td>jinhai (795), starlord (391), XuPeng-SH (304), Zhiru Zhu (290), groot (289), peng.xu (255), yukun (251), quicksilver (234), Tinkerrr (198), Wang XiangYu (165), yu yunfeng (88), Cai Yudong (82), jielinxu (56), milvus-ci-robot (47), Heisenberg (43), del-zhenwu (34), test (28), jielin.xu (27), XuanYang-cn (26), BossZou (11), yangwei.yao (8), Xiangyu Wang (4), thywdy (3), Sijie Zhang (3), CaiYudong (2), zilliz (1), dependabot <span class="badge" title="dependabot[bot]">bot</span> (1), Yukikaze-CZR (1)</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="../ecosystems/china.html">How Milvus ranks among open source projects from China by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+name: GitStats Report
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  gitstats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: shenxianpeng/gitstats-action@v1
+        with:
+          deploy-to-pages: true
+</pre></details></section><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

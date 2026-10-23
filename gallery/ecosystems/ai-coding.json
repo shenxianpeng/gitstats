@@ -1,0 +1,340 @@
+{
+  "schema_version": 1,
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:33:22+00:00",
+  "ecosystem": {
+    "id": "ai-coding",
+    "name": "AI coding assistants",
+    "title": "Open source AI coding assistants"
+  },
+  "quarter": {
+    "id": "2026-Q3",
+    "label": "Jul–Sep 2026"
+  },
+  "previous_quarter": {
+    "id": "2026-Q2",
+    "label": "Apr–Jun 2026"
+  },
+  "summary": {
+    "repositories": 12,
+    "with_commits": 11,
+    "naming": 10,
+    "median_share": 0.0529,
+    "highest": {
+      "id": "openhands",
+      "name": "OpenHands",
+      "share": 0.4833
+    }
+  },
+  "repositories": [
+    {
+      "rank": 1,
+      "id": "openhands",
+      "name": "OpenHands",
+      "repository": "OpenHands/OpenHands",
+      "report": "../openhands/",
+      "quarter": {
+        "commits": 687,
+        "ai_assisted": 332,
+        "share": 0.4833
+      },
+      "previous_quarter": {
+        "commits": 1291,
+        "ai_assisted": 797,
+        "share": 0.6174
+      },
+      "commits_last_12mo": 3265,
+      "active_authors_12mo": 212,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "OpenHands",
+        "Claude",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 2,
+      "id": "continue",
+      "name": "Continue",
+      "repository": "continuedev/continue",
+      "report": "../continue/",
+      "quarter": {
+        "commits": 3,
+        "ai_assisted": 1,
+        "share": 0.3333
+      },
+      "previous_quarter": {
+        "commits": 31,
+        "ai_assisted": 12,
+        "share": 0.3871
+      },
+      "commits_last_12mo": 1663,
+      "active_authors_12mo": 77,
+      "health": "quiet",
+      "last_commit": "2026-07-21",
+      "assistants": [
+        "Claude",
+        "Cursor",
+        "Aider"
+      ]
+    },
+    {
+      "rank": 3,
+      "id": "qwen-code",
+      "name": "Qwen Code",
+      "repository": "QwenLM/qwen-code",
+      "report": "../qwen-code/",
+      "quarter": {
+        "commits": 3564,
+        "ai_assisted": 268,
+        "share": 0.0752
+      },
+      "previous_quarter": {
+        "commits": 1695,
+        "ai_assisted": 218,
+        "share": 0.1286
+      },
+      "commits_last_12mo": 8861,
+      "active_authors_12mo": 324,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Gemini",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "goose",
+      "name": "goose",
+      "repository": "aaif-goose/goose",
+      "report": "../goose/",
+      "quarter": {
+        "commits": 834,
+        "ai_assisted": 55,
+        "share": 0.0659
+      },
+      "previous_quarter": {
+        "commits": 876,
+        "ai_assisted": 80,
+        "share": 0.0913
+      },
+      "commits_last_12mo": 3202,
+      "active_authors_12mo": 430,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 5,
+      "id": "cline",
+      "name": "Cline",
+      "repository": "cline/cline",
+      "report": "../cline/",
+      "quarter": {
+        "commits": 1070,
+        "ai_assisted": 66,
+        "share": 0.0617
+      },
+      "previous_quarter": {
+        "commits": 1035,
+        "ai_assisted": 19,
+        "share": 0.0184
+      },
+      "commits_last_12mo": 3753,
+      "active_authors_12mo": 152,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 6,
+      "id": "gemini-cli",
+      "name": "Gemini CLI",
+      "repository": "google-gemini/gemini-cli",
+      "report": "../gemini-cli/",
+      "quarter": {
+        "commits": 170,
+        "ai_assisted": 9,
+        "share": 0.0529
+      },
+      "previous_quarter": {
+        "commits": 661,
+        "ai_assisted": 27,
+        "share": 0.0408
+      },
+      "commits_last_12mo": 3377,
+      "active_authors_12mo": 421,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "Gemini",
+        "Jules",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 7,
+      "id": "crush",
+      "name": "Crush",
+      "repository": "charmbracelet/crush",
+      "report": "../crush/",
+      "quarter": {
+        "commits": 601,
+        "ai_assisted": 27,
+        "share": 0.0449
+      },
+      "previous_quarter": {
+        "commits": 669,
+        "ai_assisted": 3,
+        "share": 0.0045
+      },
+      "commits_last_12mo": 2433,
+      "active_authors_12mo": 106,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "ChatGPT"
+      ]
+    },
+    {
+      "rank": 8,
+      "id": "claude-code",
+      "name": "Claude Code",
+      "repository": "anthropics/claude-code",
+      "report": "../claude-code/",
+      "quarter": {
+        "commits": 212,
+        "ai_assisted": 7,
+        "share": 0.033
+      },
+      "previous_quarter": {
+        "commits": 115,
+        "ai_assisted": 2,
+        "share": 0.0174
+      },
+      "commits_last_12mo": 629,
+      "active_authors_12mo": 39,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "Claude"
+      ]
+    },
+    {
+      "rank": 9,
+      "id": "opencode",
+      "name": "OpenCode",
+      "repository": "anomalyco/opencode",
+      "report": "../opencode/",
+      "quarter": {
+        "commits": 5073,
+        "ai_assisted": 11,
+        "share": 0.0022
+      },
+      "previous_quarter": {
+        "commits": 4000,
+        "ai_assisted": 7,
+        "share": 0.0018
+      },
+      "commits_last_12mo": 17195,
+      "active_authors_12mo": 849,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "OpenCode",
+        "Claude",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 10,
+      "id": "kilocode",
+      "name": "Kilo Code",
+      "repository": "Kilo-Org/kilocode",
+      "report": "../kilocode/",
+      "quarter": {
+        "commits": 7033,
+        "ai_assisted": 12,
+        "share": 0.0017
+      },
+      "previous_quarter": {
+        "commits": 10221,
+        "ai_assisted": 18,
+        "share": 0.0018
+      },
+      "commits_last_12mo": 30002,
+      "active_authors_12mo": 1025,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "OpenCode",
+        "Claude",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 11,
+      "id": "codex",
+      "name": "Codex CLI",
+      "repository": "openai/codex",
+      "report": "../codex/",
+      "quarter": {
+        "commits": 3762,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 2942,
+        "ai_assisted": 5,
+        "share": 0.0017
+      },
+      "commits_last_12mo": 10762,
+      "active_authors_12mo": 513,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Codex",
+        "Claude",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 12,
+      "id": "aider",
+      "name": "Aider",
+      "repository": "Aider-AI/aider",
+      "report": "../aider/",
+      "quarter": {
+        "commits": 0,
+        "ai_assisted": 0,
+        "share": null
+      },
+      "previous_quarter": {
+        "commits": 19,
+        "ai_assisted": 8,
+        "share": 0.4211
+      },
+      "commits_last_12mo": 108,
+      "active_authors_12mo": 11,
+      "health": "quiet",
+      "last_commit": "2026-05-22",
+      "assistants": [
+        "Aider",
+        "Claude"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - Apache ECharts</title>
+	<meta name="description" content="Apache ECharts: 10,403 commits by 336 authors, 2013 to 2026. A report made with gitstats.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="Apache ECharts: Code Ownership">
+	<meta property="og:description" content="Apache ECharts: 10,403 commits by 336 authors, 2013 to 2026. A report made with gitstats.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/echarts/ownership.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/echarts/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="Apache ECharts: Code Ownership">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Apache ECharts: Code Ownership">
+	<meta name="twitter:description" content="Apache ECharts: 10,403 commits by 336 authors, 2013 to 2026. A report made with gitstats.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/echarts/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html" class="active" aria-current="page">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Code Ownership</h1><p class="section-note">Ownership is measured by how many commits each author made to each file in the current tree. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated. The <strong>bus factor</strong> is the smallest number of people who are, between them, primary owner of more than half of the files.</p><dl class="stat-tiles" style="--cols: 4; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Files Tracked</dt><dd class="stat-value">2,181</dd><dd class="stat-note">in the current tree</dd></div><div class="stat-tile"><dt>Bus Factor</dt><dd class="stat-value">2</dd><dd class="stat-note">2 authors are primary owner of 1,656 of 2,181 files</dd></div><div class="stat-tile"><dt>Single-Owner Files</dt><dd class="stat-value">873</dd><dd class="stat-note">40.0% of tracked files</dd></div><div class="stat-tile"><dt>Contributors</dt><dd class="stat-value">253</dd><dd class="stat-note">authors who changed files</dd></div></dl>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus factor risk — single-owner files</a></h2>
+
+<p class="section-note">Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</p><div class="table-scroll"><table class="sortable file-table" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">test/runTest/blacklist.js</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">17</td></tr><tr><td class="path">test/universalTransition.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">16</td></tr><tr><td class="path">src/visual/tokens.ts</td><td data-label="Sole owner">Ovilia</td><td class="num" data-label="Commits">15</td></tr><tr><td class="path">src/scale/breakImpl.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">14</td></tr><tr><td class="path">src/scale/scaleMapper.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">14</td></tr><tr><td class="path">src/coord/axisStatistics.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">12</td></tr><tr><td class="path">src/scale/break.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">11</td></tr><tr><td class="path">test/graphic-transition.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">11</td></tr><tr><td class="path">test/matrix3.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">10</td></tr><tr><td class="path">src/coord/axisBand.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">9</td></tr></table></div><details class="table-details"><summary>Table: the 100 most-changed of 873 single-owner files</summary><div class="table-scroll"><table class="sortable file-table" id="ownership-busfactor-all"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">test/runTest/blacklist.js</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">17</td></tr><tr><td class="path">test/universalTransition.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">16</td></tr><tr><td class="path">src/visual/tokens.ts</td><td data-label="Sole owner">Ovilia</td><td class="num" data-label="Commits">15</td></tr><tr><td class="path">src/scale/breakImpl.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">14</td></tr><tr><td class="path">src/scale/scaleMapper.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">14</td></tr><tr><td class="path">src/coord/axisStatistics.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">12</td></tr><tr><td class="path">src/scale/break.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">11</td></tr><tr><td class="path">test/graphic-transition.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">11</td></tr><tr><td class="path">test/matrix3.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">10</td></tr><tr><td class="path">src/coord/axisBand.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">test/lib/draggable.js</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">src/component/transform/sortTransform.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">src/chart/chord/ChordPiece.ts</td><td data-label="Sole owner">Ovilia</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">test/theme-list.html</td><td data-label="Sole owner">Ovilia</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">test/lib/simpleRequire.js</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">package.README.md</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">src/chart/chord/ChordEdge.ts</td><td data-label="Sole owner">Ovilia</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">test/graphic-animation.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">test/runTest/runtime/timeline.js</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">src/chart/helper/axisSnippets.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">src/coord/axisNiceTicks.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">test/lib/facePrint.js</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">src/layout/barCommon.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">test/axis-layout-0.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">test/axis-break-2.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">src/component/helper/listComponent.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">test/-cases.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">test/universalTransition3.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">test/pie-richText.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">test/pie-label-extreme.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">test/pie-label-mobile.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">test/build/mktest.js</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">test/bar-overflow-plot2.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">src/component/brush/selector.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">src/coord/cartesian/Cartesian.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">theme/v5.js</td><td data-label="Sole owner">Ovilia</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">test/runTest/config.js</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">test/runTest/runtime/shim.js</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">test/stream-basic3.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">test/stream-basic5.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">test/axis-break-3.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">test/axis-break-4.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">src/coord/parallel/ParallelAxis.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">AGENTS.md</td><td data-label="Sole owner">Jin</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">test/tooltip-lag-glitch.html</td><td data-label="Sole owner">Zhongxiang Wang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">test/markPoint-stock.html</td><td data-label="Sole owner">Ovilia</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">test/custom-register.html</td><td data-label="Sole owner">Ovilia</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">test/custom-update.html</td><td data-label="Sole owner">Ovilia</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">test/pie-visual.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">test/legend-visualMapColor.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">src/component/legend/installLegendScroll.ts</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">test/runTest/actions/brush.json</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">src/component/thumbnail/ThumbnailBridgeImpl.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/component/thumbnail/ThumbnailView.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/hover-layer.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/runTest/marks/axis-interval2.json</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/runTest/marks/axis-lastLabel.json</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/build/mktest-tpl2.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/runTest/marks/axis-interval.json</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/component/thumbnail/ThumbnailModel.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/matrix2.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/calendar-other-coord-sys.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/runTest/actions/axis-break-2.json</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/graph-layout-roam.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/ut/spec/component/dataZoom/helper.test.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/ut/spec/api/getVisual.test.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/chart/boxplot/boxplotTransform.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/data/obama_budget_proposal_2012.tree.js</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/runTest/actions/graph-case.json</td><td data-label="Sole owner">Zhongxiang Wang</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/chart/custom/customSeriesRegister.ts</td><td data-label="Sole owner">Ovilia</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/runTest/actions/custom-update.json</td><td data-label="Sole owner">Ovilia</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/pie-label-alignTo.html</td><td data-label="Sole owner">Ovilia</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/pie-label-alignTo-adjust.html</td><td data-label="Sole owner">Ovilia</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">build/template/charts.js</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">build/template/components.js</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">build/template/core.js</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">build/template/renderers.js</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/browser-esm.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/runTest/actions/dataZoom-rainfall.json</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">build/source-release/template/announce-release.tpl</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/runTest/actions/universalTransition2.json</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/runTest/actions/universalTransition.json</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/area-smooth.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/line-crash.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/axis-minorTick.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/resize-animation.html</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/component/marker/installMarkArea.ts</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/component/marker/installMarkPoint.ts</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/component/parallel/install.ts</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/component/toolbox/install.ts</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/runTest/actions/clip.json</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">build/transform-dev.js</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/runTest/actions/treemap-disk.json</td><td data-label="Sole owner">Yi Shen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/pie-negative-value.html</td><td data-label="Sole owner">timshen</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">test/types/cjs/main.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">test/types/no-module/main.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">ssr/client/src/.eslintrc.yaml</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/component/helper/thumbnailBridge.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/util/cycleCache.ts</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">test/pie-coordinate-system-amap.html</td><td data-label="Sole owner">100pah</td><td class="num" data-label="Commits">2</td></tr></table></div></details>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by author</a></h2>
+
+<p class="section-note">Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</p><div class="table-scroll"><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th class="num">Files owned</th><th class="num">Solely owned</th><th class="num">Files touched</th></tr><tr><td>100pah</td><td class="num">918</td><td class="num">357</td><td class="num">1,443</td></tr><tr><td>Yi Shen</td><td class="num">738</td><td class="num">299</td><td class="num">1,430</td></tr><tr><td>Ovilia</td><td class="num">211</td><td class="num">89</td><td class="num">628</td></tr><tr><td>Zhongxiang Wang</td><td class="num">107</td><td class="num">40</td><td class="num">379</td></tr><tr><td>lang</td><td class="num">37</td><td class="num">8</td><td class="num">134</td></tr><tr><td>Deqing Li</td><td class="num">17</td><td class="num">7</td><td class="num">42</td></tr><tr><td>zakwu</td><td class="num">15</td><td class="num">0</td><td class="num">53</td></tr><tr><td>Linghao Su</td><td class="num">15</td><td class="num">12</td><td class="num">32</td></tr><tr><td>make it right</td><td class="num">14</td><td class="num">6</td><td class="num">32</td></tr><tr><td>susiwen8</td><td class="num">13</td><td class="num">0</td><td class="num">136</td></tr><tr><td>Jin</td><td class="num">12</td><td class="num">8</td><td class="num">32</td></tr><tr><td>sz-p</td><td class="num">5</td><td class="num">3</td><td class="num">29</td></tr><tr><td>jiawulin001</td><td class="num">4</td><td class="num">1</td><td class="num">24</td></tr><tr><td>timshen</td><td class="num">4</td><td class="num">1</td><td class="num">20</td></tr><tr><td>fuchunhui</td><td class="num">3</td><td class="num">1</td><td class="num">16</td></tr><tr><td>dengxiaohong01</td><td class="num">3</td><td class="num">0</td><td class="num">16</td></tr><tr><td>lruler</td><td class="num">3</td><td class="num">0</td><td class="num">13</td></tr><tr><td>kongmoumou</td><td class="num">2</td><td class="num">1</td><td class="num">8</td></tr><tr><td>huanxi</td><td class="num">2</td><td class="num">2</td><td class="num">8</td></tr><tr><td>Map1en_</td><td class="num">2</td><td class="num">2</td><td class="num">6</td></tr><tr><td>zehua.wang</td><td class="num">2</td><td class="num">2</td><td class="num">5</td></tr><tr><td>akash.sonune</td><td class="num">2</td><td class="num">2</td><td class="num">5</td></tr><tr><td>jinzisen</td><td class="num">2</td><td class="num">1</td><td class="num">4</td></tr><tr><td>cvSoldier</td><td class="num">2</td><td class="num">2</td><td class="num">4</td></tr><tr><td>Dai Xuezhou</td><td class="num">2</td><td class="num">2</td><td class="num">4</td></tr></table></div><p class="moreauthors">Showing top 25 of 253 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most shared files</a></h2>
+
+<p class="section-note">Files touched by the most people — shared code where changes are most likely to need coordination.</p><div class="table-scroll"><table class="sortable file-table" id="ownership-shared"><tr><th>File</th><th class="num">Contributors</th><th>Primary owner</th><th class="num">Owner share</th></tr><tr><td class="path">README.md</td><td class="num" data-label="Contributors">30</td><td data-label="Primary owner">Yi Shen</td><td class="num" data-label="Owner share">18.9%</td></tr><tr><td class="path">src/util/types.ts</td><td class="num" data-label="Contributors">26</td><td data-label="Primary owner">Yi Shen</td><td class="num" data-label="Owner share">40.9%</td></tr><tr><td class="path">src/core/echarts.ts</td><td class="num" data-label="Contributors">19</td><td data-label="Primary owner">Yi Shen</td><td class="num" data-label="Owner share">32.4%</td></tr><tr><td class="path">src/component/tooltip/TooltipView.ts</td><td class="num" data-label="Contributors">18</td><td data-label="Primary owner">susiwen8</td><td class="num" data-label="Owner share">31.2%</td></tr><tr><td class="path">package.json</td><td class="num" data-label="Contributors">15</td><td data-label="Primary owner">100pah</td><td class="num" data-label="Owner share">38.4%</td></tr><tr><td class="path">test/runTest/actions/__meta__.json</td><td class="num" data-label="Contributors">15</td><td data-label="Primary owner">100pah</td><td class="num" data-label="Owner share">33.3%</td></tr><tr><td class="path">dist/echarts.js</td><td class="num" data-label="Contributors">14</td><td data-label="Primary owner">100pah</td><td class="num" data-label="Owner share">61.3%</td></tr><tr><td class="path">src/component/dataZoom/SliderZoomView.ts</td><td class="num" data-label="Contributors">13</td><td data-label="Primary owner">Yi Shen</td><td class="num" data-label="Owner share">37.1%</td></tr><tr><td class="path">src/coord/axisCommonTypes.ts</td><td class="num" data-label="Contributors">13</td><td data-label="Primary owner">100pah</td><td class="num" data-label="Owner share">38.1%</td></tr><tr><td class="path">dist/echarts.js.map</td><td class="num" data-label="Contributors">12</td><td data-label="Primary owner">100pah</td><td class="num" data-label="Owner share">71.2%</td></tr><tr><td class="path">src/component/tooltip/TooltipHTMLContent.ts</td><td class="num" data-label="Contributors">12</td><td data-label="Primary owner">Zhongxiang Wang</td><td class="num" data-label="Owner share">36.5%</td></tr><tr><td class="path">src/chart/sunburst/SunburstPiece.ts</td><td class="num" data-label="Contributors">12</td><td data-label="Primary owner">Yi Shen</td><td class="num" data-label="Owner share">45.9%</td></tr><tr><td class="path">src/chart/line/LineView.ts</td><td class="num" data-label="Contributors">11</td><td data-label="Primary owner">Yi Shen</td><td class="num" data-label="Owner share">41.1%</td></tr><tr><td class="path">src/chart/gauge/GaugeView.ts</td><td class="num" data-label="Contributors">11</td><td data-label="Primary owner">Yi Shen</td><td class="num" data-label="Owner share">38.1%</td></tr><tr><td class="path">src/chart/sankey/SankeySeries.ts</td><td class="num" data-label="Contributors">11</td><td data-label="Primary owner">100pah</td><td class="num" data-label="Owner share">31.1%</td></tr><tr><td class="path">src/chart/treemap/TreemapSeries.ts</td><td class="num" data-label="Contributors">11</td><td data-label="Primary owner">Yi Shen</td><td class="num" data-label="Owner share">28.3%</td></tr><tr><td class="path">src/chart/bar/BarView.ts</td><td class="num" data-label="Contributors">10</td><td data-label="Primary owner">Yi Shen</td><td class="num" data-label="Owner share">42.5%</td></tr><tr><td class="path">dist/echarts.min.js</td><td class="num" data-label="Contributors">10</td><td data-label="Primary owner">100pah</td><td class="num" data-label="Owner share">61.3%</td></tr><tr><td class="path">dist/echarts.common.js</td><td class="num" data-label="Contributors">10</td><td data-label="Primary owner">100pah</td><td class="num" data-label="Owner share">60.8%</td></tr><tr><td class="path">dist/echarts.simple.js</td><td class="num" data-label="Contributors">10</td><td data-label="Primary owner">100pah</td><td class="num" data-label="Owner share">60.5%</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="../ecosystems/china.html">How Apache ECharts ranks among open source projects from China by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+name: GitStats Report
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  gitstats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: shenxianpeng/gitstats-action@v1
+        with:
+          deploy-to-pages: true
+</pre></details></section><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

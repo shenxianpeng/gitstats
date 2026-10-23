@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - pytest</title>
+	<meta name="description" content="pytest: 17,834 commits by 1,118 authors, 2007 to 2026. A report made with gitstats.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="pytest: Activity">
+	<meta property="og:description" content="pytest: 17,834 commits by 1,118 authors, 2007 to 2026. A report made with gitstats.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/pytest/activity.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/pytest/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="pytest: Activity">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="pytest: Activity">
+	<meta name="twitter:description" content="pytest: 17,834 commits by 1,118 authors, 2007 to 2026. A report made with gitstats.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/pytest/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html" class="active" aria-current="page">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Activity</h1><dl class="stat-tiles" style="--cols: 4; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">17,834</dd><dd class="stat-note">on 4,058 active days</dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">79 days</dd><dd class="stat-note">consecutive active days</dd></div><div class="stat-tile"><dt>Busiest Hour</dt><dd class="stat-value">12:00</dd><dd class="stat-note">1,184 commits</dd></div><div class="stat-tile"><dt>Busiest Day</dt><dd class="stat-value">Tuesday</dd><dd class="stat-note">2,974 commits</dd></div></dl><nav class="page-toc" aria-label="On this page"><span>On this page</span><a href="#commits_by_year">By year</a><a href="#commits_by_year/month">By month</a><a href="#weekly_activity">Last weeks</a><a href="#punch_card">Punch card</a><a href="#month_of_year">Month of year</a><a href="#commits_by_timezone">Timezones</a></nav><span id="yearly_activity"></span>
+<h2 id="commits_by_year"><a href="#commits_by_year">Commits by year</a></h2>
+
+<div class="chart-box" style="--chart-ratio: 4"><canvas id="chart-commits-by-year"></canvas></div>
+<script>
+(function() {
+  var ctx = document.getElementById('chart-commits-by-year').getContext('2d');
+  var labels = [2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026];
+  var gap = null;
+  applyChartTheme();
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{"label": "Commits", "data": [580, 175, 805, 568, 355, 318, 517, 525, 1055, 1167, 1145, 2186, 2163, 1741, 933, 630, 640, 935, 680, 716], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { precision: 0 } }
+      }
+    }
+  });
+})();
+</script>
+<details class="table-details"><summary>Table: commits and lines per year (20 years with commits)</summary><div class="table-scroll"><table><tr><th>Year</th><th class="num">Commits (% of all)</th><th class="num">Lines added</th><th class="num">Lines removed</th></tr><tr><td>2026</td><td class="num">716 (4.0%)</td><td class="num">28,167</td><td class="num">10,532</td></tr><tr><td>2025</td><td class="num">680 (3.8%)</td><td class="num">24,787</td><td class="num">9,607</td></tr><tr><td>2024</td><td class="num">935 (5.2%)</td><td class="num">25,847</td><td class="num">16,631</td></tr><tr><td>2023</td><td class="num">640 (3.6%)</td><td class="num">17,112</td><td class="num">8,842</td></tr><tr><td>2022</td><td class="num">630 (3.5%)</td><td class="num">14,505</td><td class="num">6,395</td></tr><tr><td>2021</td><td class="num">933 (5.2%)</td><td class="num">26,681</td><td class="num">14,679</td></tr><tr><td>2020</td><td class="num">1,741 (9.8%)</td><td class="num">43,953</td><td class="num">27,429</td></tr><tr><td>2019</td><td class="num">2,163 (12.1%)</td><td class="num">35,350</td><td class="num">23,990</td></tr><tr><td>2018</td><td class="num">2,186 (12.3%)</td><td class="num">38,814</td><td class="num">21,849</td></tr><tr><td>2017</td><td class="num">1,145 (6.4%)</td><td class="num">16,638</td><td class="num">8,848</td></tr><tr><td>2016</td><td class="num">1,167 (6.5%)</td><td class="num">19,166</td><td class="num">9,884</td></tr><tr><td>2015</td><td class="num">1,055 (5.9%)</td><td class="num">17,076</td><td class="num">11,090</td></tr><tr><td>2014</td><td class="num">525 (2.9%)</td><td class="num">12,316</td><td class="num">18,347</td></tr><tr><td>2013</td><td class="num">517 (2.9%)</td><td class="num">11,301</td><td class="num">5,503</td></tr><tr><td>2012</td><td class="num">318 (1.8%)</td><td class="num">32,642</td><td class="num">16,082</td></tr><tr><td>2011</td><td class="num">355 (2.0%)</td><td class="num">10,297</td><td class="num">4,847</td></tr><tr><td>2010</td><td class="num">568 (3.2%)</td><td class="num">32,772</td><td class="num">48,552</td></tr><tr><td>2009</td><td class="num">805 (4.5%)</td><td class="num">70,049</td><td class="num">95,536</td></tr><tr><td>2008</td><td class="num">175 (1.0%)</td><td class="num">35,584</td><td class="num">32,785</td></tr><tr><td>2007</td><td class="num">580 (3.3%)</td><td class="num">101,394</td><td class="num">39,843</td></tr></table></div></details>
+<h2 id="commits_by_year/month"><a href="#commits_by_year/month">Commits by year/month</a></h2>
+
+<div class="chart-box" style="--chart-ratio: 3"><canvas id="chart-commits-by-year-month"></canvas></div>
+<script>
+(function() {
+  var ctx = document.getElementById('chart-commits-by-year-month').getContext('2d');
+  var labels = ["2007-01", "2007-02", "2007-03", "2007-04", "2007-05", "2007-06", "2007-07", "2007-08", "2007-09", "2007-10", "2007-11", "2007-12", "2008-01", "2008-02", "2008-03", "2008-04", "2008-05", "2008-06", "2008-07", "2008-08", "2008-09", "2008-10", "2008-11", "2008-12", "2009-01", "2009-02", "2009-03", "2009-04", "2009-05", "2009-06", "2009-07", "2009-08", "2009-09", "2009-10", "2009-11", "2009-12", "2010-01", "2010-02", "2010-03", "2010-04", "2010-05", "2010-06", "2010-07", "2010-08", "2010-09", "2010-10", "2010-11", "2010-12", "2011-01", "2011-02", "2011-03", "2011-04", "2011-05", "2011-06", "2011-07", "2011-08", "2011-09", "2011-10", "2011-11", "2011-12", "2012-01", "2012-02", "2012-03", "2012-04", "2012-05", "2012-06", "2012-07", "2012-08", "2012-09", "2012-10", "2012-11", "2012-12", "2013-01", "2013-02", "2013-03", "2013-04", "2013-05", "2013-06", "2013-07", "2013-08", "2013-09", "2013-10", "2013-11", "2013-12", "2014-01", "2014-02", "2014-03", "2014-04", "2014-05", "2014-06", "2014-07", "2014-08", "2014-09", "2014-10", "2014-11", "2014-12", "2015-01", "2015-02", "2015-03", "2015-04", "2015-05", "2015-06", "2015-07", "2015-08", "2015-09", "2015-10", "2015-11", "2015-12", "2016-01", "2016-02", "2016-03", "2016-04", "2016-05", "2016-06", "2016-07", "2016-08", "2016-09", "2016-10", "2016-11", "2016-12", "2017-01", "2017-02", "2017-03", "2017-04", "2017-05", "2017-06", "2017-07", "2017-08", "2017-09", "2017-10", "2017-11", "2017-12", "2018-01", "2018-02", "2018-03", "2018-04", "2018-05", "2018-06", "2018-07", "2018-08", "2018-09", "2018-10", "2018-11", "2018-12", "2019-01", "2019-02", "2019-03", "2019-04", "2019-05", "2019-06", "2019-07", "2019-08", "2019-09", "2019-10", "2019-11", "2019-12", "2020-01", "2020-02", "2020-03", "2020-04", "2020-05", "2020-06", "2020-07", "2020-08", "2020-09", "2020-10", "2020-11", "2020-12", "2021-01", "2021-02", "2021-03", "2021-04", "2021-05", "2021-06", "2021-07", "2021-08", "2021-09", "2021-10", "2021-11", "2021-12", "2022-01", "2022-02", "2022-03", "2022-04", "2022-05", "2022-06", "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12", "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05", "2026-06", "2026-07", "2026-08", "2026-09", "2026-10"];
+  var gap = null;
+  applyChartTheme();
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{"label": "Commits", "data": [147, 347, 31, 12, 2, 1, 4, 26, 5, 2, 1, 2, 13, 3, 5, 0, 3, 0, 20, 45, 67, 10, 8, 1, 5, 10, 164, 135, 73, 50, 56, 112, 60, 54, 27, 59, 66, 18, 2, 48, 68, 41, 51, 4, 43, 113, 99, 15, 15, 16, 30, 10, 79, 28, 54, 16, 21, 11, 41, 34, 8, 13, 10, 3, 21, 33, 27, 27, 32, 85, 51, 8, 8, 21, 20, 20, 48, 13, 56, 57, 44, 66, 58, 106, 85, 6, 56, 73, 19, 14, 59, 39, 54, 117, 3, 0, 10, 41, 46, 114, 35, 118, 127, 99, 211, 79, 50, 125, 66, 92, 109, 48, 40, 193, 147, 160, 103, 49, 99, 61, 65, 71, 82, 46, 80, 86, 201, 73, 107, 117, 132, 85, 161, 185, 166, 97, 93, 180, 146, 266, 187, 362, 221, 122, 135, 209, 232, 197, 205, 226, 177, 153, 66, 203, 274, 86, 299, 152, 115, 135, 209, 159, 148, 109, 75, 162, 72, 106, 82, 64, 116, 69, 98, 55, 67, 54, 46, 127, 56, 99, 74, 70, 55, 44, 54, 48, 42, 32, 31, 124, 35, 21, 30, 29, 25, 55, 61, 76, 91, 62, 66, 35, 52, 58, 113, 133, 95, 66, 56, 133, 74, 34, 46, 40, 96, 49, 52, 50, 49, 24, 32, 74, 20, 28, 59, 122, 131, 39, 42, 52, 69, 58, 92, 89, 108, 101, 64, 41], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: { ticks: { autoSkip: false, maxRotation: 0, callback: monthAxisTick }, grid: { color: monthAxisGrid } },
+        y: { beginAtZero: true, ticks: { precision: 0 } }
+      }
+    }
+  });
+})();
+</script>
+<details class="table-details"><summary>Table: commits and lines per month (235 months with commits)</summary><div class="table-scroll"><table><tr><th>Month</th><th class="num">Commits</th><th class="num">Lines added</th><th class="num">Lines removed</th></tr><tr><td>2026-10</td><td class="num">41</td><td class="num">1,580</td><td class="num">422</td></tr><tr><td>2026-09</td><td class="num">64</td><td class="num">3,108</td><td class="num">1,055</td></tr><tr><td>2026-08</td><td class="num">101</td><td class="num">4,498</td><td class="num">1,098</td></tr><tr><td>2026-07</td><td class="num">108</td><td class="num">4,628</td><td class="num">803</td></tr><tr><td>2026-06</td><td class="num">89</td><td class="num">2,837</td><td class="num">1,239</td></tr><tr><td>2026-05</td><td class="num">92</td><td class="num">4,265</td><td class="num">1,469</td></tr><tr><td>2026-04</td><td class="num">58</td><td class="num">1,810</td><td class="num">811</td></tr><tr><td>2026-03</td><td class="num">69</td><td class="num">3,448</td><td class="num">2,638</td></tr><tr><td>2026-02</td><td class="num">52</td><td class="num">1,092</td><td class="num">552</td></tr><tr><td>2026-01</td><td class="num">42</td><td class="num">901</td><td class="num">445</td></tr><tr><td>2025-12</td><td class="num">39</td><td class="num">776</td><td class="num">379</td></tr><tr><td>2025-11</td><td class="num">131</td><td class="num">5,405</td><td class="num">2,345</td></tr><tr><td>2025-10</td><td class="num">122</td><td class="num">5,753</td><td class="num">1,732</td></tr><tr><td>2025-09</td><td class="num">59</td><td class="num">1,109</td><td class="num">810</td></tr><tr><td>2025-08</td><td class="num">28</td><td class="num">535</td><td class="num">304</td></tr><tr><td>2025-07</td><td class="num">20</td><td class="num">592</td><td class="num">278</td></tr><tr><td>2025-06</td><td class="num">74</td><td class="num">1,937</td><td class="num">1,008</td></tr><tr><td>2025-05</td><td class="num">32</td><td class="num">593</td><td class="num">338</td></tr><tr><td>2025-04</td><td class="num">24</td><td class="num">625</td><td class="num">314</td></tr><tr><td>2025-03</td><td class="num">49</td><td class="num">5,266</td><td class="num">1,234</td></tr><tr><td>2025-02</td><td class="num">50</td><td class="num">739</td><td class="num">442</td></tr><tr><td>2025-01</td><td class="num">52</td><td class="num">1,457</td><td class="num">423</td></tr><tr><td>2024-12</td><td class="num">49</td><td class="num">1,527</td><td class="num">612</td></tr><tr><td>2024-11</td><td class="num">96</td><td class="num">1,604</td><td class="num">1,000</td></tr><tr><td>2024-10</td><td class="num">40</td><td class="num">802</td><td class="num">425</td></tr><tr><td>2024-09</td><td class="num">46</td><td class="num">1,172</td><td class="num">470</td></tr><tr><td>2024-08</td><td class="num">34</td><td class="num">800</td><td class="num">493</td></tr><tr><td>2024-07</td><td class="num">74</td><td class="num">1,562</td><td class="num">1,233</td></tr><tr><td>2024-06</td><td class="num">133</td><td class="num">3,848</td><td class="num">2,659</td></tr><tr><td>2024-05</td><td class="num">56</td><td class="num">1,252</td><td class="num">703</td></tr><tr><td>2024-04</td><td class="num">66</td><td class="num">2,445</td><td class="num">1,103</td></tr><tr><td>2024-03</td><td class="num">95</td><td class="num">3,212</td><td class="num">1,168</td></tr><tr><td>2024-02</td><td class="num">133</td><td class="num">2,888</td><td class="num">1,964</td></tr><tr><td>2024-01</td><td class="num">113</td><td class="num">4,735</td><td class="num">4,801</td></tr><tr><td>2023-12</td><td class="num">58</td><td class="num">1,834</td><td class="num">900</td></tr><tr><td>2023-11</td><td class="num">52</td><td class="num">2,569</td><td class="num">794</td></tr><tr><td>2023-10</td><td class="num">35</td><td class="num">815</td><td class="num">376</td></tr><tr><td>2023-09</td><td class="num">66</td><td class="num">1,353</td><td class="num">569</td></tr><tr><td>2023-08</td><td class="num">62</td><td class="num">1,029</td><td class="num">599</td></tr><tr><td>2023-07</td><td class="num">91</td><td class="num">2,050</td><td class="num">1,496</td></tr><tr><td>2023-06</td><td class="num">76</td><td class="num">1,537</td><td class="num">762</td></tr><tr><td>2023-05</td><td class="num">61</td><td class="num">1,351</td><td class="num">457</td></tr><tr><td>2023-04</td><td class="num">55</td><td class="num">872</td><td class="num">413</td></tr><tr><td>2023-03</td><td class="num">25</td><td class="num">2,153</td><td class="num">1,667</td></tr><tr><td>2023-02</td><td class="num">29</td><td class="num">468</td><td class="num">261</td></tr><tr><td>2023-01</td><td class="num">30</td><td class="num">1,081</td><td class="num">548</td></tr><tr><td>2022-12</td><td class="num">21</td><td class="num">303</td><td class="num">145</td></tr><tr><td>2022-11</td><td class="num">35</td><td class="num">1,227</td><td class="num">504</td></tr><tr><td>2022-10</td><td class="num">124</td><td class="num">4,368</td><td class="num">318</td></tr><tr><td>2022-09</td><td class="num">31</td><td class="num">499</td><td class="num">318</td></tr><tr><td>2022-08</td><td class="num">32</td><td class="num">1,091</td><td class="num">479</td></tr><tr><td>2022-07</td><td class="num">42</td><td class="num">521</td><td class="num">322</td></tr><tr><td>2022-06</td><td class="num">48</td><td class="num">508</td><td class="num">264</td></tr><tr><td>2022-05</td><td class="num">54</td><td class="num">2,199</td><td class="num">1,911</td></tr><tr><td>2022-04</td><td class="num">44</td><td class="num">501</td><td class="num">287</td></tr><tr><td>2022-03</td><td class="num">55</td><td class="num">946</td><td class="num">596</td></tr><tr><td>2022-02</td><td class="num">70</td><td class="num">1,160</td><td class="num">562</td></tr><tr><td>2022-01</td><td class="num">74</td><td class="num">1,182</td><td class="num">689</td></tr><tr><td>2021-12</td><td class="num">99</td><td class="num">1,882</td><td class="num">1,546</td></tr><tr><td>2021-11</td><td class="num">56</td><td class="num">3,149</td><td class="num">2,832</td></tr><tr><td>2021-10</td><td class="num">127</td><td class="num">10,372</td><td class="num">3,132</td></tr><tr><td>2021-09</td><td class="num">46</td><td class="num">177</td><td class="num">222</td></tr><tr><td>2021-08</td><td class="num">54</td><td class="num">797</td><td class="num">393</td></tr><tr><td>2021-07</td><td class="num">67</td><td class="num">780</td><td class="num">526</td></tr><tr><td>2021-06</td><td class="num">55</td><td class="num">608</td><td class="num">569</td></tr><tr><td>2021-05</td><td class="num">98</td><td class="num">878</td><td class="num">501</td></tr><tr><td>2021-04</td><td class="num">69</td><td class="num">2,290</td><td class="num">1,333</td></tr><tr><td>2021-03</td><td class="num">116</td><td class="num">3,823</td><td class="num">3,007</td></tr><tr><td>2021-02</td><td class="num">64</td><td class="num">321</td><td class="num">214</td></tr><tr><td>2021-01</td><td class="num">82</td><td class="num">1,604</td><td class="num">404</td></tr><tr><td>2020-12</td><td class="num">106</td><td class="num">9,435</td><td class="num">5,051</td></tr><tr><td>2020-11</td><td class="num">72</td><td class="num">1,982</td><td class="num">1,228</td></tr><tr><td>2020-10</td><td class="num">162</td><td class="num">3,655</td><td class="num">3,189</td></tr><tr><td>2020-09</td><td class="num">75</td><td class="num">2,062</td><td class="num">712</td></tr><tr><td>2020-08</td><td class="num">109</td><td class="num">3,898</td><td class="num">4,044</td></tr><tr><td>2020-07</td><td class="num">148</td><td class="num">2,868</td><td class="num">2,258</td></tr><tr><td>2020-06</td><td class="num">159</td><td class="num">6,931</td><td class="num">3,941</td></tr><tr><td>2020-05</td><td class="num">209</td><td class="num">4,295</td><td class="num">2,377</td></tr><tr><td>2020-04</td><td class="num">135</td><td class="num">509</td><td class="num">336</td></tr><tr><td>2020-03</td><td class="num">115</td><td class="num">1,908</td><td class="num">962</td></tr><tr><td>2020-02</td><td class="num">152</td><td class="num">4,289</td><td class="num">2,026</td></tr><tr><td>2020-01</td><td class="num">299</td><td class="num">2,121</td><td class="num">1,305</td></tr><tr><td>2019-12</td><td class="num">86</td><td class="num">518</td><td class="num">120</td></tr><tr><td>2019-11</td><td class="num">274</td><td class="num">11,662</td><td class="num">9,413</td></tr><tr><td>2019-10</td><td class="num">203</td><td class="num">563</td><td class="num">166</td></tr><tr><td>2019-09</td><td class="num">66</td><td class="num">837</td><td class="num">275</td></tr><tr><td>2019-08</td><td class="num">153</td><td class="num">4,022</td><td class="num">2,204</td></tr><tr><td>2019-07</td><td class="num">177</td><td class="num">951</td><td class="num">460</td></tr><tr><td>2019-06</td><td class="num">226</td><td class="num">4,602</td><td class="num">4,516</td></tr><tr><td>2019-05</td><td class="num">205</td><td class="num">2,902</td><td class="num">1,027</td></tr><tr><td>2019-04</td><td class="num">197</td><td class="num">1,027</td><td class="num">697</td></tr><tr><td>2019-03</td><td class="num">232</td><td class="num">2,630</td><td class="num">845</td></tr><tr><td>2019-02</td><td class="num">209</td><td class="num">1,841</td><td class="num">668</td></tr><tr><td>2019-01</td><td class="num">135</td><td class="num">3,795</td><td class="num">3,599</td></tr><tr><td>2018-12</td><td class="num">122</td><td class="num">182</td><td class="num">52</td></tr><tr><td>2018-11</td><td class="num">221</td><td class="num">2,525</td><td class="num">981</td></tr><tr><td>2018-10</td><td class="num">362</td><td class="num">4,095</td><td class="num">1,722</td></tr><tr><td>2018-09</td><td class="num">187</td><td class="num">2,663</td><td class="num">732</td></tr><tr><td>2018-08</td><td class="num">266</td><td class="num">2,400</td><td class="num">1,222</td></tr><tr><td>2018-07</td><td class="num">146</td><td class="num">1,810</td><td class="num">773</td></tr><tr><td>2018-06</td><td class="num">180</td><td class="num">2,485</td><td class="num">2,997</td></tr><tr><td>2018-05</td><td class="num">93</td><td class="num">15,316</td><td class="num">10,508</td></tr><tr><td>2018-04</td><td class="num">97</td><td class="num">869</td><td class="num">331</td></tr><tr><td>2018-03</td><td class="num">166</td><td class="num">4,146</td><td class="num">1,657</td></tr><tr><td>2018-02</td><td class="num">185</td><td class="num">506</td><td class="num">170</td></tr><tr><td>2018-01</td><td class="num">161</td><td class="num">1,817</td><td class="num">704</td></tr><tr><td>2017-12</td><td class="num">85</td><td class="num">1,377</td><td class="num">763</td></tr><tr><td>2017-11</td><td class="num">132</td><td class="num">3,866</td><td class="num">2,595</td></tr><tr><td>2017-10</td><td class="num">117</td><td class="num">466</td><td class="num">107</td></tr><tr><td>2017-09</td><td class="num">107</td><td class="num">393</td><td class="num">89</td></tr><tr><td>2017-08</td><td class="num">73</td><td class="num">2,492</td><td class="num">1,019</td></tr><tr><td>2017-07</td><td class="num">201</td><td class="num">2,465</td><td class="num">1,753</td></tr><tr><td>2017-06</td><td class="num">86</td><td class="num">806</td><td class="num">397</td></tr><tr><td>2017-05</td><td class="num">80</td><td class="num">3,580</td><td class="num">1,516</td></tr><tr><td>2017-04</td><td class="num">46</td><td class="num">173</td><td class="num">40</td></tr><tr><td>2017-03</td><td class="num">82</td><td class="num">405</td><td class="num">221</td></tr><tr><td>2017-02</td><td class="num">71</td><td class="num">243</td><td class="num">82</td></tr><tr><td>2017-01</td><td class="num">65</td><td class="num">372</td><td class="num">266</td></tr><tr><td>2016-12</td><td class="num">61</td><td class="num">599</td><td class="num">306</td></tr><tr><td>2016-11</td><td class="num">99</td><td class="num">930</td><td class="num">229</td></tr><tr><td>2016-10</td><td class="num">49</td><td class="num">272</td><td class="num">100</td></tr><tr><td>2016-09</td><td class="num">103</td><td class="num">569</td><td class="num">275</td></tr><tr><td>2016-08</td><td class="num">160</td><td class="num">1,931</td><td class="num">1,974</td></tr><tr><td>2016-07</td><td class="num">147</td><td class="num">4,050</td><td class="num">3,149</td></tr><tr><td>2016-06</td><td class="num">193</td><td class="num">2,658</td><td class="num">1,394</td></tr><tr><td>2016-05</td><td class="num">40</td><td class="num">359</td><td class="num">149</td></tr><tr><td>2016-04</td><td class="num">48</td><td class="num">452</td><td class="num">83</td></tr><tr><td>2016-03</td><td class="num">109</td><td class="num">1,679</td><td class="num">389</td></tr><tr><td>2016-02</td><td class="num">92</td><td class="num">5,136</td><td class="num">1,656</td></tr><tr><td>2016-01</td><td class="num">66</td><td class="num">531</td><td class="num">180</td></tr><tr><td>2015-12</td><td class="num">125</td><td class="num">1,201</td><td class="num">1,623</td></tr><tr><td>2015-11</td><td class="num">50</td><td class="num">440</td><td class="num">148</td></tr><tr><td>2015-10</td><td class="num">79</td><td class="num">1,252</td><td class="num">794</td></tr><tr><td>2015-09</td><td class="num">211</td><td class="num">3,332</td><td class="num">1,042</td></tr><tr><td>2015-08</td><td class="num">99</td><td class="num">1,364</td><td class="num">353</td></tr><tr><td>2015-07</td><td class="num">127</td><td class="num">1,395</td><td class="num">393</td></tr><tr><td>2015-06</td><td class="num">118</td><td class="num">1,705</td><td class="num">1,152</td></tr><tr><td>2015-05</td><td class="num">35</td><td class="num">865</td><td class="num">2,042</td></tr><tr><td>2015-04</td><td class="num">114</td><td class="num">3,368</td><td class="num">2,219</td></tr><tr><td>2015-03</td><td class="num">46</td><td class="num">960</td><td class="num">684</td></tr><tr><td>2015-02</td><td class="num">41</td><td class="num">1,121</td><td class="num">614</td></tr><tr><td>2015-01</td><td class="num">10</td><td class="num">73</td><td class="num">26</td></tr><tr><td>2014-11</td><td class="num">3</td><td class="num">3</td><td class="num">3</td></tr><tr><td>2014-10</td><td class="num">117</td><td class="num">1,690</td><td class="num">989</td></tr><tr><td>2014-09</td><td class="num">54</td><td class="num">1,722</td><td class="num">10,806</td></tr><tr><td>2014-08</td><td class="num">39</td><td class="num">865</td><td class="num">885</td></tr><tr><td>2014-07</td><td class="num">59</td><td class="num">1,152</td><td class="num">706</td></tr><tr><td>2014-06</td><td class="num">14</td><td class="num">46</td><td class="num">13</td></tr><tr><td>2014-05</td><td class="num">19</td><td class="num">276</td><td class="num">186</td></tr><tr><td>2014-04</td><td class="num">73</td><td class="num">1,134</td><td class="num">760</td></tr><tr><td>2014-03</td><td class="num">56</td><td class="num">1,092</td><td class="num">873</td></tr><tr><td>2014-02</td><td class="num">6</td><td class="num">112</td><td class="num">109</td></tr><tr><td>2014-01</td><td class="num">85</td><td class="num">4,224</td><td class="num">3,017</td></tr><tr><td>2013-12</td><td class="num">106</td><td class="num">2,938</td><td class="num">1,856</td></tr><tr><td>2013-11</td><td class="num">58</td><td class="num">879</td><td class="num">385</td></tr><tr><td>2013-10</td><td class="num">66</td><td class="num">1,635</td><td class="num">668</td></tr><tr><td>2013-09</td><td class="num">44</td><td class="num">1,358</td><td class="num">828</td></tr><tr><td>2013-08</td><td class="num">57</td><td class="num">1,185</td><td class="num">962</td></tr><tr><td>2013-07</td><td class="num">56</td><td class="num">2,427</td><td class="num">625</td></tr><tr><td>2013-06</td><td class="num">13</td><td class="num">0</td><td class="num">0</td></tr><tr><td>2013-05</td><td class="num">48</td><td class="num">0</td><td class="num">0</td></tr><tr><td>2013-04</td><td class="num">20</td><td class="num">188</td><td class="num">65</td></tr><tr><td>2013-03</td><td class="num">20</td><td class="num">417</td><td class="num">52</td></tr><tr><td>2013-02</td><td class="num">21</td><td class="num">167</td><td class="num">52</td></tr><tr><td>2013-01</td><td class="num">8</td><td class="num">107</td><td class="num">10</td></tr><tr><td>2012-12</td><td class="num">8</td><td class="num">185</td><td class="num">35</td></tr><tr><td>2012-11</td><td class="num">51</td><td class="num">3,409</td><td class="num">2,516</td></tr><tr><td>2012-10</td><td class="num">85</td><td class="num">7,368</td><td class="num">6,264</td></tr><tr><td>2012-09</td><td class="num">32</td><td class="num">1,213</td><td class="num">716</td></tr><tr><td>2012-08</td><td class="num">27</td><td class="num">3,149</td><td class="num">2,412</td></tr><tr><td>2012-07</td><td class="num">27</td><td class="num">3,845</td><td class="num">1,896</td></tr><tr><td>2012-06</td><td class="num">33</td><td class="num">11,405</td><td class="num">669</td></tr><tr><td>2012-05</td><td class="num">21</td><td class="num">368</td><td class="num">228</td></tr><tr><td>2012-04</td><td class="num">3</td><td class="num">25</td><td class="num">8</td></tr><tr><td>2012-03</td><td class="num">10</td><td class="num">253</td><td class="num">102</td></tr><tr><td>2012-02</td><td class="num">13</td><td class="num">1,311</td><td class="num">1,196</td></tr><tr><td>2012-01</td><td class="num">8</td><td class="num">111</td><td class="num">40</td></tr><tr><td>2011-12</td><td class="num">34</td><td class="num">869</td><td class="num">595</td></tr><tr><td>2011-11</td><td class="num">41</td><td class="num">2,197</td><td class="num">1,218</td></tr><tr><td>2011-10</td><td class="num">11</td><td class="num">299</td><td class="num">184</td></tr><tr><td>2011-09</td><td class="num">21</td><td class="num">269</td><td class="num">152</td></tr><tr><td>2011-08</td><td class="num">16</td><td class="num">333</td><td class="num">220</td></tr><tr><td>2011-07</td><td class="num">54</td><td class="num">813</td><td class="num">500</td></tr><tr><td>2011-06</td><td class="num">28</td><td class="num">610</td><td class="num">397</td></tr><tr><td>2011-05</td><td class="num">79</td><td class="num">2,501</td><td class="num">284</td></tr><tr><td>2011-04</td><td class="num">10</td><td class="num">235</td><td class="num">22</td></tr><tr><td>2011-03</td><td class="num">30</td><td class="num">1,206</td><td class="num">817</td></tr><tr><td>2011-02</td><td class="num">16</td><td class="num">619</td><td class="num">356</td></tr><tr><td>2011-01</td><td class="num">15</td><td class="num">346</td><td class="num">102</td></tr><tr><td>2010-12</td><td class="num">15</td><td class="num">477</td><td class="num">220</td></tr><tr><td>2010-11</td><td class="num">99</td><td class="num">7,639</td><td class="num">7,129</td></tr><tr><td>2010-10</td><td class="num">113</td><td class="num">10,009</td><td class="num">28,426</td></tr><tr><td>2010-09</td><td class="num">43</td><td class="num">125</td><td class="num">12</td></tr><tr><td>2010-08</td><td class="num">4</td><td class="num">98</td><td class="num">14</td></tr><tr><td>2010-07</td><td class="num">51</td><td class="num">6,191</td><td class="num">5,255</td></tr><tr><td>2010-06</td><td class="num">41</td><td class="num">687</td><td class="num">422</td></tr><tr><td>2010-05</td><td class="num">68</td><td class="num">3,132</td><td class="num">1,207</td></tr><tr><td>2010-04</td><td class="num">48</td><td class="num">1,337</td><td class="num">708</td></tr><tr><td>2010-03</td><td class="num">2</td><td class="num">2</td><td class="num">3</td></tr><tr><td>2010-02</td><td class="num">18</td><td class="num">546</td><td class="num">159</td></tr><tr><td>2010-01</td><td class="num">66</td><td class="num">2,529</td><td class="num">4,997</td></tr><tr><td>2009-12</td><td class="num">59</td><td class="num">2,809</td><td class="num">1,900</td></tr><tr><td>2009-11</td><td class="num">27</td><td class="num">1,979</td><td class="num">1,814</td></tr><tr><td>2009-10</td><td class="num">54</td><td class="num">3,417</td><td class="num">8,326</td></tr><tr><td>2009-09</td><td class="num">60</td><td class="num">5,926</td><td class="num">6,078</td></tr><tr><td>2009-08</td><td class="num">112</td><td class="num">10,254</td><td class="num">21,684</td></tr><tr><td>2009-07</td><td class="num">56</td><td class="num">7,950</td><td class="num">5,563</td></tr><tr><td>2009-06</td><td class="num">50</td><td class="num">2,183</td><td class="num">1,536</td></tr><tr><td>2009-05</td><td class="num">73</td><td class="num">4,543</td><td class="num">4,186</td></tr><tr><td>2009-04</td><td class="num">135</td><td class="num">17,968</td><td class="num">18,624</td></tr><tr><td>2009-03</td><td class="num">164</td><td class="num">6,641</td><td class="num">21,283</td></tr><tr><td>2009-02</td><td class="num">10</td><td class="num">6,267</td><td class="num">4,524</td></tr><tr><td>2009-01</td><td class="num">5</td><td class="num">112</td><td class="num">18</td></tr><tr><td>2008-12</td><td class="num">1</td><td class="num">6</td><td class="num">5</td></tr><tr><td>2008-11</td><td class="num">8</td><td class="num">193</td><td class="num">46</td></tr><tr><td>2008-10</td><td class="num">10</td><td class="num">99</td><td class="num">40</td></tr><tr><td>2008-09</td><td class="num">67</td><td class="num">3,089</td><td class="num">3,250</td></tr><tr><td>2008-08</td><td class="num">45</td><td class="num">30,004</td><td class="num">27,995</td></tr><tr><td>2008-07</td><td class="num">20</td><td class="num">376</td><td class="num">182</td></tr><tr><td>2008-05</td><td class="num">3</td><td class="num">21</td><td class="num">6</td></tr><tr><td>2008-03</td><td class="num">5</td><td class="num">739</td><td class="num">144</td></tr><tr><td>2008-02</td><td class="num">3</td><td class="num">38</td><td class="num">33</td></tr><tr><td>2008-01</td><td class="num">13</td><td class="num">1,019</td><td class="num">1,084</td></tr><tr><td>2007-12</td><td class="num">2</td><td class="num">2</td><td class="num">1</td></tr><tr><td>2007-11</td><td class="num">1</td><td class="num">17</td><td class="num">1</td></tr><tr><td>2007-10</td><td class="num">2</td><td class="num">38</td><td class="num">20</td></tr><tr><td>2007-09</td><td class="num">5</td><td class="num">167</td><td class="num">15</td></tr><tr><td>2007-08</td><td class="num">26</td><td class="num">4,709</td><td class="num">586</td></tr><tr><td>2007-07</td><td class="num">4</td><td class="num">17</td><td class="num">3,776</td></tr><tr><td>2007-06</td><td class="num">1</td><td class="num">13</td><td class="num">0</td></tr><tr><td>2007-05</td><td class="num">2</td><td class="num">1,963</td><td class="num">2,079</td></tr><tr><td>2007-04</td><td class="num">12</td><td class="num">356</td><td class="num">109</td></tr><tr><td>2007-03</td><td class="num">31</td><td class="num">8,472</td><td class="num">6,462</td></tr><tr><td>2007-02</td><td class="num">347</td><td class="num">17,882</td><td class="num">17,019</td></tr><tr><td>2007-01</td><td class="num">147</td><td class="num">67,758</td><td class="num">9,775</td></tr></table></div></details>
+<h2 id="weekly_activity"><a href="#weekly_activity">Weekly activity</a></h2>
+
+<p class="section-note">Last 32 weeks, from the week of Mar 16, 2026 to the week of Oct 19, 2026.</p><div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-weekly-activity"></canvas></div>
+<script>
+(function() {
+  var ctx = document.getElementById('chart-weekly-activity').getContext('2d');
+  var labels = ["Mar 16", "Mar 23", "Mar 30", "Apr 6", "Apr 13", "Apr 20", "Apr 27", "May 4", "May 11", "May 18", "May 25", "Jun 1", "Jun 8", "Jun 15", "Jun 22", "Jun 29", "Jul 6", "Jul 13", "Jul 20", "Jul 27", "Aug 3", "Aug 10", "Aug 17", "Aug 24", "Aug 31", "Sep 7", "Sep 14", "Sep 21", "Sep 28", "Oct 5", "Oct 12", "Oct 19"];
+  var gap = null;
+  applyChartTheme();
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{"label": "Commits", "data": [17, 7, 9, 32, 6, 15, 10, 12, 11, 34, 27, 29, 17, 20, 20, 6, 8, 11, 57, 33, 16, 19, 39, 20, 15, 18, 25, 6, 5, 24, 9, 6], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
+        y: { beginAtZero: true, ticks: { precision: 0 } }
+      }
+    }
+  });
+})();
+</script>
+<span id="hour_of_day"></span><span id="day_of_week"></span><span id="hour_of_week"></span>
+<h2 id="punch_card"><a href="#punch_card">Punch card</a></h2>
+
+<p class="section-note">Commits by day of week and hour of day, in each commit's local time. The bars along the top are the commits per hour; the last column is the commits per day.</p><div class="table-scroll"><table class="punch-card"><tr><th>Day</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th><th>17</th><th>18</th><th>19</th><th>20</th><th>21</th><th>22</th><th>23</th><th class="num">Total</th></tr><tr class="punch-hour-bars"><th>Hour</th><td title="00:00 &middot; 563 commits &middot; 3.2%"><div class="punch-vbar"><span class="punch-vbar-value">563</span><span class="punch-vbar-fill" style="height: 19px"></span></div></td><td title="01:00 &middot; 302 commits &middot; 1.7%"><div class="punch-vbar"><span class="punch-vbar-value">302</span><span class="punch-vbar-fill" style="height: 10px"></span></div></td><td title="02:00 &middot; 174 commits &middot; 1.0%"><div class="punch-vbar"><span class="punch-vbar-value">174</span><span class="punch-vbar-fill" style="height: 6px"></span></div></td><td title="03:00 &middot; 200 commits &middot; 1.1%"><div class="punch-vbar"><span class="punch-vbar-value">200</span><span class="punch-vbar-fill" style="height: 7px"></span></div></td><td title="04:00 &middot; 81 commits &middot; 0.5%"><div class="punch-vbar"><span class="punch-vbar-value">81</span><span class="punch-vbar-fill" style="height: 3px"></span></div></td><td title="05:00 &middot; 98 commits &middot; 0.5%"><div class="punch-vbar"><span class="punch-vbar-value">98</span><span class="punch-vbar-fill" style="height: 3px"></span></div></td><td title="06:00 &middot; 232 commits &middot; 1.3%"><div class="punch-vbar"><span class="punch-vbar-value">232</span><span class="punch-vbar-fill" style="height: 8px"></span></div></td><td title="07:00 &middot; 436 commits &middot; 2.4%"><div class="punch-vbar"><span class="punch-vbar-value">436</span><span class="punch-vbar-fill" style="height: 15px"></span></div></td><td title="08:00 &middot; 636 commits &middot; 3.6%"><div class="punch-vbar"><span class="punch-vbar-value">636</span><span class="punch-vbar-fill" style="height: 21px"></span></div></td><td title="09:00 &middot; 789 commits &middot; 4.4%"><div class="punch-vbar"><span class="punch-vbar-value">789</span><span class="punch-vbar-fill" style="height: 27px"></span></div></td><td title="10:00 &middot; 1,039 commits &middot; 5.8%"><div class="punch-vbar"><span class="punch-vbar-value">1,039</span><span class="punch-vbar-fill" style="height: 35px"></span></div></td><td title="11:00 &middot; 1,033 commits &middot; 5.8%"><div class="punch-vbar"><span class="punch-vbar-value">1,033</span><span class="punch-vbar-fill" style="height: 35px"></span></div></td><td title="12:00 &middot; 1,184 commits &middot; 6.6%"><div class="punch-vbar"><span class="punch-vbar-value">1,184</span><span class="punch-vbar-fill" style="height: 40px"></span></div></td><td title="13:00 &middot; 949 commits &middot; 5.3%"><div class="punch-vbar"><span class="punch-vbar-value">949</span><span class="punch-vbar-fill" style="height: 32px"></span></div></td><td title="14:00 &middot; 1,120 commits &middot; 6.3%"><div class="punch-vbar"><span class="punch-vbar-value">1,120</span><span class="punch-vbar-fill" style="height: 38px"></span></div></td><td title="15:00 &middot; 1,061 commits &middot; 5.9%"><div class="punch-vbar"><span class="punch-vbar-value">1,061</span><span class="punch-vbar-fill" style="height: 36px"></span></div></td><td title="16:00 &middot; 1,067 commits &middot; 6.0%"><div class="punch-vbar"><span class="punch-vbar-value">1,067</span><span class="punch-vbar-fill" style="height: 36px"></span></div></td><td title="17:00 &middot; 1,049 commits &middot; 5.9%"><div class="punch-vbar"><span class="punch-vbar-value">1,049</span><span class="punch-vbar-fill" style="height: 35px"></span></div></td><td title="18:00 &middot; 1,071 commits &middot; 6.0%"><div class="punch-vbar"><span class="punch-vbar-value">1,071</span><span class="punch-vbar-fill" style="height: 36px"></span></div></td><td title="19:00 &middot; 1,029 commits &middot; 5.8%"><div class="punch-vbar"><span class="punch-vbar-value">1,029</span><span class="punch-vbar-fill" style="height: 35px"></span></div></td><td title="20:00 &middot; 1,036 commits &middot; 5.8%"><div class="punch-vbar"><span class="punch-vbar-value">1,036</span><span class="punch-vbar-fill" style="height: 35px"></span></div></td><td title="21:00 &middot; 1,014 commits &middot; 5.7%"><div class="punch-vbar"><span class="punch-vbar-value">1,014</span><span class="punch-vbar-fill" style="height: 34px"></span></div></td><td title="22:00 &middot; 928 commits &middot; 5.2%"><div class="punch-vbar"><span class="punch-vbar-value">928</span><span class="punch-vbar-fill" style="height: 31px"></span></div></td><td title="23:00 &middot; 743 commits &middot; 4.2%"><div class="punch-vbar"><span class="punch-vbar-value">743</span><span class="punch-vbar-fill" style="height: 25px"></span></div></td><td></td></tr><tr><th>Mon</th><td class="heat heat1">46</td><td class="heat heat2">78</td><td class="heat heat1">17</td><td class="heat heat2">106</td><td class="heat heat1">10</td><td class="heat heat1">24</td><td class="heat heat2">57</td><td class="heat heat2">95</td><td class="heat heat3">121</td><td class="heat heat2">104</td><td class="heat heat4">171</td><td class="heat heat3">142</td><td class="heat heat4">189</td><td class="heat heat3">153</td><td class="heat heat3">144</td><td class="heat heat3">156</td><td class="heat heat3">153</td><td class="heat heat4">184</td><td class="heat heat3">165</td><td class="heat heat3">163</td><td class="heat heat4">183</td><td class="heat heat3">158</td><td class="heat heat3">144</td><td class="heat heat2">109</td><td class="num punch-total">2,872 (16.1%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 96.6%"></span></span></td></tr><tr><th>Tue</th><td class="heat heat2">60</td><td class="heat heat1">52</td><td class="heat heat1">29</td><td class="heat heat1">18</td><td class="heat heat1">18</td><td class="heat heat1">15</td><td class="heat heat1">42</td><td class="heat heat2">90</td><td class="heat heat3">125</td><td class="heat heat3">139</td><td class="heat heat4">195</td><td class="heat heat3">155</td><td class="heat heat4">170</td><td class="heat heat3">137</td><td class="heat heat3">164</td><td class="heat heat3">159</td><td class="heat heat4">183</td><td class="heat heat4">175</td><td class="heat heat3">161</td><td class="heat heat4">180</td><td class="heat heat4">200</td><td class="heat heat4">224</td><td class="heat heat3">154</td><td class="heat heat3">129</td><td class="num punch-total">2,974 (16.7%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><th>Wed</th><td class="heat heat2">81</td><td class="heat heat1">31</td><td class="heat heat1">22</td><td class="heat heat1">18</td><td class="heat heat1">12</td><td class="heat heat1">14</td><td class="heat heat1">43</td><td class="heat heat2">73</td><td class="heat heat2">85</td><td class="heat heat3">124</td><td class="heat heat3">132</td><td class="heat heat3">157</td><td class="heat heat3">159</td><td class="heat heat3">150</td><td class="heat heat4">171</td><td class="heat heat4">169</td><td class="heat heat4">174</td><td class="heat heat4">201</td><td class="heat heat4">208</td><td class="heat heat4">184</td><td class="heat heat4">189</td><td class="heat heat4">176</td><td class="heat heat3">162</td><td class="heat heat2">98</td><td class="num punch-total">2,833 (15.9%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 95.3%"></span></span></td></tr><tr><th>Thu</th><td class="heat heat2">60</td><td class="heat heat1">29</td><td class="heat heat1">23</td><td class="heat heat1">11</td><td class="heat heat1">7</td><td class="heat heat1">9</td><td class="heat heat1">31</td><td class="heat heat2">63</td><td class="heat heat2">94</td><td class="heat heat3">122</td><td class="heat heat3">150</td><td class="heat heat3">128</td><td class="heat heat4">174</td><td class="heat heat3">151</td><td class="heat heat3">149</td><td class="heat heat4">171</td><td class="heat heat3">145</td><td class="heat heat3">150</td><td class="heat heat3">160</td><td class="heat heat4">180</td><td class="heat heat3">162</td><td class="heat heat3">154</td><td class="heat heat3">120</td><td class="heat heat3">113</td><td class="num punch-total">2,556 (14.3%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 85.9%"></span></span></td></tr><tr><th>Fri</th><td class="heat heat2">78</td><td class="heat heat1">36</td><td class="heat heat1">23</td><td class="heat heat1">15</td><td class="heat heat1">17</td><td class="heat heat1">14</td><td class="heat heat1">22</td><td class="heat heat2">68</td><td class="heat heat2">93</td><td class="heat heat3">116</td><td class="heat heat3">139</td><td class="heat heat3">153</td><td class="heat heat4">194</td><td class="heat heat3">147</td><td class="heat heat4">184</td><td class="heat heat3">163</td><td class="heat heat3">157</td><td class="heat heat3">136</td><td class="heat heat3">157</td><td class="heat heat3">114</td><td class="heat heat2">105</td><td class="heat heat2">103</td><td class="heat heat3">125</td><td class="heat heat2">95</td><td class="num punch-total">2,454 (13.8%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 82.5%"></span></span></td></tr><tr><th>Sat</th><td class="heat heat2">58</td><td class="heat heat1">37</td><td class="heat heat1">30</td><td class="heat heat1">22</td><td class="heat heat1">8</td><td class="heat heat1">2</td><td class="heat heat1">11</td><td class="heat heat1">27</td><td class="heat heat2">68</td><td class="heat heat2">93</td><td class="heat heat3">144</td><td class="heat heat3">158</td><td class="heat heat3">153</td><td class="heat heat2">112</td><td class="heat heat4">171</td><td class="heat heat3">145</td><td class="heat heat3">146</td><td class="heat heat2">108</td><td class="heat heat3">118</td><td class="heat heat2">109</td><td class="heat heat2">101</td><td class="heat heat3">113</td><td class="heat heat3">119</td><td class="heat heat2">93</td><td class="num punch-total">2,146 (12.0%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 72.2%"></span></span></td></tr><tr><th>Sun</th><td class="heat heat4">180</td><td class="heat heat1">39</td><td class="heat heat1">30</td><td class="heat heat1">10</td><td class="heat heat1">9</td><td class="heat heat1">20</td><td class="heat heat1">26</td><td class="heat heat1">20</td><td class="heat heat1">50</td><td class="heat heat2">91</td><td class="heat heat2">108</td><td class="heat heat3">140</td><td class="heat heat3">145</td><td class="heat heat2">99</td><td class="heat heat3">137</td><td class="heat heat2">98</td><td class="heat heat2">109</td><td class="heat heat2">95</td><td class="heat heat2">102</td><td class="heat heat2">99</td><td class="heat heat2">96</td><td class="heat heat2">86</td><td class="heat heat2">104</td><td class="heat heat2">106</td><td class="num punch-total">1,999 (11.2%)<span class="share-bar share-bar-inline" aria-hidden="true"><span style="width: 67.2%"></span></span></td></tr></table></div><p class="heat-legend">Fewer<span class="heat0"></span><span class="heat1"></span><span class="heat2"></span><span class="heat3"></span><span class="heat4"></span>More commits</p><div class="two-columns"><section>
+<h2 id="month_of_year"><a href="#month_of_year">Month of year</a></h2>
+
+<div class="chart-box" style="--chart-ratio: 2"><canvas id="chart-month-of-year"></canvas></div>
+<script>
+(function() {
+  var ctx = document.getElementById('chart-month-of-year').getContext('2d');
+  var labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var gap = null;
+  applyChartTheme();
+  new Chart(ctx, {
+    type: 'bar',
+    plugins: [chartAnnotations],
+    data: {
+      labels: labels,
+      datasets: [{"label": "Commits", "data": [1476, 1582, 1477, 1254, 1368, 1617, 1675, 1497, 1387, 1919, 1506, 1076], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: function(item) {
+          const total = item.dataset.data.reduce(function(a, b) { return a + b; }, 0) || 1;
+          return item.parsed.y + ' commits (' + (100 * item.parsed.y / total).toFixed(1) + '%)';
+        } } },
+        gsAnnotations: {"values": true}
+      },
+      scales: {
+        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
+        y: { display: false, beginAtZero: true, grace: '10%' }
+      }, datasets: { bar: { maxBarThickness: 40 } }
+    }
+  });
+})();
+</script>
+</section><section>
+<h2 id="commits_by_timezone"><a href="#commits_by_timezone">Commits by timezone</a></h2>
+
+<div class="table-scroll"><table class="share-table"><tr><th>UTC offset</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td class="nowrap">UTC-10:00</td><td class="num">7</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.1%"></span></span></td></tr><tr><td class="nowrap">UTC-08:00</td><td class="num">231</td><td class="num">1.3%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 4.3%"></span></span></td></tr><tr><td class="nowrap">UTC-07:00</td><td class="num">736</td><td class="num">4.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 13.8%"></span></span></td></tr><tr><td class="nowrap">UTC-06:00</td><td class="num">86</td><td class="num">0.5%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.6%"></span></span></td></tr><tr><td class="nowrap">UTC-05:00</td><td class="num">429</td><td class="num">2.4%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 8.0%"></span></span></td></tr><tr><td class="nowrap">UTC-04:00</td><td class="num">431</td><td class="num">2.4%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 8.1%"></span></span></td></tr><tr><td class="nowrap">UTC-03:00</td><td class="num">3,258</td><td class="num">18.3%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 61.1%"></span></span></td></tr><tr><td class="nowrap">UTC-02:00</td><td class="num">748</td><td class="num">4.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 14.0%"></span></span></td></tr><tr><td class="nowrap">UTC+00:00</td><td class="num">938</td><td class="num">5.3%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 17.6%"></span></span></td></tr><tr><td class="nowrap">UTC+01:00</td><td class="num">3,863</td><td class="num">21.7%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 72.4%"></span></span></td></tr><tr><td class="nowrap">UTC+02:00</td><td class="num">5,336</td><td class="num">29.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td class="nowrap">UTC+03:00</td><td class="num">1,362</td><td class="num">7.6%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 25.5%"></span></span></td></tr><tr><td class="nowrap">UTC+03:30</td><td class="num">19</td><td class="num">0.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="nowrap">UTC+04:00</td><td class="num">3</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.1%"></span></span></td></tr><tr><td class="nowrap">UTC+04:30</td><td class="num">1</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.0%"></span></span></td></tr><tr><td class="nowrap">UTC+05:00</td><td class="num">6</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.1%"></span></span></td></tr><tr><td class="nowrap">UTC+05:30</td><td class="num">134</td><td class="num">0.8%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.5%"></span></span></td></tr><tr><td class="nowrap">UTC+06:00</td><td class="num">8</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.1%"></span></span></td></tr><tr><td class="nowrap">UTC+07:00</td><td class="num">19</td><td class="num">0.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="nowrap">UTC+08:00</td><td class="num">74</td><td class="num">0.4%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.4%"></span></span></td></tr><tr><td class="nowrap">UTC+09:00</td><td class="num">43</td><td class="num">0.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.8%"></span></span></td></tr><tr><td class="nowrap">UTC+09:30</td><td class="num">2</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.0%"></span></span></td></tr><tr><td class="nowrap">UTC+10:00</td><td class="num">49</td><td class="num">0.3%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.9%"></span></span></td></tr><tr><td class="nowrap">UTC+11:00</td><td class="num">48</td><td class="num">0.3%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.9%"></span></span></td></tr><tr><td class="nowrap">UTC+12:00</td><td class="num">1</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.0%"></span></span></td></tr><tr><td class="nowrap">UTC+13:00</td><td class="num">2</td><td class="num">0.0%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.0%"></span></span></td></tr></table></div></section></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="../ecosystems/python.html">How pytest ranks among Python open source projects by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+name: GitStats Report
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  gitstats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: shenxianpeng/gitstats-action@v1
+        with:
+          deploy-to-pages: true
+</pre></details></section><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

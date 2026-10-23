@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev1",
-  "generated_at": "2026-10-19T03:43:50+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:19:47+00:00",
   "name": "FastAPI",
   "report_path": "index.html",
   "first_commit": "2018-12-05 06:56:50",
-  "last_commit": "2026-10-18 15:17:21",
-  "age_days": 2875,
-  "active_days": 906,
-  "total_commits": 7849,
+  "last_commit": "2026-10-22 19:13:01",
+  "age_days": 2879,
+  "active_days": 910,
+  "total_commits": 7942,
   "total_authors": 888,
   "active_authors_12mo": 68,
-  "commits_last_12mo": 1657,
-  "total_files": 3186,
-  "total_lines": 395389,
-  "lines_added": 808609,
-  "lines_removed": 413220,
-  "total_tags": 316,
+  "commits_last_12mo": 1750,
+  "total_files": 3230,
+  "total_lines": 408522,
+  "lines_added": 824157,
+  "lines_removed": 415635,
+  "total_tags": 343,
   "era": "surge",
   "top_authors": [
     {
       "name": "Sebasti\u00e1n Ram\u00edrez",
-      "commits": 2277
+      "commits": 2308
     },
     {
       "name": "github-actions",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Yurii Motov",
-      "commits": 123
+      "commits": 124
     },
     {
       "name": "Alejandra",
@@ -41,10 +41,10 @@
     }
   ],
   "author_commits": {
-    "Sebasti\u00e1n Ram\u00edrez": 2277,
+    "Sebasti\u00e1n Ram\u00edrez": 2308,
+    "Yurii Motov": 124,
     "Mix": 1,
     "Victorien": 3,
-    "Yurii Motov": 123,
     "Alejandra": 63,
     "Saurabh Vijay Salve": 2,
     "AshNicolus": 1,
@@ -939,7 +939,7 @@
     "2023": 780,
     "2024": 1999,
     "2025": 1150,
-    "2026": 1346
+    "2026": 1439
   },
   "ai_assisted": {
     "commits": 3,
@@ -999,7 +999,113 @@
       "2026-07": 209,
       "2026-08": 88,
       "2026-09": 35,
-      "2026-10": 119
+      "2026-10": 212
+    }
+  },
+  "organizations": {
+    "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
+    "commits": 7942,
+    "by_kind": {
+      "organization": 7,
+      "one_person": 155,
+      "personal": 3328,
+      "hidden": 875,
+      "unknown": 0,
+      "bot": 3577
+    },
+    "organization_count": 3,
+    "last_12mo_from": "2025-11",
+    "top": [
+      {
+        "organization": "microsoft.com",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2019-02-14",
+        "last_commit": "2022-08-26"
+      },
+      {
+        "organization": "debian.org",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2022-05-10",
+        "last_commit": "2025-10-08"
+      },
+      {
+        "organization": "prefect.io",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2022-11-25",
+        "last_commit": "2023-06-03"
+      }
+    ],
+    "quarters": {
+      "2025-Q1": {
+        "organization": 0,
+        "one_person": 7,
+        "personal": 91,
+        "hidden": 59,
+        "unknown": 0,
+        "bot": 174
+      },
+      "2025-Q2": {
+        "organization": 0,
+        "one_person": 8,
+        "personal": 54,
+        "hidden": 12,
+        "unknown": 0,
+        "bot": 103
+      },
+      "2025-Q3": {
+        "organization": 0,
+        "one_person": 4,
+        "personal": 60,
+        "hidden": 35,
+        "unknown": 0,
+        "bot": 140
+      },
+      "2025-Q4": {
+        "organization": 1,
+        "one_person": 4,
+        "personal": 157,
+        "hidden": 43,
+        "unknown": 0,
+        "bot": 198
+      },
+      "2026-Q1": {
+        "organization": 0,
+        "one_person": 5,
+        "personal": 165,
+        "hidden": 66,
+        "unknown": 0,
+        "bot": 260
+      },
+      "2026-Q2": {
+        "organization": 0,
+        "one_person": 1,
+        "personal": 112,
+        "hidden": 29,
+        "unknown": 0,
+        "bot": 257
+      },
+      "2026-Q3": {
+        "organization": 0,
+        "one_person": 0,
+        "personal": 111,
+        "hidden": 24,
+        "unknown": 0,
+        "bot": 197
+      },
+      "2026-Q4": {
+        "organization": 0,
+        "one_person": 0,
+        "personal": 45,
+        "hidden": 6,
+        "unknown": 0,
+        "bot": 161
+      }
     }
   }
 }

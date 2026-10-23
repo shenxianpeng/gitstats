@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev1",
-  "generated_at": "2026-10-19T03:44:43+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:26:01+00:00",
   "name": "React",
   "report_path": "index.html",
   "first_commit": "2013-05-28 17:04:45",
-  "last_commit": "2026-10-15 08:14:35",
-  "age_days": 4888,
-  "active_days": 3807,
-  "total_commits": 21732,
+  "last_commit": "2026-10-21 17:50:17",
+  "age_days": 4895,
+  "active_days": 3810,
+  "total_commits": 21738,
   "total_authors": 1938,
-  "active_authors_12mo": 101,
-  "commits_last_12mo": 601,
+  "active_authors_12mo": 100,
+  "commits_last_12mo": 607,
   "total_files": 7260,
-  "total_lines": 1172344,
-  "lines_added": 3042533,
-  "lines_removed": 1870189,
+  "total_lines": 1173971,
+  "lines_added": 3044196,
+  "lines_removed": 1870225,
   "total_tags": 73,
   "era": "quiet",
   "top_authors": [
@@ -41,23 +41,23 @@
     }
   ],
   "author_commits": {
+    "Cheng": 2,
+    "Sebastian \"Sebbie\" Silbermann": 478,
+    "Hendrik Liebau": 69,
+    "Josh Story": 260,
+    "The number one sword cultivator in the south of the sky": 2,
     "Minho Yoo": 2,
-    "Josh Story": 258,
-    "Sebastian \"Sebbie\" Silbermann": 477,
     "\u8d64\u5742\u7406\u5b50": 1,
     "Konstantin Adzer": 1,
     "Batri\u0107 Perovi\u0107": 1,
     "Hmache Abdellah": 1,
-    "The number one sword cultivator in the south of the sky": 1,
     "Rick Hanlon": 318,
     "Andrew Clark": 1438,
     "Ruslan Lesiutin": 290,
     "Pieter De Baets": 20,
     "Lazizbek Ergashev": 2,
-    "Cheng": 1,
     "lauren": 822,
     "Jimmy Miller": 4,
-    "Hendrik Liebau": 68,
     "Rusty Raven": 1,
     "Srinu desetti": 1,
     "Yuri Karpenkov": 1,
@@ -1994,13 +1994,13 @@
     "2023": 1955,
     "2024": 2173,
     "2025": 1434,
-    "2026": 481
+    "2026": 487
   },
   "ai_assisted": {
-    "commits": 35,
+    "commits": 36,
     "authored": 0,
     "assistants": {
-      "Claude": 32,
+      "Claude": 33,
       "Cursor": 3,
       "Amp": 1
     },
@@ -2028,7 +2028,7 @@
       "2026-07": 14,
       "2026-08": 13,
       "2026-09": 5,
-      "2026-10": 1
+      "2026-10": 2
     },
     "commits_by_month": {
       "2024-11": 88,
@@ -2054,7 +2054,193 @@
       "2026-07": 69,
       "2026-08": 45,
       "2026-09": 48,
-      "2026-10": 23
+      "2026-10": 29
+    }
+  },
+  "organizations": {
+    "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
+    "commits": 21738,
+    "by_kind": {
+      "organization": 4451,
+      "one_person": 7603,
+      "personal": 7337,
+      "hidden": 2242,
+      "unknown": 7,
+      "bot": 98
+    },
+    "organization_count": 13,
+    "last_12mo_from": "2025-11",
+    "top": [
+      {
+        "organization": "meta.com",
+        "commits": 4091,
+        "commits_last_12mo": 11,
+        "addresses": 75,
+        "first_commit": "2013-06-03",
+        "last_commit": "2026-10-06"
+      },
+      {
+        "organization": "vercel.com",
+        "commits": 293,
+        "commits_last_12mo": 135,
+        "addresses": 5,
+        "first_commit": "2023-05-03",
+        "last_commit": "2026-10-20"
+      },
+      {
+        "organization": "khanacademy.org",
+        "commits": 18,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2014-04-10",
+        "last_commit": "2015-03-11"
+      },
+      {
+        "organization": "twitter.com",
+        "commits": 13,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2014-01-04",
+        "last_commit": "2015-11-03"
+      },
+      {
+        "organization": "instagram.com",
+        "commits": 9,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2014-02-05",
+        "last_commit": "2014-06-30"
+      },
+      {
+        "organization": "alibaba-inc.com",
+        "commits": 7,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2015-04-01",
+        "last_commit": "2016-11-13"
+      },
+      {
+        "organization": "yahoo-inc.com",
+        "commits": 5,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2014-09-19",
+        "last_commit": "2015-07-23"
+      },
+      {
+        "organization": "columbia.edu",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2015-12-23",
+        "last_commit": "2017-01-09"
+      },
+      {
+        "organization": "github.com",
+        "commits": 3,
+        "commits_last_12mo": 1,
+        "addresses": 2,
+        "first_commit": "2023-12-12",
+        "last_commit": "2026-09-02"
+      },
+      {
+        "organization": "callstack.com",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2023-10-13",
+        "last_commit": "2025-04-15"
+      },
+      {
+        "organization": "google.com",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2019-06-27",
+        "last_commit": "2019-10-15"
+      },
+      {
+        "organization": "shopify.com",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2021-11-25",
+        "last_commit": "2022-05-31"
+      },
+      {
+        "organization": "wingspan.com",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2013-09-26",
+        "last_commit": "2014-02-17"
+      }
+    ],
+    "quarters": {
+      "2025-Q1": {
+        "organization": 29,
+        "one_person": 81,
+        "personal": 93,
+        "hidden": 180,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2025-Q2": {
+        "organization": 54,
+        "one_person": 154,
+        "personal": 26,
+        "hidden": 109,
+        "unknown": 0,
+        "bot": 1
+      },
+      "2025-Q3": {
+        "organization": 119,
+        "one_person": 155,
+        "personal": 42,
+        "hidden": 107,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2025-Q4": {
+        "organization": 50,
+        "one_person": 94,
+        "personal": 33,
+        "hidden": 106,
+        "unknown": 0,
+        "bot": 1
+      },
+      "2026-Q1": {
+        "organization": 56,
+        "one_person": 24,
+        "personal": 49,
+        "hidden": 60,
+        "unknown": 0,
+        "bot": 4
+      },
+      "2026-Q2": {
+        "organization": 26,
+        "one_person": 20,
+        "personal": 27,
+        "hidden": 30,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2026-Q3": {
+        "organization": 37,
+        "one_person": 29,
+        "personal": 50,
+        "hidden": 46,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2026-Q4": {
+        "organization": 4,
+        "one_person": 9,
+        "personal": 13,
+        "hidden": 3,
+        "unknown": 0,
+        "bot": 0
+      }
     }
   }
 }

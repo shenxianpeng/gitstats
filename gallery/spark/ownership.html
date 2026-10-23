@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - Apache Spark</title>
+	<meta name="description" content="Apache Spark: 50,673 commits by 3,083 authors, 2010 to 2026. A report made with gitstats.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="Apache Spark: Code Ownership">
+	<meta property="og:description" content="Apache Spark: 50,673 commits by 3,083 authors, 2010 to 2026. A report made with gitstats.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/spark/ownership.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/spark/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="Apache Spark: Code Ownership">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Apache Spark: Code Ownership">
+	<meta name="twitter:description" content="Apache Spark: 50,673 commits by 3,083 authors, 2010 to 2026. A report made with gitstats.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/spark/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html" class="active" aria-current="page">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Code Ownership</h1><p class="section-note">Ownership is measured by how many commits each author made to each file in the current tree. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated. The <strong>bus factor</strong> is the smallest number of people who are, between them, primary owner of more than half of the files.</p><dl class="stat-tiles" style="--cols: 4; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Files Tracked</dt><dd class="stat-value">27,598</dd><dd class="stat-note">in the current tree</dd></div><div class="stat-tile"><dt>Bus Factor</dt><dd class="stat-value">7</dd><dd class="stat-note">7 authors are primary owner of 14,080 of 27,598 files</dd></div><div class="stat-tile"><dt>Single-Owner Files</dt><dd class="stat-value">15,396</dd><dd class="stat-note">55.8% of tracked files</dd></div><div class="stat-tile"><dt>Contributors</dt><dd class="stat-value">2,831</dd><dd class="stat-note">authors who changed files</dd></div></dl>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus factor risk — single-owner files</a></h2>
+
+<p class="section-note">Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</p><div class="table-scroll"><table class="sortable file-table" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/analyzer-results/st-functions.sql.out</td><td data-label="Sole owner">Uros</td><td class="num" data-label="Commits">14</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/inputs/st-functions.sql</td><td data-label="Sole owner">Uros</td><td class="num" data-label="Commits">14</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/results/st-functions.sql.out</td><td data-label="Sole owner">Uros</td><td class="num" data-label="Commits">14</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/datasources/ArchiveReadSuiteBase.scala</td><td data-label="Sole owner">akshatshenoi-db</td><td class="num" data-label="Commits">10</td></tr><tr><td class="path">python/pyspark/eval_handlers/__init__.py</td><td data-label="Sole owner">Yicong Huang</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">resource-managers/kubernetes/core/src/main/scala/org/apache/spark/scheduler/cluster/k8s/ExecutorResizePlugin.scala</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">resource-managers/kubernetes/core/src/test/scala/org/apache/spark/scheduler/cluster/k8s/ExecutorResizePluginSuite.scala</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">python/pyspark/eval_handlers/tests/test_pandas_eval_type_handlers.py</td><td data-label="Sole owner">Yicong Huang</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/jdbc/connection/MariaDBConnectionProvider.scala</td><td data-label="Sole owner">Gabor Somogyi</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/jdbc/connection/PostgresConnectionProvider.scala</td><td data-label="Sole owner">Gabor Somogyi</td><td class="num" data-label="Commits">8</td></tr></table></div><details class="table-details"><summary>Table: the 100 most-changed of 15,396 single-owner files</summary><div class="table-scroll"><table class="sortable file-table" id="ownership-busfactor-all"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/analyzer-results/st-functions.sql.out</td><td data-label="Sole owner">Uros</td><td class="num" data-label="Commits">14</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/inputs/st-functions.sql</td><td data-label="Sole owner">Uros</td><td class="num" data-label="Commits">14</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/results/st-functions.sql.out</td><td data-label="Sole owner">Uros</td><td class="num" data-label="Commits">14</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/datasources/ArchiveReadSuiteBase.scala</td><td data-label="Sole owner">akshatshenoi-db</td><td class="num" data-label="Commits">10</td></tr><tr><td class="path">python/pyspark/eval_handlers/__init__.py</td><td data-label="Sole owner">Yicong Huang</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">resource-managers/kubernetes/core/src/main/scala/org/apache/spark/scheduler/cluster/k8s/ExecutorResizePlugin.scala</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">resource-managers/kubernetes/core/src/test/scala/org/apache/spark/scheduler/cluster/k8s/ExecutorResizePluginSuite.scala</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">python/pyspark/eval_handlers/tests/test_pandas_eval_type_handlers.py</td><td data-label="Sole owner">Yicong Huang</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/jdbc/connection/MariaDBConnectionProvider.scala</td><td data-label="Sole owner">Gabor Somogyi</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/jdbc/connection/PostgresConnectionProvider.scala</td><td data-label="Sole owner">Gabor Somogyi</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">python/pyspark/eval_handlers/_pandas.py</td><td data-label="Sole owner">Yicong Huang</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">mllib/src/main/scala/org/apache/spark/ml/util/ConnectHelper.scala</td><td data-label="Sole owner">Ruifeng Zheng</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">sql/catalyst/benchmarks/InternalRowComparableWrapperBenchmark-jdk21-results.txt</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">sql/catalyst/benchmarks/InternalRowComparableWrapperBenchmark-results.txt</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">core/src/test/scala/org/apache/spark/deploy/master/PersistenceEngineBenchmark.scala</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/expressions/pipeOperators.scala</td><td data-label="Sole owner">Daniel Tenedorio</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/SupportsArchiveFormat.scala</td><td data-label="Sole owner">akshatshenoi-db</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/datasources/CSVArchiveReadBase.scala</td><td data-label="Sole owner">akshatshenoi-db</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/inputs/binary.sql</td><td data-label="Sole owner">Kent Yao</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/jdbc/connection/DB2ConnectionProvider.scala</td><td data-label="Sole owner">Gabor Somogyi</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">python/pyspark/eval_handlers/_base.py</td><td data-label="Sole owner">Yicong Huang</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/pyspark/eval_handlers/tests/test_base_eval_type_handlers.py</td><td data-label="Sole owner">Yicong Huang</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/pyspark/eval_handlers/tests/test_udtf_eval_type_handlers.py</td><td data-label="Sole owner">Yicong Huang</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/pyspark/eval_handlers/verification.py</td><td data-label="Sole owner">Yicong Huang</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">sql/connect/client/jvm/src/test/scala/org/apache/spark/sql/connect/DataFrameSuite.scala</td><td data-label="Sole owner">Ruifeng Zheng</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">mllib/src/main/scala/org/apache/spark/ml/optim/aggregator/AFTBlockAggregator.scala</td><td data-label="Sole owner">Ruifeng Zheng</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">mllib/src/main/scala/org/apache/spark/ml/optim/aggregator/BinaryLogisticBlockAggregator.scala</td><td data-label="Sole owner">Ruifeng Zheng</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">resource-managers/kubernetes/core/src/test/scala/org/apache/spark/scheduler/cluster/k8s/ExecutorPVCResizePluginSuite.scala</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">sql/core/src/main/scala/org/apache/spark/sql/execution/BinByExec.scala</td><td data-label="Sole owner">Nikolina Vraneš</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">sql/api/src/main/scala/org/apache/spark/sql/types/TimeType.scala</td><td data-label="Sole owner">Max Gekk</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/inputs/charvarchar-standard-semantics.sql</td><td data-label="Sole owner">Serge Rielau</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/results/charvarchar-standard-semantics.sql.out</td><td data-label="Sole owner">Serge Rielau</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">docs/streaming/real-time-mode.md</td><td data-label="Sole owner">Boyang Jerry Peng</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/datasources/v2/state/StatePartitionAllColumnFamiliesReaderSuite.scala</td><td data-label="Sole owner">Zifei Feng</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/conf_vscode/sitecustomize.py</td><td data-label="Sole owner">Tian Gao</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/command/v2/AutoCdcParserSuite.scala</td><td data-label="Sole owner">Andreas Neumann</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">sql/api/src/main/scala/org/apache/spark/sql/types/GeometryType.scala</td><td data-label="Sole owner">Uros</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/pyspark/eval_handlers/_udtf.py</td><td data-label="Sole owner">Yicong Huang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/pyspark/eval_handlers/utils.py</td><td data-label="Sole owner">Yicong Huang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/main/scala/org/apache/spark/sql/execution/python/ExtractPythonUDFFromLambda.scala</td><td data-label="Sole owner">Hyukjin Kwon</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/python/ExtractPythonUDFFromLambdaSuite.scala</td><td data-label="Sole owner">Hyukjin Kwon</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/main/java/org/apache/spark/sql/execution/datasources/parquet/LateMaterializationParquetRecordReader.java</td><td data-label="Sole owner">Peter Toth</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetStorageFilter.scala</td><td data-label="Sole owner">Peter Toth</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">mllib/src/main/scala/org/apache/spark/ml/optim/aggregator/HingeBlockAggregator.scala</td><td data-label="Sole owner">Ruifeng Zheng</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">mllib/src/main/scala/org/apache/spark/ml/optim/aggregator/HuberBlockAggregator.scala</td><td data-label="Sole owner">Ruifeng Zheng</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">mllib/src/main/scala/org/apache/spark/ml/optim/aggregator/LeastSquaresBlockAggregator.scala</td><td data-label="Sole owner">Ruifeng Zheng</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">resource-managers/kubernetes/core/src/main/scala/org/apache/spark/scheduler/cluster/k8s/ExecutorPVCResizePlugin.scala</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/benchmarks/RecursiveCTEBenchmark-jdk21-results.txt</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/catalyst/src/main/java/org/apache/spark/sql/catalyst/expressions/DateTimeExpressionUtils.java</td><td data-label="Sole owner">Gengliang Wang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/inputs/try_aggregates.sql</td><td data-label="Sole owner">Gengliang Wang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/command/v1/AlterTableRenamePartitionSuite.scala</td><td data-label="Sole owner">Max Gekk</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/DaysWritable.scala</td><td data-label="Sole owner">Max Gekk</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/api/src/main/scala/org/apache/spark/sql/catalyst/parser/SubstituteParmsAstBuilder.scala</td><td data-label="Sole owner">Serge Rielau</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/metric/CustomMetricsSuite.scala</td><td data-label="Sole owner">Liang-Chi Hsieh</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/JsonArraySuite.scala</td><td data-label="Sole owner">Ganesha S</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/catalyst/src/test/scala/org/apache/spark/sql/catalyst/xml/XmlInferSchemaTypeCastingSuite.scala</td><td data-label="Sole owner">Wenchen Fan</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/pipelines/src/main/scala/org/apache/spark/sql/pipelines/autocdc/Scd2VersionMap.scala</td><td data-label="Sole owner">AnishMahto</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/benchmark/ConstantColumnVectorBenchmark.scala</td><td data-label="Sole owner">YangJie</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/analysis/resolver/ExpressionResolutionValidator.scala</td><td data-label="Sole owner">Vladimir Golubev</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/analysis/resolver/DelegatesResolutionToExtensions.scala</td><td data-label="Sole owner">Vladimir Golubev</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/run-with-vscode-breakpoints</td><td data-label="Sole owner">Tian Gao</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/internal/connector/SupportsRuntimeCatalystFiltering.scala</td><td data-label="Sole owner">Szehon Ho</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/catalyst/src/test/scala/org/apache/spark/sql/connector/catalog/InMemoryCatalystRuntimeFilterTable.scala</td><td data-label="Sole owner">Szehon Ho</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">udf/worker/core/src/main/scala/org/apache/spark/udf/worker/core/WorkerDispatcher.scala</td><td data-label="Sole owner">Haiyang Sun</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/catalyst/src/main/java/org/apache/spark/sql/catalyst/util/Geo.java</td><td data-label="Sole owner">Uros</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/expressions/st/STExpressionUtils.scala</td><td data-label="Sole owner">Uros</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/datasources/BinaryFileArchiveReadBase.scala</td><td data-label="Sole owner">akshatshenoi-db</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/datasources/TextArchiveReadBase.scala</td><td data-label="Sole owner">akshatshenoi-db</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/datasources/XMLArchiveReadBase.scala</td><td data-label="Sole owner">akshatshenoi-db</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">common/unsafe/src/main/java/org/apache/spark/unsafe/types/VariantVal.java</td><td data-label="Sole owner">chenhao-db</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/analyzer-results/binary.sql.out</td><td data-label="Sole owner">Kent Yao</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/analyzer-results/binary_base64.sql.out</td><td data-label="Sole owner">Kent Yao</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/analyzer-results/binary_basic.sql.out</td><td data-label="Sole owner">Kent Yao</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/analyzer-results/binary_hex.sql.out</td><td data-label="Sole owner">Kent Yao</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/results/binary.sql.out</td><td data-label="Sole owner">Kent Yao</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/results/binary_base64.sql.out</td><td data-label="Sole owner">Kent Yao</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/results/binary_basic.sql.out</td><td data-label="Sole owner">Kent Yao</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/resources/sql-tests/results/binary_hex.sql.out</td><td data-label="Sole owner">Kent Yao</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">core/src/main/resources/org/apache/spark/ui/static/flamegraph.js</td><td data-label="Sole owner">Kent Yao</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/catalog/UserDefinedFunctionErrors.scala</td><td data-label="Sole owner">Allison Wang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/catalyst/src/main/java/org/apache/spark/sql/connector/expressions/aggregate/Avg.java</td><td data-label="Sole owner">beliefer</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/docs/source/development/logger.rst</td><td data-label="Sole owner">Haejoon Lee</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/jdbc/connection/OracleConnectionProvider.scala</td><td data-label="Sole owner">Gabor Somogyi</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/datasources/jdbc/connection/PostgresConnectionProviderSuite.scala</td><td data-label="Sole owner">Gabor Somogyi</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/pyspark/eval_handlers/_elementwise.py</td><td data-label="Sole owner">Yicong Huang</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">python/pyspark/eval_handlers/_stateful.py</td><td data-label="Sole owner">Yicong Huang</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">sql/connect/common/src/test/resources/query-tests/explain-results/expression_extension_deprecated.explain</td><td data-label="Sole owner">Hyukjin Kwon</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">sql/connect/common/src/test/resources/query-tests/explain-results/function_substring_with_columns.explain</td><td data-label="Sole owner">Hyukjin Kwon</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">sql/connect/common/src/test/resources/query-tests/explain-results/relation_extension_deprecated.explain</td><td data-label="Sole owner">Hyukjin Kwon</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">sql/connect/common/src/test/resources/query-tests/queries/expression_extension_deprecated.json</td><td data-label="Sole owner">Hyukjin Kwon</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">sql/connect/common/src/test/resources/query-tests/queries/expression_extension_deprecated.proto.bin</td><td data-label="Sole owner">Hyukjin Kwon</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">sql/connect/common/src/test/resources/query-tests/queries/relation_extension_deprecated.json</td><td data-label="Sole owner">Hyukjin Kwon</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">sql/connect/common/src/test/resources/query-tests/queries/relation_extension_deprecated.proto.bin</td><td data-label="Sole owner">Hyukjin Kwon</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/execution/datasources/parquet/ParquetStorageFilterSuite.scala</td><td data-label="Sole owner">Peter Toth</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">sql/catalyst/src/main/java/org/apache/spark/sql/catalyst/expressions/ml/MLExpressionUtils.java</td><td data-label="Sole owner">Ruifeng Zheng</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/expressions/ml/VectorDotProduct.scala</td><td data-label="Sole owner">Ruifeng Zheng</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">sql/core/benchmarks/DecimalDivideBenchmark-jdk21-results.txt</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">sql/core/benchmarks/DecimalDivideBenchmark-jdk25-results.txt</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">sql/core/benchmarks/DecimalDivideBenchmark-results.txt</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">resource-managers/kubernetes/core/src/test/scala/org/apache/spark/deploy/k8s/KubernetesDriverSpecSuite.scala</td><td data-label="Sole owner">Dongjoon Hyun</td><td class="num" data-label="Commits">3</td></tr></table></div></details>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by author</a></h2>
+
+<p class="section-note">Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</p><div class="table-scroll"><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th class="num">Files owned</th><th class="num">Solely owned</th><th class="num">Files touched</th></tr><tr><td>Michael Armbrust</td><td class="num">8,223</td><td class="num">8,053</td><td class="num">8,564</td></tr><tr><td>Paddy Xu</td><td class="num">1,281</td><td class="num">2</td><td class="num">1,380</td></tr><tr><td>Hyukjin Kwon</td><td class="num">1,236</td><td class="num">806</td><td class="num">4,846</td></tr><tr><td>Yuchen Liu</td><td class="num">889</td><td class="num">883</td><td class="num">935</td></tr><tr><td>Dylan Wong</td><td class="num">846</td><td class="num">845</td><td class="num">897</td></tr><tr><td>Ruifeng Zheng</td><td class="num">814</td><td class="num">164</td><td class="num">2,674</td></tr><tr><td>YangJie</td><td class="num">791</td><td class="num">59</td><td class="num">3,458</td></tr><tr><td>Dongjoon Hyun</td><td class="num">745</td><td class="num">84</td><td class="num">2,969</td></tr><tr><td>Wenchen Fan</td><td class="num">644</td><td class="num">109</td><td class="num">2,766</td></tr><tr><td>Tian Gao</td><td class="num">511</td><td class="num">19</td><td class="num">1,427</td></tr><tr><td>Yuming Wang</td><td class="num">474</td><td class="num">68</td><td class="num">1,388</td></tr><tr><td>Max Gekk</td><td class="num">458</td><td class="num">59</td><td class="num">1,627</td></tr><tr><td>Sean Owen</td><td class="num">376</td><td class="num">73</td><td class="num">2,038</td></tr><tr><td>Kent Yao</td><td class="num">364</td><td class="num">111</td><td class="num">1,887</td></tr><tr><td>Jungtaek Lim</td><td class="num">320</td><td class="num">265</td><td class="num">998</td></tr><tr><td>panbingkun</td><td class="num">291</td><td class="num">37</td><td class="num">1,436</td></tr><tr><td>Yi Wu</td><td class="num">289</td><td class="num">5</td><td class="num">1,065</td></tr><tr><td>Serge Rielau</td><td class="num">287</td><td class="num">72</td><td class="num">985</td></tr><tr><td>Daoyuan Wang</td><td class="num">270</td><td class="num">265</td><td class="num">381</td></tr><tr><td>Cheng Hao</td><td class="num">269</td><td class="num">269</td><td class="num">411</td></tr><tr><td>Herman van Hövell</td><td class="num">254</td><td class="num">174</td><td class="num">1,433</td></tr><tr><td>Reynold Xin</td><td class="num">218</td><td class="num">26</td><td class="num">1,437</td></tr><tr><td>Takeshi Yamamuro</td><td class="num">210</td><td class="num">176</td><td class="num">765</td></tr><tr><td>Anish Shrigondekar</td><td class="num">201</td><td class="num">172</td><td class="num">356</td></tr><tr><td>Xiangrui Meng</td><td class="num">187</td><td class="num">8</td><td class="num">632</td></tr></table></div><p class="moreauthors">Showing top 25 of 2831 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most shared files</a></h2>
+
+<p class="section-note">Files touched by the most people — shared code where changes are most likely to need coordination.</p><div class="table-scroll"><table class="sortable file-table" id="ownership-shared"><tr><th>File</th><th class="num">Contributors</th><th>Primary owner</th><th class="num">Owner share</th></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/internal/SQLConf.scala</td><td class="num" data-label="Contributors">269</td><td data-label="Primary owner">Wenchen Fan</td><td class="num" data-label="Owner share">6.7%</td></tr><tr><td class="path">pom.xml</td><td class="num" data-label="Contributors">247</td><td data-label="Primary owner">Dongjoon Hyun</td><td class="num" data-label="Owner share">21.0%</td></tr><tr><td class="path">core/src/main/scala/org/apache/spark/SparkContext.scala</td><td class="num" data-label="Contributors">205</td><td data-label="Primary owner">Reynold Xin</td><td class="num" data-label="Owner share">6.3%</td></tr><tr><td class="path">docs/configuration.md</td><td class="num" data-label="Contributors">203</td><td data-label="Primary owner">Dongjoon Hyun</td><td class="num" data-label="Owner share">6.3%</td></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/analysis/Analyzer.scala</td><td class="num" data-label="Contributors">196</td><td data-label="Primary owner">Wenchen Fan</td><td class="num" data-label="Owner share">15.8%</td></tr><tr><td class="path">project/SparkBuild.scala</td><td class="num" data-label="Contributors">177</td><td data-label="Primary owner">YangJie</td><td class="num" data-label="Owner share">9.2%</td></tr><tr><td class="path">core/src/main/scala/org/apache/spark/util/Utils.scala</td><td class="num" data-label="Contributors">175</td><td data-label="Primary owner">Dongjoon Hyun</td><td class="num" data-label="Owner share">6.5%</td></tr><tr><td class="path">common/utils/src/main/resources/error/error-conditions.json</td><td class="num" data-label="Contributors">173</td><td data-label="Primary owner">Haejoon Lee</td><td class="num" data-label="Owner share">6.4%</td></tr><tr><td class="path">project/MimaExcludes.scala</td><td class="num" data-label="Contributors">164</td><td data-label="Primary owner">Reynold Xin</td><td class="num" data-label="Owner share">8.1%</td></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/parser/AstBuilder.scala</td><td class="num" data-label="Contributors">161</td><td data-label="Primary owner">Wenchen Fan</td><td class="num" data-label="Owner share">8.4%</td></tr><tr><td class="path">sql/core/src/test/scala/org/apache/spark/sql/SQLQuerySuite.scala</td><td class="num" data-label="Contributors">145</td><td data-label="Primary owner">Reynold Xin</td><td class="num" data-label="Owner share">7.4%</td></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/optimizer/Optimizer.scala</td><td class="num" data-label="Contributors">142</td><td data-label="Primary owner">Wenchen Fan</td><td class="num" data-label="Owner share">9.3%</td></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/catalyst/analysis/FunctionRegistry.scala</td><td class="num" data-label="Contributors">142</td><td data-label="Primary owner">Max Gekk</td><td class="num" data-label="Owner share">5.9%</td></tr><tr><td class="path">python/pyspark/sql/dataframe.py</td><td class="num" data-label="Contributors">141</td><td data-label="Primary owner">Hyukjin Kwon</td><td class="num" data-label="Owner share">13.4%</td></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/errors/QueryExecutionErrors.scala</td><td class="num" data-label="Contributors">133</td><td data-label="Primary owner">Haejoon Lee</td><td class="num" data-label="Owner share">11.3%</td></tr><tr><td class="path">core/src/main/scala/org/apache/spark/internal/config/package.scala</td><td class="num" data-label="Contributors">133</td><td data-label="Primary owner">Dongjoon Hyun</td><td class="num" data-label="Owner share">13.9%</td></tr><tr><td class="path">core/src/main/scala/org/apache/spark/scheduler/DAGScheduler.scala</td><td class="num" data-label="Contributors">128</td><td data-label="Primary owner">Reynold Xin</td><td class="num" data-label="Owner share">8.3%</td></tr><tr><td class="path">docs/sql-programming-guide.md</td><td class="num" data-label="Contributors">128</td><td data-label="Primary owner">Cheng Lian</td><td class="num" data-label="Owner share">6.6%</td></tr><tr><td class="path">sql/catalyst/src/main/scala/org/apache/spark/sql/errors/QueryCompilationErrors.scala</td><td class="num" data-label="Contributors">122</td><td data-label="Primary owner">panbingkun</td><td class="num" data-label="Owner share">9.0%</td></tr><tr><td class="path">sql/core/src/main/scala/org/apache/spark/sql/execution/SparkStrategies.scala</td><td class="num" data-label="Contributors">117</td><td data-label="Primary owner">Reynold Xin</td><td class="num" data-label="Owner share">10.9%</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="../ecosystems/apache.html">How Apache Spark ranks among Apache projects by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+name: GitStats Report
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  gitstats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: shenxianpeng/gitstats-action@v1
+        with:
+          deploy-to-pages: true
+</pre></details></section><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

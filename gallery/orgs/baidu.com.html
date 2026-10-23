@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - baidu.com in GitStats Gallery</title>
+	<meta name="description" content="baidu.com in GitStats Gallery: 500 commits to 4 projects in 12 months, counted by the domain of its commit addresses.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="baidu.com in GitStats Gallery">
+	<meta property="og:description" content="baidu.com in GitStats Gallery: 500 commits to 4 projects in 12 months, counted by the domain of its commit addresses.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/orgs/baidu.com.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="baidu.com in GitStats Gallery">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="baidu.com in GitStats Gallery">
+	<meta name="twitter:description" content="baidu.com in GitStats Gallery: 500 commits to 4 projects in 12 months, counted by the domain of its commit addresses.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="../gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="../sortable.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="../index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="../index.html">GitStats Gallery</a></li>
+            <li><a href="../ai.html">AI-assisted commits</a></li><li><a href="../organizations.html" class="active" aria-current="page">Organizations</a></li>
+            </ul>
+            <div class="nav-right">
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>baidu.com</h1><p class="portfolio-subtitle"><a href="../index.html">GitStats Gallery</a>, 107 repositories &middot; generated by gitstats 2.11.0.post1.dev10 on 2026-10-23 11:33:22</p><p class="section-note">How it is counted: a commit counts here when the author&rsquo;s email address is at baidu.com or under it, and at least two people commit from the domain. A domain says where an address is, not who paid for the work, so these are lower bounds.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Commits (12 mo)</dt><dd class="stat-value">500</dd><dd class="stat-note">to 4 of these repositories</dd></div><div class="stat-tile"><dt>Repositories</dt><dd class="stat-value">11</dd><dd class="stat-note">it has committed to</dd></div><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">23,291</dd><dd class="stat-note">since 2013-07-17</dd></div></dl><h2>Repositories</h2><div class="table-scroll"><table class="sortable" id="organization-repos"><tr><th>Repository</th><th class="num">Commits (12 mo)</th><th class="num">Commits</th><th class="num">Addresses</th><th>First commit</th><th>Last commit</th></tr><tr><td><a href="../paddle/authors.html#commits_by_organization">PaddlePaddle</a></td><td class="num">287</td><td class="num">21,168</td><td class="num">186</td><td class="nowrap">2016-08-31</td><td class="nowrap">2026-10-20</td></tr><tr><td><a href="../spark/authors.html#commits_by_organization">Apache Spark</a></td><td class="num">208</td><td class="num">1,634</td><td class="num">16</td><td class="nowrap">2014-05-16</td><td class="nowrap">2026-10-12</td></tr><tr><td><a href="../vllm/authors.html#commits_by_organization">vLLM</a></td><td class="num">3</td><td class="num">8</td><td class="num">2</td><td class="nowrap">2025-09-30</td><td class="nowrap">2026-03-02</td></tr><tr><td><a href="../doris/authors.html#commits_by_organization">Apache Doris</a></td><td class="num">2</td><td class="num">262</td><td class="num">14</td><td class="nowrap">2017-08-17</td><td class="nowrap">2026-10-20</td></tr><tr><td><a href="../kubernetes/authors.html#commits_by_organization">Kubernetes</a></td><td class="num">0</td><td class="num">124</td><td class="num">16</td><td class="nowrap">2017-08-29</td><td class="nowrap">2021-03-26</td></tr><tr><td><a href="../echarts/authors.html#commits_by_organization">Apache ECharts</a></td><td class="num">0</td><td class="num">67</td><td class="num">12</td><td class="nowrap">2013-07-17</td><td class="nowrap">2023-02-21</td></tr><tr><td><a href="../pytorch/authors.html#commits_by_organization">PyTorch</a></td><td class="num">0</td><td class="num">10</td><td class="num">5</td><td class="nowrap">2017-07-28</td><td class="nowrap">2024-04-07</td></tr><tr><td><a href="../langchain/authors.html#commits_by_organization">LangChain</a></td><td class="num">0</td><td class="num">8</td><td class="num">3</td><td class="nowrap">2023-09-13</td><td class="nowrap">2024-02-06</td></tr><tr><td><a href="../vscode/authors.html#commits_by_organization">VS Code</a></td><td class="num">0</td><td class="num">5</td><td class="num">2</td><td class="nowrap">2019-04-12</td><td class="nowrap">2019-12-25</td></tr><tr><td><a href="../arrow/authors.html#commits_by_organization">Apache Arrow</a></td><td class="num">0</td><td class="num">3</td><td class="num">2</td><td class="nowrap">2022-06-08</td><td class="nowrap">2025-01-15</td></tr><tr><td><a href="../tensorflow/authors.html#commits_by_organization">TensorFlow</a></td><td class="num">0</td><td class="num">2</td><td class="num">2</td><td class="nowrap">2016-08-18</td><td class="nowrap">2017-11-06</td></tr></table></div><h2>Badge</h2><p class="section-note">For a README or an open source program&rsquo;s page. It is made again with the portfolio, so it stays current. A shields.io <a href="baidu.com.json">endpoint</a> is next to it, for badges in other styles.</p><p><img src="baidu.com.svg" alt="GitStats Gallery: 500 commits to 4 projects in 12 months"></p><pre class="badge-code">[![GitStats Gallery](https://shenxianpeng.dev/gitstats/gallery/orgs/baidu.com.svg)](https://shenxianpeng.dev/gitstats/gallery/orgs/baidu.com.html)</pre><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body>
+</html>

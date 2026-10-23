@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - Tailwind CSS</title>
+	<meta name="description" content="Tailwind CSS: 6,877 commits by 380 authors, 2017 to 2026. A report made with gitstats.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="Tailwind CSS: Hotspots">
+	<meta property="og:description" content="Tailwind CSS: 6,877 commits by 380 authors, 2017 to 2026. A report made with gitstats.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/tailwindcss/hotspots.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/tailwindcss/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="Tailwind CSS: Hotspots">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Tailwind CSS: Hotspots">
+	<meta name="twitter:description" content="Tailwind CSS: 6,877 commits by 380 authors, 2017 to 2026. A report made with gitstats.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/tailwindcss/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html" class="active" aria-current="page">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Hotspots</h1><p class="section-note">Files that are both large and changed often are where bugs tend to cluster and where refactoring pays off first. Each file in the current tree is placed by its size and by the number of commits that changed it; its <strong>hotspot score</strong> is changes &times; &radic;lines. Files without counted lines, such as binary files, are left out.</p><dl class="stat-tiles" style="--cols: 4; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Files Analyzed</dt><dd class="stat-value">542</dd><dd class="stat-note">of 558 in the current tree</dd></div><div class="stat-tile"><dt>Top 10 Files</dt><dd class="stat-value">72.2%</dd><dd class="stat-note">of the total hotspot score</dd></div><div class="stat-tile"><dt>Median File Size</dt><dd class="stat-value">68 lines</dd><dd class="stat-note">half of the files are at least this large</dd></div><div class="stat-tile"><dt>Median Changes</dt><dd class="stat-value">3 commits</dd><dd class="stat-note">half of the files changed at least this often</dd></div></dl>
+<h2 id="change_frequency_by_file_size"><a href="#change_frequency_by_file_size">Change frequency by file size</a></h2>
+
+<p class="section-note">Each dot is a file; a bigger dot is a higher score. The dashed lines mark the median file size and the median number of changes, so the large files that change often are in the top right. Both axes are logarithmic.</p><div class="chart-box has-legend" style="--chart-ratio: 2.4"><canvas id="chart-hotspots"></canvas></div><script type="application/json" id="hotspot-data">{"medianLines": 68, "medianChurn": 3, "points": [["CHANGELOG.md", 4453, 1742, 116245.1], ["packages/tailwindcss/src/utilities.test.ts", 31755, 220, 39203.9], ["pnpm-lock.yaml", 6053, 371, 28864.2], ["packages/tailwindcss/src/utilities.ts", 6855, 199, 16476.2], ["packages/tailwindcss/src/index.test.ts", 7366, 128, 10985.7], ["packages/tailwindcss/src/__snapshots__/intellisense.test.ts.snap", 13309, 78, 8998.4], ["package.json", 64, 832, 6656.0], ["integrations/upgrade/index.test.ts", 3512, 67, 3970.6], ["packages/tailwindcss/src/variants.test.ts", 3037, 68, 3747.4], ["packages/tailwindcss/src/compat/plugin-api.test.ts", 4631, 54, 3674.8], ["integrations/cli/index.test.ts", 3222, 55, 3121.9], ["packages/tailwindcss/src/ast.ts", 2083, 58, 2647.1], ["packages/tailwindcss/src/index.ts", 875, 86, 2543.9], ["integrations/upgrade/js-config.test.ts", 2187, 52, 2431.8], ["packages/tailwindcss/src/canonicalize-candidates.ts", 3275, 42, 2403.6], ["packages/tailwindcss/src/variants.ts", 1348, 61, 2239.6], ["packages/tailwindcss/tests/ui.spec.ts", 2596, 43, 2190.9], ["packages/tailwindcss/src/canonicalize-candidates.test.ts", 2047, 47, 2126.5], ["packages/tailwindcss/src/compat/config.test.ts", 1849, 48, 2064.0], ["packages/@tailwindcss-vite/src/index.ts", 543, 76, 1771.0], ["crates/oxide/tests/scanner.rs", 4080, 27, 1724.6], ["packages/tailwindcss/src/css-functions.test.ts", 1573, 43, 1705.4], ["packages/tailwindcss/src/candidate.test.ts", 2206, 34, 1596.9], ["integrations/utils.ts", 896, 52, 1556.5], ["packages/tailwindcss/src/candidate.ts", 1246, 43, 1517.8], ["packages/tailwindcss/src/__snapshots__/utilities.test.ts.snap", 2058, 32, 1451.7], ["packages/tailwindcss/package.json", 138, 122, 1433.2], ["integrations/vite/index.test.ts", 1726, 34, 1412.5], ["packages/@tailwindcss-cli/src/commands/build/index.ts", 874, 46, 1359.9], [".github/workflows/release.yml", 358, 64, 1210.9], ["packages/@tailwindcss-postcss/src/__snapshots__/index.test.ts.snap", 310, 68, 1197.3], ["packages/tailwindcss/src/intellisense.test.ts", 784, 41, 1148.0], ["packages/@tailwindcss-standalone/package.json", 55, 142, 1053.1], ["packages/tailwindcss/src/compat/plugin-api.ts", 657, 41, 1050.9], ["packages/tailwindcss/src/__snapshots__/index.test.ts.snap", 393, 52, 1030.9], ["crates/node/package.json", 77, 116, 1017.9], ["packages/@tailwindcss-postcss/src/index.ts", 402, 45, 902.2], ["packages/@tailwindcss-postcss/package.json", 51, 122, 871.3], ["packages/@tailwindcss-upgrade/package.json", 52, 118, 850.9], ["packages/@tailwindcss-postcss/src/index.test.ts", 630, 33, 828.3], ["packages/@tailwindcss-node/package.json", 64, 103, 824.0], ["packages/tailwindcss/theme.css", 510, 36, 813.0], ["packages/@tailwindcss-upgrade/src/index.ts", 461, 37, 794.4], ["crates/oxide/src/scanner/mod.rs", 952, 25, 771.4], ["packages/@tailwindcss-cli/package.json", 40, 120, 758.9], ["packages/@tailwindcss-vite/package.json", 42, 116, 751.8], ["Cargo.lock", 948, 24, 739.0], ["packages/tailwindcss/src/css-parser.test.ts", 1334, 20, 730.5], ["packages/tailwindcss/src/ast.test.ts", 1998, 16, 715.2], ["integrations/postcss/index.test.ts", 893, 23, 687.3], ["crates/oxide/src/extractor/mod.rs", 1149, 20, 677.9], [".github/workflows/prepare-release.yml", 307, 38, 665.8], ["packages/tailwindcss/src/theme.ts", 304, 36, 627.7], ["packages/tailwindcss/src/compile.ts", 402, 30, 601.5], ["packages/tailwindcss/src/compat/apply-compat-hooks.ts", 438, 28, 586.0], ["packages/tailwindcss/preflight.css", 398, 28, 558.6], ["packages/tailwindcss/src/compat/apply-config-to-theme.ts", 303, 32, 557.0], ["packages/tailwindcss/src/css-parser.ts", 718, 20, 535.9], [".github/workflows/ci.yml", 124, 45, 501.1], ["playgrounds/nextjs/package.json", 24, 94, 460.5], ["crates/node/npm/linux-arm64-gnu/package.json", 30, 84, 460.1], ["crates/node/npm/linux-arm64-musl/package.json", 30, 84, 460.1], ["crates/node/npm/linux-x64-gnu/package.json", 30, 84, 460.1], ["crates/node/npm/linux-x64-musl/package.json", 30, 84, 460.1], ["playgrounds/v3/package.json", 24, 90, 440.9], ["packages/tailwindcss/src/property-order.ts", 440, 21, 440.5], ["crates/node/npm/android-arm-eabi/package.json", 27, 84, 436.5], ["crates/node/npm/android-arm64/package.json", 27, 84, 436.5], ["crates/node/npm/darwin-arm64/package.json", 27, 84, 436.5], ["crates/node/npm/darwin-x64/package.json", 27, 84, 436.5], ["crates/node/npm/freebsd-x64/package.json", 27, 84, 436.5], ["crates/node/npm/linux-arm-gnueabihf/package.json", 27, 84, 436.5], ["crates/node/npm/win32-x64-msvc/package.json", 27, 84, 436.5], ["packages/tailwindcss/src/design-system.ts", 261, 27, 436.2], ["packages/tailwindcss/src/compat/apply-config-to-theme.test.ts", 319, 24, 428.7], ["packages/@tailwindcss-node/src/compile.ts", 281, 25, 419.1], ["packages/tailwindcss/src/source-maps/source-map.test.ts", 893, 14, 418.4], ["playgrounds/vite/package.json", 24, 83, 406.6], ["packages/tailwindcss/src/at-import.test.ts", 653, 15, 383.3], [".github/workflows/integration-tests.yml", 126, 34, 381.6], ["packages/@tailwindcss-browser/package.json", 37, 60, 365.0], ["packages/tailwindcss/src/compat/screens-config.test.ts", 669, 13, 336.2], ["crates/node/npm/win32-arm64-msvc/package.json", 27, 64, 332.6], ["packages/@tailwindcss-upgrade/src/index.test.ts", 265, 20, 325.6], ["crates/node/npm/wasm32-wasi/package.json", 42, 50, 324.0], ["packages/tailwindcss/src/compat/config/resolve-config.ts", 273, 19, 313.9], ["integrations/vite/resolvers.test.ts", 804, 10, 283.5], ["packages/tailwindcss/src/prefix.test.ts", 340, 15, 276.6], ["crates/oxide/src/extractor/pre_processors/ruby.rs", 528, 12, 275.7], ["crates/oxide/src/scanner/sources.rs", 938, 9, 275.6], ["packages/tailwindcss/src/css-functions.ts", 262, 17, 275.2], ["packages/tailwindcss/src/utils/infer-data-type.ts", 390, 13, 256.7], ["crates/oxide/src/extractor/named_utility_machine.rs", 535, 11, 254.4], ["packages/tailwindcss/src/compat/config/resolve-config.test.ts", 321, 14, 250.8], ["packages/tailwindcss/src/apply.ts", 363, 13, 247.7], ["packages/tailwindcss/src/compat/default-theme.ts", 1140, 7, 236.3], ["packages/tailwindcss/src/value-parser.ts", 279, 14, 233.8], ["packages/tailwindcss/src/selector-parser.ts", 638, 9, 227.3], ["crates/oxide/src/glob.rs", 601, 9, 220.6], ["integrations/postcss/next.test.ts", 486, 10, 220.5], ["packages/tailwindcss/src/compat/container-config.test.ts", 757, 8, 220.1], ["README.md", 36, 36, 216.0], ["pnpm-workspace.yaml", 54, 29, 213.1], ["packages/tailwindcss/src/intellisense.ts", 268, 13, 212.8], ["integrations/cli/plugins.test.ts", 368, 11, 211.0], [".github/CONTRIBUTING.md", 103, 20, 203.0], ["packages/tailwindcss/src/selector-parser.test.ts", 641, 8, 202.5], ["packages/tailwindcss/src/compat/plugin-functions.ts", 281, 12, 201.2], ["crates/oxide/src/extractor/pre_processors/haml.rs", 616, 8, 198.6], ["integrations/vite/vue.test.ts", 380, 10, 194.9], ["packages/@tailwindcss-upgrade/src/codemods/template/is-safe-migration.ts", 367, 10, 191.6], ["integrations/vite/svelte.test.ts", 253, 12, 190.9], ["crates/oxide/src/extractor/pre_processors/slim.rs", 449, 9, 190.7], ["packages/tailwindcss/src/compat/legacy-utilities.test.ts", 398, 9, 179.5], ["crates/oxide/src/extractor/pre_processors/pug.rs", 463, 8, 172.1], ["crates/oxide/src/extractor/arbitrary_property_machine.rs", 457, 8, 171.0], ["packages/tailwindcss/src/constant-fold-declaration.ts", 357, 9, 170.0], ["crates/oxide/src/extractor/pre_processors/clojure.rs", 436, 8, 167.0], ["packages/@tailwindcss-upgrade/src/codemods/config/migrate-js-config.ts", 553, 7, 164.6], ["crates/ignore/src/walk.rs", 2757, 3, 157.5], ["packages/tailwindcss/src/compat/legacy-utilities.ts", 174, 11, 145.1], ["crates/oxide/src/extractor/named_variant_machine.rs", 422, 7, 143.8], ["crates/oxide/src/extractor/arbitrary_variable_machine.rs", 413, 7, 142.3], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-at-layer-utilities.test.ts", 1178, 4, 137.3], ["packages/tailwindcss/src/at-import.ts", 178, 10, 133.4], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-theme-to-var.ts", 270, 8, 131.5], ["crates/oxide/src/extractor/utility_machine.rs", 346, 7, 130.2], ["packages/tailwindcss/src/compat/colors.ts", 345, 7, 130.0], ["integrations/vite/nuxt.test.ts", 116, 12, 129.2], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate.ts", 137, 11, 128.8], ["integrations/vite/astro.test.ts", 201, 9, 127.6], ["packages/tailwindcss/src/important.test.ts", 132, 11, 126.4], ["crates/node/src/lib.rs", 192, 9, 124.7], ["packages/@tailwindcss-upgrade/src/stylesheet.ts", 317, 7, 124.6], ["crates/ignore/src/dir.rs", 1648, 3, 121.8], ["crates/ignore/src/gitignore.rs", 913, 4, 120.9], ["scripts/version-packages.mjs", 178, 9, 120.1], ["packages/@tailwindcss-postcss/README.md", 111, 11, 115.9], ["integrations/postcss/source.test.ts", 831, 4, 115.3], ["crates/oxide/src/extractor/candidate_machine.rs", 361, 6, 114.0], ["packages/@tailwindcss-upgrade/src/codemods/template/is-safe-migration.test.ts", 154, 9, 111.7], ["packages/tailwindcss/src/compat/config/types.ts", 116, 10, 107.7], ["packages/tailwindcss/src/value-parser.test.ts", 219, 7, 103.6], ["crates/oxide/src/scanner/detect_sources.rs", 160, 8, 101.2], ["packages/@tailwindcss-node/src/optimize.ts", 155, 8, 99.6], ["crates/oxide/src/scanner/fixtures/binary-extensions.txt", 272, 6, 99.0], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-legacy-classes.ts", 144, 8, 96.0], ["integrations/cli/config.test.ts", 361, 5, 95.0], ["crates/oxide/Cargo.toml", 26, 18, 91.8], ["packages/@tailwindcss-node/src/urls.ts", 228, 6, 90.6], ["crates/oxide/src/extractor/arbitrary_value_machine.rs", 213, 6, 87.6], ["packages/tailwindcss/src/utils/is-color.ts", 208, 6, 86.5], ["turbo.json", 51, 12, 85.7], ["integrations/vite/config.test.ts", 287, 5, 84.7], ["packages/tailwindcss/src/utils/replace-shadow-colors.test.ts", 141, 7, 83.1], ["packages/@tailwindcss-upgrade/src/utils/packages.ts", 138, 7, 82.2], ["packages/@tailwindcss-webpack/package.json", 55, 11, 81.6], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-automatic-var-injection.ts", 180, 6, 80.5], ["integrations/vite/other-transforms.test.ts", 178, 6, 80.0], ["packages/tailwindcss/src/walk.test.ts", 1598, 2, 79.9], ["crates/oxide/src/lib.rs", 12, 23, 79.7], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate.test.ts", 129, 7, 79.5], ["integrations/vite/multi-root.test.ts", 170, 6, 78.2], ["integrations/oxide/wasm.test.ts", 243, 5, 77.9], ["packages/tailwindcss/src/utils/decode-arbitrary-value.test.ts", 165, 6, 77.1], ["packages/tailwindcss/src/expand-declaration.test.ts", 629, 3, 75.2], ["packages/@tailwindcss-upgrade/src/codemods/config/migrate-postcss.ts", 349, 4, 74.7], ["packages/@tailwindcss-standalone/scripts/build.ts", 111, 7, 73.7], ["crates/ignore/src/types.rs", 588, 3, 72.7], ["integrations/webpack/loader.test.ts", 588, 3, 72.7], ["packages/tailwindcss/src/utils/math-operators.ts", 205, 5, 71.6], ["packages/@tailwindcss-cli/src/commands/canonicalize/canonicalize.test.ts", 202, 5, 71.1], ["integrations/cli/standalone.test.ts", 200, 5, 70.7], ["crates/ignore/src/lib.rs", 549, 3, 70.3], ["packages/tailwindcss/src/test-utils/run.ts", 25, 14, 70.0], ["packages/tailwindcss/src/utils/replace-shadow-colors.ts", 135, 6, 69.7], ["packages/@tailwindcss-upgrade/src/codemods/css/analyze.ts", 303, 4, 69.6], ["packages/@tailwindcss-node/src/index.ts", 28, 13, 68.8], ["crates/oxide/src/extractor/pre_processors/pre_processor.rs", 186, 5, 68.2], ["packages/tailwindcss/src/candidate.bench.ts", 94, 7, 67.9], ["crates/oxide/src/extractor/pre_processors/mod.rs", 31, 12, 66.8], ["packages/tailwindcss/src/compat/config/create-compat-config.ts", 63, 8, 63.5], ["integrations/vite/source-maps.test.ts", 157, 5, 62.6], ["integrations/vite/url-rewriting.test.ts", 108, 6, 62.4], ["packages/tailwindcss/src/utils/segment.ts", 102, 6, 60.6], ["packages/@tailwindcss-standalone/src/index.ts", 98, 6, 59.4], ["packages/@tailwindcss-cli/src/commands/canonicalize/index.ts", 381, 3, 58.6], ["packages/@tailwindcss-upgrade/src/utils/extract-static-plugins.ts", 382, 3, 58.6], ["crates/oxide/src/extractor/css_variable_machine.rs", 214, 4, 58.5], ["packages/tailwindcss/src/constant-fold-declaration.test.ts", 137, 5, 58.5], ["crates/ignore/src/default_types.rs", 378, 3, 58.3], ["crates/oxide/src/cursor.rs", 134, 5, 57.9], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-at-layer-utilities.ts", 354, 3, 56.4], ["packages/tailwindcss/src/source-maps/source-map.ts", 198, 4, 56.3], ["packages/@tailwindcss-postcss/src/ast.ts", 189, 4, 55.0], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-at-apply.test.ts", 118, 5, 54.3], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-preflight.ts", 184, 4, 54.3], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-preflight.test.ts", 325, 3, 54.1], ["packages/@tailwindcss-cli/src/utils/args.ts", 181, 4, 53.8], ["packages/@tailwindcss-node/src/urls.test.ts", 174, 4, 52.8], ["packages/@tailwindcss-turbopack/src/index.ts", 300, 3, 52.0], ["packages/@tailwindcss-webpack/src/index.ts", 300, 3, 52.0], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-arbitrary-variants.ts", 55, 7, 51.9], ["crates/oxide/src/extractor/modifier_machine.rs", 167, 4, 51.7], ["scripts/pack-packages.mjs", 74, 6, 51.6], ["crates/ignore/src/overrides.rs", 293, 3, 51.4], ["packages/@tailwindcss-browser/src/index.ts", 294, 3, 51.4], ["packages/@tailwindcss-cli/src/utils/renderer.ts", 104, 5, 51.0], ["packages/tailwindcss/src/plugin.test.ts", 69, 6, 49.8], ["packages/tailwindcss/src/utils/escape.ts", 97, 5, 49.2], ["integrations/vite/react-router.test.ts", 266, 3, 48.9], ["crates/oxide/src/extractor/pre_processors/test-fixtures/haml/dst-17051.haml", 262, 3, 48.6], ["integrations/vite/css-modules.test.ts", 65, 6, 48.4], ["crates/oxide/src/extractor/variant_machine.rs", 146, 4, 48.3], ["integrations/upgrade/upgrade-errors.test.ts", 254, 3, 47.8], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-modernize-arbitrary-values.test.ts", 91, 5, 47.7], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-prefix.ts", 140, 4, 47.3], ["packages/@tailwindcss-upgrade/src/utils/renderer.ts", 140, 4, 47.3], ["crates/oxide/src/extractor/string_machine.rs", 138, 4, 47.0], ["packages/@tailwindcss-node/src/instrumentation.test.ts", 138, 4, 47.0], ["packages/@tailwindcss-node/src/index.cts", 27, 9, 46.8], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-variant-order.ts", 135, 4, 46.5], ["crates/oxide/src/extractor/pre_processors/rust.rs", 238, 3, 46.3], ["integrations/postcss/url-rewriting.test.ts", 231, 3, 45.6], ["packages/tailwindcss/src/sort.test.ts", 129, 4, 45.4], ["packages/@tailwindcss-cli/src/index.ts", 82, 5, 45.3], ["packages/tailwindcss/src/compat/container.ts", 120, 4, 43.8], ["packages/@tailwindcss-vite/README.md", 76, 5, 43.6], ["packages/tailwindcss/src/walk.ts", 204, 3, 42.8], ["integrations/vite/ssr.test.ts", 72, 5, 42.4], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-modernize-arbitrary-values.ts", 72, 5, 42.4], ["integrations/webpack/index.test.ts", 110, 4, 42.0], ["integrations/vite/bundled-dev.test.ts", 193, 3, 41.7], ["packages/@tailwindcss-cli/src/utils/args.test.ts", 186, 3, 40.9], ["packages/tailwindcss/tsup.config.ts", 34, 7, 40.8], ["packages/@tailwindcss-cli/src/commands/help/index.ts", 182, 3, 40.5], ["integrations/turbopack/loader.test.ts", 179, 3, 40.1], ["packages/tailwindcss/playwright.config.ts", 100, 4, 40.0], ["integrations/package.json", 11, 12, 39.8], ["packages/@tailwindcss-upgrade/src/codemods/template/candidates.ts", 43, 6, 39.3], ["packages/tailwindcss/src/utils/decode-arbitrary-value.ts", 93, 4, 38.6], ["packages/tailwindcss/src/source-maps/translation-map.test.ts", 371, 2, 38.5], ["packages/@tailwindcss-upgrade/src/utils/extract-static-plugins.test.ts", 354, 2, 37.6], [".github/ISSUE_TEMPLATE/bug-report.md", 39, 6, 37.5], ["packages/@tailwindcss-upgrade/src/codemods/template/candidates.test.ts", 84, 4, 36.7], ["packages/@tailwindcss-node/src/instrumentation.ts", 149, 3, 36.6], [".github/ISSUE_TEMPLATE/config.yml", 11, 11, 36.5], ["crates/ignore/src/incremental.rs", 1286, 1, 35.9], ["crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.rs", 318, 2, 35.7], ["packages/tailwindcss/src/compat/apply-keyframes-to-theme.test.ts", 137, 3, 35.1], ["crates/oxide/src/extractor/boundary.rs", 128, 3, 33.9], ["packages/tailwindcss/src/plugin.ts", 46, 5, 33.9], ["packages/@tailwindcss-cli/src/utils/renderer.test.ts", 70, 4, 33.5], ["packages/tailwindcss/src/compat/screens-config.ts", 123, 3, 33.3], ["packages/tailwindcss/src/expand-declaration.ts", 122, 3, 33.1], ["crates/classification-macros/src/lib.rs", 253, 2, 31.8], ["packages/@tailwindcss-upgrade/src/utils/version.ts", 63, 4, 31.7], ["integrations/postcss/config.test.ts", 247, 2, 31.4], ["crates/oxide/src/extractor/pre_processors/vue.rs", 60, 4, 31.0], ["integrations/postcss/core-as-postcss-plugin.test.ts", 58, 4, 30.5], ["packages/tailwindcss/src/attribute-selector-parser.ts", 232, 2, 30.5], ["packages/@tailwindcss-webpack/README.md", 102, 3, 30.3], ["packages/tailwindcss/src/index.bench.ts", 18, 7, 29.7], ["crates/node/Cargo.toml", 17, 7, 28.9], ["packages/tailwindcss/src/utils/brace-expansion.ts", 91, 3, 28.6], ["crates/oxide/src/extractor/pre_processors/markdown.rs", 83, 3, 27.3], ["packages/tailwindcss/src/utils/brace-expansion.test.ts", 81, 3, 27.0], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-legacy-classes.test.ts", 45, 4, 26.8], ["packages/@tailwindcss-browser/tests/ui.spec.ts", 176, 2, 26.5], ["crates/ignore/src/pathutil.rs", 171, 2, 26.2], ["packages/tailwindcss/src/utils/compare.test.ts", 168, 2, 25.9], ["crates/oxide/src/extractor/pre_processors/test-fixtures/haml/src-17051.haml", 155, 2, 24.9], ["crates/oxide/src/extractor/pre_processors/elixir.rs", 154, 2, 24.8], ["packages/@tailwindcss-postcss/src/postcss-fix-relative-paths/index.test.ts", 66, 3, 24.4], ["crates/ignore/examples/walk.rs", 64, 3, 24.0], ["packages/@tailwindcss-browser/README.md", 36, 4, 24.0], ["packages/@tailwindcss-cli/README.md", 36, 4, 24.0], ["packages/@tailwindcss-node/README.md", 36, 4, 24.0], ["packages/@tailwindcss-upgrade/README.md", 36, 4, 24.0], ["packages/tailwindcss/README.md", 36, 4, 24.0], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-simple-legacy-classes.ts", 63, 3, 23.8], ["crates/oxide/src/fixtures/example.html", 552, 1, 23.5], ["packages/tailwindcss/src/utils/compare.ts", 61, 3, 23.4], ["packages/@tailwindcss-node/src/source-maps.ts", 60, 3, 23.2], ["packages/tailwindcss/src/source-maps/visualize-source-map.ts", 538, 1, 23.2], ["crates/oxide/fuzz/Cargo.lock", 531, 1, 23.0], ["packages/@tailwindcss-browser/tsup.config.ts", 32, 4, 22.6], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-media-screen.ts", 53, 3, 21.8], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-legacy-arbitrary-values.ts", 29, 4, 21.5], ["packages/tailwindcss/src/compat/dark-mode.ts", 51, 3, 21.4], ["crates/ignore/Cargo.toml", 50, 3, 21.2], ["integrations/postcss/multi-root.test.ts", 50, 3, 21.2], ["packages/tailwindcss/src/utils/escape.test.ts", 50, 3, 21.2], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-config.ts", 110, 2, 21.0], ["packages/@tailwindcss-postcss/src/ast.test.ts", 107, 2, 20.7], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-tailwind-directives.test.ts", 420, 1, 20.5], ["crates/oxide/src/scanner/init_tracing.rs", 102, 2, 20.2], ["packages/@tailwindcss-upgrade/src/utils/walk.ts", 45, 3, 20.1], ["packages/tailwindcss/src/utils/is-valid-arbitrary.ts", 96, 2, 19.6], ["crates/node/src/utf16.rs", 94, 2, 19.4], ["crates/oxide/src/scanner/fixtures/ignored-content-dirs.txt", 15, 5, 19.4], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-variant-order.test.ts", 91, 2, 19.1], ["packages/@tailwindcss-node/src/esm-cache.loader.mts", 40, 3, 19.0], ["packages/tailwindcss/src/compat/config/deep-merge.ts", 40, 3, 19.0], ["crates/oxide/src/fast_skip.rs", 89, 2, 18.9], ["crates/node/scripts/move-artifacts.mjs", 37, 3, 18.2], ["integrations/vite/ignored-packages.test.ts", 81, 2, 18.0], ["integrations/postcss/plugins.test.ts", 79, 2, 17.8], ["packages/tailwindcss/src/source-maps/visualize-source-map.test.ts", 318, 1, 17.8], ["packages/@tailwindcss-postcss/src/postcss-fix-relative-paths/index.ts", 74, 2, 17.2], ["packages/@tailwindcss-postcss/tsup.config.ts", 18, 4, 17.0], ["crates/oxide/src/scanner/auto_source_detection.rs", 71, 2, 16.9], ["packages/tailwindcss/src/attribute-selector-parser.test.ts", 69, 2, 16.6], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-automatic-var-injection.test.ts", 68, 2, 16.5], ["packages/@tailwindcss-browser/playwright.config.ts", 67, 2, 16.4], ["packages/tailwindcss/src/compat/flatten-color-palette.ts", 30, 3, 16.4], [".github/PULL_REQUEST_TEMPLATE.md", 29, 3, 16.2], ["packages/@tailwindcss-upgrade/src/utils/git.ts", 29, 3, 16.2], ["packages/@tailwindcss-upgrade/src/utils/package-version.ts", 29, 3, 16.2], ["packages/@tailwindcss-upgrade/src/codemods/css/split.ts", 257, 1, 16.0], ["packages/tailwindcss/src/ast.bench.ts", 64, 2, 16.0], ["crates/oxide/src/extractor/pre_processors/json.rs", 63, 2, 15.9], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-at-apply.ts", 61, 2, 15.6], ["crates/ignore/README.md", 59, 2, 15.4], ["integrations/vite/html-style-blocks.test.ts", 58, 2, 15.2], ["crates/oxide/src/extractor/bracket_stack.rs", 57, 2, 15.1], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-missing-layers.test.ts", 227, 1, 15.1], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate.ts", 57, 2, 15.1], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-max-width-screen.ts", 25, 3, 15.0], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-prefix.test.ts", 56, 2, 15.0], ["crates/ignore/tests/gitignore_matched_path_or_any_parents_tests.gitignore", 216, 1, 14.7], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-camelcase-in-named-value.ts", 54, 2, 14.7], ["packages/tailwindcss/src/utils/segment.test.ts", 53, 2, 14.6], ["packages/tailwindcss/src/compat/apply-keyframes-to-theme.ts", 23, 3, 14.4], ["packages/tailwindcss/src/utils/variables.ts", 23, 3, 14.4], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-media-screen.test.ts", 197, 1, 14.0], ["packages/tailwindcss/src/utils/compare-breakpoints.ts", 48, 2, 13.9], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-tailwind-directives.ts", 188, 1, 13.7], ["packages/@tailwindcss-upgrade/src/utils/resolve.ts", 47, 2, 13.7], ["packages/tailwindcss/src/compat/config/create-compat-config.test.ts", 189, 1, 13.7], ["crates/oxide/src/extractor/pre_processors/twig.rs", 179, 1, 13.4], ["packages/@tailwindcss-cli/src/utils/disposables.ts", 45, 2, 13.4], ["scripts/release-channel.js", 20, 3, 13.4], ["packages/@tailwindcss-node/src/env.ts", 44, 2, 13.3], ["playgrounds/vite/src/app.tsx", 7, 5, 13.2], ["crates/oxide/src/extractor/pre_processors/razor.rs", 42, 2, 13.0], ["packages/@tailwindcss-upgrade/src/commands/help/index.ts", 170, 1, 13.0], ["integrations/vite/preact.test.ts", 165, 1, 12.8], ["crates/oxide/src/extractor/machine.rs", 161, 1, 12.7], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-missing-layers.ts", 161, 1, 12.7], ["packages/@tailwindcss-upgrade/src/codemods/css/sort-buckets.ts", 161, 1, 12.7], ["packages/@tailwindcss-node/tsup.config.ts", 40, 2, 12.6], ["packages/@tailwindcss-standalone/src/types.d.ts", 10, 4, 12.6], ["packages/@tailwindcss-upgrade/src/utils/args.ts", 160, 1, 12.6], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-handle-empty-arbitrary-values.test.ts", 39, 2, 12.5], ["packages/tailwindcss/src/css-parser.bench.ts", 16, 3, 12.0], ["packages/@tailwindcss-cli/src/commands/build/utils.ts", 35, 2, 11.8], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-theme-to-var.ts", 34, 2, 11.7], ["packages/@tailwindcss-upgrade/src/codemods/template/prepare-config.ts", 133, 1, 11.5], ["playgrounds/nextjs/tsconfig.json", 33, 2, 11.5], ["playgrounds/v3/tsconfig.json", 33, 2, 11.5], ["packages/@tailwindcss-cli/src/utils/resolve.ts", 32, 2, 11.3], ["packages/tailwindcss/src/compat/flatten-color-palette.test.ts", 32, 2, 11.3], ["packages/tailwindcss/src/utils/infer-data-type.bench.ts", 32, 2, 11.3], ["crates/node/.cargo/config.toml", 14, 3, 11.2], ["packages/@tailwindcss-upgrade/src/utils/args.test.ts", 123, 1, 11.1], ["packages/@tailwindcss-upgrade/src/codemods/css/link.ts", 122, 1, 11.0], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-simple-legacy-classes.test.ts", 30, 2, 11.0], ["packages/tailwindcss/src/sort.ts", 30, 2, 11.0], ["scripts/release-notes.mjs", 29, 2, 10.8], ["integrations/vite/solidstart.test.ts", 108, 1, 10.4], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-handle-empty-arbitrary-values.ts", 27, 2, 10.4], ["packages/@tailwindcss-node/src/get-module-dependencies.ts", 106, 1, 10.3], ["playgrounds/vite/tsconfig.json", 26, 2, 10.2], ["integrations/vite/qwik.test.ts", 100, 1, 10.0], ["packages/tailwindcss/src/source-maps/line-table.ts", 100, 1, 10.0], ["packages/@tailwindcss-turbopack/README.md", 99, 1, 9.9], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-import.test.ts", 97, 1, 9.8], ["packages/tsconfig.base.json", 24, 2, 9.8], ["packages/tailwindcss/src/sort.bench.ts", 23, 2, 9.6], ["packages/tailwindcss/src/test-utils/custom-serializer.ts", 23, 2, 9.6], ["playgrounds/nextjs/app/layout.tsx", 23, 2, 9.6], ["packages/tailwindcss/src/source-maps/line-table.test.ts", 87, 1, 9.3], ["packages/@tailwindcss-upgrade/src/codemods/css/format-nodes.ts", 84, 1, 9.2], ["packages/tailwindcss/src/canonicalize-calc-expressions.ts", 82, 1, 9.1], ["integrations/vite/sveltekit.test.ts", 80, 1, 8.9], ["packages/tailwindcss/src/utils/dimensions.ts", 20, 2, 8.9], ["patches/@napi-rs__cli@3.7.4.patch", 80, 1, 8.9], ["rust-toolchain.toml", 3, 5, 8.7], ["packages/tailwindcss/src/compat/colors.cts", 8, 3, 8.5], ["packages/tailwindcss/src/compat/default-theme.cts", 8, 3, 8.5], ["packages/tailwindcss/src/utils/lru-default-map.test.ts", 70, 1, 8.4], ["patches/@parcel__watcher@2.6.0.patch", 70, 1, 8.4], ["packages/tailwindcss/src/compat/theme-variants.ts", 68, 1, 8.2], ["crates/oxide/src/main.rs", 65, 1, 8.1], ["crates/oxide/src/paths.rs", 65, 1, 8.1], ["patches/lightningcss@1.33.0.patch", 62, 1, 7.9], ["crates/oxide/src/scanner/fixtures/template-extensions.txt", 61, 1, 7.8], ["scripts/lock-pre-release-versions.mjs", 60, 1, 7.7], ["packages/tailwindcss/src/intellisense.bench.ts", 56, 1, 7.5], ["crates/oxide/src/scanner/fixtures/ignored-extensions.txt", 6, 3, 7.3], ["crates/oxide/src/scanner/fixtures/ignored-files.txt", 6, 3, 7.3], ["packages/@tailwindcss-upgrade/tsconfig.json", 6, 3, 7.3], ["packages/tailwindcss/src/utils/to-key-path.ts", 54, 1, 7.3], ["crates/oxide/src/extractor/pre_processors/template_toolkit.rs", 52, 1, 7.2], ["crates/oxide/src/throughput.rs", 52, 1, 7.2], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-import.ts", 52, 1, 7.2], ["packages/@tailwindcss-upgrade/src/utils/write-file-safely.ts", 49, 1, 7.0], ["packages/@tailwindcss-node/src/normalize-path.ts", 47, 1, 6.9], ["playgrounds/vite/src/index.html", 12, 2, 6.9], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-theme-to-var.test.ts", 46, 1, 6.8], ["packages/@tailwindcss-upgrade/src/codemods/css/format-nodes.test.ts", 45, 1, 6.7], ["packages/tailwindcss/src/cartesian.ts", 45, 1, 6.7], ["playgrounds/nextjs/app/page.module.css", 5, 3, 6.7], ["playgrounds/nextjs/postcss.config.js", 5, 3, 6.7], ["crates/oxide/src/extractor/pre_processors/svelte.rs", 43, 1, 6.6], ["packages/@tailwindcss-turbopack/package.json", 43, 1, 6.6], ["playgrounds/vite/src/main.tsx", 11, 2, 6.6], ["packages/@tailwindcss-upgrade/src/utils/splice-changes-into-string.ts", 42, 1, 6.5], ["playgrounds/v3/scripts/upgrade.mjs", 40, 1, 6.3], ["packages/tailwindcss/src/compiler-lifetime.test.ts", 38, 1, 6.2], ["packages/@tailwindcss-vite/tsup.config.ts", 9, 2, 6.0], ["packages/tailwindcss/src/utils/topological-sort.ts", 36, 1, 6.0], ["playgrounds/nextjs/README.md", 36, 1, 6.0], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-variants-directive.test.ts", 35, 1, 5.9], ["packages/@tailwindcss-upgrade/src/codemods/css/migrate-variants-directive.ts", 35, 1, 5.9], ["packages/tailwindcss/src/attribute-selector-parser.bench.ts", 35, 1, 5.9], ["packages/tailwindcss/src/utils/lru-default-map.ts", 34, 1, 5.8], ["integrations/oxide/workers.test.ts", 32, 1, 5.7], ["packages/@tailwindcss-cli/tsup.config.ts", 8, 2, 5.7], ["packages/tailwindcss/src/plugin.cts", 8, 2, 5.7], ["crates/oxide/fuzz/fuzz_targets/parsing.rs", 31, 1, 5.6], ["crates/oxide/src/extractor/pre_processors/test-fixtures/haml/dst-17813.haml", 30, 1, 5.5], ["packages/@tailwindcss-browser/src/instrumentation.ts", 29, 1, 5.4], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-canonicalize-candidate.ts", 29, 1, 5.4], ["packages/@tailwindcss-cli/src/utils/format-ns.test.ts", 28, 1, 5.3], ["packages/@tailwindcss-upgrade/src/utils/format-ns.test.ts", 28, 1, 5.3], ["crates/oxide/fuzz/Cargo.toml", 27, 1, 5.2], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-canonicalize-candidate.test.ts", 27, 1, 5.2], ["packages/tailwindcss/src/source-maps/source.ts", 27, 1, 5.2], ["packages/@tailwindcss-node/tsconfig.json", 6, 2, 4.9], ["packages/@tailwindcss-postcss/tsconfig.json", 6, 2, 4.9], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-camelcase-in-named-value.test.ts", 24, 1, 4.9], ["packages/@tailwindcss-webpack/tsconfig.json", 6, 2, 4.9], ["packages/tailwindcss/src/canonicalize-calc-expressions.test.ts", 24, 1, 4.9], ["packages/tailwindcss/tsconfig.json", 6, 2, 4.9], ["packages/@tailwindcss-cli/src/utils/format-ns.ts", 23, 1, 4.8], ["packages/@tailwindcss-upgrade/src/utils/format-ns.ts", 23, 1, 4.8], ["playgrounds/v3/app/layout.tsx", 23, 1, 4.8], ["scripts/pre-publish-optimizations.mjs", 21, 1, 4.6], ["packages/@tailwindcss-cli/src/utils/test-helpers.ts", 5, 2, 4.5], ["packages/tailwindcss/src/utils/default-map.ts", 20, 1, 4.5], ["playgrounds/nextjs/app/page.tsx", 5, 2, 4.5], ["crates/oxide/src/extractor/pre_processors/test-fixtures/haml/src-17813.haml", 19, 1, 4.4], ["packages/@tailwindcss-turbopack/tsup.config.ts", 19, 1, 4.4], ["packages/@tailwindcss-webpack/tsup.config.ts", 19, 1, 4.4], ["packages/@tailwindcss-upgrade/src/utils/walk-variants.ts", 18, 1, 4.2], ["crates/ignore/tests/gitignore_skip_bom.rs", 17, 1, 4.1], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-legacy-arbitrary-values.test.ts", 15, 1, 3.9], ["packages/tailwindcss/src/utils/decode-arbitrary-value.bench.ts", 15, 1, 3.9], ["packages/tailwindcss/src/index.cts", 14, 1, 3.7], ["packages/tailwindcss/src/utils/brace-expansion.bench.ts", 14, 1, 3.7], ["packages/tailwindcss/src/utils/segment.bench.ts", 14, 1, 3.7], ["packages/@tailwindcss-cli/src/commands/canonicalize/fixtures/plugin-with-logs.mjs", 13, 1, 3.6], ["packages/tailwindcss/src/source-maps/line-table.bench.ts", 13, 1, 3.6], ["packages/tailwindcss/src/utils/to-key-path.test.ts", 13, 1, 3.6], ["crates/classification-macros/Cargo.toml", 12, 1, 3.5], ["crates/node/npm/wasm32-wasi/README.md", 3, 2, 3.5], ["packages/@tailwindcss-upgrade/src/codemods/template/migrate-max-width-screen.test.ts", 12, 1, 3.5], ["packages/tailwindcss/src/utils/to-key-path.bench.ts", 12, 1, 3.5], ["packages/tailwindcss/vitest.config.mts", 12, 1, 3.5], ["packages/@tailwindcss-browser/src/assets.ts", 11, 1, 3.3], ["packages/@tailwindcss-node/src/source-maps.test.ts", 8, 1, 2.8], ["packages/@tailwindcss-upgrade/tsup.config.ts", 8, 1, 2.8], ["packages/tailwindcss/src/compat/flatten-color-palette.cts", 8, 1, 2.8], ["vitest.config.mts", 8, 1, 2.8], ["integrations/vitest.config.mts", 7, 1, 2.6], ["packages/@tailwindcss-browser/vitest.config.mts", 7, 1, 2.6], ["packages/@tailwindcss-postcss/src/index.cts", 7, 1, 2.6], ["packages/tailwindcss/src/utils/replace-object.ts", 7, 1, 2.6], ["playgrounds/nextjs/.eslintrc.json", 7, 1, 2.6], ["playgrounds/v3/.eslintrc.json", 7, 1, 2.6], ["playgrounds/vite/vite.config.ts", 7, 1, 2.6], ["Cargo.toml", 6, 1, 2.4], ["packages/@tailwindcss-browser/tsconfig.json", 6, 1, 2.4], ["packages/@tailwindcss-turbopack/tsconfig.json", 6, 1, 2.4], ["packages/internal-example-plugin/package.json", 6, 1, 2.4], ["playgrounds/v3/postcss.config.js", 6, 1, 2.4], ["crates/node/build.rs", 5, 1, 2.2], ["packages/@tailwindcss-node/src/require-cache.cts", 5, 1, 2.2], ["packages/@tailwindcss-node/src/require-cache.ts", 5, 1, 2.2], ["packages/@tailwindcss-postcss/src/postcss-fix-relative-paths/fixtures/external-import/src/plugins-in-root.css", 5, 1, 2.2], ["packages/@tailwindcss-turbopack/src/index.cts", 5, 1, 2.2], ["packages/@tailwindcss-webpack/src/index.cts", 5, 1, 2.2], ["packages/tailwindcss/index.css", 5, 1, 2.2], ["packages/tailwindcss/src/node.d.ts", 5, 1, 2.2], ["packages/@tailwindcss-browser/src/types.d.ts", 4, 1, 2.0], ["packages/@tailwindcss-postcss/src/fixtures/example-project/index.html", 1, 2, 2.0], ["packages/@tailwindcss-postcss/src/fixtures/example-project/plugin.js", 4, 1, 2.0], ["packages/@tailwindcss-postcss/src/postcss-fix-relative-paths/fixtures/example-project/src/index.css", 4, 1, 2.0], ["packages/@tailwindcss-postcss/src/postcss-fix-relative-paths/fixtures/example-project/src/invalid.css", 4, 1, 2.0], ["packages/internal-example-plugin/index.js", 4, 1, 2.0], ["playgrounds/nextjs/next.config.mjs", 4, 1, 2.0], ["playgrounds/v3/next.config.mjs", 4, 1, 2.0], ["playgrounds/v3/tailwind.config.js", 4, 1, 2.0], ["crates/node/npm/android-arm-eabi/README.md", 3, 1, 1.7], ["crates/node/npm/android-arm64/README.md", 3, 1, 1.7], ["crates/node/npm/darwin-arm64/README.md", 3, 1, 1.7], ["crates/node/npm/darwin-x64/README.md", 3, 1, 1.7], ["crates/node/npm/freebsd-x64/README.md", 3, 1, 1.7], ["crates/node/npm/linux-arm-gnueabihf/README.md", 3, 1, 1.7], ["crates/node/npm/linux-arm64-gnu/README.md", 3, 1, 1.7], ["crates/node/npm/linux-arm64-musl/README.md", 3, 1, 1.7], ["crates/node/npm/linux-x64-gnu/README.md", 3, 1, 1.7], ["crates/node/npm/linux-x64-musl/README.md", 3, 1, 1.7], ["crates/node/npm/win32-arm64-msvc/README.md", 3, 1, 1.7], ["crates/node/npm/win32-x64-msvc/README.md", 3, 1, 1.7], ["packages/@tailwindcss-cli/tsconfig.json", 3, 1, 1.7], ["packages/@tailwindcss-postcss/src/postcss-fix-relative-paths/fixtures/external-import/src/plugins-in-sibling.css", 3, 1, 1.7], ["packages/@tailwindcss-standalone/tsconfig.json", 3, 1, 1.7], ["packages/@tailwindcss-upgrade/src/codemods/css/fixtures/test.css", 3, 1, 1.7], ["packages/@tailwindcss-vite/tsconfig.json", 3, 1, 1.7], ["playgrounds/v3/app/globals.css", 3, 1, 1.7], ["playgrounds/v3/app/page.tsx", 3, 1, 1.7], ["crates/ignore/tests/gitignore_skip_bom.gitignore", 2, 1, 1.4], ["crates/node/rustfmt.toml", 2, 1, 1.4], ["packages/@tailwindcss-cli/src/commands/canonicalize/fixtures/input-with-plugin-logs.css", 2, 1, 1.4], [".github/FUNDING.yml", 1, 1, 1.0], [".github/logo-dark.svg", 1, 1, 1.0], [".github/logo-light.svg", 1, 1, 1.0], ["packages/@tailwindcss-cli/src/commands/canonicalize/fixtures/input.css", 1, 1, 1.0], ["packages/@tailwindcss-postcss/src/fixtures/example-project/input.css", 1, 1, 1.0], ["packages/@tailwindcss-postcss/src/fixtures/example-project/src/index.js", 1, 1, 1.0], ["packages/@tailwindcss-postcss/src/fixtures/example-project/src/relative-import.css", 1, 1, 1.0], ["packages/@tailwindcss-postcss/src/postcss-fix-relative-paths/fixtures/external-import/src/index.css", 1, 1, 1.0], ["packages/@tailwindcss-postcss/src/postcss-fix-relative-paths/fixtures/external-import/src/invalid.css", 1, 1, 1.0], ["packages/tailwindcss/src/types.ts", 1, 1, 1.0], ["packages/tailwindcss/utilities.css", 1, 1, 1.0], ["playgrounds/nextjs/app/globals.css", 1, 1, 1.0], ["playgrounds/nextjs/public/next.svg", 1, 1, 1.0], ["playgrounds/nextjs/public/vercel.svg", 1, 1, 1.0], ["playgrounds/vite/src/index.css", 1, 1, 1.0]]}</script><script>
+(function() {
+	const data = JSON.parse(document.getElementById('hotspot-data').textContent);
+	const points = data.points.map(function(p) {
+		return { path: p[0], x: p[1], y: p[2], score: p[3] };
+	});
+	const scores = points.map(function(p) { return p.score; });
+	const low = Math.min.apply(null, scores);
+	const range = (Math.max.apply(null, scores) - low) || 1;
+
+	// One dataset per quadrant around the medians: each gets a legend entry and
+	// a --series-N color that applyChartTheme() keeps in step with the theme.
+	const large = function(p) { return p.x >= data.medianLines; };
+	const busy = function(p) { return p.y >= data.medianChurn; };
+	const quadrants = [
+		['Large, changed often', 3, function(p) { return large(p) && busy(p); }],
+		['Small, changed often', 5, function(p) { return !large(p) && busy(p); }],
+		['Large, rarely changed', 2, function(p) { return large(p) && !busy(p); }],
+		['Small, rarely changed', 1, function(p) { return !large(p) && !busy(p); }]
+	];
+	const datasets = quadrants.map(function(q) {
+		const own = points.filter(q[2]);
+		const color = getCSSVar('--series-' + q[1]);
+		// a bigger dot is a higher score
+		const radius = own.map(function(p) { return 3 + 9 * (p.score - low) / range; });
+		return {
+			label: q[0],
+			series: q[1],
+			data: own,
+			borderColor: color,
+			backgroundColor: color + '33',
+			borderWidth: 1.5,
+			pointRadius: radius,
+			pointHoverRadius: radius.map(function(r) { return r + 2; }),
+			pointHitRadius: 6,
+			clip: 16  // dots on the axes (one line, one change) are drawn whole
+		};
+	}).filter(function(ds) { return ds.data.length; });
+
+	// Dashed lines at the median size and the median change count
+	const medianLines = {
+		id: 'gsMedianLines',
+		beforeDatasetsDraw: function(chart) {
+			const ctx = chart.ctx, area = chart.chartArea;
+			const x = chart.scales.x.getPixelForValue(data.medianLines);
+			const y = chart.scales.y.getPixelForValue(data.medianChurn);
+			ctx.save();
+			ctx.strokeStyle = getCSSVar('--border-strong');
+			ctx.setLineDash([3, 3]);
+			ctx.beginPath();
+			ctx.moveTo(x, area.top); ctx.lineTo(x, area.bottom);
+			ctx.moveTo(area.left, y); ctx.lineTo(area.right, y);
+			ctx.stroke();
+			ctx.restore();
+		}
+	};
+
+	// A logarithmic axis ticked at 1, 2, 5, 10, 20, 50, ... with room past the
+	// largest value, so the highest-scoring dots are not drawn on the frame
+	function logAxis(title) {
+		return {
+			type: 'logarithmic',
+			min: 1,
+			title: { display: true, text: title },
+			afterDataLimits: function(scale) { scale.max *= 1.3; },
+			afterBuildTicks: function(scale) {
+				scale.ticks = scale.ticks.filter(function(tick) {
+					const lead = tick.value / Math.pow(10, Math.floor(Math.log10(tick.value) + 1e-9));
+					return [1, 2, 5].some(function(n) { return Math.abs(lead - n) < 1e-6; });
+				});
+			},
+			ticks: {
+				maxRotation: 0,
+				callback: function(value) { return value.toLocaleString(); }
+			}
+		};
+	}
+
+	applyChartTheme();
+	new Chart(document.getElementById('chart-hotspots').getContext('2d'), {
+		type: 'scatter',
+		plugins: [medianLines],
+		data: { datasets: datasets },
+		options: {
+			responsive: true,
+			maintainAspectRatio: false,
+			plugins: {
+				legend: { display: true, labels: { usePointStyle: true, pointStyle: 'circle' } },
+				tooltip: {
+					callbacks: {
+						// the path on its own line: a deep one is as wide as the rest together
+						label: function(item) {
+							const p = item.raw;
+							return [p.path, p.x.toLocaleString() + (p.x === 1 ? ' line' : ' lines')
+								+ ', changed ' + p.y.toLocaleString() + (p.y === 1 ? ' time' : ' times')
+								+ ', score ' + p.score.toLocaleString()];
+						}
+					}
+				}
+			},
+			scales: {
+				x: logAxis('File size (lines)'),
+				y: logAxis('Changes (commits)')
+			}
+		}
+	});
+})();
+</script>
+<h2 id="top_hotspots"><a href="#top_hotspots">Top hotspots</a></h2>
+
+<p class="section-note">The files ranked by hotspot score: the larger a file is and the more often it changes, the higher it ranks. <strong>Authors</strong> is how many people have changed the file, bots aside, as on the <a href="ownership.html">Code Ownership</a> page: a hotspot only one person has changed is also a bus-factor risk.</p><div class="table-scroll"><table class="sortable share-table file-table" id="hotspots"><tr><th>File</th><th class="num">Lines</th><th class="num">Changes</th><th class="num">Authors</th><th class="num">Score</th><th class="unsortable"></th></tr><tr><td class="path">CHANGELOG.md</td><td class="num" data-label="Lines">4,453</td><td class="num" data-label="Changes">1,742</td><td class="num" data-label="Authors">130</td><td class="num" data-label="Score">116,245.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/utilities.test.ts</td><td class="num" data-label="Lines">31,755</td><td class="num" data-label="Changes">220</td><td class="num" data-label="Authors">24</td><td class="num" data-label="Score">39,203.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 33.7%"></span></span></td></tr><tr><td class="path">pnpm-lock.yaml</td><td class="num" data-label="Lines">6,053</td><td class="num" data-label="Changes">371</td><td class="num" data-label="Authors">14</td><td class="num" data-label="Score">28,864.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 24.8%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/utilities.ts</td><td class="num" data-label="Lines">6,855</td><td class="num" data-label="Changes">199</td><td class="num" data-label="Authors">22</td><td class="num" data-label="Score">16,476.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 14.2%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/index.test.ts</td><td class="num" data-label="Lines">7,366</td><td class="num" data-label="Changes">128</td><td class="num" data-label="Authors">16</td><td class="num" data-label="Score">10,985.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 9.5%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/__snapshots__/intellisense.test.ts.snap</td><td class="num" data-label="Lines">13,309</td><td class="num" data-label="Changes">78</td><td class="num" data-label="Authors">12</td><td class="num" data-label="Score">8,998.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 7.7%"></span></span></td></tr><tr><td class="path">package.json</td><td class="num" data-label="Lines">64</td><td class="num" data-label="Changes">832</td><td class="num" data-label="Authors">21</td><td class="num" data-label="Score">6,656.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 5.7%"></span></span></td></tr><tr><td class="path">integrations/upgrade/index.test.ts</td><td class="num" data-label="Lines">3,512</td><td class="num" data-label="Changes">67</td><td class="num" data-label="Authors">9</td><td class="num" data-label="Score">3,970.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.4%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/variants.test.ts</td><td class="num" data-label="Lines">3,037</td><td class="num" data-label="Changes">68</td><td class="num" data-label="Authors">13</td><td class="num" data-label="Score">3,747.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.2%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/compat/plugin-api.test.ts</td><td class="num" data-label="Lines">4,631</td><td class="num" data-label="Changes">54</td><td class="num" data-label="Authors">10</td><td class="num" data-label="Score">3,674.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.2%"></span></span></td></tr></table></div><details class="table-details"><summary>Table: the 100 highest-scoring of 542 files</summary><div class="table-scroll"><table class="sortable share-table file-table" id="hotspots-all"><tr><th>File</th><th class="num">Lines</th><th class="num">Changes</th><th class="num">Authors</th><th class="num">Score</th><th class="unsortable"></th></tr><tr><td class="path">CHANGELOG.md</td><td class="num" data-label="Lines">4,453</td><td class="num" data-label="Changes">1,742</td><td class="num" data-label="Authors">130</td><td class="num" data-label="Score">116,245.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/utilities.test.ts</td><td class="num" data-label="Lines">31,755</td><td class="num" data-label="Changes">220</td><td class="num" data-label="Authors">24</td><td class="num" data-label="Score">39,203.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 33.7%"></span></span></td></tr><tr><td class="path">pnpm-lock.yaml</td><td class="num" data-label="Lines">6,053</td><td class="num" data-label="Changes">371</td><td class="num" data-label="Authors">14</td><td class="num" data-label="Score">28,864.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 24.8%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/utilities.ts</td><td class="num" data-label="Lines">6,855</td><td class="num" data-label="Changes">199</td><td class="num" data-label="Authors">22</td><td class="num" data-label="Score">16,476.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 14.2%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/index.test.ts</td><td class="num" data-label="Lines">7,366</td><td class="num" data-label="Changes">128</td><td class="num" data-label="Authors">16</td><td class="num" data-label="Score">10,985.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 9.5%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/__snapshots__/intellisense.test.ts.snap</td><td class="num" data-label="Lines">13,309</td><td class="num" data-label="Changes">78</td><td class="num" data-label="Authors">12</td><td class="num" data-label="Score">8,998.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 7.7%"></span></span></td></tr><tr><td class="path">package.json</td><td class="num" data-label="Lines">64</td><td class="num" data-label="Changes">832</td><td class="num" data-label="Authors">21</td><td class="num" data-label="Score">6,656.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 5.7%"></span></span></td></tr><tr><td class="path">integrations/upgrade/index.test.ts</td><td class="num" data-label="Lines">3,512</td><td class="num" data-label="Changes">67</td><td class="num" data-label="Authors">9</td><td class="num" data-label="Score">3,970.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.4%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/variants.test.ts</td><td class="num" data-label="Lines">3,037</td><td class="num" data-label="Changes">68</td><td class="num" data-label="Authors">13</td><td class="num" data-label="Score">3,747.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.2%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/compat/plugin-api.test.ts</td><td class="num" data-label="Lines">4,631</td><td class="num" data-label="Changes">54</td><td class="num" data-label="Authors">10</td><td class="num" data-label="Score">3,674.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 3.2%"></span></span></td></tr><tr><td class="path">integrations/cli/index.test.ts</td><td class="num" data-label="Lines">3,222</td><td class="num" data-label="Changes">55</td><td class="num" data-label="Authors">13</td><td class="num" data-label="Score">3,121.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.7%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/ast.ts</td><td class="num" data-label="Lines">2,083</td><td class="num" data-label="Changes">58</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">2,647.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.3%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/index.ts</td><td class="num" data-label="Lines">875</td><td class="num" data-label="Changes">86</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">2,543.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.2%"></span></span></td></tr><tr><td class="path">integrations/upgrade/js-config.test.ts</td><td class="num" data-label="Lines">2,187</td><td class="num" data-label="Changes">52</td><td class="num" data-label="Authors">9</td><td class="num" data-label="Score">2,431.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.1%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/canonicalize-candidates.ts</td><td class="num" data-label="Lines">3,275</td><td class="num" data-label="Changes">42</td><td class="num" data-label="Authors">9</td><td class="num" data-label="Score">2,403.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 2.1%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/variants.ts</td><td class="num" data-label="Lines">1,348</td><td class="num" data-label="Changes">61</td><td class="num" data-label="Authors">9</td><td class="num" data-label="Score">2,239.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.9%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/tests/ui.spec.ts</td><td class="num" data-label="Lines">2,596</td><td class="num" data-label="Changes">43</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">2,190.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.9%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/canonicalize-candidates.test.ts</td><td class="num" data-label="Lines">2,047</td><td class="num" data-label="Changes">47</td><td class="num" data-label="Authors">10</td><td class="num" data-label="Score">2,126.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.8%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/compat/config.test.ts</td><td class="num" data-label="Lines">1,849</td><td class="num" data-label="Changes">48</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">2,064.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.8%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-vite/src/index.ts</td><td class="num" data-label="Lines">543</td><td class="num" data-label="Changes">76</td><td class="num" data-label="Authors">19</td><td class="num" data-label="Score">1,771.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.5%"></span></span></td></tr><tr><td class="path">crates/oxide/tests/scanner.rs</td><td class="num" data-label="Lines">4,080</td><td class="num" data-label="Changes">27</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">1,724.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.5%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/css-functions.test.ts</td><td class="num" data-label="Lines">1,573</td><td class="num" data-label="Changes">43</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">1,705.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.5%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/candidate.test.ts</td><td class="num" data-label="Lines">2,206</td><td class="num" data-label="Changes">34</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">1,596.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.4%"></span></span></td></tr><tr><td class="path">integrations/utils.ts</td><td class="num" data-label="Lines">896</td><td class="num" data-label="Changes">52</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">1,556.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.3%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/candidate.ts</td><td class="num" data-label="Lines">1,246</td><td class="num" data-label="Changes">43</td><td class="num" data-label="Authors">10</td><td class="num" data-label="Score">1,517.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.3%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/__snapshots__/utilities.test.ts.snap</td><td class="num" data-label="Lines">2,058</td><td class="num" data-label="Changes">32</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">1,451.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.2%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/package.json</td><td class="num" data-label="Lines">138</td><td class="num" data-label="Changes">122</td><td class="num" data-label="Authors">6</td><td class="num" data-label="Score">1,433.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.2%"></span></span></td></tr><tr><td class="path">integrations/vite/index.test.ts</td><td class="num" data-label="Lines">1,726</td><td class="num" data-label="Changes">34</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">1,412.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.2%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-cli/src/commands/build/index.ts</td><td class="num" data-label="Lines">874</td><td class="num" data-label="Changes">46</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">1,359.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.2%"></span></span></td></tr><tr><td class="path">.github/workflows/release.yml</td><td class="num" data-label="Lines">358</td><td class="num" data-label="Changes">64</td><td class="num" data-label="Authors">6</td><td class="num" data-label="Score">1,210.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.0%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-postcss/src/__snapshots__/index.test.ts.snap</td><td class="num" data-label="Lines">310</td><td class="num" data-label="Changes">68</td><td class="num" data-label="Authors">15</td><td class="num" data-label="Score">1,197.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.0%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/intellisense.test.ts</td><td class="num" data-label="Lines">784</td><td class="num" data-label="Changes">41</td><td class="num" data-label="Authors">6</td><td class="num" data-label="Score">1,148.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 1.0%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-standalone/package.json</td><td class="num" data-label="Lines">55</td><td class="num" data-label="Changes">142</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">1,053.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.9%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/compat/plugin-api.ts</td><td class="num" data-label="Lines">657</td><td class="num" data-label="Changes">41</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">1,050.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.9%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/__snapshots__/index.test.ts.snap</td><td class="num" data-label="Lines">393</td><td class="num" data-label="Changes">52</td><td class="num" data-label="Authors">11</td><td class="num" data-label="Score">1,030.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.9%"></span></span></td></tr><tr><td class="path">crates/node/package.json</td><td class="num" data-label="Lines">77</td><td class="num" data-label="Changes">116</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">1,017.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.9%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-postcss/src/index.ts</td><td class="num" data-label="Lines">402</td><td class="num" data-label="Changes">45</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">902.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.8%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-postcss/package.json</td><td class="num" data-label="Lines">51</td><td class="num" data-label="Changes">122</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">871.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.7%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-upgrade/package.json</td><td class="num" data-label="Lines">52</td><td class="num" data-label="Changes">118</td><td class="num" data-label="Authors">6</td><td class="num" data-label="Score">850.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.7%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-postcss/src/index.test.ts</td><td class="num" data-label="Lines">630</td><td class="num" data-label="Changes">33</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">828.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.7%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-node/package.json</td><td class="num" data-label="Lines">64</td><td class="num" data-label="Changes">103</td><td class="num" data-label="Authors">6</td><td class="num" data-label="Score">824.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.7%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/theme.css</td><td class="num" data-label="Lines">510</td><td class="num" data-label="Changes">36</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">813.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.7%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-upgrade/src/index.ts</td><td class="num" data-label="Lines">461</td><td class="num" data-label="Changes">37</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">794.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.7%"></span></span></td></tr><tr><td class="path">crates/oxide/src/scanner/mod.rs</td><td class="num" data-label="Lines">952</td><td class="num" data-label="Changes">25</td><td class="num" data-label="Authors">6</td><td class="num" data-label="Score">771.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.7%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-cli/package.json</td><td class="num" data-label="Lines">40</td><td class="num" data-label="Changes">120</td><td class="num" data-label="Authors">6</td><td class="num" data-label="Score">758.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.7%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-vite/package.json</td><td class="num" data-label="Lines">42</td><td class="num" data-label="Changes">116</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">751.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path">Cargo.lock</td><td class="num" data-label="Lines">948</td><td class="num" data-label="Changes">24</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">739.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/css-parser.test.ts</td><td class="num" data-label="Lines">1,334</td><td class="num" data-label="Changes">20</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">730.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/ast.test.ts</td><td class="num" data-label="Lines">1,998</td><td class="num" data-label="Changes">16</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">715.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path">integrations/postcss/index.test.ts</td><td class="num" data-label="Lines">893</td><td class="num" data-label="Changes">23</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">687.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path">crates/oxide/src/extractor/mod.rs</td><td class="num" data-label="Lines">1,149</td><td class="num" data-label="Changes">20</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">677.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path">.github/workflows/prepare-release.yml</td><td class="num" data-label="Lines">307</td><td class="num" data-label="Changes">38</td><td class="num" data-label="Authors">6</td><td class="num" data-label="Score">665.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.6%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/theme.ts</td><td class="num" data-label="Lines">304</td><td class="num" data-label="Changes">36</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">627.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.5%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/compile.ts</td><td class="num" data-label="Lines">402</td><td class="num" data-label="Changes">30</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">601.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.5%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/compat/apply-compat-hooks.ts</td><td class="num" data-label="Lines">438</td><td class="num" data-label="Changes">28</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">586.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.5%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/preflight.css</td><td class="num" data-label="Lines">398</td><td class="num" data-label="Changes">28</td><td class="num" data-label="Authors">12</td><td class="num" data-label="Score">558.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.5%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/compat/apply-config-to-theme.ts</td><td class="num" data-label="Lines">303</td><td class="num" data-label="Changes">32</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">557.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.5%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/css-parser.ts</td><td class="num" data-label="Lines">718</td><td class="num" data-label="Changes">20</td><td class="num" data-label="Authors">8</td><td class="num" data-label="Score">535.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.5%"></span></span></td></tr><tr><td class="path">.github/workflows/ci.yml</td><td class="num" data-label="Lines">124</td><td class="num" data-label="Changes">45</td><td class="num" data-label="Authors">6</td><td class="num" data-label="Score">501.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">playgrounds/nextjs/package.json</td><td class="num" data-label="Lines">24</td><td class="num" data-label="Changes">94</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">460.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">crates/node/npm/linux-arm64-gnu/package.json</td><td class="num" data-label="Lines">30</td><td class="num" data-label="Changes">84</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">460.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">crates/node/npm/linux-arm64-musl/package.json</td><td class="num" data-label="Lines">30</td><td class="num" data-label="Changes">84</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">460.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">crates/node/npm/linux-x64-gnu/package.json</td><td class="num" data-label="Lines">30</td><td class="num" data-label="Changes">84</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">460.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">crates/node/npm/linux-x64-musl/package.json</td><td class="num" data-label="Lines">30</td><td class="num" data-label="Changes">84</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">460.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">playgrounds/v3/package.json</td><td class="num" data-label="Lines">24</td><td class="num" data-label="Changes">90</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">440.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/property-order.ts</td><td class="num" data-label="Lines">440</td><td class="num" data-label="Changes">21</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">440.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">crates/node/npm/android-arm-eabi/package.json</td><td class="num" data-label="Lines">27</td><td class="num" data-label="Changes">84</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">436.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">crates/node/npm/android-arm64/package.json</td><td class="num" data-label="Lines">27</td><td class="num" data-label="Changes">84</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">436.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">crates/node/npm/darwin-arm64/package.json</td><td class="num" data-label="Lines">27</td><td class="num" data-label="Changes">84</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">436.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">crates/node/npm/darwin-x64/package.json</td><td class="num" data-label="Lines">27</td><td class="num" data-label="Changes">84</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">436.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">crates/node/npm/freebsd-x64/package.json</td><td class="num" data-label="Lines">27</td><td class="num" data-label="Changes">84</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">436.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">crates/node/npm/linux-arm-gnueabihf/package.json</td><td class="num" data-label="Lines">27</td><td class="num" data-label="Changes">84</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">436.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">crates/node/npm/win32-x64-msvc/package.json</td><td class="num" data-label="Lines">27</td><td class="num" data-label="Changes">84</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">436.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/design-system.ts</td><td class="num" data-label="Lines">261</td><td class="num" data-label="Changes">27</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">436.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/compat/apply-config-to-theme.test.ts</td><td class="num" data-label="Lines">319</td><td class="num" data-label="Changes">24</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">428.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-node/src/compile.ts</td><td class="num" data-label="Lines">281</td><td class="num" data-label="Changes">25</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">419.1</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/source-maps/source-map.test.ts</td><td class="num" data-label="Lines">893</td><td class="num" data-label="Changes">14</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">418.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.4%"></span></span></td></tr><tr><td class="path">playgrounds/vite/package.json</td><td class="num" data-label="Lines">24</td><td class="num" data-label="Changes">83</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">406.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.3%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/at-import.test.ts</td><td class="num" data-label="Lines">653</td><td class="num" data-label="Changes">15</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">383.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.3%"></span></span></td></tr><tr><td class="path">.github/workflows/integration-tests.yml</td><td class="num" data-label="Lines">126</td><td class="num" data-label="Changes">34</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">381.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.3%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-browser/package.json</td><td class="num" data-label="Lines">37</td><td class="num" data-label="Changes">60</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">365.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.3%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/compat/screens-config.test.ts</td><td class="num" data-label="Lines">669</td><td class="num" data-label="Changes">13</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">336.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.3%"></span></span></td></tr><tr><td class="path">crates/node/npm/win32-arm64-msvc/package.json</td><td class="num" data-label="Lines">27</td><td class="num" data-label="Changes">64</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">332.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.3%"></span></span></td></tr><tr><td class="path">packages/@tailwindcss-upgrade/src/index.test.ts</td><td class="num" data-label="Lines">265</td><td class="num" data-label="Changes">20</td><td class="num" data-label="Authors">7</td><td class="num" data-label="Score">325.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.3%"></span></span></td></tr><tr><td class="path">crates/node/npm/wasm32-wasi/package.json</td><td class="num" data-label="Lines">42</td><td class="num" data-label="Changes">50</td><td class="num" data-label="Authors">3</td><td class="num" data-label="Score">324.0</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.3%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/compat/config/resolve-config.ts</td><td class="num" data-label="Lines">273</td><td class="num" data-label="Changes">19</td><td class="num" data-label="Authors">3</td><td class="num" data-label="Score">313.9</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.3%"></span></span></td></tr><tr><td class="path">integrations/vite/resolvers.test.ts</td><td class="num" data-label="Lines">804</td><td class="num" data-label="Changes">10</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">283.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/prefix.test.ts</td><td class="num" data-label="Lines">340</td><td class="num" data-label="Changes">15</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">276.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">crates/oxide/src/extractor/pre_processors/ruby.rs</td><td class="num" data-label="Lines">528</td><td class="num" data-label="Changes">12</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">275.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path" data-tag="sole owner" title="Only one person has changed this file">crates/oxide/src/scanner/sources.rs</td><td class="num" data-label="Lines">938</td><td class="num" data-label="Changes">9</td><td class="num" data-label="Authors">1</td><td class="num" data-label="Score">275.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/css-functions.ts</td><td class="num" data-label="Lines">262</td><td class="num" data-label="Changes">17</td><td class="num" data-label="Authors">6</td><td class="num" data-label="Score">275.2</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/utils/infer-data-type.ts</td><td class="num" data-label="Lines">390</td><td class="num" data-label="Changes">13</td><td class="num" data-label="Authors">5</td><td class="num" data-label="Score">256.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">crates/oxide/src/extractor/named_utility_machine.rs</td><td class="num" data-label="Lines">535</td><td class="num" data-label="Changes">11</td><td class="num" data-label="Authors">3</td><td class="num" data-label="Score">254.4</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/compat/config/resolve-config.test.ts</td><td class="num" data-label="Lines">321</td><td class="num" data-label="Changes">14</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">250.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/apply.ts</td><td class="num" data-label="Lines">363</td><td class="num" data-label="Changes">13</td><td class="num" data-label="Authors">3</td><td class="num" data-label="Score">247.7</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/compat/default-theme.ts</td><td class="num" data-label="Lines">1,140</td><td class="num" data-label="Changes">7</td><td class="num" data-label="Authors">4</td><td class="num" data-label="Score">236.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/value-parser.ts</td><td class="num" data-label="Lines">279</td><td class="num" data-label="Changes">14</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">233.8</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">packages/tailwindcss/src/selector-parser.ts</td><td class="num" data-label="Lines">638</td><td class="num" data-label="Changes">9</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">227.3</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">crates/oxide/src/glob.rs</td><td class="num" data-label="Lines">601</td><td class="num" data-label="Changes">9</td><td class="num" data-label="Authors">2</td><td class="num" data-label="Score">220.6</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr><tr><td class="path">integrations/postcss/next.test.ts</td><td class="num" data-label="Lines">486</td><td class="num" data-label="Changes">10</td><td class="num" data-label="Authors">3</td><td class="num" data-label="Score">220.5</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 0.2%"></span></span></td></tr></table></div></details><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="../ecosystems/frontend.html">How Tailwind CSS ranks among open source web frontend projects by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+name: GitStats Report
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  gitstats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: shenxianpeng/gitstats-action@v1
+        with:
+          deploy-to-pages: true
+</pre></details></section><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

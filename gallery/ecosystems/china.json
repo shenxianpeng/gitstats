@@ -1,0 +1,426 @@
+{
+  "schema_version": 1,
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:33:22+00:00",
+  "ecosystem": {
+    "id": "china",
+    "name": "Open source from China",
+    "title": "Open source projects from China"
+  },
+  "quarter": {
+    "id": "2026-Q3",
+    "label": "Jul–Sep 2026"
+  },
+  "previous_quarter": {
+    "id": "2026-Q2",
+    "label": "Apr–Jun 2026"
+  },
+  "summary": {
+    "repositories": 16,
+    "with_commits": 16,
+    "naming": 10,
+    "median_share": 0.0031,
+    "highest": {
+      "id": "nacos",
+      "name": "Nacos",
+      "share": 0.7447
+    }
+  },
+  "repositories": [
+    {
+      "rank": 1,
+      "id": "nacos",
+      "name": "Nacos",
+      "repository": "alibaba/nacos",
+      "report": "../nacos/",
+      "quarter": {
+        "commits": 188,
+        "ai_assisted": 140,
+        "share": 0.7447
+      },
+      "previous_quarter": {
+        "commits": 305,
+        "ai_assisted": 138,
+        "share": 0.4525
+      },
+      "commits_last_12mo": 767,
+      "active_authors_12mo": 81,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Codex",
+        "ChatGPT"
+      ]
+    },
+    {
+      "rank": 2,
+      "id": "milvus",
+      "name": "Milvus",
+      "repository": "milvus-io/milvus",
+      "report": "../milvus/",
+      "quarter": {
+        "commits": 706,
+        "ai_assisted": 264,
+        "share": 0.3739
+      },
+      "previous_quarter": {
+        "commits": 658,
+        "ai_assisted": 225,
+        "share": 0.3419
+      },
+      "commits_last_12mo": 2499,
+      "active_authors_12mo": 103,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Cursor",
+        "OpenCode"
+      ]
+    },
+    {
+      "rank": 3,
+      "id": "ant-design",
+      "name": "Ant Design",
+      "repository": "ant-design/ant-design",
+      "report": "../ant-design/",
+      "quarter": {
+        "commits": 527,
+        "ai_assisted": 32,
+        "share": 0.0607
+      },
+      "previous_quarter": {
+        "commits": 685,
+        "ai_assisted": 92,
+        "share": 0.1343
+      },
+      "commits_last_12mo": 2348,
+      "active_authors_12mo": 196,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Gemini",
+        "Claude",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "kubeedge",
+      "name": "KubeEdge",
+      "repository": "kubeedge/kubeedge",
+      "report": "../kubeedge/",
+      "quarter": {
+        "commits": 85,
+        "ai_assisted": 5,
+        "share": 0.0588
+      },
+      "previous_quarter": {
+        "commits": 89,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 294,
+      "active_authors_12mo": 44,
+      "health": "steady",
+      "last_commit": "2026-10-20",
+      "assistants": [
+        "GitHub Copilot",
+        "Claude"
+      ]
+    },
+    {
+      "rank": 5,
+      "id": "doris",
+      "name": "Apache Doris",
+      "repository": "apache/doris",
+      "report": "../doris/",
+      "quarter": {
+        "commits": 1323,
+        "ai_assisted": 67,
+        "share": 0.0506
+      },
+      "previous_quarter": {
+        "commits": 1040,
+        "ai_assisted": 100,
+        "share": 0.0962
+      },
+      "commits_last_12mo": 4456,
+      "active_authors_12mo": 166,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 6,
+      "id": "paddle",
+      "name": "PaddlePaddle",
+      "repository": "PaddlePaddle/Paddle",
+      "report": "../paddle/",
+      "quarter": {
+        "commits": 185,
+        "ai_assisted": 9,
+        "share": 0.0486
+      },
+      "previous_quarter": {
+        "commits": 383,
+        "ai_assisted": 47,
+        "share": 0.1227
+      },
+      "commits_last_12mo": 2084,
+      "active_authors_12mo": 188,
+      "health": "quiet",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "GitHub Copilot",
+        "Claude",
+        "Codex"
+      ]
+    },
+    {
+      "rank": 7,
+      "id": "rocketmq",
+      "name": "Apache RocketMQ",
+      "repository": "apache/rocketmq",
+      "report": "../rocketmq/",
+      "quarter": {
+        "commits": 72,
+        "ai_assisted": 1,
+        "share": 0.0139
+      },
+      "previous_quarter": {
+        "commits": 87,
+        "ai_assisted": 6,
+        "share": 0.069
+      },
+      "commits_last_12mo": 322,
+      "active_authors_12mo": 64,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 8,
+      "id": "openharmony-arkui",
+      "name": "OpenHarmony ArkUI",
+      "repository": "openharmony/arkui_ace_engine",
+      "report": "../openharmony-arkui/",
+      "quarter": {
+        "commits": 3199,
+        "ai_assisted": 12,
+        "share": 0.0038
+      },
+      "previous_quarter": {
+        "commits": 4494,
+        "ai_assisted": 12,
+        "share": 0.0027
+      },
+      "commits_last_12mo": 17098,
+      "active_authors_12mo": 517,
+      "health": "steady",
+      "last_commit": "2026-10-07",
+      "assistants": [
+        "Claude",
+        "Codex"
+      ]
+    },
+    {
+      "rank": 9,
+      "id": "tidb",
+      "name": "TiDB",
+      "repository": "pingcap/tidb",
+      "report": "../tidb/",
+      "quarter": {
+        "commits": 398,
+        "ai_assisted": 1,
+        "share": 0.0025
+      },
+      "previous_quarter": {
+        "commits": 432,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 1707,
+      "active_authors_12mo": 138,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 10,
+      "id": "shardingsphere",
+      "name": "Apache ShardingSphere",
+      "repository": "apache/shardingsphere",
+      "report": "../shardingsphere/",
+      "quarter": {
+        "commits": 900,
+        "ai_assisted": 1,
+        "share": 0.0011
+      },
+      "previous_quarter": {
+        "commits": 339,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 2887,
+      "active_authors_12mo": 65,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 11,
+      "id": "apisix",
+      "name": "Apache APISIX",
+      "repository": "apache/apisix",
+      "report": "../apisix/",
+      "quarter": {
+        "commits": 192,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 280,
+        "ai_assisted": 1,
+        "share": 0.0036
+      },
+      "commits_last_12mo": 615,
+      "active_authors_12mo": 59,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude"
+      ]
+    },
+    {
+      "rank": 12,
+      "id": "dolphinscheduler",
+      "name": "Apache DolphinScheduler",
+      "repository": "apache/dolphinscheduler",
+      "report": "../dolphinscheduler/",
+      "quarter": {
+        "commits": 60,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 125,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 351,
+      "active_authors_12mo": 69,
+      "health": "quiet",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 13,
+      "id": "skywalking",
+      "name": "Apache SkyWalking",
+      "repository": "apache/skywalking",
+      "report": "../skywalking/",
+      "quarter": {
+        "commits": 55,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 96,
+        "ai_assisted": 1,
+        "share": 0.0104
+      },
+      "commits_last_12mo": 272,
+      "active_authors_12mo": 28,
+      "health": "quiet",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude"
+      ]
+    },
+    {
+      "rank": 14,
+      "id": "dubbo",
+      "name": "Apache Dubbo",
+      "repository": "apache/dubbo",
+      "report": "../dubbo/",
+      "quarter": {
+        "commits": 22,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 79,
+        "ai_assisted": 1,
+        "share": 0.0127
+      },
+      "commits_last_12mo": 334,
+      "active_authors_12mo": 47,
+      "health": "steady",
+      "last_commit": "2026-10-21",
+      "assistants": [
+        "GitHub Copilot",
+        "Claude"
+      ]
+    },
+    {
+      "rank": 15,
+      "id": "openharmony-liteos-a",
+      "name": "OpenHarmony LiteOS-A",
+      "repository": "openharmony/kernel_liteos_a",
+      "report": "../openharmony-liteos-a/",
+      "quarter": {
+        "commits": 22,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 37,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 84,
+      "active_authors_12mo": 2,
+      "health": "steady",
+      "last_commit": "2026-07-28",
+      "assistants": []
+    },
+    {
+      "rank": 16,
+      "id": "echarts",
+      "name": "Apache ECharts",
+      "repository": "apache/echarts",
+      "report": "../echarts/",
+      "quarter": {
+        "commits": 21,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 74,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 240,
+      "active_authors_12mo": 24,
+      "health": "quiet",
+      "last_commit": "2026-10-04",
+      "assistants": []
+    }
+  ]
+}

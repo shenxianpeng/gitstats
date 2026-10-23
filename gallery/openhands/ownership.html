@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - OpenHands</title>
+	<meta name="description" content="OpenHands: 8,726 commits by 575 authors, 2024 to 2026. A report made with gitstats.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="OpenHands: Code Ownership">
+	<meta property="og:description" content="OpenHands: 8,726 commits by 575 authors, 2024 to 2026. A report made with gitstats.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/openhands/ownership.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/openhands/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="OpenHands: Code Ownership">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="OpenHands: Code Ownership">
+	<meta name="twitter:description" content="OpenHands: 8,726 commits by 575 authors, 2024 to 2026. A report made with gitstats.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/openhands/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html" class="active" aria-current="page">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Code Ownership</h1><p class="section-note">Ownership is measured by how many commits each author made to each file in the current tree. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated. The <strong>bus factor</strong> is the smallest number of people who are, between them, primary owner of more than half of the files.</p><dl class="stat-tiles" style="--cols: 4; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Files Tracked</dt><dd class="stat-value">2,846</dd><dd class="stat-note">in the current tree</dd></div><div class="stat-tile"><dt>Bus Factor</dt><dd class="stat-value">5</dd><dd class="stat-note">5 authors are primary owner of 1,531 of 2,846 files</dd></div><div class="stat-tile"><dt>Single-Owner Files</dt><dd class="stat-value">1,196</dd><dd class="stat-note">42.0% of tracked files</dd></div><div class="stat-tile"><dt>Contributors</dt><dd class="stat-value">170</dd><dd class="stat-note">authors who changed files</dd></div></dl>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus factor risk — single-owner files</a></h2>
+
+<p class="section-note">Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</p><div class="table-scroll"><table class="sortable file-table" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">.agents/skills/verify-openhands/references/feature-map/F01-first-run-and-sign-in.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">12</td></tr><tr><td class="path">.agents/skills/verify-openhands/references/feature-map/F02-app-shell.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">.agents/skills/verify-openhands/references/maintenance.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">.agents/skills/verify-openhands/references/feature-map/F11-provider-connections.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">.agents/skills/verify-openhands/references/feature-map/F12-model-router.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">__tests__/components/features/setup-guide/super-admin-setup-guide.test.tsx</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">__tests__/components/conversation-events/chat/duplicate-streamed-message.test.tsx</td><td data-label="Sole owner">Vasco Schiavo</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">src/services/telemetry-context.ts</td><td data-label="Sole owner">Rohit Malhotra</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">.agents/skills/verify-openhands/references/daily.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">src/hooks/query/use-native-git-integrations.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">4</td></tr></table></div><details class="table-details"><summary>Table: the 100 most-changed of 1,196 single-owner files</summary><div class="table-scroll"><table class="sortable file-table" id="ownership-busfactor-all"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">.agents/skills/verify-openhands/references/feature-map/F01-first-run-and-sign-in.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">12</td></tr><tr><td class="path">.agents/skills/verify-openhands/references/feature-map/F02-app-shell.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">.agents/skills/verify-openhands/references/maintenance.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">.agents/skills/verify-openhands/references/feature-map/F11-provider-connections.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">.agents/skills/verify-openhands/references/feature-map/F12-model-router.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">__tests__/components/features/setup-guide/super-admin-setup-guide.test.tsx</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">__tests__/components/conversation-events/chat/duplicate-streamed-message.test.tsx</td><td data-label="Sole owner">Vasco Schiavo</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">src/services/telemetry-context.ts</td><td data-label="Sole owner">Rohit Malhotra</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">.agents/skills/verify-openhands/references/daily.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">src/hooks/query/use-native-git-integrations.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">src/components/features/setup-guide/super-admin-setup-guide.tsx</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">electron/loading.html</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">__tests__/hooks/chat/use-model-interceptor.test.tsx</td><td data-label="Sole owner">Vasco Schiavo</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">src/components/features/settings/meta-llm-profiles/default-meta-profile.ts</td><td data-label="Sole owner">Juan Pedro Michelini Jorge</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">.agents/skills/verify-openhands/scripts/lib/known-bug.mjs</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">__tests__/scripts/raw-colors-lint.test.ts</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">tests/e2e/settings-responsive.spec.ts</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">.agents/skills/verify-openhands/references/report.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/components/features/markdown/markdown-table-scroll.tsx</td><td data-label="Sole owner">FraterCCCLXIII</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/hooks/mutation/use-resume-conversation.ts</td><td data-label="Sole owner">Graham Neubig</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/api/mcp-service/mcp-redacted-credentials.ts</td><td data-label="Sole owner">Graham Neubig</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/components/features/setup-guide/use-super-admin-setup-guide.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/components/features/setup-guide/super-admin-setup-guide.constants.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">__tests__/components/features/setup-guide/setup-guide-tour.test.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">__tests__/components/features/setup-guide/tour-engine.test.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/components/features/setup-guide/tour/setup-guide-tour.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/components/features/setup-guide/tour/tour-engine.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/components/features/setup-guide/tour/tour-types.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/utils/responder-deployment.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">__tests__/components/features/plugins/build-plugins-view-model.test.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/api/plugins-service.test.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/api/plugins-service.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/components/features/plugins/build-plugins-view-model.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">__tests__/hooks/use-streamed-text.test.tsx</td><td data-label="Sole owner">Vasco Schiavo</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/hooks/use-streamed-text.ts</td><td data-label="Sole owner">Vasco Schiavo</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/components/features/settings/agent-profiles/merge-agent-profile-save-input.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">src/hooks/use-save-acp-secrets.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">__tests__/routes/mcp.test.tsx</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">3</td></tr><tr><td class="path">.agents/skills/verify-openhands/scripts/lib/testids.mjs</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">.agents/skills/verify-openhands/scripts/lib/launcher-env.mjs</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">.agents/skills/verify-openhands/scripts/lib/tmux-path.mjs</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/hooks/use-close-on-escape.ts</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/hooks/use-conversation-panel-route.test.tsx</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">.agents/skills/verify-openhands/scripts/lib/map-sources.mjs</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/scripts/restyle-lint.test.ts</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">.agents/skills/verify-openhands/references/adaptation.md</td><td data-label="Sole owner">Engel Nyst</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/components/features/conversation-panel/conversation-group-folder-list.tsx</td><td data-label="Sole owner">FraterCCCLXIII</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/ui/combobox-caret.tsx</td><td data-label="Sole owner">FraterCCCLXIII</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/components/features/sidebar/sidebar-collapsed-icon-slot.tsx</td><td data-label="Sole owner">FraterCCCLXIII</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/components/automations/detail/run-phase.test.tsx</td><td data-label="Sole owner">Artem Altukhov</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/mocks/automation-runs.mock.test.ts</td><td data-label="Sole owner">Artem Altukhov</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/api/llm-subscription-service.ts</td><td data-label="Sole owner">Graham Neubig</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/utils/mcp-installed-servers.test.ts</td><td data-label="Sole owner">Graham Neubig</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/types/agent-server/core/events/observation-event.ts</td><td data-label="Sole owner">Graham Neubig</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/utils/mcp-server-name.ts</td><td data-label="Sole owner">Graham Neubig</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/query-client-config.test.ts</td><td data-label="Sole owner">Graham Neubig</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/hooks/query/use-agent-settings-schema.test.tsx</td><td data-label="Sole owner">Graham Neubig</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/types/agent-server/core/events/index.ts</td><td data-label="Sole owner">Graham Neubig</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/types/agent-server/core/openhands-event.ts</td><td data-label="Sole owner">Graham Neubig</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/hooks/mutation/use-resume-conversation.test.tsx</td><td data-label="Sole owner">Graham Neubig</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/utils/automation-repo-sources.ts</td><td data-label="Sole owner">Alona</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/api/cloud/setup-state-service.api.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/components/features/setup-guide/tour/tour-theme.css</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/hooks/query/use-manifest-prerequisites.test.tsx</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/hooks/query/use-manifest-prerequisites.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/components/features/home/build-pinned-automation-menu-items.test.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/components/features/home/featured-automations/build-home-automation-menu-items.tsx</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/components/features/home/featured-automations/build-pinned-automation-menu-items.tsx</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">electron/package.json</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/manifests/manifest-sources.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/manifests/manifest-capabilities.test.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/api/plugins-management-service.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/utils/mcp-credential-validation.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/api/cloud/git-service.api.ts</td><td data-label="Sole owner">Hiep Le</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/services/secret-request.test.ts</td><td data-label="Sole owner">Vasco Schiavo</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/api/request-secret-client-tool.ts</td><td data-label="Sole owner">Vasco Schiavo</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/constants/secret-request.ts</td><td data-label="Sole owner">Vasco Schiavo</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/services/secret-request.ts</td><td data-label="Sole owner">Vasco Schiavo</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/stores/secret-request-store.ts</td><td data-label="Sole owner">Vasco Schiavo</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/utils/streaming-delta-batcher.test.ts</td><td data-label="Sole owner">Vasco Schiavo</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/utils/streaming-delta-batcher.ts</td><td data-label="Sole owner">Vasco Schiavo</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/hooks/mutation/sync-agent-profiles.test.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/hooks/mutation/sync-agent-profiles.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/hooks/mutation/resolve-conversation-launch.test.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/hooks/use-active-agent-profile.test.tsx</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/routes/agent-settings-tool-selection.test.tsx</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/api/agent-profiles-service/agent-profiles-service.api.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/components/features/settings/agent-profiles/delete-agent-profile-modal.tsx</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/components/features/settings/agent-profiles/profile-behavior-form.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/hooks/mutation/resolve-conversation-launch.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/hooks/mutation/use-apply-onboarding-agent-profile.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/constants/profile-tools.test.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/constants/profile-tools.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/constants/profile-scope.test.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/constants/profile-scope.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/utils/acp-command.test.ts</td><td data-label="Sole owner">simonrosenberg</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/components/automations/detail/disabled-reason-banner.test.tsx</td><td data-label="Sole owner">Rohit Malhotra</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">__tests__/tools/automation-form-tool.test.ts</td><td data-label="Sole owner">Rohit Malhotra</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/api/automation-form-client-tool.ts</td><td data-label="Sole owner">Rohit Malhotra</td><td class="num" data-label="Commits">2</td></tr><tr><td class="path">src/constants/automation-form.ts</td><td data-label="Sole owner">Rohit Malhotra</td><td class="num" data-label="Commits">2</td></tr></table></div></details>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by author</a></h2>
+
+<p class="section-note">Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</p><div class="table-scroll"><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th class="num">Files owned</th><th class="num">Solely owned</th><th class="num">Files touched</th></tr><tr><td>Hiep Le</td><td class="num">405</td><td class="num">134</td><td class="num">956</td></tr><tr><td>openhands</td><td class="num">356</td><td class="num">179</td><td class="num">723</td></tr><tr><td>FraterCCCLXIII</td><td class="num">277</td><td class="num">81</td><td class="num">710</td></tr><tr><td>Graham Neubig</td><td class="num">256</td><td class="num">72</td><td class="num">819</td></tr><tr><td>Engel Nyst</td><td class="num">237</td><td class="num">166</td><td class="num">626</td></tr><tr><td>🐾 smolpaws</td><td class="num">229</td><td class="num">66</td><td class="num">552</td></tr><tr><td>Vasco Schiavo</td><td class="num">216</td><td class="num">93</td><td class="num">492</td></tr><tr><td>Rohit Malhotra</td><td class="num">190</td><td class="num">69</td><td class="num">501</td></tr><tr><td>simonrosenberg</td><td class="num">162</td><td class="num">52</td><td class="num">309</td></tr><tr><td>aivong-openhands</td><td class="num">69</td><td class="num">40</td><td class="num">132</td></tr><tr><td>Robert Brennan</td><td class="num">62</td><td class="num">27</td><td class="num">294</td></tr><tr><td>Juan Pedro Michelini Jorge</td><td class="num">50</td><td class="num">29</td><td class="num">150</td></tr><tr><td>george larson</td><td class="num">47</td><td class="num">26</td><td class="num">155</td></tr><tr><td>amandhaw</td><td class="num">47</td><td class="num">32</td><td class="num">85</td></tr><tr><td>Tim O&#x27;Farrell</td><td class="num">24</td><td class="num">8</td><td class="num">160</td></tr><tr><td>david l euler</td><td class="num">22</td><td class="num">13</td><td class="num">240</td></tr><tr><td>Xingyao Wang</td><td class="num">22</td><td class="num">6</td><td class="num">79</td></tr><tr><td>Denis Ermakov</td><td class="num">11</td><td class="num">11</td><td class="num">59</td></tr><tr><td>chuckbutkus</td><td class="num">8</td><td class="num">1</td><td class="num">41</td></tr><tr><td>kr1shna-exe</td><td class="num">8</td><td class="num">5</td><td class="num">26</td></tr><tr><td>Alona</td><td class="num">7</td><td class="num">7</td><td class="num">75</td></tr><tr><td>Sleeyax</td><td class="num">7</td><td class="num">7</td><td class="num">21</td></tr><tr><td>Shashwat Pratap Singh</td><td class="num">6</td><td class="num">3</td><td class="num">40</td></tr><tr><td>OpenHands Bot</td><td class="num">6</td><td class="num">2</td><td class="num">33</td></tr><tr><td>Liang Xu</td><td class="num">6</td><td class="num">6</td><td class="num">28</td></tr></table></div><p class="moreauthors">Showing top 25 of 170 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most shared files</a></h2>
+
+<p class="section-note">Files touched by the most people — shared code where changes are most likely to need coordination.</p><div class="table-scroll"><table class="sortable file-table" id="ownership-shared"><tr><th>File</th><th class="num">Contributors</th><th>Primary owner</th><th class="num">Owner share</th></tr><tr><td class="path">README.md</td><td class="num" data-label="Contributors">55</td><td data-label="Primary owner">mamoodi</td><td class="num" data-label="Owner share">25.2%</td></tr><tr><td class="path">src/i18n/translation.json</td><td class="num" data-label="Contributors">39</td><td data-label="Primary owner">Hiep Le</td><td class="num" data-label="Owner share">24.5%</td></tr><tr><td class="path">.gitignore</td><td class="num" data-label="Contributors">30</td><td data-label="Primary owner">Xingyao Wang</td><td class="num" data-label="Owner share">22.2%</td></tr><tr><td class="path">AGENTS.md</td><td class="num" data-label="Contributors">27</td><td data-label="Primary owner">Graham Neubig</td><td class="num" data-label="Owner share">21.7%</td></tr><tr><td class="path">package.json</td><td class="num" data-label="Contributors">24</td><td data-label="Primary owner">Graham Neubig</td><td class="num" data-label="Owner share">19.6%</td></tr><tr><td class="path">package-lock.json</td><td class="num" data-label="Contributors">24</td><td data-label="Primary owner">Graham Neubig</td><td class="num" data-label="Owner share">18.7%</td></tr><tr><td class="path">src/api/agent-server-adapter.ts</td><td class="num" data-label="Contributors">24</td><td data-label="Primary owner">Graham Neubig</td><td class="num" data-label="Owner share">19.4%</td></tr><tr><td class="path">src/api/conversation-service/agent-server-conversation-service.api.ts</td><td class="num" data-label="Contributors">20</td><td data-label="Primary owner">Graham Neubig</td><td class="num" data-label="Owner share">20.0%</td></tr><tr><td class="path">__tests__/api/agent-server-adapter.test.ts</td><td class="num" data-label="Contributors">19</td><td data-label="Primary owner">Graham Neubig</td><td class="num" data-label="Owner share">20.8%</td></tr><tr><td class="path">scripts/dev-with-automation.mjs</td><td class="num" data-label="Contributors">18</td><td data-label="Primary owner">Rohit Malhotra</td><td class="num" data-label="Owner share">25.4%</td></tr><tr><td class="path">__tests__/components/features/conversation-panel/conversation-card.test.tsx</td><td class="num" data-label="Contributors">18</td><td data-label="Primary owner">simonrosenberg</td><td class="num" data-label="Owner share">13.9%</td></tr><tr><td class="path">__tests__/api/agent-server-conversation-service.test.ts</td><td class="num" data-label="Contributors">17</td><td data-label="Primary owner">Graham Neubig</td><td class="num" data-label="Owner share">22.2%</td></tr><tr><td class="path">src/components/features/chat/chat-interface.tsx</td><td class="num" data-label="Contributors">17</td><td data-label="Primary owner">Vasco Schiavo</td><td class="num" data-label="Owner share">12.8%</td></tr><tr><td class="path">src/contexts/conversation-websocket-context.tsx</td><td class="num" data-label="Contributors">17</td><td data-label="Primary owner">Vasco Schiavo</td><td class="num" data-label="Owner share">20.0%</td></tr><tr><td class="path">scripts/dev-safe.mjs</td><td class="num" data-label="Contributors">16</td><td data-label="Primary owner">Graham Neubig</td><td class="num" data-label="Owner share">20.0%</td></tr><tr><td class="path">config/defaults.json</td><td class="num" data-label="Contributors">16</td><td data-label="Primary owner">Rohit Malhotra</td><td class="num" data-label="Owner share">21.1%</td></tr><tr><td class="path">src/components/features/conversation-panel/conversation-panel.tsx</td><td class="num" data-label="Contributors">16</td><td data-label="Primary owner">FraterCCCLXIII</td><td class="num" data-label="Owner share">28.6%</td></tr><tr><td class="path">src/api/settings-service/settings-service.api.ts</td><td class="num" data-label="Contributors">16</td><td data-label="Primary owner">Hiep Le</td><td class="num" data-label="Owner share">30.3%</td></tr><tr><td class="path">__tests__/scripts/dev-safe.test.ts</td><td class="num" data-label="Contributors">15</td><td data-label="Primary owner">Graham Neubig</td><td class="num" data-label="Owner share">21.1%</td></tr><tr><td class="path">docs/DEVELOPMENT.md</td><td class="num" data-label="Contributors">15</td><td data-label="Primary owner">Graham Neubig</td><td class="num" data-label="Owner share">17.4%</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="../ecosystems/ai-coding.html">How OpenHands ranks among open source AI coding assistants by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+name: GitStats Report
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  gitstats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: shenxianpeng/gitstats-action@v1
+        with:
+          deploy-to-pages: true
+</pre></details></section><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

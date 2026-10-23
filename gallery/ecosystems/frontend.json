@@ -1,0 +1,310 @@
+{
+  "schema_version": 1,
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:33:22+00:00",
+  "ecosystem": {
+    "id": "frontend",
+    "name": "Web frontend",
+    "title": "Open source web frontend projects"
+  },
+  "quarter": {
+    "id": "2026-Q3",
+    "label": "Jul–Sep 2026"
+  },
+  "previous_quarter": {
+    "id": "2026-Q2",
+    "label": "Apr–Jun 2026"
+  },
+  "summary": {
+    "repositories": 11,
+    "with_commits": 11,
+    "naming": 9,
+    "median_share": 0.0167,
+    "highest": {
+      "id": "react",
+      "name": "React",
+      "share": 0.1975
+    }
+  },
+  "repositories": [
+    {
+      "rank": 1,
+      "id": "react",
+      "name": "React",
+      "repository": "react/react",
+      "report": "../react/",
+      "quarter": {
+        "commits": 162,
+        "ai_assisted": 32,
+        "share": 0.1975
+      },
+      "previous_quarter": {
+        "commits": 103,
+        "ai_assisted": 2,
+        "share": 0.0194
+      },
+      "commits_last_12mo": 607,
+      "active_authors_12mo": 100,
+      "health": "quiet",
+      "last_commit": "2026-10-21",
+      "assistants": [
+        "Claude",
+        "Cursor",
+        "Amp"
+      ]
+    },
+    {
+      "rank": 2,
+      "id": "typescript",
+      "name": "TypeScript",
+      "repository": "microsoft/TypeScript",
+      "report": "../typescript/",
+      "quarter": {
+        "commits": 408,
+        "ai_assisted": 70,
+        "share": 0.1716
+      },
+      "previous_quarter": {
+        "commits": 502,
+        "ai_assisted": 162,
+        "share": 0.3227
+      },
+      "commits_last_12mo": 1795,
+      "active_authors_12mo": 137,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "GitHub Copilot",
+        "Claude",
+        "Codex"
+      ]
+    },
+    {
+      "rank": 3,
+      "id": "nextjs",
+      "name": "Next.js",
+      "repository": "vercel/next.js",
+      "report": "../nextjs/",
+      "quarter": {
+        "commits": 1422,
+        "ai_assisted": 69,
+        "share": 0.0485
+      },
+      "previous_quarter": {
+        "commits": 1104,
+        "ai_assisted": 83,
+        "share": 0.0752
+      },
+      "commits_last_12mo": 4852,
+      "active_authors_12mo": 248,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Cursor",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "webpack",
+      "name": "webpack",
+      "repository": "webpack/webpack",
+      "report": "../webpack/",
+      "quarter": {
+        "commits": 824,
+        "ai_assisted": 39,
+        "share": 0.0473
+      },
+      "previous_quarter": {
+        "commits": 391,
+        "ai_assisted": 23,
+        "share": 0.0588
+      },
+      "commits_last_12mo": 1989,
+      "active_authors_12mo": 48,
+      "health": "surge",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "CodeRabbit",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 5,
+      "id": "svelte",
+      "name": "Svelte",
+      "repository": "sveltejs/svelte",
+      "report": "../svelte/",
+      "quarter": {
+        "commits": 161,
+        "ai_assisted": 5,
+        "share": 0.0311
+      },
+      "previous_quarter": {
+        "commits": 156,
+        "ai_assisted": 8,
+        "share": 0.0513
+      },
+      "commits_last_12mo": 764,
+      "active_authors_12mo": 142,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "Codex"
+      ]
+    },
+    {
+      "rank": 6,
+      "id": "tailwindcss",
+      "name": "Tailwind CSS",
+      "repository": "tailwindlabs/tailwindcss",
+      "report": "../tailwindcss/",
+      "quarter": {
+        "commits": 60,
+        "ai_assisted": 1,
+        "share": 0.0167
+      },
+      "previous_quarter": {
+        "commits": 114,
+        "ai_assisted": 4,
+        "share": 0.0351
+      },
+      "commits_last_12mo": 379,
+      "active_authors_12mo": 66,
+      "health": "steady",
+      "last_commit": "2026-10-19",
+      "assistants": [
+        "Claude",
+        "CodeRabbit",
+        "Codex"
+      ]
+    },
+    {
+      "rank": 7,
+      "id": "vite",
+      "name": "Vite",
+      "repository": "vitejs/vite",
+      "report": "../vite/",
+      "quarter": {
+        "commits": 319,
+        "ai_assisted": 4,
+        "share": 0.0125
+      },
+      "previous_quarter": {
+        "commits": 293,
+        "ai_assisted": 14,
+        "share": 0.0478
+      },
+      "commits_last_12mo": 1213,
+      "active_authors_12mo": 222,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "GitHub Copilot",
+        "Claude",
+        "Codex"
+      ]
+    },
+    {
+      "rank": 8,
+      "id": "nuxt",
+      "name": "Nuxt",
+      "repository": "nuxt/nuxt",
+      "report": "../nuxt/",
+      "quarter": {
+        "commits": 681,
+        "ai_assisted": 8,
+        "share": 0.0117
+      },
+      "previous_quarter": {
+        "commits": 300,
+        "ai_assisted": 2,
+        "share": 0.0067
+      },
+      "commits_last_12mo": 1587,
+      "active_authors_12mo": 181,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "Claude",
+        "CodeRabbit",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 9,
+      "id": "astro",
+      "name": "Astro",
+      "repository": "withastro/astro",
+      "report": "../astro/",
+      "quarter": {
+        "commits": 487,
+        "ai_assisted": 4,
+        "share": 0.0082
+      },
+      "previous_quarter": {
+        "commits": 701,
+        "ai_assisted": 9,
+        "share": 0.0128
+      },
+      "commits_last_12mo": 2313,
+      "active_authors_12mo": 211,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 10,
+      "id": "angular",
+      "name": "Angular",
+      "repository": "angular/angular",
+      "report": "../angular/",
+      "quarter": {
+        "commits": 827,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 902,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 3857,
+      "active_authors_12mo": 239,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude"
+      ]
+    },
+    {
+      "rank": 11,
+      "id": "vue",
+      "name": "Vue",
+      "repository": "vuejs/core",
+      "report": "../vue/",
+      "quarter": {
+        "commits": 96,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 116,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 428,
+      "active_authors_12mo": 108,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": []
+    }
+  ]
+}

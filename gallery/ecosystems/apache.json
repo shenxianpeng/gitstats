@@ -1,0 +1,291 @@
+{
+  "schema_version": 1,
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:33:22+00:00",
+  "ecosystem": {
+    "id": "apache",
+    "name": "Apache",
+    "title": "Apache projects"
+  },
+  "quarter": {
+    "id": "2026-Q3",
+    "label": "Jul–Sep 2026"
+  },
+  "previous_quarter": {
+    "id": "2026-Q2",
+    "label": "Apr–Jun 2026"
+  },
+  "summary": {
+    "repositories": 10,
+    "with_commits": 10,
+    "naming": 10,
+    "median_share": 0.0568,
+    "highest": {
+      "id": "spark",
+      "name": "Apache Spark",
+      "share": 0.6643
+    }
+  },
+  "repositories": [
+    {
+      "rank": 1,
+      "id": "spark",
+      "name": "Apache Spark",
+      "repository": "apache/spark",
+      "report": "../spark/",
+      "quarter": {
+        "commits": 1522,
+        "ai_assisted": 1011,
+        "share": 0.6643
+      },
+      "previous_quarter": {
+        "commits": 1199,
+        "ai_assisted": 711,
+        "share": 0.593
+      },
+      "commits_last_12mo": 4777,
+      "active_authors_12mo": 427,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Codex",
+        "ChatGPT"
+      ]
+    },
+    {
+      "rank": 2,
+      "id": "superset",
+      "name": "Apache Superset",
+      "repository": "apache/superset",
+      "report": "../superset/",
+      "quarter": {
+        "commits": 2377,
+        "ai_assisted": 906,
+        "share": 0.3812
+      },
+      "previous_quarter": {
+        "commits": 1635,
+        "ai_assisted": 620,
+        "share": 0.3792
+      },
+      "commits_last_12mo": 5998,
+      "active_authors_12mo": 471,
+      "health": "peak",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 3,
+      "id": "flink",
+      "name": "Apache Flink",
+      "repository": "apache/flink",
+      "report": "../flink/",
+      "quarter": {
+        "commits": 483,
+        "ai_assisted": 109,
+        "share": 0.2257
+      },
+      "previous_quarter": {
+        "commits": 378,
+        "ai_assisted": 37,
+        "share": 0.0979
+      },
+      "commits_last_12mo": 1446,
+      "active_authors_12mo": 171,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "ChatGPT",
+        "Codex"
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "iceberg",
+      "name": "Apache Iceberg",
+      "repository": "apache/iceberg",
+      "report": "../iceberg/",
+      "quarter": {
+        "commits": 562,
+        "ai_assisted": 52,
+        "share": 0.0925
+      },
+      "previous_quarter": {
+        "commits": 480,
+        "ai_assisted": 36,
+        "share": 0.075
+      },
+      "commits_last_12mo": 1858,
+      "active_authors_12mo": 276,
+      "health": "peak",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Codex",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 5,
+      "id": "airflow",
+      "name": "Apache Airflow",
+      "repository": "apache/airflow",
+      "report": "../airflow/",
+      "quarter": {
+        "commits": 2231,
+        "ai_assisted": 135,
+        "share": 0.0605
+      },
+      "previous_quarter": {
+        "commits": 2192,
+        "ai_assisted": 93,
+        "share": 0.0424
+      },
+      "commits_last_12mo": 8466,
+      "active_authors_12mo": 906,
+      "health": "surge",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 6,
+      "id": "kafka",
+      "name": "Apache Kafka",
+      "repository": "apache/kafka",
+      "report": "../kafka/",
+      "quarter": {
+        "commits": 584,
+        "ai_assisted": 31,
+        "share": 0.0531
+      },
+      "previous_quarter": {
+        "commits": 520,
+        "ai_assisted": 10,
+        "share": 0.0192
+      },
+      "commits_last_12mo": 1983,
+      "active_authors_12mo": 254,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "ChatGPT"
+      ]
+    },
+    {
+      "rank": 7,
+      "id": "cassandra",
+      "name": "Apache Cassandra",
+      "repository": "apache/cassandra",
+      "report": "../cassandra/",
+      "quarter": {
+        "commits": 373,
+        "ai_assisted": 19,
+        "share": 0.0509
+      },
+      "previous_quarter": {
+        "commits": 282,
+        "ai_assisted": 3,
+        "share": 0.0106
+      },
+      "commits_last_12mo": 992,
+      "active_authors_12mo": 92,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Codex",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 8,
+      "id": "arrow",
+      "name": "Apache Arrow",
+      "repository": "apache/arrow",
+      "report": "../arrow/",
+      "quarter": {
+        "commits": 396,
+        "ai_assisted": 19,
+        "share": 0.048
+      },
+      "previous_quarter": {
+        "commits": 271,
+        "ai_assisted": 8,
+        "share": 0.0295
+      },
+      "commits_last_12mo": 1344,
+      "active_authors_12mo": 220,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "GitHub Copilot",
+        "Claude",
+        "Jules"
+      ]
+    },
+    {
+      "rank": 9,
+      "id": "beam",
+      "name": "Apache Beam",
+      "repository": "apache/beam",
+      "report": "../beam/",
+      "quarter": {
+        "commits": 856,
+        "ai_assisted": 20,
+        "share": 0.0234
+      },
+      "previous_quarter": {
+        "commits": 718,
+        "ai_assisted": 23,
+        "share": 0.032
+      },
+      "commits_last_12mo": 2666,
+      "active_authors_12mo": 217,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Gemini",
+        "Claude",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 10,
+      "id": "pulsar",
+      "name": "Apache Pulsar",
+      "repository": "apache/pulsar",
+      "report": "../pulsar/",
+      "quarter": {
+        "commits": 419,
+        "ai_assisted": 7,
+        "share": 0.0167
+      },
+      "previous_quarter": {
+        "commits": 411,
+        "ai_assisted": 5,
+        "share": 0.0122
+      },
+      "commits_last_12mo": 1427,
+      "active_authors_12mo": 119,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "Cursor"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - pip</title>
+	<meta name="description" content="pip: 16,333 commits by 853 authors, 2008 to 2026. A report made with gitstats.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="pip: Tags">
+	<meta property="og:description" content="pip: 16,333 commits by 853 authors, 2008 to 2026. A report made with gitstats.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/pip/tags.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/pip/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="pip: Tags">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="pip: Tags">
+	<meta name="twitter:description" content="pip: 16,333 commits by 853 authors, 2008 to 2026. A report made with gitstats.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/pip/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html" class="active" aria-current="page">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Tags</h1><dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">162</dd><dd class="stat-note"><span class="nowrap">latest 26.2.2</span>&nbsp;&middot; <span class="nowrap">2026-10-20</span></dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">100.8</dd><dd class="stat-note">16,333 commits in total</dd></div></dl>
+<h2 id="all_tags"><a href="#all_tags">All tags</a></h2>
+
+<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th>Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">26.2.2</td><td class="nowrap">2026-10-20</td><td class="num">2</td><td>Damian Shaw (2)</td></tr><tr><td class="nowrap">26.2.1</td><td class="nowrap">2026-08-04</td><td class="num">4</td><td>Richard Si (4)</td></tr><tr><td class="nowrap">26.2</td><td class="nowrap">2026-07-29</td><td class="num">194</td><td>Damian Shaw (55), Richard Si (44), Stéphane Bidoul (19), Sepehr Rasouli (11), Youngkwang Yang (10), dependabot <span class="badge" title="dependabot[bot]">bot</span> (6), Phil Elson (5), Abdul Rawoof Khan (5), Mohsen Fooladnezhad (4), Kevin Turcios (4), Daniel Hollas (4), Paul Moore (3), rahulkotargasthi (1), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (1), lorddavidiii (1), dereksz (1), Tzu-ping Chung (1), Shivam Shrey (1), Sebastian Höffner (1), Sai Sridhar Tarra (1), RoyS (1), RAHUL KUMAR (1), Omar Abdalgwad (1), Nok Lam Chan (1), Nate Prewitt (1), Luis Carlos (1), Louis Liu (1), Hugo van Kemenade (1), Hugo (1), Henry Schreiner (1), Edgar Ramírez Mondragón (1), Dewank Pant (1), Dayna Blackwell (1), Bradley Reynolds (1), Aren Siekmeier (1), Andrea Corna (1)</td></tr><tr><td class="nowrap">26.1.2</td><td class="nowrap">2026-05-31</td><td class="num">15</td><td>Stéphane Bidoul (7), Damian Shaw (6), S​age Abdullah (1), Pradyun Gedam (1)</td></tr><tr><td class="nowrap">26.1.1</td><td class="nowrap">2026-05-04</td><td class="num">6</td><td>Stéphane Bidoul (6)</td></tr><tr><td class="nowrap">26.1</td><td class="nowrap">2026-04-26</td><td class="num">187</td><td>Damian Shaw (91), Stéphane Bidoul (47), Hugo van Kemenade (7), Dmitrii Sutiagin (7), dependabot <span class="badge" title="dependabot[bot]">bot</span> (6), Pradyun Gedam (5), Dimitri Papadopoulos Orfanos (5), Paul Moore (3), Henry Schreiner (3), Richard Si (2), Norbert Manthey (2), Kevin Turcios (2), Giancarlo Cicellyn Comneno (2), Gertjan van Zwieten (2), Zachary Ware (1), Vincent Fazio (1), Kurt McKee (1)</td></tr><tr><td class="nowrap">26.0.1</td><td class="nowrap">2026-02-05</td><td class="num">4</td><td>Damian Shaw (4)</td></tr><tr><td class="nowrap">26.0</td><td class="nowrap">2026-01-31</td><td class="num">195</td><td>Damian Shaw (93), Richard Si (46), Yash (8), dependabot <span class="badge" title="dependabot[bot]">bot</span> (6), Stéphane Bidoul (4), Roman Donchenko (4), Paul Moore (4), Guido Diepen (4), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (3), Daniel Hollas (3), Phil Elson (2), oxygen dioxide (1), Weida Hong (1), Tzu-ping Chung (1), Terrance (1), Stephane Chazelas (1), Seth Michael Larson (1), Paresh Joshi (1), Nothing-991 (1), MUTHUSRIHEMADHARSHINI S A (1), Kaz Nishimura (1), Julien Stephan (1), Jost Migenda (1), James (1), Hasan-8326 (1), Harsha Sai (1), Ellen Marie Dash (1), Barney Gale (1), Aarni Koskela (1)</td></tr><tr><td class="nowrap">25.3</td><td class="nowrap">2025-10-24</td><td class="num">222</td><td>Damian Shaw (125), Stéphane Bidoul (29), Shubham Nagure (13), dkjsone (10), Sepehr Rasouli (9), Richard Si (6), Meet Vasita (6), Phil Elson (5), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (4), dependabot <span class="badge" title="dependabot[bot]">bot</span> (3), Mateusz Sokół (3), Seth Michael Larson (1), Pradyun Gedam (1), Miro Hrončok (1), MajorTanya (1), Ilya Abdolmanafi (1), Dimitri Papadopoulos Orfanos (1), Antoine Lambert (1), Aman (1), Alessandro Molina (1)</td></tr><tr><td class="nowrap">25.2</td><td class="nowrap">2025-07-30</td><td class="num">151</td><td>Richard Si (44), Damian Shaw (28), Rodney, Tiara (17), dependabot <span class="badge" title="dependabot[bot]">bot</span> (7), Ryuma Asai (6), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (5), Taneli Hukkinen (5), Sepehr Rasouli (5), Pradyun Gedam (4), Tzu-ping Chung (3), Stephen Payne (3), Paul Moore (3), Barney Gale (3), zackzack38 (2), iamsrp-deshaw (2), Stéphane Bidoul (2), Roman Donchenko (2), Christian Clauss (2), chrysle (1), Yuki Kobayashi (1), Miro Hrončok (1), Michał Górny (1), Matthew Hughes (1), Gene Wood (1), Devesh Kumar (1), Denis Roussel (ACSONE) (1)</td></tr><tr><td class="nowrap">25.1.1</td><td class="nowrap">2025-05-02</td><td class="num">16</td><td>Paul Moore (9), Stéphane Bidoul (3), Stephen Rosen (2), Richard Si (1), Eli Schwartz (1)</td></tr><tr><td class="nowrap">25.1</td><td class="nowrap">2025-04-26</td><td class="num">236</td><td>Damian Shaw (67), Stéphane Bidoul (48), Richard Si (37), Paul Moore (14), Stephen Rosen (11), Krishan Bhasin (11), dependabot <span class="badge" title="dependabot[bot]">bot</span> (7), developer (6), Tzu-ping Chung (5), Oleg Burnaev (5), rmorotti (3), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (2), Adam Turner (2), nucccc (1), iTrooz (1), Viktor Szépe (1), Stefano Rivera (1), Seth Michael Larson (1), Pradyun Gedam (1), Md Sujauddin Sekh (1), Matthew Hughes (1), Malcolm Smith (1), Johannes Altmanninger (1), Joa (1), Jake Lishman (1), George Margaritis (1), Fredrik Roubert (1), Dustin Ingram (1), Dimitri Papadopoulos Orfanos (1), Bradley Reynolds (1), Alexander Regueiro (1)</td></tr><tr><td class="nowrap">25.0.1</td><td class="nowrap">2025-02-09</td><td class="num">6</td><td>Stéphane Bidoul (3), Richard Si (3)</td></tr><tr><td class="nowrap">25.0</td><td class="nowrap">2025-01-26</td><td class="num">81</td><td>Stéphane Bidoul (29), Richard Si (28), Damian Shaw (5), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (2), shenxianpeng (1), dependabot <span class="badge" title="dependabot[bot]">bot</span> (1), charwick (1), Tzu-ping Chung (1), Randy Döring (1), Pradyun Gedam (1), Paul Moore (1), Michał Górny (1), Matthew Hughes (1), Karolina Surma (1), Justin van Heek (1), July Tikhonov (1), JoshuaPerdue (1), Jason R. Coombs (1), Dos Moonen (1), Dimitri Papadopoulos Orfanos (1), Caleb Brown (1)</td></tr><tr><td class="nowrap">24.3.1</td><td class="nowrap">2024-10-27</td><td class="num">5</td><td>Stéphane Bidoul (5)</td></tr><tr><td class="nowrap">24.3</td><td class="nowrap">2024-10-26</td><td class="num">126</td><td>Damian Shaw (46), Stéphane Bidoul (18), Russell Keith-Magee (15), Tzu-ping Chung (12), Kuntal Majumder (8), Richard Si (4), Pradyun Gedam (4), mayeut (3), Jannis Leidel (3), Hugo van Kemenade (3), shenxianpeng (2), Seth Michael Larson (2), hauntsaninja (1), Srishti Hegde (1), Matthew Hughes (1), Illia Volochii (1), Dimitri Papadopoulos Orfanos (1), Anton Zelenov (1)</td></tr><tr><td class="nowrap">24.2</td><td class="nowrap">2024-07-28</td><td class="num">94</td><td>Pradyun Gedam (22), Richard Si (15), Michał Górny (6), Damian Shaw (6), rmorotti (5), Paul Moore (5), Stéphane Bidoul (4), Seth Michael Larson (4), Petr Viktorin (4), q0w (2), morotti (2), Tzu-ping Chung (2), Matthew Hughes (2), Jinzhe Zeng (2), shenxianpeng (1), dependabot <span class="badge" title="dependabot[bot]">bot</span> (1), Sviatoslav Sydorenko (Святослав Сидоренко) (1), Miro Hrončok (1), Kuntal Majumder (1), Josh Cannon (1), Jeremy Fleischman (1), Eli Schwartz (1), Ed Morley (1), Dustin Rodrigues (1), Chris Markiewicz (1), Charlie Marsh (1), Branch Vincent (1)</td></tr><tr><td class="nowrap">24.1.2</td><td class="nowrap">2024-07-07</td><td class="num">3</td><td>Pradyun Gedam (2), Stéphane Bidoul (1)</td></tr><tr><td class="nowrap">24.1.1</td><td class="nowrap">2024-06-26</td><td class="num">12</td><td>Pradyun Gedam (4), Paul Moore (4), Matthew Hughes (2), Tzu-ping Chung (1), Damian Shaw (1)</td></tr><tr><td class="nowrap">24.1</td><td class="nowrap">2024-06-20</td><td class="num">9</td><td>Pradyun Gedam (6), Tzu-ping Chung (2), Seth Michael Larson (1)</td></tr><tr><td class="nowrap">24.1b2</td><td class="nowrap">2024-06-12</td><td class="num">29</td><td>Pradyun Gedam (8), Richard Si (6), Tzu-ping Chung (5), Stéphane Bidoul (2), Shixian Sheng (2), Paul Moore (2), mrKazzila (1), Nate Prewitt (1), Ian Wienand (1), Fredrik Orderud (1)</td></tr><tr><td class="nowrap">24.1b1</td><td class="nowrap">2024-05-06</td><td class="num">315</td><td>Stéphane Bidoul (83), Pradyun Gedam (31), Damian Shaw (28), Richard Si (27), Paul Moore (26), Tzu-ping Chung (20), Jakub Kuczys (13), Hugo van Kemenade (12), Luis Medel (7), arenasys (6), shenxianpeng (5), chrysle (5), q0w (4), hauntsaninja (4), Michał Górny (4), Matthew Feickert (4), Tom Forbes (3), S. Guliaev (3), John Sirois (3), Felipe Peter (3), Brannon Dorsey (3), wim glenn (2), Mark McLoughlin (2), Arnon Yaari (2), konstin (1), devsagul (1), ctg123 (1), Sumana Harihareswara (1), Seth Michael Larson (1), Ran Benita (1), Petr Viktorin (1), Ofek Lev (1), Nicole Harris (1), Miro Hrončok (1), Matt Wozniski (1), Ikko Ashimine (1), David Poznik (1), Agus (1), Adolfo Ochagavía (1)</td></tr><tr><td class="nowrap">24.0</td><td class="nowrap">2024-02-03</td><td class="num">78</td><td>Stéphane Bidoul (37), Damian Shaw (8), Tzu-ping Chung (4), Pradyun Gedam (4), Jean Abou Samra (4), Qiming Xu (3), Роман Донченко (2), Vladimir Fokow (2), Sviatoslav Sydorenko (Святослав Сидоренко) (2), Sander Van Balen (2), J. Nick Koston (2), Flavio Amurrio (2), efflamlemaillet (1), dependabot <span class="badge" title="dependabot[bot]">bot</span> (1), Richard Si (1), Paul Moore (1), Edgar Ramírez Mondragón (1), Dale (1)</td></tr><tr><td class="nowrap">23.3.2</td><td class="nowrap">2023-12-17</td><td class="num">8</td><td>Stéphane Bidoul (4), Sander Van Balen (2), efflamlemaillet (1), Efflam Lemaillet (1)</td></tr><tr><td class="nowrap">23.3.1</td><td class="nowrap">2023-10-21</td><td class="num">14</td><td>Stéphane Bidoul (11), Paul Moore (2), Itamar Turner-Trauring (1)</td></tr><tr><td class="nowrap">23.3</td><td class="nowrap">2023-10-15</td><td class="num">234</td><td>Tzu-ping Chung (50), Sander Van Balen (47), Itamar Turner-Trauring (23), Danny McClanahan (20), Stéphane Bidoul (19), Pradyun Gedam (12), Seth Michael Larson (8), Christian Clauss (8), Paul Moore (7), ddelange (5), Aleš Erjavec (5), Shantanu (4), Joshua (4), Illia Volochii (4), Damian Shaw (3), hauntsaninja (2), dependabot <span class="badge" title="dependabot[bot]">bot</span> (2), Sviatoslav Sydorenko (Святослав Сидоренко) (2), Jeff Widman (2), studioj (1), Wu Zhenyu (1), Shahar Epstein (1), Paul Ganssle (1), Lukas Geiger (1), Kurt McKee (1), Ed Morley (1)</td></tr><tr><td class="nowrap">23.2.1</td><td class="nowrap">2023-07-22</td><td class="num">10</td><td>Paul Moore (7), Tzu-ping Chung (1), Shantanu (1), Matthew Treinish (1)</td></tr><tr><td class="nowrap">23.2</td><td class="nowrap">2023-07-15</td><td class="num">134</td><td>Paul Moore (47), JasonMo1 (17), Tzu-ping Chung (15), Stéphane Bidoul (13), Pradyun Gedam (8), hauntsaninja (6), Maurits van Rees (4), Greg Roodt (4), Роман Донченко (3), stonebig (3), Felipe Peter (3), Chris Kuehl (3), Wu Zhenyu (1), Steven Silvester (1), Shantanu (1), Robert Pollak (1), Nate Prewitt (1), Miro Hrončok (1), Joe Bylund (1), Awit (Ah-Wit) Ghirmai (1)</td></tr><tr><td class="nowrap">23.1.2</td><td class="nowrap">2023-04-26</td><td class="num">7</td><td>Paul Moore (7)</td></tr><tr><td class="nowrap">23.1.1</td><td class="nowrap">2023-04-22</td><td class="num">10</td><td>Paul Moore (8), Stéphane Bidoul (2)</td></tr><tr><td class="nowrap">23.1</td><td class="nowrap">2023-04-15</td><td class="num">232</td><td>Stéphane Bidoul (87), Pradyun Gedam (29), q0w (26), Tzu-ping Chung (15), Paul Moore (14), Ryan Shepherd (11), Michael Mintz (6), Honnix (6), Dos Moonen (6), Phil Elson (5), Frost Ming (3), Filipe Laíns (3), William Edwards (2), Pieter Degroote (2), Matthew Feickert (2), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (1), lorddavidiii (1), Tobias Hermann (1), Sviatoslav Sydorenko (Святослав Сидоренко) (1), Stefano Rivera (1), Roman Donchenko (1), Oliver Mannion (1), Nikhil Ladha (1), Miro Hrončok (1), Juan Luis Cano Rodríguez (1), Hugo van Kemenade (1), Guillaume Seguin (1), Daniele Nicolodi (1), Damian Shaw (1), Collin Anderson (1)</td></tr><tr><td class="nowrap">23.0.1</td><td class="nowrap">2023-02-17</td><td class="num">5</td><td>Pradyun Gedam (2), Stefano Rivera (1), Oliver Mannion (1), Daniele Nicolodi (1)</td></tr><tr><td class="nowrap">23.0</td><td class="nowrap">2023-01-30</td><td class="num">177</td><td>Pradyun Gedam (49), Tzu-ping Chung (44), Judah Rand (20), Paul Moore (14), William Woodruff (12), Stéphane Bidoul (9), Daniil Konovalenko (6), Oliver Freund (3), Daniele Nicolodi (3), Tommi Enenkel | AnB (2), Miro Hrončok (2), Роман Донченко (1), q0w (1), doron zarhi (1), Stephen Rosen (1), Rishi (1), Muha Ajjan‮ (1), Joonatan Partanen (1), Jason Curtis (1), Jakub Kuczys (1), Holly Stotelmyer (1), Ed Morley (1), Dimitri Papadopoulos Orfanos (1), Chris Pryer (1)</td></tr><tr><td class="nowrap">22.3.1</td><td class="nowrap">2022-11-05</td><td class="num">2</td><td>Paul Moore (2)</td></tr><tr><td class="nowrap">22.3</td><td class="nowrap">2022-10-15</td><td class="num">190</td><td>Paul Moore (59), Stéphane Bidoul (44), Pradyun Gedam (39), Tzu-ping Chung (11), Kai Mueller (5), hauntsaninja (4), q0w (3), Sviatoslav Sydorenko (Святослав Сидоренко) (3), Klaas van Schelven (3), M00nL1ght (2), Godefroid Chapelle (2), Federico (2), Claudio Jolowicz (2), kasium (1), Riccardo Schirone (1), Philippe Ombredanne (1), Min RK (1), Jelmer Vernooĳ (1), Jaime Sanz (1), Felipe Peter (1), Dominic Davis-Foster (1), Diego Ramirez (1), Danny McClanahan (1), Brett Rosen (1)</td></tr><tr><td class="nowrap">22.2.2</td><td class="nowrap">2022-08-03</td><td class="num">7</td><td>Stéphane Bidoul (5), Godefroid Chapelle (1), Brett Rosen (1)</td></tr><tr><td class="nowrap">22.2.1</td><td class="nowrap">2022-07-27</td><td class="num">24</td><td>Stéphane Bidoul (9), Pradyun Gedam (6), Klaas van Schelven (4), Tzu-ping Chung (2), Paul Moore (2), q0w (1)</td></tr><tr><td class="nowrap">22.2</td><td class="nowrap">2022-07-21</td><td class="num">186</td><td>Stéphane Bidoul (77), Pradyun Gedam (35), Donald Stufft (21), Tzu-ping Chung (16), Finn Womack (7), q0w (6), Thomas VINCENT (4), Роман Донченко (3), Tony Narlock (3), Seth Michael Larson (3), Paul Moore (3), sandeepkiran-js (2), Jeremy Stanley (1), Hugues Bruant (1), Ed Morley (1), David Runge (1), Bastian Venthur (1), Andrew Shymanel (1)</td></tr><tr><td class="nowrap">22.1.2</td><td class="nowrap">2022-05-31</td><td class="num">3</td><td>Pradyun Gedam (3)</td></tr><tr><td class="nowrap">22.1.1</td><td class="nowrap">2022-05-20</td><td class="num">14</td><td>Pradyun Gedam (12), q0w (1), Tzu-ping Chung (1)</td></tr><tr><td class="nowrap">22.1</td><td class="nowrap">2022-05-11</td><td class="num">23</td><td>Pradyun Gedam (13), wim glenn (4), Tzu-ping Chung (3), Stéphane Bidoul (2), Mathieu Kniewallner (1)</td></tr><tr><td class="nowrap">22.1b1</td><td class="nowrap">2022-04-30</td><td class="num">198</td><td>Pradyun Gedam (88), Tzu-ping Chung (37), q0w (21), Paul Moore (12), ronaudinho (7), Jiun Bae (5), gavin (4), kasium (2), Yusuke Hayashi (2), Stéphane Bidoul (2), Kai Mueller (2), Georgy Pchelkin (2), wim glenn (1), Tomáš Hrnčiar (1), Thiago (1), Shivansh-007 (1), Russell Keith-Magee (1), Nahuel Ambrosini (1), Martin Fischer (1), Jarek Potiuk (1), Hugo van Kemenade (1), Henrich Hartzer (1), Frost Ming (1), Edgar Ramírez Mondragón (1), Diego Ramirez (1), Anthony Sottile (1)</td></tr><tr><td class="nowrap">22.0.4</td><td class="nowrap">2022-03-06</td><td class="num">3</td><td>Pradyun Gedam (2), q0w (1)</td></tr><tr><td class="nowrap">22.0.3</td><td class="nowrap">2022-02-03</td><td class="num">23</td><td>Pradyun Gedam (16), Maurits van Rees (3), q0w (1), Matt Bacchi (1), Martey Dodoo (1), Alex Hedges (1)</td></tr><tr><td class="nowrap">22.0.2</td><td class="nowrap">2022-01-30</td><td class="num">7</td><td>Pradyun Gedam (7)</td></tr><tr><td class="nowrap">22.0.1</td><td class="nowrap">2022-01-30</td><td class="num">8</td><td>Pradyun Gedam (8)</td></tr><tr><td class="nowrap">22.0</td><td class="nowrap">2022-01-29</td><td class="num">245</td><td>Pradyun Gedam (127), Tzu-ping Chung (42), Diego Ramirez (12), Tushar Sadhwani (8), Stéphane Bidoul (7), Alberto Sottile (7), Lukas Juhrich (6), gousaiyang (3), Jon Dufresne (3), Hugo van Kemenade (3), Dustin Ingram (3), Ofek Lev (2), Nate Prewitt (2), Nadav Wexler (2), Ee Durbin (2), Dane Hillard (2), Chris Pawley (2), layday (1), Taneli Hukkinen (1), Paweł Szramowski (1), Nathan Houghton (1), Miro Hrončok (1), Michał Górny (1), Maurits van Rees (1), James (1), Ed Morley (1), Dmitry Volodin (1), Andy Freeland (1), Alex Hedges (1)</td></tr><tr><td class="nowrap">21.3.1</td><td class="nowrap">2021-10-22</td><td class="num">10</td><td>Pradyun Gedam (7), Tzu-ping Chung (2), Ee Durbin (1)</td></tr><tr><td class="nowrap">21.3</td><td class="nowrap">2021-10-11</td><td class="num">429</td><td>Pradyun Gedam (155), Tzu-ping Chung (94), Jon Dufresne (44), Stéphane Bidoul (34), Damian Shaw (19), Nipunn Koorapati (13), Dominic Davis-Foster (13), meowmeowcat (9), harupy (8), Joe Bylund (6), Noah Gorny (5), Ben Mares (5), Alex Hedges (5), ziebam (4), Diego Ramirez (3), Hugo van Kemenade (2), Blazej Michalik (2), Andrey Bienkowski (2), Xavier Fernandez (1), Sylvain (1), Peter Gessler (1), Pavel Safronov (1), Niyas Sait (1), Jesse Rittner (1)</td></tr><tr><td class="nowrap">21.2.4</td><td class="nowrap">2021-08-12</td><td class="num">4</td><td>Tzu-ping Chung (4)</td></tr><tr><td class="nowrap">21.2.3</td><td class="nowrap">2021-08-06</td><td class="num">9</td><td>Tzu-ping Chung (7), Sylvain (1), Alex Hedges (1)</td></tr><tr><td class="nowrap">21.2.2</td><td class="nowrap">2021-07-31</td><td class="num">11</td><td>Tzu-ping Chung (8), Dominic Davis-Foster (2), meowmeowcat (1)</td></tr><tr><td class="nowrap">21.2.1</td><td class="nowrap">2021-07-25</td><td class="num">252</td><td>Tzu-ping Chung (79), Pradyun Gedam (67), OBITORASU (14), Diego Ramirez (13), Stéphane Bidoul (12), harupy (10), Bruno S (8), Taneli Hukkinen (6), Joe Michelini (5), Nicholas Serra (4), Alex Gaynor (4), bwoodsend (2), Min RK (2), Jacob Walls (2), Inada Naoki (2), Illia Volochii (2), Hugo van Kemenade (2), Dominic Davis-Foster (2), johnthagen (1), briantracy (1), Xavier Fernandez (1), Paul Moore (1), Noah Gorny (1), Nikita Chepanov (1), Miro Hrončok (1), László Kiss Kollár (1), Guy Tuval (1), Filipe Laíns (1), Donald Stufft (1), Dirk Stolle (1), Dimitri Merejkowsky (1), Deepyaman Datta (1), Ben Darnell (1), Arun Babu Neelicattu (1)</td></tr><tr><td class="nowrap">21.1.3</td><td class="nowrap">2021-06-26</td><td class="num">4</td><td>Stéphane Bidoul (1), Pradyun Gedam (1), Filipe Laíns (1), Ben Darnell (1)</td></tr><tr><td class="nowrap">21.1.2</td><td class="nowrap">2021-05-23</td><td class="num">14</td><td>Tzu-ping Chung (4), Stéphane Bidoul (4), Nicholas Serra (4), Dimitri Merejkowsky (1), Arun Babu Neelicattu (1)</td></tr><tr><td class="nowrap">21.1.1</td><td class="nowrap">2021-04-30</td><td class="num">15</td><td>Stéphane Bidoul (7), Tzu-ping Chung (4), Pradyun Gedam (3), James Curtin (1)</td></tr><tr><td class="nowrap">21.1</td><td class="nowrap">2021-04-24</td><td class="num">391</td><td>Tzu-ping Chung (134), Pradyun Gedam (100), Andrey Bienkowski (36), Stéphane Bidoul (26), Jon Dufresne (25), Ben Bodenmiller (13), Paul Moore (9), Klaas van Schelven (4), Eric Cousineau (4), Martin Häcker (3), Laurent LAPORTE (3), Jim Fisher (3), Sviatoslav Sydorenko (Святослав Сидоренко) (2), Stefano Rivera (2), Quentin Lee (2), Miro Hrončok (2), Inada Naoki (2), Hugo van Kemenade (2), Danny McClanahan (2), Blazej Michalik (2), ‮rekcäH nitraM‮ (1), cjc7373 (1), XAMES3 (1), Winson Luk (1), Thomas Grainger (1), Max W Chase (1), Martin Pavlasek (1), KOLANICH (1), Joe Bylund (1), Dominic Davis-Foster (1), Denise Yu (1), David Hewitt (1), David D Lowe (1), Darren Kavanagh (1), Daan De Meyer (1)</td></tr><tr><td class="nowrap">21.0.1</td><td class="nowrap">2021-01-30</td><td class="num">20</td><td>Paul Moore (5), Tzu-ping Chung (4), Pradyun Gedam (4), Stéphane Bidoul (3), Noah Gorny (1), Hugo van Kemenade (1), Henry Schreiner (1), Greg Roodt (1)</td></tr><tr><td class="nowrap">21.0</td><td class="nowrap">2021-01-23</td><td class="num">175</td><td>Pradyun Gedam (60), Jon Dufresne (37), Stéphane Bidoul (34), Paul Moore (18), Hugo van Kemenade (11), Tzu-ping Chung (9), Xavier Fernandez (3), Sviatoslav Sydorenko (Святослав Сидоренко) (1), Richard Si (1), Nikita Chepanov (1)</td></tr><tr><td class="nowrap">20.3.3</td><td class="nowrap">2020-12-15</td><td class="num">8</td><td>Pradyun Gedam (7), Tzu-ping Chung (1)</td></tr><tr><td class="nowrap">20.3.2</td><td class="nowrap">2020-12-15</td><td class="num">34</td><td>Pradyun Gedam (16), Tzu-ping Chung (10), Sumana Harihareswara (4), Noah Gorny (2), toxinu (1), gpiks (1)</td></tr><tr><td class="nowrap">20.3.1</td><td class="nowrap">2020-12-03</td><td class="num">5</td><td>Pradyun Gedam (4), Stéphane Bidoul (1)</td></tr><tr><td class="nowrap">20.3</td><td class="nowrap">2020-11-30</td><td class="num">101</td><td>Pradyun Gedam (65), Bernard (12), Tzu-ping Chung (10), Stéphane Bidoul (4), Noah Gorny (4), Sviatoslav Sydorenko (Святослав Сидоренко) (2), Bernard Tyers (2), Jon Dufresne (1), Dustin Ingram (1)</td></tr><tr><td class="nowrap">20.3b1</td><td class="nowrap">2020-10-31</td><td class="num">407</td><td>Pradyun Gedam (177), Nguyễn Gia Phong (45), Tzu-ping Chung (44), Chris Hunt (24), Srinivas Nyayapati (22), Sumana Harihareswara (14), Xavier Fernandez (13), Hugo van Kemenade (13), Stéphane Bidoul (10), Paul Moore (8), Daniel Katz (7), Noah Gorny (5), Devesh Kumar Singh (4), Sviatoslav Sydorenko (Святослав Сидоренко) (3), Nicole Harris (3), wim glenn (2), Laurie O (2), Emmanuel Arias (2), Vipul Kumar (1), Oliver Mannion (1), Noah (1), Miro Hrončok (1), Filipe Laíns (1), Elisha Hollander (1), Ed Morley (1), David Poggi (1), Anthony Sottile (1)</td></tr><tr><td class="nowrap">20.2.4</td><td class="nowrap">2020-10-16</td><td class="num">15</td><td>Pradyun Gedam (14), Xavier Fernandez (1)</td></tr><tr><td class="nowrap">20.2.3</td><td class="nowrap">2020-09-08</td><td class="num">3</td><td>Pradyun Gedam (3)</td></tr><tr><td class="nowrap">20.2.2</td><td class="nowrap">2020-08-11</td><td class="num">7</td><td>Pradyun Gedam (6), Chris Hunt (1)</td></tr><tr><td class="nowrap">20.2.1</td><td class="nowrap">2020-08-04</td><td class="num">13</td><td>Pradyun Gedam (12), Stéphane Bidoul (1)</td></tr><tr><td class="nowrap">20.2</td><td class="nowrap">2020-07-29</td><td class="num">678</td><td>Pradyun Gedam (140), Devesh Kumar Singh (120), Chris Hunt (97), Tzu-ping Chung (65), Paul Moore (59), Stéphane Bidoul (37), Ilan Schnell (35), Nguyễn Gia Phong (24), Sumana Harihareswara (20), Prashant Sharma (19), Cristina Muñoz (13), Surbhi Sharma (6), Srinivas Nyayapati (6), cjc7373 (5), Emmanuel Arias (5), Noah Gorny (4), Nicole Harris (4), Andy Freeland (4), Xavier Fernandez (3), Jussi Kukkonen (3), Christian Heimes (3), Vikram - Google (2), Ruairidh MacLeod (1), Noah (1), Greg Ward (1), Avinash Karhana (1)</td></tr><tr><td class="nowrap">20.2b1</td><td class="nowrap">2020-05-21</td><td class="num">190</td><td>Pradyun Gedam (46), Paul Moore (43), Tzu-ping Chung (30), Ilan Schnell (27), Devesh Kumar Singh (26), Nicole Harris (6), Stéphane Bidoul (5), Prashant Sharma (2), Nguyễn Gia Phong (2), Ville Skyttä (1), Phil Elson (1), Hugo van Kemenade (1)</td></tr><tr><td class="nowrap">20.1.1</td><td class="nowrap">2020-05-19</td><td class="num">7</td><td>Pradyun Gedam (7)</td></tr><tr><td class="nowrap">20.1</td><td class="nowrap">2020-04-28</td><td class="num">34</td><td>Pradyun Gedam (18), Tzu-ping Chung (8), Sumana Harihareswara (2), Noah Gorny (2), Hugo van Kemenade (2), Stefano Rivera (1), Andy Kluger (1)</td></tr><tr><td class="nowrap">20.1b1</td><td class="nowrap">2020-04-20</td><td class="num">632</td><td>Pradyun Gedam (156), Tzu-ping Chung (92), Chris Hunt (85), Paul Moore (76), Ellen Marie Dash (40), Devesh Kumar Singh (28), Sviatoslav Sydorenko (Святослав Сидоренко) (25), Stéphane Bidoul (18), Nikolay Korolev (18), Xavier Fernandez (13), Ilan Schnell (11), Noah Gorny (10), Jason R. Coombs (9), Reece Dunham (8), onlinejudge95 (7), sinscary (5), Nguyễn Gia Phong (4), Deepak Sharma (3), Prashant Sharma (2), Miro Hrončok (2), KOLANICH (2), Hugo van Kemenade (2), Anudit Nagar (2), ghost (1), cjc7373 (1), Tomáš Hrnčiar (1), Sumana Harihareswara (1), Ricky Ng-Adam (1), John T. Wodder II (1), Danny McClanahan (1), Christoph Reiter (1), Christian Clauss (1), Bhavam Vidyarthi (1), Anthony Sottile (1), Andre Aguiar (1), Albert Tugushev (1), @Switch01 (1)</td></tr><tr><td class="nowrap">20.0.2</td><td class="nowrap">2020-01-24</td><td class="num">16</td><td>Pradyun Gedam (11), Tzu-ping Chung (2), Paul Moore (2), Chris Hunt (1)</td></tr><tr><td class="nowrap">20.0.1</td><td class="nowrap">2020-01-21</td><td class="num">6</td><td>Pradyun Gedam (6)</td></tr><tr><td class="nowrap">20.0</td><td class="nowrap">2020-01-21</td><td class="num">823</td><td>Chris Hunt (377), Pradyun Gedam (178), Stéphane Bidoul (83), Tzu-ping Chung (29), Thomas Kluyver (28), Xavier Fernandez (21), Paul Moore (12), Aniruddha Basak (12), Sebastian Jordan (11), Hugo van Kemenade (9), Maxim Kurnikov (8), Hanjun Kim (4), Chris Jerdonek (4), Anatoly Techtonik (4), Preet Thakkar (3), Neil Botelho (3), Harsh Vardhan (3), jenix21 (2), Patrik Kopkan (2), Jiashuo Li (2), Desetude (2), Akash Srivastava (2), victorvpaulo (1), toonarmycaptain (1), sinoroc (1), robin elisha robinson (1), mdebi (1), everdimension (1), admin (1), abs51295 (1), Yeray Diaz Diaz (1), Tomas Orsava (1), Swat009 (1), Shovan Maity (1), Remi Rampin (1), Prabhu Marappan (1), Keith Maxwell (1), Kai Chen (1), Jacob Kim (1), Gopinath M (1), Eitan Adler (1), BorisZZZ (1), Ananya Maiti (1), Albert Tugushev (1), Ahilya (1), Aakanksha Agrawal (1)</td></tr><tr><td class="nowrap">19.3.1</td><td class="nowrap">2019-10-17</td><td class="num">3</td><td>Xavier Fernandez (1), Pradyun Gedam (1), Chris Hunt (1)</td></tr><tr><td class="nowrap">19.3</td><td class="nowrap">2019-10-14</td><td class="num">690</td><td>Pradyun Gedam (267), Chris Hunt (162), Chris Jerdonek (87), Albert Tugushev (22), Omry Yadan (14), Hugo van Kemenade (14), tbeswick (13), Xavier Fernandez (13), Sumana Harihareswara (11), ofrinevo (10), Emil Burzo (8), Stéphane Bidoul (7), NtaleGrey (6), keanemind (5), Sviatoslav Sydorenko (Святослав Сидоренко) (5), Paul Moore (5), John Paton (5), Tony Beswick (3), Prabakaran Kumaresshan (3), Ivan Pozdeev (3), Adam Tse (3), mayeut (2), ahayrapetyan (2), Vinicyus Macedo (2), Mike Hendricks (2), Maxim Kurnikov (2), Frost Ming (2), rdb (1), gpiks (1), Wilson Mo (1), TonyBeswick (1), Steve Barnes (1), Pachwenko (1), Krishna Oza (1), Ashwin Ramaswami (1), Anthony Sottile (1), Anders Kaseorg (1), AinsworthK (1), A_Rog (1)</td></tr><tr><td class="nowrap">19.2.3</td><td class="nowrap">2019-08-25</td><td class="num">4</td><td>Pradyun Gedam (2), Paul Moore (1), Chris Jerdonek (1)</td></tr><tr><td class="nowrap">19.2.2</td><td class="nowrap">2019-08-11</td><td class="num">5</td><td>Pradyun Gedam (5)</td></tr><tr><td class="nowrap">19.2.1</td><td class="nowrap">2019-07-23</td><td class="num">8</td><td>Pradyun Gedam (6), Chris Jerdonek (1), Chris Hunt (1)</td></tr><tr><td class="nowrap">19.2</td><td class="nowrap">2019-07-22</td><td class="num">340</td><td>Chris Jerdonek (144), Pradyun Gedam (93), johnthagen (23), Xavier Fernandez (15), Chris Hunt (9), Steve Dower (4), Eli Schwartz (4), David Bordeynik (4), László Kiss Kollár (3), DiegoCaraballo (3), Benoit Pierre (3), Adam Tse (3), Stéphane Bidoul (2), Segev Finer (2), Masaki (2), Laszlo Kiss-Kollar (2), Jason R. Coombs (2), Abhinav Sagar (2), gzpan123 (1), Tim Gates (1), SeongSoo Cho (1), Savio Jomton (1), Riccardo Magliocchetti (1), Pulkit Goyal (1), Prabakaran Kumaresshan (1), Paul Moore (1), Julian Gethmann (1), Ian Wienand (1), Hugo van Kemenade (1), Donald Stufft (1), Chih-Hsuan Yen (1), Brandt Bucher (1), Bertil Hatt (1), Artem (1), Andreas Lutro (1), Alethea Flowers (1), A_Rog (1), ABHYUDAY PRATAP SINGH (1)</td></tr><tr><td class="nowrap">19.1.1</td><td class="nowrap">2019-05-06</td><td class="num">22</td><td>Chris Jerdonek (11), Donald Stufft (7), ekristina (1), Pradyun Gedam (1), Paul Moore (1), Nicolas Bock (1)</td></tr><tr><td class="nowrap">19.1</td><td class="nowrap">2019-04-24</td><td class="num">137</td><td>Chris Jerdonek (63), Maxim Kurnikov (15), Pradyun Gedam (14), Paul Moore (6), Anthony Sottile (6), Donald Stufft (4), Quentin Pradet (3), Miro Hrončok (3), Jelmer Vernooĳ (3), Tzu-ping Chung (2), Chih-Hsuan Yen (2), Albert Tugushev (2), johnthagen (1), jakirkham (1), Xavier Fernandez (1), Steve Dower (1), Pi Delport (1), Nicolas Bock (1), Juanjo Bazán (1), Jon Dufresne (1), Daniele Esposti (1), Clark Boylan (1), Caleb Martinez (1), Benoit Pierre (1), Andy Freeland (1), Alex Loosley (1)</td></tr><tr><td class="nowrap">19.0.3</td><td class="nowrap">2019-02-20</td><td class="num">10</td><td>Chris Jerdonek (6), Pradyun Gedam (4)</td></tr><tr><td class="nowrap">19.0.2</td><td class="nowrap">2019-02-09</td><td class="num">46</td><td>Pradyun Gedam (20), Chris Jerdonek (12), Steve Dower (6), Alethea Flowers (4), Philip Jägenstedt (1), Nick Timkovich (1), Nick Coghlan (1), Julian Berman (1)</td></tr><tr><td class="nowrap">19.0.1</td><td class="nowrap">2019-01-23</td><td class="num">10</td><td>Pradyun Gedam (8), Paul Moore (1), Donald Stufft (1)</td></tr><tr><td class="nowrap">19.0</td><td class="nowrap">2019-01-22</td><td class="num">394</td><td>Pradyun Gedam (103), Chris Jerdonek (78), Paul Moore (34), Brian Cristante (24), Tzu-ping Chung (21), Benoit Pierre (17), Xavier Fernandez (11), Thomas Kluyver (10), Steve Dower (9), Donald Stufft (8), Maxim Kurnikov (7), elainechan (6), Florian Rathgeber (6), Alexey Popravka (6), Erdinc Mutlu (5), cytolentino (4), William T Olson (4), Kevin R Patterson (4), Albert-Guan (4), xtreak (2), lakshmanaram (2), Peter Lisák (2), Nick Coghlan (2), Miro Hrončok (2), Mark Williams (2), Jon Dufresne (2), Alethea Flowers (2), wim glenn (1), petr-tik (1), mbaluna (1), Yuan Jing Vincent Yan (1), Tom Forbes (1), Sean (1), Prabhjyotsing Surjit Singh Sodhi (1), Pavithra Eswaramoorthy (1), Monica Baluna (1), Felix Yan (1), Eli Schwartz (1), Dave Jones (1), Chih-Hsuan Yen (1), Benjamin Peterson (1), Ami Fischman (1), Adam Tse (1), AceGentile (1)</td></tr><tr><td class="nowrap">18.1</td><td class="nowrap">2018-10-05</td><td class="num">284</td><td>Pradyun Gedam (160), Paul Moore (35), Chris Jerdonek (33), Tzu-ping Chung (16), sinscary (12), Donald Stufft (5), Mickaël Schoentgen (3), Hugo van Kemenade (3), Anatoly Techtonik (3), Laurie Opperman (2), Jonathan Herbert (2), Benoit Pierre (2), Barney Gale (2), Loren Carvalho (1), Jon Dufresne (1), Jean-Christophe Fillion-Robin (1), Bstrdsmkr (1), Bernhard M. Wiedemann (1), Andrew Gaul (1)</td></tr><tr><td class="nowrap">18.0</td><td class="nowrap">2018-07-22</td><td class="num">302</td><td>Pradyun Gedam (191), Benoit Pierre (14), Paul Moore (13), Chris Jerdonek (12), Tom Freudenheim (10), Donald Stufft (10), Jon Dufresne (4), Jeremy Zafran (4), Thijs Triemstra (3), Miro Hrončok (3), Andrés Delfino (3), Alexander Shtyrov (3), Łukasz Langa (2), kpinc (2), keanemind (2), gkdoc (2), Nick Coghlan (2), Ee Durbin (2), Danny Hermes (2), Daniel Shaulov (2), Stephan Erb (1), Shlomi Fish (1), Philip Molloy (1), Paul Kehrer (1), Oliver Jeeves (1), Nehal J Wani (1), Kexuan Sun (1), Jakub Wilk (1), Hugo van Kemenade (1), Eli Schwartz (1), DrFeathers (1), Dan Black (1), Brett Randall (1), Bastian Venthur (1), Anthony Sottile (1), Adrien Morison (1)</td></tr><tr><td class="nowrap">10.0.1</td><td class="nowrap">2018-04-19</td><td class="num">32</td><td>Paul Moore (12), Pradyun Gedam (11), Donald Stufft (6), Benoit Pierre (3)</td></tr><tr><td class="nowrap">10.0.0</td><td class="nowrap">2018-04-14</td><td class="num">39</td><td>Pradyun Gedam (16), Paul Moore (16), Dustin Ingram (4), mattip (1), Stephan Erb (1), Benoit Pierre (1)</td></tr><tr><td class="nowrap">10.0.0b2</td><td class="nowrap">2018-04-02</td><td class="num">15</td><td>Paul Moore (11), Pradyun Gedam (2), Donald Stufft (2)</td></tr><tr><td class="nowrap">10.0.0b1</td><td class="nowrap">2018-03-31</td><td class="num">857</td><td>Pradyun Gedam (358), Donald Stufft (139), Thomas Kluyver (57), Paul Moore (40), Xavier Fernandez (35), Chris Jerdonek (31), Alex Gaynor (30), xoviat (23), Benoit Pierre (15), Anubhav Patel (11), Luo Jiebin (10), Brandon L. Reiss (7), Dustin Ingram (6), Cooper Ry Lees (6), Michael Williamson (5), Anthony Sottile (4), Anatoly Techtonik (4), Min RK (3), Jon Dufresne (3), Anish Tambe (3), Ville Skyttä (2), Segev Finer (2), R. David Murray (2), Phil Pennock (2), OMOTO Kenji (2), Mariatta (2), Igor Kuzmitshov (2), Hugo van Kemenade (2), Curtis Doty (2), Bartek Ogryczak (2), Avner Cohen (2), Atsushi Odagiri (2), Семён Марьясин (1), pip (1), luz.paz (1), luojiebin (1), kpinc (1), gdanielson (1), fiber-space (1), Zearin (1), Vincent Philippon (1), Victor Stinner (1), Stephan Erb (1), Pratik Mallya (1), Pi Delport (1), Paul Kehrer (1), Oz N Tiram (1), Nikhil Benesch (1), Maxim Kurnikov (1), Matthew Willson (1), <em>and 25 more authors</em></td></tr><tr><td class="nowrap">9.0.3</td><td class="nowrap">2018-03-22</td><td class="num">4</td><td>Donald Stufft (4)</td></tr><tr><td class="nowrap">9.0.2</td><td class="nowrap">2018-03-17</td><td class="num">7</td><td>Donald Stufft (7)</td></tr><tr><td class="nowrap">9.0.1</td><td class="nowrap">2016-11-06</td><td class="num">17</td><td>Donald Stufft (9), Xavier Fernandez (2), Zearin (1), Viktor Szépe (1), Tom V (1), Simon Pichugin (1), Marc Abramowitz (1), Lipis (1)</td></tr><tr><td class="nowrap">9.0.0</td><td class="nowrap">2016-11-02</td><td class="num">189</td><td>Xavier Fernandez (54), Paul Moore (21), Donald Stufft (19), Matthias Bussonnier (8), Marc Abramowitz (8), nvdv (7), Patrick Lawson (7), Connor Osborn (5), stepshal (3), c22 (3), Wolfgang Maier (3), Stéphane Bidoul (3), Pradyun Gedam (3), Bruno Oliveira (3), ryneeverett (2), Steve Barnes (2), Sebastian Schaetz (2), Pekka Klärck (2), Ofek Lev (2), Min RK (2), Benjamin VanEvery (2), michaelpacer (1), memoselyk (1), Zvezdan Petkovic (1), YAMAMOTO Takashi (1), Wilfred Hughes (1), Victor Stinner (1), Tim Heap (1), Tim D. Smith (1), Sorin Sbarnea (1), Nathaniel J. Smith (1), Michael Aquilina (1), Maxim Kurnikov (1), Mathew Jennings (1), Jivan Amara (1), Jason R. Coombs (1), Jakub Wilk (1), Ian Lee (1), Douglas Thor (1), David Caro (1), Daniel Holth (1), Cody (1), Chandrasekhar Atina (1), Carter Thayer (1), Calvin Smith (1), Andy Kluger (1), Anatoly Techtonik (1), Alex Stachowiak (1), Adam Chainz (1)</td></tr><tr><td class="nowrap">8.1.2</td><td class="nowrap">2016-05-11</td><td class="num">27</td><td>Donald Stufft (10), Xavier Fernandez (4), Steve Kowalik (2), Paul Moore (2), Nathaniel J. Smith (2), tinruufu (1), burrows (1), Ville Skyttä (1), Matthew Iversen (1), Ian Wienand (1), Geoffrey Sneddon (1), Chih-Hsuan Yen (1)</td></tr><tr><td class="nowrap">8.1.1</td><td class="nowrap">2016-03-17</td><td class="num">13</td><td>Xavier Fernandez (5), Donald Stufft (5), Matthew Iversen (1), Ian Lee (1), Cory Wright (1)</td></tr><tr><td class="nowrap">8.1.0</td><td class="nowrap">2016-03-05</td><td class="num">147</td><td>Xavier Fernandez (56), Donald Stufft (31), Stéphane Bidoul (8), Francesco Montesano (6), Carlos Liam (5), stonebig (4), Rohan Jain (4), Matthew Iversen (4), Buck Golemon (3), Steve Kowalik (2), Salvatore Rinchiera (2), Nathaniel J. Smith (2), seanj (1), nvdv (1), kaustav haldar (1), jwg4 (1), Tony Zhaocheng Tan (1), Stephan Erb (1), Ryan Wooden (1), Robert T. McGibbon (1), Paul Moore (1), Olivier Grisel (1), Marc Abramowitz (1), Kenneth Reitz (1), Jon Banafato (1), Jeremy Stanley (1), Ed Morley (1), Christopher Snyder (1), Cass (1), Carol Willing (1), Anton Ovchinnikov (1), Antoine Musso (1)</td></tr><tr><td class="nowrap">8.0.3</td><td class="nowrap">2016-02-25</td><td class="num">9</td><td>Xavier Fernandez (7), Paul Moore (1), Donald Stufft (1)</td></tr><tr><td class="nowrap">8.0.2</td><td class="nowrap">2016-01-21</td><td class="num">6</td><td>Donald Stufft (6)</td></tr><tr><td class="nowrap">8.0.1</td><td class="nowrap">2016-01-21</td><td class="num">40</td><td>Donald Stufft (30), Xavier Fernandez (4), daniel (1), Vladimir Rutsky (1), Robert Collins (1), Michael (1), Ian Wienand (1), Emil Styrke (1)</td></tr><tr><td class="nowrap">8.0.0</td><td class="nowrap">2016-01-20</td><td class="num">378</td><td>Xavier Fernandez (123), Donald Stufft (86), Erik Rose (40), Marcus Smith (38), Stéphane Bidoul (13), Paul Moore (11), Matthew Iversen (9), Alex Gaynor (8), Nate Coraor (6), Roy Wellington Ⅳ (5), Douglas Thor (5), Sachi King (3), Domen Kožar (3), Andy Freeland (3), Ville Skyttä (2), Thomas Smith (2), David Linke (2), Anatoly Techtonik (2), Thomas Grainger (1), Steve Kowalik (1), Robert T. McGibbon (1), Robert Collins (1), Nick Coghlan (1), Nathaniel J. Smith (1), Michael Klich (1), Matt Robenolt (1), Mathew Jennings (1), Kevin Carter (1), Jeff Barber (1), James Firth (1), Ian Stapleton Cordasco (1), Colin Watson (1), Carol Willing (1), Arindam Choudhury (1), AQNOUCH Mohammed (1)</td></tr><tr><td class="nowrap">7.1.2</td><td class="nowrap">2015-08-22</td><td class="num">7</td><td>Donald Stufft (7)</td></tr><tr><td class="nowrap">7.1.1</td><td class="nowrap">2015-08-20</td><td class="num">43</td><td>Donald Stufft (29), Xavier Fernandez (5), Tim D. Smith (1), Paulus Schoutsen (1), Min RK (1), Marcus Smith (1), Kit Randel (1), James Cleveland (1), Ian Wienand (1), Berker Peksag (1), Alex Gaynor (1)</td></tr><tr><td class="nowrap">7.1.0</td><td class="nowrap">2015-06-30</td><td class="num">69</td><td>Donald Stufft (44), Marcus Smith (8), Robert Collins (3), James Polley (3), Paul Moore (2), Min RK (2), matthew (1), Xavier Fernandez (1), William ML Leslie (1), Scott Kitterman (1), Matthias Bussonnier (1), Julien Demoor (1), Joost Molenaar (1)</td></tr><tr><td class="nowrap">7.0.3</td><td class="nowrap">2015-06-02</td><td class="num">4</td><td>Donald Stufft (4)</td></tr><tr><td class="nowrap">7.0.2</td><td class="nowrap">2015-06-01</td><td class="num">10</td><td>Donald Stufft (9), Paul Moore (1)</td></tr><tr><td class="nowrap">7.0.1</td><td class="nowrap">2015-05-23</td><td class="num">8</td><td>Donald Stufft (8)</td></tr><tr><td class="nowrap">7.0.0</td><td class="nowrap">2015-05-22</td><td class="num">192</td><td>Donald Stufft (79), Marcus Smith (52), Robert Collins (24), Georgi Valkov (12), Xavier Fernandez (10), Mihir Singh (4), Paul Moore (2), Matthew Trumbell (2), Marc Abramowitz (2), Anatoly Techtonik (2), Thomas Guettler (1), Razzi Abuissa (1), Mark Kohler (1)</td></tr><tr><td class="nowrap">6.1.1</td><td class="nowrap">2015-04-07</td><td class="num">7</td><td>Donald Stufft (7)</td></tr><tr><td class="nowrap">6.1.0</td><td class="nowrap">2015-04-07</td><td class="num">381</td><td>Donald Stufft (165), Xavier Fernandez (38), Marc Abramowitz (36), derwolfe (30), Paul Moore (26), Robert Collins (24), Marcus Smith (21), Thomas Kluyver (9), Ludovic Gasc (4), Cory Benfield (3), Romuald Brunet (2), Matthew Iversen (2), Daniel Holth (2), Aleks Bunin (2), Tim Harder (1), Richard Jones (1), Pi Delport (1), Philippe Ombredanne (1), Patrick Lawson (1), Matej Stuchlik (1), Kyle Persohn (1), Joseph Long (1), Ionel Cristian Mărieș (1), Ian Stapleton Cordasco (1), Guilherme Espada (1), Eric Hanchrow (1), Eric Gillingham (1), Dwayne Bailey (1), Clark Boylan (1), Bence Nagy (1), Alex Gaynor (1)</td></tr><tr><td class="nowrap">6.0.8</td><td class="nowrap">2015-02-05</td><td class="num">10</td><td>Donald Stufft (8), Paul Moore (2)</td></tr><tr><td class="nowrap">6.0.7</td><td class="nowrap">2015-01-28</td><td class="num">16</td><td>Donald Stufft (15), Paul Moore (1)</td></tr><tr><td class="nowrap">6.0.6</td><td class="nowrap">2015-01-03</td><td class="num">5</td><td>Donald Stufft (5)</td></tr><tr><td class="nowrap">6.0.5</td><td class="nowrap">2015-01-03</td><td class="num">5</td><td>Donald Stufft (5)</td></tr><tr><td class="nowrap">6.0.4</td><td class="nowrap">2015-01-03</td><td class="num">18</td><td>Donald Stufft (18)</td></tr><tr><td class="nowrap">6.0.3</td><td class="nowrap">2014-12-24</td><td class="num">6</td><td>Donald Stufft (6)</td></tr><tr><td class="nowrap">6.0.2</td><td class="nowrap">2014-12-23</td><td class="num">9</td><td>Donald Stufft (8), Marc Abramowitz (1)</td></tr><tr><td class="nowrap">6.0.1</td><td class="nowrap">2014-12-22</td><td class="num">18</td><td>Donald Stufft (10), Marcus Smith (3), patricktokeeffe (1), Matthew Einhorn (1), Marc Abramowitz (1), Laurent Bristiel (1), Ionel Cristian Mărieș (1)</td></tr><tr><td class="nowrap">6.0</td><td class="nowrap">2014-12-22</td><td class="num">744</td><td>Donald Stufft (365), Marcus Smith (84), Matthew Iversen (59), Paul Moore (47), Marc Abramowitz (25), Xavier Fernandez (16), Alex Gaynor (10), Richard Jones (8), Kevin Burke (7), Jannis Leidel (7), Berker Peksag (7), Remi Rampin (6), Min RK (6), Chris Jerdonek (6), Anatoly Techtonik (6), Buck Golemon (5), Dongweiming (3), Davidovich (3), Daniel Hahler (3), Antonio Alvarado Hernandez (3), Alethea Flowers (3), schlamar (2), Victor Stinner (2), Toshio Kuratomi (2), Stefan Scherfke (2), Simeon Visser (2), RobberPhex (2), Pierre-Yves Rofes (2), Pawel Jasinski (2), Michael E. Karpeles (2), Matthias Bussonnier (2), Matthew Gilliard (2), Matt Good (2), Jyrki Pulliainen (2), James Polley (2), Inada Naoki (2), Florian Briand (2), Eugene Vereshchagin (2), Daniele Procida (2), Ashley Manton (2), Alli (2), jarondl (1), gizmoguy1 (1), Valentin Haenel (1), Tomer Chachamu (1), Roman Bogorodskiy (1), Phaneendra Chiruvella (1), Oscar Benjamin (1), Matthew Einhorn (1), Matt Robenolt (1), <em>and 16 more authors</em></td></tr><tr><td class="nowrap">1.5.6</td><td class="nowrap">2014-05-17</td><td class="num">6</td><td>Donald Stufft (6)</td></tr><tr><td class="nowrap">1.5.5</td><td class="nowrap">2014-05-03</td><td class="num">32</td><td>Donald Stufft (18), Marcus Smith (9), Jannis Leidel (5)</td></tr><tr><td class="nowrap">1.5.4</td><td class="nowrap">2014-02-21</td><td class="num">4</td><td>Marcus Smith (2), Donald Stufft (2)</td></tr><tr><td class="nowrap">1.5.3</td><td class="nowrap">2014-02-21</td><td class="num">21</td><td>Donald Stufft (10), Marcus Smith (8), Paul Moore (2), Matthew Iversen (1)</td></tr><tr><td class="nowrap">1.5.2</td><td class="nowrap">2014-01-26</td><td class="num">23</td><td>Donald Stufft (16), Marcus Smith (4), Paul Moore (1), Jannis Leidel (1), Daniel Jost (1)</td></tr><tr><td class="nowrap">1.5.1</td><td class="nowrap">2014-01-21</td><td class="num">1</td><td>Donald Stufft (1)</td></tr><tr><td class="nowrap">1.5.1rc1</td><td class="nowrap">2014-01-17</td><td class="num">47</td><td>Donald Stufft (28), Marcus Smith (16), Ralf Schmitt (3)</td></tr><tr><td class="nowrap">1.5</td><td class="nowrap">2014-01-02</td><td class="num">4</td><td>Donald Stufft (3), Marcus Smith (1)</td></tr><tr><td class="nowrap">1.5rc4</td><td class="nowrap">2013-12-31</td><td class="num">3</td><td>Donald Stufft (3)</td></tr><tr><td class="nowrap">1.5rc3</td><td class="nowrap">2013-12-27</td><td class="num">3</td><td>Donald Stufft (3)</td></tr><tr><td class="nowrap">1.5rc2</td><td class="nowrap">2013-12-20</td><td class="num">35</td><td>Marcus Smith (20), Donald Stufft (12), Stefan Scherfke (2), Ben Darnell (1)</td></tr><tr><td class="nowrap">1.5rc1</td><td class="nowrap">2013-11-22</td><td class="num">317</td><td>Donald Stufft (160), Marcus Smith (81), Paul Moore (26), Jannis Leidel (16), Paul Nasrat (9), Jorge Niedbalski (7), Michael Williamson (2), Lincoln de Sousa (2), David Pursehouse (2), Zearin (1), Yu Jian (1), Takayuki SHIMIZUKAWA (1), Steven Myint (1), Preston Holmes (1), Monty Taylor (1), Jim Garrison (1), Hynek Schlawack (1), Georgi Valkov (1), Carl Meyer (1), Baptiste Mispelon (1), Adam Wentz (1)</td></tr><tr><td class="nowrap">1.4.1</td><td class="nowrap">2013-08-08</td><td class="num">24</td><td>Marcus Smith (17), Donald Stufft (5), Jannis Leidel (1), Daniel Holth (1)</td></tr><tr><td class="nowrap">1.4</td><td class="nowrap">2013-07-23</td><td class="num">11</td><td>Jannis Leidel (10), Marcus Smith (1)</td></tr><tr><td class="nowrap">1.4rc5</td><td class="nowrap">2013-07-16</td><td class="num">4</td><td>Marcus Smith (2), Toshio Kuratomi (1), David Aguilar (1)</td></tr><tr><td class="nowrap">1.4rc4</td><td class="nowrap">2013-07-13</td><td class="num">8</td><td>Marcus Smith (6), Donald Stufft (2)</td></tr><tr><td class="nowrap">1.4rc3</td><td class="nowrap">2013-07-06</td><td class="num">14</td><td>Marcus Smith (9), Daniel Holth (4), Donald Stufft (1)</td></tr><tr><td class="nowrap">1.4rc2</td><td class="nowrap">2013-07-02</td><td class="num">16</td><td>Daniel Holth (8), Marcus Smith (7), Kevin Frommelt (1)</td></tr><tr><td class="nowrap">1.4rc1</td><td class="nowrap">2013-06-30</td><td class="num">246</td><td>Marcus Smith (148), Donald Stufft (30), Jannis Leidel (14), Daniel Holth (13), Carl Meyer (11), Gabriel de Perthuis (8), Hugo Lopes Tavares (6), Paul Moore (5), Paul Nasrat (4), Steven Myint (2), Yoval P (1), Josh Hansen (1), Erik M. Bray (1), David Black (1), Anrs Hu (1)</td></tr><tr><td class="nowrap">1.3.1</td><td class="nowrap">2013-03-07</td><td class="num">5</td><td>Jannis Leidel (5)</td></tr><tr><td class="nowrap">1.3</td><td class="nowrap">2013-03-07</td><td class="num">3</td><td>Jannis Leidel (3)</td></tr><tr><td class="nowrap">1.3rc2</td><td class="nowrap">2013-03-05</td><td class="num">8</td><td>Marcus Smith (8)</td></tr><tr><td class="nowrap">1.3rc1</td><td class="nowrap">2013-02-22</td><td class="num">299</td><td>Marcus Smith (161), Georgi Valkov (34), Rafael Caricio (22), Carl Meyer (19), Ben Rosser (10), Paul Nasrat (8), Jannis Leidel (7), James Cleveland (6), David Black (6), Andrey Bulgakov (5), Przemek Wrzos (4), Paul Moore (3), Maxime Rouyrre (3), Miguel Araujo Perez (2), Chris McDonough (2), socketubs (1), enoch (1), Roey Berman (1), Marc Abramowitz (1), Jonas Nockert (1), Dmitry Gladkov (1), Alex Grönholm (1)</td></tr><tr><td class="nowrap">1.2.1</td><td class="nowrap">2012-09-06</td><td class="num">14</td><td>Marcus Smith (5), Jannis Leidel (5), Carl Meyer (2), Preston Holmes (1), Garry Polley (1)</td></tr><tr><td class="nowrap">1.2</td><td class="nowrap">2012-09-01</td><td class="num">240</td><td>Paul Nasrat (62), Carl Meyer (41), Marcus Smith (28), Jannis Leidel (28), Donald Stufft (13), Ben Rosser (11), Clay McClure (7), Rory McCann (6), Marc Abramowitz (4), Georgi Valkov (4), Phil Whelan (3), Ollie Rutherfurd (3), Markus Hametner (3), Kamal Bin Mustafa (3), W. Trevor King (2), Thomas Fenzl (2), Seth Woodworth (2), Pi Delport (2), Nick Stenning (2), Hsiaoming Yang (2), Stéphane Klein (1), Phil Freo (1), Oren Held (1), Marc Tamlyn (1), Kenneth Reitz (1), Jeff Dairiki (1), Jakub Stasiak (1), Ian Bicking (1), Endoh Takanao (1), Bernardo B. Marques (1), Anton Patrushev (1), Andrei Geacar (1)</td></tr><tr><td class="nowrap">1.1</td><td class="nowrap">2012-02-16</td><td class="num">177</td><td>Carl Meyer (65), Jannis Leidel (19), Paul Nasrat (18), Alex Morega (13), Hugo Lopes Tavares (12), Qiangning Hong (7), Stavros Korokithakis (5), Marc Abramowitz (5), Olivier Girardot (4), Erik M. Bray (4), Rene Dudfield (2), Paul van der Linden (2), Marcus Smith (2), Herbert Pfennig (2), David Evans (2), Zhiping Deng (1), Travis Swicegood (1), Sergey Vasilyev (1), Ross Brattain (1), Preston Holmes (1), Pi Delport (1), Paul Oswald (1), Patrick Dubroy (1), Matt Maker (1), Lev Givon (1), George Song (1), Cristian Sorinel (1), Craig Kerstiens (1), Antti Kaihola (1), Alex Gaynor (1)</td></tr><tr><td class="nowrap">1.0.2</td><td class="nowrap">2011-07-16</td><td class="num">15</td><td>Jannis Leidel (8), Carl Meyer (4), Paul Nasrat (1), Patrick Dubroy (1), Hugo Lopes Tavares (1)</td></tr><tr><td class="nowrap">1.0.1</td><td class="nowrap">2011-04-30</td><td class="num">38</td><td>Carl Meyer (11), Paul Nasrat (9), Jannis Leidel (9), Hugo Lopes Tavares (5), Bradley Ayers (3), Dan Sully (1)</td></tr><tr><td class="nowrap">1.0</td><td class="nowrap">2011-04-04</td><td class="num">95</td><td>Carl Meyer (42), Jannis Leidel (26), Hugo Lopes Tavares (11), Vitaly Babiy (5), Alex Morega (5), Alex Grönholm (3), Vinay Sajip (1), Ian Bicking (1), Christian Oudard (1)</td></tr><tr><td class="nowrap">0.8.3</td><td class="nowrap">2011-03-12</td><td class="num">34</td><td>Jannis Leidel (11), Hugo Lopes Tavares (9), Igor Sobreira (3), Carl Meyer (3), Patrick Jenkins (2), Kelsey Hightower (2), Jon Parise (2), Oliver Tonnhofer (1), Ian Bicking (1)</td></tr><tr><td class="nowrap">0.8.2</td><td class="nowrap">2010-11-29</td><td class="num">15</td><td>Jannis Leidel (6), Ian Bicking (5), Hugo Lopes Tavares (3), Peter Waller (1)</td></tr><tr><td class="nowrap">0.8.1</td><td class="nowrap">2010-09-14</td><td class="num">61</td><td>Hugo Lopes Tavares (26), Jannis Leidel (17), Ronny Pfannschmidt (10), Carl Meyer (4), Ian Bicking (2), Wil Tan (1), John-Scott Atlakson (1)</td></tr><tr><td class="nowrap">0.8</td><td class="nowrap">2010-08-03</td><td class="num">196</td><td>Hugo Lopes Tavares (76), Dave Abrahams (53), Carl Meyer (32), Ian Bicking (13), Jannis Leidel (10), Francesco (10), Ronny Pfannschmidt (1), Armin Ronacher (1)</td></tr><tr><td class="nowrap">0.7.1</td><td class="nowrap">2010-04-22</td><td class="num">19</td><td>Ian Bicking (10), Alexandre Conrad (5), Simon Cross (2), Carl Meyer (2)</td></tr><tr><td class="nowrap">0.7</td><td class="nowrap">2010-04-16</td><td class="num">151</td><td>Carl Meyer (40), Ian Bicking (39), Jannis Leidel (22), Jakub Vysoky (13), Simon Cross (9), Cody Soyland (9), Hugo Lopes Tavares (7), Alexandre Conrad (7), Daniel Holth (2), Paul Nasrat (1), Brian Rosner (1), Alex Grönholm (1)</td></tr><tr><td class="nowrap">0.6</td><td class="nowrap">2009-11-10</td><td class="num">138</td><td>Jannis Leidel (59), Carl Meyer (57), Ian Bicking (20), Thomas Johansson (1), Nowell Strite (1)</td></tr><tr><td class="nowrap">0.5</td><td class="nowrap">2009-10-07</td><td class="num">78</td><td>Jannis Leidel (53), Carl Meyer (10), Ian Bicking (8), Brian Rosner (4), Masklinn (2), Kenneth Belitzky (1)</td></tr><tr><td class="nowrap">0.4</td><td class="nowrap">2009-05-27</td><td class="num">83</td><td>Ian Bicking (38), Jannis Leidel (28), Ionel Maries Cristian (6), Carl Meyer (5), Masklinn (2), Jay Graves (2), Luke Macken (1), Kumar McMillan (1)</td></tr><tr><td class="nowrap">0.3</td><td class="nowrap">2009-01-21</td><td class="num">56</td><td>Ian Bicking (37), Jannis Leidel (18), Josh Bronson (1)</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="../ecosystems/python.html">How pip ranks among Python open source projects by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+name: GitStats Report
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  gitstats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: shenxianpeng/gitstats-action@v1
+        with:
+          deploy-to-pages: true
+</pre></details></section><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

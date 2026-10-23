@@ -1,0 +1,168 @@
+# The repositories of the GitStats Gallery, by ecosystem:
+# https://shenxianpeng.dev/gitstats/gallery/
+#
+# .github/workflows/gallery.yml makes one report for each, every Monday, and
+# scripts/generate_gallery_portfolio.py lists them by these groups.
+#
+# Each group has an id (its page: /gallery/ecosystems/<id>.html, so do not
+# rename one), a name, and the title its page's heading names its projects by.
+#
+#   id       the report's folder: https://shenxianpeng.dev/gitstats/gallery/<id>/
+#            Lower case, digits and dashes. Do not rename one: links point to it.
+#   name     how the pages name the repository
+#   url      owner/name on GitHub
+#   timeout  minutes the job may take (optional, default 90): the largest
+#            histories take about five
+#
+# To suggest a repository, open an issue with the "Add my project to the
+# Gallery" template.
+
+groups:
+  - id: python
+    name: Python
+    title: Python open source projects
+    repos:
+      - { id: cpython,       name: "CPython",       url: "python/cpython" }
+      - { id: django,        name: "Django",        url: "django/django" }
+      - { id: flask,         name: "Flask",         url: "pallets/flask" }
+      - { id: fastapi,       name: "FastAPI",       url: "fastapi/fastapi" }
+      - { id: requests,      name: "Requests",      url: "psf/requests" }
+      - { id: pandas,        name: "pandas",        url: "pandas-dev/pandas" }
+      - { id: numpy,         name: "NumPy",         url: "numpy/numpy" }
+      - { id: scipy,         name: "SciPy",         url: "scipy/scipy" }
+      - { id: scikit-learn,  name: "scikit-learn",  url: "scikit-learn/scikit-learn" }
+      - { id: matplotlib,    name: "Matplotlib",    url: "matplotlib/matplotlib" }
+      - { id: pip,           name: "pip",           url: "pypa/pip" }
+      - { id: pytest,        name: "pytest",        url: "pytest-dev/pytest" }
+      - { id: sqlalchemy,    name: "SQLAlchemy",    url: "sqlalchemy/sqlalchemy" }
+      - { id: pydantic,      name: "Pydantic",      url: "pydantic/pydantic" }
+      - { id: uv,            name: "uv",            url: "astral-sh/uv" }
+      - { id: ruff,          name: "Ruff",          url: "astral-sh/ruff" }
+      - { id: home-assistant, name: "Home Assistant", url: "home-assistant/core" }
+
+  - id: ai-coding
+    name: AI coding assistants
+    title: Open source AI coding assistants
+    # how much their own history names one
+    repos:
+      - { id: codex,         name: "Codex CLI",     url: "openai/codex" }
+      - { id: gemini-cli,    name: "Gemini CLI",    url: "google-gemini/gemini-cli" }
+      - { id: claude-code,   name: "Claude Code",   url: "anthropics/claude-code" }
+      - { id: opencode,      name: "OpenCode",      url: "anomalyco/opencode" }
+      - { id: aider,         name: "Aider",         url: "Aider-AI/aider" }
+      - { id: cline,         name: "Cline",         url: "cline/cline" }
+      - { id: continue,      name: "Continue",      url: "continuedev/continue" }
+      - { id: openhands,     name: "OpenHands",     url: "OpenHands/OpenHands" }
+      - { id: goose,         name: "goose",         url: "aaif-goose/goose" }
+      - { id: qwen-code,     name: "Qwen Code",     url: "QwenLM/qwen-code" }
+      - { id: kilocode,      name: "Kilo Code",     url: "Kilo-Org/kilocode" }
+      - { id: crush,         name: "Crush",         url: "charmbracelet/crush" }
+
+  - id: ai-ml
+    name: AI and machine learning
+    title: Open source AI and machine learning projects
+    repos:
+      - { id: pytorch,       name: "PyTorch",       url: "pytorch/pytorch" }
+      - { id: transformers,  name: "Transformers",  url: "huggingface/transformers" }
+      - { id: langchain,     name: "LangChain",     url: "langchain-ai/langchain" }
+      - { id: tensorflow,    name: "TensorFlow",    url: "tensorflow/tensorflow" }
+      - { id: jax,           name: "JAX",           url: "jax-ml/jax" }
+      - { id: vllm,          name: "vLLM",          url: "vllm-project/vllm" }
+      - { id: llama-cpp,     name: "llama.cpp",     url: "ggml-org/llama.cpp" }
+      - { id: ollama,        name: "Ollama",        url: "ollama/ollama" }
+      - { id: diffusers,     name: "Diffusers",     url: "huggingface/diffusers" }
+      - { id: llama-index,   name: "LlamaIndex",    url: "run-llama/llama_index" }
+      - { id: ray,           name: "Ray",           url: "ray-project/ray" }
+      - { id: sglang,        name: "SGLang",        url: "sgl-project/sglang" }
+
+  - id: cncf
+    name: CNCF graduated
+    title: CNCF graduated projects
+    repos:
+      - { id: kubernetes,    name: "Kubernetes",    url: "kubernetes/kubernetes" }
+      - { id: prometheus,    name: "Prometheus",    url: "prometheus/prometheus" }
+      - { id: envoy,         name: "Envoy",         url: "envoyproxy/envoy" }
+      - { id: etcd,          name: "etcd",          url: "etcd-io/etcd" }
+      - { id: containerd,    name: "containerd",    url: "containerd/containerd" }
+      - { id: helm,          name: "Helm",          url: "helm/helm" }
+      - { id: istio,         name: "Istio",         url: "istio/istio" }
+      - { id: argo-cd,       name: "Argo CD",       url: "argoproj/argo-cd" }
+      - { id: cilium,        name: "Cilium",        url: "cilium/cilium" }
+      - { id: coredns,       name: "CoreDNS",       url: "coredns/coredns" }
+      - { id: jaeger,        name: "Jaeger",        url: "jaegertracing/jaeger" }
+      - { id: linkerd,       name: "Linkerd",       url: "linkerd/linkerd2" }
+      - { id: harbor,        name: "Harbor",        url: "goharbor/harbor" }
+      - { id: flux,          name: "Flux",          url: "fluxcd/flux2" }
+      - { id: tikv,          name: "TiKV",          url: "tikv/tikv" }
+
+  - id: apache
+    name: Apache
+    title: Apache projects
+    repos:
+      - { id: airflow,       name: "Apache Airflow",  url: "apache/airflow" }
+      - { id: spark,         name: "Apache Spark",    url: "apache/spark" }
+      - { id: kafka,         name: "Apache Kafka",    url: "apache/kafka" }
+      - { id: flink,         name: "Apache Flink",    url: "apache/flink" }
+      - { id: arrow,         name: "Apache Arrow",    url: "apache/arrow" }
+      - { id: superset,      name: "Apache Superset", url: "apache/superset" }
+      - { id: cassandra,     name: "Apache Cassandra", url: "apache/cassandra" }
+      - { id: beam,          name: "Apache Beam",     url: "apache/beam" }
+      - { id: iceberg,       name: "Apache Iceberg",  url: "apache/iceberg" }
+      - { id: pulsar,        name: "Apache Pulsar",   url: "apache/pulsar" }
+
+  - id: frontend
+    name: Web frontend
+    title: Open source web frontend projects
+    repos:
+      - { id: react,         name: "React",         url: "react/react" }
+      - { id: vue,           name: "Vue",           url: "vuejs/core" }
+      - { id: angular,       name: "Angular",       url: "angular/angular" }
+      - { id: svelte,        name: "Svelte",        url: "sveltejs/svelte" }
+      - { id: nextjs,        name: "Next.js",       url: "vercel/next.js" }
+      - { id: nuxt,          name: "Nuxt",          url: "nuxt/nuxt" }
+      - { id: vite,          name: "Vite",          url: "vitejs/vite" }
+      - { id: astro,         name: "Astro",         url: "withastro/astro" }
+      - { id: tailwindcss,   name: "Tailwind CSS",  url: "tailwindlabs/tailwindcss" }
+      - { id: webpack,       name: "webpack",       url: "webpack/webpack" }
+      - { id: typescript,    name: "TypeScript",    url: "microsoft/TypeScript" }
+
+  - id: china
+    name: Open source from China
+    title: Open source projects from China
+    # Apache projects started in China, OpenHarmony (its GitHub mirrors) and others
+    repos:
+      - { id: dubbo,         name: "Apache Dubbo",  url: "apache/dubbo" }
+      - { id: shardingsphere, name: "Apache ShardingSphere", url: "apache/shardingsphere" }
+      - { id: doris,         name: "Apache Doris",  url: "apache/doris" }
+      - { id: echarts,       name: "Apache ECharts", url: "apache/echarts" }
+      - { id: dolphinscheduler, name: "Apache DolphinScheduler", url: "apache/dolphinscheduler" }
+      - { id: skywalking,    name: "Apache SkyWalking", url: "apache/skywalking" }
+      - { id: rocketmq,      name: "Apache RocketMQ", url: "apache/rocketmq" }
+      - { id: apisix,        name: "Apache APISIX", url: "apache/apisix" }
+      - { id: tidb,          name: "TiDB",          url: "pingcap/tidb" }
+      - { id: milvus,        name: "Milvus",        url: "milvus-io/milvus" }
+      - { id: nacos,         name: "Nacos",         url: "alibaba/nacos" }
+      - { id: ant-design,    name: "Ant Design",    url: "ant-design/ant-design" }
+      - { id: paddle,        name: "PaddlePaddle",  url: "PaddlePaddle/Paddle" }
+      - { id: kubeedge,      name: "KubeEdge",      url: "kubeedge/kubeedge" }
+      - { id: openharmony-arkui, name: "OpenHarmony ArkUI", url: "openharmony/arkui_ace_engine" }
+      - { id: openharmony-liteos-a, name: "OpenHarmony LiteOS-A", url: "openharmony/kernel_liteos_a" }
+
+  - id: devtools
+    name: Languages and developer tools
+    title: Open source languages and developer tools
+    repos:
+      - { id: git,           name: "Git",           url: "git/git" }
+      - { id: vscode,        name: "VS Code",       url: "microsoft/vscode" }
+      - { id: nodejs,        name: "Node.js",       url: "nodejs/node" }
+      - { id: rust,          name: "Rust",          url: "rust-lang/rust" }
+      - { id: go,            name: "Go",            url: "golang/go" }
+      - { id: deno,          name: "Deno",          url: "denoland/deno" }
+      - { id: bun,           name: "Bun",           url: "oven-sh/bun" }
+      - { id: zed,           name: "Zed",           url: "zed-industries/zed" }
+      - { id: neovim,        name: "Neovim",        url: "neovim/neovim" }
+      - { id: homebrew,      name: "Homebrew",      url: "Homebrew/brew" }
+      - { id: nginx,         name: "nginx",         url: "nginx/nginx" }
+      - { id: curl,          name: "curl",          url: "curl/curl" }
+      - { id: redis,         name: "Redis",         url: "redis/redis" }
+      - { id: postgres,      name: "PostgreSQL",    url: "postgres/postgres" }

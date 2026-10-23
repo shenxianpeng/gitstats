@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - Ray</title>
+	<meta name="description" content="Ray: 32,233 commits by 1,625 authors, 2016 to 2026. A report made with gitstats.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="Ray: Code Ownership">
+	<meta property="og:description" content="Ray: 32,233 commits by 1,625 authors, 2016 to 2026. A report made with gitstats.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/ray/ownership.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/ray/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="Ray: Code Ownership">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Ray: Code Ownership">
+	<meta name="twitter:description" content="Ray: 32,233 commits by 1,625 authors, 2016 to 2026. A report made with gitstats.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/ray/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html" class="active" aria-current="page">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Code Ownership</h1><p class="section-note">Ownership is measured by how many commits each author made to each file in the current tree. It highlights <strong>bus-factor risk</strong> (files only one person has ever touched) and where knowledge is concentrated. The <strong>bus factor</strong> is the smallest number of people who are, between them, primary owner of more than half of the files.</p><dl class="stat-tiles" style="--cols: 4; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Files Tracked</dt><dd class="stat-value">10,482</dd><dd class="stat-note">in the current tree</dd></div><div class="stat-tile"><dt>Bus Factor</dt><dd class="stat-value">16</dd><dd class="stat-note">16 authors are primary owner of 5,354 of 10,482 files</dd></div><div class="stat-tile"><dt>Single-Owner Files</dt><dd class="stat-value">5,071</dd><dd class="stat-note">48.4% of tracked files</dd></div><div class="stat-tile"><dt>Contributors</dt><dd class="stat-value">1,165</dd><dd class="stat-note">authors who changed files</dd></div></dl>
+<h2 id="bus_factor_risk_—_single-owner_files"><a href="#bus_factor_risk_—_single-owner_files">Bus factor risk — single-owner files</a></h2>
+
+<p class="section-note">Files only one author has ever changed. The more a file has changed, the more knowledge is at risk if that person leaves.</p><div class="table-scroll"><table class="sortable file-table" id="ownership-busfactor"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">doc/redirects/current.yaml</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">20</td></tr><tr><td class="path">ci/raydepsets/workspace.py</td><td data-label="Sole owner">Elliot Barnwell</td><td class="num" data-label="Commits">16</td></tr><tr><td class="path">doc/source/ray-contribute/ci.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">15</td></tr><tr><td class="path">doc/source/ray-contribute/writing-style.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">10</td></tr><tr><td class="path">ci/raydepsets/tests/test_data/test.depsets.yaml</td><td data-label="Sole owner">Elliot Barnwell</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">doc/source/train/user-guides/data-loading-preprocessing.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">release/llm_tests/kv_router_test/test_kv_events.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">release/llm_tests/kv_router_test/utils.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">doc/redirects/README.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">doc/source/_includes/rllib/new_api_stack.rst</td><td data-label="Sole owner">Sven Mika</td><td class="num" data-label="Commits">8</td></tr></table></div><details class="table-details"><summary>Table: the 100 most-changed of 5,071 single-owner files</summary><div class="table-scroll"><table class="sortable file-table" id="ownership-busfactor-all"><tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr><tr><td class="path">doc/redirects/current.yaml</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">20</td></tr><tr><td class="path">ci/raydepsets/workspace.py</td><td data-label="Sole owner">Elliot Barnwell</td><td class="num" data-label="Commits">16</td></tr><tr><td class="path">doc/source/ray-contribute/ci.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">15</td></tr><tr><td class="path">doc/source/ray-contribute/writing-style.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">10</td></tr><tr><td class="path">ci/raydepsets/tests/test_data/test.depsets.yaml</td><td data-label="Sole owner">Elliot Barnwell</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">doc/source/train/user-guides/data-loading-preprocessing.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">9</td></tr><tr><td class="path">release/llm_tests/kv_router_test/test_kv_events.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">release/llm_tests/kv_router_test/utils.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">doc/redirects/README.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">doc/source/_includes/rllib/new_api_stack.rst</td><td data-label="Sole owner">Sven Mika</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">doc/source/_static/css/examples.css</td><td data-label="Sole owner">Peyton Murray</td><td class="num" data-label="Commits">8</td></tr><tr><td class="path">python/ray/llm/_internal/serve/routing_policies/kv_aware/vllm/tokenizer.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">python/ray/llm/tests/serve/cpu/deployments/routers/kv/test_kv_aware_router.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">release/llm_tests/kv_router_test/test_kv_event_ingestion.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">doc/source/data/saving-data.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">doc/source/ray-overview/use-cases.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">doc/.claude/CLAUDE.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">python/ray/data/_internal/usage/collector.py</td><td data-label="Sole owner">Ayush Kumar</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">python/ray/data/_internal/progress/tqdm_progress.py</td><td data-label="Sole owner">Daniel Shin</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">src/ray/common/cgroup2/integration_tests/sysfs_cgroup_driver_integration_test.cc</td><td data-label="Sole owner">Ibrahim Rabbani</td><td class="num" data-label="Commits">7</td></tr><tr><td class="path">python/ray/llm/_internal/serve/routing_policies/kv_aware/kv_aware_router.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">python/ray/llm/_internal/serve/routing_policies/kv_aware/utils.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">python/ray/train/v2/_internal/callbacks/nccl_ras.py</td><td data-label="Sole owner">Mark Towers</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">python/ray/train/v2/tests/test_nccl_ras_callback.py</td><td data-label="Sole owner">Mark Towers</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">doc/source/ray-contribute/writing-code-snippets.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">doc/source/template_pins.json</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">doc/source/ray-contribute/fake-autoscaler.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">doc/.claude/skills/rst-to-myst/SKILL.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">doc/source/data/key-concepts.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">doc/source/data/shuffling-data.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">doc/source/data/custom-datasource-example.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">src/ray/core_worker/shutdown_coordinator.h</td><td data-label="Sole owner">Sagar Sumit</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">python/ray/data/tests/test_usage.py</td><td data-label="Sole owner">Ayush Kumar</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">src/ray/rpc/authentication/k8s_constants.h</td><td data-label="Sole owner">Andrew Sy Kim</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">.github/workflows/stale_pull_request.yaml</td><td data-label="Sole owner">Christina Zhu</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">release/ray_release/configs/oss_config.yaml</td><td data-label="Sole owner">Cuong Nguyen</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">java/serve/src/test/java/io/ray/serve/poll/KeyTypeTest.java</td><td data-label="Sole owner">liuyang-my</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">java/test/src/main/java/io/ray/test/ConcurrencyGroupTest.java</td><td data-label="Sole owner">Qing Wang</td><td class="num" data-label="Commits">6</td></tr><tr><td class="path">src/ray/raylet/worker_killing_policy_interface.h</td><td data-label="Sole owner">Kunchen (David) Dai</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">src/ray/raylet/worker_killing_policy_by_time.h</td><td data-label="Sole owner">Kunchen (David) Dai</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/ray/experimental/sandbox/http/tests/conftest.py</td><td data-label="Sole owner">Xinyu Zhang</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/ray/experimental/sandbox/http/grpc_facade.py</td><td data-label="Sole owner">Xinyu Zhang</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">ci/raydepsets/configs/ci_windows.depsets.yaml</td><td data-label="Sole owner">Elliot Barnwell</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/ray/llm/_internal/serve/routing_policies/kv_aware/constants.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/ray/llm/_internal/serve/routing_policies/kv_aware/vllm/token_tracking.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/ray/llm/tests/serve/cpu/deployments/routers/kv/test_request_lifecycle_tracking.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">release/llm_tests/kv_router_test/test_request_lifecycle_tracking.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">src/ray/raylet/scheduling/policy/tests/BUILD.bazel</td><td data-label="Sole owner">Edward Oakes</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">doc/AGENTS.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">doc/source/data/inspecting-data.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">doc/source/data/scaling-collation-functions.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">doc/source/data/working-with-pytorch.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">doc/source/ray-contribute/testing-tips.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">doc/source/train/distributed-tensorflow-keras.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">doc/source/train/huggingface-accelerate.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">doc/source/train/user-guides/hyperparameter-optimization.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">doc/source/core/scheduling/memory-management.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">doc/source/ray-contribute/publishing-examples-legacy.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">doc/source/data/aggregating-data.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">doc/source/data/joining-data.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">src/ray/core_worker/shutdown_coordinator.cc</td><td data-label="Sole owner">Sagar Sumit</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/ray/llm/_internal/serve/engines/vllm/kv_transfer/factory.py</td><td data-label="Sole owner">kourosh hakhamaneshi</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/ray/llm/_internal/serve/core/ingress/dev_ingress.py</td><td data-label="Sole owner">kourosh hakhamaneshi</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/ray/data/_internal/usage/execution_callback.py</td><td data-label="Sole owner">Ayush Kumar</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">release/ray_release/reporter/observability_agent.py</td><td data-label="Sole owner">Sai Miduthuri</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">release/ray_release/tests/test_observability_agent_reporter.py</td><td data-label="Sole owner">Sai Miduthuri</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">ci/build/build_image.py</td><td data-label="Sole owner">Andrew Pollack-Gray</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/ray/_version.py</td><td data-label="Sole owner">Lonnie Liu</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">cpp/include/ray/api/static_check.h</td><td data-label="Sole owner">qicosmos</td><td class="num" data-label="Commits">5</td></tr><tr><td class="path">python/ray/experimental/sandbox/http/host.py</td><td data-label="Sole owner">Xinyu Zhang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/ray/experimental/sandbox/http/tests/test_sandbox_host.py</td><td data-label="Sole owner">Xinyu Zhang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/ray/experimental/sandbox/http/schemas.py</td><td data-label="Sole owner">Xinyu Zhang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/ray/experimental/sandbox/http/tests/test_grpc_facade.py</td><td data-label="Sole owner">Xinyu Zhang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/ray/experimental/sandbox/http/tests/test_http_app.py</td><td data-label="Sole owner">Xinyu Zhang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/ray/experimental/sandbox/http/tests/test_modal_client.py</td><td data-label="Sole owner">Xinyu Zhang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/requirements/windows-requirements.txt</td><td data-label="Sole owner">Elliot Barnwell</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">ci/raydepsets/configs/ci_core.depsets.yaml</td><td data-label="Sole owner">Elliot Barnwell</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/deplocks/ci/ci_ml_thirdparty_depset_py3.10.lock</td><td data-label="Sole owner">Elliot Barnwell</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/deplocks/ci/ci_ml_thirdparty_depset_py3.12.lock</td><td data-label="Sole owner">Elliot Barnwell</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/ray/llm/tests/serve/cpu/deployments/routers/kv/test_token_channel.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/ray/llm/tests/serve/cpu/deployments/routers/kv/test_tokenizer_exactness.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/ray/llm/_internal/serve/routing_policies/kv_aware/kv_token_tracker.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/ray/llm/tests/serve/cpu/deployments/routers/kv/test_kv_token_tracker.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">release/llm_tests/batch/test_batch_multi_node_vllm.py</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">release/ray_release/byod/byod_llm_kv_router_test.sh</td><td data-label="Sole owner">Jeffrey Wang</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/ray/data/tests/datasource/test_catalog_azure.py</td><td data-label="Sole owner">Dhruvil Shah</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">python/ray/data/tests/test_infer_schema.py</td><td data-label="Sole owner">Goutam</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">src/ray/core_worker/task_execution/tests/normal_task_execution_queue_test.cc</td><td data-label="Sole owner">Edward Oakes</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">src/ray/util/clock.h</td><td data-label="Sole owner">Edward Oakes</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">src/ray/gcs/store_client/tests/in_memory_store_client_test.cc</td><td data-label="Sole owner">Edward Oakes</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">src/ray/core_worker/task_execution/tests/concurrency_group_manager_test.cc</td><td data-label="Sole owner">Edward Oakes</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">doc/source/core/actors/async-api.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">doc/source/core/compiled-graph/index.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">doc/source/core/configure.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">doc/source/data/batch-inference.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">doc/source/data/working-with-text.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">doc/source/train/getting-started-lightgbm.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">doc/source/train/horovod.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">doc/source/train/user-guides/local-mode.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">4</td></tr><tr><td class="path">doc/source/train/user-guides/persistent-storage.md</td><td data-label="Sole owner">Douglas Strodtman</td><td class="num" data-label="Commits">4</td></tr></table></div></details>
+<h2 id="ownership_by_author"><a href="#ownership_by_author">Ownership by author</a></h2>
+
+<p class="section-note">Primary owner = the author with the most commits to a file. Solely owned = files only that author has touched.</p><div class="table-scroll"><table class="sortable" id="ownership-by-author"><tr><th>Author</th><th class="num">Files owned</th><th class="num">Solely owned</th><th class="num">Files touched</th></tr><tr><td>Mark Towers</td><td class="num">1,575</td><td class="num">1,525</td><td class="num">2,201</td></tr><tr><td>Douglas Strodtman</td><td class="num">785</td><td class="num">681</td><td class="num">1,012</td></tr><tr><td>Edward Oakes</td><td class="num">432</td><td class="num">133</td><td class="num">1,463</td></tr><tr><td>Lonnie Liu</td><td class="num">397</td><td class="num">200</td><td class="num">1,053</td></tr><tr><td>Kai Fricke</td><td class="num">269</td><td class="num">90</td><td class="num">705</td></tr><tr><td>Cuong Nguyen</td><td class="num">264</td><td class="num">82</td><td class="num">865</td></tr><tr><td>Elliot Barnwell</td><td class="num">208</td><td class="num">65</td><td class="num">528</td></tr><tr><td>Justin Yu</td><td class="num">198</td><td class="num">40</td><td class="num">604</td></tr><tr><td>kourosh hakhamaneshi</td><td class="num">190</td><td class="num">88</td><td class="num">323</td></tr><tr><td>Eric Liang</td><td class="num">189</td><td class="num">38</td><td class="num">840</td></tr><tr><td>Jeffrey Wang</td><td class="num">164</td><td class="num">99</td><td class="num">510</td></tr><tr><td>Balaji Veeramani</td><td class="num">157</td><td class="num">69</td><td class="num">1,047</td></tr><tr><td>Sampan S Nayak</td><td class="num">145</td><td class="num">44</td><td class="num">337</td></tr><tr><td>SangBin Cho</td><td class="num">140</td><td class="num">16</td><td class="num">602</td></tr><tr><td>matthewdeng</td><td class="num">124</td><td class="num">17</td><td class="num">501</td></tr><tr><td>dentiny</td><td class="num">117</td><td class="num">19</td><td class="num">303</td></tr><tr><td>czgdp1807</td><td class="num">115</td><td class="num">0</td><td class="num">557</td></tr><tr><td>Ricky Xu</td><td class="num">115</td><td class="num">52</td><td class="num">354</td></tr><tr><td>Abrar Sheikh</td><td class="num">113</td><td class="num">82</td><td class="num">520</td></tr><tr><td>Jiajun Yao</td><td class="num">107</td><td class="num">25</td><td class="num">847</td></tr><tr><td>chaokunyang</td><td class="num">107</td><td class="num">20</td><td class="num">222</td></tr><tr><td>Qing Wang</td><td class="num">100</td><td class="num">40</td><td class="num">302</td></tr><tr><td>Cindy Zhang</td><td class="num">99</td><td class="num">10</td><td class="num">297</td></tr><tr><td>Seiji Eicher</td><td class="num">91</td><td class="num">39</td><td class="num">413</td></tr><tr><td>Sai Miduthuri</td><td class="num">89</td><td class="num">8</td><td class="num">239</td></tr></table></div><p class="moreauthors">Showing top 25 of 1165 contributors.</p>
+<h2 id="most_shared_files"><a href="#most_shared_files">Most shared files</a></h2>
+
+<p class="section-note">Files touched by the most people — shared code where changes are most likely to need coordination.</p><div class="table-scroll"><table class="sortable file-table" id="ownership-shared"><tr><th>File</th><th class="num">Contributors</th><th>Primary owner</th><th class="num">Owner share</th></tr><tr><td class="path">python/setup.py</td><td class="num" data-label="Contributors">133</td><td data-label="Primary owner">Robert Nishihara</td><td class="num" data-label="Owner share">8.2%</td></tr><tr><td class="path">python/ray/data/dataset.py</td><td class="num" data-label="Contributors">120</td><td data-label="Primary owner">Balaji Veeramani</td><td class="num" data-label="Owner share">14.5%</td></tr><tr><td class="path">python/ray/_raylet.pyx</td><td class="num" data-label="Contributors">115</td><td data-label="Primary owner">SangBin Cho</td><td class="num" data-label="Owner share">10.3%</td></tr><tr><td class="path">python/ray/scripts/scripts.py</td><td class="num" data-label="Contributors">108</td><td data-label="Primary owner">Eric Liang</td><td class="num" data-label="Owner share">9.8%</td></tr><tr><td class="path">src/ray/core_worker/core_worker.cc</td><td class="num" data-label="Contributors">103</td><td data-label="Primary owner">SangBin Cho</td><td class="num" data-label="Owner share">10.7%</td></tr><tr><td class="path">src/ray/raylet/node_manager.cc</td><td class="num" data-label="Contributors">97</td><td data-label="Primary owner">Stephanie Wang</td><td class="num" data-label="Owner share">10.6%</td></tr><tr><td class="path">python/ray/data/read_api.py</td><td class="num" data-label="Contributors">95</td><td data-label="Primary owner">Balaji Veeramani</td><td class="num" data-label="Owner share">14.6%</td></tr><tr><td class="path">BUILD.bazel</td><td class="num" data-label="Contributors">93</td><td data-label="Primary owner">Yi Cheng</td><td class="num" data-label="Owner share">8.4%</td></tr><tr><td class="path">src/ray/common/ray_config_def.h</td><td class="num" data-label="Contributors">92</td><td data-label="Primary owner">SangBin Cho</td><td class="num" data-label="Owner share">10.9%</td></tr><tr><td class="path">release/release_tests.yaml</td><td class="num" data-label="Contributors">88</td><td data-label="Primary owner">Cuong Nguyen</td><td class="num" data-label="Owner share">9.3%</td></tr><tr><td class="path">python/ray/_private/worker.py</td><td class="num" data-label="Contributors">87</td><td data-label="Primary owner">Jiajun Yao</td><td class="num" data-label="Owner share">10.6%</td></tr><tr><td class="path">src/ray/core_worker/core_worker.h</td><td class="num" data-label="Contributors">86</td><td data-label="Primary owner">Edward Oakes</td><td class="num" data-label="Owner share">11.2%</td></tr><tr><td class="path">python/requirements.txt</td><td class="num" data-label="Contributors">83</td><td data-label="Primary owner">Kai Fricke</td><td class="num" data-label="Owner share">6.4%</td></tr><tr><td class="path">python/ray/_private/services.py</td><td class="num" data-label="Contributors">80</td><td data-label="Primary owner">Yi Cheng</td><td class="num" data-label="Owner share">10.0%</td></tr><tr><td class="path">doc/source/conf.py</td><td class="num" data-label="Contributors">78</td><td data-label="Primary owner">Douglas Strodtman</td><td class="num" data-label="Owner share">12.1%</td></tr><tr><td class="path">src/ray/raylet/node_manager.h</td><td class="num" data-label="Contributors">76</td><td data-label="Primary owner">Stephanie Wang</td><td class="num" data-label="Owner share">9.6%</td></tr><tr><td class="path">python/ray/actor.py</td><td class="num" data-label="Contributors">75</td><td data-label="Primary owner">Robert Nishihara</td><td class="num" data-label="Owner share">16.3%</td></tr><tr><td class="path">python/ray/tests/conftest.py</td><td class="num" data-label="Contributors">70</td><td data-label="Primary owner">Yi Cheng</td><td class="num" data-label="Owner share">8.8%</td></tr><tr><td class="path">src/ray/protobuf/gcs.proto</td><td class="num" data-label="Contributors">69</td><td data-label="Primary owner">SangBin Cho</td><td class="num" data-label="Owner share">9.5%</td></tr><tr><td class="path">src/ray/raylet/worker_pool.cc</td><td class="num" data-label="Contributors">68</td><td data-label="Primary owner">Kai Yang</td><td class="num" data-label="Owner share">9.2%</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="../ecosystems/ai-ml.html">How Ray ranks among open source AI and machine learning projects by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+name: GitStats Report
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  gitstats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: shenxianpeng/gitstats-action@v1
+        with:
+          deploy-to-pages: true
+</pre></details></section><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

@@ -1,0 +1,456 @@
+{
+  "schema_version": 1,
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:33:22+00:00",
+  "ecosystem": {
+    "id": "python",
+    "name": "Python",
+    "title": "Python open source projects"
+  },
+  "quarter": {
+    "id": "2026-Q3",
+    "label": "Jul–Sep 2026"
+  },
+  "previous_quarter": {
+    "id": "2026-Q2",
+    "label": "Apr–Jun 2026"
+  },
+  "summary": {
+    "repositories": 17,
+    "with_commits": 17,
+    "naming": 13,
+    "median_share": 0.0064,
+    "highest": {
+      "id": "pandas",
+      "name": "pandas",
+      "share": 0.6674
+    }
+  },
+  "repositories": [
+    {
+      "rank": 1,
+      "id": "pandas",
+      "name": "pandas",
+      "repository": "pandas-dev/pandas",
+      "report": "../pandas/",
+      "quarter": {
+        "commits": 947,
+        "ai_assisted": 632,
+        "share": 0.6674
+      },
+      "previous_quarter": {
+        "commits": 630,
+        "ai_assisted": 356,
+        "share": 0.5651
+      },
+      "commits_last_12mo": 2934,
+      "active_authors_12mo": 402,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "Claude",
+        "Devin",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 2,
+      "id": "pytest",
+      "name": "pytest",
+      "repository": "pytest-dev/pytest",
+      "report": "../pytest/",
+      "quarter": {
+        "commits": 273,
+        "ai_assisted": 82,
+        "share": 0.3004
+      },
+      "previous_quarter": {
+        "commits": 239,
+        "ai_assisted": 12,
+        "share": 0.0502
+      },
+      "commits_last_12mo": 886,
+      "active_authors_12mo": 123,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Codex",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 3,
+      "id": "home-assistant",
+      "name": "Home Assistant",
+      "repository": "home-assistant/core",
+      "report": "../home-assistant/",
+      "quarter": {
+        "commits": 5560,
+        "ai_assisted": 1069,
+        "share": 0.1923
+      },
+      "previous_quarter": {
+        "commits": 5028,
+        "ai_assisted": 850,
+        "share": 0.1691
+      },
+      "commits_last_12mo": 20403,
+      "active_authors_12mo": 1407,
+      "health": "peak",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "cpython",
+      "name": "CPython",
+      "repository": "python/cpython",
+      "report": "../cpython/",
+      "quarter": {
+        "commits": 1353,
+        "ai_assisted": 244,
+        "share": 0.1803
+      },
+      "previous_quarter": {
+        "commits": 1302,
+        "ai_assisted": 111,
+        "share": 0.0853
+      },
+      "commits_last_12mo": 4964,
+      "active_authors_12mo": 782,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 5,
+      "id": "numpy",
+      "name": "NumPy",
+      "repository": "numpy/numpy",
+      "report": "../numpy/",
+      "quarter": {
+        "commits": 803,
+        "ai_assisted": 16,
+        "share": 0.0199
+      },
+      "previous_quarter": {
+        "commits": 465,
+        "ai_assisted": 10,
+        "share": 0.0215
+      },
+      "commits_last_12mo": 2470,
+      "active_authors_12mo": 236,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "Claude",
+        "Codex",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 6,
+      "id": "scipy",
+      "name": "SciPy",
+      "repository": "scipy/scipy",
+      "report": "../scipy/",
+      "quarter": {
+        "commits": 570,
+        "ai_assisted": 10,
+        "share": 0.0175
+      },
+      "previous_quarter": {
+        "commits": 509,
+        "ai_assisted": 12,
+        "share": 0.0236
+      },
+      "commits_last_12mo": 2229,
+      "active_authors_12mo": 224,
+      "health": "steady",
+      "last_commit": "2026-10-21",
+      "assistants": [
+        "Claude",
+        "Warp",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 7,
+      "id": "scikit-learn",
+      "name": "scikit-learn",
+      "repository": "scikit-learn/scikit-learn",
+      "report": "../scikit-learn/",
+      "quarter": {
+        "commits": 235,
+        "ai_assisted": 3,
+        "share": 0.0128
+      },
+      "previous_quarter": {
+        "commits": 300,
+        "ai_assisted": 2,
+        "share": 0.0067
+      },
+      "commits_last_12mo": 987,
+      "active_authors_12mo": 193,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "GitHub Copilot",
+        "Cursor",
+        "Claude"
+      ]
+    },
+    {
+      "rank": 8,
+      "id": "pydantic",
+      "name": "Pydantic",
+      "repository": "pydantic/pydantic",
+      "report": "../pydantic/",
+      "quarter": {
+        "commits": 209,
+        "ai_assisted": 2,
+        "share": 0.0096
+      },
+      "previous_quarter": {
+        "commits": 111,
+        "ai_assisted": 1,
+        "share": 0.009
+      },
+      "commits_last_12mo": 607,
+      "active_authors_12mo": 129,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 9,
+      "id": "uv",
+      "name": "uv",
+      "repository": "astral-sh/uv",
+      "report": "../uv/",
+      "quarter": {
+        "commits": 1244,
+        "ai_assisted": 8,
+        "share": 0.0064
+      },
+      "previous_quarter": {
+        "commits": 651,
+        "ai_assisted": 33,
+        "share": 0.0507
+      },
+      "commits_last_12mo": 3457,
+      "active_authors_12mo": 185,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "ChatGPT",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 10,
+      "id": "ruff",
+      "name": "Ruff",
+      "repository": "astral-sh/ruff",
+      "report": "../ruff/",
+      "quarter": {
+        "commits": 1515,
+        "ai_assisted": 9,
+        "share": 0.0059
+      },
+      "previous_quarter": {
+        "commits": 1210,
+        "ai_assisted": 10,
+        "share": 0.0083
+      },
+      "commits_last_12mo": 5126,
+      "active_authors_12mo": 315,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 11,
+      "id": "matplotlib",
+      "name": "Matplotlib",
+      "repository": "matplotlib/matplotlib",
+      "report": "../matplotlib/",
+      "quarter": {
+        "commits": 507,
+        "ai_assisted": 3,
+        "share": 0.0059
+      },
+      "previous_quarter": {
+        "commits": 713,
+        "ai_assisted": 2,
+        "share": 0.0028
+      },
+      "commits_last_12mo": 2048,
+      "active_authors_12mo": 165,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Cursor",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 12,
+      "id": "pip",
+      "name": "pip",
+      "repository": "pypa/pip",
+      "report": "../pip/",
+      "quarter": {
+        "commits": 187,
+        "ai_assisted": 1,
+        "share": 0.0053
+      },
+      "previous_quarter": {
+        "commits": 236,
+        "ai_assisted": 3,
+        "share": 0.0127
+      },
+      "commits_last_12mo": 734,
+      "active_authors_12mo": 68,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Codex",
+        "Claude",
+        "OpenCode"
+      ]
+    },
+    {
+      "rank": 13,
+      "id": "fastapi",
+      "name": "FastAPI",
+      "repository": "fastapi/fastapi",
+      "report": "../fastapi/",
+      "quarter": {
+        "commits": 332,
+        "ai_assisted": 1,
+        "share": 0.003
+      },
+      "previous_quarter": {
+        "commits": 399,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 1750,
+      "active_authors_12mo": 68,
+      "health": "surge",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "Claude",
+        "Cursor",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 14,
+      "id": "sqlalchemy",
+      "name": "SQLAlchemy",
+      "repository": "sqlalchemy/sqlalchemy",
+      "report": "../sqlalchemy/",
+      "quarter": {
+        "commits": 206,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 142,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 657,
+      "active_authors_12mo": 93,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": []
+    },
+    {
+      "rank": 15,
+      "id": "django",
+      "name": "Django",
+      "repository": "django/django",
+      "report": "../django/",
+      "quarter": {
+        "commits": 192,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 303,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 993,
+      "active_authors_12mo": 215,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": []
+    },
+    {
+      "rank": 16,
+      "id": "flask",
+      "name": "Flask",
+      "repository": "pallets/flask",
+      "report": "../flask/",
+      "quarter": {
+        "commits": 17,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 16,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 94,
+      "active_authors_12mo": 6,
+      "health": "quiet",
+      "last_commit": "2026-10-07",
+      "assistants": []
+    },
+    {
+      "rank": 17,
+      "id": "requests",
+      "name": "Requests",
+      "repository": "psf/requests",
+      "report": "../requests/",
+      "quarter": {
+        "commits": 14,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 54,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 115,
+      "active_authors_12mo": 22,
+      "health": "steady",
+      "last_commit": "2026-09-21",
+      "assistants": [
+        "Claude"
+      ]
+    }
+  ]
+}

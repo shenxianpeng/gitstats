@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:33:22+00:00",
+  "quarter": {
+    "id": "2026-Q3",
+    "label": "Jul–Sep 2026"
+  },
+  "ecosystems": [
+    {
+      "id": "python",
+      "name": "Python",
+      "title": "Python open source projects",
+      "page": "python.html",
+      "data": "python.json",
+      "summary": {
+        "repositories": 17,
+        "with_commits": 17,
+        "naming": 13,
+        "median_share": 0.0064,
+        "highest": {
+          "id": "pandas",
+          "name": "pandas",
+          "share": 0.6674
+        }
+      }
+    },
+    {
+      "id": "ai-coding",
+      "name": "AI coding assistants",
+      "title": "Open source AI coding assistants",
+      "page": "ai-coding.html",
+      "data": "ai-coding.json",
+      "summary": {
+        "repositories": 12,
+        "with_commits": 11,
+        "naming": 10,
+        "median_share": 0.0529,
+        "highest": {
+          "id": "openhands",
+          "name": "OpenHands",
+          "share": 0.4833
+        }
+      }
+    },
+    {
+      "id": "ai-ml",
+      "name": "AI and machine learning",
+      "title": "Open source AI and machine learning projects",
+      "page": "ai-ml.html",
+      "data": "ai-ml.json",
+      "summary": {
+        "repositories": 12,
+        "with_commits": 12,
+        "naming": 10,
+        "median_share": 0.1029,
+        "highest": {
+          "id": "ray",
+          "name": "Ray",
+          "share": 0.3042
+        }
+      }
+    },
+    {
+      "id": "cncf",
+      "name": "CNCF graduated",
+      "title": "CNCF graduated projects",
+      "page": "cncf.html",
+      "data": "cncf.json",
+      "summary": {
+        "repositories": 15,
+        "with_commits": 15,
+        "naming": 13,
+        "median_share": 0.0243,
+        "highest": {
+          "id": "jaeger",
+          "name": "Jaeger",
+          "share": 0.4286
+        }
+      }
+    },
+    {
+      "id": "apache",
+      "name": "Apache",
+      "title": "Apache projects",
+      "page": "apache.html",
+      "data": "apache.json",
+      "summary": {
+        "repositories": 10,
+        "with_commits": 10,
+        "naming": 10,
+        "median_share": 0.0568,
+        "highest": {
+          "id": "spark",
+          "name": "Apache Spark",
+          "share": 0.6643
+        }
+      }
+    },
+    {
+      "id": "frontend",
+      "name": "Web frontend",
+      "title": "Open source web frontend projects",
+      "page": "frontend.html",
+      "data": "frontend.json",
+      "summary": {
+        "repositories": 11,
+        "with_commits": 11,
+        "naming": 9,
+        "median_share": 0.0167,
+        "highest": {
+          "id": "react",
+          "name": "React",
+          "share": 0.1975
+        }
+      }
+    },
+    {
+      "id": "china",
+      "name": "Open source from China",
+      "title": "Open source projects from China",
+      "page": "china.html",
+      "data": "china.json",
+      "summary": {
+        "repositories": 16,
+        "with_commits": 16,
+        "naming": 10,
+        "median_share": 0.0031,
+        "highest": {
+          "id": "nacos",
+          "name": "Nacos",
+          "share": 0.7447
+        }
+      }
+    },
+    {
+      "id": "devtools",
+      "name": "Languages and developer tools",
+      "title": "Open source languages and developer tools",
+      "page": "devtools.html",
+      "data": "devtools.json",
+      "summary": {
+        "repositories": 14,
+        "with_commits": 14,
+        "naming": 12,
+        "median_share": 0.0246,
+        "highest": {
+          "id": "vscode",
+          "name": "VS Code",
+          "share": 0.5708
+        }
+      }
+    }
+  ]
+}

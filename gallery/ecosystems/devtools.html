@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Open source languages and developer tools ranked by AI-assisted commits – 2026 Q3 | GitStats Gallery</title>
+	<meta name="description" content="In Jul–Sep 2026, the median project among 14 open source languages and developer tools had 2.5% of its commits name an AI coding assistant; the highest was VS Code, at 57.1%. 12 of 14 named one at least once.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="Open source languages and developer tools ranked by AI-assisted commits – 2026 Q3">
+	<meta property="og:description" content="In Jul–Sep 2026, the median project among 14 open source languages and developer tools had 2.5% of its commits name an AI coding assistant; the highest was VS Code, at 57.1%. 12 of 14 named one at least once.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/ecosystems/devtools.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/ecosystems/devtools-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="Open source languages and developer tools ranked by AI-assisted commits – 2026 Q3">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Open source languages and developer tools ranked by AI-assisted commits – 2026 Q3">
+	<meta name="twitter:description" content="In Jul–Sep 2026, the median project among 14 open source languages and developer tools had 2.5% of its commits name an AI coding assistant; the highest was VS Code, at 57.1%. 12 of 14 named one at least once.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/ecosystems/devtools-card.png">
+	<link rel="canonical" href="https://shenxianpeng.dev/gitstats/gallery/ecosystems/devtools.html">
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="../gitstats.css" type="text/css">
+	<script type="text/javascript" src="../sortable.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+</head>
+<body>
+<div class="nav"><a href="../index.html" class="nav-brand">GitStats</a><ul><li><a href="../index.html">GitStats Gallery</a></li><li><a href="../ai.html">AI-assisted commits</a></li><li><a href="../organizations.html">Organizations</a></li><li><a href="index.html">Ecosystems</a></li></ul><div class="nav-right"><button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button></div></div><h1>Languages and developer tools: ranked by AI-assisted commits</h1><p class="portfolio-subtitle">Jul–Sep 2026 &middot; 14 repositories &middot; updated 2026-10-23 &middot; <a href="devtools.json">data</a></p><p class="section-note">In Jul–Sep 2026, the median project among 14 open source languages and developer tools had 2.5% of its commits name an AI coding assistant; the highest was VS Code, at 57.1%. 12 of 14 named one at least once.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Median Share</dt><dd class="stat-value">2.5%</dd><dd class="stat-note">an AI coding assistant, Jul–Sep 2026</dd></div><div class="stat-tile"><dt>Highest Share</dt><dd class="stat-value">57.1%</dd><dd class="stat-note">VS Code</dd></div><div class="stat-tile"><dt>Naming One</dt><dd class="stat-value">12 of 14</dd><dd class="stat-note">projects with commits that quarter</dd></div></dl><div class="table-scroll"><table class="sortable" id="ecosystem"><tr><th class="num">#</th><th>Repository</th><th class="num">Jul–Sep 2026</th><th class="num">Apr–Jun 2026</th><th class="num">Commits (12 mo)</th><th class="num">Active authors (12 mo)</th><th>Health</th><th>Named most</th></tr><tr><td class="num">1</td><td><a href="../vscode/">VS Code</a></td><td class="num" title="3,597 of 6,302 commits">57.1%</td><td class="num" title="1,842 of 6,693 commits">27.5%</td><td class="num">27,324</td><td class="num">463</td><td><span class="history-era history-era-peak">peak</span></td><td>GitHub Copilot, Claude</td></tr><tr><td class="num">2</td><td><a href="../nodejs/">Node.js</a></td><td class="num" title="381 of 1,564 commits">24.4%</td><td class="num" title="99 of 888 commits">11.1%</td><td class="num">3,811</td><td class="num">433</td><td><span class="history-era history-era-steady">steady</span></td><td>Codex, OpenCode</td></tr><tr><td class="num">3</td><td><a href="../redis/">Redis</a></td><td class="num" title="12 of 162 commits">7.4%</td><td class="num" title="7 of 144 commits">4.9%</td><td class="num">583</td><td class="num">120</td><td><span class="history-era history-era-steady">steady</span></td><td>Claude, GitHub Copilot</td></tr><tr><td class="num">4</td><td><a href="../git/">Git</a></td><td class="num" title="70 of 953 commits">7.3%</td><td class="num" title="24 of 954 commits">2.5%</td><td class="num">3,625</td><td class="num">222</td><td><span class="history-era history-era-steady">steady</span></td><td>Claude, ChatGPT</td></tr><tr><td class="num">5</td><td><a href="../nginx/">nginx</a></td><td class="num" title="5 of 91 commits">5.5%</td><td class="num" title="0 of 89 commits">0%</td><td class="num">287</td><td class="num">45</td><td><span class="history-era history-era-steady">steady</span></td><td>OpenCode</td></tr><tr><td class="num">6</td><td><a href="../zed/">Zed</a></td><td class="num" title="40 of 1,467 commits">2.7%</td><td class="num" title="29 of 2,162 commits">1.3%</td><td class="num">8,189</td><td class="num">1,191</td><td><span class="history-era history-era-steady">steady</span></td><td>Claude, Amp</td></tr><tr><td class="num">7</td><td><a href="../neovim/">Neovim</a></td><td class="num" title="31 of 1,252 commits">2.5%</td><td class="num" title="19 of 1,089 commits">1.7%</td><td class="num">4,197</td><td class="num">288</td><td><span class="history-era history-era-steady">steady</span></td><td>Claude, Unnamed assistant</td></tr><tr><td class="num">8</td><td><a href="../homebrew/">Homebrew</a></td><td class="num" title="58 of 2,372 commits">2.4%</td><td class="num" title="49 of 1,854 commits">2.6%</td><td class="num">6,310</td><td class="num">192</td><td><span class="history-era history-era-peak">peak</span></td><td>GitHub Copilot, Claude</td></tr><tr><td class="num">9</td><td><a href="../deno/">Deno</a></td><td class="num" title="10 of 493 commits">2.0%</td><td class="num" title="122 of 1,451 commits">8.4%</td><td class="num">2,934</td><td class="num">198</td><td><span class="history-era history-era-peak">peak</span></td><td>Claude, GitHub Copilot</td></tr><tr><td class="num">10</td><td><a href="../go/">Go</a></td><td class="num" title="11 of 993 commits">1.1%</td><td class="num" title="0 of 948 commits">0%</td><td class="num">3,450</td><td class="num">336</td><td><span class="history-era history-era-steady">steady</span></td><td>Claude, GitHub Copilot</td></tr><tr><td class="num">11</td><td><a href="../bun/">Bun</a></td><td class="num" title="5 of 2,355 commits">0.2%</td><td class="num" title="10 of 1,131 commits">0.9%</td><td class="num">4,599</td><td class="num">88</td><td><span class="history-era history-era-peak">peak</span></td><td>Claude, CodeRabbit</td></tr><tr><td class="num">12</td><td><a href="../rust/">Rust</a></td><td class="num" title="5 of 10,336 commits">0.05%</td><td class="num" title="7 of 8,635 commits">0.08%</td><td class="num">33,216</td><td class="num">1,321</td><td><span class="history-era history-era-steady">steady</span></td><td>Claude, GitHub Copilot</td></tr><tr><td class="num">13</td><td><a href="../postgres/">PostgreSQL</a></td><td class="num" title="0 of 906 commits">0%</td><td class="num" title="0 of 766 commits">0%</td><td class="num">3,269</td><td class="num">30</td><td><span class="history-era history-era-steady">steady</span></td><td>&ndash;</td></tr><tr><td class="num">14</td><td><a href="../curl/">curl</a></td><td class="num" title="0 of 787 commits">0%</td><td class="num" title="0 of 858 commits">0%</td><td class="num">3,528</td><td class="num">188</td><td><span class="history-era history-era-surge">surge</span></td><td>ChatGPT, GitHub Copilot</td></tr></table></div><p class="section-note">The share of each quarter&rsquo;s commits that name an AI coding assistant: as their author, as a co-author, or in the line it signs with. A lower bound: an assistant that leaves no mark is not counted. Commits and active authors are those of the last 12 months; health is the project's pace of the last year.</p><details class="table-details"><summary>What is counted</summary><ul><li>The author is an assistant's own account, such as the Copilot coding agent, Devin or Cursor's agent.</li><li>A <code>Co-authored-by:</code> line names an assistant, as Claude Code, Copilot, Cursor, Codex, Aider and others add when they commit for a person. A review bot whose suggestion was applied is named the same way.</li><li>An <code>Assisted-by:</code> or <code>Generated-by:</code> line names an assistant.</li><li>The message has the line an assistant leaves in it, such as &ldquo;Generated with [Claude Code]&rdquo; or the link to a Devin or Codex session.</li></ul><p>Accounts and addresses are matched, not first names: a person called Claude, Devin or Jules is not an assistant.</p></details><p class="more-link">Other ecosystems: <a href="python.html">Python</a> &middot; <a href="ai-coding.html">AI coding assistants</a> &middot; <a href="ai-ml.html">AI and machine learning</a> &middot; <a href="cncf.html">CNCF graduated</a> &middot; <a href="apache.html">Apache</a> &middot; <a href="frontend.html">Web frontend</a> &middot; <a href="china.html">Open source from China</a></p><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body>
+</html>

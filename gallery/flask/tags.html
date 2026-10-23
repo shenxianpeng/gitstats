@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - Flask</title>
+	<meta name="description" content="Flask: 5,562 commits by 836 authors, 2010 to 2026. A report made with gitstats.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="Flask: Tags">
+	<meta property="og:description" content="Flask: 5,562 commits by 836 authors, 2010 to 2026. A report made with gitstats.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/flask/tags.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/flask/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="Flask: Tags">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="Flask: Tags">
+	<meta name="twitter:description" content="Flask: 5,562 commits by 836 authors, 2010 to 2026. A report made with gitstats.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/flask/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html" class="active" aria-current="page">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Tags</h1><dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">63</dd><dd class="stat-note"><span class="nowrap">latest 3.1.3</span>&nbsp;&middot; <span class="nowrap">2026-02-19</span></dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">88.3</dd><dd class="stat-note">5,562 commits in total</dd></div></dl>
+<h2 id="all_tags"><a href="#all_tags">All tags</a></h2>
+
+<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th>Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">3.1.3</td><td class="nowrap">2026-02-19</td><td class="num">23</td><td>David Lord (18), Markus Heidelberg (2), subhajitsaha01 (1), Christian Clauss (1), ADITYA SAH (1)</td></tr><tr><td class="nowrap">3.1.2</td><td class="nowrap">2025-08-19</td><td class="num">31</td><td>David Lord (26), abhiram kamini (1), Tero Vuotila (1), Grant Birkinbine (1), Badhreesh (1), AJ Jordan (1)</td></tr><tr><td class="nowrap">3.1.1</td><td class="nowrap">2025-05-13</td><td class="num">34</td><td>David Lord (27), zhuangzhuang (1), kurtatter (1), kotvkvante (1), black (1), James Addison (1), George Waters (1), CoolCat467 (1)</td></tr><tr><td class="nowrap">3.1.0</td><td class="nowrap">2024-11-13</td><td class="num">163</td><td>David Lord (123), dependabot <span class="badge" title="dependabot[bot]">bot</span> (16), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (8), Resistor-git (2), Éloi Rivard (1), pgjones (1), bre-17387639 (1), Sviatoslav Sydorenko (Святослав Сидоренко) (1), JamesMRamm (1), Jake Tanis (1), Iztok Fister Jr (1), Heisenberg (1), Grey Li (1), David (1), Catarina Bressan (1), Arnout Engelen (1), Amirreza A (1), Akinola Abiodun Emmanuel (1)</td></tr><tr><td class="nowrap">3.0.3</td><td class="nowrap">2024-04-07</td><td class="num">9</td><td>David Lord (8), pgjones (1)</td></tr><tr><td class="nowrap">3.0.2</td><td class="nowrap">2024-02-03</td><td class="num">7</td><td>David Lord (5), Tony Huang (1), Cody Scott (1)</td></tr><tr><td class="nowrap">3.0.1</td><td class="nowrap">2024-01-18</td><td class="num">93</td><td>David Lord (62), dependabot <span class="badge" title="dependabot[bot]">bot</span> (15), pgjones (12), nick2202 (1), lizard (1), Daniel Isaac (1), Ben Huebscher (1)</td></tr><tr><td class="nowrap">2.3.x</td><td class="nowrap">2023-08-21</td><td class="num">1</td><td>David Lord (1)</td></tr><tr><td class="nowrap">2.3.3</td><td class="nowrap">2023-08-21</td><td class="num">171</td><td>David Lord (137), dependabot <span class="badge" title="dependabot[bot]">bot</span> (8), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (3), pgjones (3), Pamela Fox (2), waffle-stomper (1), pavithra (1), mohammad m. moniri (1), hauntsaninja (1), emisargent (1), Yang Yang (1), ToolMoney (1), TehBrian (1), Pedro Guilherme S. Moreira (1), Maksim Salau (1), Lucas Werkmeister (1), Josh Michael Karamuth (1), Jonah Lawrence (1), Jeroendevr (1), Evgeny Mozhaev (1), EtiennePelletier (1), AntoineMath (1), Adam Dangoor (1)</td></tr><tr><td class="nowrap">2.2.x</td><td class="nowrap">2023-05-02</td><td class="num">1</td><td>David Lord (1)</td></tr><tr><td class="nowrap">2.2.5</td><td class="nowrap">2023-05-02</td><td class="num">6</td><td>David Lord (6)</td></tr><tr><td class="nowrap">2.3.2</td><td class="nowrap">2023-05-01</td><td class="num">10</td><td>David Lord (10)</td></tr><tr><td class="nowrap">2.3.1</td><td class="nowrap">2023-04-25</td><td class="num">5</td><td>David Lord (4), Lucas Werkmeister (1)</td></tr><tr><td class="nowrap">2.3.0</td><td class="nowrap">2023-04-25</td><td class="num">104</td><td>David Lord (82), dependabot <span class="badge" title="dependabot[bot]">bot</span> (8), pgjones (2), waffle-stomper (1), emisargent (1), Yang Yang (1), TehBrian (1), Pamela Fox (1), Maksim Salau (1), Josh Michael Karamuth (1), Jonah Lawrence (1), Evgeny Mozhaev (1), EtiennePelletier (1), AntoineMath (1), Adam Dangoor (1)</td></tr><tr><td class="nowrap">2.2.4</td><td class="nowrap">2023-04-25</td><td class="num">27</td><td>David Lord (24), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (1), martinamca (1), lettow-humain (1)</td></tr><tr><td class="nowrap">2.2.3</td><td class="nowrap">2023-02-15</td><td class="num">81</td><td>David Lord (44), Grey Li (9), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (7), Maxim G. Ivanov (5), tautv (1), rayanth (1), owgreen (1), Thomas Rhines (1), Philipp Rohde (1), Oğuzhan Çelikarslan (1), Mat Steininger (1), Kevin Kirsche (1), Jonah Lawrence (1), Isaac Woodruff (1), Dosenpfand (1), Dillon Barnes (1), Bhushan Mohanraj (1), Asif Saif Uddin (1), Andrii Kolomoiets (1), Abdur-Rahmaan Janhangeer (1)</td></tr><tr><td class="nowrap">2.2.2</td><td class="nowrap">2022-08-08</td><td class="num">11</td><td>David Lord (11)</td></tr><tr><td class="nowrap">2.2.1</td><td class="nowrap">2022-08-03</td><td class="num">6</td><td>David Lord (6)</td></tr><tr><td class="nowrap">2.2.0</td><td class="nowrap">2022-08-02</td><td class="num">111</td><td>David Lord (92), pgjones (5), dependabot <span class="badge" title="dependabot[bot]">bot</span> (2), Stanislav Bushuev (2), Pedro Torcatt (2), dzcode (1), Tim Hoagland (1), Qingpeng Li (1), Matthijs van der Vleuten (1), Kevin Kirsche (1), Ivan Sushkov (1), Grey Li (1), Chris Hallacy (1)</td></tr><tr><td class="nowrap">2.1.x</td><td class="nowrap">2022-08-02</td><td class="num">5</td><td>David Lord (4), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (1)</td></tr><tr><td class="nowrap">2.1.3</td><td class="nowrap">2022-07-13</td><td class="num">62</td><td>David Lord (45), lecovi (2), hankhank10 (2), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (1), Yourun-Proger (1), Ties Jan Hefting (1), Numerlor (1), Nick Kocharhook (1), Nathan Brown (1), Maria Andrea Vignau (1), Luis Palacios (1), Justin Bull (1), Evgeny Prigorodov (1), Earl C. Ruby III (1), Dan Mirsky (1), DailyDreaming (1)</td></tr><tr><td class="nowrap">2.1.2</td><td class="nowrap">2022-04-28</td><td class="num">25</td><td>David Lord (18), MeViMo (2), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (1), Rafael Zimmer (1), LarsMoons (1), James Warne (1), Bo Bayles (1)</td></tr><tr><td class="nowrap">2.1.1</td><td class="nowrap">2022-03-30</td><td class="num">7</td><td>David Lord (7)</td></tr><tr><td class="nowrap">2.1.0</td><td class="nowrap">2022-03-28</td><td class="num">146</td><td>David Lord (95), Grey Li (19), dependabot <span class="badge" title="dependabot[bot]">bot</span> (17), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (3), pgjones (2), Adrian Moennich (2), uedvt359 (1), octopoulpe (1), Tushar Sadhwani (1), Stefane Fermigier (1), Pedro Torcatt (1), Mickaël Guérin (1), K900 (1), Colin Adams (1)</td></tr><tr><td class="nowrap">2.0.3</td><td class="nowrap">2022-02-14</td><td class="num">58</td><td>David Lord (45), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (1), otherJL0 (1), olliemath (1), karintou8710 (1), Yourun-Proger (1), Ryan Nevius (1), Kevin Kirsche (1), Jürgen Gmach (1), Henry Kobin (1), Grey Li (1), Chenwei Xiao (1), Cameron Dahl (1), Bojan Delić (1)</td></tr><tr><td class="nowrap">2.0.2</td><td class="nowrap">2021-10-04</td><td class="num">80</td><td>David Lord (36), Grey Li (8), Frank Yu (7), pgjones (2), laggardkernel (2), default-303 (2), Pascal Corpet (2), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (1), nabbisen (1), na2shell (1), kaushik kothiya (1), Yourun-Proger (1), Seth Rutner (1), Rohan salwan (1), Pedro Torcatt (1), Mindiell (1), Miguel Grinberg (1), Matthias Paulsen (1), Marat Sharafutdinov (1), Makonede (1), Kevin Kirsche (1), Kasper Primdal Lauritzen (1), Karuna Tata (1), Hugo Montenegro (1), Emil Sadek (1), Elahi-cs (1), Angeline (1), Adrian Moennich (1)</td></tr><tr><td class="nowrap">2.0.1</td><td class="nowrap">2021-05-21</td><td class="num">498</td><td>David Lord (245), dependabot-preview <span class="badge" title="dependabot-preview[bot]">bot</span> (91), Grey Li (38), pgjones (23), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (12), Joshua Bronson (11), Leonardo Giordani (4), Alex Hedges (4), Adrian Moennich (4), jackwardell (3), dependabot <span class="badge" title="dependabot[bot]">bot</span> (3), Pedro Lourenço (2), Jeff Widman (2), Armin Ronacher (2), Aadi Bajpai (2), yk396 (1), sblondon (1), raymond-devries (1), ongopongo (1), oleksis (1), miquelvir (1), makdon (1), linchiwei123 (1), kevinanew (1), iomintz (1), girst (1), erfanio (1), bearnun (1), WolframAlph (1), Viet Hung Nguyen (1), Tony De La Nuez (1), Thiago J. Barbalho (1), Shanavas M (1), Sergei (1), Sebastian Höffner (1), Ryuichi Watanabe (1), Reece Dunham (1), Rafael Aviles (1), Peter G Kritikos (1), Paul Sanders (1), Oleksis Fraga Menéndez (1), Nils Philippsen (1), Nathan McKinley-Pace (1), Mellcap Zhao (1), Matěj Volf (1), Matthew Preble (1), Mathurshan Vimalesvaran (1), Martin Thoma (1), Marc Hernandez Cabot (1), Marat Sharafutdinov (1), <em>and 17 more authors</em></td></tr><tr><td class="nowrap">1.1.4</td><td class="nowrap">2021-05-14</td><td class="num">4</td><td>David Lord (3), brettlangdon (1)</td></tr><tr><td class="nowrap">1.1.x</td><td class="nowrap">2021-05-14</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">1.1.3</td><td class="nowrap">2021-05-13</td><td class="num">4</td><td>David Lord (4)</td></tr><tr><td class="nowrap">2.0.0</td><td class="nowrap">2021-05-11</td><td class="num">15</td><td>David Lord (12), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (2), Grey Li (1)</td></tr><tr><td class="nowrap">2.0.0rc2</td><td class="nowrap">2021-05-03</td><td class="num">31</td><td>David Lord (11), pgjones (7), Grey Li (5), dependabot <span class="badge" title="dependabot[bot]">bot</span> (3), Adrian Moennich (2), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (1), dependabot-preview <span class="badge" title="dependabot-preview[bot]">bot</span> (1), Joshua Bronson (1)</td></tr><tr><td class="nowrap">2.0.0rc1</td><td class="nowrap">2021-04-16</td><td class="num">405</td><td>David Lord (187), dependabot-preview <span class="badge" title="dependabot-preview[bot]">bot</span> (90), Grey Li (26), Joshua Bronson (12), pgjones (10), pre-commit-ci <span class="badge" title="pre-commit-ci[bot]">bot</span> (9), Leonardo Giordani (4), jackwardell (3), Pedro Lourenço (2), Jeff Widman (2), Armin Ronacher (2), Aadi Bajpai (2), yk396 (1), sblondon (1), raymond-devries (1), ongopongo (1), miquelvir (1), makdon (1), linchiwei123 (1), kevinanew (1), kangetsu121 (1), jordivandooren (1), iomintz (1), huimingz (1), girst (1), erfanio (1), bearnun (1), WolframAlph (1), Viet Hung Nguyen (1), Tony De La Nuez (1), Thiago J. Barbalho (1), Shanavas M (1), Sergei (1), Sebastian Höffner (1), Sarthak Vineet Kumar (1), Ryuichi Watanabe (1), Reece Dunham (1), Peter G Kritikos (1), Paul Sanders (1), Nils Philippsen (1), Nathan McKinley-Pace (1), Mellcap Zhao (1), Matěj Volf (1), Matthew Preble (1), Mathurshan Vimalesvaran (1), Martin Thoma (1), Marc Hernandez Cabot (1), Marat Sharafutdinov (1), Karthikeyan Singaravelan (1), Kai Chen (1), <em>and 18 more authors</em></td></tr><tr><td class="nowrap">1.1.2</td><td class="nowrap">2020-04-03</td><td class="num">315</td><td>David Lord (162), Matt Cooper (9), Grey Li (9), Joshua Bronson (8), Hsiaoming Yang (7), David Baumgold (6), Daniel Pope (6), garenchan (5), Jarek Piórkowski (3), Isaac To (3), Gabriel Saldanha (3), EtiennePelletier (3), Anthony Plunkett (3), wim glenn (2), mattc41190 (2), Martin Michlmayr (2), Justin W. Flory (2), Jon S. Stumpf (2), Dilan Coss (2), Adrian Moennich (2), yingshaoxo (1), vorelq (1), venus (1), ultimecia7 (1), shidenggui (1), pgjones (1), ongopongo (1), moyosore (1), kylepollina (1), jaydarius (1), icreatedanaccount (1), hharutyunyan (1), gutianci (1), gokcegrbl (1), frostming (1), dayiguizhen (1), cslecrone (1), cktan98 (1), Vik (1), Tom Busby (1), Tobias Sette (1), Tiago Coutinho (1), Suraj Chafle (1), Stéphane Wirtel (1), Scott Crosby (1), Saul  Urias (1), Sang Min Park (1), Ryan Thielke (1), Radovan Bast (1), Pete Beardmore (1), <em>and 44 more authors</em></td></tr><tr><td class="nowrap">1.0.x</td><td class="nowrap">2020-02-11</td><td class="num">795</td><td>David Lord (444), Kenneth Reitz (19), Markus Unterwaditzer (18), Hsiaoming Yang (18), Grey Li (18), Adam Byrtek (13), Randy Liou (8), Eugene M. Kim (8), Adrian Moennich (8), Tully Rankin (7), Kyle Lawlor (7), Armin Ronacher (7), Lowell Abbott (6), Hendrik Makait (6), Jimmy McCarthy (5), Jeff Widman (5), Daniel Neuhäuser (5), garenchan (4), cerickson (4), MikeTheReader (4), Antonio Larrosa (4), Sven-Hendrik Haase (3), Rene A. Zelaya (3), Neil Grey (3), Miguel Grinberg (3), Kiss György (3), Dave Barker (3), tristan fisher (2), bovarysme (2), Zev Averbach (2), Tony Narlock (2), RamiC (2), Ondřej Nový (2), Nick Pope (2), Ngalim Siregar (2), Mihir Singh (2), Karthikeyan Singaravelan (2), John Moutafis (2), Fadhel_Chaabane (2), Ed Brannin (2), Christian Stade-Schuldt (2), Camilo (2), Anton Sarukhanov (2), Anthony Plunkett (2), Andy Craze (2), zcchen (1), wim glenn (1), wangbing (1), vojtekb (1), venus (1), <em>and 118 more authors</em></td></tr><tr><td class="nowrap">0.12.x</td><td class="nowrap">2020-02-10</td><td class="num">1</td><td>Armin Ronacher (1)</td></tr><tr><td class="nowrap">0.12.5</td><td class="nowrap">2020-02-10</td><td class="num">5</td><td>Armin Ronacher (3), David Lord (2)</td></tr><tr><td class="nowrap">1.1.1</td><td class="nowrap">2019-07-08</td><td class="num">3</td><td>David Lord (3)</td></tr><tr><td class="nowrap">1.1.0</td><td class="nowrap">2019-07-04</td><td class="num">255</td><td>David Lord (128), Matt Cooper (9), Grey Li (8), Hsiaoming Yang (7), David Baumgold (6), Daniel Pope (6), garenchan (5), Joshua Bronson (5), Jarek Piórkowski (3), Gabriel Saldanha (3), EtiennePelletier (3), Anthony Plunkett (3), wim glenn (2), Martin Michlmayr (2), Justin W. Flory (2), Jon S. Stumpf (2), Dilan Coss (2), Adrian Moennich (2), vorelq (1), venus (1), ultimecia7 (1), shidenggui (1), pgjones (1), moyosore (1), jaydarius (1), icreatedanaccount (1), gokcegrbl (1), dayiguizhen (1), cslecrone (1), cktan98 (1), Vik (1), Tom Busby (1), Tiago Coutinho (1), Suraj Chafle (1), Scott Crosby (1), Saul  Urias (1), Sang Min Park (1), Ryan Thielke (1), Radovan Bast (1), Pete Beardmore (1), Paul Butler (1), Oliver Bestwalter (1), Nicola Iarocci (1), Max (1), Matt Robenolt (1), Markus Unterwaditzer (1), Lindsay Young (1), LeeW (1), Kamil Wargula (1), Juan Lara (1), <em>and 25 more authors</em></td></tr><tr><td class="nowrap">1.0.4</td><td class="nowrap">2019-07-04</td><td class="num">34</td><td>David Lord (27), vdanain (1), aligoren (1), Logan Wright (1), Diego Alberto Torres Quintanilla (1), Anthony Sottile (1), Adrian Moennich (1), Abhinav Sagar (1)</td></tr><tr><td class="nowrap">1.0.3</td><td class="nowrap">2019-05-17</td><td class="num">108</td><td>David Lord (66), garenchan (4), Grey Li (3), Karthikeyan Singaravelan (2), Adrian Moennich (2), venus (1), nathanbegbie (1), jordan bonser (1), jangjunha (1), brunoais (1), Tom-McDonald (1), Stephon Harris (1), Sebastian Jakubiak (1), RyanSquared (1), Rohan Talip (1), Peter Landoll (1), Ondřej Nový (1), Mitchel Humpherys (1), Michael E. Karpeles (1), Mark Amery (1), Jimmy Jia (1), Jesse Seldess (1), Jarek Lipski (1), Igor Ghisi (1), Douglas Thor (1), Dilan Coss (1), Daniel Opitz (1), DamianSkrzypczak (1), Colin Adams (1), Charles Ross (1), Briehan Lombaard (1), Andrew Crouse (1), Adam Johnson (1), Abhinav (1), Abdur-Rahmaan Janhangeer (1), A Brooks (1)</td></tr><tr><td class="nowrap">1.0.2</td><td class="nowrap">2018-05-02</td><td class="num">13</td><td>David Lord (10), Hsiaoming Yang (1), Grey Li (1), Aaron Hall, MBA (1)</td></tr><tr><td class="nowrap">1.0.1</td><td class="nowrap">2018-04-30</td><td class="num">632</td><td>David Lord (335), Kenneth Reitz (19), Markus Unterwaditzer (18), Hsiaoming Yang (17), Adam Byrtek (13), Grey Li (12), Randy Liou (8), Eugene M. Kim (8), Tully Rankin (7), Kyle Lawlor (7), Lowell Abbott (6), Hendrik Makait (6), Armin Ronacher (6), Jimmy McCarthy (5), Jeff Widman (5), Daniel Neuhäuser (5), Adrian Moennich (5), cerickson (4), MikeTheReader (4), Antonio Larrosa (4), Sven-Hendrik Haase (3), Rene A. Zelaya (3), Neil Grey (3), Miguel Grinberg (3), Kiss György (3), Dave Barker (3), tristan fisher (2), bovarysme (2), Zev Averbach (2), Tony Narlock (2), RamiC (2), Nick Pope (2), Ngalim Siregar (2), Mihir Singh (2), John Moutafis (2), Fadhel_Chaabane (2), Ed Brannin (2), Christian Stade-Schuldt (2), Camilo (2), Anton Sarukhanov (2), Anthony Plunkett (2), Andy Craze (2), zcchen (1), wim glenn (1), wangbing (1), vojtekb (1), trirpi (1), rocambolesque (1), kaveh (1), ka7 (1), <em>and 80 more authors</em></td></tr><tr><td class="nowrap">0.12.4</td><td class="nowrap">2018-04-30</td><td class="num">3</td><td>David Lord (3)</td></tr><tr><td class="nowrap">1.0</td><td class="nowrap">2018-04-26</td><td class="num">601</td><td>David Lord (312), Kenneth Reitz (19), Markus Unterwaditzer (18), Hsiaoming Yang (16), Adam Byrtek (13), Grey Li (12), Randy Liou (8), Eugene M. Kim (8), Tully Rankin (7), Kyle Lawlor (7), Lowell Abbott (6), Hendrik Makait (6), Armin Ronacher (6), Jimmy McCarthy (5), Jeff Widman (5), Daniel Neuhäuser (5), cerickson (4), MikeTheReader (4), Antonio Larrosa (4), Adrian Moennich (4), Sven-Hendrik Haase (3), Rene A. Zelaya (3), Neil Grey (3), Miguel Grinberg (3), Kiss György (3), Dave Barker (3), tristan fisher (2), bovarysme (2), Zev Averbach (2), Tony Narlock (2), RamiC (2), Nick Pope (2), Ngalim Siregar (2), Mihir Singh (2), John Moutafis (2), Fadhel_Chaabane (2), Ed Brannin (2), Christian Stade-Schuldt (2), Camilo (2), Anton Sarukhanov (2), Anthony Plunkett (2), Andy Craze (2), zcchen (1), wangbing (1), vojtekb (1), trirpi (1), rocambolesque (1), kaveh (1), ka7 (1), hugovk (1), <em>and 74 more authors</em></td></tr><tr><td class="nowrap">0.12.3</td><td class="nowrap">2018-04-26</td><td class="num">14</td><td>David Lord (12), Markus Unterwaditzer (1), Adrian Moennich (1)</td></tr><tr><td class="nowrap">0.12.2</td><td class="nowrap">2017-05-16</td><td class="num">6</td><td>Markus Unterwaditzer (3), David Lord (3)</td></tr><tr><td class="nowrap">0.12.1</td><td class="nowrap">2017-03-31</td><td class="num">13</td><td>Markus Unterwaditzer (8), Diggory Blake (3), Paul Brown (2)</td></tr><tr><td class="nowrap">0.12</td><td class="nowrap">2016-12-21</td><td class="num">164</td><td>Markus Unterwaditzer (34), David Lord (15), Armin Ronacher (13), Kyle Lawlor (6), Jeff Widman (6), Hyunchel Kim (4), Anton Sarukhanov (4), RamiC (3), jphilipsen05 (2), Tery Lim (2), Sven-Hendrik Haase (2), Ryan Backman (2), Randy Liou (2), Prachi Shirish Khadke (2), Michael Recachinas (2), Jochen Kupperschmidt (2), James Farrington (2), Giampaolo Eusebi (2), Clenimar Filemon (2), Andrew Arendt (2), Alex Kahan (2), 小明 (1), wldtyp (1), teichopsia- (1), sanderl-mediamonks (1), georgschoelly (1), ezramorris (1), dcfix (1), avborhanian (1), alatar- (1), ahmedakef (1), Yoav Ram (1), Sudheer Satyanarayana (1), Shawn McElroy (1), Shandy Brown (1), Shakib Hossain (1), SaturnR (1), Roman (1), Raphael Deem (1), Ping Hu (1), Philippe Ombredanne (1), Pablo Marti (1), PHeanEX (1), Olexander Yermakov (1), Nathan Land (1), Nate Prewitt (1), Martijn Pieters (1), Leo Tindall (1), Joël Charles (1), Josh Soref (1), <em>and 24 more authors</em></td></tr><tr><td class="nowrap">0.11.1</td><td class="nowrap">2016-06-07</td><td class="num">5</td><td>Markus Unterwaditzer (3), Josiah Philipsen (1), Armin Ronacher (1)</td></tr><tr><td class="nowrap">0.11</td><td class="nowrap">2016-05-29</td><td class="num">898</td><td>Markus Unterwaditzer (199), Armin Ronacher (169), Kenneth Reitz (42), Daniel Neuhäuser (38), Keyan Pishdadian (36), Daniel Neuhäuser (33), defuz (26), David Lord (26), lord63 (18), Phil Schaf (12), Petr Zemek (12), Jeff Widman (9), Adrian Moennich (9), Alexander Pantyukhin (8), INADA Naoki (7), Mieszko (6), Chris Rebert (6), max demian (5), Matt Wright (5), Sven-Hendrik Haase (4), Bruce Sutherland (4), Abhijeet Kasurde (4), lobeck (3), Winston Kouch (3), Sourya Vatsyayan (3), Paulo Bu (3), Miguel Grinberg (3), cgar (2), Wouter Van Hemel (2), Wang Haowei (2), Torstein Krause Johansen (2), Tommaso Allevi (2), Timo Furrer (2), Shipeng Feng (2), Oliver Beattie (2), Nick Luchsinger (2), Mikael Åhlén (2), Michael Bikovitsky (2), Matt Iversen (2), Mathias J. Hennig (2), Martijn Pieters (2), Mark Slater (2), Kevin Yap (2), Jonathan Como (2), Jonas Gröger (2), Jochen Kupperschmidt (2), Ian Connolly (2), Daniel Quinn (2), Corey Goldberg (2), Christopher Su (2), <em>and 154 more authors</em></td></tr><tr><td class="nowrap">0.10.1</td><td class="nowrap">2013-06-14</td><td class="num">17</td><td>Armin Ronacher (14), Daniel Neuhäuser (2), Serge S. Koval (1)</td></tr><tr><td class="nowrap">0.10</td><td class="nowrap">2013-06-13</td><td class="num">315</td><td>Armin Ronacher (151), Kenneth Reitz (33), Daniel Neuhäuser (25), Thomas Waldmann (23), Daniel Neuhäuser (14), Markus Unterwaditzer (7), Max Countryman (4), Alex Couper (4), Ron DuPlain (3), Finbarr O&#x27;Callaghan (3), Sven-Hendrik Haase (2), Priit Laes (2), Mitchell Peabody (2), Gennady Kovshenin (2), Ed Burnett (2), schneems (1), pinchsp (1), oliversong (1), lambdadi (1), jfinkels (1), esaurito (1), d1ffuz0r (1), Trung Ly (1), Trey Long (1), Tony Narlock (1), Tomasz Kalkosiński (1), Tobias Bieniek (1), Sven Slootweg (1), Simon Sapin (1), Ryan Macy (1), Randall Degges (1), Ramiro Gomez (1), Ralph Bean (1), Paulo Poiati (1), Paul McMillan (1), OrangeTux (1), Michael N. Gagnon (1), Mark Steve Samson (1), Laurens Van Houtven (1), Jason Moon (1), Iyra Gaura (1), INADA Naoki (1), Erik Rose (1), Devon Mizelle (1), Corbin Simpson (1), Cenk Altı (1), Ben Rousch (1), Baiju Muthukadan (1), Alexander Thaller (1), Alex Morega (1), <em>and 3 more authors</em></td></tr><tr><td class="nowrap">0.9</td><td class="nowrap">2012-07-01</td><td class="num">256</td><td>Ron DuPlain (85), Armin Ronacher (62), Kenneth Reitz (19), Ori Livneh (5), Priit Laes (4), Ned Jackson Lovely (4), Max (4), FND (4), Dmitry Shevchenko (4), wilsaj (3), jfinkels (3), awsum (3), Simon Sapin (3), Kevin Burke (3), Dave Shawley (3), Alex Vykalyuk (3), ekoka (2), Paul McMillan (2), Natan L (2), Marc Abramowitz (2), Kyle Wild (2), Jim Rollenhagen (2), James Saryerwinnie (2), kracekumar (1), jtsoi (1), iammookli (1), bev-a-tron (1), Vadim Pestovnikov (1), ThomasWaldmann (1), Thibaud Morel (1), Thiago de Arruda (1), Sundar Raman (1), Steven Osborn (1), Sergey (1), Sean Vieira (1), Ross Lawley (1), Reisen (1), Ramiro Gomez (1), Pascal Hartig (1), Matt Wright (1), Matt Dawson (1), Massimo Santini (1), Kamil Kisiel (1), Jon Parise (1), Joe Esposito (1), Florent Xicluna (1), Filip Ristić (1), Craig Dennis (1), Cory Li (1), Christoph Heer (1), <em>and 3 more authors</em></td></tr><tr><td class="nowrap">0.8.1</td><td class="nowrap">2012-07-01</td><td class="num">4</td><td>Armin Ronacher (4)</td></tr><tr><td class="nowrap">0.8</td><td class="nowrap">2011-09-29</td><td class="num">240</td><td>Armin Ronacher (196), Ron DuPlain (13), Simon Sapin (5), Pedro Algarvio (4), Michał Bartoszkiewicz (3), ThomasWaldmann (2), Priit Laes (2), Brandon Stafford (2), consigliere (1), Ustun Ozgur (1), Luit van Drongelen (1), Kenneth Reitz (1), Joel Perras (1), Jesse Dubay (1), Hadley Rich (1), Felix Hummel (1), Daniel Neuhäuser (1), Dan Callahan (1), Christopher Currie (1), Bastian Hoyer (1), Alexis Metaireau (1)</td></tr><tr><td class="nowrap">0.7</td><td class="nowrap">2011-06-28</td><td class="num">245</td><td>Armin Ronacher (154), Ron DuPlain (19), matt swanson (6), Aaron Kavlie (6), Simon Sapin (5), Daniel Haaker (5), Dag Odenhall (4), mvantellingen (3), jgraeme (2), agentultra (2), Ronny Pfannschmidt (2), Pedro Algarvio (2), Aku Kotkavuo (2), wilsaj (1), streety (1), jfinkels (1), fmw (1), doobeh (1), Zhao Xiaohong (1), Stéphane Wirtel (1), Steve Romanow (1), Sharoon Thomas (1), Sean Reifschneider (1), Sam Anderson (1), Rémy Roy (1), Priit Laes (1), Peter Manser (1), Noufal Ibrahim (1), Nick Walker (1), Merlin (1), Matt Dawson (1), Matt Chisholm (1), Kenneth Reitz (1), Kanak Kshetri (1), Jerry Baker (1), Jeff Weber (1), Jason Davies (1), Ivo Danihelka (1), Heungsub Lee (1), Georg Brandl (1), Francisco Souza (1), Florent Xicluna (1), Drew Vogel (1), Daniel Gerber (1), Daniel D. Beck (1), Baiju Muthukadan (1)</td></tr><tr><td class="nowrap">0.6</td><td class="nowrap">2010-07-27</td><td class="num">99</td><td>Armin Ronacher (95), Thomas Schranz (1), Ron DuPlain (1), Florent Xicluna (1), Ali Afshar (1)</td></tr><tr><td class="nowrap">0.5</td><td class="nowrap">2010-07-06</td><td class="num">77</td><td>Armin Ronacher (58), Matt Campbell (5), Adam Zapletal (5), Justin Quick (4), Christopher Grebs (3), Marcus Fredriksson (1), Florent Xicluna (1)</td></tr><tr><td class="nowrap">0.4</td><td class="nowrap">2010-06-18</td><td class="num">57</td><td>Armin Ronacher (37), Dag Odenhall (9), Simon Sapin (4), Georg Brandl (2), Florent Xicluna (2), jgraeme (1), Merlin (1), Andre Wobst (1)</td></tr><tr><td class="nowrap">0.3</td><td class="nowrap">2010-05-27</td><td class="num">48</td><td>Armin Ronacher (41), Zhao Xiaohong (2), Marian Sigler (2), Stéphane Wirtel (1), Ron DuPlain (1), Kenneth Reitz (1)</td></tr><tr><td class="nowrap">0.2</td><td class="nowrap">2010-05-11</td><td class="num">139</td><td>Armin Ronacher (120), Florent Xicluna (11), Sebastien Estienne (3), unknown (2), cgrinds (2), Chris Edgemon (1)</td></tr><tr><td class="nowrap">0.1</td><td class="nowrap">2010-04-16</td><td class="num">64</td><td>Armin Ronacher (62), moraes (1), Justin Quick (1)</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="../ecosystems/python.html">How Flask ranks among Python open source projects by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+name: GitStats Report
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  gitstats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: shenxianpeng/gitstats-action@v1
+        with:
+          deploy-to-pages: true
+</pre></details></section><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev1",
-  "generated_at": "2026-10-19T03:44:19+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:19:53+00:00",
   "name": "NumPy",
   "report_path": "index.html",
   "first_commit": "2001-12-18 15:45:10",
-  "last_commit": "2026-10-18 22:56:33",
-  "age_days": 9071,
-  "active_days": 6823,
-  "total_commits": 42417,
-  "total_authors": 2104,
-  "active_authors_12mo": 234,
-  "commits_last_12mo": 2454,
-  "total_files": 2420,
-  "total_lines": 1007126,
-  "lines_added": 2790811,
-  "lines_removed": 1783685,
+  "last_commit": "2026-10-22 21:45:57",
+  "age_days": 9075,
+  "active_days": 6827,
+  "total_commits": 42433,
+  "total_authors": 2108,
+  "active_authors_12mo": 236,
+  "commits_last_12mo": 2470,
+  "total_files": 2423,
+  "total_lines": 1007821,
+  "lines_added": 2791653,
+  "lines_removed": 1783832,
   "total_tags": 16,
   "era": "steady",
   "top_authors": [
     {
       "name": "Charles Harris",
-      "commits": 7288
+      "commits": 7289
     },
     {
       "name": "Matti Picus",
@@ -29,7 +29,7 @@
     },
     {
       "name": "Sebastian Berg",
-      "commits": 2983
+      "commits": 2984
     },
     {
       "name": "Travis Oliphant",
@@ -41,35 +41,40 @@
     }
   ],
   "author_commits": {
-    "Nathan Goldbaum": 871,
+    "Tyler Reddy": 198,
+    "LeeMEow23": 1,
+    "Charles Harris": 7289,
+    "Dragos-Georgian Ion": 4,
+    "Anush Vishwakarma": 1,
+    "Gopu Yeshwanth Reddy": 2,
+    "gregwb": 3,
+    "Sebastian Berg": 2984,
+    "Abhinay Reddy Keesara": 3,
+    "David King": 1,
+    "pereradrian": 1,
+    "Nathan Goldbaum": 872,
+    "HughStanway": 4,
+    "Iason Krommydas": 33,
     "Joren Hammudoglu": 1436,
     "Inessa Pawson": 51,
     "aryangorde6": 1,
     "Matti Picus": 3035,
-    "Iason Krommydas": 32,
     "Ganesh Kathiresan": 159,
     "Michael Zhan": 4,
-    "Abhinay Reddy Keesara": 2,
-    "Sebastian Berg": 2983,
-    "HughStanway": 3,
     "sukeyzhou": 2,
-    "Dragos-Georgian Ion": 3,
     "Fun-Projects-Learn": 1,
     "bymasha": 1,
     "ssmore": 1,
     "Mohd Maaz Khan": 14,
     "Yuka Sadaoka": 1,
-    "gregwb": 2,
     "Likhitha J": 1,
     "Raghuveer Devulapalli": 330,
     "Lakshay Garg": 5,
     "Andrew Nelson": 94,
-    "Charles Harris": 7288,
     "Pratham Hole": 58,
     "Eugenio \"Jay\" Zuccarelli": 1,
     "Rayson Yeap": 1,
     "Gustav Lantz": 1,
-    "Tyler Reddy": 197,
     "stanley": 1,
     "Syed Labeeq Sajid Bukhari": 1,
     "Michael Niklas": 1,
@@ -128,7 +133,6 @@
     "Michael Newman": 2,
     "Abhijeetsingh Meena": 5,
     "Marten van Kerkwijk": 362,
-    "Gopu Yeshwanth Reddy": 1,
     "Malcolm Smith": 2,
     "Scott Shambaugh": 7,
     "Steve Stagg": 4,
@@ -2172,7 +2176,7 @@
     "2023": 3422,
     "2024": 3054,
     "2025": 2543,
-    "2026": 2053
+    "2026": 2069
   },
   "ai_assisted": {
     "commits": 38,
@@ -2232,7 +2236,649 @@
       "2026-07": 241,
       "2026-08": 229,
       "2026-09": 333,
-      "2026-10": 181
+      "2026-10": 197
+    }
+  },
+  "organizations": {
+    "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
+    "commits": 42433,
+    "by_kind": {
+      "organization": 2800,
+      "one_person": 6066,
+      "personal": 31199,
+      "hidden": 1269,
+      "unknown": 486,
+      "bot": 613
+    },
+    "organization_count": 70,
+    "last_12mo_from": "2025-11",
+    "top": [
+      {
+        "organization": "berkeley.edu",
+        "commits": 881,
+        "commits_last_12mo": 0,
+        "addresses": 6,
+        "first_commit": "2005-06-17",
+        "last_commit": "2024-12-11"
+      },
+      {
+        "organization": "enthought.com",
+        "commits": 532,
+        "commits_last_12mo": 0,
+        "addresses": 12,
+        "first_commit": "2001-12-18",
+        "last_commit": "2025-03-11"
+      },
+      {
+        "organization": "utoronto.ca",
+        "commits": 365,
+        "commits_last_12mo": 15,
+        "addresses": 2,
+        "first_commit": "2013-10-12",
+        "last_commit": "2026-07-17"
+      },
+      {
+        "organization": "continuum.io",
+        "commits": 207,
+        "commits_last_12mo": 0,
+        "addresses": 5,
+        "first_commit": "2012-02-20",
+        "last_commit": "2017-01-03"
+      },
+      {
+        "organization": "huawei.com",
+        "commits": 123,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2020-03-02",
+        "last_commit": "2023-01-09"
+      },
+      {
+        "organization": "google.com",
+        "commits": 91,
+        "commits_last_12mo": 2,
+        "addresses": 15,
+        "first_commit": "2016-02-22",
+        "last_commit": "2026-03-06"
+      },
+      {
+        "organization": "intel.com",
+        "commits": 62,
+        "commits_last_12mo": 0,
+        "addresses": 8,
+        "first_commit": "2015-09-14",
+        "last_commit": "2025-01-23"
+      },
+      {
+        "organization": "python.org",
+        "commits": 56,
+        "commits_last_12mo": 37,
+        "addresses": 3,
+        "first_commit": "2014-12-03",
+        "last_commit": "2026-09-17"
+      },
+      {
+        "organization": "quansight.com",
+        "commits": 50,
+        "commits_last_12mo": 3,
+        "addresses": 4,
+        "first_commit": "2021-06-07",
+        "last_commit": "2025-11-18"
+      },
+      {
+        "organization": "ibm.com",
+        "commits": 47,
+        "commits_last_12mo": 4,
+        "addresses": 13,
+        "first_commit": "2018-07-02",
+        "last_commit": "2026-07-03"
+      },
+      {
+        "organization": "inria.fr",
+        "commits": 27,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2010-11-17",
+        "last_commit": "2022-10-18"
+      },
+      {
+        "organization": "mit.edu",
+        "commits": 26,
+        "commits_last_12mo": 0,
+        "addresses": 6,
+        "first_commit": "2013-08-09",
+        "last_commit": "2023-10-26"
+      },
+      {
+        "organization": "uw.edu",
+        "commits": 16,
+        "commits_last_12mo": 0,
+        "addresses": 4,
+        "first_commit": "2011-08-01",
+        "last_commit": "2021-01-04"
+      },
+      {
+        "organization": "iscas.ac.cn",
+        "commits": 14,
+        "commits_last_12mo": 1,
+        "addresses": 2,
+        "first_commit": "2024-04-01",
+        "last_commit": "2026-05-29"
+      },
+      {
+        "organization": "stanford.edu",
+        "commits": 14,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2013-07-01",
+        "last_commit": "2018-02-26"
+      },
+      {
+        "organization": "microsoft.com",
+        "commits": 13,
+        "commits_last_12mo": 0,
+        "addresses": 4,
+        "first_commit": "2018-09-25",
+        "last_commit": "2022-09-16"
+      },
+      {
+        "organization": "apache.org",
+        "commits": 12,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2016-01-25",
+        "last_commit": "2020-05-27"
+      },
+      {
+        "organization": "colorado.edu",
+        "commits": 12,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2014-03-24",
+        "last_commit": "2020-07-09"
+      },
+      {
+        "organization": "fujitsu.com",
+        "commits": 12,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2023-03-08",
+        "last_commit": "2025-05-14"
+      },
+      {
+        "organization": "redhat.com",
+        "commits": 12,
+        "commits_last_12mo": 4,
+        "addresses": 6,
+        "first_commit": "2013-07-25",
+        "last_commit": "2026-07-10"
+      },
+      {
+        "organization": "waw.pl",
+        "commits": 12,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2014-09-10",
+        "last_commit": "2016-10-28"
+      },
+      {
+        "organization": "nasa.gov",
+        "commits": 11,
+        "commits_last_12mo": 0,
+        "addresses": 5,
+        "first_commit": "2021-04-22",
+        "last_commit": "2025-05-23"
+      },
+      {
+        "organization": "preferred.jp",
+        "commits": 10,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2015-12-23",
+        "last_commit": "2022-06-09"
+      },
+      {
+        "organization": "bloomberg.net",
+        "commits": 9,
+        "commits_last_12mo": 4,
+        "addresses": 3,
+        "first_commit": "2009-12-28",
+        "last_commit": "2026-10-21"
+      },
+      {
+        "organization": "cmu.edu",
+        "commits": 8,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2016-01-23",
+        "last_commit": "2025-07-10"
+      },
+      {
+        "organization": "debian.org",
+        "commits": 8,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2012-12-30",
+        "last_commit": "2024-09-19"
+      },
+      {
+        "organization": "mpg.de",
+        "commits": 8,
+        "commits_last_12mo": 0,
+        "addresses": 4,
+        "first_commit": "2018-01-22",
+        "last_commit": "2025-01-16"
+      },
+      {
+        "organization": "lbl.gov",
+        "commits": 7,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2013-11-12",
+        "last_commit": "2021-12-29"
+      },
+      {
+        "organization": "metoffice.gov.uk",
+        "commits": 7,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2014-08-31",
+        "last_commit": "2022-07-16"
+      },
+      {
+        "organization": "nag.co.uk",
+        "commits": 7,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2017-10-19",
+        "last_commit": "2020-12-07"
+      },
+      {
+        "organization": "suse.de",
+        "commits": 7,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2012-01-11",
+        "last_commit": "2024-03-28"
+      },
+      {
+        "organization": "deshaw.com",
+        "commits": 6,
+        "commits_last_12mo": 2,
+        "addresses": 3,
+        "first_commit": "2023-10-17",
+        "last_commit": "2026-10-20"
+      },
+      {
+        "organization": "loongson.cn",
+        "commits": 6,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2021-07-20",
+        "last_commit": "2024-12-23"
+      },
+      {
+        "organization": "ulisboa.pt",
+        "commits": 6,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2024-03-08",
+        "last_commit": "2024-03-25"
+      },
+      {
+        "organization": "gentoo.org",
+        "commits": 5,
+        "commits_last_12mo": 0,
+        "addresses": 4,
+        "first_commit": "2017-02-15",
+        "last_commit": "2025-08-18"
+      },
+      {
+        "organization": "illinois.edu",
+        "commits": 5,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2019-05-05",
+        "last_commit": "2024-10-30"
+      },
+      {
+        "organization": "linaro.org",
+        "commits": 5,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2013-01-10",
+        "last_commit": "2022-01-28"
+      },
+      {
+        "organization": "oregonstate.edu",
+        "commits": 5,
+        "commits_last_12mo": 3,
+        "addresses": 3,
+        "first_commit": "2017-02-23",
+        "last_commit": "2026-02-28"
+      },
+      {
+        "organization": "quantopian.com",
+        "commits": 5,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2016-07-23",
+        "last_commit": "2020-09-18"
+      },
+      {
+        "organization": "ucf.edu",
+        "commits": 5,
+        "commits_last_12mo": 1,
+        "addresses": 3,
+        "first_commit": "2017-11-28",
+        "last_commit": "2026-07-13"
+      },
+      {
+        "organization": "uchicago.edu",
+        "commits": 5,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2015-02-23",
+        "last_commit": "2019-02-18"
+      },
+      {
+        "organization": "ugent.be",
+        "commits": 5,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2014-10-04",
+        "last_commit": "2018-10-05"
+      },
+      {
+        "organization": "amazon.com",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2018-03-14",
+        "last_commit": "2019-09-12"
+      },
+      {
+        "organization": "cam.ac.uk",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2014-01-15",
+        "last_commit": "2022-01-22"
+      },
+      {
+        "organization": "edu.tr",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2021-06-07",
+        "last_commit": "2023-03-16"
+      },
+      {
+        "organization": "normalesup.org",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2012-11-15",
+        "last_commit": "2014-12-17"
+      },
+      {
+        "organization": "umich.edu",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2018-12-16",
+        "last_commit": "2024-09-28"
+      },
+      {
+        "organization": "uni-bonn.de",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2014-11-26",
+        "last_commit": "2024-07-26"
+      },
+      {
+        "organization": "anaconda.com",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2018-10-29",
+        "last_commit": "2023-09-21"
+      },
+      {
+        "organization": "dickinson.edu",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2021-02-05",
+        "last_commit": "2021-03-25"
+      },
+      {
+        "organization": "mcgill.ca",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2020-11-29",
+        "last_commit": "2022-12-01"
+      },
+      {
+        "organization": "nexedi.com",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2014-07-16",
+        "last_commit": "2014-08-25"
+      },
+      {
+        "organization": "openai.com",
+        "commits": 3,
+        "commits_last_12mo": 3,
+        "addresses": 2,
+        "first_commit": "2026-06-14",
+        "last_commit": "2026-07-10"
+      },
+      {
+        "organization": "tum.de",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2016-12-13",
+        "last_commit": "2024-06-28"
+      },
+      {
+        "organization": "ucdavis.edu",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2014-03-03",
+        "last_commit": "2023-08-24"
+      },
+      {
+        "organization": "utexas.edu",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2015-07-11",
+        "last_commit": "2024-06-26"
+      },
+      {
+        "organization": "aalto.fi",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2021-07-14",
+        "last_commit": "2021-11-29"
+      },
+      {
+        "organization": "acm.org",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2015-02-25",
+        "last_commit": "2021-10-13"
+      },
+      {
+        "organization": "altlinux.org",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2023-10-12",
+        "last_commit": "2025-07-24"
+      },
+      {
+        "organization": "ecmwf.int",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2011-12-05",
+        "last_commit": "2016-08-05"
+      },
+      {
+        "organization": "ed.ac.uk",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2013-07-21",
+        "last_commit": "2016-11-13"
+      },
+      {
+        "organization": "edu.br",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2020-06-26",
+        "last_commit": "2022-06-08"
+      },
+      {
+        "organization": "imperial.ac.uk",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2016-10-21",
+        "last_commit": "2018-02-03"
+      },
+      {
+        "organization": "meta.com",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2020-03-31",
+        "last_commit": "2021-12-16"
+      },
+      {
+        "organization": "nvidia.com",
+        "commits": 2,
+        "commits_last_12mo": 1,
+        "addresses": 2,
+        "first_commit": "2024-09-09",
+        "last_commit": "2026-10-12"
+      },
+      {
+        "organization": "semmle.com",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2017-06-26",
+        "last_commit": "2018-12-10"
+      },
+      {
+        "organization": "tuwien.ac.at",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2018-02-08",
+        "last_commit": "2022-05-19"
+      },
+      {
+        "organization": "ucsd.edu",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2014-04-24",
+        "last_commit": "2018-02-28"
+      },
+      {
+        "organization": "umn.edu",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2015-05-12",
+        "last_commit": "2016-11-15"
+      },
+      {
+        "organization": "uni-augsburg.de",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2015-03-03",
+        "last_commit": "2021-01-14"
+      }
+    ],
+    "quarters": {
+      "2025-Q1": {
+        "organization": 24,
+        "one_person": 29,
+        "personal": 480,
+        "hidden": 21,
+        "unknown": 1,
+        "bot": 23
+      },
+      "2025-Q2": {
+        "organization": 8,
+        "one_person": 49,
+        "personal": 503,
+        "hidden": 150,
+        "unknown": 0,
+        "bot": 22
+      },
+      "2025-Q3": {
+        "organization": 17,
+        "one_person": 22,
+        "personal": 352,
+        "hidden": 33,
+        "unknown": 1,
+        "bot": 35
+      },
+      "2025-Q4": {
+        "organization": 37,
+        "one_person": 37,
+        "personal": 619,
+        "hidden": 40,
+        "unknown": 0,
+        "bot": 40
+      },
+      "2026-Q1": {
+        "organization": 22,
+        "one_person": 19,
+        "personal": 478,
+        "hidden": 49,
+        "unknown": 1,
+        "bot": 35
+      },
+      "2026-Q2": {
+        "organization": 17,
+        "one_person": 56,
+        "personal": 302,
+        "hidden": 28,
+        "unknown": 0,
+        "bot": 62
+      },
+      "2026-Q3": {
+        "organization": 17,
+        "one_person": 21,
+        "personal": 680,
+        "hidden": 36,
+        "unknown": 0,
+        "bot": 49
+      },
+      "2026-Q4": {
+        "organization": 6,
+        "one_person": 2,
+        "personal": 160,
+        "hidden": 20,
+        "unknown": 0,
+        "bot": 9
+      }
     }
   }
 }

@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:20:29+00:00",
+  "name": "Claude Code",
+  "report_path": "index.html",
+  "first_commit": "2025-02-22 17:23:42",
+  "last_commit": "2026-10-22 22:18:33",
+  "age_days": 608,
+  "active_days": 368,
+  "total_commits": 940,
+  "total_authors": 60,
+  "active_authors_12mo": 39,
+  "commits_last_12mo": 629,
+  "total_files": 1615,
+  "total_lines": 99223,
+  "lines_added": 113470,
+  "lines_removed": 14247,
+  "total_tags": 256,
+  "era": "steady",
+  "top_authors": [
+    {
+      "name": "GitHub Actions",
+      "commits": 487
+    },
+    {
+      "name": "Alice T'Poteat",
+      "commits": 113
+    },
+    {
+      "name": "Boris Cherny",
+      "commits": 71
+    },
+    {
+      "name": "ant-kurt",
+      "commits": 32
+    },
+    {
+      "name": "Ashwin Bhat",
+      "commits": 21
+    }
+  ],
+  "author_commits": {
+    "GitHub Actions": 487,
+    "Sarah Deaton": 5,
+    "Alice T'Poteat": 113,
+    "Qing Wang": 1,
+    "Claude": 12,
+    "7487": 2,
+    "timgu0": 1,
+    "Dickson Tsai": 8,
+    "william qian": 3,
+    "Boris Cherny": 71,
+    "Roy Arsan": 6,
+    "Miguel": 1,
+    "Ashwin Bhat": 21,
+    "Mohamed Hegazy": 4,
+    "Sid Bidasaria": 7,
+    "Joe Portner": 1,
+    "Octavian Guzu": 14,
+    "jportner": 1,
+    "orbisai0security": 1,
+    "Daisy S. Hollman": 8,
+    "ant-kurt": 32,
+    "bogini": 20,
+    "kashyap murali": 5,
+    "Chris Lloyd": 8,
+    "Franklin Volcic": 20,
+    "JB": 8,
+    "Thariq Shihipar": 8,
+    "David Dworken": 6,
+    "Anthony Morris": 2,
+    "Nelson Auner": 1,
+    "Stephen Grider": 2,
+    "William Hu": 2,
+    "Steve M": 1,
+    "Wanghong Yuan": 8,
+    "Ravshan Samandarov": 1,
+    "James Trew": 1,
+    "Saadiq Rodgers-King": 1,
+    "Catherine Wu": 8,
+    "Stephen Benjamin": 1,
+    "Adam Wolff": 2,
+    "Giovani Moutinho": 1,
+    "Dalton Flanagan": 2,
+    "I\u00f1igo Beitia Ar\u00e9valo": 1,
+    "Arsen Hovhanissian": 1,
+    "Rui Quintino": 2,
+    "nozokare": 1,
+    "Uragami Taichi": 1,
+    "keitosuwahara": 2,
+    "shota-0129": 2,
+    "Toshiyuki Tanaka": 1,
+    "toms74209200": 1,
+    "Robert Boyce": 7,
+    "Masa1984a": 3,
+    "Kowsik Perumalla": 1,
+    "Mads R. Havmand": 2,
+    "Filip Mikovcak": 1,
+    "Lina Tawfik": 2,
+    "Guillaume Raille": 2,
+    "Christopher Cooper": 1,
+    "8enmann": 1
+  },
+  "commits_by_year": {
+    "2025": 405,
+    "2026": 535
+  },
+  "ai_assisted": {
+    "commits": 80,
+    "authored": 13,
+    "assistants": {
+      "Claude": 80
+    },
+    "by_month": {
+      "2024-11": 0,
+      "2024-12": 0,
+      "2025-01": 0,
+      "2025-02": 0,
+      "2025-03": 0,
+      "2025-04": 1,
+      "2025-05": 2,
+      "2025-06": 1,
+      "2025-07": 10,
+      "2025-08": 23,
+      "2025-09": 4,
+      "2025-10": 10,
+      "2025-11": 9,
+      "2025-12": 4,
+      "2026-01": 5,
+      "2026-02": 2,
+      "2026-03": 0,
+      "2026-04": 0,
+      "2026-05": 1,
+      "2026-06": 1,
+      "2026-07": 0,
+      "2026-08": 0,
+      "2026-09": 7,
+      "2026-10": 0
+    },
+    "commits_by_month": {
+      "2024-11": 0,
+      "2024-12": 0,
+      "2025-01": 0,
+      "2025-02": 1,
+      "2025-03": 1,
+      "2025-04": 15,
+      "2025-05": 31,
+      "2025-06": 26,
+      "2025-07": 57,
+      "2025-08": 77,
+      "2025-09": 45,
+      "2025-10": 58,
+      "2025-11": 56,
+      "2025-12": 38,
+      "2026-01": 66,
+      "2026-02": 70,
+      "2026-03": 31,
+      "2026-04": 35,
+      "2026-05": 42,
+      "2026-06": 38,
+      "2026-07": 27,
+      "2026-08": 30,
+      "2026-09": 155,
+      "2026-10": 41
+    }
+  },
+  "organizations": {
+    "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
+    "commits": 940,
+    "by_kind": {
+      "organization": 245,
+      "one_person": 10,
+      "personal": 31,
+      "hidden": 166,
+      "unknown": 0,
+      "bot": 488
+    },
+    "organization_count": 1,
+    "last_12mo_from": "2025-11",
+    "top": [
+      {
+        "organization": "anthropic.com",
+        "commits": 245,
+        "commits_last_12mo": 107,
+        "addresses": 28,
+        "first_commit": "2025-02-22",
+        "last_commit": "2026-10-09"
+      }
+    ],
+    "quarters": {
+      "2025-Q1": {
+        "organization": 2,
+        "one_person": 0,
+        "personal": 0,
+        "hidden": 0,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2025-Q2": {
+        "organization": 25,
+        "one_person": 3,
+        "personal": 7,
+        "hidden": 0,
+        "unknown": 0,
+        "bot": 37
+      },
+      "2025-Q3": {
+        "organization": 83,
+        "one_person": 4,
+        "personal": 9,
+        "hidden": 22,
+        "unknown": 0,
+        "bot": 61
+      },
+      "2025-Q4": {
+        "organization": 62,
+        "one_person": 1,
+        "personal": 7,
+        "hidden": 9,
+        "unknown": 0,
+        "bot": 73
+      },
+      "2026-Q1": {
+        "organization": 51,
+        "one_person": 2,
+        "personal": 2,
+        "hidden": 8,
+        "unknown": 0,
+        "bot": 104
+      },
+      "2026-Q2": {
+        "organization": 13,
+        "one_person": 0,
+        "personal": 2,
+        "hidden": 7,
+        "unknown": 0,
+        "bot": 93
+      },
+      "2026-Q3": {
+        "organization": 6,
+        "one_person": 0,
+        "personal": 4,
+        "hidden": 118,
+        "unknown": 0,
+        "bot": 84
+      },
+      "2026-Q4": {
+        "organization": 3,
+        "one_person": 0,
+        "personal": 0,
+        "hidden": 2,
+        "unknown": 0,
+        "bot": 36
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev1",
-  "generated_at": "2026-10-19T03:43:50+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:20:52+00:00",
   "name": "Aider",
   "report_path": "index.html",
   "first_commit": "2023-04-04 02:05:33",
@@ -292,6 +292,96 @@
       "2026-08": 0,
       "2026-09": 0,
       "2026-10": 0
+    }
+  },
+  "organizations": {
+    "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
+    "commits": 13138,
+    "by_kind": {
+      "organization": 4,
+      "one_person": 12402,
+      "personal": 189,
+      "hidden": 534,
+      "unknown": 8,
+      "bot": 1
+    },
+    "organization_count": 1,
+    "last_12mo_from": "2025-06",
+    "top": [
+      {
+        "organization": "google.com",
+        "commits": 4,
+        "commits_last_12mo": 3,
+        "addresses": 2,
+        "first_commit": "2025-01-07",
+        "last_commit": "2026-01-16"
+      }
+    ],
+    "quarters": {
+      "2024-Q3": {
+        "organization": 0,
+        "one_person": 2860,
+        "personal": 35,
+        "hidden": 87,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2024-Q4": {
+        "organization": 0,
+        "one_person": 2013,
+        "personal": 28,
+        "hidden": 56,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2025-Q1": {
+        "organization": 1,
+        "one_person": 1960,
+        "personal": 46,
+        "hidden": 75,
+        "unknown": 2,
+        "bot": 0
+      },
+      "2025-Q2": {
+        "organization": 2,
+        "one_person": 863,
+        "personal": 33,
+        "hidden": 68,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2025-Q3": {
+        "organization": 0,
+        "one_person": 71,
+        "personal": 5,
+        "hidden": 17,
+        "unknown": 0,
+        "bot": 1
+      },
+      "2025-Q4": {
+        "organization": 0,
+        "one_person": 22,
+        "personal": 4,
+        "hidden": 7,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2026-Q1": {
+        "organization": 1,
+        "one_person": 48,
+        "personal": 1,
+        "hidden": 13,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2026-Q2": {
+        "organization": 0,
+        "one_person": 16,
+        "personal": 1,
+        "hidden": 2,
+        "unknown": 0,
+        "bot": 0
+      }
     }
   }
 }

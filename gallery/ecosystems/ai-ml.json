@@ -1,0 +1,338 @@
+{
+  "schema_version": 1,
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:33:22+00:00",
+  "ecosystem": {
+    "id": "ai-ml",
+    "name": "AI and machine learning",
+    "title": "Open source AI and machine learning projects"
+  },
+  "quarter": {
+    "id": "2026-Q3",
+    "label": "Jul–Sep 2026"
+  },
+  "previous_quarter": {
+    "id": "2026-Q2",
+    "label": "Apr–Jun 2026"
+  },
+  "summary": {
+    "repositories": 12,
+    "with_commits": 12,
+    "naming": 10,
+    "median_share": 0.1029,
+    "highest": {
+      "id": "ray",
+      "name": "Ray",
+      "share": 0.3042
+    }
+  },
+  "repositories": [
+    {
+      "rank": 1,
+      "id": "ray",
+      "name": "Ray",
+      "repository": "ray-project/ray",
+      "report": "../ray/",
+      "quarter": {
+        "commits": 1052,
+        "ai_assisted": 320,
+        "share": 0.3042
+      },
+      "previous_quarter": {
+        "commits": 1114,
+        "ai_assisted": 281,
+        "share": 0.2522
+      },
+      "commits_last_12mo": 4390,
+      "active_authors_12mo": 486,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Gemini",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 2,
+      "id": "vllm",
+      "name": "vLLM",
+      "repository": "vllm-project/vllm",
+      "report": "../vllm/",
+      "quarter": {
+        "commits": 4000,
+        "ai_assisted": 970,
+        "share": 0.2425
+      },
+      "previous_quarter": {
+        "commits": 2857,
+        "ai_assisted": 346,
+        "share": 0.1211
+      },
+      "commits_last_12mo": 12773,
+      "active_authors_12mo": 2313,
+      "health": "peak",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Codex",
+        "Gemini"
+      ]
+    },
+    {
+      "rank": 3,
+      "id": "diffusers",
+      "name": "Diffusers",
+      "repository": "huggingface/diffusers",
+      "report": "../diffusers/",
+      "quarter": {
+        "commits": 307,
+        "ai_assisted": 54,
+        "share": 0.1759
+      },
+      "previous_quarter": {
+        "commits": 270,
+        "ai_assisted": 31,
+        "share": 0.1148
+      },
+      "commits_last_12mo": 1056,
+      "active_authors_12mo": 219,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "transformers",
+      "name": "Transformers",
+      "repository": "huggingface/transformers",
+      "report": "../transformers/",
+      "quarter": {
+        "commits": 902,
+        "ai_assisted": 153,
+        "share": 0.1696
+      },
+      "previous_quarter": {
+        "commits": 771,
+        "ai_assisted": 37,
+        "share": 0.048
+      },
+      "commits_last_12mo": 3477,
+      "active_authors_12mo": 665,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 5,
+      "id": "sglang",
+      "name": "SGLang",
+      "repository": "sgl-project/sglang",
+      "report": "../sglang/",
+      "quarter": {
+        "commits": 4497,
+        "ai_assisted": 639,
+        "share": 0.1421
+      },
+      "previous_quarter": {
+        "commits": 3553,
+        "ai_assisted": 425,
+        "share": 0.1196
+      },
+      "commits_last_12mo": 14322,
+      "active_authors_12mo": 1465,
+      "health": "peak",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Gemini",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 6,
+      "id": "llama-cpp",
+      "name": "llama.cpp",
+      "repository": "ggml-org/llama.cpp",
+      "report": "../llama-cpp/",
+      "quarter": {
+        "commits": 1460,
+        "ai_assisted": 159,
+        "share": 0.1089
+      },
+      "previous_quarter": {
+        "commits": 1245,
+        "ai_assisted": 18,
+        "share": 0.0145
+      },
+      "commits_last_12mo": 4929,
+      "active_authors_12mo": 943,
+      "health": "peak",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Pi",
+        "Claude",
+        "Codex"
+      ]
+    },
+    {
+      "rank": 7,
+      "id": "pytorch",
+      "name": "PyTorch",
+      "repository": "pytorch/pytorch",
+      "report": "../pytorch/",
+      "quarter": {
+        "commits": 4908,
+        "ai_assisted": 476,
+        "share": 0.097
+      },
+      "previous_quarter": {
+        "commits": 4953,
+        "ai_assisted": 118,
+        "share": 0.0238
+      },
+      "commits_last_12mo": 17654,
+      "active_authors_12mo": 1540,
+      "health": "peak",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Cursor",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 8,
+      "id": "llama-index",
+      "name": "LlamaIndex",
+      "repository": "run-llama/llama_index",
+      "report": "../llama-index/",
+      "quarter": {
+        "commits": 115,
+        "ai_assisted": 2,
+        "share": 0.0174
+      },
+      "previous_quarter": {
+        "commits": 132,
+        "ai_assisted": 4,
+        "share": 0.0303
+      },
+      "commits_last_12mo": 718,
+      "active_authors_12mo": 301,
+      "health": "steady",
+      "last_commit": "2026-10-14",
+      "assistants": [
+        "Claude",
+        "Cursor",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 9,
+      "id": "langchain",
+      "name": "LangChain",
+      "repository": "langchain-ai/langchain",
+      "report": "../langchain/",
+      "quarter": {
+        "commits": 525,
+        "ai_assisted": 6,
+        "share": 0.0114
+      },
+      "previous_quarter": {
+        "commits": 720,
+        "ai_assisted": 5,
+        "share": 0.0069
+      },
+      "commits_last_12mo": 2377,
+      "active_authors_12mo": 240,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "GitHub Copilot",
+        "Claude"
+      ]
+    },
+    {
+      "rank": 10,
+      "id": "tensorflow",
+      "name": "TensorFlow",
+      "repository": "tensorflow/tensorflow",
+      "report": "../tensorflow/",
+      "quarter": {
+        "commits": 4075,
+        "ai_assisted": 16,
+        "share": 0.0039
+      },
+      "previous_quarter": {
+        "commits": 3913,
+        "ai_assisted": 22,
+        "share": 0.0056
+      },
+      "commits_last_12mo": 15363,
+      "active_authors_12mo": 688,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Gemini",
+        "Claude",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 11,
+      "id": "jax",
+      "name": "JAX",
+      "repository": "jax-ml/jax",
+      "report": "../jax/",
+      "quarter": {
+        "commits": 2013,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 2041,
+        "ai_assisted": 2,
+        "share": 0.001
+      },
+      "commits_last_12mo": 7755,
+      "active_authors_12mo": 315,
+      "health": "surge",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Gemini"
+      ]
+    },
+    {
+      "rank": 12,
+      "id": "ollama",
+      "name": "Ollama",
+      "repository": "ollama/ollama",
+      "report": "../ollama/",
+      "quarter": {
+        "commits": 305,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 257,
+        "ai_assisted": 2,
+        "share": 0.0078
+      },
+      "commits_last_12mo": 1211,
+      "active_authors_12mo": 112,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot"
+      ]
+    }
+  ]
+}

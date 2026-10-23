@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - KubeEdge</title>
+	<meta name="description" content="KubeEdge: 6,491 commits by 405 authors, 2018 to 2026. A report made with gitstats.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="KubeEdge: Tags">
+	<meta property="og:description" content="KubeEdge: 6,491 commits by 405 authors, 2018 to 2026. A report made with gitstats.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/kubeedge/tags.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/kubeedge/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="KubeEdge: Tags">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="KubeEdge: Tags">
+	<meta name="twitter:description" content="KubeEdge: 6,491 commits by 405 authors, 2018 to 2026. A report made with gitstats.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/kubeedge/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="sortable.js"></script>
+	<script type="text/javascript" src="chart.umd.min.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+	<script>
+	// Chart.js reads colors once when a chart is built, so re-read the CSS
+	// variables whenever the theme switches. Datasets flagged `themed` follow --bar-color.
+	function applyChartTheme(chart) {
+		const text = getCSSVar('--chart-text');
+		const grid = getCSSVar('--chart-grid');
+		Chart.defaults.color = text;
+		Chart.defaults.borderColor = grid;
+		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
+		Chart.defaults.font.family = getCSSVar('--font-mono');
+		Chart.defaults.font.size = 11;
+		if (!chart) return;
+		// Built charts keep the defaults they resolved, so set colors on each one.
+		Object.values(chart.options.scales).forEach(function(scale) {
+			scale.ticks.color = text;
+			scale.title.color = text;
+			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
+			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
+			scale.border.color = grid;
+		});
+		chart.options.plugins.legend.labels.color = text;
+		const bar = getCSSVar('--bar-color');
+		chart.data.datasets.forEach(function(ds) {
+			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
+			if (ds.series) {
+				const color = getCSSVar('--series-' + ds.series);
+				ds.borderColor = color;
+				ds.backgroundColor = color + '33';
+			}
+		});
+	}
+
+	document.addEventListener('themechange', function() {
+		applyChartTheme();
+		Object.values(Chart.instances).forEach(function(chart) {
+			applyChartTheme(chart);
+			chart.update('none');
+		});
+	});
+
+	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
+	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
+	//   peaks  a label above chosen bars
+	//   values a value label above every non-zero bar
+	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
+	// hatched, its caption runs up the band, and `axis` names it under the plot.
+	// Colors are read from CSS at draw time, so they follow the theme.
+	function bandEdges(chart, band) {
+		const x = chart.scales.x;
+		const half = x.type === 'category' && chart.data.labels.length > 1
+			? (x.getPixelForValue(1) - x.getPixelForValue(0)) / 2 : 0;
+		return [x.getPixelForValue(band.from) - half, x.getPixelForValue(band.to) + half];
+	}
+
+	const chartAnnotations = {
+		id: 'gsAnnotations',
+		beforeDatasetsDraw: function(chart, args, opts) {
+			const area = chart.chartArea, ctx = chart.ctx;
+			const height = area.bottom - area.top;
+			(opts.bands || []).forEach(function(band) {
+				const edges = bandEdges(chart, band), left = edges[0], right = edges[1];
+				ctx.save();
+				ctx.fillStyle = getCSSVar('--surface-color');
+				ctx.fillRect(left, area.top, right - left, height);
+				if (band.collapsed) {
+					// hatched: not drawn to scale
+					ctx.save();
+					ctx.beginPath();
+					ctx.rect(left, area.top, right - left, height);
+					ctx.clip();
+					ctx.strokeStyle = getCSSVar('--border-color');
+					ctx.beginPath();
+					for (let d = left - height; d < right; d += 8) {
+						ctx.moveTo(d, area.bottom); ctx.lineTo(d + height, area.top);
+					}
+					ctx.stroke();
+					ctx.restore();
+				}
+				ctx.strokeStyle = getCSSVar('--border-strong');
+				ctx.setLineDash([3, 3]);
+				ctx.beginPath();
+				ctx.moveTo(left, area.top); ctx.lineTo(left, area.bottom);
+				ctx.moveTo(right, area.top); ctx.lineTo(right, area.bottom);
+				ctx.stroke();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				ctx.textAlign = 'center';
+				// the caption runs along the band's longer side
+				const room = band.collapsed ? height : right - left;
+				let text = band.text;
+				if (ctx.measureText(text).width > room - 8) text = band.short || '';
+				const width = ctx.measureText(text).width;
+				const taken = band.collapsed && barMarks(chart, opts).some(function(mark) {
+					return mark.onBand && mark.x + mark.half > left && mark.x - mark.half < right;
+				});
+				if (text && !taken && width <= room - 4 && (!band.collapsed || right - left >= 14)) {
+					ctx.translate((left + right) / 2, area.top + height / 2);
+					if (band.collapsed) {
+						ctx.rotate(-Math.PI / 2);
+						// clear the hatching behind the caption
+						ctx.fillStyle = getCSSVar('--surface-color');
+						ctx.fillRect(-width / 2 - 4, -7, width + 8, 14);
+						ctx.textBaseline = 'middle';
+					}
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.fillText(text, 0, 0);
+				}
+				ctx.restore();
+			});
+		},
+		// The years a collapsed band stands for, on the row of the tick labels,
+		// unless it would run into one of them (a narrow chart on a phone).
+		afterDraw: function(chart, args, opts) {
+			const x = chart.scales.x, ctx = chart.ctx;
+			(opts.bands || []).forEach(function(band) {
+				if (!band.collapsed || !band.axis) return;
+				const edges = bandEdges(chart, band), center = (edges[0] + edges[1]) / 2;
+				ctx.save();
+				ctx.font = '11px ' + getCSSVar('--font-mono');
+				const half = ctx.measureText(band.axis).width / 2;
+				const clash = x.ticks.some(function(tick, i) {
+					const label = Array.isArray(tick.label) ? tick.label.join(' ') : tick.label;
+					if (!label) return false;
+					const reach = half + ctx.measureText(String(label)).width / 2 + 6;
+					return Math.abs(x.getPixelForTick(i) - center) < reach;
+				});
+				if (!clash) {
+					const grid = x.options.grid;
+					ctx.fillStyle = getCSSVar('--chart-text');
+					ctx.textAlign = 'center';
+					ctx.textBaseline = 'top';
+					ctx.fillText(band.axis, center,
+						x.top + (grid.drawTicks ? grid.tickLength : 0) + x.options.ticks.padding);
+				}
+				ctx.restore();
+			});
+		},
+		afterDatasetsDraw: function(chart, args, opts) {
+			const ctx = chart.ctx;
+			barMarks(chart, opts).forEach(function(mark) {
+				ctx.save();
+				ctx.font = mark.font;
+				ctx.textAlign = 'center';
+				if (mark.onBand) {
+					// no room beside the band: clear its hatching behind the label
+					ctx.fillStyle = getCSSVar('--surface-color');
+					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
+				}
+				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillText(mark.text, mark.x, mark.y);
+				ctx.restore();
+			});
+		}
+	};
+
+	// Where the labels above bars go: {text, plain, font, x, y, half, onBand}.
+	// A label stays inside the plot area and, when there is room, beside a
+	// collapsed band rather than on it; `onBand` marks the ones left on one.
+	function barMarks(chart, opts) {
+		const meta = chart.getDatasetMeta(0), ctx = chart.ctx, area = chart.chartArea;
+		const marks = (opts.peaks || []).slice();
+		if (opts.values) {
+			chart.data.datasets[0].data.forEach(function(v, i) {
+				if (v) marks.push({ index: i, text: String(v), plain: true });
+			});
+		}
+		const bands = (opts.bands || []).filter(function(band) { return band.collapsed; })
+			.map(function(band) { return bandEdges(chart, band); });
+		const placed = [];
+		marks.forEach(function(mark) {
+			const bar = meta.data[mark.index];
+			if (!bar) return;
+			const font = (mark.plain ? '' : '600 ') + '11px ' + getCSSVar('--font-mono');
+			ctx.save();
+			ctx.font = font;
+			const half = ctx.measureText(mark.text).width / 2;
+			ctx.restore();
+			const inside = function(x) { return Math.min(Math.max(x, area.left + half), area.right - half); };
+			let x = inside(bar.x);
+			bands.forEach(function(edges) {
+				if (bar.x >= edges[1]) x = inside(Math.max(x, edges[1] + half + 4));
+				else if (bar.x <= edges[0]) x = inside(Math.min(x, edges[0] - half - 4));
+			});
+			const onBand = bands.some(function(edges) {
+				return x + half > edges[0] && x - half < edges[1];
+			});
+			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
+				half: half, onBand: onBand });
+		});
+		return placed;
+	}
+
+	// The slots standing in for a collapsed stretch are named after all of it
+	// ("2016 – 2023"), for tooltips; under the plot the annotation names it.
+	function isCollapsedLabel(label) {
+		return String(label).indexOf(' – ') !== -1;
+	}
+
+	function categoryTick(value) {
+		const label = this.getLabelForValue(value);
+		return isCollapsedLabel(label) ? '' : label;
+	}
+
+	// Ticks for a category axis of "YYYY-MM" months: the year at each January,
+	// thinned so labels never collide; short spans label every few months.
+	function monthAxisTick(value) {
+		const label = this.getLabelForValue(value);
+		if (isCollapsedLabel(label)) return '';
+		const n = this.chart.data.labels.length;
+		const width = Math.max(this.width, 1);
+		if (n <= 24) {
+			return value % Math.max(1, Math.ceil(n * 64 / width)) === 0 ? label : '';
+		}
+		if (String(label).slice(5) !== '01') return '';
+		const year = Number(String(label).slice(0, 4));
+		const step = Math.max(1, Math.ceil((n / 12) * 40 / width));
+		return year % step === 0 ? String(year) : '';
+	}
+
+	function monthAxisGrid(ctx) {
+		return ctx.tick && ctx.tick.label ? getCSSVar('--chart-grid') : 'transparent';
+	}
+
+	function formatChartDate(ms, unit) {
+		const d = new Date(ms);
+		const pad = function(n) { return (n < 10 ? '0' : '') + n; };
+		if (unit === 'year') return String(d.getFullYear());
+		if (unit === 'month') return d.getFullYear() + '-' + pad(d.getMonth() + 1);
+		return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+	}
+
+	// A long stretch without commits is cut out of a time axis and drawn as a
+	// short break: `gap` is {from, to, width} in milliseconds, and the stretch
+	// from..to takes `width` on the axis. squeezeTime() gives a timestamp its
+	// place on the cut axis, stretchTime() gives a place its timestamp back.
+	// Without a gap both leave the value alone.
+	function squeezeTime(gap, ms) {
+		if (!gap || ms <= gap.from) return ms;
+		if (ms >= gap.to) return ms - (gap.to - gap.from) + gap.width;
+		return gap.from + (ms - gap.from) / (gap.to - gap.from) * gap.width;
+	}
+
+	function stretchTime(gap, at) {
+		if (!gap || at <= gap.from) return at;
+		if (at >= gap.from + gap.width) return at + (gap.to - gap.from) - gap.width;
+		return gap.from + (at - gap.from) / gap.width * (gap.to - gap.from);
+	}
+
+	// A linear x-axis over millisecond timestamps, ticked on year (or month)
+	// boundaries, so gaps in history take up the space they really span;
+	// only a gap handed in as `gap` is cut short (see squeezeTime).
+	function timeAxis(xs, gap) {
+		return {
+			type: 'linear',
+			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
+			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			afterBuildTicks: function(scale) {
+				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
+				const from = new Date(first), to = new Date(last);
+				const ticks = [];
+				// no tick inside the stretch that was cut out
+				const add = function(ms) {
+					if (!gap || ms < gap.from || ms >= gap.to) ticks.push({ value: squeezeTime(gap, ms) });
+				};
+				let unit = 'year';
+				if (to.getFullYear() - from.getFullYear() >= 2) {
+					for (let y = from.getFullYear() + 1; y <= to.getFullYear(); y++) {
+						add(new Date(y, 0, 1).getTime());
+					}
+				} else {
+					unit = 'month';
+					const d = new Date(from.getFullYear(), from.getMonth() + 1, 1);
+					for (; d.getTime() <= last; d.setMonth(d.getMonth() + 1)) {
+						add(d.getTime());
+					}
+				}
+				scale.dateUnit = ticks.length >= 2 ? unit : 'day';
+				if (ticks.length >= 2) scale.ticks = ticks;
+			},
+			ticks: {
+				maxRotation: 0,
+				autoSkipPadding: 12,
+				callback: function(value) {
+					return formatChartDate(stretchTime(gap, value), this.dateUnit);
+				}
+			}
+		};
+	}
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="index.html">General</a></li>
+            <li><a href="activity.html">Activity</a></li>
+            <li><a href="authors.html">Authors</a></li>
+            <li><a href="ownership.html">Code Ownership</a></li>
+            <li><a href="hotspots.html">Hotspots</a></li>
+            <li><a href="files.html">Files</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="lines.html">Lines</a></li>
+            <li><a href="tags.html" class="active" aria-current="page">Tags</a></li>
+            <li><a href="badges.html">Badges</a></li>
+            
+            </ul>
+            <div class="nav-right">
+            <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>Tags</h1><dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">35</dd><dd class="stat-note"><span class="nowrap">latest v1.23.0-beta.0</span>&nbsp;&middot; <span class="nowrap">2026-03-03</span></dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">185.5</dd><dd class="stat-note">6,491 commits in total</dd></div></dl>
+<h2 id="all_tags"><a href="#all_tags">All tags</a></h2>
+
+<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th>Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">v1.23.0-beta.0</td><td class="nowrap">2026-03-03</td><td class="num">113</td><td>KubeEdge Bot (41), Shelley-BaoYue (23), Tomoya.Fujita (12), Haojie Zhang (12), ddc-baiye (6), Abirdcfly (5), William Wang (4), WillardHu (4), vincyfli (2), ming.tang (1), Maxim Khon (1), HT0403 (1), 2938893385@qq.com (1)</td></tr><tr><td class="nowrap">v1.22.0-beta.0</td><td class="nowrap">2025-10-30</td><td class="num">119</td><td>KubeEdge Bot (43), Shelley-BaoYue (14), Xmchx (11), charminghacker (10), Dhiren-Mhatre (9), Zishan Ahmad (8), WillardHu (7), wbc6080 (2), co63oc (2), Tomoya.Fujita (2), Shixiuwen (2), Daniel Li (2), zhangtianxi05 (1), liuzhen (1), Travis Baker (1), Tianxi Zhang (1), NishantSinghhhhh (1), HT0403 (1), Arpit Rath(Hackmey) (1)</td></tr><tr><td class="nowrap">v1.21.0-beta.0</td><td class="nowrap">2025-06-06</td><td class="num">228</td><td>KubeEdge Bot (106), Dhiren-Mhatre (57), WillardHu (19), wbc6080 (9), Xmchx (7), Shelley-BaoYue (6), vivekbisen04 (5), ming.tang (5), William Wang (3), luomengY (2), jiawei (2), yuvraj Kolkar (1), upsaurav12 (1), mahmut (1), lu2heng (1), YASH PANDEY (1), Tesla (1), Dhairya Majmudar (1)</td></tr><tr><td class="nowrap">v1.20.0-beta.0</td><td class="nowrap">2025-01-16</td><td class="num">164</td><td>KubeEdge Bot (64), Shelley-BaoYue (24), WillardHu (11), Shubham Singh (10), wbc6080 (8), ming.tang (7), WeiXingEsther (7), luomengY (5), Martin Tzvetanov Grigorov (4), ryWangkkk (3), jiawei (3), MiraBit (3), EraKin575 (3), zhangf (2), lingyu.hou (2), YulinLi (2), Tesla (2), unknown (1), luchaoshi45 (1), fisherxu (1), Tomoya.Fujita (1)</td></tr><tr><td class="nowrap">v1.19.0-beta.0</td><td class="nowrap">2024-10-25</td><td class="num">163</td><td>KubeEdge Bot (60), Shubham Singh (24), wbc6080 (20), llmmqq8023 (14), Shelley-BaoYue (9), coldWater (8), HT0403 (4), luomengY (3), WillardHu (3), Tomoya.Fujita (3), magichan (2), bzsuni (2), Sanil Kumar (2), EraKin575 (2), ming.tang (1), lingyu.hou (1), jiawei (1), fisherxu (1), cuishuang (1), Tesla (1), Nishant Bansal (1)</td></tr><tr><td class="nowrap">v1.18.0-beta.0</td><td class="nowrap">2024-07-19</td><td class="num">144</td><td>KubeEdge Bot (54), Shubham Singh (21), Shelley-BaoYue (14), HT0403 (11), wbc6080 (7), 2938893385@qq.com (7), WillardHu (5), micplus (3), luomengY (3), lingyu.hou (3), jiawei (3), guolinsheng (3), Tomoya.Fujita (3), spambot000 (2), fisherxu (2), ming.tang (1), bzsuni (1), Kevin Wang (1)</td></tr><tr><td class="nowrap">v1.17.0-beta.0</td><td class="nowrap">2024-04-24</td><td class="num">130</td><td>KubeEdge Bot (46), Shelley-BaoYue (28), micplus (20), wbc6080 (8), luomengY (8), fisherxu (5), WillardHu (3), 侯玲玉 (2), ming.tang (2), Windrow14 (2), zhengxinwei-f (1), spambot000 (1), joohwan (1), jiawei (1), Bob (1), 2938893385@qq.com (1)</td></tr><tr><td class="nowrap">v1.16.0-beta.0</td><td class="nowrap">2024-01-19</td><td class="num">269</td><td>KubeEdge Bot (101), Shelley-BaoYue (44), wbc6080 (24), cai6489 (17), cl2017 (13), wujunyi (12), luomengY (10), zhengxinwei-f (8), Windrow14 (8), fisherxu (5), Windrow (5), WillardHu (5), ming.tang (3), liqing.wu (3), jiawei (3), zhiying (2), liulijin (2), lishaokai1995 (2), pengbinbin1 (1), guoguangwu (1)</td></tr><tr><td class="nowrap">v1.15.0-beta.0</td><td class="nowrap">2023-10-10</td><td class="num">197</td><td>KubeEdge Bot (72), Shelley-BaoYue (47), wbc6080 (15), wujunyi (13), cl2017 (7), fisherxu (6), WillardHu (5), ming.tang (4), zhengxinwei-f (3), wlq1212 (3), Arnold (3), zhiying (2), luomengY (2), chong.yuan (2), Vamshi Reddy (2), Ryan (2), ljjzhk (1), liulijin (1), liqing.wu (1), hellocn9 (1), guoguangwu (1), Zhizhen He (1), VamshiReddy02 (1), QiQi-OvO (1), Akshat Khanna (1)</td></tr><tr><td class="nowrap">v1.14.0</td><td class="nowrap">2023-06-30</td><td class="num">90</td><td>KubeEdge Bot (39), vincentgoat (10), Shelley-BaoYue (8), gy95 (6), cl2017 (4), wackxu (3), lishaokai1995 (2), fisherxu (2), Zechun Chen (2), Ryan (2), Kevin Wang (2), zhiying (1), xin.li (1), snstaberah (1), lmxia (1), liucw17 (1), kadisi (1), jiawei (1), dehaocheng (1), WillardHu (1), QianQianowo (1)</td></tr><tr><td class="nowrap">v1.14.0-beta.0</td><td class="nowrap">2023-06-30</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">v1.13.0-beta.0</td><td class="nowrap">2023-01-16</td><td class="num">257</td><td>KubeEdge Bot (112), wackxu (34), Shelley-BaoYue (26), gy95 (25), vincentgoat (17), xin.li (9), Congrool (5), yanggang (3), xian-jie.shen (3), jiawei (3), Zechun Chen (3), wuxuesong (2), shankeerthan-kasilingam (2), rei (2), cl2017 (2), HIHIA (2), wlq1212 (1), penguin (1), hexiaodai (1), fisherxu (1), donghui.jiang (1), chengengkun (1), NicoleLeeuu (1)</td></tr><tr><td class="nowrap">v1.12.0-beta.0</td><td class="nowrap">2022-09-24</td><td class="num">211</td><td>KubeEdge Bot (93), wackxu (19), gy95 (18), vincentgoat (15), Shelley-BaoYue (15), xuxiawei (8), fisherxu (4), crui (4), zhouguowei (3), liulijin (3), jianfei.zhang (3), snstaberah (2), WillardHu (2), Ryan (2), Kevin Wang (2), Congrool (2), AdamKorcz (2), yojay11717 (1), tl (1), lonelyCZ (1), liyuerich (1), jacky (1), guiyong.ou (1), cuishuang (1), cl2017 (1), chengjin (1), chengengkun (1), Tomoya.Fujita (1), TianTianBigWang (1), Alanthur (1), Abirdcfly (1)</td></tr><tr><td class="nowrap">v1.11.0-beta.0</td><td class="nowrap">2022-06-16</td><td class="num">35</td><td>KubeEdge Bot (13), wackxu (6), gy95 (6), vincentgoat (4), Congrool (4), snstaberah (1), Kevin Wang (1)</td></tr><tr><td class="nowrap">v1.11.0-alpha.0</td><td class="nowrap">2022-06-01</td><td class="num">204</td><td>KubeEdge Bot (95), gy95 (30), wackxu (12), zc (8), zhu733756 (7), fisherxu (7), Shelley-BaoYue (7), vincentgoat (6), orange (6), TianTianBigWang (6), cl2017 (5), lwabish (3), xin.li (2), zhangfeng (1), yojay11717 (1), threestoneliu (1), snstaberah (1), qi.han (1), pengbinbin1 (1), jinglinax@163.com (1), chengjin (1), Ryan (1), Drew Halloran (1)</td></tr><tr><td class="nowrap">v1.10.0-beta.0</td><td class="nowrap">2022-03-04</td><td class="num">213</td><td>KubeEdge Bot (96), gy95 (29), zhu733756 (12), fisherxu (12), zc (7), TianTianBigWang (6), My-pleasure (5), Shelley-BaoYue (4), zhukunshuai (3), wackxu (3), jidalong (3), allenleu (3), zivAnyvision (2), xuxiawei (2), wlq (2), fei.lv4 (2), Rachel-Shao (2), Moritz Johner (2), Dave Chen (2), zjcomeon (1), yojay11717 (1), wangchl01 (1), vincentgoat (1), shenyi (1), orange (1), lyndon (1), lvchenggang (1), jun.gu (1), jasha64 (1), hey-kong (1), dsy3502 (1), chengengkun (1), Michael Shen (1), Charles (1), Ankit R Gadiya (1)</td></tr><tr><td class="nowrap">v1.9.0</td><td class="nowrap">2021-12-03</td><td class="num">350</td><td>KubeEdge Bot (155), gy95 (41), zhu733756 (19), zc (14), TianTianBigWang (14), jidalong (10), Armin Schlegel (10), chenchunxiu (9), lvchenggang (8), fisherxu (7), WillardHu (6), xuxiawei (5), CooperLi (5), zjcomeon (4), orange (4), Michael Shen (4), xujingjing (3), hudengfeng (3), xiaopeng han (2), wuyuhao (2), shenyi (2), pengbinbin1 (2), muxuelan (2), cuirunxing-hub (2), allenleu (2), Rachel-Shao (2), Haines Chan (2), Congrool (2), zhuyaguang (1), ttlv (1), khalid-jobs (1), dsy3502 (1), Wayne Chan (1), QeelinDarly (1), Kevin Wang (1), Jan Unterbrink (1), Gian Ortiz (1)</td></tr><tr><td class="nowrap">v1.9.0-beta.0</td><td class="nowrap">2021-12-03</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">v1.8.0-beta.0</td><td class="nowrap">2021-08-30</td><td class="num">143</td><td>KubeEdge Bot (61), gy95 (33), fisherxu (11), zc (5), Rachel-Shao (5), liufen90 (4), ttlv (3), blackdobb (3), xujingjing (2), WintonChan (2), Kevin Wang (2), Jan Unterbrink (2), yangling (1), shenyi (1), ruanzhaoyin@chinatelecom.cn (1), qugq0228 (1), orange (1), muxuelan (1), lyndon (1), huangpengtao (1), chengjin (1), TianTianBigWang (1)</td></tr><tr><td class="nowrap">v1.7.0</td><td class="nowrap">2021-05-31</td><td class="num">256</td><td>KubeEdge Bot (114), fisherxu (32), Iceber Gu (23), Shiming Zhang (12), GsssC (9), TianTianBigWang (8), zc (7), gy95 (7), WintonChan (5), MesaCrush (3), Long Dai (3), Jakub Guzik (3), Elaine4CY (3), ttlv (2), songlujun (2), mengjiao.liu (2), longguang.yue (2), chuanhaojin (2), Mingjun Zhang (2), Kevin Wang (2), zhu733756 (1), owenkuai (1), liufen90 (1), jackzhang (1), hackers365 (1), guanzuoyu (1), fei.lv4 (1), charles-woshicai (1), Rachel-Shao (1), Leo Fang (1), LIYUNFAN (1), Jw (1), Abirdcfly (1)</td></tr><tr><td class="nowrap">v1.7.0-beta.0</td><td class="nowrap">2021-05-31</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">v1.6.0-beta.0</td><td class="nowrap">2021-02-08</td><td class="num">300</td><td>KubeEdge Bot (126), Long Dai (28), Threestone (17), fisherxu (15), muxuelan (13), LIYUNFAN (11), GsssC (11), lvchenggang (10), liufen90 (9), WintonChan (8), zc (7), llhuii (5), zhengshuyuan (3), Li Zhijian (3), Didier Durand (3), wangxj0826 (2), luogangyi (2), antoniomusolino (2), TianTianBigWang (2), QinglongLee (2), Peeknut (2), Kevin Wang (2), Abirdcfly (2), zyt312074545 (1), zhaoze (1), wuqihui0317 (1), swartz-k (1), shijingbo (1), shenkonghui (1), shaowenchen (1), sailorvii (1), gy95 (1), chentao (1), Tang Yanhan (1), Joy (1), Jiayi Suo (所嘉懿) (1), Ihor Dvoretskyi (1), Alexander Wenzel (1)</td></tr><tr><td class="nowrap">v1.5.0-beta.0</td><td class="nowrap">2020-11-05</td><td class="num">281</td><td>KubeEdge Bot (115), Long Dai (46), Yin Ding (14), fisherxu (10), ZYZ (7), Kevin Wang (7), luogangyi (6), llhuii (6), shenkonghui (5), Joe Borg (5), sailorvii (4), lvchenggang (4), [zqzzq] (4), Rio Zhu (4), Gui Hecheng (4), ttlv (3), muxuelan (3), jidalong (3), Yellow-L (3), Qiang Zheng (3), zhengshuyuan (2), Poor12 (2), Liangshuang (2), Dave Chen (2), Alan Pinkert (2), xiaojiangwang (1), wuqihui0317 (1), qingchen1203 (1), jianping0222 (1), elementyang (1), chenchunxiu (1), Woa (1), Siddharth Bhadri (1), Sanil Kumar (1), Rachel-Shao (1), Philippe Coval (1), Lars Lehtonen (1), Jiejie Xu (1), GsssC (1), Charlie Tseng (1)</td></tr><tr><td class="nowrap">v1.4.0-beta.0</td><td class="nowrap">2020-08-04</td><td class="num">283</td><td>KubeEdge Bot (116), Long Dai (48), Yin Ding (17), luogangyi (11), Jan Unterbrink (11), fisherxu (10), sailorvii (9), Liangshuang (7), Kevin Wang (6), ZYZ (4), Jiejie Xu (4), Rio Zhu (3), Poor12 (3), Kevin Zhao (3), Congrool (3), guojianyu (2), GsssC (2), ESWZY (2), zongke (1), xiaojiangwang (1), wzharies (1), threestoneliu (1), sjyu (1), shashidharatd (1), loongify (1), lljstar (1), liuzhiyi1993 (1), lihanchen (1), kadisi (1), dwq (1), dependabot <span class="badge" title="dependabot[bot]">bot</span> (1), dddddai (1), coversb (1), codebee (1), better0332 (1), Su Xiaolin (1), Qiang Zheng (1), FeynmanZhou (1), Faicker Mo (1), Baoqiang-Zhang (1)</td></tr><tr><td class="nowrap">v1.4.0-alpha.0</td><td class="nowrap">2020-05-28</td><td class="num">57</td><td>KubeEdge Bot (21), Long Dai (19), fisherxu (6), luogangyi (2), Kevin Wang (2), xhken (1), bluefriday (1), ZYZ (1), Poor12 (1), Liangshuang (1), Jiejie Xu (1), GsssC (1)</td></tr><tr><td class="nowrap">v1.3.0</td><td class="nowrap">2020-05-15</td><td class="num">77</td><td>KubeEdge Bot (22), Liangshuang (12), Kevin Wang (10), Long Dai (9), Jiejie Xu (6), fisherxu (4), GsssC (4), ls889 (3), qingchen1203 (1), kadisi (1), gitolicious (1), XJangel (1), Siddharth Bhadri (1), Poor12 (1), Dave Chen (1)</td></tr><tr><td class="nowrap">v1.3.0-beta.0</td><td class="nowrap">2020-04-30</td><td class="num">57</td><td>kadisi (10), fisherxu (9), KubeEdge Bot (9), GsssC (7), Yin Ding (6), Kevin Wang (6), Liangshuang (4), Jiejie Xu (4), Long Dai (1), Dave Chen (1)</td></tr><tr><td class="nowrap">v1.3.0-alpha.0</td><td class="nowrap">2020-04-21</td><td class="num">228</td><td>KubeEdge Bot (74), fisherxu (54), Vijay Kumar (18), Kevin Wang (15), kadisi (13), Su Xiaolin (10), stacktasec (8), Dave Chen (7), Will (5), zhuguihua (3), maao (3), Jan Unterbrink (3), Jeremy Huylebroeck (2), xmxxiong (1), peiqi (1), needkane (1), mcsos (1), lmxia (1), liuzhiyi1993 (1), iszhyang (1), amleczko (1), Yin Ding (1), Wurui Chen (1), Late Lee (1), GsssC (1), FengyunPan2 (1)</td></tr><tr><td class="nowrap">v1.2.0-beta.0</td><td class="nowrap">2020-02-06</td><td class="num">480</td><td>KubeEdge Bot (137), kadisi (112), fisherxu (68), Kevin Wang (32), Siddharth Bhadri (23), Dave Chen (17), Su Xiaolin (16), lidiyag (9), Johannes M. Scheuermann (6), du2016 (5), LianxiangZhang (5), glenn-lg (4), edisonxiang (4), edge (4), Xinchi Ji (4), Guangming Wang (4), FengyunPan2 (4), zhuguihua (3), Leo Ochoa (3), Qi Zhang (2), Philippe Coval (2), Jun Du (2), wuyuting1986 (1), soolaugust (1), kexun (1), jie zhang (1), j00501162 (1), gnodli (1), dwSun (1), anyscoding (1), Ziran Sun (1), Vijay Kumar (1), SpaghettiAndSalmon (1), Pavan Kumar D (1), NoWhere-zh (1), Jan Unterbrink (1)</td></tr><tr><td class="nowrap">v1.1.0-beta.0</td><td class="nowrap">2019-09-09</td><td class="num">389</td><td>KubeEdge Bot (156), fisherxu (46), kadisi (31), edisonxiang (27), Jan Unterbrink (20), Siddharth Bhadri (11), sujithsimon22 (9), arcanique (9), Dave Chen (9), Guangming Wang (8), Haines Chan (7), YAMAMOTO Takashi (6), Kevin Wang (6), kexun (5), Rohit Sardesai (5), Ziyi Yan (4), anyscoding (3), CH_Qing (3), Baoqiang-Zhang (3), soolaugust (2), shouhong (2), luguanglong (2), lidiyag (2), Bug Fest (2), zhongjun2 (1), gpinaik (1), chlins (1), Victor Login (1), RicardoZPHuang (1), Qing (1), Manju Srivatsa (1), Holt2016 (1), Heath Kang (1), Edison Xiang (1), 10240987 (1)</td></tr><tr><td class="nowrap">v1.0.0</td><td class="nowrap">2019-06-26</td><td class="num">306</td><td>KubeEdge Bot (88), Siddharth Bhadri (38), sujithsimon22 (27), Jan Unterbrink (18), Rohit Sardesai (14), shouhong (12), kadisi (12), Manju Srivatsa (12), suredandan (8), edisonxiang (8), Kevin Wang (7), Cindy (7), samy2019 (5), kexun (5), Jun Du (4), Dave Chen (4), lou-lan (3), arcanique (3), anyscoding (3), Toper2035 (3), Pavan Kumar D (3), Guruprasad I Naik (3), lidiyag (2), YAMAMOTO Takashi (2), RicardoZPHuang (2), Qi Zhang (2), 张奇怪 (1), maurya-anuj (1), lzx258 (1), liuzhiyi1993 (1), googlebabaio (1), fisherxu (1), chenlx (1), Naveen Sriram (1), Janki Chhatbar (1), Edison Xiang (1), Abdul Bostan (1)</td></tr><tr><td class="nowrap">v0.3.0-beta.0</td><td class="nowrap">2019-05-03</td><td class="num">104</td><td>Jun Du (25), Siddharth Bhadri (18), Rohit Sardesai (10), sujithsimon22 (7), Omung Garg oWX619547 (6), Dave Chen (6), edisonxiang (4), kadisi (3), Trilok M Geer (3), Naveen Sriram (3), Edison Xiang (3), googlebabaio (2), Y.Horie (2), Pavan Kumar D (2), Kevin Wang (2), Jan Unterbrink (2), samy2019 (1), lidiyag (1), Zhengguang Ou (1), Omung Garg (1), Manju Srivatsa (1), Cindy (1)</td></tr><tr><td class="nowrap">v0.2.1</td><td class="nowrap">2019-04-15</td><td class="num">179</td><td>Jun Du (47), Qi Zhang (29), Siddharth Bhadri (17), Rohit Sardesai (12), anvithks (10), 张奇怪 (7), tedli (5), lidiyag (5), sujithsimon22 (4), soolaugust (4), samy2019 (4), Pavan Kumar D (4), Anuj Maurya (4), nkwangleiGIT (3), Manju Srivatsa (3), Edison Xiang (3), edisonxiang (2), Zachary Ma (2), Yu Peng (2), zfu (1), xiechengsheng (1), junxu (1), huangxiangdong (1), fstMoon (1), brant4test (1), Yong Wu (1), Shubham Mathur (1), Manju Srivatsav (1), Lifei Chen (1), Kevin Wang (1), Gokalp Kuscu (1)</td></tr><tr><td class="nowrap">v0.2</td><td class="nowrap">2019-03-05</td><td class="num">193</td><td>Jun Du (69), Siddharth Bhadri (42), sujithsimon22 (14), Rohit Sardesai (14), Cindy (7), lidiyag (6), anvithks (6), Manju Srivatsa (6), Pavan Kumar D (5), llhuii (4), Sanil Kumar (3), Anuj Maurya (3), savitaashture (2), samy2019 (2), qianchenjie (2), mtk54101 (1), jahentao (1), diaojuan (1), Shubham Agarwal (1), Quinton Hoole (1), Qi Zhang (1), Naveen Sriram (1), Kannan V (1)</td></tr><tr><td class="nowrap">v0.1</td><td class="nowrap">2018-12-27</td><td class="num">69</td><td>Jun Du (38), linweibin (13), Lion-Wei (6), stewart-yu (3), Siddharth Bhadri (3), Xu Liang (2), Kevin Wang (2), tian (1), Cindy (1)</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="../ecosystems/china.html">How KubeEdge ranks among open source projects from China by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+name: GitStats Report
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  gitstats:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: shenxianpeng/gitstats-action@v1
+        with:
+          deploy-to-pages: true
+</pre></details></section><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body></html>

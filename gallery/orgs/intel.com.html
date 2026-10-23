@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>GitStats - intel.com in GitStats Gallery</title>
+	<meta name="description" content="intel.com in GitStats Gallery: 2.7k commits to 16 projects in 12 months, counted by the domain of its commit addresses.">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="GitStats">
+	<meta property="og:title" content="intel.com in GitStats Gallery">
+	<meta property="og:description" content="intel.com in GitStats Gallery: 2.7k commits to 16 projects in 12 months, counted by the domain of its commit addresses.">
+	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/orgs/intel.com.html">
+	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/share-card.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta property="og:image:alt" content="intel.com in GitStats Gallery">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:title" content="intel.com in GitStats Gallery">
+	<meta name="twitter:description" content="intel.com in GitStats Gallery: 2.7k commits to 16 projects in 12 months, counted by the domain of its commit addresses.">
+	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/share-card.png">
+	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
+	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
+	<link rel="stylesheet" href="../gitstats.css" type="text/css">
+	<meta name="generator" content="GitStats 2.11.0.post1.dev10">
+	<script type="text/javascript" src="../sortable.js"></script>
+	<script>
+	function getCSSVar(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+
+	function setTheme(theme) {
+		document.documentElement.setAttribute('data-theme', theme);
+		updateThemeIcon(theme);
+		document.dispatchEvent(new Event('themechange'));
+	}
+
+	function toggleTheme() {
+		const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+		try { localStorage.setItem('theme', newTheme); } catch (e) {}
+		setTheme(newTheme);
+	}
+
+	function updateThemeIcon(theme) {
+		const button = document.getElementById('theme-toggle');
+		if (button) {
+			button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+		}
+	}
+
+	// Follow OS theme changes until the user picks one with the toggle.
+	(function() {
+		const query = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)');
+		if (!query || !query.addEventListener) return;
+		query.addEventListener('change', function(e) {
+			let stored = null;
+			try { stored = localStorage.getItem('theme'); } catch (err) {}
+			if (stored !== 'light' && stored !== 'dark') setTheme(e.matches ? 'dark' : 'light');
+		});
+	})();
+
+	// The nav scrolls sideways when it does not fit; start with the current page in view.
+	function revealCurrentNavItem() {
+		const current = document.querySelector('.nav a.active');
+		if (!current) return;
+		const list = current.closest('ul');
+		const item = current.getBoundingClientRect(), box = list.getBoundingClientRect();
+		list.scrollLeft += item.left - box.left - (box.width - item.width) / 2;
+	}
+
+	// Wide tables scroll sideways on phones, with the first column pinned; mark
+	// the ones that actually overflow so only they draw the pinned column's divider.
+	function watchScrollBoxes() {
+		if (!window.ResizeObserver) return;
+		const observer = new ResizeObserver(function(entries) {
+			entries.forEach(function(entry) {
+				const box = entry.target;
+				box.classList.toggle('is-scrollable', box.scrollWidth > box.clientWidth + 1);
+			});
+		});
+		document.querySelectorAll('.table-scroll, .timeline-scroll').forEach(function(box) {
+			observer.observe(box);
+		});
+	}
+
+	document.addEventListener('DOMContentLoaded', function() {
+		updateThemeIcon(document.documentElement.getAttribute('data-theme'));
+		revealCurrentNavItem();
+		watchScrollBoxes();
+	});
+</script>
+</head>
+<body>
+
+            <div class="nav">
+            <a href="../index.html" class="nav-brand">GitStats</a>
+            <ul>
+            <li><a href="../index.html">GitStats Gallery</a></li>
+            <li><a href="../ai.html">AI-assisted commits</a></li><li><a href="../organizations.html" class="active" aria-current="page">Organizations</a></li>
+            </ul>
+            <div class="nav-right">
+            <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+            </div>
+            </div>
+            <h1>intel.com</h1><p class="portfolio-subtitle"><a href="../index.html">GitStats Gallery</a>, 107 repositories &middot; generated by gitstats 2.11.0.post1.dev10 on 2026-10-23 11:33:22</p><p class="section-note">How it is counted: a commit counts here when the author&rsquo;s email address is at intel.com or under it, and at least two people commit from the domain. A domain says where an address is, not who paid for the work, so these are lower bounds.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Commits (12 mo)</dt><dd class="stat-value">2,712</dd><dd class="stat-note">to 16 of these repositories</dd></div><div class="stat-tile"><dt>Repositories</dt><dd class="stat-value">43</dd><dd class="stat-note">it has committed to</dd></div><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">14,124</dd><dd class="stat-note">since 2005-04-30</dd></div></dl><h2>Repositories</h2><div class="table-scroll"><table class="sortable" id="organization-repos"><tr><th>Repository</th><th class="num">Commits (12 mo)</th><th class="num">Commits</th><th class="num">Addresses</th><th>First commit</th><th>Last commit</th></tr><tr><td><a href="../pytorch/authors.html#commits_by_organization">PyTorch</a></td><td class="num">838</td><td class="num">3,491</td><td class="num">185</td><td class="nowrap">2017-04-25</td><td class="nowrap">2026-10-23</td></tr><tr><td><a href="../vllm/authors.html#commits_by_organization">vLLM</a></td><td class="num">584</td><td class="num">833</td><td class="num">84</td><td class="nowrap">2024-02-01</td><td class="nowrap">2026-10-23</td></tr><tr><td><a href="../kubernetes/authors.html#commits_by_organization">Kubernetes</a></td><td class="num">359</td><td class="num">2,241</td><td class="num">39</td><td class="nowrap">2016-04-01</td><td class="nowrap">2026-10-15</td></tr><tr><td><a href="../sglang/authors.html#commits_by_organization">SGLang</a></td><td class="num">293</td><td class="num">355</td><td class="num">50</td><td class="nowrap">2024-10-11</td><td class="nowrap">2026-10-23</td></tr><tr><td><a href="../transformers/authors.html#commits_by_organization">Transformers</a></td><td class="num">271</td><td class="num">581</td><td class="num">44</td><td class="nowrap">2020-01-29</td><td class="nowrap">2026-10-23</td></tr><tr><td><a href="../tensorflow/authors.html#commits_by_organization">TensorFlow</a></td><td class="num">196</td><td class="num">2,986</td><td class="num">100</td><td class="nowrap">2016-07-20</td><td class="nowrap">2026-10-22</td></tr><tr><td><a href="../llama-cpp/authors.html#commits_by_organization">llama.cpp</a></td><td class="num">60</td><td class="num">134</td><td class="num">23</td><td class="nowrap">2023-06-20</td><td class="nowrap">2026-10-23</td></tr><tr><td><a href="../diffusers/authors.html#commits_by_organization">Diffusers</a></td><td class="num">48</td><td class="num">131</td><td class="num">17</td><td class="nowrap">2022-12-15</td><td class="nowrap">2026-10-14</td></tr><tr><td><a href="../jax/authors.html#commits_by_organization">JAX</a></td><td class="num">37</td><td class="num">41</td><td class="num">8</td><td class="nowrap">2023-12-21</td><td class="nowrap">2026-10-07</td></tr><tr><td><a href="../containerd/authors.html#commits_by_organization">containerd</a></td><td class="num">15</td><td class="num">92</td><td class="num">12</td><td class="nowrap">2017-06-19</td><td class="nowrap">2026-08-07</td></tr><tr><td><a href="../scikit-learn/authors.html#commits_by_organization">scikit-learn</a></td><td class="num">4</td><td class="num">7</td><td class="num">4</td><td class="nowrap">2016-10-20</td><td class="nowrap">2026-06-22</td></tr><tr><td><a href="../ray/authors.html#commits_by_organization">Ray</a></td><td class="num">2</td><td class="num">47</td><td class="num">10</td><td class="nowrap">2019-11-18</td><td class="nowrap">2026-08-03</td></tr><tr><td><a href="../llama-index/authors.html#commits_by_organization">LlamaIndex</a></td><td class="num">2</td><td class="num">35</td><td class="num">8</td><td class="nowrap">2024-02-25</td><td class="nowrap">2026-09-23</td></tr><tr><td><a href="../paddle/authors.html#commits_by_organization">PaddlePaddle</a></td><td class="num">1</td><td class="num">1,319</td><td class="num">44</td><td class="nowrap">2017-07-18</td><td class="nowrap">2025-12-25</td></tr><tr><td><a href="../redis/authors.html#commits_by_organization">Redis</a></td><td class="num">1</td><td class="num">7</td><td class="num">4</td><td class="nowrap">2018-05-06</td><td class="nowrap">2026-10-17</td></tr><tr><td><a href="../cassandra/authors.html#commits_by_organization">Apache Cassandra</a></td><td class="num">1</td><td class="num">3</td><td class="num">2</td><td class="nowrap">2018-04-11</td><td class="nowrap">2025-12-04</td></tr><tr><td><a href="../spark/authors.html#commits_by_organization">Apache Spark</a></td><td class="num">0</td><td class="num">656</td><td class="num">42</td><td class="nowrap">2013-01-08</td><td class="nowrap">2022-05-28</td></tr><tr><td><a href="../envoy/authors.html#commits_by_organization">Envoy</a></td><td class="num">0</td><td class="num">342</td><td class="num">23</td><td class="nowrap">2019-01-21</td><td class="nowrap">2024-08-12</td></tr><tr><td><a href="../go/authors.html#commits_by_organization">Go</a></td><td class="num">0</td><td class="num">219</td><td class="num">16</td><td class="nowrap">2015-07-02</td><td class="nowrap">2024-07-02</td></tr><tr><td><a href="../istio/authors.html#commits_by_organization">Istio</a></td><td class="num">0</td><td class="num">115</td><td class="num">10</td><td class="nowrap">2018-02-07</td><td class="nowrap">2023-07-11</td></tr><tr><td><a href="../helm/authors.html#commits_by_organization">Helm</a></td><td class="num">0</td><td class="num">81</td><td class="num">6</td><td class="nowrap">2016-12-07</td><td class="nowrap">2025-04-02</td></tr><tr><td><a href="../arrow/authors.html#commits_by_organization">Apache Arrow</a></td><td class="num">0</td><td class="num">71</td><td class="num">21</td><td class="nowrap">2016-04-11</td><td class="nowrap">2024-08-18</td></tr><tr><td><a href="../numpy/authors.html#commits_by_organization">NumPy</a></td><td class="num">0</td><td class="num">62</td><td class="num">8</td><td class="nowrap">2015-09-14</td><td class="nowrap">2025-01-23</td></tr><tr><td><a href="../nodejs/authors.html#commits_by_organization">Node.js</a></td><td class="num">0</td><td class="num">51</td><td class="num">15</td><td class="nowrap">2015-10-21</td><td class="nowrap">2024-12-07</td></tr><tr><td><a href="../git/authors.html#commits_by_organization">Git</a></td><td class="num">0</td><td class="num">39</td><td class="num">11</td><td class="nowrap">2005-04-30</td><td class="nowrap">2025-09-24</td></tr><tr><td><a href="../flink/authors.html#commits_by_organization">Apache Flink</a></td><td class="num">0</td><td class="num">38</td><td class="num">8</td><td class="nowrap">2014-06-30</td><td class="nowrap">2021-10-31</td></tr><tr><td><a href="../cilium/authors.html#commits_by_organization">Cilium</a></td><td class="num">0</td><td class="num">27</td><td class="num">7</td><td class="nowrap">2019-02-06</td><td class="nowrap">2024-04-01</td></tr><tr><td><a href="../langchain/authors.html#commits_by_organization">LangChain</a></td><td class="num">0</td><td class="num">26</td><td class="num">10</td><td class="nowrap">2024-02-15</td><td class="nowrap">2025-02-21</td></tr><tr><td><a href="../curl/authors.html#commits_by_organization">curl</a></td><td class="num">0</td><td class="num">18</td><td class="num">6</td><td class="nowrap">2011-07-18</td><td class="nowrap">2024-12-13</td></tr><tr><td><a href="../scipy/authors.html#commits_by_organization">SciPy</a></td><td class="num">0</td><td class="num">16</td><td class="num">2</td><td class="nowrap">2015-10-19</td><td class="nowrap">2019-09-12</td></tr><tr><td><a href="../rust/authors.html#commits_by_organization">Rust</a></td><td class="num">0</td><td class="num">10</td><td class="num">6</td><td class="nowrap">2014-01-02</td><td class="nowrap">2024-07-26</td></tr><tr><td><a href="../homebrew/authors.html#commits_by_organization">Homebrew</a></td><td class="num">0</td><td class="num">9</td><td class="num">2</td><td class="nowrap">2017-11-29</td><td class="nowrap">2024-08-05</td></tr><tr><td><a href="../pytest/authors.html#commits_by_organization">pytest</a></td><td class="num">0</td><td class="num">7</td><td class="num">3</td><td class="nowrap">2017-01-23</td><td class="nowrap">2019-12-03</td></tr><tr><td><a href="../airflow/authors.html#commits_by_organization">Apache Airflow</a></td><td class="num">0</td><td class="num">6</td><td class="num">2</td><td class="nowrap">2017-02-13</td><td class="nowrap">2023-10-05</td></tr><tr><td><a href="../linkerd/authors.html#commits_by_organization">Linkerd</a></td><td class="num">0</td><td class="num">5</td><td class="num">2</td><td class="nowrap">2022-05-25</td><td class="nowrap">2023-04-17</td></tr><tr><td><a href="../pip/authors.html#commits_by_organization">pip</a></td><td class="num">0</td><td class="num">5</td><td class="num">2</td><td class="nowrap">2012-01-02</td><td class="nowrap">2018-08-17</td></tr><tr><td><a href="../etcd/authors.html#commits_by_organization">etcd</a></td><td class="num">0</td><td class="num">4</td><td class="num">3</td><td class="nowrap">2015-12-15</td><td class="nowrap">2020-07-21</td></tr><tr><td><a href="../matplotlib/authors.html#commits_by_organization">Matplotlib</a></td><td class="num">0</td><td class="num">3</td><td class="num">2</td><td class="nowrap">2022-11-09</td><td class="nowrap">2024-09-14</td></tr><tr><td><a href="../prometheus/authors.html#commits_by_organization">Prometheus</a></td><td class="num">0</td><td class="num">3</td><td class="num">3</td><td class="nowrap">2021-09-13</td><td class="nowrap">2022-10-14</td></tr><tr><td><a href="../kafka/authors.html#commits_by_organization">Apache Kafka</a></td><td class="num">0</td><td class="num">2</td><td class="num">2</td><td class="nowrap">2013-11-22</td><td class="nowrap">2017-07-14</td></tr><tr><td><a href="../cpython/authors.html#commits_by_organization">CPython</a></td><td class="num">0</td><td class="num">2</td><td class="num">2</td><td class="nowrap">2017-09-08</td><td class="nowrap">2022-03-11</td></tr><tr><td><a href="../milvus/authors.html#commits_by_organization">Milvus</a></td><td class="num">0</td><td class="num">2</td><td class="num">2</td><td class="nowrap">2023-06-05</td><td class="nowrap">2023-09-05</td></tr><tr><td><a href="../requests/authors.html#commits_by_organization">Requests</a></td><td class="num">0</td><td class="num">2</td><td class="num">2</td><td class="nowrap">2015-04-03</td><td class="nowrap">2016-09-06</td></tr></table></div><h2>Badge</h2><p class="section-note">For a README or an open source program&rsquo;s page. It is made again with the portfolio, so it stays current. A shields.io <a href="intel.com.json">endpoint</a> is next to it, for badges in other styles.</p><p><img src="intel.com.svg" alt="GitStats Gallery: 2.7k commits to 16 projects in 12 months"></p><pre class="badge-code">[![GitStats Gallery](https://shenxianpeng.dev/gitstats/gallery/orgs/intel.com.svg)](https://shenxianpeng.dev/gitstats/gallery/orgs/intel.com.html)</pre><div class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></div>
+</body>
+</html>

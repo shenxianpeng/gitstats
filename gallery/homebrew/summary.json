@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev1",
-  "generated_at": "2026-10-19T03:44:08+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:28:42+00:00",
   "name": "Homebrew",
   "report_path": "index.html",
   "first_commit": "2009-05-20 23:04:11",
-  "last_commit": "2026-10-18 12:55:26",
-  "age_days": 6360,
-  "active_days": 5596,
-  "total_commits": 53235,
+  "last_commit": "2026-10-23 08:19:08",
+  "age_days": 6365,
+  "active_days": 5601,
+  "total_commits": 53302,
   "total_authors": 1319,
   "active_authors_12mo": 192,
-  "commits_last_12mo": 6243,
-  "total_files": 3427,
-  "total_lines": 530938,
-  "lines_added": 1957143,
-  "lines_removed": 1426205,
-  "total_tags": 537,
-  "era": "surge",
+  "commits_last_12mo": 6310,
+  "total_files": 3429,
+  "total_lines": 533665,
+  "lines_added": 1960151,
+  "lines_removed": 1426486,
+  "total_tags": 538,
+  "era": "peak",
   "top_authors": [
     {
       "name": "Mike McQuaid",
-      "commits": 14532
+      "commits": 14564
     },
     {
       "name": "BrewTestBot",
-      "commits": 3341
+      "commits": 3343
     },
     {
       "name": "Markus Reiter",
@@ -41,19 +41,23 @@
     }
   ],
   "author_commits": {
-    "Mike McQuaid": 14532,
+    "Anton Melnikov": 197,
+    "BrewTestBot": 3343,
+    "Mike McQuaid": 14564,
+    "Izaak Beekman": 14,
+    "Patrick Linnane": 1550,
+    "Bevan Kay": 302,
+    "edel67": 9,
+    "hyuraku": 349,
+    "Ingmar Stein": 5,
+    "Harald Nordgren": 75,
+    "Sam Ford": 542,
     "Douglas Eichelberger": 1009,
     "BrandenXia": 3,
     "Xavier Lange": 1,
     "Justin Krehel": 53,
-    "Bevan Kay": 296,
-    "Harald Nordgren": 70,
     "Carlo Cabrera": 1212,
-    "BrewTestBot": 3341,
-    "Patrick Linnane": 1542,
-    "hyuraku": 348,
     "Hafez": 19,
-    "botantony": 196,
     "adamv": 1074,
     "Issy Long": 1039,
     "Daeho Ro": 44,
@@ -73,8 +77,6 @@
     "Ivan Dergachev": 2,
     "Andrew Nesbitt": 105,
     "Hoshino-Yumetsuki": 1,
-    "Izaak Beekman": 12,
-    "Sam Ford": 541,
     "kronikpillow": 1,
     "rseleven": 2,
     "Sean Molenaar": 311,
@@ -88,7 +90,6 @@
     "William Woodruff": 260,
     "Noah": 1,
     "Jordan Brough": 1,
-    "edel67": 1,
     "Sean Yang": 2,
     "Todd Schulman": 9,
     "Anthony Holland": 28,
@@ -111,7 +112,6 @@
     "moscowmule2240": 3,
     "rexmhall09": 16,
     "Cyril Jouve": 1,
-    "Ingmar Stein": 4,
     "AbishekRaj2007": 4,
     "Adrian Ho": 61,
     "Michael Hackner": 2,
@@ -1379,7 +1379,7 @@
     "2023": 4255,
     "2024": 5411,
     "2025": 4570,
-    "2026": 5486
+    "2026": 5553
   },
   "ai_assisted": {
     "commits": 218,
@@ -1440,7 +1440,241 @@
       "2026-07": 971,
       "2026-08": 640,
       "2026-09": 761,
-      "2026-10": 261
+      "2026-10": 328
+    }
+  },
+  "organizations": {
+    "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
+    "commits": 53302,
+    "by_kind": {
+      "organization": 1125,
+      "one_person": 26912,
+      "personal": 15799,
+      "hidden": 6867,
+      "unknown": 49,
+      "bot": 2550
+    },
+    "organization_count": 19,
+    "last_12mo_from": "2025-11",
+    "top": [
+      {
+        "organization": "issyl0.co.uk",
+        "commits": 707,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2017-05-27",
+        "last_commit": "2024-07-14"
+      },
+      {
+        "organization": "github.com",
+        "commits": 159,
+        "commits_last_12mo": 22,
+        "addresses": 6,
+        "first_commit": "2012-12-08",
+        "last_commit": "2026-09-28"
+      },
+      {
+        "organization": "tim-smith.us",
+        "commits": 107,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2014-09-28",
+        "last_commit": "2017-08-12"
+      },
+      {
+        "organization": "gusto.com",
+        "commits": 49,
+        "commits_last_12mo": 40,
+        "addresses": 2,
+        "first_commit": "2023-10-06",
+        "last_commit": "2026-08-28"
+      },
+      {
+        "organization": "squareup.com",
+        "commits": 23,
+        "commits_last_12mo": 3,
+        "addresses": 3,
+        "first_commit": "2017-08-30",
+        "last_commit": "2026-07-29"
+      },
+      {
+        "organization": "datadoghq.com",
+        "commits": 17,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2018-02-24",
+        "last_commit": "2024-10-07"
+      },
+      {
+        "organization": "trailofbits.com",
+        "commits": 13,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2018-08-17",
+        "last_commit": "2024-04-30"
+      },
+      {
+        "organization": "intel.com",
+        "commits": 9,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2017-11-29",
+        "last_commit": "2024-08-05"
+      },
+      {
+        "organization": "apache.org",
+        "commits": 6,
+        "commits_last_12mo": 0,
+        "addresses": 4,
+        "first_commit": "2009-08-31",
+        "last_commit": "2020-11-24"
+      },
+      {
+        "organization": "google.com",
+        "commits": 6,
+        "commits_last_12mo": 0,
+        "addresses": 5,
+        "first_commit": "2016-06-22",
+        "last_commit": "2024-02-08"
+      },
+      {
+        "organization": "mit.edu",
+        "commits": 6,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2017-02-28",
+        "last_commit": "2017-05-14"
+      },
+      {
+        "organization": "berkeley.edu",
+        "commits": 5,
+        "commits_last_12mo": 0,
+        "addresses": 4,
+        "first_commit": "2013-03-06",
+        "last_commit": "2023-10-28"
+      },
+      {
+        "organization": "amazon.com",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2016-08-25",
+        "last_commit": "2024-10-21"
+      },
+      {
+        "organization": "apple.com",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 3,
+        "first_commit": "2012-07-03",
+        "last_commit": "2024-01-29"
+      },
+      {
+        "organization": "meta.com",
+        "commits": 3,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2019-12-06",
+        "last_commit": "2020-08-14"
+      },
+      {
+        "organization": "bendyworks.com",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2009-10-22",
+        "last_commit": "2010-04-22"
+      },
+      {
+        "organization": "cpan.org",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2015-05-17",
+        "last_commit": "2015-08-09"
+      },
+      {
+        "organization": "hubspot.com",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2020-03-04",
+        "last_commit": "2021-04-13"
+      },
+      {
+        "organization": "shopify.com",
+        "commits": 2,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2011-12-04",
+        "last_commit": "2021-04-26"
+      }
+    ],
+    "quarters": {
+      "2025-Q1": {
+        "organization": 10,
+        "one_person": 575,
+        "personal": 256,
+        "hidden": 322,
+        "unknown": 0,
+        "bot": 198
+      },
+      "2025-Q2": {
+        "organization": 9,
+        "one_person": 604,
+        "personal": 215,
+        "hidden": 163,
+        "unknown": 0,
+        "bot": 112
+      },
+      "2025-Q3": {
+        "organization": 14,
+        "one_person": 619,
+        "personal": 246,
+        "hidden": 123,
+        "unknown": 0,
+        "bot": 40
+      },
+      "2025-Q4": {
+        "organization": 8,
+        "one_person": 694,
+        "personal": 205,
+        "hidden": 125,
+        "unknown": 0,
+        "bot": 32
+      },
+      "2026-Q1": {
+        "organization": 6,
+        "one_person": 572,
+        "personal": 208,
+        "hidden": 176,
+        "unknown": 1,
+        "bot": 36
+      },
+      "2026-Q2": {
+        "organization": 33,
+        "one_person": 1272,
+        "personal": 253,
+        "hidden": 255,
+        "unknown": 2,
+        "bot": 39
+      },
+      "2026-Q3": {
+        "organization": 20,
+        "one_person": 1710,
+        "personal": 302,
+        "hidden": 272,
+        "unknown": 0,
+        "bot": 68
+      },
+      "2026-Q4": {
+        "organization": 0,
+        "one_person": 238,
+        "personal": 47,
+        "hidden": 33,
+        "unknown": 0,
+        "bot": 10
+      }
     }
   }
 }

@@ -1,0 +1,415 @@
+{
+  "schema_version": 1,
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:33:22+00:00",
+  "ecosystem": {
+    "id": "cncf",
+    "name": "CNCF graduated",
+    "title": "CNCF graduated projects"
+  },
+  "quarter": {
+    "id": "2026-Q3",
+    "label": "Jul–Sep 2026"
+  },
+  "previous_quarter": {
+    "id": "2026-Q2",
+    "label": "Apr–Jun 2026"
+  },
+  "summary": {
+    "repositories": 15,
+    "with_commits": 15,
+    "naming": 13,
+    "median_share": 0.0243,
+    "highest": {
+      "id": "jaeger",
+      "name": "Jaeger",
+      "share": 0.4286
+    }
+  },
+  "repositories": [
+    {
+      "rank": 1,
+      "id": "jaeger",
+      "name": "Jaeger",
+      "repository": "jaegertracing/jaeger",
+      "report": "../jaeger/",
+      "quarter": {
+        "commits": 343,
+        "ai_assisted": 147,
+        "share": 0.4286
+      },
+      "previous_quarter": {
+        "commits": 287,
+        "ai_assisted": 84,
+        "share": 0.2927
+      },
+      "commits_last_12mo": 1055,
+      "active_authors_12mo": 115,
+      "health": "peak",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 2,
+      "id": "flux",
+      "name": "Flux",
+      "repository": "fluxcd/flux2",
+      "report": "../flux/",
+      "quarter": {
+        "commits": 64,
+        "ai_assisted": 8,
+        "share": 0.125
+      },
+      "previous_quarter": {
+        "commits": 130,
+        "ai_assisted": 12,
+        "share": 0.0923
+      },
+      "commits_last_12mo": 354,
+      "active_authors_12mo": 48,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "ChatGPT",
+        "Codex"
+      ]
+    },
+    {
+      "rank": 3,
+      "id": "harbor",
+      "name": "Harbor",
+      "repository": "goharbor/harbor",
+      "report": "../harbor/",
+      "quarter": {
+        "commits": 143,
+        "ai_assisted": 10,
+        "share": 0.0699
+      },
+      "previous_quarter": {
+        "commits": 96,
+        "ai_assisted": 1,
+        "share": 0.0104
+      },
+      "commits_last_12mo": 404,
+      "active_authors_12mo": 95,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Cursor",
+        "GitHub Copilot",
+        "Claude"
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "envoy",
+      "name": "Envoy",
+      "repository": "envoyproxy/envoy",
+      "report": "../envoy/",
+      "quarter": {
+        "commits": 1218,
+        "ai_assisted": 60,
+        "share": 0.0493
+      },
+      "previous_quarter": {
+        "commits": 822,
+        "ai_assisted": 41,
+        "share": 0.0499
+      },
+      "commits_last_12mo": 3775,
+      "active_authors_12mo": 347,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "Gemini"
+      ]
+    },
+    {
+      "rank": 5,
+      "id": "argo-cd",
+      "name": "Argo CD",
+      "repository": "argoproj/argo-cd",
+      "report": "../argo-cd/",
+      "quarter": {
+        "commits": 637,
+        "ai_assisted": 31,
+        "share": 0.0487
+      },
+      "previous_quarter": {
+        "commits": 631,
+        "ai_assisted": 21,
+        "share": 0.0333
+      },
+      "commits_last_12mo": 2265,
+      "active_authors_12mo": 379,
+      "health": "peak",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Cursor",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 6,
+      "id": "prometheus",
+      "name": "Prometheus",
+      "repository": "prometheus/prometheus",
+      "report": "../prometheus/",
+      "quarter": {
+        "commits": 793,
+        "ai_assisted": 35,
+        "share": 0.0441
+      },
+      "previous_quarter": {
+        "commits": 668,
+        "ai_assisted": 20,
+        "share": 0.0299
+      },
+      "commits_last_12mo": 2684,
+      "active_authors_12mo": 275,
+      "health": "surge",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 7,
+      "id": "helm",
+      "name": "Helm",
+      "repository": "helm/helm",
+      "report": "../helm/",
+      "quarter": {
+        "commits": 253,
+        "ai_assisted": 10,
+        "share": 0.0395
+      },
+      "previous_quarter": {
+        "commits": 239,
+        "ai_assisted": 8,
+        "share": 0.0335
+      },
+      "commits_last_12mo": 965,
+      "active_authors_12mo": 88,
+      "health": "steady",
+      "last_commit": "2026-10-21",
+      "assistants": [
+        "GitHub Copilot",
+        "Claude",
+        "Grok"
+      ]
+    },
+    {
+      "rank": 8,
+      "id": "containerd",
+      "name": "containerd",
+      "repository": "containerd/containerd",
+      "report": "../containerd/",
+      "quarter": {
+        "commits": 493,
+        "ai_assisted": 12,
+        "share": 0.0243
+      },
+      "previous_quarter": {
+        "commits": 404,
+        "ai_assisted": 8,
+        "share": 0.0198
+      },
+      "commits_last_12mo": 1682,
+      "active_authors_12mo": 128,
+      "health": "steady",
+      "last_commit": "2026-10-21",
+      "assistants": [
+        "Claude",
+        "Gemini",
+        "Codex"
+      ]
+    },
+    {
+      "rank": 9,
+      "id": "coredns",
+      "name": "CoreDNS",
+      "repository": "coredns/coredns",
+      "report": "../coredns/",
+      "quarter": {
+        "commits": 297,
+        "ai_assisted": 6,
+        "share": 0.0202
+      },
+      "previous_quarter": {
+        "commits": 153,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 771,
+      "active_authors_12mo": 93,
+      "health": "peak",
+      "last_commit": "2026-10-21",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot"
+      ]
+    },
+    {
+      "rank": 10,
+      "id": "istio",
+      "name": "Istio",
+      "repository": "istio/istio",
+      "report": "../istio/",
+      "quarter": {
+        "commits": 354,
+        "ai_assisted": 6,
+        "share": 0.0169
+      },
+      "previous_quarter": {
+        "commits": 302,
+        "ai_assisted": 8,
+        "share": 0.0265
+      },
+      "commits_last_12mo": 1225,
+      "active_authors_12mo": 164,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "Claude",
+        "GitHub Copilot",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 11,
+      "id": "linkerd",
+      "name": "Linkerd",
+      "repository": "linkerd/linkerd2",
+      "report": "../linkerd/",
+      "quarter": {
+        "commits": 203,
+        "ai_assisted": 1,
+        "share": 0.0049
+      },
+      "previous_quarter": {
+        "commits": 226,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 776,
+      "active_authors_12mo": 32,
+      "health": "steady",
+      "last_commit": "2026-10-20",
+      "assistants": [
+        "Claude"
+      ]
+    },
+    {
+      "rank": 12,
+      "id": "etcd",
+      "name": "etcd",
+      "repository": "etcd-io/etcd",
+      "report": "../etcd/",
+      "quarter": {
+        "commits": 273,
+        "ai_assisted": 1,
+        "share": 0.0037
+      },
+      "previous_quarter": {
+        "commits": 397,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 1313,
+      "active_authors_12mo": 89,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "GitHub Copilot",
+        "Claude"
+      ]
+    },
+    {
+      "rank": 13,
+      "id": "cilium",
+      "name": "Cilium",
+      "repository": "cilium/cilium",
+      "report": "../cilium/",
+      "quarter": {
+        "commits": 1626,
+        "ai_assisted": 1,
+        "share": 0.0006
+      },
+      "previous_quarter": {
+        "commits": 1214,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 5231,
+      "active_authors_12mo": 346,
+      "health": "steady",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "Claude",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 14,
+      "id": "kubernetes",
+      "name": "Kubernetes",
+      "repository": "kubernetes/kubernetes",
+      "report": "../kubernetes/",
+      "quarter": {
+        "commits": 2366,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 2192,
+        "ai_assisted": 1,
+        "share": 0.0005
+      },
+      "commits_last_12mo": 8488,
+      "active_authors_12mo": 619,
+      "health": "steady",
+      "last_commit": "2026-10-23",
+      "assistants": [
+        "Claude",
+        "Codex",
+        "Cursor"
+      ]
+    },
+    {
+      "rank": 15,
+      "id": "tikv",
+      "name": "TiKV",
+      "repository": "tikv/tikv",
+      "report": "../tikv/",
+      "quarter": {
+        "commits": 68,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "previous_quarter": {
+        "commits": 56,
+        "ai_assisted": 0,
+        "share": 0.0
+      },
+      "commits_last_12mo": 216,
+      "active_authors_12mo": 66,
+      "health": "quiet",
+      "last_commit": "2026-10-22",
+      "assistants": [
+        "GitHub Copilot",
+        "Claude"
+      ]
+    }
+  ]
+}

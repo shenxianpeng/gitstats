@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev1",
-  "generated_at": "2026-10-19T03:44:11+00:00",
+  "generated_by": "gitstats 2.11.0.post1.dev10",
+  "generated_at": "2026-10-23T11:21:06+00:00",
   "name": "OpenCode",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-10-19 03:42:17",
-  "age_days": 577,
-  "active_days": 564,
-  "total_commits": 20572,
-  "total_authors": 1017,
-  "active_authors_12mo": 851,
-  "commits_last_12mo": 16968,
-  "total_files": 8561,
-  "total_lines": 1375341,
-  "lines_added": 4346303,
-  "lines_removed": 2970962,
-  "total_tags": 916,
+  "last_commit": "2026-10-23 11:19:47",
+  "age_days": 581,
+  "active_days": 568,
+  "total_commits": 20799,
+  "total_authors": 1026,
+  "active_authors_12mo": 849,
+  "commits_last_12mo": 17195,
+  "total_files": 8597,
+  "total_lines": 1387409,
+  "lines_added": 4373580,
+  "lines_removed": 2986171,
+  "total_tags": 917,
   "era": "steady",
   "top_authors": [
     {
@@ -25,15 +25,15 @@
     },
     {
       "name": "Aiden Cline",
-      "commits": 2293
+      "commits": 2367
     },
     {
       "name": "Kit Langton",
-      "commits": 2151
+      "commits": 2165
     },
     {
       "name": "Adam",
-      "commits": 1468
+      "commits": 1471
     },
     {
       "name": "Github Action",
@@ -41,29 +41,43 @@
     }
   ],
   "author_commits": {
-    "Aiden Cline": 2293,
+    "Filip": 118,
+    "opencode": 633,
+    "Luke Parker": 621,
+    "Simon Klee": 131,
+    "Aiden Cline": 2367,
+    "Brendan Allan": 542,
+    "DS": 23,
+    "Imamuzzaki Abu Salam": 1,
+    "James Long": 355,
+    "Dax": 437,
+    "Adam": 1471,
+    "ANSH SINGH": 1,
+    "ANIRUDDHA ADAK": 1,
+    "0": 1,
+    "Kit Langton": 2165,
+    "MohammadAlMasalmeh": 1,
+    "Frank": 924,
+    "Victor Navarro": 104,
+    "Rhys Sullivan": 5,
+    "Aarav Sareen": 86,
+    "Rich Rauenzahn": 1,
+    "Lane Wagner": 1,
+    "Finn763": 1,
+    "Andrei Vince": 1,
+    "J\u00e9r\u00f4me Benoit": 35,
     "F\u00e1bio D. Batista": 1,
-    "Dax": 425,
-    "Victor Navarro": 97,
-    "Kit Langton": 2151,
-    "Filip": 112,
     "Divanshu": 1,
     "tobwen": 3,
-    "Brendan Allan": 540,
-    "opencode": 628,
     "Jack": 126,
-    "Aarav Sareen": 78,
     "Lucas Kim": 2,
     "JasonH": 1,
     "Jensen": 3,
-    "Luke Parker": 611,
     "xin zhuang": 2,
     "argszero": 2,
     "Dante": 1,
     "berce": 1,
-    "DS": 9,
     "Daniel Nunns": 1,
-    "James Long": 340,
     "terry-an-investor": 1,
     "Kyrylo": 1,
     "Don Bowman": 1,
@@ -72,13 +86,10 @@
     "Stefan Avram": 6,
     "\u9ed1\u58a8\u6c34\u9c7c": 8,
     "usrnk1": 71,
-    "Simon Klee": 129,
     "Tommy D. Rossi": 26,
-    "Frank": 923,
     "uyencss": 1,
     "OpeOginni": 87,
     "Max Weinbach": 1,
-    "Adam": 1468,
     "Bence Ferdinandy": 2,
     "Dax Raad": 2472,
     "Henri-Maxime Ducoulombier": 1,
@@ -95,7 +106,6 @@
     "Vladimir Glafirov": 40,
     "Jordan Lee": 1,
     "mlimarenko": 1,
-    "J\u00e9r\u00f4me Benoit": 34,
     "R\u00e9my Sanchez": 1,
     "Ryan": 6,
     "Metal Heart": 1,
@@ -647,7 +657,6 @@
     "Shpetim": 4,
     "jerilynzheng": 1,
     "Saatvik Arya": 5,
-    "Rhys Sullivan": 4,
     "Osinachi Okpara": 2,
     "Jake Nelson": 3,
     "Gabriel Patzleiner": 1,
@@ -1061,14 +1070,14 @@
   },
   "commits_by_year": {
     "2025": 6529,
-    "2026": 14043
+    "2026": 14270
   },
   "ai_assisted": {
-    "commits": 135,
+    "commits": 136,
     "authored": 1,
     "assistants": {
       "OpenCode": 81,
-      "Claude": 38,
+      "Claude": 39,
       "GitHub Copilot": 13,
       "Cursor": 3,
       "Jules": 1
@@ -1097,7 +1106,7 @@
       "2026-07": 4,
       "2026-08": 4,
       "2026-09": 3,
-      "2026-10": 2
+      "2026-10": 3
     },
     "commits_by_month": {
       "2024-11": 0,
@@ -1123,7 +1132,121 @@
       "2026-07": 1581,
       "2026-08": 1996,
       "2026-09": 1496,
-      "2026-10": 758
+      "2026-10": 985
+    }
+  },
+  "organizations": {
+    "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
+    "commits": 20799,
+    "by_kind": {
+      "organization": 1703,
+      "one_person": 3979,
+      "personal": 5526,
+      "hidden": 6008,
+      "unknown": 1,
+      "bot": 3582
+    },
+    "organization_count": 4,
+    "last_12mo_from": "2025-11",
+    "top": [
+      {
+        "organization": "sst.dev",
+        "commits": 1048,
+        "commits_last_12mo": 564,
+        "addresses": 2,
+        "first_commit": "2025-05-23",
+        "last_commit": "2026-10-23"
+      },
+      {
+        "organization": "anoma.ly",
+        "commits": 641,
+        "commits_last_12mo": 641,
+        "addresses": 3,
+        "first_commit": "2025-12-29",
+        "last_commit": "2026-10-20"
+      },
+      {
+        "organization": "cloudflare.com",
+        "commits": 11,
+        "commits_last_12mo": 11,
+        "addresses": 5,
+        "first_commit": "2025-12-09",
+        "last_commit": "2026-09-28"
+      },
+      {
+        "organization": "sentry.io",
+        "commits": 3,
+        "commits_last_12mo": 3,
+        "addresses": 2,
+        "first_commit": "2025-12-22",
+        "last_commit": "2026-04-02"
+      }
+    ],
+    "quarters": {
+      "2025-Q1": {
+        "organization": 0,
+        "one_person": 0,
+        "personal": 8,
+        "hidden": 0,
+        "unknown": 0,
+        "bot": 0
+      },
+      "2025-Q2": {
+        "organization": 22,
+        "one_person": 598,
+        "personal": 159,
+        "hidden": 325,
+        "unknown": 0,
+        "bot": 3
+      },
+      "2025-Q3": {
+        "organization": 291,
+        "one_person": 760,
+        "personal": 147,
+        "hidden": 447,
+        "unknown": 0,
+        "bot": 137
+      },
+      "2025-Q4": {
+        "organization": 474,
+        "one_person": 734,
+        "personal": 891,
+        "hidden": 931,
+        "unknown": 0,
+        "bot": 602
+      },
+      "2026-Q1": {
+        "organization": 330,
+        "one_person": 676,
+        "personal": 1181,
+        "hidden": 1459,
+        "unknown": 0,
+        "bot": 566
+      },
+      "2026-Q2": {
+        "organization": 271,
+        "one_person": 432,
+        "personal": 1504,
+        "hidden": 822,
+        "unknown": 0,
+        "bot": 971
+      },
+      "2026-Q3": {
+        "organization": 269,
+        "one_person": 716,
+        "personal": 1360,
+        "hidden": 1613,
+        "unknown": 1,
+        "bot": 1114
+      },
+      "2026-Q4": {
+        "organization": 46,
+        "one_person": 63,
+        "personal": 276,
+        "hidden": 411,
+        "unknown": 0,
+        "bot": 189
+      }
     }
   }
 }
