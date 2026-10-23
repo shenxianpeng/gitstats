@@ -27,3 +27,11 @@ FAQ
     The numbers are lower bounds. An assistant that completes lines in an editor leaves no mark in the commit, and an assistant that signs can be told not to. A mark says that an assistant took part in a commit, not how much of it the assistant wrote, which is why lines are not counted.
 
     Accounts and addresses are matched, not first names: a person called Claude, Devin or Jules is not an assistant. The marks are listed in ``gitstats/assistants.py``; the same numbers are in the JSON output as ``ai_assisted_commits``, ``ai_assisted_authored``, ``ai_assisted_by_month`` and ``ai_assistants``.
+
+5. How does GitStats know which organization a commit comes from?
+
+    From the domain of the author's email address, the part after ``@``. ``ann@corp.google.com`` and ``bo@google.com`` both count under ``google.com``; ``@ox.ac.uk`` is kept whole, not cut to ``ac.uk``. A few organizations that commit under more than one domain are counted under one, such as ``fb.com`` under ``meta.com``.
+
+    The other addresses are counted apart, by kind: mail providers anyone can sign up for (``gmail.com``, ``qq.com``, ``outlook.com``…) as personal email, a code host's private ``noreply`` address as hidden, an address with no usable domain (``ann@laptop.local``) as unknown, and an account whose name ends in ``[bot]`` as a bot.
+
+    A domain says where an address is, not who paid for the work: people commit from personal addresses on paid time, and from work addresses on their own. Only domains and counts are kept, never an address. The lists are in ``gitstats/employers.py``; the numbers are in the JSON output as ``organizations``, ``organization_authors`` (how many addresses) and ``affiliation_by_month``, and in each repository's ``summary.json`` as ``organizations``.
