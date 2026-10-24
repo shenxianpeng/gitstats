@@ -341,7 +341,7 @@ def facts(summaries: list[dict[str, Any]], scope: str = "projects") -> list[list
     known = {k: [v for v in vals if v is not None] for k, vals in values.items()}
     out = []
     for index, summary in enumerate(summaries):
-        found = []
+        found: list[dict[str, Any]] = []
         for kind in KINDS:
             value = values[kind.id][index]
             pool = known[kind.id]

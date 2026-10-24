@@ -1610,7 +1610,7 @@ def test_compute_repo_summary_keeps_humans_and_source_lines():
 class TestWhatStandsOut:
     @staticmethod
     def _summaries(count=12):
-        from tests.test_insights import _summary as insight_summary
+        from test_insights import _summary as insight_summary
 
         out = []
         for n in range(count):
