@@ -182,7 +182,10 @@ def own_domain(summary: dict[str, Any], domain: str) -> bool:
     if domain in FOUNDATION_DOMAINS:
         return True
     label = _flat(domain.split(".")[0])
-    names = {_flat(str(summary.get("name", ""))), _flat(str(summary.get("report_path", "")).split("/")[0])}
+    names = {
+        _flat(str(summary.get("name", ""))),
+        _flat(str(summary.get("report_path", "")).split("/")[0]),
+    }
     owner, _, repository = str(summary.get("repository", "")).partition("/")
     names |= {_flat(owner), _flat(repository)} - {""}
     return label in names or any(name.startswith(label) for name in names if len(label) >= 4)
@@ -233,12 +236,12 @@ def _name(summary: dict[str, Any]) -> str:
 
 
 def _owns(summary: dict[str, Any]) -> str:
-    """"Kubernetes's": a name is singular, whatever its last letter."""
+    """ "Kubernetes's": a name is singular, whatever its last letter."""
     return f"{_name(summary)}'s"
 
 
 def _zone(zone: str) -> str:
-    """"+0800" -> "UTC+08:00"."""
+    """ "+0800" -> "UTC+08:00"."""
     raw = zone.replace("UTC", "")
     if len(raw) == 5 and raw[0] in "+-":
         return f"UTC{raw[:3]}:{raw[3:]}"
@@ -283,7 +286,9 @@ def _say_source(s: dict[str, Any], v: float) -> str:
             f"Of the {added:,} lines ever written into {_owns(s)} own source, {pct(v)} are "
             "still there; the rest were rewritten or removed."
         )
-    return f"{pct(v)} of the {added:,} lines ever written into {_owns(s)} own source are still there."
+    return (
+        f"{pct(v)} of the {added:,} lines ever written into {_owns(s)} own source are still there."
+    )
 
 
 def _say_zone(s: dict[str, Any], v: float) -> str:
@@ -405,4 +410,3 @@ def overview_html(name: str, found: list[dict[str, Any]], others: int, portfolio
         f'<p class="more-link"><a href="compare.html">How {html.escape(name)} compares, '
         "measure by measure &rarr;</a></p></section>"
     )
-

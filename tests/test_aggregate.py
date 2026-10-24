@@ -1485,7 +1485,7 @@ class TestComparisonPages:
         )
         page = read("repo0/compare.html")
         assert "<h1>repo0</h1>" in page
-        assert "Compared with 5 Python projects, and all 7 of" in page
+        assert "Compared with 5 Python open source projects, and all 7 of" in page
         # the sentence: alone at the top of its group for commits
         assert (
             '<p class="compare-headline">repo0 had more commits in the last 12 months than '
@@ -1654,6 +1654,8 @@ class TestWhatStandsOut:
 
         page = self._read(temp_dir, "p11/compare.html")
         assert page.index("What stands out") < page.index("Where it stands")
+        # the sentence on where it ranks would say part of it again
+        assert '<p class="compare-headline">' not in page
         assert '<ul class="insights">' in page
         # the first fact's sentence is what a shared link says
         data = json.loads(self._read(temp_dir, "compare.json"))

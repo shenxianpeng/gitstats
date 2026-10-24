@@ -53,7 +53,9 @@ def _portfolio(count=12):
 # ── small helpers ────────────────────────────────────────────────────────
 
 
-@pytest.mark.parametrize(("value", "text"), [(0.954, "95%"), (0.004, "0.4%"), (0, "0%"), (1, "100%")])
+@pytest.mark.parametrize(
+    ("value", "text"), [(0.954, "95%"), (0.004, "0.4%"), (0, "0%"), (1, "100%")]
+)
 def test_pct(value, text):
     assert insights.pct(value) == text
 
@@ -146,7 +148,9 @@ def test_top_zone():
     # mostly UTC+0: a tool's setting, more likely than a place
     assert insights.top_zone(_summary(0, timezones={"+0000": 700, "+0800": 300})) is None
     # UTC+0 the largest, though not most of them
-    assert insights.top_zone(_summary(0, timezones={"+0000": 500, "+0800": 300, "-0700": 300})) is None
+    assert (
+        insights.top_zone(_summary(0, timezones={"+0000": 500, "+0800": 300, "-0700": 300})) is None
+    )
     assert insights.zone_share(_summary(0, timezones={})) is None
 
 
@@ -236,8 +240,7 @@ def test_sentences():
     )
     assert _said("zone", p11) == (
         "68%",
-        "68% of p11's commits were made in one time zone, UTC+08:00, of the 3 it has "
-        "commits from.",
+        "68% of p11's commits were made in one time zone, UTC+08:00, of the 3 it has commits from.",
     )
     assert _said("employer", p11)[1] == (
         "Of p11's commits from company addresses in the last 12 months, 76% came from one "

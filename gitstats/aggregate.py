@@ -1338,7 +1338,9 @@ class AggregateReportCreator:
         f.write(f"<h1>{html.escape(name)}</h1>")
         compared = f"all {len(rows)} repositories of"
         if peers:
-            compared = f"{len(peers)} {html.escape(group_name)} projects, and all {len(rows)} of"
+            # "14 open source languages and developer tools", as a sentence names them
+            projects = self._group_projects(group)
+            compared = f"{len(peers)} {html.escape(projects)}, and all {len(rows)} of"
         f.write(
             f'<p class="portfolio-subtitle">Compared with {compared} '
             f'<a href="../index.html">{html.escape(title)}</a> &middot; the 12 months up to '
@@ -1351,7 +1353,9 @@ class AggregateReportCreator:
                 "projects.</p>" + insights.facts_html(found)
             )
             f.write(html_header(2, "Where it stands"))
-        if headline:
+        elif headline:
+            # with nothing that stands out, the sentence on where it ranks leads;
+            # with something, that sentence would say part of it again
             f.write(f'<p class="compare-headline">{html.escape(headline)}</p>')
         legend = [f'<span><i class="own"></i>{html.escape(name)}</span>']
         if peers:
