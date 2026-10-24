@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:53:31+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:47:24+00:00",
   "name": "TypeScript",
   "report_path": "index.html",
   "first_commit": "2014-07-08 00:08:16",
-  "last_commit": "2026-10-22 19:08:38",
-  "age_days": 4490,
-  "active_days": 3923,
-  "total_commits": 39591,
+  "last_commit": "2026-10-24 16:26:34",
+  "age_days": 4492,
+  "active_days": 3925,
+  "total_commits": 39593,
   "total_authors": 995,
   "active_authors_12mo": 137,
-  "commits_last_12mo": 1795,
-  "total_files": 67927,
-  "total_lines": 6418699,
-  "lines_added": 25810323,
-  "lines_removed": 19391624,
+  "commits_last_12mo": 1797,
+  "total_files": 67951,
+  "total_lines": 6420173,
+  "lines_added": 25811886,
+  "lines_removed": 19391713,
   "total_tags": 16,
   "era": "steady",
   "top_authors": [
     {
       "name": "Anders Hejlsberg",
-      "commits": 4127
+      "commits": 4128
     },
     {
       "name": "Sheetal Nandi",
@@ -41,18 +41,18 @@
     }
   ],
   "author_commits": {
+    "Jake Bailey": 1436,
+    "Anders Hejlsberg": 4128,
     "John Favret": 43,
     "Wesley Wigham": 1780,
     "Oleksandr Tarasiuk": 590,
     "Mateusz Burzy\u0144ski": 585,
-    "Jake Bailey": 1435,
     "Andrew Branch": 869,
     "Joaquin Jares": 2,
     "Max Schwenk": 6,
     "Ryan Cavanaugh": 1013,
     "Titian Cernicova-Dragomir": 56,
     "HazyLab": 1,
-    "Anders Hejlsberg": 4127,
     "Christopher Plieger": 5,
     "Andre Fajar N": 1,
     "Ryuya": 1,
@@ -1050,7 +1050,7 @@
     "2023": 1305,
     "2024": 1085,
     "2025": 1465,
-    "2026": 1567
+    "2026": 1569
   },
   "ai_assisted": {
     "commits": 445,
@@ -1110,17 +1110,17 @@
       "2026-07": 118,
       "2026-08": 137,
       "2026-09": 153,
-      "2026-10": 109
+      "2026-10": 111
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39591,
+    "commits": 39593,
     "by_kind": {
-      "organization": 25462,
+      "organization": 25463,
       "one_person": 1221,
       "personal": 5823,
-      "hidden": 6938,
+      "hidden": 6939,
       "unknown": 10,
       "bot": 137
     },
@@ -1129,11 +1129,11 @@
     "top": [
       {
         "organization": "microsoft.com",
-        "commits": 25146,
-        "commits_last_12mo": 192,
+        "commits": 25147,
+        "commits_last_12mo": 193,
         "addresses": 70,
         "first_commit": "2014-07-08",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "umich.edu",
@@ -1250,10 +1250,10 @@
         "bot": 11
       },
       "2026-Q4": {
-        "organization": 15,
+        "organization": 16,
         "one_person": 0,
         "personal": 28,
-        "hidden": 61,
+        "hidden": 62,
         "unknown": 0,
         "bot": 5
       }
@@ -1262,9 +1262,32 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1744,
+    "commits": 1746,
     "authors": 137,
     "new_authors": 98,
     "half_of_commits": 3
+  },
+  "humans": {
+    "commits": 39456,
+    "commits_by_year": {
+      "2014": 3328,
+      "2015": 6550,
+      "2016": 6152,
+      "2017": 5125,
+      "2018": 5172,
+      "2019": 3129,
+      "2020": 2140,
+      "2021": 1243,
+      "2022": 1328,
+      "2023": 1301,
+      "2024": 1053,
+      "2025": 1409,
+      "2026": 1526
+    },
+    "active_days": 3923
+  },
+  "source_lines": {
+    "added": 27232851,
+    "current": 1417562
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:54:30+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:47:49+00:00",
   "name": "Zed",
   "report_path": "index.html",
   "first_commit": "2021-02-20 17:02:34",
-  "last_commit": "2026-10-23 15:02:03",
-  "age_days": 2071,
-  "active_days": 1913,
-  "total_commits": 40571,
+  "last_commit": "2026-10-24 17:19:26",
+  "age_days": 2073,
+  "active_days": 1914,
+  "total_commits": 40580,
   "total_authors": 2264,
-  "active_authors_12mo": 1192,
-  "commits_last_12mo": 8194,
+  "active_authors_12mo": 1190,
+  "commits_last_12mo": 8203,
   "total_files": 4382,
-  "total_lines": 2086076,
-  "lines_added": 5163660,
-  "lines_removed": 3077584,
+  "total_lines": 2087594,
+  "lines_added": 5165326,
+  "lines_removed": 3077732,
   "total_tags": 194,
   "era": "steady",
   "top_authors": [
@@ -41,8 +41,9 @@
     }
   ],
   "author_commits": {
+    "Ben Brandt": 478,
+    "Oleksiy Syvokon": 242,
     "Bennet Bo Fenner": 681,
-    "Ben Brandt": 471,
     "nchendri": 1,
     "Kirill Bulatov": 1916,
     "Piotr Osiewicz": 1398,
@@ -98,7 +99,6 @@
     "Sergio Ugalde": 1,
     "Hieu Le": 1,
     "Lorenzo Biassio": 1,
-    "Oleksiy Syvokon": 240,
     "Dom Porada": 18,
     "Chris Drackett": 3,
     "Manoj sk": 3,
@@ -2312,7 +2312,7 @@
     "2023": 9010,
     "2024": 7829,
     "2025": 9769,
-    "2026": 6686
+    "2026": 6695
   },
   "ai_assisted": {
     "commits": 169,
@@ -2375,16 +2375,16 @@
       "2026-07": 640,
       "2026-08": 397,
       "2026-09": 430,
-      "2026-10": 360
+      "2026-10": 369
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 40571,
+    "commits": 40580,
     "by_kind": {
-      "organization": 15334,
+      "organization": 15336,
       "one_person": 10222,
-      "personal": 11680,
+      "personal": 11687,
       "hidden": 2927,
       "unknown": 0,
       "bot": 408
@@ -2394,8 +2394,8 @@
     "top": [
       {
         "organization": "zed.dev",
-        "commits": 15315,
-        "commits_last_12mo": 3276,
+        "commits": 15317,
+        "commits_last_12mo": 3278,
         "addresses": 30,
         "first_commit": "2021-02-20",
         "last_commit": "2026-10-23"
@@ -2499,9 +2499,9 @@
         "bot": 20
       },
       "2026-Q4": {
-        "organization": 84,
+        "organization": 86,
         "one_person": 29,
-        "personal": 145,
+        "personal": 152,
         "hidden": 97,
         "unknown": 0,
         "bot": 5
@@ -2511,9 +2511,25 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 8139,
+    "commits": 8148,
     "authors": 1169,
     "new_authors": 990,
     "half_of_commits": 17
+  },
+  "humans": {
+    "commits": 40172,
+    "commits_by_year": {
+      "2021": 2298,
+      "2022": 4979,
+      "2023": 9010,
+      "2024": 7635,
+      "2025": 9612,
+      "2026": 6638
+    },
+    "active_days": 1914
+  },
+  "source_lines": {
+    "added": 5507111,
+    "current": 2026861
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:47:23+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:41:29+00:00",
   "name": "etcd",
   "report_path": "index.html",
   "first_commit": "2013-06-07 00:43:32",
-  "last_commit": "2026-10-23 05:10:15",
+  "last_commit": "2026-10-23 20:28:27",
   "age_days": 4887,
   "active_days": 4011,
-  "total_commits": 25330,
+  "total_commits": 25334,
   "total_authors": 1141,
   "active_authors_12mo": 89,
-  "commits_last_12mo": 1313,
+  "commits_last_12mo": 1317,
   "total_files": 1505,
-  "total_lines": 258917,
-  "lines_added": 2398092,
-  "lines_removed": 2139175,
+  "total_lines": 258930,
+  "lines_added": 2398111,
+  "lines_removed": 2139181,
   "total_tags": 101,
   "era": "steady",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "Benjamin Wang",
-      "commits": 2315
+      "commits": 2316
     },
     {
       "name": "Marek Siarkowicz",
@@ -41,8 +41,8 @@
     }
   ],
   "author_commits": {
-    "Iv\u00e1n Vald\u00e9s Castillo": 370,
-    "Benjamin Wang": 2315,
+    "Benjamin Wang": 2316,
+    "Iv\u00e1n Vald\u00e9s Castillo": 373,
     "Tobi Abidoye": 6,
     "Fu Wei": 248,
     "Batianxieshen1": 1,
@@ -1197,7 +1197,7 @@
     "2023": 1621,
     "2024": 1553,
     "2025": 1899,
-    "2026": 1147
+    "2026": 1151
   },
   "ai_assisted": {
     "commits": 3,
@@ -1256,16 +1256,16 @@
       "2026-07": 137,
       "2026-08": 76,
       "2026-09": 60,
-      "2026-10": 71
+      "2026-10": 75
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 25330,
+    "commits": 25334,
     "by_kind": {
       "organization": 9897,
-      "one_person": 2383,
-      "personal": 12502,
+      "one_person": 2386,
+      "personal": 12503,
       "hidden": 222,
       "unknown": 7,
       "bot": 319
@@ -1645,8 +1645,8 @@
       },
       "2026-Q4": {
         "organization": 4,
-        "one_person": 20,
-        "personal": 39,
+        "one_person": 23,
+        "personal": 40,
         "hidden": 4,
         "unknown": 0,
         "bot": 4
@@ -1656,9 +1656,33 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1226,
+    "commits": 1230,
     "authors": 88,
     "new_authors": 62,
     "half_of_commits": 3
+  },
+  "humans": {
+    "commits": 25015,
+    "commits_by_year": {
+      "2013": 1220,
+      "2014": 2950,
+      "2015": 2395,
+      "2016": 3852,
+      "2017": 2384,
+      "2018": 2053,
+      "2019": 947,
+      "2020": 745,
+      "2021": 973,
+      "2022": 1580,
+      "2023": 1545,
+      "2024": 1464,
+      "2025": 1828,
+      "2026": 1079
+    },
+    "active_days": 3998
+  },
+  "source_lines": {
+    "added": 941262,
+    "current": 239466
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:54:36+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:47:50+00:00",
   "name": "VS Code",
   "report_path": "index.html",
   "first_commit": "2015-11-13 13:39:38",
-  "last_commit": "2026-10-23 16:22:15",
-  "age_days": 3998,
-  "active_days": 3906,
-  "total_commits": 168958,
+  "last_commit": "2026-10-24 17:31:10",
+  "age_days": 3999,
+  "active_days": 3907,
+  "total_commits": 169021,
   "total_authors": 2898,
-  "active_authors_12mo": 463,
-  "commits_last_12mo": 27366,
-  "total_files": 21211,
-  "total_lines": 6918822,
-  "lines_added": 13229790,
-  "lines_removed": 6310968,
+  "active_authors_12mo": 461,
+  "commits_last_12mo": 27429,
+  "total_files": 21232,
+  "total_lines": 6931953,
+  "lines_added": 13251070,
+  "lines_removed": 6319117,
   "total_tags": 28,
   "era": "peak",
   "top_authors": [
@@ -41,48 +41,49 @@
     }
   ],
   "author_commits": {
-    "Bryan Chen": 265,
-    "Christof Marti": 1630,
-    "Ben Villalobos": 151,
+    "Ladislau Szomoru": 2822,
+    "Benjamin Christopher Simmonds": 1554,
+    "Ben Villalobos": 153,
+    "Connor Peet": 3722,
+    "Alexandru Dima": 1990,
+    "Giuseppe Cianci": 231,
+    "Christof Marti": 1631,
+    "Bryan Chen": 267,
+    "Dmitriy Vasyura": 939,
+    "Ross Wollman": 76,
+    "Jessie Houghton": 50,
+    "Megan Rogge": 5258,
+    "roblourens": 7125,
+    "TylerLeonhardt": 1272,
+    "Hawk Ticehurst": 194,
+    "Anthony Kim": 268,
+    "Martin Aeschlimann": 5341,
+    "Osvaldo Ortega": 1142,
+    "Karthik Nadig": 65,
     "Henning Dieterichs": 2839,
     "Sandeep Somavarapu": 9474,
-    "Hawk Ticehurst": 187,
-    "Ladislau Szomoru": 2816,
     "Logan Ramos": 1454,
     "Vritant Bhardwaj": 359,
-    "Alexandru Dima": 1987,
     "Lee Murray": 882,
-    "Benjamin Christopher Simmonds": 1549,
     "mrleemurray": 954,
     "Ulugbek Abdullaev": 934,
     "Alex Ross": 2850,
     "Robo": 861,
     "Joaqu\u00edn Ruales": 132,
-    "Martin Aeschlimann": 5337,
     "Bhavya U": 897,
-    "Jessie Houghton": 47,
-    "Anthony Kim": 267,
     "Vijay Upadya": 232,
-    "Osvaldo Ortega": 1141,
-    "roblourens": 7122,
-    "Megan Rogge": 5246,
     "Justin Chen": 1059,
     "Dileep Yavanmandha": 259,
     "vritant24": 576,
-    "Ross Wollman": 75,
     "Raymond Zhao": 947,
     "Cherry Wang": 80,
     "Copilot": 1129,
     "Harald Kirschner": 304,
-    "Connor Peet": 3719,
     "Hang Zhao": 5,
-    "Giuseppe Cianci": 229,
     "benibenj": 63,
     "Nick Trogh": 54,
     "Sahinur": 1,
     "SahinurDEV": 1,
-    "TylerLeonhardt": 1271,
-    "Dmitriy Vasyura": 937,
     "Kyle Cutler": 262,
     "Shengjie Ma": 2,
     "Dirk B\u00e4umer": 1150,
@@ -91,7 +92,6 @@
     "Aaron Munger": 985,
     "renat": 1,
     "Elijah King": 318,
-    "Karthik Nadig": 64,
     "Anisha Agarwal": 33,
     "Tim Rogers": 2,
     "Akshat Anand": 10,
@@ -2952,13 +2952,13 @@
     "2023": 13128,
     "2024": 11064,
     "2025": 16682,
-    "2026": 23851
+    "2026": 23914
   },
   "ai_assisted": {
-    "commits": 8937,
+    "commits": 8990,
     "authored": 1129,
     "assistants": {
-      "GitHub Copilot": 8864,
+      "GitHub Copilot": 8917,
       "Claude": 72,
       "Cursor": 8
     },
@@ -2986,7 +2986,7 @@
       "2026-07": 884,
       "2026-08": 1216,
       "2026-09": 1497,
-      "2026-10": 1722
+      "2026-10": 1775
     },
     "commits_by_month": {
       "2024-11": 1004,
@@ -3012,30 +3012,30 @@
       "2026-07": 1910,
       "2026-08": 2076,
       "2026-09": 2316,
-      "2026-10": 2307
+      "2026-10": 2370
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 168958,
+    "commits": 169021,
     "by_kind": {
-      "organization": 94795,
+      "organization": 94820,
       "one_person": 6756,
-      "personal": 41002,
-      "hidden": 25051,
+      "personal": 41008,
+      "hidden": 25080,
       "unknown": 117,
-      "bot": 1237
+      "bot": 1240
     },
     "organization_count": 35,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "microsoft.com",
-        "commits": 94034,
-        "commits_last_12mo": 8506,
+        "commits": 94059,
+        "commits_last_12mo": 8531,
         "addresses": 226,
         "first_commit": "2015-11-13",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-24"
       },
       {
         "organization": "georgejames.com",
@@ -3368,21 +3368,43 @@
         "bot": 232
       },
       "2026-Q4": {
-        "organization": 898,
+        "organization": 923,
         "one_person": 24,
-        "personal": 672,
-        "hidden": 669,
+        "personal": 678,
+        "hidden": 698,
         "unknown": 0,
-        "bot": 44
+        "bot": 47
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 26782,
+    "commits": 26842,
     "authors": 457,
     "new_authors": 338,
     "half_of_commits": 14
+  },
+  "humans": {
+    "commits": 167781,
+    "commits_by_year": {
+      "2015": 1398,
+      "2016": 12008,
+      "2017": 14565,
+      "2018": 16278,
+      "2019": 14857,
+      "2020": 15721,
+      "2021": 16233,
+      "2022": 13101,
+      "2023": 13103,
+      "2024": 11034,
+      "2025": 16400,
+      "2026": 23083
+    },
+    "active_days": 3907
+  },
+  "source_lines": {
+    "added": 14443348,
+    "current": 6600955
   }
 }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:44:26+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:38:56+00:00",
   "name": "Ruff",
   "report_path": "index.html",
   "first_commit": "2022-08-09 17:19:19",
-  "last_commit": "2026-10-23 16:42:22",
-  "age_days": 1536,
+  "last_commit": "2026-10-23 23:32:27",
+  "age_days": 1537,
   "active_days": 1469,
-  "total_commits": 17773,
+  "total_commits": 17782,
   "total_authors": 948,
-  "active_authors_12mo": 314,
-  "commits_last_12mo": 5131,
-  "total_files": 11264,
-  "total_lines": 2231916,
-  "lines_added": 4451685,
-  "lines_removed": 2219769,
+  "active_authors_12mo": 313,
+  "commits_last_12mo": 5140,
+  "total_files": 11265,
+  "total_lines": 2234193,
+  "lines_added": 4455476,
+  "lines_removed": 2221283,
   "total_tags": 432,
   "era": "steady",
   "top_authors": [
     {
       "name": "Charlie Marsh",
-      "commits": 4457
+      "commits": 4460
     },
     {
       "name": "Micha Reiser",
@@ -41,19 +41,19 @@
     }
   ],
   "author_commits": {
+    "Carl Meyer": 523,
+    "Brent Westbrook": 513,
+    "Anish Giri": 20,
+    "Charlie Marsh": 4460,
+    "Douglas Creager": 206,
     "Zanie Blue": 302,
-    "Douglas Creager": 205,
     "David Peter": 722,
-    "Brent Westbrook": 511,
     "zaniebot": 32,
     "Alex Waygood": 1309,
-    "Charlie Marsh": 4457,
-    "Carl Meyer": 521,
     "Micha Reiser": 1555,
     "L\u00e9r\u00e8": 103,
     "Francesco Pezzella": 1,
     "Zsolt Dollenstein": 35,
-    "Anish Giri": 19,
     "fixfon": 5,
     "konsti": 237,
     "Rajveer Singh": 1,
@@ -995,7 +995,7 @@
     "2023": 4573,
     "2024": 2969,
     "2025": 4478,
-    "2026": 4348
+    "2026": 4357
   },
   "ai_assisted": {
     "commits": 70,
@@ -1054,17 +1054,17 @@
       "2026-07": 563,
       "2026-08": 488,
       "2026-09": 464,
-      "2026-10": 310
+      "2026-10": 319
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17773,
+    "commits": 17782,
     "by_kind": {
-      "organization": 972,
-      "one_person": 3295,
-      "personal": 8909,
-      "hidden": 2740,
+      "organization": 974,
+      "one_person": 3296,
+      "personal": 8912,
+      "hidden": 2743,
       "unknown": 0,
       "bot": 1857
     },
@@ -1073,11 +1073,11 @@
     "top": [
       {
         "organization": "astral.sh",
-        "commits": 960,
-        "commits_last_12mo": 451,
+        "commits": 962,
+        "commits_last_12mo": 453,
         "addresses": 7,
         "first_commit": "2023-06-12",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "openai.com",
@@ -1154,10 +1154,10 @@
         "bot": 205
       },
       "2026-Q4": {
-        "organization": 37,
-        "one_person": 60,
-        "personal": 126,
-        "hidden": 42,
+        "organization": 39,
+        "one_person": 61,
+        "personal": 129,
+        "hidden": 45,
         "unknown": 0,
         "bot": 45
       }
@@ -1166,9 +1166,24 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4379,
+    "commits": 4388,
     "authors": 311,
     "new_authors": 230,
     "half_of_commits": 4
+  },
+  "humans": {
+    "commits": 15925,
+    "commits_by_year": {
+      "2022": 1405,
+      "2023": 4456,
+      "2024": 2464,
+      "2025": 3890,
+      "2026": 3710
+    },
+    "active_days": 1465
+  },
+  "source_lines": {
+    "added": 2791917,
+    "current": 1440024
   }
 }

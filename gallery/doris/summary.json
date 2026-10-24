@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:51:59+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:45:47+00:00",
   "name": "Apache Doris",
   "report_path": "index.html",
   "first_commit": "2017-08-11 09:51:21",
-  "last_commit": "2026-10-23 13:27:29",
+  "last_commit": "2026-10-24 08:34:31",
   "age_days": 3361,
-  "active_days": 2652,
-  "total_commits": 32761,
+  "active_days": 2653,
+  "total_commits": 32762,
   "total_authors": 776,
   "active_authors_12mo": 166,
-  "commits_last_12mo": 4457,
+  "commits_last_12mo": 4458,
   "total_files": 43561,
-  "total_lines": 11069490,
-  "lines_added": 16969884,
-  "lines_removed": 5900394,
+  "total_lines": 11069499,
+  "lines_added": 16969908,
+  "lines_removed": 5900409,
   "total_tags": 3,
   "era": "steady",
   "top_authors": [
@@ -41,8 +41,8 @@
     }
   ],
   "author_commits": {
+    "Jack": 414,
     "Socrates": 210,
-    "Jack": 413,
     "lihangyu": 483,
     "Gavin Chou": 195,
     "Oliveira": 17,
@@ -828,7 +828,7 @@
     "2023": 8087,
     "2024": 7748,
     "2025": 5271,
-    "2026": 3704
+    "2026": 3705
   },
   "ai_assisted": {
     "commits": 225,
@@ -888,14 +888,14 @@
       "2026-07": 431,
       "2026-08": 379,
       "2026-09": 513,
-      "2026-10": 388
+      "2026-10": 389
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 32761,
+    "commits": 32762,
     "by_kind": {
-      "organization": 9558,
+      "organization": 9559,
       "one_person": 179,
       "personal": 15468,
       "hidden": 7555,
@@ -907,11 +907,11 @@
     "top": [
       {
         "organization": "selectdb.com",
-        "commits": 8407,
-        "commits_last_12mo": 3601,
+        "commits": 8408,
+        "commits_last_12mo": 3602,
         "addresses": 71,
         "first_commit": "2023-01-22",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-24"
       },
       {
         "organization": "apache.org",
@@ -1012,7 +1012,7 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 271,
+        "organization": 272,
         "one_person": 5,
         "personal": 95,
         "hidden": 17,
@@ -1024,9 +1024,29 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4457,
+    "commits": 4458,
     "authors": 164,
     "new_authors": 74,
     "half_of_commits": 17
+  },
+  "humans": {
+    "commits": 32761,
+    "commits_by_year": {
+      "2017": 144,
+      "2018": 196,
+      "2019": 1008,
+      "2020": 1265,
+      "2021": 1067,
+      "2022": 4270,
+      "2023": 8087,
+      "2024": 7748,
+      "2025": 5271,
+      "2026": 3705
+    },
+    "active_days": 2653
+  },
+  "source_lines": {
+    "added": 16851972,
+    "current": 10922623
   }
 }

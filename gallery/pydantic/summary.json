@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:43:50+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:38:21+00:00",
   "name": "Pydantic",
   "report_path": "index.html",
   "first_commit": "2017-05-03 21:23:41",
@@ -10,7 +10,7 @@
   "active_days": 1416,
   "total_commits": 5845,
   "total_authors": 803,
-  "active_authors_12mo": 128,
+  "active_authors_12mo": 127,
   "commits_last_12mo": 611,
   "total_files": 851,
   "total_lines": 259536,
@@ -1022,5 +1022,25 @@
     "authors": 123,
     "new_authors": 110,
     "half_of_commits": 1
+  },
+  "humans": {
+    "commits": 5240,
+    "commits_by_year": {
+      "2017": 116,
+      "2018": 131,
+      "2019": 320,
+      "2020": 225,
+      "2021": 237,
+      "2022": 619,
+      "2023": 1663,
+      "2024": 927,
+      "2025": 577,
+      "2026": 425
+    },
+    "active_days": 1360
+  },
+  "source_lines": {
+    "added": 494947,
+    "current": 252885
   }
 }

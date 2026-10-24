@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:54:25+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:47:44+00:00",
   "name": "Node.js",
   "report_path": "index.html",
   "first_commit": "2009-02-16 00:02:00",
-  "last_commit": "2026-10-23 13:23:50",
-  "age_days": 6459,
-  "active_days": 6110,
-  "total_commits": 49205,
+  "last_commit": "2026-10-24 13:45:23",
+  "age_days": 6460,
+  "active_days": 6111,
+  "total_commits": 49213,
   "total_authors": 4375,
   "active_authors_12mo": 433,
-  "commits_last_12mo": 3815,
+  "commits_last_12mo": 3823,
   "total_files": 56553,
-  "total_lines": 17921486,
-  "lines_added": 41966669,
-  "lines_removed": 24045183,
+  "total_lines": 17921729,
+  "lines_added": 41967114,
+  "lines_removed": 24045385,
   "total_tags": 245,
   "era": "steady",
   "top_authors": [
@@ -41,7 +41,10 @@
     }
   ],
   "author_commits": {
-    "Filip Skokan": 624,
+    "Filip Skokan": 628,
+    "Trivikram Kamat": 212,
+    "Rafael Gonzaga": 478,
+    "Chengzhong Wu": 399,
     "Lazizbek Ergashev": 18,
     "Yuya Inoue": 26,
     "Antoine du Hamel": 1211,
@@ -49,8 +52,6 @@
     "Mert Can Altin": 55,
     "joao-oliveira-softtor": 2,
     "Guilherme Ara\u00fajo": 33,
-    "Trivikram Kamat": 211,
-    "Rafael Gonzaga": 476,
     "Christian Aurich Zanettini Martins": 24,
     "Efe Karasakal": 25,
     "Tamir Duberstein": 1,
@@ -60,7 +61,6 @@
     "Evgenii Kliuchnikov": 1,
     "James M Snell": 1412,
     "Marco Ippolito": 210,
-    "Chengzhong Wu": 398,
     "Node.js GitHub Bot": 1105,
     "Ulises Gasc\u00f3n": 18,
     "Nigro Simone": 6,
@@ -4435,15 +4435,15 @@
     "2023": 2700,
     "2024": 2606,
     "2025": 2556,
-    "2026": 3425
+    "2026": 3433
   },
   "ai_assisted": {
-    "commits": 616,
+    "commits": 619,
     "authored": 0,
     "assistants": {
-      "Codex": 217,
+      "Codex": 219,
       "OpenCode": 181,
-      "Claude": 98,
+      "Claude": 99,
       "ChatGPT": 81,
       "Pi": 16,
       "Unnamed assistant": 15,
@@ -4478,7 +4478,7 @@
       "2026-07": 39,
       "2026-08": 125,
       "2026-09": 217,
-      "2026-10": 124
+      "2026-10": 127
     },
     "commits_by_month": {
       "2024-11": 212,
@@ -4504,16 +4504,16 @@
       "2026-07": 341,
       "2026-08": 623,
       "2026-09": 600,
-      "2026-10": 300
+      "2026-10": 308
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 49205,
+    "commits": 49213,
     "by_kind": {
       "organization": 3234,
       "one_person": 17654,
-      "personal": 25595,
+      "personal": 25603,
       "hidden": 1236,
       "unknown": 23,
       "bot": 1463
@@ -5254,7 +5254,7 @@
       "2026-Q4": {
         "organization": 3,
         "one_person": 42,
-        "personal": 199,
+        "personal": 207,
         "hidden": 23,
         "unknown": 0,
         "bot": 33
@@ -5264,9 +5264,37 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3653,
+    "commits": 3661,
     "authors": 427,
     "new_authors": 269,
     "half_of_commits": 9
+  },
+  "humans": {
+    "commits": 47750,
+    "commits_by_year": {
+      "2009": 915,
+      "2010": 1954,
+      "2011": 2346,
+      "2012": 2368,
+      "2013": 1961,
+      "2014": 1076,
+      "2015": 2314,
+      "2016": 3159,
+      "2017": 4600,
+      "2018": 4685,
+      "2019": 4001,
+      "2020": 3370,
+      "2021": 2554,
+      "2022": 2423,
+      "2023": 2421,
+      "2024": 2294,
+      "2025": 2272,
+      "2026": 3037
+    },
+    "active_days": 6103
+  },
+  "source_lines": {
+    "added": 35411618,
+    "current": 15005226
   }
 }

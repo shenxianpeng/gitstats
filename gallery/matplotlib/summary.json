@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:43:54+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:38:19+00:00",
   "name": "Matplotlib",
   "report_path": "index.html",
   "first_commit": "2003-05-12 15:20:38",
-  "last_commit": "2026-10-23 04:01:20",
-  "age_days": 8565,
+  "last_commit": "2026-10-23 18:59:49",
+  "age_days": 8566,
   "active_days": 7021,
-  "total_commits": 55577,
+  "total_commits": 55584,
   "total_authors": 1837,
   "active_authors_12mo": 165,
-  "commits_last_12mo": 2048,
-  "total_files": 4608,
-  "total_lines": 570076,
-  "lines_added": 1902271,
-  "lines_removed": 1332195,
+  "commits_last_12mo": 2055,
+  "total_files": 4606,
+  "total_lines": 569251,
+  "lines_added": 1902541,
+  "lines_removed": 1333290,
   "total_tags": 142,
   "era": "steady",
   "top_authors": [
     {
       "name": "Thomas A Caswell",
-      "commits": 6978
+      "commits": 6979
     },
     {
       "name": "Elliott Sales de Andrade",
-      "commits": 6026
+      "commits": 6027
     },
     {
       "name": "Tim Hoffmann",
@@ -41,16 +41,17 @@
     }
   ],
   "author_commits": {
+    "Thomas A Caswell": 6979,
+    "Kyle Sunden": 1084,
     "Tim Hoffmann": 4727,
     "Ricci Adams": 67,
-    "Elliott Sales de Andrade": 6026,
+    "Elliott Sales de Andrade": 6027,
     "Christian Aurich Zanettini Martins": 2,
-    "Thomas A Caswell": 6978,
     "Omar Zagonel El Laden": 1,
     "Mohd Maaz Khan": 19,
+    "Greg Lucas": 344,
     "Ruth Comer": 620,
     "Anu Jangir": 1,
-    "Kyle Sunden": 1083,
     "Sebastian Torres": 3,
     "DavidVadnais": 1,
     "hannah": 660,
@@ -60,7 +61,6 @@
     "Albert Y. Shih": 74,
     "RYAN AKMAL PASYA": 1,
     "Qianye Su": 3,
-    "Greg Lucas": 340,
     "Ahmed Mohamed": 5,
     "Daniel Liu": 2,
     "Eric Larson": 50,
@@ -1903,7 +1903,7 @@
     "2023": 3663,
     "2024": 2332,
     "2025": 1843,
-    "2026": 1881
+    "2026": 1888
   },
   "ai_assisted": {
     "commits": 9,
@@ -1963,17 +1963,17 @@
       "2026-06": 248,
       "2026-07": 199,
       "2026-08": 135,
-      "2026-09": 173,
-      "2026-10": 135
+      "2026-09": 176,
+      "2026-10": 139
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 55577,
+    "commits": 55584,
     "by_kind": {
       "organization": 3522,
-      "one_person": 3478,
-      "personal": 42351,
+      "one_person": 3479,
+      "personal": 42357,
       "hidden": 6009,
       "unknown": 78,
       "bot": 139
@@ -2538,15 +2538,15 @@
       "2026-Q3": {
         "organization": 32,
         "one_person": 57,
-        "personal": 278,
+        "personal": 281,
         "hidden": 127,
         "unknown": 0,
         "bot": 13
       },
       "2026-Q4": {
         "organization": 3,
-        "one_person": 8,
-        "personal": 55,
+        "one_person": 9,
+        "personal": 58,
         "hidden": 66,
         "unknown": 0,
         "bot": 3
@@ -2556,9 +2556,43 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2006,
+    "commits": 2013,
     "authors": 162,
     "new_authors": 121,
     "half_of_commits": 3
+  },
+  "humans": {
+    "commits": 55445,
+    "commits_by_year": {
+      "2003": 88,
+      "2004": 673,
+      "2005": 549,
+      "2006": 644,
+      "2007": 1160,
+      "2008": 1502,
+      "2009": 1117,
+      "2010": 712,
+      "2011": 1172,
+      "2012": 1826,
+      "2013": 2004,
+      "2014": 2173,
+      "2015": 3445,
+      "2016": 3449,
+      "2017": 3642,
+      "2018": 4268,
+      "2019": 4535,
+      "2020": 4753,
+      "2021": 4319,
+      "2022": 3806,
+      "2023": 3641,
+      "2024": 2301,
+      "2025": 1818,
+      "2026": 1848
+    },
+    "active_days": 7018
+  },
+  "source_lines": {
+    "added": 2186133,
+    "current": 801238
   }
 }

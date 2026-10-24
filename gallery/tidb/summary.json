@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:52:24+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:46:02+00:00",
   "name": "TiDB",
   "report_path": "index.html",
   "first_commit": "2015-09-06 04:04:42",
-  "last_commit": "2026-10-23 11:13:43",
-  "age_days": 4066,
-  "active_days": 3409,
-  "total_commits": 28777,
+  "last_commit": "2026-10-24 11:51:56",
+  "age_days": 4067,
+  "active_days": 3410,
+  "total_commits": 28778,
   "total_authors": 993,
   "active_authors_12mo": 138,
-  "commits_last_12mo": 1707,
+  "commits_last_12mo": 1708,
   "total_files": 7838,
-  "total_lines": 2575056,
-  "lines_added": 9972531,
-  "lines_removed": 7397475,
+  "total_lines": 2575264,
+  "lines_added": 9972744,
+  "lines_removed": 7397480,
   "total_tags": 54,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Chao Wang": 495,
     "D3Hunter": 706,
     "Ruihao Chen": 124,
     "Jiong": 9,
@@ -80,7 +81,6 @@
     "YiBo Chen": 3,
     "ystaticy": 26,
     "wjHuang": 477,
-    "Chao Wang": 494,
     "JaySon": 23,
     "Chunzhu Li": 51,
     "Jianyuan Jiang": 7,
@@ -1047,7 +1047,7 @@
     "2023": 3184,
     "2024": 2840,
     "2025": 1979,
-    "2026": 1416
+    "2026": 1417
   },
   "ai_assisted": {
     "commits": 4,
@@ -1105,16 +1105,16 @@
       "2026-07": 123,
       "2026-08": 118,
       "2026-09": 157,
-      "2026-10": 86
+      "2026-10": 87
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 28777,
+    "commits": 28778,
     "by_kind": {
       "organization": 4090,
       "one_person": 1533,
-      "personal": 19672,
+      "personal": 19673,
       "hidden": 3214,
       "unknown": 2,
       "bot": 266
@@ -1279,7 +1279,7 @@
       "2026-Q4": {
         "organization": 12,
         "one_person": 14,
-        "personal": 38,
+        "personal": 39,
         "hidden": 22,
         "unknown": 0,
         "bot": 0
@@ -1289,9 +1289,31 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1689,
+    "commits": 1690,
     "authors": 138,
     "new_authors": 55,
     "half_of_commits": 9
+  },
+  "humans": {
+    "commits": 28512,
+    "commits_by_year": {
+      "2015": 2528,
+      "2016": 1541,
+      "2017": 2008,
+      "2018": 1744,
+      "2019": 2606,
+      "2020": 2675,
+      "2021": 3267,
+      "2022": 2979,
+      "2023": 3099,
+      "2024": 2767,
+      "2025": 1904,
+      "2026": 1394
+    },
+    "active_days": 3389
+  },
+  "source_lines": {
+    "added": 8126550,
+    "current": 2420863
   }
 }

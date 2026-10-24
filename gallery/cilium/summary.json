@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:48:11+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:42:19+00:00",
   "name": "Cilium",
   "report_path": "index.html",
   "first_commit": "2015-12-16 12:33:31",
-  "last_commit": "2026-10-23 09:49:03",
-  "age_days": 3964,
+  "last_commit": "2026-10-23 14:57:57",
+  "age_days": 3965,
   "active_days": 3526,
-  "total_commits": 45258,
+  "total_commits": 45262,
   "total_authors": 1343,
   "active_authors_12mo": 346,
-  "commits_last_12mo": 5233,
+  "commits_last_12mo": 5237,
   "total_files": 27350,
-  "total_lines": 6719654,
-  "lines_added": 18946195,
-  "lines_removed": 12226541,
+  "total_lines": 6719812,
+  "lines_added": 18946367,
+  "lines_removed": 12226555,
   "total_tags": 142,
   "era": "steady",
   "top_authors": [
     {
       "name": "Andr\u00e9 Martins",
-      "commits": 3973
+      "commits": 3974
     },
     {
       "name": "Thomas Graf",
@@ -41,8 +41,10 @@
     }
   ],
   "author_commits": {
-    "Andr\u00e9 Martins": 3973,
-    "Alex Melhem": 47,
+    "Alex Melhem": 48,
+    "Chris Tarazi": 680,
+    "Andr\u00e9 Martins": 3974,
+    "Aleksei Sviridkin": 6,
     "Leonardo Di Giovanna": 43,
     "Aleksandr Rybolovlev": 24,
     "Himanshu Verma": 9,
@@ -66,7 +68,6 @@
     "Steven Johnson": 12,
     "Andrea Terzolo": 59,
     "Hadrien Patte": 342,
-    "Chris Tarazi": 679,
     "Eddie Burns": 1,
     "Jarno Rajahalme": 1641,
     "Rongzheng Wang": 8,
@@ -120,7 +121,6 @@
     "Vipul Singh": 64,
     "Ankita Ojha": 1,
     "Feroz Salam": 41,
-    "Aleksei Sviridkin": 5,
     "Olivier Calzi": 1,
     "Andrea Lattuada": 3,
     "Gyutae Bae": 17,
@@ -1397,7 +1397,7 @@
     "2023": 6497,
     "2024": 5768,
     "2025": 5811,
-    "2026": 4299
+    "2026": 4303
   },
   "ai_assisted": {
     "commits": 2,
@@ -1455,16 +1455,16 @@
       "2026-06": 418,
       "2026-07": 552,
       "2026-08": 538,
-      "2026-09": 536,
-      "2026-10": 258
+      "2026-09": 537,
+      "2026-10": 261
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 45258,
+    "commits": 45262,
     "by_kind": {
-      "organization": 33614,
-      "one_person": 3996,
+      "organization": 33617,
+      "one_person": 3997,
       "personal": 4435,
       "hidden": 663,
       "unknown": 3,
@@ -1475,16 +1475,16 @@
     "top": [
       {
         "organization": "isovalent.com",
-        "commits": 14263,
-        "commits_last_12mo": 2257,
+        "commits": 14264,
+        "commits_last_12mo": 2258,
         "addresses": 90,
         "first_commit": "2017-06-05",
         "last_commit": "2026-10-22"
       },
       {
         "organization": "cilium.io",
-        "commits": 13567,
-        "commits_last_12mo": 733,
+        "commits": 13568,
+        "commits_last_12mo": 734,
         "addresses": 12,
         "first_commit": "2015-12-16",
         "last_commit": "2026-10-23"
@@ -1515,8 +1515,8 @@
       },
       {
         "organization": "datadoghq.com",
-        "commits": 551,
-        "commits_last_12mo": 326,
+        "commits": 552,
+        "commits_last_12mo": 327,
         "addresses": 12,
         "first_commit": "2019-07-11",
         "last_commit": "2026-10-22"
@@ -2005,14 +2005,14 @@
       },
       "2026-Q3": {
         "organization": 1121,
-        "one_person": 85,
+        "one_person": 86,
         "personal": 234,
         "hidden": 47,
         "unknown": 0,
         "bot": 139
       },
       "2026-Q4": {
-        "organization": 148,
+        "organization": 151,
         "one_person": 3,
         "personal": 71,
         "hidden": 9,
@@ -2024,9 +2024,31 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4815,
+    "commits": 4819,
     "authors": 340,
     "new_authors": 203,
     "half_of_commits": 13
+  },
+  "humans": {
+    "commits": 42715,
+    "commits_by_year": {
+      "2015": 21,
+      "2016": 1320,
+      "2017": 2109,
+      "2018": 3955,
+      "2019": 3511,
+      "2020": 4504,
+      "2021": 3246,
+      "2022": 3579,
+      "2023": 5916,
+      "2024": 5228,
+      "2025": 5346,
+      "2026": 3980
+    },
+    "active_days": 3502
+  },
+  "source_lines": {
+    "added": 3217558,
+    "current": 1378939
   }
 }

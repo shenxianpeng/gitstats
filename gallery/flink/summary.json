@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:49:15+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:43:10+00:00",
   "name": "Apache Flink",
   "report_path": "index.html",
   "first_commit": "2010-12-15 16:02:01",
-  "last_commit": "2026-10-23 16:28:55",
+  "last_commit": "2026-10-24 14:24:41",
   "age_days": 5792,
-  "active_days": 4884,
-  "total_commits": 38703,
+  "active_days": 4885,
+  "total_commits": 38707,
   "total_authors": 1772,
   "active_authors_12mo": 171,
-  "commits_last_12mo": 1448,
-  "total_files": 27292,
-  "total_lines": 4045552,
-  "lines_added": 10662380,
-  "lines_removed": 6616828,
+  "commits_last_12mo": 1452,
+  "total_files": 27295,
+  "total_lines": 4047253,
+  "lines_added": 10664603,
+  "lines_removed": 6617350,
   "total_tags": 2,
   "era": "steady",
   "top_authors": [
@@ -41,7 +41,9 @@
     }
   ],
   "author_commits": {
-    "Sergey Nuyanzin": 604,
+    "Yuepeng Pan": 176,
+    "Sergey Nuyanzin": 606,
+    "bowenli86": 233,
     "Gustavo de Morais": 88,
     "Efrat Levitan": 22,
     "Purushottam Sinha": 40,
@@ -59,7 +61,6 @@
     "Ramin Gharib": 93,
     "Liu Liu": 19,
     "Sangkyoon Nam": 1,
-    "Yuepeng Pan": 175,
     "Mohsen Rezaei": 3,
     "Victor Wang": 1,
     "Weiqing Yang": 16,
@@ -103,7 +104,6 @@
     "Samrat": 40,
     "Chris Lu": 2,
     "Vishal Kamlapure": 3,
-    "bowenli86": 232,
     "weicheng-07": 1,
     "Archit Goyal": 6,
     "Lorenzo Nicora": 3,
@@ -1831,7 +1831,7 @@
     "2023": 2085,
     "2024": 1658,
     "2025": 1064,
-    "2026": 1315
+    "2026": 1319
   },
   "ai_assisted": {
     "commits": 194,
@@ -1894,17 +1894,17 @@
       "2026-06": 141,
       "2026-07": 205,
       "2026-08": 120,
-      "2026-09": 158,
-      "2026-10": 120
+      "2026-09": 159,
+      "2026-10": 123
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38703,
+    "commits": 38707,
     "by_kind": {
-      "organization": 20793,
+      "organization": 20794,
       "one_person": 1245,
-      "personal": 15419,
+      "personal": 15422,
       "hidden": 1121,
       "unknown": 109,
       "bot": 16
@@ -1914,8 +1914,8 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 12610,
-        "commits_last_12mo": 123,
+        "commits": 12611,
+        "commits_last_12mo": 124,
         "addresses": 85,
         "first_commit": "2012-05-11",
         "last_commit": "2026-10-20"
@@ -2515,7 +2515,7 @@
         "bot": 0
       },
       "2026-Q3": {
-        "organization": 135,
+        "organization": 136,
         "one_person": 9,
         "personal": 259,
         "hidden": 78,
@@ -2525,7 +2525,7 @@
       "2026-Q4": {
         "organization": 31,
         "one_person": 4,
-        "personal": 50,
+        "personal": 53,
         "hidden": 34,
         "unknown": 0,
         "bot": 1
@@ -2535,9 +2535,36 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1445,
+    "commits": 1449,
     "authors": 169,
     "new_authors": 90,
     "half_of_commits": 8
+  },
+  "humans": {
+    "commits": 38691,
+    "commits_by_year": {
+      "2010": 37,
+      "2011": 1880,
+      "2012": 1518,
+      "2013": 509,
+      "2014": 2084,
+      "2015": 2146,
+      "2016": 2035,
+      "2017": 2541,
+      "2018": 2702,
+      "2019": 4589,
+      "2020": 5235,
+      "2021": 4214,
+      "2022": 3083,
+      "2023": 2080,
+      "2024": 1658,
+      "2025": 1064,
+      "2026": 1316
+    },
+    "active_days": 4884
+  },
+  "source_lines": {
+    "added": 11364965,
+    "current": 3864747
   }
 }

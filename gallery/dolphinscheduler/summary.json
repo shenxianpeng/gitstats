@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:51:26+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:44:59+00:00",
   "name": "Apache DolphinScheduler",
   "report_path": "index.html",
   "first_commit": "2019-03-01 16:39:25",
-  "last_commit": "2026-10-23 12:01:45",
-  "age_days": 2793,
-  "active_days": 1900,
-  "total_commits": 9109,
-  "total_authors": 675,
+  "last_commit": "2026-10-24 06:03:45",
+  "age_days": 2794,
+  "active_days": 1901,
+  "total_commits": 9111,
+  "total_authors": 676,
   "active_authors_12mo": 69,
-  "commits_last_12mo": 352,
+  "commits_last_12mo": 354,
   "total_files": 4874,
-  "total_lines": 450099,
-  "lines_added": 1679663,
-  "lines_removed": 1229564,
+  "total_lines": 450586,
+  "lines_added": 1680174,
+  "lines_removed": 1229588,
   "total_tags": 8,
   "era": "quiet",
   "top_authors": [
@@ -41,8 +41,9 @@
     }
   ],
   "author_commits": {
+    "silvermissile": 1,
+    "Kerwin": 208,
     "mengzhe gan": 5,
-    "Kerwin": 207,
     "Ethan": 1,
     "suyc": 58,
     "wank125": 1,
@@ -725,7 +726,7 @@
     "2023": 571,
     "2024": 429,
     "2025": 224,
-    "2026": 300
+    "2026": 302
   },
   "ai_assisted": {
     "commits": 1,
@@ -783,17 +784,17 @@
       "2026-07": 11,
       "2026-08": 23,
       "2026-09": 26,
-      "2026-10": 25
+      "2026-10": 27
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9109,
+    "commits": 9111,
     "by_kind": {
       "organization": 1582,
       "one_person": 417,
-      "personal": 5328,
-      "hidden": 1779,
+      "personal": 5329,
+      "hidden": 1780,
       "unknown": 1,
       "bot": 2
     },
@@ -893,8 +894,8 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 1,
-        "personal": 16,
-        "hidden": 8,
+        "personal": 17,
+        "hidden": 9,
         "unknown": 0,
         "bot": 0
       }
@@ -903,9 +904,27 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 352,
-    "authors": 67,
-    "new_authors": 52,
+    "commits": 354,
+    "authors": 68,
+    "new_authors": 53,
     "half_of_commits": 2
+  },
+  "humans": {
+    "commits": 9109,
+    "commits_by_year": {
+      "2019": 1889,
+      "2020": 2359,
+      "2021": 1426,
+      "2022": 1909,
+      "2023": 571,
+      "2024": 429,
+      "2025": 224,
+      "2026": 302
+    },
+    "active_days": 1901
+  },
+  "source_lines": {
+    "added": 1829484,
+    "current": 442207
   }
 }

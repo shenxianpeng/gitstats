@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:50:16+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:44:09+00:00",
   "name": "Nuxt",
   "report_path": "index.html",
   "first_commit": "2016-10-26 11:18:47",
-  "last_commit": "2026-10-23 15:03:33",
-  "age_days": 3650,
-  "active_days": 2623,
-  "total_commits": 15844,
+  "last_commit": "2026-10-24 14:41:18",
+  "age_days": 3651,
+  "active_days": 2624,
+  "total_commits": 15848,
   "total_authors": 1300,
-  "active_authors_12mo": 181,
-  "commits_last_12mo": 1590,
-  "total_files": 2470,
-  "total_lines": 216739,
-  "lines_added": 1010132,
-  "lines_removed": 793393,
+  "active_authors_12mo": 180,
+  "commits_last_12mo": 1594,
+  "total_files": 2487,
+  "total_lines": 217461,
+  "lines_added": 1010924,
+  "lines_removed": 793463,
   "total_tags": 269,
   "era": "steady",
   "top_authors": [
     {
       "name": "Daniel Roe",
-      "commits": 3717
+      "commits": 3721
     },
     {
       "name": "Pooya Parsa",
@@ -41,8 +41,8 @@
     }
   ],
   "author_commits": {
+    "Daniel Roe": 3721,
     "Gareth": 4,
-    "Daniel Roe": 3717,
     "S\u00e9bastien Chopin": 1315,
     "Baptiste Leproux": 4,
     "Hugo": 8,
@@ -1353,7 +1353,7 @@
     "2023": 2123,
     "2024": 1825,
     "2025": 1398,
-    "2026": 1432
+    "2026": 1436
   },
   "ai_assisted": {
     "commits": 20,
@@ -1413,15 +1413,15 @@
       "2026-07": 284,
       "2026-08": 182,
       "2026-09": 215,
-      "2026-10": 120
+      "2026-10": 124
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15844,
+    "commits": 15848,
     "by_kind": {
       "organization": 243,
-      "one_person": 6813,
+      "one_person": 6817,
       "personal": 4780,
       "hidden": 949,
       "unknown": 0,
@@ -1530,7 +1530,7 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 81,
+        "one_person": 85,
         "personal": 19,
         "hidden": 13,
         "unknown": 0,
@@ -1541,9 +1541,30 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1367,
+    "commits": 1371,
     "authors": 178,
     "new_authors": 119,
     "half_of_commits": 1
+  },
+  "humans": {
+    "commits": 12789,
+    "commits_by_year": {
+      "2016": 353,
+      "2017": 1647,
+      "2018": 1471,
+      "2019": 740,
+      "2020": 690,
+      "2021": 1187,
+      "2022": 1620,
+      "2023": 1558,
+      "2024": 1218,
+      "2025": 1062,
+      "2026": 1243
+    },
+    "active_days": 2451
+  },
+  "source_lines": {
+    "added": 651629,
+    "current": 173081
   }
 }

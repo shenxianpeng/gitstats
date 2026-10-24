@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:47:44+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:42:02+00:00",
   "name": "Istio",
   "report_path": "index.html",
   "first_commit": "2016-11-18 23:57:24",
-  "last_commit": "2026-10-23 16:19:38",
-  "age_days": 3626,
-  "active_days": 3349,
-  "total_commits": 26796,
+  "last_commit": "2026-10-24 16:53:34",
+  "age_days": 3627,
+  "active_days": 3350,
+  "total_commits": 26797,
   "total_authors": 1284,
   "active_authors_12mo": 165,
-  "commits_last_12mo": 1228,
+  "commits_last_12mo": 1229,
   "total_files": 6774,
   "total_lines": 989639,
-  "lines_added": 8127892,
-  "lines_removed": 7138253,
+  "lines_added": 8127893,
+  "lines_removed": 7138254,
   "total_tags": 54,
   "era": "steady",
   "top_authors": [
     {
       "name": "Istio Automation",
-      "commits": 4184
+      "commits": 4185
     },
     {
       "name": "John Howard",
@@ -41,9 +41,9 @@
     }
   ],
   "author_commits": {
+    "Istio Automation": 4185,
     "John Howard": 3640,
     "Max Xu": 1,
-    "Istio Automation": 4184,
     "Michael Fraenkel": 24,
     "Petr McAllister": 89,
     "Junho Baek": 4,
@@ -1337,7 +1337,7 @@
     "2023": 2538,
     "2024": 2341,
     "2025": 1459,
-    "2026": 1069
+    "2026": 1070
   },
   "ai_assisted": {
     "commits": 22,
@@ -1397,19 +1397,19 @@
       "2026-07": 95,
       "2026-08": 122,
       "2026-09": 137,
-      "2026-10": 110
+      "2026-10": 111
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 26796,
+    "commits": 26797,
     "by_kind": {
       "organization": 12976,
       "one_person": 919,
       "personal": 4499,
       "hidden": 4462,
       "unknown": 0,
-      "bot": 3940
+      "bot": 3941
     },
     "organization_count": 30,
     "last_12mo_from": "2025-11",
@@ -1718,16 +1718,37 @@
         "personal": 26,
         "hidden": 6,
         "unknown": 0,
-        "bot": 40
+        "bot": 41
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1224,
+    "commits": 1225,
     "authors": 164,
     "new_authors": 101,
     "half_of_commits": 6
+  },
+  "humans": {
+    "commits": 22856,
+    "commits_by_year": {
+      "2016": 134,
+      "2017": 2811,
+      "2018": 3468,
+      "2019": 4309,
+      "2020": 3418,
+      "2021": 2249,
+      "2022": 1678,
+      "2023": 1702,
+      "2024": 1497,
+      "2025": 849,
+      "2026": 741
+    },
+    "active_days": 3111
+  },
+  "source_lines": {
+    "added": 3412257,
+    "current": 727847
   }
 }

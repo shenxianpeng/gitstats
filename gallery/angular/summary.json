@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:50:23+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:44:39+00:00",
   "name": "Angular",
   "report_path": "index.html",
   "first_commit": "2014-09-18 16:12:01",
-  "last_commit": "2026-10-23 12:44:27",
-  "age_days": 4418,
-  "active_days": 4190,
-  "total_commits": 39035,
-  "total_authors": 2483,
-  "active_authors_12mo": 239,
-  "commits_last_12mo": 3860,
+  "last_commit": "2026-10-24 14:18:40",
+  "age_days": 4419,
+  "active_days": 4191,
+  "total_commits": 39070,
+  "total_authors": 2484,
+  "active_authors_12mo": 238,
+  "commits_last_12mo": 3895,
   "total_files": 11725,
-  "total_lines": 1951701,
-  "lines_added": 8978395,
-  "lines_removed": 7026694,
+  "total_lines": 1953929,
+  "lines_added": 8981296,
+  "lines_removed": 7027367,
   "total_tags": 494,
   "era": "steady",
   "top_authors": [
@@ -28,12 +28,12 @@
       "commits": 1771
     },
     {
-      "name": "Angular Robot",
-      "commits": 1566
+      "name": "Kristiyan Kostadinov",
+      "commits": 1585
     },
     {
-      "name": "Kristiyan Kostadinov",
-      "commits": 1564
+      "name": "Angular Robot",
+      "commits": 1567
     },
     {
       "name": "Paul Gschwendtner",
@@ -41,29 +41,30 @@
     }
   ],
   "author_commits": {
-    "Angular Robot": 1566,
-    "Charles Lyding": 147,
-    "Kam": 249,
+    "Kam": 252,
+    "lazerg": 13,
+    "Angular Robot": 1567,
+    "Ilyoskhuja": 1,
+    "Shuaib Hasan Akib": 227,
+    "Charles Lyding": 148,
+    "aparziale": 77,
+    "Amine": 16,
+    "Andrew Scott": 1416,
+    "Kristiyan Kostadinov": 1585,
     "Matthieu Riegler": 1315,
     "Matthew Beck": 94,
-    "Shuaib Hasan Akib": 224,
     "Vadim Vinogradov": 4,
     "Matt Berry": 3,
-    "Andrew Scott": 1415,
-    "aparziale": 76,
     "jaybell": 5,
     "\u041c\u0430\u043a\u0441\u0438\u043c \u0418\u0432\u0430\u043d\u043e\u0432": 29,
-    "Kristiyan Kostadinov": 1564,
     "Minho Yoo": 3,
     "SkyZeroZx": 444,
     "arturovt": 283,
-    "lazerg": 12,
     "Doug Parker": 252,
     "Naveed Khan": 6,
     "diegoinost02": 5,
     "Michael Small": 28,
     "Alon Mishne": 17,
-    "Amine": 14,
     "TTNAN": 1,
     "jhjh1214": 8,
     "Dan Russell": 2,
@@ -2538,7 +2539,7 @@
     "2023": 2978,
     "2024": 2880,
     "2025": 4050,
-    "2026": 3041
+    "2026": 3076
   },
   "ai_assisted": {
     "commits": 3,
@@ -2595,18 +2596,18 @@
       "2026-06": 299,
       "2026-07": 233,
       "2026-08": 236,
-      "2026-09": 358,
-      "2026-10": 314
+      "2026-09": 359,
+      "2026-10": 348
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39035,
+    "commits": 39070,
     "by_kind": {
-      "organization": 9214,
-      "one_person": 8737,
-      "personal": 18108,
-      "hidden": 2325,
+      "organization": 9215,
+      "one_person": 8758,
+      "personal": 18120,
+      "hidden": 2326,
       "unknown": 1,
       "bot": 650
     },
@@ -2615,11 +2616,11 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 7778,
-        "commits_last_12mo": 885,
+        "commits": 7779,
+        "commits_last_12mo": 886,
         "addresses": 137,
         "first_commit": "2014-10-28",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-24"
       },
       {
         "organization": "angular.io",
@@ -2850,16 +2851,16 @@
       "2026-Q3": {
         "organization": 143,
         "one_person": 94,
-        "personal": 455,
+        "personal": 456,
         "hidden": 135,
         "unknown": 0,
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 44,
-        "one_person": 122,
-        "personal": 125,
-        "hidden": 23,
+        "organization": 45,
+        "one_person": 143,
+        "personal": 136,
+        "hidden": 24,
         "unknown": 0,
         "bot": 0
       }
@@ -2868,9 +2869,32 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3860,
-    "authors": 234,
-    "new_authors": 156,
+    "commits": 3895,
+    "authors": 235,
+    "new_authors": 157,
     "half_of_commits": 6
+  },
+  "humans": {
+    "commits": 38420,
+    "commits_by_year": {
+      "2014": 316,
+      "2015": 3366,
+      "2016": 2614,
+      "2017": 3001,
+      "2018": 3253,
+      "2019": 4152,
+      "2020": 3534,
+      "2021": 2897,
+      "2022": 2305,
+      "2023": 2976,
+      "2024": 2880,
+      "2025": 4050,
+      "2026": 3076
+    },
+    "active_days": 4181
+  },
+  "source_lines": {
+    "added": 6180471,
+    "current": 1746234
   }
 }

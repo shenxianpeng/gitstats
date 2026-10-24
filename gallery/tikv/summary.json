@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:48:39+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:42:33+00:00",
   "name": "TiKV",
   "report_path": "index.html",
   "first_commit": "2016-01-07 05:02:04",
-  "last_commit": "2026-10-22 05:04:14",
-  "age_days": 3942,
-  "active_days": 2599,
-  "total_commits": 8535,
+  "last_commit": "2026-10-23 21:37:29",
+  "age_days": 3943,
+  "active_days": 2600,
+  "total_commits": 8536,
   "total_authors": 474,
   "active_authors_12mo": 66,
-  "commits_last_12mo": 216,
+  "commits_last_12mo": 217,
   "total_files": 1552,
-  "total_lines": 848689,
-  "lines_added": 1599449,
-  "lines_removed": 750760,
+  "total_lines": 850722,
+  "lines_added": 1601649,
+  "lines_removed": 750927,
   "total_tags": 47,
   "era": "quiet",
   "top_authors": [
@@ -41,12 +41,12 @@
     }
   ],
   "author_commits": {
+    "mittalrishabh": 13,
     "Vlad Dmitriev": 5,
     "Sanket Kedia": 2,
     "lucasliang": 119,
     "ris": 7,
     "Dongpo Liu": 10,
-    "mittalrishabh": 12,
     "expxiaoli": 1,
     "Wenxuan": 236,
     "Ziqian Qin": 47,
@@ -527,7 +527,7 @@
     "2023": 642,
     "2024": 509,
     "2025": 253,
-    "2026": 184
+    "2026": 185
   },
   "ai_assisted": {
     "commits": 4,
@@ -586,16 +586,16 @@
       "2026-07": 21,
       "2026-08": 35,
       "2026-09": 12,
-      "2026-10": 9
+      "2026-10": 10
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8535,
+    "commits": 8536,
     "by_kind": {
       "organization": 1003,
       "one_person": 747,
-      "personal": 5325,
+      "personal": 5326,
       "hidden": 1408,
       "unknown": 4,
       "bot": 48
@@ -696,7 +696,7 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 0,
-        "personal": 8,
+        "personal": 9,
         "hidden": 1,
         "unknown": 0,
         "bot": 0
@@ -706,9 +706,30 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 216,
+    "commits": 217,
     "authors": 66,
     "new_authors": 29,
     "half_of_commits": 11
+  },
+  "humans": {
+    "commits": 8488,
+    "commits_by_year": {
+      "2016": 1887,
+      "2017": 703,
+      "2018": 721,
+      "2019": 1083,
+      "2020": 1044,
+      "2021": 767,
+      "2022": 715,
+      "2023": 642,
+      "2024": 501,
+      "2025": 247,
+      "2026": 178
+    },
+    "active_days": 2591
+  },
+  "source_lines": {
+    "added": 1585894,
+    "current": 838855
   }
 }

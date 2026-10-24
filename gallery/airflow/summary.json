@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:49:18+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:43:29+00:00",
   "name": "Apache Airflow",
   "report_path": "index.html",
   "first_commit": "2014-10-06 21:29:38",
-  "last_commit": "2026-10-23 16:18:55",
-  "age_days": 4400,
-  "active_days": 4022,
-  "total_commits": 42404,
-  "total_authors": 4358,
+  "last_commit": "2026-10-24 16:05:32",
+  "age_days": 4401,
+  "active_days": 4023,
+  "total_commits": 42426,
+  "total_authors": 4359,
   "active_authors_12mo": 908,
-  "commits_last_12mo": 8485,
-  "total_files": 15092,
-  "total_lines": 2930090,
-  "lines_added": 6298937,
-  "lines_removed": 3368847,
+  "commits_last_12mo": 8507,
+  "total_files": 15102,
+  "total_lines": 2934209,
+  "lines_added": 6303959,
+  "lines_removed": 3369750,
   "total_tags": 9785,
   "era": "surge",
   "top_authors": [
     {
       "name": "Jarek Potiuk",
-      "commits": 5173
+      "commits": 5174
     },
     {
       "name": "Kaxil Naik",
-      "commits": 2250
+      "commits": 2253
     },
     {
       "name": "Maxime Beauchemin",
@@ -41,40 +41,43 @@
     }
   ],
   "author_commits": {
-    "Parv Goyal": 2,
-    "Kaxil Naik": 2250,
+    "Henry Chen": 155,
+    "Jarek Potiuk": 5174,
+    "Jason(Zhe-You) Liu": 361,
+    "Parv Goyal": 3,
+    "Shahar Epstein": 320,
+    "Jed Cunningham": 817,
+    "Kaxil Naik": 2253,
+    "Ramit Kataria": 63,
+    "Sean Ghaeli": 44,
+    "Stephen Yang": 1,
+    "PoAn Yang": 127,
+    "Shivam Rastogi": 38,
     "Jingi Kim": 4,
     "Kacper Muda": 239,
     "\uae40\ub09c\ud76c": 1,
     "Zhen-Lun (Kevin) Hong": 49,
     "CA": 6,
-    "Jason(Zhe-You) Liu": 360,
     "Rahul Vats": 204,
     "Mohamed Laghdaf Dadda": 1,
     "Jeff(Wei-Hao) Lu": 10,
-    "Jed Cunningham": 816,
     "Alejandro Morgante": 20,
     "Niko Oliveira": 271,
     "Vincent Hsiao": 27,
-    "Jarek Potiuk": 5173,
     "Andrey Karazhev": 1,
     "Zach": 13,
     "Brent Bovenzi": 647,
     "stephen-bracken": 23,
-    "Sean Ghaeli": 42,
     "David Blain": 166,
     "Pierre Jeambrun": 654,
     "Arthur": 8,
-    "PoAn Yang": 126,
     "Anmol Mishra": 14,
     "ChickenBenny": 2,
-    "Shahar Epstein": 318,
     "Wei Lee": 603,
     "Himanshu Chawla": 6,
     "Souradeep Biswas": 1,
     "Yuseok Jo": 80,
     "Jens Scheffler": 758,
-    "Ramit Kataria": 59,
     "Anzin Mohammed": 2,
     "Hussein Awala": 376,
     "Y-C": 58,
@@ -87,9 +90,7 @@
     "Julian LaNeve": 12,
     "Pushkal Gupta": 8,
     "Dheeraj Turaga": 135,
-    "Henry Chen": 154,
     "Tzu-ping Chung": 687,
-    "Shivam Rastogi": 37,
     "Mathieu Monet": 11,
     "Ephraim Anierobi": 689,
     "Pankaj Singh": 115,
@@ -4413,13 +4414,13 @@
     "2023": 4159,
     "2024": 4857,
     "2025": 7583,
-    "2026": 7356
+    "2026": 7378
   },
   "ai_assisted": {
-    "commits": 453,
+    "commits": 454,
     "authored": 0,
     "assistants": {
-      "Claude": 378,
+      "Claude": 379,
       "GitHub Copilot": 55,
       "Cursor": 22,
       "ChatGPT": 3,
@@ -4450,7 +4451,7 @@
       "2026-07": 27,
       "2026-08": 25,
       "2026-09": 83,
-      "2026-10": 131
+      "2026-10": 132
     },
     "commits_by_month": {
       "2024-11": 552,
@@ -4476,30 +4477,30 @@
       "2026-07": 788,
       "2026-08": 614,
       "2026-09": 829,
-      "2026-10": 804
+      "2026-10": 826
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 42404,
+    "commits": 42426,
     "by_kind": {
-      "organization": 8734,
-      "one_person": 8491,
-      "personal": 12047,
-      "hidden": 12389,
+      "organization": 8739,
+      "one_person": 8496,
+      "personal": 12049,
+      "hidden": 12396,
       "unknown": 40,
-      "bot": 703
+      "bot": 706
     },
     "organization_count": 86,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "apache.org",
-        "commits": 5832,
-        "commits_last_12mo": 667,
+        "commits": 5837,
+        "commits_last_12mo": 672,
         "addresses": 27,
         "first_commit": "2014-10-06",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-24"
       },
       {
         "organization": "astronomer.io",
@@ -5240,21 +5241,44 @@
         "bot": 158
       },
       "2026-Q4": {
-        "organization": 246,
-        "one_person": 90,
-        "personal": 164,
-        "hidden": 252,
+        "organization": 251,
+        "one_person": 95,
+        "personal": 166,
+        "hidden": 259,
         "unknown": 0,
-        "bot": 52
+        "bot": 55
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 8012,
-    "authors": 895,
-    "new_authors": 697,
+    "commits": 8031,
+    "authors": 896,
+    "new_authors": 698,
     "half_of_commits": 21
+  },
+  "humans": {
+    "commits": 41720,
+    "commits_by_year": {
+      "2014": 214,
+      "2015": 2084,
+      "2016": 1337,
+      "2017": 787,
+      "2018": 1276,
+      "2019": 1983,
+      "2020": 3567,
+      "2021": 3359,
+      "2022": 3807,
+      "2023": 4146,
+      "2024": 4829,
+      "2025": 7415,
+      "2026": 6916
+    },
+    "active_days": 4023
+  },
+  "source_lines": {
+    "added": 5853681,
+    "current": 2824299
   }
 }

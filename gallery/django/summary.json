@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:44:02+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:38:19+00:00",
   "name": "Django",
   "report_path": "index.html",
   "first_commit": "2005-07-13 01:25:57",
   "last_commit": "2026-10-22 16:09:30",
   "age_days": 7772,
-  "active_days": 6663,
-  "total_commits": 35049,
+  "active_days": 6664,
+  "total_commits": 35051,
   "total_authors": 3182,
-  "active_authors_12mo": 217,
-  "commits_last_12mo": 997,
+  "active_authors_12mo": 216,
+  "commits_last_12mo": 999,
   "total_files": 7089,
-  "total_lines": 1121287,
-  "lines_added": 3417826,
-  "lines_removed": 2296539,
+  "total_lines": 1121368,
+  "lines_added": 3417945,
+  "lines_removed": 2296577,
   "total_tags": 8,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Mike Edmunds": 91,
+    "Carlton Gibson": 330,
     "Jacob Rief": 8,
     "Gerry Mcbride": 1,
     "Jacob Walls": 430,
@@ -51,10 +53,8 @@
     "HelmiDev03": 1,
     "Clifford Gama": 79,
     "Aman Kumar Jain": 1,
-    "Carlton Gibson": 329,
     "Mariusz Felisiak": 1695,
     "Varun Kasyap": 21,
-    "Mike Edmunds": 90,
     "Tim Kedmenec": 1,
     "Philip S\u00f8rensen": 2,
     "Simon Charette": 762,
@@ -3246,7 +3246,7 @@
     "2023": 952,
     "2024": 939,
     "2025": 954,
-    "2026": 826
+    "2026": 828
   },
   "ai_assisted": {
     "commits": 0,
@@ -3299,19 +3299,19 @@
       "2026-04": 103,
       "2026-05": 102,
       "2026-06": 98,
-      "2026-07": 79,
+      "2026-07": 80,
       "2026-08": 57,
       "2026-09": 57,
-      "2026-10": 64
+      "2026-10": 65
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 35049,
+    "commits": 35051,
     "by_kind": {
       "organization": 943,
-      "one_person": 13545,
-      "personal": 19351,
+      "one_person": 13546,
+      "personal": 19352,
       "hidden": 1171,
       "unknown": 39,
       "bot": 0
@@ -3916,14 +3916,14 @@
       "2026-Q3": {
         "organization": 8,
         "one_person": 18,
-        "personal": 116,
+        "personal": 117,
         "hidden": 50,
         "unknown": 1,
         "bot": 0
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 2,
+        "one_person": 3,
         "personal": 39,
         "hidden": 23,
         "unknown": 0,
@@ -3934,9 +3934,41 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 997,
+    "commits": 999,
     "authors": 215,
     "new_authors": 148,
     "half_of_commits": 6
+  },
+  "humans": {
+    "commits": 35051,
+    "commits_by_year": {
+      "2005": 1277,
+      "2006": 1320,
+      "2007": 1877,
+      "2008": 1992,
+      "2009": 1167,
+      "2010": 1926,
+      "2011": 1774,
+      "2012": 2307,
+      "2013": 3187,
+      "2014": 2792,
+      "2015": 2346,
+      "2016": 1833,
+      "2017": 1563,
+      "2018": 1154,
+      "2019": 1309,
+      "2020": 1327,
+      "2021": 1264,
+      "2022": 963,
+      "2023": 952,
+      "2024": 939,
+      "2025": 954,
+      "2026": 828
+    },
+    "active_days": 6664
+  },
+  "source_lines": {
+    "added": 3384265,
+    "current": 1089111
   }
 }

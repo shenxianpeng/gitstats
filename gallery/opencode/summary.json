@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:45:16+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:39:30+00:00",
   "name": "OpenCode",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-10-23 16:11:22",
-  "age_days": 581,
-  "active_days": 568,
-  "total_commits": 20814,
-  "total_authors": 1026,
-  "active_authors_12mo": 849,
-  "commits_last_12mo": 17210,
-  "total_files": 8616,
-  "total_lines": 1389175,
-  "lines_added": 4375656,
-  "lines_removed": 2986481,
+  "last_commit": "2026-10-24 17:37:03",
+  "age_days": 583,
+  "active_days": 569,
+  "total_commits": 20851,
+  "total_authors": 1027,
+  "active_authors_12mo": 848,
+  "commits_last_12mo": 17247,
+  "total_files": 8633,
+  "total_lines": 1349278,
+  "lines_added": 4380743,
+  "lines_removed": 3031465,
   "total_tags": 917,
   "era": "steady",
   "top_authors": [
@@ -25,15 +25,15 @@
     },
     {
       "name": "Aiden Cline",
-      "commits": 2375
+      "commits": 2384
     },
     {
       "name": "Kit Langton",
-      "commits": 2165
+      "commits": 2172
     },
     {
       "name": "Adam",
-      "commits": 1471
+      "commits": 1482
     },
     {
       "name": "Github Action",
@@ -41,7 +41,12 @@
     }
   ],
   "author_commits": {
-    "Aiden Cline": 2375,
+    "Aiden Cline": 2384,
+    "Adam": 1482,
+    "DS": 24,
+    "kernel-oops": 1,
+    "Kit Langton": 2172,
+    "James Long": 356,
     "Dax": 438,
     "Victor Navarro": 105,
     "Filip": 120,
@@ -49,14 +54,10 @@
     "Luke Parker": 621,
     "Simon Klee": 131,
     "Brendan Allan": 542,
-    "DS": 23,
     "Imamuzzaki Abu Salam": 1,
-    "James Long": 355,
-    "Adam": 1471,
     "ANSH SINGH": 1,
     "ANIRUDDHA ADAK": 1,
     "0": 1,
-    "Kit Langton": 2165,
     "MohammadAlMasalmeh": 1,
     "Frank": 924,
     "Rhys Sullivan": 5,
@@ -1070,7 +1071,7 @@
   },
   "commits_by_year": {
     "2025": 6529,
-    "2026": 14285
+    "2026": 14322
   },
   "ai_assisted": {
     "commits": 136,
@@ -1132,19 +1133,19 @@
       "2026-07": 1581,
       "2026-08": 1996,
       "2026-09": 1496,
-      "2026-10": 1000
+      "2026-10": 1037
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20814,
+    "commits": 20851,
     "by_kind": {
       "organization": 1703,
-      "one_person": 3980,
-      "personal": 5527,
-      "hidden": 6018,
+      "one_person": 3981,
+      "personal": 5535,
+      "hidden": 6039,
       "unknown": 1,
-      "bot": 3585
+      "bot": 3592
     },
     "organization_count": 4,
     "last_12mo_from": "2025-11",
@@ -1241,20 +1242,32 @@
       },
       "2026-Q4": {
         "organization": 46,
-        "one_person": 64,
-        "personal": 277,
-        "hidden": 421,
+        "one_person": 65,
+        "personal": 285,
+        "hidden": 442,
         "unknown": 0,
-        "bot": 192
+        "bot": 199
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 14611,
-    "authors": 834,
-    "new_authors": 780,
+    "commits": 14641,
+    "authors": 835,
+    "new_authors": 781,
     "half_of_commits": 5
+  },
+  "humans": {
+    "commits": 17259,
+    "commits_by_year": {
+      "2025": 5787,
+      "2026": 11472
+    },
+    "active_days": 568
+  },
+  "source_lines": {
+    "added": 4716973,
+    "current": 1323838
   }
 }

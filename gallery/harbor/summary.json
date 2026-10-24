@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:48:33+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:42:28+00:00",
   "name": "Harbor",
   "report_path": "index.html",
   "first_commit": "2016-02-01 11:59:10",
-  "last_commit": "2026-10-23 16:07:23",
-  "age_days": 3918,
-  "active_days": 2433,
-  "total_commits": 12925,
+  "last_commit": "2026-10-24 17:11:30",
+  "age_days": 3919,
+  "active_days": 2434,
+  "total_commits": 12932,
   "total_authors": 476,
-  "active_authors_12mo": 95,
-  "commits_last_12mo": 411,
+  "active_authors_12mo": 93,
+  "commits_last_12mo": 418,
   "total_files": 3307,
-  "total_lines": 483439,
-  "lines_added": 4985400,
-  "lines_removed": 4501961,
+  "total_lines": 483443,
+  "lines_added": 4985448,
+  "lines_removed": 4502005,
   "total_tags": 41,
   "era": "steady",
   "top_authors": [
@@ -529,7 +529,7 @@
     "2023": 434,
     "2024": 323,
     "2025": 269,
-    "2026": 390
+    "2026": 397
   },
   "ai_assisted": {
     "commits": 16,
@@ -589,19 +589,19 @@
       "2026-07": 39,
       "2026-08": 58,
       "2026-09": 46,
-      "2026-10": 65
+      "2026-10": 72
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 12925,
+    "commits": 12932,
     "by_kind": {
       "organization": 9000,
       "one_person": 302,
       "personal": 2293,
       "hidden": 1072,
       "unknown": 8,
-      "bot": 250
+      "bot": 257
     },
     "organization_count": 10,
     "last_12mo_from": "2025-11",
@@ -750,7 +750,7 @@
         "personal": 22,
         "hidden": 6,
         "unknown": 0,
-        "bot": 17
+        "bot": 24
       }
     }
   },
@@ -761,5 +761,26 @@
     "authors": 91,
     "new_authors": 75,
     "half_of_commits": 5
+  },
+  "humans": {
+    "commits": 12675,
+    "commits_by_year": {
+      "2016": 2176,
+      "2017": 1824,
+      "2018": 1826,
+      "2019": 2493,
+      "2020": 1856,
+      "2021": 803,
+      "2022": 522,
+      "2023": 407,
+      "2024": 237,
+      "2025": 204,
+      "2026": 327
+    },
+    "active_days": 2385
+  },
+  "source_lines": {
+    "added": 1504938,
+    "current": 439662
   }
 }

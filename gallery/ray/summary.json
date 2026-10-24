@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:47:08+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:41:18+00:00",
   "name": "Ray",
   "report_path": "index.html",
   "first_commit": "2016-02-07 22:18:40",
-  "last_commit": "2026-10-23 13:59:26",
-  "age_days": 3911,
-  "active_days": 3500,
-  "total_commits": 32234,
-  "total_authors": 1624,
-  "active_authors_12mo": 486,
-  "commits_last_12mo": 4391,
-  "total_files": 10482,
-  "total_lines": 2608037,
-  "lines_added": 6313687,
-  "lines_removed": 3705650,
+  "last_commit": "2026-10-24 17:00:43",
+  "age_days": 3912,
+  "active_days": 3501,
+  "total_commits": 32256,
+  "total_authors": 1626,
+  "active_authors_12mo": 485,
+  "commits_last_12mo": 4413,
+  "total_files": 10490,
+  "total_lines": 2617503,
+  "lines_added": 6352613,
+  "lines_removed": 3735110,
   "total_tags": 20,
   "era": "steady",
   "top_authors": [
@@ -41,21 +41,26 @@
     }
   ],
   "author_commits": {
-    "Douglas Strodtman": 292,
-    "abhishekverma-ray": 16,
-    "Ding-Xin Chen": 16,
+    "Artur Niederfahrenhorst": 331,
+    "Ding-Xin Chen": 17,
+    "Chi-Sheng Liu": 137,
+    "SaiTejaMutchi": 1,
+    "Jeffrey Wang": 157,
+    "Goutam": 181,
+    "abhishekverma-ray": 17,
+    "Elliot Barnwell": 321,
+    "zhangdove": 1,
+    "Douglas Strodtman": 296,
+    "YangJie": 10,
+    "Mark Towers": 109,
+    "Kevin H. Luu": 199,
+    "prasad-anyscale": 5,
     "Kunchen (David) Dai": 65,
     "Xinyu Zhang": 37,
-    "Elliot Barnwell": 316,
-    "Artur Niederfahrenhorst": 330,
-    "Jeffrey Wang": 156,
-    "Chi-Sheng Liu": 135,
     "Kai-Hsun Chen": 253,
-    "Mark Towers": 108,
     "Chao-Ting, Chen": 4,
     "Dhruvil Shah": 8,
     "Kevin Klues": 3,
-    "Goutam": 180,
     "Junwang Zhao": 5,
     "Edward Oakes": 1197,
     "Thunderkeg": 8,
@@ -131,7 +136,6 @@
     "Ethan Villalovoz": 1,
     "Vaishnavi Panchavati": 16,
     "Jun-Hao Wan": 41,
-    "prasad-anyscale": 4,
     "Limark Dcunha": 10,
     "YashwanthRanjanSingaravel": 10,
     "Haoran FENG": 1,
@@ -190,11 +194,9 @@
     "Kit Lee": 20,
     "Po-Han Shih": 1,
     "Tran Cam Huy": 1,
-    "YangJie": 9,
     "Ronny": 18,
     "Thomas Desrosiers": 23,
     "Henry Su": 1,
-    "Kevin H. Luu": 198,
     "Narendra": 1,
     "hogeheer499-commits": 1,
     "Bo Xu": 1,
@@ -1677,14 +1679,14 @@
     "2023": 4766,
     "2024": 3194,
     "2025": 5137,
-    "2026": 3651
+    "2026": 3673
   },
   "ai_assisted": {
-    "commits": 1027,
+    "commits": 1041,
     "authored": 0,
     "assistants": {
-      "Claude": 731,
-      "Gemini": 269,
+      "Claude": 745,
+      "Gemini": 270,
       "GitHub Copilot": 37,
       "Cursor": 29
     },
@@ -1712,7 +1714,7 @@
       "2026-07": 129,
       "2026-08": 60,
       "2026-09": 131,
-      "2026-10": 173
+      "2026-10": 187
     },
     "commits_by_month": {
       "2024-11": 236,
@@ -1738,17 +1740,17 @@
       "2026-07": 344,
       "2026-08": 321,
       "2026-09": 387,
-      "2026-10": 302
+      "2026-10": 324
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 32234,
+    "commits": 32256,
     "by_kind": {
-      "organization": 8132,
-      "one_person": 721,
-      "personal": 14238,
-      "hidden": 9073,
+      "organization": 8146,
+      "one_person": 724,
+      "personal": 14242,
+      "hidden": 9074,
       "unknown": 3,
       "bot": 67
     },
@@ -1757,11 +1759,11 @@
     "top": [
       {
         "organization": "anyscale.com",
-        "commits": 4991,
-        "commits_last_12mo": 1813,
+        "commits": 5005,
+        "commits_last_12mo": 1827,
         "addresses": 82,
         "first_commit": "2020-05-20",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-24"
       },
       {
         "organization": "berkeley.edu",
@@ -2094,10 +2096,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 161,
-        "one_person": 16,
-        "personal": 54,
-        "hidden": 71,
+        "organization": 175,
+        "one_person": 19,
+        "personal": 58,
+        "hidden": 72,
         "unknown": 0,
         "bot": 0
       }
@@ -2106,9 +2108,30 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4391,
-    "authors": 474,
-    "new_authors": 343,
+    "commits": 4413,
+    "authors": 476,
+    "new_authors": 345,
     "half_of_commits": 19
+  },
+  "humans": {
+    "commits": 32189,
+    "commits_by_year": {
+      "2016": 712,
+      "2017": 579,
+      "2018": 1049,
+      "2019": 1416,
+      "2020": 3062,
+      "2021": 3927,
+      "2022": 4676,
+      "2023": 4765,
+      "2024": 3194,
+      "2025": 5136,
+      "2026": 3673
+    },
+    "active_days": 3501
+  },
+  "source_lines": {
+    "added": 5094168,
+    "current": 2060965
   }
 }

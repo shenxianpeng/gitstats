@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:48:49+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:42:55+00:00",
   "name": "Apache Kafka",
   "report_path": "index.html",
   "first_commit": "2011-08-01 23:41:24",
-  "last_commit": "2026-10-23 16:11:13",
-  "age_days": 5562,
-  "active_days": 4188,
-  "total_commits": 18504,
-  "total_authors": 1547,
-  "active_authors_12mo": 254,
-  "commits_last_12mo": 1987,
+  "last_commit": "2026-10-24 11:40:01",
+  "age_days": 5563,
+  "active_days": 4189,
+  "total_commits": 18506,
+  "total_authors": 1548,
+  "active_authors_12mo": 255,
+  "commits_last_12mo": 1989,
   "total_files": 7633,
-  "total_lines": 1850852,
-  "lines_added": 3482367,
-  "lines_removed": 1631515,
+  "total_lines": 1850861,
+  "lines_added": 3482386,
+  "lines_removed": 1631525,
   "total_tags": 2,
   "era": "steady",
   "top_authors": [
@@ -41,10 +41,11 @@
     }
   ],
   "author_commits": {
+    "Sean Quah": 104,
+    "Junpei Zhang": 1,
     "Apoorv Mittal": 169,
     "Kevin Wu": 34,
     "Evan Zhou": 18,
-    "Sean Quah": 103,
     "Federico Valeri": 71,
     "David Jacot": 480,
     "Sushant Mahajan": 123,
@@ -1605,13 +1606,13 @@
     "2023": 1474,
     "2024": 2451,
     "2025": 2182,
-    "2026": 1703
+    "2026": 1705
   },
   "ai_assisted": {
-    "commits": 85,
+    "commits": 86,
     "authored": 0,
     "assistants": {
-      "Claude": 69,
+      "Claude": 70,
       "GitHub Copilot": 15,
       "ChatGPT": 1,
       "Codex": 1,
@@ -1641,7 +1642,7 @@
       "2026-07": 11,
       "2026-08": 6,
       "2026-09": 14,
-      "2026-10": 29
+      "2026-10": 30
     },
     "commits_by_month": {
       "2024-11": 246,
@@ -1667,16 +1668,16 @@
       "2026-07": 201,
       "2026-08": 171,
       "2026-09": 212,
-      "2026-10": 142
+      "2026-10": 144
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 18504,
+    "commits": 18506,
     "by_kind": {
-      "organization": 6962,
+      "organization": 6963,
       "one_person": 1624,
-      "personal": 7398,
+      "personal": 7399,
       "hidden": 2500,
       "unknown": 17,
       "bot": 3
@@ -1686,11 +1687,11 @@
     "top": [
       {
         "organization": "confluent.io",
-        "commits": 4256,
-        "commits_last_12mo": 445,
+        "commits": 4257,
+        "commits_last_12mo": 446,
         "addresses": 109,
         "first_commit": "2015-06-12",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-24"
       },
       {
         "organization": "apache.org",
@@ -2047,9 +2048,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 60,
+        "organization": 61,
         "one_person": 2,
-        "personal": 52,
+        "personal": 53,
         "hidden": 28,
         "unknown": 0,
         "bot": 0
@@ -2059,9 +2060,35 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1985,
-    "authors": 252,
-    "new_authors": 149,
+    "commits": 1987,
+    "authors": 253,
+    "new_authors": 150,
     "half_of_commits": 19
+  },
+  "humans": {
+    "commits": 18503,
+    "commits_by_year": {
+      "2011": 116,
+      "2012": 286,
+      "2013": 350,
+      "2014": 343,
+      "2015": 761,
+      "2016": 1150,
+      "2017": 1508,
+      "2018": 1207,
+      "2019": 1219,
+      "2020": 1405,
+      "2021": 1280,
+      "2022": 1069,
+      "2023": 1474,
+      "2024": 2451,
+      "2025": 2181,
+      "2026": 1703
+    },
+    "active_days": 4189
+  },
+  "source_lines": {
+    "added": 3509564,
+    "current": 1845820
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:46:21+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:40:39+00:00",
   "name": "Diffusers",
   "report_path": "index.html",
   "first_commit": "2022-05-30 16:07:33",
-  "last_commit": "2026-10-22 13:16:58",
-  "age_days": 1606,
-  "active_days": 1312,
-  "total_commits": 7009,
-  "total_authors": 1146,
-  "active_authors_12mo": 219,
-  "commits_last_12mo": 1056,
+  "last_commit": "2026-10-24 04:24:16",
+  "age_days": 1608,
+  "active_days": 1313,
+  "total_commits": 7010,
+  "total_authors": 1147,
+  "active_authors_12mo": 220,
+  "commits_last_12mo": 1057,
   "total_files": 2989,
-  "total_lines": 1187200,
-  "lines_added": 1637783,
-  "lines_removed": 450583,
+  "total_lines": 1187146,
+  "lines_added": 1637789,
+  "lines_removed": 450643,
   "total_tags": 26,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "A-Raphie": 1,
     "Linoy Tsaban": 75,
     "Sayak Paul": 1078,
     "Aayush D C Dangi": 1,
@@ -1193,7 +1194,7 @@
     "2023": 1890,
     "2024": 1466,
     "2025": 1151,
-    "2026": 921
+    "2026": 922
   },
   "ai_assisted": {
     "commits": 105,
@@ -1252,17 +1253,17 @@
       "2026-07": 111,
       "2026-08": 132,
       "2026-09": 64,
-      "2026-10": 62
+      "2026-10": 63
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7009,
+    "commits": 7010,
     "by_kind": {
       "organization": 812,
       "one_person": 336,
       "personal": 4261,
-      "hidden": 1579,
+      "hidden": 1580,
       "unknown": 1,
       "bot": 20
     },
@@ -1451,7 +1452,7 @@
         "organization": 6,
         "one_person": 0,
         "personal": 39,
-        "hidden": 17,
+        "hidden": 18,
         "unknown": 0,
         "bot": 0
       }
@@ -1460,9 +1461,24 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1046,
-    "authors": 213,
-    "new_authors": 160,
+    "commits": 1047,
+    "authors": 214,
+    "new_authors": 161,
     "half_of_commits": 5
+  },
+  "humans": {
+    "commits": 6990,
+    "commits_by_year": {
+      "2022": 1581,
+      "2023": 1889,
+      "2024": 1462,
+      "2025": 1146,
+      "2026": 912
+    },
+    "active_days": 1313
+  },
+  "source_lines": {
+    "added": 1642584,
+    "current": 1186040
   }
 }

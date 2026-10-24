@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:47:49+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:41:40+00:00",
   "name": "CoreDNS",
   "report_path": "index.html",
   "first_commit": "2016-03-18 20:57:35",
-  "last_commit": "2026-10-21 15:46:27",
-  "age_days": 3869,
-  "active_days": 1676,
-  "total_commits": 5193,
+  "last_commit": "2026-10-24 08:12:11",
+  "age_days": 3872,
+  "active_days": 1677,
+  "total_commits": 5194,
   "total_authors": 514,
   "active_authors_12mo": 93,
-  "commits_last_12mo": 771,
+  "commits_last_12mo": 772,
   "total_files": 1057,
   "total_lines": 147218,
-  "lines_added": 15101280,
-  "lines_removed": 14954062,
+  "lines_added": 15101281,
+  "lines_removed": 14954063,
   "total_tags": 85,
   "era": "peak",
   "top_authors": [
@@ -41,9 +41,9 @@
     }
   ],
   "author_commits": {
+    "ump45nose": 10,
     "houyuwushang": 38,
     "Yong Tang": 358,
-    "ump45nose": 9,
     "Pujitha Paladugu": 3,
     "Baltasar Blanco": 8,
     "Ahmad Mehrabi": 1,
@@ -567,7 +567,7 @@
     "2023": 299,
     "2024": 234,
     "2025": 493,
-    "2026": 655
+    "2026": 656
   },
   "ai_assisted": {
     "commits": 8,
@@ -626,17 +626,17 @@
       "2026-07": 134,
       "2026-08": 81,
       "2026-09": 82,
-      "2026-10": 53
+      "2026-10": 54
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5193,
+    "commits": 5194,
     "by_kind": {
       "organization": 594,
       "one_person": 1690,
       "personal": 751,
-      "hidden": 337,
+      "hidden": 338,
       "unknown": 0,
       "bot": 1821
     },
@@ -801,7 +801,7 @@
         "organization": 5,
         "one_person": 2,
         "personal": 13,
-        "hidden": 13,
+        "hidden": 14,
         "unknown": 0,
         "bot": 20
       }
@@ -810,9 +810,30 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 386,
+    "commits": 387,
     "authors": 93,
     "new_authors": 77,
-    "half_of_commits": 3
+    "half_of_commits": 4
+  },
+  "humans": {
+    "commits": 3373,
+    "commits_by_year": {
+      "2016": 480,
+      "2017": 509,
+      "2018": 559,
+      "2019": 500,
+      "2020": 227,
+      "2021": 219,
+      "2022": 190,
+      "2023": 91,
+      "2024": 68,
+      "2025": 184,
+      "2026": 346
+    },
+    "active_days": 1459
+  },
+  "source_lines": {
+    "added": 259751,
+    "current": 145686
   }
 }

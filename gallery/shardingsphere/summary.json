@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:51:38+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:45:22+00:00",
   "name": "Apache ShardingSphere",
   "report_path": "index.html",
   "first_commit": "2016-01-18 12:49:26",
-  "last_commit": "2026-10-23 16:26:22",
-  "age_days": 3932,
-  "active_days": 3424,
-  "total_commits": 50064,
+  "last_commit": "2026-10-24 14:06:25",
+  "age_days": 3933,
+  "active_days": 3425,
+  "total_commits": 50067,
   "total_authors": 744,
   "active_authors_12mo": 65,
-  "commits_last_12mo": 2891,
+  "commits_last_12mo": 2894,
   "total_files": 17839,
-  "total_lines": 1511772,
-  "lines_added": 4818382,
-  "lines_removed": 3306610,
+  "total_lines": 1511905,
+  "lines_added": 4818621,
+  "lines_removed": 3306716,
   "total_tags": 37,
   "era": "steady",
   "top_authors": [
     {
       "name": "Liang Zhang",
-      "commits": 18864
+      "commits": 18866
     },
     {
       "name": "tristaZero",
@@ -41,11 +41,11 @@
     }
   ],
   "author_commits": {
-    "Liang Zhang": 18864,
+    "Divyansh Yadav": 2,
+    "Liang Zhang": 18866,
     "Zhengqiang Duan": 1571,
     "Maxim Igoshin": 45,
     "Rain.": 1,
-    "Divyansh Yadav": 1,
     "Zhang Muyuan": 1,
     "ZhangCheng": 539,
     "Raigor": 502,
@@ -797,7 +797,7 @@
     "2023": 4028,
     "2024": 3620,
     "2025": 2956,
-    "2026": 2352
+    "2026": 2355
   },
   "ai_assisted": {
     "commits": 60,
@@ -856,16 +856,16 @@
       "2026-07": 263,
       "2026-08": 339,
       "2026-09": 298,
-      "2026-10": 256
+      "2026-10": 259
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 50064,
+    "commits": 50067,
     "by_kind": {
-      "organization": 15810,
+      "organization": 15812,
       "one_person": 526,
-      "personal": 30557,
+      "personal": 30558,
       "hidden": 3079,
       "unknown": 71,
       "bot": 21
@@ -875,11 +875,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 15345,
-        "commits_last_12mo": 2231,
+        "commits": 15347,
+        "commits_last_12mo": 2233,
         "addresses": 21,
         "first_commit": "2018-03-02",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-24"
       },
       {
         "organization": "huobi.com",
@@ -980,9 +980,9 @@
         "bot": 4
       },
       "2026-Q4": {
-        "organization": 203,
+        "organization": 205,
         "one_person": 0,
-        "personal": 8,
+        "personal": 9,
         "hidden": 45,
         "unknown": 0,
         "bot": 0
@@ -992,9 +992,30 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2883,
+    "commits": 2886,
     "authors": 65,
     "new_authors": 44,
     "half_of_commits": 1
+  },
+  "humans": {
+    "commits": 50046,
+    "commits_by_year": {
+      "2016": 399,
+      "2017": 2025,
+      "2018": 11722,
+      "2019": 9680,
+      "2020": 4007,
+      "2021": 3367,
+      "2022": 5902,
+      "2023": 4025,
+      "2024": 3617,
+      "2025": 2953,
+      "2026": 2349
+    },
+    "active_days": 3425
+  },
+  "source_lines": {
+    "added": 6596422,
+    "current": 1509359
   }
 }

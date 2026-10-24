@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:45:14+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:39:35+00:00",
   "name": "Codex CLI",
   "report_path": "index.html",
   "first_commit": "2025-04-16 16:56:08",
-  "last_commit": "2026-10-23 16:12:05",
-  "age_days": 555,
+  "last_commit": "2026-10-23 18:21:21",
+  "age_days": 556,
   "active_days": 513,
-  "total_commits": 12577,
+  "total_commits": 12591,
   "total_authors": 665,
   "active_authors_12mo": 513,
-  "commits_last_12mo": 10780,
-  "total_files": 9508,
-  "total_lines": 2531936,
-  "lines_added": 4206156,
-  "lines_removed": 1674220,
+  "commits_last_12mo": 10794,
+  "total_files": 9515,
+  "total_lines": 2533298,
+  "lines_added": 4209514,
+  "lines_removed": 1676216,
   "total_tags": 48,
   "era": "steady",
   "top_authors": [
@@ -41,36 +41,37 @@
     }
   ],
   "author_commits": {
+    "alexsong-oai": 68,
+    "felixxia-oai": 273,
+    "ioanbudea-OAI": 20,
+    "viyatb-oai": 209,
+    "andrewgu-oai": 35,
+    "Dmitriy Kovalenko": 42,
+    "Benjamin Carlsson": 186,
+    "Sean Huang": 35,
+    "Anthony Tafoya": 27,
+    "Andrei Eternal": 21,
+    "bkotsopoulos": 7,
     "Eric Traut": 975,
-    "bkotsopoulos": 6,
-    "ioanbudea-OAI": 18,
-    "felixxia-oai": 270,
     "jif": 1927,
     "Charlie Marsh": 204,
     "Vivian Fang": 14,
     "Keyan Zhang": 5,
     "Brent Traut": 20,
-    "andrewgu-oai": 34,
     "cassirer-openai": 25,
     "alishobeiri-oai": 9,
     "smurching-oai": 7,
     "rhan-oai": 102,
     "goodman-oai": 7,
-    "Benjamin Carlsson": 185,
-    "viyatb-oai": 208,
     "Adam Perry @ OpenAI": 292,
     "Kenny Yi": 1,
     "Matthew Zeng": 142,
     "Celia Chen": 166,
     "willwang-openai": 25,
-    "Sean Huang": 34,
     "Owen Lin": 266,
-    "Dmitriy Kovalenko": 41,
     "Abhinav": 97,
     "olliem-oai": 9,
     "eknight-oai": 3,
-    "Anthony Tafoya": 26,
-    "alexsong-oai": 67,
     "liame-oai": 6,
     "richardopenai": 30,
     "Jeff Mickey": 2,
@@ -228,7 +229,6 @@
     "Gabriel Peal": 91,
     "Alex Ryan": 1,
     "Drew Hintz": 2,
-    "Andrei Eternal": 20,
     "Felicia Chen": 4,
     "Eric Burke": 6,
     "Rasmus Rygaard": 28,
@@ -709,7 +709,7 @@
   },
   "commits_by_year": {
     "2025": 2601,
-    "2026": 9976
+    "2026": 9990
   },
   "ai_assisted": {
     "commits": 102,
@@ -769,14 +769,14 @@
       "2026-07": 879,
       "2026-08": 1266,
       "2026-09": 1617,
-      "2026-10": 894
+      "2026-10": 908
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 12577,
+    "commits": 12591,
     "by_kind": {
-      "organization": 11308,
+      "organization": 11322,
       "one_person": 66,
       "personal": 404,
       "hidden": 658,
@@ -788,8 +788,8 @@
     "top": [
       {
         "organization": "openai.com",
-        "commits": 11302,
-        "commits_last_12mo": 10107,
+        "commits": 11316,
+        "commits_last_12mo": 10121,
         "addresses": 363,
         "first_commit": "2025-04-16",
         "last_commit": "2026-10-23"
@@ -861,7 +861,7 @@
         "bot": 2
       },
       "2026-Q4": {
-        "organization": 878,
+        "organization": 892,
         "one_person": 1,
         "personal": 3,
         "hidden": 12,
@@ -873,9 +873,21 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 10694,
+    "commits": 10708,
     "authors": 503,
     "new_authors": 465,
     "half_of_commits": 9
+  },
+  "humans": {
+    "commits": 12450,
+    "commits_by_year": {
+      "2025": 2508,
+      "2026": 9942
+    },
+    "active_days": 512
+  },
+  "source_lines": {
+    "added": 3990025,
+    "current": 2432497
   }
 }

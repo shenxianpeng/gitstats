@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:44:09+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:38:51+00:00",
   "name": "pandas",
   "report_path": "index.html",
   "first_commit": "2009-07-31 15:07:16",
-  "last_commit": "2026-10-23 16:28:59",
-  "age_days": 6294,
-  "active_days": 5306,
-  "total_commits": 39603,
-  "total_authors": 4045,
-  "active_authors_12mo": 403,
-  "commits_last_12mo": 2936,
+  "last_commit": "2026-10-24 17:12:58",
+  "age_days": 6295,
+  "active_days": 5307,
+  "total_commits": 39609,
+  "total_authors": 4047,
+  "active_authors_12mo": 402,
+  "commits_last_12mo": 2942,
   "total_files": 2689,
-  "total_lines": 1071867,
-  "lines_added": 3316271,
-  "lines_removed": 2244404,
+  "total_lines": 1072112,
+  "lines_added": 3316537,
+  "lines_removed": 2244425,
   "total_tags": 102,
   "era": "steady",
   "top_authors": [
     {
       "name": "jbrockmendel",
-      "commits": 6454
+      "commits": 6458
     },
     {
       "name": "Jeff Reback",
@@ -41,9 +41,11 @@
     }
   ],
   "author_commits": {
+    "jbrockmendel": 6458,
+    "Minh Tuan Pham": 1,
+    "Ammar Hassona": 1,
     "Breno Barreto": 1,
     "Joris Van den Bossche": 1696,
-    "jbrockmendel": 6454,
     "Julian Harbeck": 7,
     "Ryan George": 1,
     "Tiereonna": 1,
@@ -4105,13 +4107,13 @@
     "2023": 3017,
     "2024": 1769,
     "2025": 1097,
-    "2026": 2681
+    "2026": 2687
   },
   "ai_assisted": {
-    "commits": 1442,
+    "commits": 1446,
     "authored": 1,
     "assistants": {
-      "Claude": 1440,
+      "Claude": 1444,
       "Devin": 1,
       "GitHub Copilot": 1
     },
@@ -4139,7 +4141,7 @@
       "2026-07": 176,
       "2026-08": 167,
       "2026-09": 289,
-      "2026-10": 298
+      "2026-10": 302
     },
     "commits_by_month": {
       "2024-11": 115,
@@ -4165,17 +4167,17 @@
       "2026-07": 250,
       "2026-08": 275,
       "2026-09": 422,
-      "2026-10": 403
+      "2026-10": 409
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39603,
+    "commits": 39609,
     "by_kind": {
       "organization": 987,
       "one_person": 6674,
-      "personal": 23583,
-      "hidden": 8113,
+      "personal": 23587,
+      "hidden": 8115,
       "unknown": 25,
       "bot": 221
     },
@@ -4715,8 +4717,8 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 2,
-        "personal": 350,
-        "hidden": 36,
+        "personal": 354,
+        "hidden": 38,
         "unknown": 0,
         "bot": 14
       }
@@ -4725,9 +4727,37 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2817,
-    "authors": 384,
-    "new_authors": 317,
+    "commits": 2823,
+    "authors": 386,
+    "new_authors": 319,
     "half_of_commits": 1
+  },
+  "humans": {
+    "commits": 39388,
+    "commits_by_year": {
+      "2009": 100,
+      "2010": 147,
+      "2011": 1322,
+      "2012": 3245,
+      "2013": 3262,
+      "2014": 3081,
+      "2015": 2049,
+      "2016": 1302,
+      "2017": 1771,
+      "2018": 2299,
+      "2019": 2716,
+      "2020": 4150,
+      "2021": 3141,
+      "2022": 2428,
+      "2023": 2991,
+      "2024": 1747,
+      "2025": 1064,
+      "2026": 2573
+    },
+    "active_days": 5299
+  },
+  "source_lines": {
+    "added": 3113806,
+    "current": 995515
   }
 }

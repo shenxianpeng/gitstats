@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:55:10+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:47:59+00:00",
   "name": "Bun",
   "report_path": "index.html",
   "first_commit": "2021-04-17 22:21:31",
-  "last_commit": "2026-10-23 04:36:47",
-  "age_days": 2015,
-  "active_days": 1878,
-  "total_commits": 18556,
+  "last_commit": "2026-10-24 09:43:26",
+  "age_days": 2016,
+  "active_days": 1879,
+  "total_commits": 18563,
   "total_authors": 898,
-  "active_authors_12mo": 88,
-  "commits_last_12mo": 4599,
-  "total_files": 24711,
-  "total_lines": 5694955,
-  "lines_added": 10576856,
-  "lines_removed": 4881901,
+  "active_authors_12mo": 86,
+  "commits_last_12mo": 4606,
+  "total_files": 24778,
+  "total_lines": 5693170,
+  "lines_added": 10589395,
+  "lines_removed": 4896225,
   "total_tags": 262,
   "era": "peak",
   "top_authors": [
@@ -25,11 +25,11 @@
     },
     {
       "name": "robobun",
-      "commits": 3085
+      "commits": 3087
     },
     {
       "name": "Dylan Conway",
-      "commits": 1263
+      "commits": 1267
     },
     {
       "name": "Meghan Denny",
@@ -41,11 +41,11 @@
     }
   ],
   "author_commits": {
+    "Dylan Conway": 1267,
+    "robobun": 3087,
+    "Alistair Smith": 333,
     "SUZUKI Sosuke": 87,
-    "Dylan Conway": 1263,
     "Jarred Sumner": 8689,
-    "robobun": 3085,
-    "Alistair Smith": 332,
     "Samuel Attard": 4,
     "Ciro Spaciari": 529,
     "Andrew Jefferson": 2,
@@ -946,13 +946,13 @@
     "2023": 3560,
     "2024": 2944,
     "2025": 2983,
-    "2026": 4266
+    "2026": 4273
   },
   "ai_assisted": {
-    "commits": 733,
+    "commits": 734,
     "authored": 0,
     "assistants": {
-      "Claude": 715,
+      "Claude": 716,
       "CodeRabbit": 15,
       "Cursor": 6,
       "Devin": 1
@@ -981,7 +981,7 @@
       "2026-07": 3,
       "2026-08": 0,
       "2026-09": 2,
-      "2026-10": 17
+      "2026-10": 18
     },
     "commits_by_month": {
       "2024-11": 213,
@@ -1007,16 +1007,16 @@
       "2026-07": 752,
       "2026-08": 1043,
       "2026-09": 560,
-      "2026-10": 239
+      "2026-10": 246
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 18556,
+    "commits": 18563,
     "by_kind": {
       "organization": 876,
-      "one_person": 10577,
-      "personal": 2614,
+      "one_person": 10580,
+      "personal": 2618,
       "hidden": 4435,
       "unknown": 4,
       "bot": 50
@@ -1108,8 +1108,8 @@
       },
       "2026-Q4": {
         "organization": 6,
-        "one_person": 137,
-        "personal": 96,
+        "one_person": 140,
+        "personal": 100,
         "hidden": 0,
         "unknown": 0,
         "bot": 0
@@ -1119,9 +1119,25 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4583,
+    "commits": 4590,
     "authors": 85,
     "new_authors": 62,
     "half_of_commits": 1
+  },
+  "humans": {
+    "commits": 18513,
+    "commits_by_year": {
+      "2021": 1465,
+      "2022": 3338,
+      "2023": 3560,
+      "2024": 2932,
+      "2025": 2957,
+      "2026": 4261
+    },
+    "active_days": 1878
+  },
+  "source_lines": {
+    "added": 9710105,
+    "current": 5100135
   }
 }

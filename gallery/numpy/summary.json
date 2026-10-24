@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:43:53+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:38:24+00:00",
   "name": "NumPy",
   "report_path": "index.html",
   "first_commit": "2001-12-18 15:45:10",
-  "last_commit": "2026-10-22 21:45:57",
-  "age_days": 9075,
-  "active_days": 6827,
-  "total_commits": 42433,
-  "total_authors": 2108,
-  "active_authors_12mo": 236,
-  "commits_last_12mo": 2470,
-  "total_files": 2423,
-  "total_lines": 1007821,
-  "lines_added": 2791653,
-  "lines_removed": 1783832,
+  "last_commit": "2026-10-23 23:40:25",
+  "age_days": 9076,
+  "active_days": 6828,
+  "total_commits": 42437,
+  "total_authors": 2109,
+  "active_authors_12mo": 237,
+  "commits_last_12mo": 2474,
+  "total_files": 2424,
+  "total_lines": 1007868,
+  "lines_added": 2791709,
+  "lines_removed": 1783841,
   "total_tags": 16,
   "era": "steady",
   "top_authors": [
     {
       "name": "Charles Harris",
-      "commits": 7289
+      "commits": 7290
     },
     {
       "name": "Matti Picus",
@@ -41,9 +41,11 @@
     }
   ],
   "author_commits": {
+    "Charles Harris": 7290,
+    "Fun-Projects-Learn": 2,
+    "Adnan Sami": 1,
     "Tyler Reddy": 198,
     "LeeMEow23": 1,
-    "Charles Harris": 7289,
     "Dragos-Georgian Ion": 4,
     "Anush Vishwakarma": 1,
     "Gopu Yeshwanth Reddy": 2,
@@ -62,7 +64,6 @@
     "Ganesh Kathiresan": 159,
     "Michael Zhan": 4,
     "sukeyzhou": 2,
-    "Fun-Projects-Learn": 1,
     "bymasha": 1,
     "ssmore": 1,
     "Mohd Maaz Khan": 14,
@@ -2176,7 +2177,7 @@
     "2023": 3422,
     "2024": 3054,
     "2025": 2543,
-    "2026": 2069
+    "2026": 2073
   },
   "ai_assisted": {
     "commits": 38,
@@ -2236,19 +2237,19 @@
       "2026-07": 241,
       "2026-08": 229,
       "2026-09": 333,
-      "2026-10": 197
+      "2026-10": 201
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 42433,
+    "commits": 42437,
     "by_kind": {
       "organization": 2800,
       "one_person": 6066,
-      "personal": 31199,
-      "hidden": 1269,
+      "personal": 31201,
+      "hidden": 1270,
       "unknown": 486,
-      "bot": 613
+      "bot": 614
     },
     "organization_count": 70,
     "last_12mo_from": "2025-11",
@@ -2874,19 +2875,55 @@
       "2026-Q4": {
         "organization": 6,
         "one_person": 2,
-        "personal": 160,
-        "hidden": 20,
+        "personal": 162,
+        "hidden": 21,
         "unknown": 0,
-        "bot": 9
+        "bot": 10
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2290,
-    "authors": 234,
-    "new_authors": 171,
+    "commits": 2293,
+    "authors": 235,
+    "new_authors": 172,
     "half_of_commits": 3
+  },
+  "humans": {
+    "commits": 41823,
+    "commits_by_year": {
+      "2001": 8,
+      "2002": 408,
+      "2003": 182,
+      "2004": 322,
+      "2005": 776,
+      "2006": 1654,
+      "2007": 707,
+      "2008": 1348,
+      "2009": 1577,
+      "2010": 721,
+      "2011": 1140,
+      "2012": 949,
+      "2013": 1567,
+      "2014": 1399,
+      "2015": 1399,
+      "2016": 1265,
+      "2017": 1890,
+      "2018": 2312,
+      "2019": 2380,
+      "2020": 3208,
+      "2021": 3481,
+      "2022": 2500,
+      "2023": 3343,
+      "2024": 2947,
+      "2025": 2423,
+      "2026": 1917
+    },
+    "active_days": 6825
+  },
+  "source_lines": {
+    "added": 3219322,
+    "current": 1005376
   }
 }

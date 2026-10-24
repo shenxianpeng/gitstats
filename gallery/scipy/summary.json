@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:44:06+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:38:07+00:00",
   "name": "SciPy",
   "report_path": "index.html",
   "first_commit": "2001-02-01 08:32:30",
-  "last_commit": "2026-10-23 13:25:04",
-  "age_days": 9396,
-  "active_days": 6828,
-  "total_commits": 38478,
-  "total_authors": 1944,
-  "active_authors_12mo": 224,
-  "commits_last_12mo": 2230,
+  "last_commit": "2026-10-24 09:53:19",
+  "age_days": 9397,
+  "active_days": 6829,
+  "total_commits": 38482,
+  "total_authors": 1946,
+  "active_authors_12mo": 226,
+  "commits_last_12mo": 2234,
   "total_files": 2929,
-  "total_lines": 1137609,
-  "lines_added": 5258677,
-  "lines_removed": 4121068,
+  "total_lines": 1137664,
+  "lines_added": 5258749,
+  "lines_removed": 4121085,
   "total_tags": 5,
   "era": "steady",
   "top_authors": [
@@ -41,8 +41,11 @@
     }
   ],
   "author_commits": {
+    "Martin Schuck": 45,
+    "Yi-Han Chen": 1,
+    "Andrew Nelson": 1031,
+    "Cl\u00e9ment_Basdevant": 1,
     "Dietrich Brunn": 76,
-    "Martin Schuck": 44,
     "Evgeni Burovski": 2179,
     "Jash Ambaliya": 3,
     "Florian Bourgey": 172,
@@ -53,7 +56,6 @@
     "pratik9751": 2,
     "Aadya Chinubhai": 16,
     "Senanur \u00c7etin": 1,
-    "Andrew Nelson": 1030,
     "Ilhan Polat": 711,
     "Rohit Goswami": 49,
     "Veerendra Kumar Sunkavalli": 7,
@@ -2012,13 +2014,13 @@
     "2023": 2061,
     "2024": 2957,
     "2025": 2335,
-    "2026": 1792
+    "2026": 1796
   },
   "ai_assisted": {
-    "commits": 52,
+    "commits": 53,
     "authored": 1,
     "assistants": {
-      "Claude": 42,
+      "Claude": 43,
       "Warp": 5,
       "GitHub Copilot": 4,
       "Devin": 1
@@ -2047,7 +2049,7 @@
       "2026-07": 5,
       "2026-08": 2,
       "2026-09": 3,
-      "2026-10": 3
+      "2026-10": 4
     },
     "commits_by_month": {
       "2024-11": 226,
@@ -2073,17 +2075,17 @@
       "2026-07": 171,
       "2026-08": 228,
       "2026-09": 171,
-      "2026-10": 81
+      "2026-10": 85
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38478,
+    "commits": 38482,
     "by_kind": {
       "organization": 3833,
       "one_person": 3073,
-      "personal": 27077,
-      "hidden": 2675,
+      "personal": 27078,
+      "hidden": 2678,
       "unknown": 1820,
       "bot": 0
     },
@@ -2647,8 +2649,8 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 2,
-        "personal": 45,
-        "hidden": 33,
+        "personal": 46,
+        "hidden": 36,
         "unknown": 0,
         "bot": 0
       }
@@ -2657,9 +2659,45 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2230,
-    "authors": 222,
-    "new_authors": 159,
+    "commits": 2234,
+    "authors": 224,
+    "new_authors": 161,
     "half_of_commits": 6
+  },
+  "humans": {
+    "commits": 38482,
+    "commits_by_year": {
+      "2001": 286,
+      "2002": 357,
+      "2003": 260,
+      "2004": 275,
+      "2005": 296,
+      "2006": 889,
+      "2007": 1187,
+      "2008": 1261,
+      "2009": 645,
+      "2010": 706,
+      "2011": 609,
+      "2012": 1275,
+      "2013": 2446,
+      "2014": 1958,
+      "2015": 2301,
+      "2016": 2014,
+      "2017": 1848,
+      "2018": 1802,
+      "2019": 2185,
+      "2020": 2239,
+      "2021": 2247,
+      "2022": 2247,
+      "2023": 2061,
+      "2024": 2957,
+      "2025": 2335,
+      "2026": 1796
+    },
+    "active_days": 6829
+  },
+  "source_lines": {
+    "added": 5661442,
+    "current": 1179745
   }
 }

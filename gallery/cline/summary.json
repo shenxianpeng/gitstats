@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:45:15+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:39:29+00:00",
   "name": "Cline",
   "report_path": "index.html",
   "first_commit": "2024-07-06 00:51:41",
-  "last_commit": "2026-10-22 23:55:24",
-  "age_days": 839,
-  "active_days": 741,
-  "total_commits": 7668,
+  "last_commit": "2026-10-24 05:46:17",
+  "age_days": 841,
+  "active_days": 743,
+  "total_commits": 7691,
   "total_authors": 348,
   "active_authors_12mo": 152,
-  "commits_last_12mo": 3753,
-  "total_files": 4329,
-  "total_lines": 1203128,
-  "lines_added": 2694368,
-  "lines_removed": 1491240,
+  "commits_last_12mo": 3776,
+  "total_files": 4366,
+  "total_lines": 1217650,
+  "lines_added": 2711146,
+  "lines_removed": 1493496,
   "total_tags": 766,
   "era": "steady",
   "top_authors": [
     {
       "name": "Saoud Rizwan",
-      "commits": 2837
+      "commits": 2853
     },
     {
       "name": "Bee",
-      "commits": 730
+      "commits": 734
     },
     {
       "name": "celestial-vault",
@@ -41,15 +41,15 @@
     }
   ],
   "author_commits": {
-    "Saoud Rizwan": 2837,
+    "Saoud Rizwan": 2853,
+    "Bee": 734,
+    "Tom\u00e1s Barreiro": 252,
+    "Miko\u0142aj Kondratek": 106,
+    "John Choi": 76,
     "Max": 100,
     "zurrll": 1,
-    "Miko\u0142aj Kondratek": 105,
-    "Bee": 730,
-    "John Choi": 75,
     "Dominic Cooney": 114,
     "Lucien": 2,
-    "Tom\u00e1s Barreiro": 251,
     "TheRealSpencer": 11,
     "WANG JIANFEI": 1,
     "Fenil Modi": 2,
@@ -393,15 +393,15 @@
   "commits_by_year": {
     "2024": 1067,
     "2025": 3336,
-    "2026": 3265
+    "2026": 3288
   },
   "ai_assisted": {
-    "commits": 163,
+    "commits": 167,
     "authored": 0,
     "assistants": {
       "Claude": 72,
-      "GitHub Copilot": 47,
-      "Cursor": 45
+      "Cursor": 49,
+      "GitHub Copilot": 47
     },
     "by_month": {
       "2024-11": 0,
@@ -427,7 +427,7 @@
       "2026-07": 26,
       "2026-08": 14,
       "2026-09": 26,
-      "2026-10": 4
+      "2026-10": 8
     },
     "commits_by_month": {
       "2024-11": 21,
@@ -453,17 +453,17 @@
       "2026-07": 355,
       "2026-08": 392,
       "2026-09": 323,
-      "2026-10": 168
+      "2026-10": 191
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7668,
+    "commits": 7691,
     "by_kind": {
       "organization": 911,
       "one_person": 256,
       "personal": 1213,
-      "hidden": 5100,
+      "hidden": 5123,
       "unknown": 0,
       "bot": 188
     },
@@ -580,7 +580,7 @@
         "organization": 13,
         "one_person": 2,
         "personal": 13,
-        "hidden": 139,
+        "hidden": 162,
         "unknown": 0,
         "bot": 1
       }
@@ -589,9 +589,22 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3692,
+    "commits": 3715,
     "authors": 148,
     "new_authors": 117,
     "half_of_commits": 3
+  },
+  "humans": {
+    "commits": 7503,
+    "commits_by_year": {
+      "2024": 1067,
+      "2025": 3188,
+      "2026": 3248
+    },
+    "active_days": 742
+  },
+  "source_lines": {
+    "added": 2597596,
+    "current": 1175350
   }
 }

@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:53:44+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:47:14+00:00",
   "name": "Neovim",
   "report_path": "index.html",
   "first_commit": "2014-01-31 13:39:15",
@@ -10,7 +10,7 @@
   "active_days": 4500,
   "total_commits": 38552,
   "total_authors": 1505,
-  "active_authors_12mo": 289,
+  "active_authors_12mo": 288,
   "commits_last_12mo": 4198,
   "total_files": 3940,
   "total_lines": 1738792,
@@ -1775,5 +1775,28 @@
     "authors": 285,
     "new_authors": 205,
     "half_of_commits": 2
+  },
+  "humans": {
+    "commits": 38393,
+    "commits_by_year": {
+      "2014": 2640,
+      "2015": 2124,
+      "2016": 2468,
+      "2017": 2838,
+      "2018": 2294,
+      "2019": 2769,
+      "2020": 1987,
+      "2021": 2786,
+      "2022": 4309,
+      "2023": 3971,
+      "2024": 3279,
+      "2025": 3354,
+      "2026": 3574
+    },
+    "active_days": 4500
+  },
+  "source_lines": {
+    "added": 3672231,
+    "current": 1702923
   }
 }

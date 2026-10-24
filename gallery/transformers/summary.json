@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:46:14+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:40:43+00:00",
   "name": "Transformers",
   "report_path": "index.html",
   "first_commit": "2018-10-29 13:56:02",
-  "last_commit": "2026-10-23 13:22:36",
-  "age_days": 2916,
+  "last_commit": "2026-10-23 17:36:24",
+  "age_days": 2917,
   "active_days": 2349,
-  "total_commits": 24486,
+  "total_commits": 24487,
   "total_authors": 3939,
-  "active_authors_12mo": 662,
-  "commits_last_12mo": 3479,
+  "active_authors_12mo": 661,
+  "commits_last_12mo": 3480,
   "total_files": 6644,
-  "total_lines": 2092911,
-  "lines_added": 4562893,
-  "lines_removed": 2469982,
+  "total_lines": 2092923,
+  "lines_added": 4562939,
+  "lines_removed": 2470016,
   "total_tags": 87,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Steven Liu": 260,
     "Ilyas Moutawwakil": 74,
     "eustlb": 84,
     "kaixuanliu": 125,
@@ -93,7 +94,6 @@
     "Matt": 452,
     "Jin": 1,
     "airlsyn": 1,
-    "Steven Liu": 259,
     "Albert Villanova del Moral": 23,
     "Ting SUN": 13,
     "Harry Mellor": 50,
@@ -3990,7 +3990,7 @@
     "2023": 3144,
     "2024": 2850,
     "2025": 3909,
-    "2026": 2911
+    "2026": 2912
   },
   "ai_assisted": {
     "commits": 285,
@@ -4053,17 +4053,17 @@
       "2026-07": 284,
       "2026-08": 277,
       "2026-09": 341,
-      "2026-10": 321
+      "2026-10": 322
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 24486,
+    "commits": 24487,
     "by_kind": {
       "organization": 2608,
       "one_person": 1945,
       "personal": 8874,
-      "hidden": 10853,
+      "hidden": 10854,
       "unknown": 14,
       "bot": 192
     },
@@ -4596,7 +4596,7 @@
         "organization": 53,
         "one_person": 18,
         "personal": 39,
-        "hidden": 206,
+        "hidden": 207,
         "unknown": 0,
         "bot": 5
       }
@@ -4605,9 +4605,28 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3437,
+    "commits": 3438,
     "authors": 657,
     "new_authors": 520,
     "half_of_commits": 15
+  },
+  "humans": {
+    "commits": 24295,
+    "commits_by_year": {
+      "2018": 345,
+      "2019": 2582,
+      "2020": 3275,
+      "2021": 2393,
+      "2022": 3044,
+      "2023": 3108,
+      "2024": 2780,
+      "2025": 3898,
+      "2026": 2870
+    },
+    "active_days": 2349
+  },
+  "source_lines": {
+    "added": 4597076,
+    "current": 2079602
   }
 }

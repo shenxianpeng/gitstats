@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:46:20+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:40:30+00:00",
   "name": "Qwen Code",
   "report_path": "index.html",
   "first_commit": "2025-04-16 04:41:08",
-  "last_commit": "2026-10-23 16:44:20",
-  "age_days": 556,
-  "active_days": 514,
-  "total_commits": 11377,
+  "last_commit": "2026-10-24 17:29:22",
+  "age_days": 557,
+  "active_days": 515,
+  "total_commits": 11440,
   "total_authors": 610,
   "active_authors_12mo": 324,
-  "commits_last_12mo": 8875,
-  "total_files": 12769,
-  "total_lines": 6130421,
-  "lines_added": 8006582,
-  "lines_removed": 1876161,
+  "commits_last_12mo": 8938,
+  "total_files": 12911,
+  "total_lines": 6197939,
+  "lines_added": 8078654,
+  "lines_removed": 1880715,
   "total_tags": 98,
   "era": "steady",
   "top_authors": [
     {
       "name": "\u6613\u826f",
-      "commits": 1539
+      "commits": 1564
     },
     {
       "name": "Shaojin Wen",
-      "commits": 1458
+      "commits": 1476
     },
     {
       "name": "tanzhenxin",
@@ -33,31 +33,35 @@
     },
     {
       "name": "jinye",
-      "commits": 592
+      "commits": 596
     },
     {
       "name": "qqqys",
-      "commits": 520
+      "commits": 523
     }
   ],
   "author_commits": {
-    "qqqys": 520,
-    "\u6613\u826f": 1539,
-    "jinye": 592,
-    "Shaojin Wen": 1458,
-    "Qiu": 5,
+    "\u6613\u826f": 1564,
+    "Bob.qwencode": 27,
+    "jinye": 596,
+    "ChiGao": 122,
+    "qqqys": 523,
+    "Shaojin Wen": 1476,
+    "qwen-code-dev-bot": 246,
+    "\u66f9\u6f47\u7f24": 10,
+    "Jabrail": 12,
+    "callmeYe": 89,
+    "Kun De": 3,
+    "Yaroslav Sivakov": 3,
+    "Qiu": 6,
     "ytahdn": 249,
-    "qwen-code-dev-bot": 243,
-    "ChiGao": 121,
     "Heyang Wang": 19,
     "Yufeng He": 57,
     "Mohammed Alkindi": 2,
     "Xiaonan Li": 3,
     "Canberk Pitirli": 3,
-    "callmeYe": 88,
     "Aleksandr Shpak": 2,
     "zjgzx1988": 10,
-    "Bob.qwencode": 25,
     "\u70fd\u5b81": 6,
     "\u987e\u76fc": 376,
     "Edenman": 28,
@@ -66,7 +70,6 @@
     "ZedingZhang": 2,
     "4ekuct25": 1,
     "Cenab Batu Bora": 1,
-    "\u66f9\u6f47\u7f24": 9,
     "haochen": 2,
     "bu-xiu-bug-AI": 9,
     "Boulanouar Walid": 1,
@@ -86,7 +89,6 @@
     "Jay0130-a": 1,
     "hahahahahayesyeseys": 1,
     "Anton Dziatkovskii": 2,
-    "Jabrail": 11,
     "LUOSENGWA": 2,
     "Andrea-Bruno": 2,
     "Yan Shen": 18,
@@ -112,7 +114,6 @@
     "banned2054": 1,
     "pratik wayase": 7,
     "Zhu Lei": 5,
-    "Yaroslav Sivakov": 2,
     "Barry": 6,
     "kuse": 1,
     "Juampi": 1,
@@ -168,7 +169,6 @@
     "snoopyIsADog": 1,
     "Octopus": 1,
     "Isaac Hern\u00e1ndez": 1,
-    "Kun De": 1,
     "Changxiao Ruan": 4,
     "carffuca": 21,
     "Michael Yochpaz": 1,
@@ -654,7 +654,7 @@
   },
   "commits_by_year": {
     "2025": 3155,
-    "2026": 8222
+    "2026": 8285
   },
   "ai_assisted": {
     "commits": 625,
@@ -718,17 +718,17 @@
       "2026-07": 1315,
       "2026-08": 1068,
       "2026-09": 1181,
-      "2026-10": 1035
+      "2026-10": 1098
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11377,
+    "commits": 11440,
     "by_kind": {
-      "organization": 2773,
-      "one_person": 484,
-      "personal": 6865,
-      "hidden": 1133,
+      "organization": 2791,
+      "one_person": 487,
+      "personal": 6906,
+      "hidden": 1134,
       "unknown": 31,
       "bot": 91
     },
@@ -737,11 +737,11 @@
     "top": [
       {
         "organization": "alibaba-inc.com",
-        "commits": 1912,
-        "commits_last_12mo": 1877,
+        "commits": 1930,
+        "commits_last_12mo": 1895,
         "addresses": 19,
         "first_commit": "2025-06-26",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-24"
       },
       {
         "organization": "google.com",
@@ -810,10 +810,10 @@
         "bot": 33
       },
       "2026-Q4": {
-        "organization": 376,
-        "one_person": 86,
-        "personal": 537,
-        "hidden": 35,
+        "organization": 394,
+        "one_person": 89,
+        "personal": 578,
+        "hidden": 36,
         "unknown": 0,
         "bot": 1
       }
@@ -822,9 +822,21 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 8871,
+    "commits": 8934,
     "authors": 320,
     "new_authors": 310,
     "half_of_commits": 4
+  },
+  "humans": {
+    "commits": 11349,
+    "commits_by_year": {
+      "2025": 3140,
+      "2026": 8209
+    },
+    "active_days": 515
+  },
+  "source_lines": {
+    "added": 8252106,
+    "current": 6130167
   }
 }

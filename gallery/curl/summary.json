@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:53:51+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:47:28+00:00",
   "name": "curl",
   "report_path": "index.html",
   "first_commit": "1999-12-29 14:20:26",
-  "last_commit": "2026-10-23 01:47:06",
-  "age_days": 9795,
-  "active_days": 7812,
-  "total_commits": 40237,
-  "total_authors": 1539,
+  "last_commit": "2026-10-24 11:14:00",
+  "age_days": 9796,
+  "active_days": 7813,
+  "total_commits": 40247,
+  "total_authors": 1540,
   "active_authors_12mo": 189,
-  "commits_last_12mo": 3529,
-  "total_files": 4599,
-  "total_lines": 630988,
-  "lines_added": 1947910,
-  "lines_removed": 1316922,
+  "commits_last_12mo": 3539,
+  "total_files": 4602,
+  "total_lines": 631639,
+  "lines_added": 1948723,
+  "lines_removed": 1317084,
   "total_tags": 217,
   "era": "surge",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Viktor Szakats",
-      "commits": 3564
+      "commits": 3567
     },
     {
       "name": "Yang Tse",
@@ -37,21 +37,23 @@
     },
     {
       "name": "Dan Fandrich",
-      "commits": 1470
+      "commits": 1471
     }
   ],
   "author_commits": {
+    "Viktor Szakats": 3567,
+    "Martin Mirchev": 9,
+    "Armaan Sandhu": 3,
+    "Michiel van Slobbe": 2,
+    "Stefan Eissing": 1279,
+    "Dan Fandrich": 1471,
     "Derek Martin": 1,
-    "Michiel van Slobbe": 1,
-    "Viktor Szakats": 3564,
     "matty69v": 3,
-    "Stefan Eissing": 1278,
     "11soda11": 4,
     "Daniel Stenberg": 20747,
     "Stephen Augustus": 1,
     "AP": 1,
     "Khaled": 1,
-    "Martin Mirchev": 8,
     "akashdeshmukh-git": 2,
     "Martin Vlach": 2,
     "Jon DeVree": 4,
@@ -78,7 +80,6 @@
     "Jorge Rocamora": 4,
     "Renan Pimentel": 1,
     "Max Dymond": 67,
-    "Dan Fandrich": 1470,
     "Johannes Schindelin": 51,
     "xhon-pelushi": 4,
     "Marcel Raad": 407,
@@ -1609,7 +1610,7 @@
     "2023": 1905,
     "2024": 2436,
     "2025": 3477,
-    "2026": 2788
+    "2026": 2798
   },
   "ai_assisted": {
     "commits": 2,
@@ -1668,16 +1669,16 @@
       "2026-07": 173,
       "2026-08": 259,
       "2026-09": 355,
-      "2026-10": 273
+      "2026-10": 283
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 40237,
+    "commits": 40247,
     "by_kind": {
       "organization": 22023,
-      "one_person": 10639,
-      "personal": 6889,
+      "one_person": 10645,
+      "personal": 6893,
       "hidden": 313,
       "unknown": 60,
       "bot": 313
@@ -2201,8 +2202,8 @@
       },
       "2026-Q4": {
         "organization": 51,
-        "one_person": 173,
-        "personal": 23,
+        "one_person": 179,
+        "personal": 27,
         "hidden": 15,
         "unknown": 0,
         "bot": 11
@@ -2212,9 +2213,47 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3401,
-    "authors": 187,
-    "new_authors": 144,
+    "commits": 3411,
+    "authors": 188,
+    "new_authors": 145,
     "half_of_commits": 2
+  },
+  "humans": {
+    "commits": 39934,
+    "commits_by_year": {
+      "1999": 1,
+      "2000": 710,
+      "2001": 1346,
+      "2002": 937,
+      "2003": 1218,
+      "2004": 2102,
+      "2005": 1094,
+      "2006": 884,
+      "2007": 1434,
+      "2008": 1632,
+      "2009": 1137,
+      "2010": 1085,
+      "2011": 1094,
+      "2012": 1013,
+      "2013": 1515,
+      "2014": 1758,
+      "2015": 1210,
+      "2016": 1234,
+      "2017": 1375,
+      "2018": 1089,
+      "2019": 1263,
+      "2020": 1485,
+      "2021": 1441,
+      "2022": 1574,
+      "2023": 1905,
+      "2024": 2354,
+      "2025": 3348,
+      "2026": 2696
+    },
+    "active_days": 7809
+  },
+  "source_lines": {
+    "added": 1948737,
+    "current": 495335
   }
 }

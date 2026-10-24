@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:50:52+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:44:03+00:00",
   "name": "Kubernetes",
   "report_path": "index.html",
   "first_commit": "2014-06-06 23:40:48",
-  "last_commit": "2026-10-23 16:13:25",
-  "age_days": 4522,
-  "active_days": 4481,
-  "total_commits": 142499,
+  "last_commit": "2026-10-24 15:00:02",
+  "age_days": 4523,
+  "active_days": 4482,
+  "total_commits": 142518,
   "total_authors": 4905,
-  "active_authors_12mo": 619,
-  "commits_last_12mo": 8505,
-  "total_files": 31500,
-  "total_lines": 7312090,
-  "lines_added": 28014011,
-  "lines_removed": 20701921,
+  "active_authors_12mo": 616,
+  "commits_last_12mo": 8524,
+  "total_files": 31507,
+  "total_lines": 7317238,
+  "lines_added": 28021245,
+  "lines_removed": 20704007,
   "total_tags": 215,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Ania Borowiec": 32,
+    "Ivan Valdes": 8,
     "Danki Hong": 3,
     "Jaros\u0142aw Dzikowski": 33,
     "Marek Siarkowicz": 395,
@@ -49,6 +51,7 @@
     "Wojciech Tyczy\u0144ski": 1916,
     "Sascha Grunert": 204,
     "Ciprian Hacman": 19,
+    "Anant Kumar": 11,
     "Joe Betz": 535,
     "Jefftree": 409,
     "upodroid": 47,
@@ -58,6 +61,7 @@
     "Francesco Romani": 214,
     "Antonio Ojea": 733,
     "Nabarun Pal": 37,
+    "Ed Bartosh": 309,
     "Doramarothy": 2,
     "ashishpatel26": 3,
     "Praveen Krishna": 91,
@@ -71,11 +75,12 @@
     "Anish Ramasekar": 194,
     "Jian Zhang": 4,
     "Matt Boersma": 5,
-    "Rishabh Raj": 1,
+    "Yongrui Lin": 352,
+    "Rishabh Raj": 4,
     "Dan Winship": 656,
-    "Davanum Srinivas": 1129,
-    "Yongrui Lin": 351,
+    "Davanum Srinivas": 1131,
     "Marly Salazar": 5,
+    "SEPURI-SAI-KRISHNA": 2,
     "yuzhiquan": 30,
     "Mikhail Fedosin": 7,
     "xin.li": 68,
@@ -88,7 +93,6 @@
     "Maciej Wyrzuc": 33,
     "Stephen Kitt": 149,
     "Franciszek": 1,
-    "SEPURI-SAI-KRISHNA": 1,
     "paniccaaa": 2,
     "supahero1": 1,
     "Paco Xu": 451,
@@ -155,7 +159,6 @@
     "Stephane Loeuillet": 1,
     "Zhiting Zhu": 1,
     "Andrzej Wasylkowski": 18,
-    "Anant Kumar": 10,
     "Austin Abro": 6,
     "jubittajohn": 2,
     "Siddhanth Gupta": 1,
@@ -267,7 +270,6 @@
     "bzsuni": 51,
     "Tim Allclair": 406,
     "Dean Chen": 1,
-    "Ed Bartosh": 307,
     "Priyanka Saggu": 12,
     "anshulchikhale30p": 4,
     "utam0k": 28,
@@ -346,7 +348,6 @@
     "Sparsh Garg": 1,
     "elmiko": 6,
     "Kunalbehbud": 1,
-    "Ania Borowiec": 31,
     "RyanLin5967": 1,
     "rithwik-01": 7,
     "uditDewan": 2,
@@ -592,7 +593,6 @@
     "Tore L\u00f8n\u00f8y": 1,
     "Yuvraj": 4,
     "MohammedSaalif": 1,
-    "Ivan Valdes": 7,
     "Basheer": 2,
     "Vinayak Goyal": 59,
     "rogowski-piotr": 1,
@@ -4960,7 +4960,7 @@
     "2023": 7533,
     "2024": 7044,
     "2025": 7152,
-    "2026": 7624
+    "2026": 7643
   },
   "ai_assisted": {
     "commits": 10,
@@ -5021,30 +5021,30 @@
       "2026-07": 1115,
       "2026-08": 397,
       "2026-09": 855,
-      "2026-10": 680
+      "2026-10": 699
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 142499,
+    "commits": 142518,
     "by_kind": {
-      "organization": 65669,
-      "one_person": 5027,
-      "personal": 24868,
-      "hidden": 45562,
+      "organization": 65672,
+      "one_person": 5028,
+      "personal": 24872,
+      "hidden": 45566,
       "unknown": 2,
-      "bot": 1371
+      "bot": 1378
     },
     "organization_count": 156,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "google.com",
-        "commits": 35207,
-        "commits_last_12mo": 1561,
+        "commits": 35208,
+        "commits_last_12mo": 1562,
         "addresses": 498,
         "first_commit": "2014-06-07",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-24"
       },
       {
         "organization": "redhat.com",
@@ -5056,11 +5056,11 @@
       },
       {
         "organization": "intel.com",
-        "commits": 2241,
-        "commits_last_12mo": 359,
+        "commits": 2243,
+        "commits_last_12mo": 361,
         "addresses": 39,
         "first_commit": "2016-04-01",
-        "last_commit": "2026-10-15"
+        "last_commit": "2026-10-22"
       },
       {
         "organization": "huawei.com",
@@ -6345,21 +6345,44 @@
         "bot": 933
       },
       "2026-Q4": {
-        "organization": 181,
-        "one_person": 25,
-        "personal": 120,
-        "hidden": 19,
+        "organization": 184,
+        "one_person": 26,
+        "personal": 124,
+        "hidden": 23,
         "unknown": 0,
-        "bot": 335
+        "bot": 342
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 7134,
+    "commits": 7146,
     "authors": 608,
     "new_authors": 362,
     "half_of_commits": 15
+  },
+  "humans": {
+    "commits": 141140,
+    "commits_by_year": {
+      "2014": 4577,
+      "2015": 18247,
+      "2016": 18787,
+      "2017": 18378,
+      "2018": 13447,
+      "2019": 13865,
+      "2020": 9638,
+      "2021": 8968,
+      "2022": 7239,
+      "2023": 7533,
+      "2024": 7044,
+      "2025": 7152,
+      "2026": 6265
+    },
+    "active_days": 4481
+  },
+  "source_lines": {
+    "added": 14746144,
+    "current": 4432878
   }
 }

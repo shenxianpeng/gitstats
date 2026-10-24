@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:52:26+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:45:57+00:00",
   "name": "Milvus",
   "report_path": "index.html",
   "first_commit": "2019-03-18 11:33:09",
-  "last_commit": "2026-10-23 10:49:53",
-  "age_days": 2776,
+  "last_commit": "2026-10-23 22:15:53",
+  "age_days": 2777,
   "active_days": 2300,
-  "total_commits": 25869,
+  "total_commits": 25870,
   "total_authors": 383,
   "active_authors_12mo": 103,
-  "commits_last_12mo": 2499,
+  "commits_last_12mo": 2500,
   "total_files": 7273,
-  "total_lines": 3523422,
-  "lines_added": 8017146,
-  "lines_removed": 4493724,
+  "total_lines": 3523736,
+  "lines_added": 8017558,
+  "lines_removed": 4493822,
   "total_tags": 35,
   "era": "steady",
   "top_authors": [
@@ -41,8 +41,8 @@
     }
   ],
   "author_commits": {
+    "sijie-ni-0214": 75,
     "Li Liu": 111,
-    "sijie-ni-0214": 74,
     "cai.zhang": 833,
     "Wangshu": 2,
     "Chun Han": 216,
@@ -433,7 +433,7 @@
     "2023": 2450,
     "2024": 2810,
     "2025": 2228,
-    "2026": 2085
+    "2026": 2086
   },
   "ai_assisted": {
     "commits": 697,
@@ -494,14 +494,14 @@
       "2026-07": 270,
       "2026-08": 219,
       "2026-09": 217,
-      "2026-10": 183
+      "2026-10": 184
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 25869,
+    "commits": 25870,
     "by_kind": {
-      "organization": 18938,
+      "organization": 18939,
       "one_person": 164,
       "personal": 2669,
       "hidden": 4061,
@@ -513,8 +513,8 @@
     "top": [
       {
         "organization": "zilliz.com",
-        "commits": 18924,
-        "commits_last_12mo": 1306,
+        "commits": 18925,
+        "commits_last_12mo": 1307,
         "addresses": 103,
         "first_commit": "2019-03-18",
         "last_commit": "2026-10-23"
@@ -618,7 +618,7 @@
         "bot": 1
       },
       "2026-Q4": {
-        "organization": 81,
+        "organization": 82,
         "one_person": 0,
         "personal": 55,
         "hidden": 47,
@@ -630,9 +630,27 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2497,
+    "commits": 2498,
     "authors": 102,
     "new_authors": 56,
     "half_of_commits": 10
+  },
+  "humans": {
+    "commits": 25840,
+    "commits_by_year": {
+      "2019": 4644,
+      "2020": 1360,
+      "2021": 7592,
+      "2022": 2681,
+      "2023": 2443,
+      "2024": 2810,
+      "2025": 2226,
+      "2026": 2084
+    },
+    "active_days": 2300
+  },
+  "source_lines": {
+    "added": 6225936,
+    "current": 2755788
   }
 }

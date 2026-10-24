@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:53:50+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:47:11+00:00",
   "name": "Homebrew",
   "report_path": "index.html",
   "first_commit": "2009-05-20 23:04:11",
-  "last_commit": "2026-10-23 15:51:10",
-  "age_days": 6365,
-  "active_days": 5601,
-  "total_commits": 53315,
-  "total_authors": 1319,
-  "active_authors_12mo": 192,
-  "commits_last_12mo": 6323,
+  "last_commit": "2026-10-24 16:31:14",
+  "age_days": 6366,
+  "active_days": 5602,
+  "total_commits": 53333,
+  "total_authors": 1323,
+  "active_authors_12mo": 196,
+  "commits_last_12mo": 6341,
   "total_files": 3431,
-  "total_lines": 534105,
-  "lines_added": 1960908,
-  "lines_removed": 1426803,
+  "total_lines": 534708,
+  "lines_added": 1961581,
+  "lines_removed": 1426873,
   "total_tags": 538,
   "era": "peak",
   "top_authors": [
     {
       "name": "Mike McQuaid",
-      "commits": 14571
+      "commits": 14580
     },
     {
       "name": "BrewTestBot",
@@ -41,12 +41,18 @@
     }
   ],
   "author_commits": {
-    "Mike McQuaid": 14571,
+    "Mike McQuaid": 14580,
+    "Andrew Nesbitt": 108,
+    "Justin Krehel": 54,
+    "Aktan Azat": 1,
+    "Bevan Kay": 303,
+    "Maksym Tymoshyk": 1,
+    "xucian": 1,
     "Anton Melnikov": 197,
     "BrewTestBot": 3343,
+    "QuillVot": 1,
     "Izaak Beekman": 14,
     "Patrick Linnane": 1550,
-    "Bevan Kay": 302,
     "edel67": 9,
     "hyuraku": 349,
     "Ingmar Stein": 5,
@@ -55,7 +61,6 @@
     "Douglas Eichelberger": 1009,
     "BrandenXia": 3,
     "Xavier Lange": 1,
-    "Justin Krehel": 53,
     "Carlo Cabrera": 1212,
     "Hafez": 19,
     "adamv": 1074,
@@ -75,7 +80,6 @@
     "Erik Weathers": 1,
     "TSURU": 1,
     "Ivan Dergachev": 2,
-    "Andrew Nesbitt": 105,
     "Hoshino-Yumetsuki": 1,
     "kronikpillow": 1,
     "rseleven": 2,
@@ -1379,7 +1383,7 @@
     "2023": 4255,
     "2024": 5411,
     "2025": 4570,
-    "2026": 5566
+    "2026": 5584
   },
   "ai_assisted": {
     "commits": 218,
@@ -1440,17 +1444,17 @@
       "2026-07": 971,
       "2026-08": 640,
       "2026-09": 761,
-      "2026-10": 341
+      "2026-10": 359
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 53315,
+    "commits": 53333,
     "by_kind": {
       "organization": 1125,
-      "one_person": 26919,
-      "personal": 15799,
-      "hidden": 6867,
+      "one_person": 26929,
+      "personal": 15805,
+      "hidden": 6869,
       "unknown": 49,
       "bot": 2556
     },
@@ -1669,9 +1673,9 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 245,
-        "personal": 47,
-        "hidden": 33,
+        "one_person": 255,
+        "personal": 53,
+        "hidden": 35,
         "unknown": 0,
         "bot": 16
       }
@@ -1680,9 +1684,37 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 6151,
-    "authors": 191,
-    "new_authors": 125,
+    "commits": 6169,
+    "authors": 195,
+    "new_authors": 129,
     "half_of_commits": 2
+  },
+  "humans": {
+    "commits": 50777,
+    "commits_by_year": {
+      "2009": 617,
+      "2010": 567,
+      "2011": 556,
+      "2012": 1148,
+      "2013": 1889,
+      "2014": 2074,
+      "2015": 1794,
+      "2016": 3060,
+      "2017": 3056,
+      "2018": 2731,
+      "2019": 1943,
+      "2020": 5269,
+      "2021": 4455,
+      "2022": 3057,
+      "2023": 4098,
+      "2024": 4850,
+      "2025": 4188,
+      "2026": 5425
+    },
+    "active_days": 5599
+  },
+  "source_lines": {
+    "added": 1821121,
+    "current": 465090
   }
 }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:43:30+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:37:56+00:00",
   "name": "FastAPI",
   "report_path": "index.html",
   "first_commit": "2018-12-05 06:56:50",
-  "last_commit": "2026-10-22 19:13:01",
-  "age_days": 2879,
-  "active_days": 910,
-  "total_commits": 7942,
+  "last_commit": "2026-10-23 18:45:33",
+  "age_days": 2880,
+  "active_days": 911,
+  "total_commits": 7945,
   "total_authors": 888,
   "active_authors_12mo": 68,
-  "commits_last_12mo": 1750,
-  "total_files": 3230,
-  "total_lines": 408522,
-  "lines_added": 824157,
-  "lines_removed": 415635,
-  "total_tags": 343,
+  "commits_last_12mo": 1753,
+  "total_files": 3233,
+  "total_lines": 408651,
+  "lines_added": 824399,
+  "lines_removed": 415748,
+  "total_tags": 344,
   "era": "surge",
   "top_authors": [
     {
       "name": "Sebasti\u00e1n Ram\u00edrez",
-      "commits": 2308
+      "commits": 2309
     },
     {
       "name": "github-actions",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Sebasti\u00e1n Ram\u00edrez": 2308,
+    "Sebasti\u00e1n Ram\u00edrez": 2309,
     "Yurii Motov": 124,
     "Mix": 1,
     "Victorien": 3,
@@ -939,7 +939,7 @@
     "2023": 780,
     "2024": 1999,
     "2025": 1150,
-    "2026": 1439
+    "2026": 1442
   },
   "ai_assisted": {
     "commits": 3,
@@ -999,19 +999,19 @@
       "2026-07": 209,
       "2026-08": 88,
       "2026-09": 35,
-      "2026-10": 212
+      "2026-10": 215
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7942,
+    "commits": 7945,
     "by_kind": {
       "organization": 7,
       "one_person": 155,
-      "personal": 3328,
+      "personal": 3329,
       "hidden": 875,
       "unknown": 0,
-      "bot": 3577
+      "bot": 3579
     },
     "organization_count": 3,
     "last_12mo_from": "2025-11",
@@ -1101,19 +1101,38 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 0,
-        "personal": 45,
+        "personal": 46,
         "hidden": 6,
         "unknown": 0,
-        "bot": 161
+        "bot": 163
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 730,
+    "commits": 731,
     "authors": 68,
     "new_authors": 54,
     "half_of_commits": 1
+  },
+  "humans": {
+    "commits": 4366,
+    "commits_by_year": {
+      "2018": 190,
+      "2019": 510,
+      "2020": 621,
+      "2021": 252,
+      "2022": 324,
+      "2023": 395,
+      "2024": 974,
+      "2025": 535,
+      "2026": 565
+    },
+    "active_days": 852
+  },
+  "source_lines": {
+    "added": 810524,
+    "current": 403627
   }
 }

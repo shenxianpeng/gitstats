@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:53:01+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:46:50+00:00",
   "name": "Git",
   "report_path": "index.html",
   "first_commit": "2005-04-07 22:13:13",
@@ -10,7 +10,7 @@
   "active_days": 7345,
   "total_commits": 82563,
   "total_authors": 2368,
-  "active_authors_12mo": 222,
+  "active_authors_12mo": 221,
   "commits_last_12mo": 3625,
   "total_files": 4856,
   "total_lines": 1691632,
@@ -3216,5 +3216,37 @@
     "authors": 219,
     "new_authors": 134,
     "half_of_commits": 3
+  },
+  "humans": {
+    "commits": 82563,
+    "commits_by_year": {
+      "2005": 3137,
+      "2006": 4551,
+      "2007": 5381,
+      "2008": 3992,
+      "2009": 3689,
+      "2010": 3716,
+      "2011": 3318,
+      "2012": 3622,
+      "2013": 4169,
+      "2014": 2969,
+      "2015": 3198,
+      "2016": 3731,
+      "2017": 4469,
+      "2018": 4451,
+      "2019": 3725,
+      "2020": 3549,
+      "2021": 3919,
+      "2022": 3519,
+      "2023": 2835,
+      "2024": 3967,
+      "2025": 3491,
+      "2026": 3165
+    },
+    "active_days": 7345
+  },
+  "source_lines": {
+    "added": 4074297,
+    "current": 1655125
   }
 }

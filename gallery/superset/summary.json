@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:50:14+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:44:06+00:00",
   "name": "Apache Superset",
   "report_path": "index.html",
   "first_commit": "2015-07-02 22:16:59",
-  "last_commit": "2026-10-23 15:58:46",
-  "age_days": 4131,
-  "active_days": 3318,
-  "total_commits": 23954,
+  "last_commit": "2026-10-24 12:31:54",
+  "age_days": 4132,
+  "active_days": 3319,
+  "total_commits": 23975,
   "total_authors": 1728,
-  "active_authors_12mo": 471,
-  "commits_last_12mo": 6002,
-  "total_files": 11446,
-  "total_lines": 3041206,
-  "lines_added": 8707624,
-  "lines_removed": 5666418,
+  "active_authors_12mo": 470,
+  "commits_last_12mo": 6023,
+  "total_files": 11448,
+  "total_lines": 3044147,
+  "lines_added": 8710874,
+  "lines_removed": 5666727,
   "total_tags": 232,
   "era": "peak",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Evan Rusackas",
-      "commits": 1331
+      "commits": 1332
     },
     {
       "name": "Ville Brofeldt",
@@ -41,18 +41,18 @@
     }
   ],
   "author_commits": {
-    "Evan Rusackas": 1331,
+    "Amin Ghadersohi": 379,
+    "Mike Bridge": 219,
+    "Evan Rusackas": 1332,
+    "Joe Li": 316,
+    "Sam Firke": 84,
     "SBIN2010": 58,
     "Rafael Benitez": 37,
     "Amogh Atreya": 7,
     "Enzo Martellucci": 124,
-    "Joe Li": 313,
-    "Amin Ghadersohi": 378,
     "Elizabeth Thompson": 400,
     "Shaitan": 80,
     "Aleem Sattar": 3,
-    "Mike Bridge": 216,
-    "Sam Firke": 83,
     "Miko\u0142aj Balcerek": 1,
     "Michael Gerber": 8,
     "Jean Massucatto": 29,
@@ -1782,13 +1782,13 @@
     "2023": 1594,
     "2024": 2068,
     "2025": 1996,
-    "2026": 5584
+    "2026": 5605
   },
   "ai_assisted": {
-    "commits": 2110,
+    "commits": 2117,
     "authored": 0,
     "assistants": {
-      "Claude": 2078,
+      "Claude": 2085,
       "GitHub Copilot": 34,
       "Cursor": 12,
       "Devin": 7
@@ -1817,7 +1817,7 @@
       "2026-07": 301,
       "2026-08": 258,
       "2026-09": 347,
-      "2026-10": 206
+      "2026-10": 213
     },
     "commits_by_month": {
       "2024-11": 191,
@@ -1843,30 +1843,30 @@
       "2026-07": 808,
       "2026-08": 728,
       "2026-09": 841,
-      "2026-10": 577
+      "2026-10": 598
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 23954,
+    "commits": 23975,
     "by_kind": {
-      "organization": 3963,
+      "organization": 3970,
       "one_person": 1377,
-      "personal": 9075,
-      "hidden": 5776,
+      "personal": 9076,
+      "hidden": 5777,
       "unknown": 0,
-      "bot": 3763
+      "bot": 3775
     },
     "organization_count": 16,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "preset.io",
-        "commits": 2105,
-        "commits_last_12mo": 1288,
+        "commits": 2112,
+        "commits_last_12mo": 1295,
         "addresses": 12,
         "first_commit": "2019-06-09",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-24"
       },
       {
         "organization": "airbnb.com",
@@ -2047,21 +2047,43 @@
         "bot": 778
       },
       "2026-Q4": {
-        "organization": 196,
+        "organization": 203,
         "one_person": 16,
-        "personal": 135,
-        "hidden": 76,
+        "personal": 136,
+        "hidden": 77,
         "unknown": 0,
-        "bot": 154
+        "bot": 166
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3911,
+    "commits": 3920,
     "authors": 468,
     "new_authors": 391,
     "half_of_commits": 6
+  },
+  "humans": {
+    "commits": 20200,
+    "commits_by_year": {
+      "2015": 432,
+      "2016": 1167,
+      "2017": 1016,
+      "2018": 1219,
+      "2019": 1584,
+      "2020": 2134,
+      "2021": 2940,
+      "2022": 1840,
+      "2023": 1368,
+      "2024": 1393,
+      "2025": 1447,
+      "2026": 3660
+    },
+    "active_days": 3296
+  },
+  "source_lines": {
+    "added": 6967674,
+    "current": 2969471
   }
 }

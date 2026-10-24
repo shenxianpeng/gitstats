@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:49:07+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:43:19+00:00",
   "name": "Apache Iceberg",
   "report_path": "index.html",
   "first_commit": "2017-12-13 21:52:43",
-  "last_commit": "2026-10-23 08:26:22",
-  "age_days": 3236,
-  "active_days": 2289,
-  "total_commits": 9494,
+  "last_commit": "2026-10-24 15:31:01",
+  "age_days": 3237,
+  "active_days": 2290,
+  "total_commits": 9497,
   "total_authors": 839,
   "active_authors_12mo": 275,
-  "commits_last_12mo": 1858,
-  "total_files": 6616,
-  "total_lines": 1494020,
-  "lines_added": 6763401,
-  "lines_removed": 5269381,
+  "commits_last_12mo": 1861,
+  "total_files": 6617,
+  "total_lines": 1495034,
+  "lines_added": 6764476,
+  "lines_removed": 5269442,
   "total_tags": 20,
   "era": "peak",
   "top_authors": [
     {
       "name": "Ryan Blue",
-      "commits": 767
+      "commits": 768
     },
     {
       "name": "Eduard Tudenhoefner",
@@ -41,6 +41,9 @@
     }
   ],
   "author_commits": {
+    "Ryan Blue": 768,
+    "Kevin Liu": 110,
+    "Steven Zhen Wu": 162,
     "Hongyue/Steve Zhang": 99,
     "pvary": 140,
     "Anoop Johnson": 40,
@@ -55,7 +58,6 @@
     "Vova Kolmakov": 29,
     "openinx": 86,
     "gaborkaszab": 80,
-    "Steven Zhen Wu": 161,
     "Rakesh Pai": 1,
     "Anurag Mantripragada": 22,
     "aiborodin": 17,
@@ -94,7 +96,6 @@
     "Thomas Thornton": 4,
     "Charlie Chen": 6,
     "Matt Topol": 5,
-    "Ryan Blue": 767,
     "Marco Kroll": 1,
     "Mithun M": 2,
     "Sushant Raikar": 4,
@@ -103,7 +104,6 @@
     "kumarpritam863": 6,
     "Xiaoxuan": 13,
     "Sreesh Maheshwar": 17,
-    "Kevin Liu": 109,
     "Kurtis Wright": 4,
     "JeonDaehong": 6,
     "Szehon Ho": 101,
@@ -891,16 +891,16 @@
     "2023": 1472,
     "2024": 1231,
     "2025": 1512,
-    "2026": 1610
+    "2026": 1613
   },
   "ai_assisted": {
-    "commits": 106,
+    "commits": 108,
     "authored": 0,
     "assistants": {
       "Claude": 54,
       "Codex": 30,
-      "Cursor": 12,
-      "GitHub Copilot": 10,
+      "Cursor": 13,
+      "GitHub Copilot": 11,
       "ChatGPT": 7,
       "Grok": 2,
       "Kiro": 1,
@@ -930,7 +930,7 @@
       "2026-07": 19,
       "2026-08": 12,
       "2026-09": 21,
-      "2026-10": 12
+      "2026-10": 14
     },
     "commits_by_month": {
       "2024-11": 131,
@@ -956,17 +956,17 @@
       "2026-07": 170,
       "2026-08": 197,
       "2026-09": 195,
-      "2026-10": 136
+      "2026-10": 139
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9494,
+    "commits": 9497,
     "by_kind": {
-      "organization": 2968,
+      "organization": 2969,
       "one_person": 381,
-      "personal": 3514,
-      "hidden": 1523,
+      "personal": 3515,
+      "hidden": 1524,
       "unknown": 0,
       "bot": 1108
     },
@@ -975,11 +975,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 1701,
-        "commits_last_12mo": 250,
+        "commits": 1702,
+        "commits_last_12mo": 251,
         "addresses": 42,
         "first_commit": "2017-12-13",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-24"
       },
       {
         "organization": "apple.com",
@@ -1208,10 +1208,10 @@
         "bot": 102
       },
       "2026-Q4": {
-        "organization": 23,
+        "organization": 24,
         "one_person": 3,
-        "personal": 62,
-        "hidden": 27,
+        "personal": 63,
+        "hidden": 28,
         "unknown": 0,
         "bot": 21
       }
@@ -1220,9 +1220,29 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1523,
+    "commits": 1526,
     "authors": 273,
     "new_authors": 179,
-    "half_of_commits": 17
+    "half_of_commits": 16
+  },
+  "humans": {
+    "commits": 8389,
+    "commits_by_year": {
+      "2017": 17,
+      "2018": 264,
+      "2019": 359,
+      "2020": 712,
+      "2021": 825,
+      "2022": 1446,
+      "2023": 1223,
+      "2024": 962,
+      "2025": 1253,
+      "2026": 1328
+    },
+    "active_days": 2225
+  },
+  "source_lines": {
+    "added": 6523051,
+    "current": 1471979
   }
 }

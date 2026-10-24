@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:45:09+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:39:38+00:00",
   "name": "Crush",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-10-23 15:03:43",
-  "age_days": 581,
-  "active_days": 507,
-  "total_commits": 4348,
+  "last_commit": "2026-10-24 14:13:01",
+  "age_days": 582,
+  "active_days": 508,
+  "total_commits": 4350,
   "total_authors": 168,
   "active_authors_12mo": 107,
-  "commits_last_12mo": 2438,
+  "commits_last_12mo": 2440,
   "total_files": 1266,
-  "total_lines": 196322,
-  "lines_added": 1622218,
-  "lines_removed": 1425896,
+  "total_lines": 196326,
+  "lines_added": 1622227,
+  "lines_removed": 1425901,
   "total_tags": 208,
   "era": "steady",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "Christian Rocha",
-      "commits": 610
+      "commits": 611
     },
     {
       "name": "Charm",
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Christian Rocha": 611,
+    "Kieran Klukas": 281,
     "drew": 19,
     "Andrey Nering": 750,
     "Charm": 449,
@@ -50,9 +52,7 @@
     "PatricioCobelo": 1,
     "Chris Brown": 2,
     "Truffle": 2,
-    "Kieran Klukas": 280,
     "Lee-Si-Yoon": 1,
-    "Christian Rocha": 610,
     "Alex Castillo": 1,
     "jdx": 1,
     "Lars Artmann": 3,
@@ -212,7 +212,7 @@
   },
   "commits_by_year": {
     "2025": 2294,
-    "2026": 2054
+    "2026": 2056
   },
   "ai_assisted": {
     "commits": 55,
@@ -269,19 +269,19 @@
       "2026-03": 182,
       "2026-04": 209,
       "2026-05": 287,
-      "2026-06": 173,
+      "2026-06": 174,
       "2026-07": 298,
       "2026-08": 117,
       "2026-09": 186,
-      "2026-10": 83
+      "2026-10": 84
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 4348,
+    "commits": 4350,
     "by_kind": {
       "organization": 0,
-      "one_person": 1173,
+      "one_person": 1175,
       "personal": 1477,
       "hidden": 1591,
       "unknown": 0,
@@ -333,7 +333,7 @@
       },
       "2026-Q2": {
         "organization": 0,
-        "one_person": 369,
+        "one_person": 370,
         "personal": 28,
         "hidden": 253,
         "unknown": 0,
@@ -349,7 +349,7 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 51,
+        "one_person": 52,
         "personal": 5,
         "hidden": 27,
         "unknown": 0,
@@ -360,9 +360,21 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2370,
+    "commits": 2372,
     "authors": 106,
     "new_authors": 90,
     "half_of_commits": 3
+  },
+  "humans": {
+    "commits": 4243,
+    "commits_by_year": {
+      "2025": 2244,
+      "2026": 1999
+    },
+    "active_days": 507
+  },
+  "source_lines": {
+    "added": 388623,
+    "current": 191260
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:50:59+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:44:28+00:00",
   "name": "webpack",
   "report_path": "index.html",
   "first_commit": "2012-03-10 12:11:23",
-  "last_commit": "2026-10-23 16:31:24",
-  "age_days": 5341,
-  "active_days": 3255,
-  "total_commits": 20148,
+  "last_commit": "2026-10-24 17:39:04",
+  "age_days": 5342,
+  "active_days": 3256,
+  "total_commits": 20161,
   "total_authors": 938,
   "active_authors_12mo": 48,
-  "commits_last_12mo": 2000,
-  "total_files": 21693,
-  "total_lines": 1103702,
-  "lines_added": 2075250,
-  "lines_removed": 971548,
+  "commits_last_12mo": 2013,
+  "total_files": 21735,
+  "total_lines": 1111473,
+  "lines_added": 2085270,
+  "lines_removed": 973797,
   "total_tags": 654,
   "era": "surge",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Alexander Akait",
-      "commits": 1869
+      "commits": 1875
     },
     {
       "name": "alexander-akait",
@@ -41,14 +41,14 @@
     }
   ],
   "author_commits": {
-    "Alexander Akait": 1869,
+    "Alexander Akait": 1875,
+    "Lazizbek Ergashev": 3,
+    "Raj Aryan": 93,
+    "Sebastian Beltran": 92,
     "Xiao": 160,
-    "Sebastian Beltran": 89,
     "Siddharth S": 1,
-    "Lazizbek Ergashev": 2,
     "hai-x": 215,
     "Eshiv": 6,
-    "Raj Aryan": 91,
     "Qingyuan Wang": 1,
     "Manit Roy": 1,
     "Even Stensberg": 41,
@@ -995,13 +995,13 @@
     "2023": 1153,
     "2024": 1152,
     "2025": 681,
-    "2026": 1869
+    "2026": 1882
   },
   "ai_assisted": {
-    "commits": 232,
+    "commits": 238,
     "authored": 2,
     "assistants": {
-      "Claude": 221,
+      "Claude": 227,
       "CodeRabbit": 8,
       "GitHub Copilot": 4
     },
@@ -1029,7 +1029,7 @@
       "2026-07": 7,
       "2026-08": 2,
       "2026-09": 30,
-      "2026-10": 167
+      "2026-10": 173
     },
     "commits_by_month": {
       "2024-11": 130,
@@ -1055,19 +1055,19 @@
       "2026-07": 203,
       "2026-08": 238,
       "2026-09": 383,
-      "2026-10": 423
+      "2026-10": 436
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20148,
+    "commits": 20161,
     "by_kind": {
       "organization": 331,
       "one_person": 1503,
-      "personal": 14225,
-      "hidden": 2471,
+      "personal": 14229,
+      "hidden": 2479,
       "unknown": 6,
-      "bot": 1612
+      "bot": 1613
     },
     "organization_count": 15,
     "last_12mo_from": "2025-11",
@@ -1253,19 +1253,44 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 1,
-        "personal": 50,
-        "hidden": 343,
+        "personal": 54,
+        "hidden": 351,
         "unknown": 0,
-        "bot": 29
+        "bot": 30
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1761,
+    "commits": 1773,
     "authors": 48,
     "new_authors": 36,
     "half_of_commits": 1
+  },
+  "humans": {
+    "commits": 18548,
+    "commits_by_year": {
+      "2012": 274,
+      "2013": 306,
+      "2014": 510,
+      "2015": 612,
+      "2016": 963,
+      "2017": 2598,
+      "2018": 2928,
+      "2019": 1586,
+      "2020": 2118,
+      "2021": 1774,
+      "2022": 480,
+      "2023": 1088,
+      "2024": 1053,
+      "2025": 587,
+      "2026": 1671
+    },
+    "active_days": 3124
+  },
+  "source_lines": {
+    "added": 1740084,
+    "current": 892745
   }
 }

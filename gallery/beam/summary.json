@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.11.0.post1.dev12",
-  "generated_at": "2026-10-23T16:50:29+00:00",
+  "generated_by": "gitstats 2.12.0",
+  "generated_at": "2026-10-24T17:44:22+00:00",
   "name": "Apache Beam",
   "report_path": "index.html",
   "first_commit": "2014-07-11 01:59:48",
-  "last_commit": "2026-10-23 16:28:54",
-  "age_days": 4488,
-  "active_days": 3882,
-  "total_commits": 48641,
+  "last_commit": "2026-10-24 16:56:16",
+  "age_days": 4489,
+  "active_days": 3883,
+  "total_commits": 48654,
   "total_authors": 1629,
   "active_authors_12mo": 217,
-  "commits_last_12mo": 2672,
-  "total_files": 15867,
-  "total_lines": 3415264,
-  "lines_added": 5232890,
-  "lines_removed": 1817626,
+  "commits_last_12mo": 2685,
+  "total_files": 15873,
+  "total_lines": 3416412,
+  "lines_added": 5234263,
+  "lines_removed": 1817851,
   "total_tags": 46,
   "era": "steady",
   "top_authors": [
@@ -41,23 +41,26 @@
     }
   ],
   "author_commits": {
-    "Derrick Williams": 196,
+    "Vitaly Terentyev": 470,
+    "claudevdm": 164,
+    "Yi Hu": 874,
+    "RuiLong J.": 15,
+    "Derrick Williams": 197,
+    "Jack McCluskey": 463,
+    "Rados\u0142aw Stankiewicz": 191,
+    "Tobias Kaymak": 38,
+    "Anish Mehta": 10,
     "alisha-1000": 1,
-    "Jack McCluskey": 462,
-    "Vitaly Terentyev": 467,
     "ddebowczyk92": 3,
     "Danish Amjad": 2,
     "Khaled Hammouda": 1,
-    "RuiLong J.": 14,
     "Shunping Huang": 317,
     "Divyansh Yadav": 7,
     "Danny McCormick": 908,
     "Ahmed Abualsaud": 339,
     "Bruno Volpato": 87,
-    "Yi Hu": 873,
     "Reuven Lax": 682,
     "Ganesh Sivakumar": 4,
-    "Tobias Kaymak": 37,
     "Abdelrahman Ibrahim": 149,
     "Florent Biville": 4,
     "GAURAV THAKUR": 3,
@@ -68,13 +71,11 @@
     "jrmccluskey": 13,
     "Elia LIU": 35,
     "Valentyn Tymofieiev": 169,
-    "claudevdm": 162,
     "Arun Pandian": 103,
     "CH-Abhinav": 1,
     "Andrew Crites": 45,
     "pablo rodriguez defino": 23,
     "Ryan McGinnis": 1,
-    "Rados\u0142aw Stankiewicz": 190,
     "Shahar Epstein": 5,
     "Maksym Tymoshyk": 7,
     "Goutam Adwant": 5,
@@ -82,7 +83,6 @@
     "Julien Tournay": 12,
     "Bal\u00e1zs N\u00e9meth": 7,
     "Wangshu": 2,
-    "Anish Mehta": 9,
     "Sam Whittle": 229,
     "Clay Johnson": 11,
     "Igor": 3,
@@ -1684,7 +1684,7 @@
     "2023": 3260,
     "2024": 2456,
     "2025": 2429,
-    "2026": 2360
+    "2026": 2373
   },
   "ai_assisted": {
     "commits": 77,
@@ -1745,27 +1745,27 @@
       "2026-07": 304,
       "2026-08": 255,
       "2026-09": 297,
-      "2026-10": 293
+      "2026-10": 306
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 48641,
+    "commits": 48654,
     "by_kind": {
-      "organization": 26608,
+      "organization": 26613,
       "one_person": 1367,
-      "personal": 12173,
-      "hidden": 6981,
+      "personal": 12176,
+      "hidden": 6985,
       "unknown": 65,
-      "bot": 1447
+      "bot": 1448
     },
     "organization_count": 45,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "google.com",
-        "commits": 20312,
-        "commits_last_12mo": 910,
+        "commits": 20315,
+        "commits_last_12mo": 913,
         "addresses": 363,
         "first_commit": "2014-12-13",
         "last_commit": "2026-10-23"
@@ -1780,11 +1780,11 @@
       },
       {
         "organization": "akvelon.com",
-        "commits": 740,
-        "commits_last_12mo": 89,
+        "commits": 742,
+        "commits_last_12mo": 91,
         "addresses": 17,
         "first_commit": "2020-12-14",
-        "last_commit": "2026-10-21"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "polidea.com",
@@ -2181,21 +2181,44 @@
         "bot": 221
       },
       "2026-Q4": {
-        "organization": 115,
+        "organization": 120,
         "one_person": 2,
-        "personal": 91,
-        "hidden": 56,
+        "personal": 94,
+        "hidden": 60,
         "unknown": 2,
-        "bot": 27
+        "bot": 28
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2179,
+    "commits": 2191,
     "authors": 217,
     "new_authors": 141,
     "half_of_commits": 8
+  },
+  "humans": {
+    "commits": 47206,
+    "commits_by_year": {
+      "2014": 87,
+      "2015": 1454,
+      "2016": 4896,
+      "2017": 6164,
+      "2018": 6794,
+      "2019": 5601,
+      "2020": 5188,
+      "2021": 3933,
+      "2022": 3872,
+      "2023": 2877,
+      "2024": 2280,
+      "2025": 2117,
+      "2026": 1943
+    },
+    "active_days": 3874
+  },
+  "source_lines": {
+    "added": 7363883,
+    "current": 3315741
   }
 }
