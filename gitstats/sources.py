@@ -20,7 +20,7 @@ EXCLUDED_FOLDERS: tuple[str, ...] = (
     "vendor",
     "third_party",
     "third-party",
-    "thirdparty",
+    "thirdparty",  # codespell:ignore
     "Godeps",
     "node_modules",
     "bower_components",

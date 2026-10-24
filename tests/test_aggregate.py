@@ -1,6 +1,7 @@
 """Tests for the multi-repository aggregation module."""
 
 import datetime
+import html as html_module
 import json
 import os
 from types import SimpleNamespace
@@ -1484,7 +1485,7 @@ class TestComparisonPages:
         )
         page = read("repo0/compare.html")
         assert "<h1>repo0</h1>" in page
-        assert "Compared with 5 Python projects, and all 7 of" in page
+        assert "Compared with 5 Python open source projects, and all 7 of" in page
         # the sentence: alone at the top of its group for commits
         assert (
             '<p class="compare-headline">repo0 had more commits in the last 12 months than '
@@ -1601,3 +1602,83 @@ def test_compute_repo_summary_keeps_humans_and_source_lines():
     summary = compute_repo_summary(data, "index.html")
     assert summary["humans"]["active_days"] == 1
     assert summary["source_lines"] == {"added": 4, "current": 2}
+
+
+# ── what stands out ──────────────────────────────────────────────────────
+
+
+class TestWhatStandsOut:
+    @staticmethod
+    def _summaries(count=12):
+        from test_insights import _summary as insight_summary
+
+        out = []
+        for n in range(count):
+            measures = insight_summary(n)
+            del measures["name"]
+            summary = _summary(f"p{n}", 100, {}, **measures)
+            summary["report_path"] = f"p{n}/index.html"
+            out.append(summary)
+        return out
+
+    @staticmethod
+    def _overview(temp_dir, name, text):
+        folder = os.path.join(temp_dir, name)
+        os.makedirs(folder, exist_ok=True)
+        with open(os.path.join(folder, "index.html"), "w", encoding="utf-8") as f:
+            f.write(text)
+
+    @staticmethod
+    def _read(temp_dir, name):
+        with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
+            return f.read()
+
+    def test_pages_cards_and_data(self, temp_dir):
+        from gitstats.report_creator import INSIGHTS_END, INSIGHTS_START
+
+        placeholder = f"<h1>p11</h1>{INSIGHTS_START}{INSIGHTS_END}<p>tiles</p>"
+        self._overview(temp_dir, "p11", placeholder)
+        # one made earlier by a portfolio: what it holds is replaced
+        self._overview(temp_dir, "p0", f"{INSIGHTS_START}<p>old</p>{INSIGHTS_END}")
+        # one from before there was a place for it: left as it is
+        self._overview(temp_dir, "p5", "<h1>p5</h1>")
+        AggregateReportCreator().create(self._summaries(), [], temp_dir, title="Gallery")
+
+        overview = self._read(temp_dir, "p11/index.html")
+        assert overview.startswith(f"<h1>p11</h1>{INSIGHTS_START}<section")
+        assert overview.endswith(f"{INSIGHTS_END}<p>tiles</p>")
+        assert "Next to the 11 other projects of" in overview
+        assert overview.count('<li class="insight">') == 3
+        assert "<p>old</p>" not in self._read(temp_dir, "p0/index.html")
+        assert self._read(temp_dir, "p5/index.html") == "<h1>p5</h1>"
+
+        page = self._read(temp_dir, "p11/compare.html")
+        assert page.index("What stands out") < page.index("Where it stands")
+        # the sentence on where it ranks would say part of it again
+        assert '<p class="compare-headline">' not in page
+        assert '<ul class="insights">' in page
+        # the first fact's sentence is what a shared link says
+        data = json.loads(self._read(temp_dir, "compare.json"))
+        first = data["repositories"][11]["insights"][0]
+        assert set(first) == {"kind", "label", "value", "big", "sentence", "compared"}
+        assert f'content="{html_module.escape(first["sentence"], quote=True)}"' in page
+
+        card = self._read(temp_dir, "p11/compare-card.html")
+        assert "// what stands out" in card
+        assert '<div class="facts n3">' in card
+        assert first["big"] in card
+
+    def test_nothing_stands_out(self, temp_dir):
+        AggregateReportCreator().create(self._summaries(), [], temp_dir)
+        data = json.loads(self._read(temp_dir, "compare.json"))
+        assert data["repositories"][6]["insights"] == []
+        page = self._read(temp_dir, "p6/compare.html")
+        assert "What stands out" not in page
+        assert "Where it stands" not in page
+        # the card shows the ranks instead
+        assert '<div class="bars ranks">' in self._read(temp_dir, "p6/compare-card.html")
+
+    def test_overview_outside_the_portfolio_is_left_alone(self, temp_dir):
+        AggregateReportCreator._fill_overview(temp_dir, "../elsewhere", "<p>x</p>")
+        AggregateReportCreator._fill_overview(temp_dir, "missing", "<p>x</p>")
+        assert not os.path.exists(os.path.join(temp_dir, "missing"))

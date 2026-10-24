@@ -21,17 +21,20 @@ import re
 import shutil
 from typing import Any
 
-from gitstats import compare, load_config
+from gitstats import compare, insights, load_config
 from gitstats.badge import compact_count, endpoint_json, render_badge
 from gitstats.employers import KIND_LABELS, ORGANIZATION
 from gitstats.employers import KINDS as ORGANIZATION_KINDS
 from gitstats.employers import summarize as summarize_organizations
 from gitstats.report_creator import (
     AI_ASSISTED_COUNTED,
+    INSIGHTS_END,
+    INSIGHTS_START,
     THEME_INIT_SCRIPT,
     THEME_SCRIPT,
     THEME_TOGGLE_BUTTON,
     _classify_eras,
+    html_header,
     nav_link,
     share_card_page,
     share_meta_html,
@@ -154,6 +157,11 @@ def compute_repo_summary(data: Any, report_path: str) -> dict[str, Any]:
         "organizations": organizations_summary(data),
         "people_last_12mo": people_summary(data),
         "humans": humans_summary(data),
+        # commits by the UTC offset recorded in each: "+0800" -> commits
+        "timezones": {
+            str(zone): int(commits)
+            for zone, commits in sorted((getattr(data, "commits_by_timezone", {}) or {}).items())
+        },
         "source_lines": source_lines_summary(data),
     }
 
@@ -1218,9 +1226,10 @@ class AggregateReportCreator:
         now = datetime.datetime.now()
         quarters = [months for _, months in last_quarters(now)]
         rows = compare.comparisons(summaries, quarters)
+        stand_out = insights.facts(summaries, f"{title} projects")
         names = dict(self.groups)
         data = []
-        for row in rows:
+        for row, found in zip(rows, stand_out):
             summary = row["summary"]
             report = str(summary.get("report_path", "") or "")
             folder = report[: -len("/index.html")] if report.endswith("/index.html") else ""
@@ -1237,6 +1246,13 @@ class AggregateReportCreator:
             }
             if group:
                 entry["group"] = group
+            entry["insights"] = [
+                {
+                    key: fact[key]
+                    for key in ("kind", "label", "value", "big", "sentence", "compared")
+                }
+                for fact in found
+            ]
             if not _COMPARE_FILE.fullmatch(f"{folder}/compare.html"):
                 data.append(entry)
                 continue
@@ -1245,14 +1261,23 @@ class AggregateReportCreator:
             data.append(entry)
             f = self._open_portfolio_file(path, f"{folder}/compare.html")
             try:
-                self._write_comparison_page(f, row, rows, title, folder, entry["headline"], ai)
+                self._write_comparison_page(
+                    f, row, rows, title, folder, entry["headline"], ai, found
+                )
             finally:
                 f.close()
             f = self._open_portfolio_file(path, f"{folder}/compare-card.html")
             try:
-                f.write(self._comparison_card(row, names.get(group, ""), entry["headline"]))
+                f.write(self._comparison_card(row, names.get(group, ""), entry["headline"], found))
             finally:
                 f.close()
+            self._fill_overview(
+                path,
+                folder,
+                insights.overview_html(
+                    str(summary.get("name", "") or ""), found, len(rows) - 1, title
+                ),
+            )
         f = self._open_portfolio_file(path, "compare.json")
         try:
             json.dump(
@@ -1284,9 +1309,11 @@ class AggregateReportCreator:
         folder: str,
         headline: str,
         ai: bool,
+        found: list[dict[str, Any]] | None = None,
     ) -> None:
-        """One repository next to the others: a sentence on where it stands
-        out, then each measure with every repository on a strip and its rank."""
+        """One repository next to the others: what stands out about it, then
+        a sentence on where it ranks, and each measure with every repository
+        on a strip and its rank."""
         summary = row["summary"]
         name = str(summary.get("name", "") or "")
         group = str(summary.get("group", "") or "")
@@ -1294,7 +1321,11 @@ class AggregateReportCreator:
         peers = [other for other in rows if group and other["summary"].get("group") == group]
         others = [other for other in rows if other not in peers]
         page_title = f"How {name} compares"
-        description = headline or f"{name} next to the other repositories of {title}."
+        description = (
+            found[0]["sentence"]
+            if found
+            else headline or f"{name} next to the other repositories of {title}."
+        )
         self._print_header(
             f,
             page_title,
@@ -1307,13 +1338,24 @@ class AggregateReportCreator:
         f.write(f"<h1>{html.escape(name)}</h1>")
         compared = f"all {len(rows)} repositories of"
         if peers:
-            compared = f"{len(peers)} {html.escape(group_name)} projects, and all {len(rows)} of"
+            # "14 open source languages and developer tools", as a sentence names them
+            projects = self._group_projects(group)
+            compared = f"{len(peers)} {html.escape(projects)}, and all {len(rows)} of"
         f.write(
             f'<p class="portfolio-subtitle">Compared with {compared} '
             f'<a href="../index.html">{html.escape(title)}</a> &middot; the 12 months up to '
             "each one&rsquo;s last commit</p>"
         )
-        if headline:
+        if found:
+            f.write(html_header(2, "What stands out"))
+            f.write(
+                '<p class="section-note">Where it is in the top or bottom 15% of these '
+                "projects.</p>" + insights.facts_html(found)
+            )
+            f.write(html_header(2, "Where it stands"))
+        elif headline:
+            # with nothing that stands out, the sentence on where it ranks leads;
+            # with something, that sentence would say part of it again
             f.write(f'<p class="compare-headline">{html.escape(headline)}</p>')
         legend = [f'<span><i class="own"></i>{html.escape(name)}</span>']
         if peers:
@@ -1363,10 +1405,27 @@ class AggregateReportCreator:
         self._print_footer(f)
 
     @staticmethod
-    def _comparison_card(row: dict[str, Any], group_name: str, headline: str) -> str:
-        """The comparison's share card: the sentence, and each measure's rank
-        as a bar, longer the nearer the top."""
+    def _comparison_card(
+        row: dict[str, Any],
+        group_name: str,
+        headline: str,
+        found: list[dict[str, Any]] | None = None,
+    ) -> str:
+        """The comparison's share card: what stands out, each fact's number
+        large; or, with nothing that does, the sentence, and each measure's
+        rank as a bar, longer the nearer the top."""
         name = str(row["summary"].get("name", "") or "")
+        if found:
+            facts = "".join(
+                f"<div><b>{html.escape(fact['big'])}</b>"
+                f"<span>{html.escape(fact['sentence'])}</span></div>"
+                for fact in found
+            )
+            return share_card_page(
+                f"What stands out in {name}",
+                f'<div class="brand">// what stands out</div><h1>{html.escape(name)}</h1>'
+                f'<div class="facts n{len(found)}">{facts}</div>',
+            )
         scope = "group" if group_name else "all"
         bars = "".join(
             f"<div><b>{html.escape(label)}</b>"
@@ -1385,6 +1444,25 @@ class AggregateReportCreator:
             f'<p class="sub clamp">{html.escape(headline)}</p>'
             f'<div class="bars ranks">{bars}</div>',
         )
+
+    @staticmethod
+    def _fill_overview(path: str, folder: str, section: str) -> None:
+        """Put ``section`` in the place a report's overview keeps for it,
+        replacing what an earlier portfolio put there; nothing when the page
+        is missing or keeps no place (a report made before there was one)."""
+        base = os.path.abspath(path)
+        page = os.path.abspath(os.path.join(base, folder, "index.html"))
+        if os.path.commonpath([base, page]) != base or not os.path.isfile(page):
+            return
+        with open(page, encoding="utf-8") as f:
+            text = f.read()
+        start = text.find(INSIGHTS_START)
+        end = text.find(INSIGHTS_END, start)
+        if start < 0 or end < 0:
+            return
+        text = text[: start + len(INSIGHTS_START)] + section + text[end:]
+        with open(page, "w", encoding="utf-8") as f:
+            f.write(text)
 
     def _group_projects(self, group: str) -> str:
         """How a sentence names a group's projects: its title, or "<name>

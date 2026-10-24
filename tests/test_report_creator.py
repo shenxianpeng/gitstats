@@ -3762,3 +3762,14 @@ def test_organizations_section_is_left_out_without_any(mock_data_collector):
     # data collected before addresses were sorted
     mock_data_collector.affiliation_by_month = None
     assert creator._organizations_html(mock_data_collector) == ""
+
+
+def test_overview_keeps_an_empty_place_for_what_stands_out(mock_data_collector, temp_dir):
+    """A report made alone shows nothing there; a portfolio fills it."""
+    from gitstats.report_creator import INSIGHTS_END, INSIGHTS_START
+
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    page = _read_page(temp_dir, "index.html")
+    assert INSIGHTS_START + INSIGHTS_END in page
+    # under the heading and its meta line, above the tiles
+    assert page.index('class="page-meta"') < page.index(INSIGHTS_START) < page.index("stat-tiles")

@@ -518,6 +518,15 @@ def test_comparison_pages_are_linked_and_listed(gallery_script, temp_dir, monkey
     assert gallery_script.NOTE_MARK not in _read(gallery, "pandas", "compare.html")
     assert gallery_script.NOTE_MARK not in _read(gallery, "pandas", "compare-card.html")
     assert f"<loc>{site}pandas/compare.html</loc>" in _read(gallery, "sitemap.xml")
+    # each summary knows its repository: its own domain is not an employer
+    data = json.loads(_read(gallery, "compare.json"))
+    assert {r["name"] for r in data["repositories"]} == {
+        "django",
+        "flask",
+        "pandas",
+        "numpy",
+        "pip",
+    }
 
 
 def test_note_links_to_the_comparison(gallery_script):

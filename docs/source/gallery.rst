@@ -201,3 +201,33 @@ history would otherwise mislead:
   vendored copy of its dependencies, committed and later removed: counted with
   them, 1% of what was written is still there; without them, 56%. The rules
   are in ``gitstats/sources.py``.
+
+What stands out
+---------------
+
+The top of each project's report, and of its comparison page, says what
+stands out about it next to the other projects: up to three facts, each a
+number and a sentence, said only where the project is in the top or bottom
+15% of the Gallery. Six kinds are looked at:
+
+- **AI-assisted commits**: the share of commits that name an AI coding
+  assistant, three months a year ago against the last three.
+- **Days with a commit**: days with a commit by a person, of all days since the
+  first.
+- **Against its busiest year**: people's commits of the last 12 months against
+  their busiest full year.
+- **Code still there**: of the lines ever written into the project's own
+  source (``source_lines``), those still there.
+- **One time zone**: the share of commits made in the busiest time zone; left
+  out where UTC+0 holds most commits, which is more likely a tool's setting
+  than a place.
+- **One company**: the share of one company in the commits from company
+  addresses of the last 12 months, leaving out foundations' and the project's
+  own domains.
+
+They were chosen by reviewing candidates for every project of the Gallery and
+keeping the kinds that told something new; others, such as the share of
+contributors who committed once, were left out. The facts are in
+``compare.json`` as each repository's ``insights``; a portfolio needs ten
+projects with a value for a kind before it says anything about it. The rules
+are in ``gitstats/insights.py``.
