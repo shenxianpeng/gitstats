@@ -867,6 +867,8 @@ class HTMLReportCreator(ReportCreator):
             ' &middot; <a href="badges.html">Badge for your README</a>'
             "</p>"
         )
+        # where a portfolio of repositories writes what stands out about this one
+        f.write(INSIGHTS_START + INSIGHTS_END)
         if getattr(data, "shallow", False) is True:
             f.write(
                 '<p class="section-note shallow-note"><strong>Shallow clone:</strong> this '
@@ -4061,6 +4063,14 @@ AI_ASSISTED_COUNTED = (
 )
 
 
+# The overview page keeps a place, between these two, for what stands out about
+# the repository next to the others of a portfolio (see gitstats.insights). A
+# report made alone leaves it empty; a portfolio fills it, and fills it again
+# when it is made again.
+INSIGHTS_START = "<!-- gitstats:insights -->"
+INSIGHTS_END = "<!-- /gitstats:insights -->"
+
+
 # A share card is what a link shows where it is posted, at the size those
 # places ask for. gitstats writes it as an HTML page; the pages point to it as
 # an image (share-card.png) when the report is published with share_card on.
@@ -4101,6 +4111,14 @@ font:16px {_CARD_MONO}}}
 .bars.ranks b{{font-size:23px;font-weight:500;color:#716b6b}}
 .bars.ranks i{{height:20px}}
 .bars.ranks span{{font-size:24px;white-space:nowrap}}
+.facts{{display:grid;gap:34px;margin:14px 0 0}}
+.facts div{{display:grid;grid-template-columns:200px 1fr;align-items:center;gap:28px}}
+.facts b{{font:700 60px/1 {_CARD_MONO};color:#4a7ab5;white-space:nowrap}}
+.facts span{{font-size:27px;line-height:1.32;display:-webkit-box;-webkit-line-clamp:3;
+-webkit-box-orient:vertical;overflow:hidden}}
+.facts.n3{{gap:24px;margin-top:8px}}
+.facts.n3 b{{font-size:50px}}
+.facts.n3 span{{font-size:23px;-webkit-line-clamp:2}}
 footer{{margin-top:auto;display:flex;justify-content:space-between;color:#716b6b;
 font:20px {_CARD_MONO}}}
 """

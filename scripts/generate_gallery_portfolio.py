@@ -324,6 +324,8 @@ def _listed_summaries(
         report_id = summary["report_path"].split("/", 1)[0]
         found.add(report_id)
         summary["group"] = by_id[report_id].group
+        # owner/name: its own domain (pytorch.org) is not an employer
+        summary["repository"] = by_id[report_id].url
     failures = [
         {"name": repo.name, "error": f"No report: generating it for {repo.url} failed"}
         for repo in repos
