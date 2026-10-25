@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:43:10+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:32:05+00:00",
   "name": "Apache Flink",
   "report_path": "index.html",
   "first_commit": "2010-12-15 16:02:01",
-  "last_commit": "2026-10-24 14:24:41",
-  "age_days": 5792,
+  "last_commit": "2026-10-24 19:36:25",
+  "age_days": 5793,
   "active_days": 4885,
-  "total_commits": 38707,
+  "total_commits": 38709,
   "total_authors": 1772,
   "active_authors_12mo": 171,
-  "commits_last_12mo": 1452,
-  "total_files": 27295,
-  "total_lines": 4047253,
-  "lines_added": 10664603,
-  "lines_removed": 6617350,
+  "commits_last_12mo": 1454,
+  "total_files": 27296,
+  "total_lines": 4047768,
+  "lines_added": 10665230,
+  "lines_removed": 6617462,
   "total_tags": 2,
   "era": "steady",
   "top_authors": [
@@ -41,8 +41,9 @@
     }
   ],
   "author_commits": {
+    "Sergey Nuyanzin": 607,
+    "Piotr Przybylski": 5,
     "Yuepeng Pan": 176,
-    "Sergey Nuyanzin": 606,
     "bowenli86": 233,
     "Gustavo de Morais": 88,
     "Efrat Levitan": 22,
@@ -166,7 +167,6 @@
     "Jiaan Geng": 24,
     "Huanglin Shen": 1,
     "Robin Moffatt": 4,
-    "Piotr Przybylski": 4,
     "Omid Hemmati": 1,
     "Wenjin Xie": 1,
     "Swapna Marru": 3,
@@ -1831,13 +1831,13 @@
     "2023": 2085,
     "2024": 1658,
     "2025": 1064,
-    "2026": 1319
+    "2026": 1321
   },
   "ai_assisted": {
-    "commits": 194,
+    "commits": 195,
     "authored": 0,
     "assistants": {
-      "Claude": 174,
+      "Claude": 175,
       "ChatGPT": 18,
       "Codex": 15,
       "GitHub Copilot": 3,
@@ -1868,7 +1868,7 @@
       "2026-06": 27,
       "2026-07": 51,
       "2026-08": 14,
-      "2026-09": 44,
+      "2026-09": 45,
       "2026-10": 44
     },
     "commits_by_month": {
@@ -1894,17 +1894,17 @@
       "2026-06": 141,
       "2026-07": 205,
       "2026-08": 120,
-      "2026-09": 159,
-      "2026-10": 123
+      "2026-09": 160,
+      "2026-10": 124
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38707,
+    "commits": 38709,
     "by_kind": {
       "organization": 20794,
       "one_person": 1245,
-      "personal": 15422,
+      "personal": 15424,
       "hidden": 1121,
       "unknown": 109,
       "bot": 16
@@ -2517,7 +2517,7 @@
       "2026-Q3": {
         "organization": 136,
         "one_person": 9,
-        "personal": 259,
+        "personal": 260,
         "hidden": 78,
         "unknown": 0,
         "bot": 2
@@ -2525,7 +2525,7 @@
       "2026-Q4": {
         "organization": 31,
         "one_person": 4,
-        "personal": 53,
+        "personal": 54,
         "hidden": 34,
         "unknown": 0,
         "bot": 1
@@ -2535,13 +2535,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1449,
+    "commits": 1451,
     "authors": 169,
     "new_authors": 90,
     "half_of_commits": 8
   },
   "humans": {
-    "commits": 38691,
+    "commits": 38693,
     "commits_by_year": {
       "2010": 37,
       "2011": 1880,
@@ -2559,12 +2559,38 @@
       "2023": 2080,
       "2024": 1658,
       "2025": 1064,
-      "2026": 1316
+      "2026": 1318
     },
     "active_days": 4884
   },
+  "timezones": {
+    "+0000": 301,
+    "+0100": 10178,
+    "+0200": 13539,
+    "+0300": 210,
+    "+0400": 28,
+    "+0430": 1,
+    "+0530": 249,
+    "+0545": 1,
+    "+0600": 1,
+    "+0700": 31,
+    "+0800": 12084,
+    "+0900": 90,
+    "+1000": 3,
+    "+1100": 2,
+    "+1200": 2,
+    "+1300": 1,
+    "-0200": 1,
+    "-0300": 3,
+    "-0400": 332,
+    "-0500": 294,
+    "-0600": 127,
+    "-0700": 837,
+    "-0800": 393,
+    "-1000": 1
+  },
   "source_lines": {
-    "added": 11364965,
-    "current": 3864747
+    "added": 11365592,
+    "current": 3865262
   }
 }

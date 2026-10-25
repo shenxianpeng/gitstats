@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:40:30+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:28:42+00:00",
   "name": "Qwen Code",
   "report_path": "index.html",
   "first_commit": "2025-04-16 04:41:08",
-  "last_commit": "2026-10-24 17:29:22",
-  "age_days": 557,
-  "active_days": 515,
-  "total_commits": 11440,
-  "total_authors": 610,
-  "active_authors_12mo": 324,
-  "commits_last_12mo": 8938,
-  "total_files": 12911,
-  "total_lines": 6197939,
-  "lines_added": 8078654,
-  "lines_removed": 1880715,
+  "last_commit": "2026-10-25 05:04:17",
+  "age_days": 558,
+  "active_days": 516,
+  "total_commits": 11450,
+  "total_authors": 612,
+  "active_authors_12mo": 326,
+  "commits_last_12mo": 8948,
+  "total_files": 12931,
+  "total_lines": 6214271,
+  "lines_added": 8096605,
+  "lines_removed": 1882334,
   "total_tags": 98,
   "era": "steady",
   "top_authors": [
     {
       "name": "\u6613\u826f",
-      "commits": 1564
+      "commits": 1567
     },
     {
       "name": "Shaojin Wen",
@@ -41,13 +41,15 @@
     }
   ],
   "author_commits": {
-    "\u6613\u826f": 1564,
+    "EthDing": 1,
+    "\u6613\u826f": 1567,
+    "ChiGao": 126,
+    "qwen-code-dev-bot": 247,
+    "sxl-lucky7": 1,
     "Bob.qwencode": 27,
     "jinye": 596,
-    "ChiGao": 122,
     "qqqys": 523,
     "Shaojin Wen": 1476,
-    "qwen-code-dev-bot": 246,
     "\u66f9\u6f47\u7f24": 10,
     "Jabrail": 12,
     "callmeYe": 89,
@@ -654,7 +656,7 @@
   },
   "commits_by_year": {
     "2025": 3155,
-    "2026": 8285
+    "2026": 8295
   },
   "ai_assisted": {
     "commits": 625,
@@ -718,17 +720,17 @@
       "2026-07": 1315,
       "2026-08": 1068,
       "2026-09": 1181,
-      "2026-10": 1098
+      "2026-10": 1108
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11440,
+    "commits": 11450,
     "by_kind": {
       "organization": 2791,
-      "one_person": 487,
-      "personal": 6906,
-      "hidden": 1134,
+      "one_person": 488,
+      "personal": 6914,
+      "hidden": 1135,
       "unknown": 31,
       "bot": 91
     },
@@ -811,9 +813,9 @@
       },
       "2026-Q4": {
         "organization": 394,
-        "one_person": 89,
-        "personal": 578,
-        "hidden": 36,
+        "one_person": 90,
+        "personal": 586,
+        "hidden": 37,
         "unknown": 0,
         "bot": 1
       }
@@ -822,21 +824,42 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 8934,
-    "authors": 320,
-    "new_authors": 310,
+    "commits": 8944,
+    "authors": 322,
+    "new_authors": 312,
     "half_of_commits": 4
   },
   "humans": {
-    "commits": 11349,
+    "commits": 11359,
     "commits_by_year": {
       "2025": 3140,
-      "2026": 8209
+      "2026": 8219
     },
-    "active_days": 515
+    "active_days": 516
+  },
+  "timezones": {
+    "+0000": 2663,
+    "+0100": 122,
+    "+0200": 80,
+    "+0300": 49,
+    "+0400": 3,
+    "+0500": 10,
+    "+0530": 73,
+    "+0545": 1,
+    "+0700": 6,
+    "+0800": 6418,
+    "+0900": 86,
+    "+1000": 17,
+    "+1100": 3,
+    "-0300": 7,
+    "-0400": 407,
+    "-0500": 44,
+    "-0600": 18,
+    "-0700": 1342,
+    "-0800": 101
   },
   "source_lines": {
-    "added": 8252106,
-    "current": 6130167
+    "added": 8270014,
+    "current": 6146456
   }
 }

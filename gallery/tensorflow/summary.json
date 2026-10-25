@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:43:36+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:30:49+00:00",
   "name": "TensorFlow",
   "report_path": "index.html",
   "first_commit": "2015-11-07 00:27:58",
-  "last_commit": "2026-10-24 17:15:06",
+  "last_commit": "2026-10-24 18:06:13",
   "age_days": 4005,
   "active_days": 3994,
-  "total_commits": 201996,
+  "total_commits": 201997,
   "total_authors": 4617,
   "active_authors_12mo": 687,
-  "commits_last_12mo": 15474,
+  "commits_last_12mo": 15475,
   "total_files": 37489,
-  "total_lines": 11119688,
-  "lines_added": 29005005,
-  "lines_removed": 17885317,
+  "total_lines": 11119666,
+  "lines_added": 29005013,
+  "lines_removed": 17885347,
   "total_tags": 53,
   "era": "steady",
   "top_authors": [
     {
       "name": "A. Unique TensorFlower",
-      "commits": 61393
+      "commits": 61394
     },
     {
       "name": "Eugene Zhulenev",
@@ -41,8 +41,8 @@
     }
   ],
   "author_commits": {
+    "A. Unique TensorFlower": 61394,
     "Changming Sun CA": 83,
-    "A. Unique TensorFlower": 61393,
     "Christian Sigg": 916,
     "Luke Baumann": 5,
     "Junwhan Ahn": 414,
@@ -4671,7 +4671,7 @@
     "2023": 16742,
     "2024": 16193,
     "2025": 14683,
-    "2026": 13231
+    "2026": 13232
   },
   "ai_assisted": {
     "commits": 50,
@@ -4731,19 +4731,19 @@
       "2026-07": 1294,
       "2026-08": 1423,
       "2026-09": 1370,
-      "2026-10": 1970
+      "2026-10": 1971
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 201996,
+    "commits": 201997,
     "by_kind": {
       "organization": 120237,
       "one_person": 2710,
       "personal": 14143,
       "hidden": 4644,
       "unknown": 5,
-      "bot": 60257
+      "bot": 60258
     },
     "organization_count": 101,
     "last_12mo_from": "2025-11",
@@ -5620,14 +5620,14 @@
         "personal": 464,
         "hidden": 102,
         "unknown": 0,
-        "bot": 509
+        "bot": 510
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 15372,
+    "commits": 15373,
     "authors": 685,
     "new_authors": 371,
     "half_of_commits": 18
@@ -5649,6 +5649,34 @@
       "2026": 9430
     },
     "active_days": 3938
+  },
+  "timezones": {
+    "+0000": 4307,
+    "+0100": 2284,
+    "+0200": 1792,
+    "+0300": 754,
+    "+0330": 4,
+    "+0400": 46,
+    "+0430": 1,
+    "+0500": 34,
+    "+0530": 3116,
+    "+0600": 5,
+    "+0700": 360,
+    "+0800": 3051,
+    "+0900": 749,
+    "+1000": 139,
+    "+1030": 1,
+    "+1100": 133,
+    "+1200": 6,
+    "+1300": 3,
+    "-0200": 5,
+    "-0300": 63,
+    "-0400": 2012,
+    "-0500": 1353,
+    "-0600": 483,
+    "-0700": 113793,
+    "-0800": 67501,
+    "-1000": 2
   },
   "source_lines": {
     "added": 21921528,

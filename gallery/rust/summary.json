@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:51:31+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:40:05+00:00",
   "name": "Rust",
   "report_path": "index.html",
   "first_commit": "2010-06-16 21:30:45",
-  "last_commit": "2026-10-24 08:43:09",
-  "age_days": 5974,
+  "last_commit": "2026-10-24 22:38:06",
+  "age_days": 5975,
   "active_days": 5916,
-  "total_commits": 344485,
+  "total_commits": 344502,
   "total_authors": 7776,
-  "active_authors_12mo": 1320,
-  "commits_last_12mo": 33339,
+  "active_authors_12mo": 1319,
+  "commits_last_12mo": 33356,
   "total_files": 63908,
-  "total_lines": 6194773,
-  "lines_added": 14901583,
-  "lines_removed": 8706810,
+  "total_lines": 6194780,
+  "lines_added": 14901707,
+  "lines_removed": 8706927,
   "total_tags": 23,
   "era": "steady",
   "top_authors": [
     {
       "name": "bors",
-      "commits": 48877
+      "commits": 48879
     },
     {
       "name": "Matthias Kr\u00fcger",
@@ -29,7 +29,7 @@
     },
     {
       "name": "Ralf Jung",
-      "commits": 10758
+      "commits": 10759
     },
     {
       "name": "Guillaume Gomez",
@@ -41,25 +41,28 @@
     }
   ],
   "author_commits": {
-    "bors": 48877,
-    "Jonathan Brouwer": 4319,
+    "bors": 48879,
+    "Jonathan Brouwer": 4326,
+    "bjorn3": 5912,
+    "Max Dexheimer": 54,
+    "sleepycatcoding": 3,
     "Hans Wennborg": 27,
     "Weihang Lo": 366,
+    "Augie Fackler": 148,
     "Folkert de Vries": 1073,
     "Yacin Tmimi": 308,
     "apiraino": 28,
     "Le\u00f3n Orell Valerian Liehr": 1083,
-    "hamidreza kalbasi": 247,
-    "Ralf Jung": 10758,
+    "hamidreza kalbasi": 248,
+    "Ralf Jung": 10759,
     "Gabriel Bj\u00f8rnager Jensen": 31,
     "TechnoPorg": 9,
-    "bjorn3": 5911,
     "Rom\u00e1n C\u00e1rdenas Rodr\u00edguez": 6,
     "Matyas Susits": 15,
     "opale": 1,
     "N1ark": 27,
     "Jakub Ber\u00e1nek": 1758,
-    "Esteban K\u00fcber": 3056,
+    "Esteban K\u00fcber": 3057,
     "Guillaume Gomez": 8465,
     "mejrs": 404,
     "ivmarkov": 13,
@@ -76,7 +79,6 @@
     "Jacob Pratt": 2437,
     "Gordon Ross": 1,
     "panstromek": 30,
-    "Max Dexheimer": 53,
     "Amirhossein Akhlaghpour": 56,
     "Abhinav Srivastav": 14,
     "Dion Dokter": 18,
@@ -102,20 +104,18 @@
     "THARUN": 3,
     "rustbot": 163,
     "Yu": 8,
-    "Augie Fackler": 147,
     "antoyo": 449,
     "Tomasz Mi\u0105sko": 716,
     "James Barford-Evans": 119,
     "RegularCoder239": 1,
     "Shoyu Vanilla": 557,
     "The Miri Cronjob Bot": 963,
-    "Tim (Theemathas Chirananthavat)": 96,
+    "Tim (Theemathas Chirananthavat)": 97,
     "arya dradjica": 49,
     "Matthew Hughes": 27,
     "Chayim Refael Friedman": 1627,
     "annieversary": 7,
     "Michael Howell": 1349,
-    "sleepycatcoding": 2,
     "Muhtasim-Rasheed": 5,
     "Sasha Pourcelot": 78,
     "Ben Kimock": 597,
@@ -7835,7 +7835,7 @@
     "2023": 28833,
     "2024": 33227,
     "2025": 32840,
-    "2026": 28850
+    "2026": 28867
   },
   "ai_assisted": {
     "commits": 15,
@@ -7890,24 +7890,24 @@
       "2025-12": 2181,
       "2026-01": 2639,
       "2026-02": 2672,
-      "2026-03": 2656,
+      "2026-03": 2657,
       "2026-04": 3093,
       "2026-05": 2705,
       "2026-06": 2837,
       "2026-07": 3622,
       "2026-08": 3750,
-      "2026-09": 2979,
-      "2026-10": 1897
+      "2026-09": 2980,
+      "2026-10": 1912
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 344485,
+    "commits": 344502,
     "by_kind": {
-      "organization": 17208,
-      "one_person": 166814,
-      "personal": 126445,
-      "hidden": 29981,
+      "organization": 17209,
+      "one_person": 166818,
+      "personal": 126455,
+      "hidden": 29983,
       "unknown": 3324,
       "bot": 713
     },
@@ -7932,11 +7932,11 @@
       },
       {
         "organization": "google.com",
-        "commits": 1143,
-        "commits_last_12mo": 143,
+        "commits": 1144,
+        "commits_last_12mo": 144,
         "addresses": 130,
         "first_commit": "2014-05-12",
-        "last_commit": "2026-10-20"
+        "last_commit": "2026-10-23"
       },
       {
         "organization": "linux.com",
@@ -9262,7 +9262,7 @@
       },
       "2026-Q1": {
         "organization": 506,
-        "one_person": 2679,
+        "one_person": 2680,
         "personal": 3603,
         "hidden": 1090,
         "unknown": 5,
@@ -9278,17 +9278,17 @@
       },
       "2026-Q3": {
         "organization": 707,
-        "one_person": 3529,
+        "one_person": 3530,
         "personal": 4913,
         "hidden": 1125,
         "unknown": 9,
         "bot": 68
       },
       "2026-Q4": {
-        "organization": 88,
-        "one_person": 704,
-        "personal": 918,
-        "hidden": 172,
+        "organization": 89,
+        "one_person": 706,
+        "personal": 928,
+        "hidden": 174,
         "unknown": 1,
         "bot": 14
       }
@@ -9297,13 +9297,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 33306,
+    "commits": 33323,
     "authors": 1311,
     "new_authors": 778,
     "half_of_commits": 15
   },
   "humans": {
-    "commits": 343772,
+    "commits": 343789,
     "commits_by_year": {
       "2010": 1173,
       "2011": 5822,
@@ -9321,12 +9321,43 @@
       "2023": 28826,
       "2024": 33181,
       "2025": 32661,
-      "2026": 28599
+      "2026": 28616
     },
     "active_days": 5916
   },
+  "timezones": {
+    "+0000": 74843,
+    "+0100": 49299,
+    "+0200": 69249,
+    "+0300": 13358,
+    "+0330": 371,
+    "+0400": 509,
+    "+0430": 69,
+    "+0500": 362,
+    "+0530": 6005,
+    "+0545": 3,
+    "+0600": 120,
+    "+0700": 644,
+    "+0800": 11160,
+    "+0900": 10381,
+    "+0930": 5,
+    "+1000": 4880,
+    "+1030": 37,
+    "+1100": 4413,
+    "+1200": 1521,
+    "+1300": 1217,
+    "-0200": 100,
+    "-0300": 1828,
+    "-0400": 22404,
+    "-0430": 1,
+    "-0500": 15971,
+    "-0600": 3916,
+    "-0700": 36357,
+    "-0800": 15464,
+    "-1000": 15
+  },
   "source_lines": {
-    "added": 23557272,
-    "current": 6282504
+    "added": 23557396,
+    "current": 6282511
   }
 }

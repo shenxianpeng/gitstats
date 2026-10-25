@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:38:07+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:26:35+00:00",
   "name": "SciPy",
   "report_path": "index.html",
   "first_commit": "2001-02-01 08:32:30",
-  "last_commit": "2026-10-24 09:53:19",
+  "last_commit": "2026-10-24 21:37:37",
   "age_days": 9397,
   "active_days": 6829,
-  "total_commits": 38482,
-  "total_authors": 1946,
-  "active_authors_12mo": 226,
-  "commits_last_12mo": 2234,
+  "total_commits": 38486,
+  "total_authors": 1947,
+  "active_authors_12mo": 227,
+  "commits_last_12mo": 2238,
   "total_files": 2929,
-  "total_lines": 1137664,
-  "lines_added": 5258749,
-  "lines_removed": 4121085,
+  "total_lines": 1137706,
+  "lines_added": 5258894,
+  "lines_removed": 4121188,
   "total_tags": 5,
   "era": "steady",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "Matt Haberland",
-      "commits": 2362
+      "commits": 2364
     },
     {
       "name": "Evgeni Burovski",
@@ -41,7 +41,9 @@
     }
   ],
   "author_commits": {
-    "Martin Schuck": 45,
+    "Hannah Rittich": 1,
+    "Matt Haberland": 2364,
+    "Martin Schuck": 46,
     "Yi-Han Chen": 1,
     "Andrew Nelson": 1031,
     "Cl\u00e9ment_Basdevant": 1,
@@ -68,7 +70,6 @@
     "Basil Liekens": 26,
     "alvaroborras": 2,
     "Jesse Livezey": 19,
-    "Matt Haberland": 2362,
     "Abhirav Gholba": 2,
     "Sangeetha Grama Srinivasan": 1,
     "CJ Carey": 208,
@@ -2014,7 +2015,7 @@
     "2023": 2061,
     "2024": 2957,
     "2025": 2335,
-    "2026": 1796
+    "2026": 1800
   },
   "ai_assisted": {
     "commits": 53,
@@ -2075,17 +2076,17 @@
       "2026-07": 171,
       "2026-08": 228,
       "2026-09": 171,
-      "2026-10": 85
+      "2026-10": 89
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38482,
+    "commits": 38486,
     "by_kind": {
       "organization": 3833,
       "one_person": 3073,
-      "personal": 27078,
-      "hidden": 2678,
+      "personal": 27080,
+      "hidden": 2680,
       "unknown": 1820,
       "bot": 0
     },
@@ -2649,8 +2650,8 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 2,
-        "personal": 46,
-        "hidden": 36,
+        "personal": 48,
+        "hidden": 38,
         "unknown": 0,
         "bot": 0
       }
@@ -2659,13 +2660,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2234,
-    "authors": 224,
-    "new_authors": 161,
+    "commits": 2238,
+    "authors": 225,
+    "new_authors": 162,
     "half_of_commits": 6
   },
   "humans": {
-    "commits": 38482,
+    "commits": 38486,
     "commits_by_year": {
       "2001": 286,
       "2002": 357,
@@ -2692,12 +2693,43 @@
       "2023": 2061,
       "2024": 2957,
       "2025": 2335,
-      "2026": 1796
+      "2026": 1800
     },
     "active_days": 6829
   },
+  "timezones": {
+    "+0000": 7829,
+    "+0100": 5418,
+    "+0200": 6560,
+    "+0300": 2005,
+    "+0330": 6,
+    "+0400": 20,
+    "+0430": 4,
+    "+0500": 261,
+    "+0530": 729,
+    "+0600": 28,
+    "+0700": 16,
+    "+0800": 477,
+    "+0900": 458,
+    "+0930": 1,
+    "+1000": 463,
+    "+1030": 7,
+    "+1100": 803,
+    "+1200": 207,
+    "+1300": 203,
+    "-0100": 10,
+    "-0200": 14,
+    "-0300": 175,
+    "-0400": 3381,
+    "-0500": 2451,
+    "-0600": 1328,
+    "-0700": 3714,
+    "-0800": 1893,
+    "-0900": 1,
+    "-1000": 24
+  },
   "source_lines": {
-    "added": 5661442,
-    "current": 1179745
+    "added": 5661587,
+    "current": 1179787
   }
 }

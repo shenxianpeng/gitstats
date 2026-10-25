@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:46:59+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:35:39+00:00",
   "name": "Next.js",
   "report_path": "index.html",
   "first_commit": "2016-10-05 23:35:00",
-  "last_commit": "2026-10-24 16:15:09",
+  "last_commit": "2026-10-24 23:21:03",
   "age_days": 3671,
   "active_days": 3329,
-  "total_commits": 36436,
+  "total_commits": 36441,
   "total_authors": 3970,
   "active_authors_12mo": 248,
-  "commits_last_12mo": 4866,
-  "total_files": 34485,
-  "total_lines": 3139946,
-  "lines_added": 13063635,
-  "lines_removed": 9923689,
-  "total_tags": 3906,
+  "commits_last_12mo": 4871,
+  "total_files": 34503,
+  "total_lines": 3140877,
+  "lines_added": 13065187,
+  "lines_removed": 9924310,
+  "total_tags": 3907,
   "era": "steady",
   "top_authors": [
     {
@@ -29,7 +29,7 @@
     },
     {
       "name": "Tobias Koppers",
-      "commits": 2679
+      "commits": 2683
     },
     {
       "name": "nextjs-bot",
@@ -41,9 +41,9 @@
     }
   ],
   "author_commits": {
+    "Tobias Koppers": 2683,
     "Luke Sandberg": 466,
     "dan": 49,
-    "Tobias Koppers": 2679,
     "Benjamin Woodruff \u202e": 646,
     "Jamiboy Mohammad": 47,
     "Sebastian \"Sebbie\" Silbermann": 881,
@@ -4023,7 +4023,7 @@
     "2023": 5710,
     "2024": 5744,
     "2025": 5619,
-    "2026": 4308
+    "2026": 4313
   },
   "ai_assisted": {
     "commits": 275,
@@ -4084,19 +4084,19 @@
       "2026-07": 454,
       "2026-08": 490,
       "2026-09": 478,
-      "2026-10": 457
+      "2026-10": 462
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 36436,
+    "commits": 36441,
     "by_kind": {
       "organization": 5480,
       "one_person": 12535,
-      "personal": 11646,
+      "personal": 11650,
       "hidden": 5090,
       "unknown": 0,
-      "bot": 1685
+      "bot": 1686
     },
     "organization_count": 21,
     "last_12mo_from": "2025-11",
@@ -4330,23 +4330,23 @@
       "2026-Q4": {
         "organization": 78,
         "one_person": 45,
-        "personal": 158,
+        "personal": 162,
         "hidden": 128,
         "unknown": 0,
-        "bot": 48
+        "bot": 49
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4599,
+    "commits": 4603,
     "authors": 242,
     "new_authors": 177,
     "half_of_commits": 7
   },
   "humans": {
-    "commits": 34751,
+    "commits": 34755,
     "commits_by_year": {
       "2016": 446,
       "2017": 1137,
@@ -4358,12 +4358,45 @@
       "2023": 5677,
       "2024": 5609,
       "2025": 4834,
-      "2026": 3737
+      "2026": 3741
     },
     "active_days": 3316
   },
+  "timezones": {
+    "+0000": 2381,
+    "+0100": 6094,
+    "+0200": 8909,
+    "+0300": 397,
+    "+0330": 35,
+    "+0400": 34,
+    "+0430": 14,
+    "+0500": 78,
+    "+0530": 866,
+    "+0545": 8,
+    "+0600": 36,
+    "+0630": 2,
+    "+0700": 172,
+    "+0800": 838,
+    "+0900": 1881,
+    "+0930": 1,
+    "+1000": 59,
+    "+1030": 1,
+    "+1100": 56,
+    "+1200": 7,
+    "+1300": 11,
+    "-0200": 13,
+    "-0230": 2,
+    "-0300": 256,
+    "-0330": 1,
+    "-0400": 2422,
+    "-0500": 3194,
+    "-0600": 1172,
+    "-0700": 5317,
+    "-0800": 2180,
+    "-1000": 4
+  },
   "source_lines": {
-    "added": 13457765,
-    "current": 2998806
+    "added": 13459282,
+    "current": 2999702
   }
 }

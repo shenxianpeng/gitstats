@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:39:30+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:27:46+00:00",
   "name": "OpenHands",
   "report_path": "index.html",
   "first_commit": "2024-03-13 03:36:30",
-  "last_commit": "2026-10-24 09:13:14",
+  "last_commit": "2026-10-25 02:21:18",
   "age_days": 956,
-  "active_days": 906,
-  "total_commits": 8736,
+  "active_days": 907,
+  "total_commits": 8743,
   "total_authors": 573,
-  "active_authors_12mo": 212,
-  "commits_last_12mo": 3275,
-  "total_files": 2782,
-  "total_lines": 564150,
-  "lines_added": 2175469,
-  "lines_removed": 1611319,
+  "active_authors_12mo": 211,
+  "commits_last_12mo": 3282,
+  "total_files": 2800,
+  "total_lines": 565461,
+  "lines_added": 2176938,
+  "lines_removed": 1611477,
   "total_tags": 104,
   "era": "steady",
   "top_authors": [
@@ -37,11 +37,12 @@
     },
     {
       "name": "Engel Nyst",
-      "commits": 543
+      "commits": 549
     }
   ],
   "author_commits": {
-    "Engel Nyst": 543,
+    "Engel Nyst": 549,
+    "Nelson Spence": 4,
     "Irhas Abdul Rosyid": 2,
     "dymux": 1,
     "OpenHands Bot": 61,
@@ -172,7 +173,6 @@
     "burak keles": 1,
     "Jathin Sreenivas": 4,
     "Sanjay Santhanam": 1,
-    "Nelson Spence": 3,
     "Ray Myers": 73,
     "Kushal": 1,
     "Chris Bagwell": 8,
@@ -618,14 +618,14 @@
   "commits_by_year": {
     "2024": 2995,
     "2025": 2790,
-    "2026": 2951
+    "2026": 2958
   },
   "ai_assisted": {
-    "commits": 2538,
+    "commits": 2539,
     "authored": 17,
     "assistants": {
       "OpenHands": 2343,
-      "Claude": 182,
+      "Claude": 183,
       "Cursor": 38,
       "GitHub Copilot": 5,
       "Codex": 3,
@@ -656,7 +656,7 @@
       "2026-07": 108,
       "2026-08": 63,
       "2026-09": 161,
-      "2026-10": 135
+      "2026-10": 136
     },
     "commits_by_month": {
       "2024-11": 245,
@@ -682,16 +682,16 @@
       "2026-07": 258,
       "2026-08": 179,
       "2026-09": 250,
-      "2026-10": 363
+      "2026-10": 370
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8736,
+    "commits": 8743,
     "by_kind": {
       "organization": 967,
-      "one_person": 1176,
-      "personal": 3234,
+      "one_person": 1177,
+      "personal": 3240,
       "hidden": 2237,
       "unknown": 0,
       "bot": 1122
@@ -783,8 +783,8 @@
       },
       "2026-Q4": {
         "organization": 28,
-        "one_person": 28,
-        "personal": 231,
+        "one_person": 29,
+        "personal": 237,
         "hidden": 64,
         "unknown": 0,
         "bot": 12
@@ -794,22 +794,46 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3056,
+    "commits": 3063,
     "authors": 204,
     "new_authors": 178,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 7614,
+    "commits": 7621,
     "commits_by_year": {
       "2024": 2270,
       "2025": 2591,
-      "2026": 2753
+      "2026": 2760
     },
-    "active_days": 906
+    "active_days": 907
+  },
+  "timezones": {
+    "+0000": 423,
+    "+0100": 281,
+    "+0200": 1100,
+    "+0300": 103,
+    "+0330": 4,
+    "+0400": 388,
+    "+0500": 3,
+    "+0530": 247,
+    "+0545": 5,
+    "+0600": 1,
+    "+0700": 783,
+    "+0800": 762,
+    "+0900": 54,
+    "+1000": 2,
+    "+1100": 2,
+    "+1300": 1,
+    "-0300": 62,
+    "-0400": 2070,
+    "-0500": 1050,
+    "-0600": 545,
+    "-0700": 767,
+    "-0800": 90
   },
   "source_lines": {
-    "added": 1859464,
-    "current": 540442
+    "added": 1859958,
+    "current": 540778
   }
 }

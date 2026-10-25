@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:43:24+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:31:46+00:00",
   "name": "Apache Spark",
   "report_path": "index.html",
   "first_commit": "2010-03-29 23:17:55",
-  "last_commit": "2026-10-24 16:54:37",
+  "last_commit": "2026-10-24 22:03:48",
   "age_days": 6053,
   "active_days": 5306,
-  "total_commits": 50689,
+  "total_commits": 50694,
   "total_authors": 3085,
-  "active_authors_12mo": 427,
-  "commits_last_12mo": 4793,
+  "active_authors_12mo": 426,
+  "commits_last_12mo": 4798,
   "total_files": 27599,
-  "total_lines": 4384003,
-  "lines_added": 7826488,
-  "lines_removed": 3442485,
+  "total_lines": 4384431,
+  "lines_added": 7827490,
+  "lines_removed": 3443059,
   "total_tags": 11,
   "era": "steady",
   "top_authors": [
     {
       "name": "Dongjoon Hyun",
-      "commits": 2623
+      "commits": 2625
     },
     {
       "name": "Ruifeng Zheng",
@@ -41,9 +41,10 @@
     }
   ],
   "author_commits": {
-    "Dongjoon Hyun": 2623,
+    "Yicong Huang": 238,
+    "Wenchen Fan": 1426,
+    "Dongjoon Hyun": 2625,
     "Liang-Chi Hsieh": 780,
-    "Wenchen Fan": 1425,
     "Kumar Sambhav": 1,
     "Szehon Ho": 143,
     "Chiran Ravani": 3,
@@ -51,7 +52,6 @@
     "hu hengrui": 1,
     "Luka Zdravi\u0107": 18,
     "Ruifeng Zheng": 2031,
-    "Yicong Huang": 236,
     "Hyukjin Kwon": 2030,
     "Peter Toth": 185,
     "Daniel Tenedorio": 127,
@@ -3144,13 +3144,13 @@
     "2023": 4113,
     "2024": 3762,
     "2025": 3411,
-    "2026": 4145
+    "2026": 4150
   },
   "ai_assisted": {
-    "commits": 2265,
+    "commits": 2270,
     "authored": 0,
     "assistants": {
-      "Claude": 1697,
+      "Claude": 1702,
       "Codex": 371,
       "ChatGPT": 369,
       "Cursor": 215,
@@ -3186,7 +3186,7 @@
       "2026-07": 332,
       "2026-08": 359,
       "2026-09": 320,
-      "2026-10": 268
+      "2026-10": 273
     },
     "commits_by_month": {
       "2024-11": 250,
@@ -3212,17 +3212,17 @@
       "2026-07": 531,
       "2026-08": 536,
       "2026-09": 455,
-      "2026-10": 323
+      "2026-10": 328
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 50689,
+    "commits": 50694,
     "by_kind": {
-      "organization": 31014,
+      "organization": 31017,
       "one_person": 2303,
       "personal": 16406,
-      "hidden": 797,
+      "hidden": 799,
       "unknown": 169,
       "bot": 0
     },
@@ -3231,16 +3231,16 @@
     "top": [
       {
         "organization": "databricks.com",
-        "commits": 11161,
-        "commits_last_12mo": 871,
+        "commits": 11162,
+        "commits_last_12mo": 872,
         "addresses": 336,
         "first_commit": "2013-09-04",
         "last_commit": "2026-10-24"
       },
       {
         "organization": "apache.org",
-        "commits": 8339,
-        "commits_last_12mo": 1391,
+        "commits": 8341,
+        "commits_last_12mo": 1393,
         "addresses": 98,
         "first_commit": "2013-07-08",
         "last_commit": "2026-10-24"
@@ -4360,10 +4360,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 163,
+        "organization": 166,
         "one_person": 21,
         "personal": 106,
-        "hidden": 33,
+        "hidden": 35,
         "unknown": 0,
         "bot": 0
       }
@@ -4372,13 +4372,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4793,
+    "commits": 4798,
     "authors": 423,
     "new_authors": 256,
     "half_of_commits": 11
   },
   "humans": {
-    "commits": 50689,
+    "commits": 50694,
     "commits_by_year": {
       "2010": 306,
       "2011": 326,
@@ -4396,12 +4396,31 @@
       "2023": 4113,
       "2024": 3762,
       "2025": 3411,
-      "2026": 4145
+      "2026": 4150
     },
     "active_days": 5306
   },
+  "timezones": {
+    "+0000": 2077,
+    "+0100": 1302,
+    "+0200": 951,
+    "+0300": 879,
+    "+0400": 1,
+    "+0500": 109,
+    "+0530": 238,
+    "+0700": 5,
+    "+0800": 9338,
+    "+0900": 6763,
+    "-0300": 5,
+    "-0400": 541,
+    "-0500": 1466,
+    "-0600": 875,
+    "-0700": 17030,
+    "-0800": 9104,
+    "-1000": 10
+  },
   "source_lines": {
-    "added": 15009696,
-    "current": 4175464
+    "added": 15010698,
+    "current": 4175892
   }
 }

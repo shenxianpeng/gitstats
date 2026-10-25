@@ -1949,3 +1949,67 @@ details.table-details[open] > summary {
 		grid-row: 3;
 	}
 }
+
+/* What stands out about a repository: each fact's number large, its sentence,
+   and how it compares; on the overview of a report and on its comparison */
+.insights-section {
+	margin-bottom: var(--space-6);
+}
+
+.insights {
+	list-style: none;
+	margin: var(--space-3) 0 var(--space-3);
+	padding: 0;
+	border-top: 1px solid var(--border-strong);
+}
+
+.insight {
+	display: grid;
+	grid-template-columns: 7.5rem minmax(0, 1fr);
+	column-gap: var(--space-5);
+	align-items: baseline;
+	padding: var(--space-4) 0;
+	border-bottom: 1px solid var(--table-border);
+}
+
+.insight-big {
+	font-family: var(--font-mono);
+	font-size: 34px;
+	font-weight: 600;
+	line-height: 1.1;
+	font-variant-numeric: tabular-nums;
+	color: var(--bar-color);
+}
+
+.insight-label {
+	font-family: var(--font-mono);
+	font-size: var(--font-size-xs);
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.insight-sentence {
+	margin: var(--space-1) 0 0;
+	max-width: 46rem;
+	font-size: var(--font-size-md);
+	line-height: 1.5;
+	color: var(--text-color);
+}
+
+.insight-compared {
+	margin: var(--space-1) 0 0;
+	font-size: var(--font-size-sm);
+	color: var(--text-muted);
+}
+
+@media (max-width: 560px) {
+	.insight {
+		grid-template-columns: 4.75rem minmax(0, 1fr);
+		column-gap: var(--space-3);
+	}
+
+	.insight-big {
+		font-size: 24px;
+	}
+}

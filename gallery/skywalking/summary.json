@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:44:59+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:33:47+00:00",
   "name": "Apache SkyWalking",
   "report_path": "index.html",
   "first_commit": "2015-11-07 03:30:37",
@@ -10,7 +10,7 @@
   "active_days": 2700,
   "total_commits": 8648,
   "total_authors": 519,
-  "active_authors_12mo": 28,
+  "active_authors_12mo": 27,
   "commits_last_12mo": 273,
   "total_files": 5592,
   "total_lines": 607768,
@@ -765,6 +765,25 @@
       "2026": 250
     },
     "active_days": 2700
+  },
+  "timezones": {
+    "+0000": 23,
+    "+0100": 15,
+    "+0200": 21,
+    "+0300": 12,
+    "+0400": 16,
+    "+0530": 9,
+    "+0700": 11,
+    "+0800": 8277,
+    "+0900": 23,
+    "+1000": 1,
+    "+1100": 3,
+    "-0300": 14,
+    "-0400": 27,
+    "-0500": 72,
+    "-0600": 42,
+    "-0700": 72,
+    "-0800": 10
   },
   "source_lines": {
     "added": 2097677,

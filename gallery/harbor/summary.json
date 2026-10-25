@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:42:28+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:30:52+00:00",
   "name": "Harbor",
   "report_path": "index.html",
   "first_commit": "2016-02-01 11:59:10",
-  "last_commit": "2026-10-24 17:11:30",
+  "last_commit": "2026-10-24 20:56:55",
   "age_days": 3919,
   "active_days": 2434,
-  "total_commits": 12932,
+  "total_commits": 12933,
   "total_authors": 476,
   "active_authors_12mo": 93,
-  "commits_last_12mo": 418,
+  "commits_last_12mo": 419,
   "total_files": 3307,
   "total_lines": 483443,
-  "lines_added": 4985448,
-  "lines_removed": 4502005,
+  "lines_added": 4985450,
+  "lines_removed": 4502007,
   "total_tags": 41,
   "era": "steady",
   "top_authors": [
@@ -529,7 +529,7 @@
     "2023": 434,
     "2024": 323,
     "2025": 269,
-    "2026": 397
+    "2026": 398
   },
   "ai_assisted": {
     "commits": 16,
@@ -589,19 +589,19 @@
       "2026-07": 39,
       "2026-08": 58,
       "2026-09": 46,
-      "2026-10": 72
+      "2026-10": 73
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 12932,
+    "commits": 12933,
     "by_kind": {
       "organization": 9000,
       "one_person": 302,
       "personal": 2293,
       "hidden": 1072,
       "unknown": 8,
-      "bot": 257
+      "bot": 258
     },
     "organization_count": 10,
     "last_12mo_from": "2025-11",
@@ -750,7 +750,7 @@
         "personal": 22,
         "hidden": 6,
         "unknown": 0,
-        "bot": 24
+        "bot": 25
       }
     }
   },
@@ -779,8 +779,31 @@
     },
     "active_days": 2385
   },
+  "timezones": {
+    "+0000": 332,
+    "+0100": 186,
+    "+0200": 234,
+    "+0300": 56,
+    "+0400": 1,
+    "+0500": 3,
+    "+0530": 121,
+    "+0600": 11,
+    "+0700": 4,
+    "+0800": 11289,
+    "+0900": 19,
+    "+1100": 11,
+    "+1200": 1,
+    "+1300": 1,
+    "-0200": 6,
+    "-0300": 4,
+    "-0400": 145,
+    "-0500": 94,
+    "-0600": 44,
+    "-0700": 299,
+    "-0800": 72
+  },
   "source_lines": {
-    "added": 1504938,
+    "added": 1504940,
     "current": 439662
   }
 }

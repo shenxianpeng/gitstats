@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:38:24+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:26:34+00:00",
   "name": "NumPy",
   "report_path": "index.html",
   "first_commit": "2001-12-18 15:45:10",
-  "last_commit": "2026-10-23 23:40:25",
-  "age_days": 9076,
-  "active_days": 6828,
-  "total_commits": 42437,
+  "last_commit": "2026-10-24 17:56:04",
+  "age_days": 9077,
+  "active_days": 6829,
+  "total_commits": 42440,
   "total_authors": 2109,
   "active_authors_12mo": 237,
-  "commits_last_12mo": 2474,
+  "commits_last_12mo": 2477,
   "total_files": 2424,
   "total_lines": 1007868,
-  "lines_added": 2791709,
-  "lines_removed": 1783841,
+  "lines_added": 2791717,
+  "lines_removed": 1783849,
   "total_tags": 16,
   "era": "steady",
   "top_authors": [
     {
       "name": "Charles Harris",
-      "commits": 7290
+      "commits": 7292
     },
     {
       "name": "Matti Picus",
@@ -41,10 +41,10 @@
     }
   ],
   "author_commits": {
-    "Charles Harris": 7290,
+    "Tyler Reddy": 199,
+    "Charles Harris": 7292,
     "Fun-Projects-Learn": 2,
     "Adnan Sami": 1,
-    "Tyler Reddy": 198,
     "LeeMEow23": 1,
     "Dragos-Georgian Ion": 4,
     "Anush Vishwakarma": 1,
@@ -2177,7 +2177,7 @@
     "2023": 3422,
     "2024": 3054,
     "2025": 2543,
-    "2026": 2073
+    "2026": 2076
   },
   "ai_assisted": {
     "commits": 38,
@@ -2237,16 +2237,16 @@
       "2026-07": 241,
       "2026-08": 229,
       "2026-09": 333,
-      "2026-10": 201
+      "2026-10": 204
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 42437,
+    "commits": 42440,
     "by_kind": {
       "organization": 2800,
       "one_person": 6066,
-      "personal": 31201,
+      "personal": 31204,
       "hidden": 1270,
       "unknown": 486,
       "bot": 614
@@ -2875,7 +2875,7 @@
       "2026-Q4": {
         "organization": 6,
         "one_person": 2,
-        "personal": 162,
+        "personal": 165,
         "hidden": 21,
         "unknown": 0,
         "bot": 10
@@ -2885,13 +2885,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2293,
+    "commits": 2296,
     "authors": 235,
     "new_authors": 172,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 41823,
+    "commits": 41826,
     "commits_by_year": {
       "2001": 8,
       "2002": 408,
@@ -2918,12 +2918,43 @@
       "2023": 3343,
       "2024": 2947,
       "2025": 2423,
-      "2026": 1917
+      "2026": 1920
     },
-    "active_days": 6825
+    "active_days": 6826
+  },
+  "timezones": {
+    "+0000": 9547,
+    "+0100": 4306,
+    "+0200": 6945,
+    "+0300": 1943,
+    "+0330": 7,
+    "+0400": 45,
+    "+0430": 2,
+    "+0500": 50,
+    "+0530": 1103,
+    "+0545": 1,
+    "+0600": 15,
+    "+0700": 15,
+    "+0800": 539,
+    "+0900": 289,
+    "+1000": 104,
+    "+1030": 2,
+    "+1100": 144,
+    "+1200": 45,
+    "+1300": 58,
+    "-0100": 1,
+    "-0200": 3,
+    "-0300": 284,
+    "-0400": 1898,
+    "-0430": 1,
+    "-0500": 2745,
+    "-0600": 4905,
+    "-0700": 5667,
+    "-0800": 1762,
+    "-1000": 14
   },
   "source_lines": {
-    "added": 3219322,
+    "added": 3219330,
     "current": 1005376
   }
 }

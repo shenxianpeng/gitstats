@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:39:48+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:27:53+00:00",
   "name": "goose",
   "report_path": "index.html",
   "first_commit": "2024-08-23 23:39:04",
-  "last_commit": "2026-10-24 12:41:47",
+  "last_commit": "2026-10-24 17:41:22",
   "age_days": 792,
   "active_days": 645,
-  "total_commits": 5882,
+  "total_commits": 5883,
   "total_authors": 649,
-  "active_authors_12mo": 430,
-  "commits_last_12mo": 3204,
+  "active_authors_12mo": 429,
+  "commits_last_12mo": 3205,
   "total_files": 2531,
-  "total_lines": 1088910,
-  "lines_added": 2314789,
-  "lines_removed": 1225879,
-  "total_tags": 92,
+  "total_lines": 1088977,
+  "lines_added": 2314885,
+  "lines_removed": 1225908,
+  "total_tags": 93,
   "era": "steady",
   "top_authors": [
     {
@@ -694,7 +694,7 @@
   "commits_by_year": {
     "2024": 187,
     "2025": 2859,
-    "2026": 2836
+    "2026": 2837
   },
   "ai_assisted": {
     "commits": 288,
@@ -757,19 +757,19 @@
       "2026-07": 287,
       "2026-08": 348,
       "2026-09": 199,
-      "2026-10": 121
+      "2026-10": 122
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5882,
+    "commits": 5883,
     "by_kind": {
       "organization": 2178,
       "one_person": 412,
       "personal": 1285,
       "hidden": 1649,
       "unknown": 0,
-      "bot": 358
+      "bot": 359
     },
     "organization_count": 5,
     "last_12mo_from": "2025-11",
@@ -878,7 +878,7 @@
         "personal": 32,
         "hidden": 11,
         "unknown": 0,
-        "bot": 5
+        "bot": 6
       }
     }
   },
@@ -899,8 +899,33 @@
     },
     "active_days": 643
   },
+  "timezones": {
+    "+0000": 679,
+    "+0100": 202,
+    "+0200": 241,
+    "+0300": 35,
+    "+0400": 1,
+    "+0500": 8,
+    "+0530": 227,
+    "+0600": 18,
+    "+0700": 19,
+    "+0800": 116,
+    "+0900": 36,
+    "+1000": 394,
+    "+1100": 217,
+    "+1200": 14,
+    "+1300": 4,
+    "-0300": 38,
+    "-0330": 1,
+    "-0400": 1275,
+    "-0500": 799,
+    "-0600": 227,
+    "-0700": 958,
+    "-0800": 366,
+    "-1000": 8
+  },
   "source_lines": {
-    "added": 2098953,
-    "current": 1031719
+    "added": 2099041,
+    "current": 1031786
   }
 }

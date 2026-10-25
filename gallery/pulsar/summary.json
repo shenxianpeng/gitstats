@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:43:42+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:31:58+00:00",
   "name": "Apache Pulsar",
   "report_path": "index.html",
   "first_commit": "2016-09-07 04:17:28",
-  "last_commit": "2026-10-24 15:31:01",
+  "last_commit": "2026-10-24 23:17:41",
   "age_days": 3700,
   "active_days": 2945,
-  "total_commits": 15248,
-  "total_authors": 773,
-  "active_authors_12mo": 129,
-  "commits_last_12mo": 1472,
+  "total_commits": 15250,
+  "total_authors": 774,
+  "active_authors_12mo": 130,
+  "commits_last_12mo": 1474,
   "total_files": 6353,
-  "total_lines": 1334670,
-  "lines_added": 6323514,
-  "lines_removed": 4988844,
+  "total_lines": 1334756,
+  "lines_added": 6323619,
+  "lines_removed": 4988863,
   "total_tags": 6,
   "era": "steady",
   "top_authors": [
@@ -41,7 +41,8 @@
     }
   ],
   "author_commits": {
-    "void-ptr974": 56,
+    "void-ptr974": 57,
+    "LiuYC3213687107": 1,
     "Michael Marshall": 237,
     "lordcheng10": 24,
     "Dream95": 25,
@@ -826,13 +827,13 @@
     "2023": 1165,
     "2024": 931,
     "2025": 719,
-    "2026": 1359
+    "2026": 1361
   },
   "ai_assisted": {
-    "commits": 31,
+    "commits": 32,
     "authored": 0,
     "assistants": {
-      "Claude": 22,
+      "Claude": 23,
       "GitHub Copilot": 8,
       "Cursor": 1
     },
@@ -860,7 +861,7 @@
       "2026-07": 1,
       "2026-08": 3,
       "2026-09": 3,
-      "2026-10": 2
+      "2026-10": 3
     },
     "commits_by_month": {
       "2024-11": 67,
@@ -886,17 +887,17 @@
       "2026-07": 81,
       "2026-08": 82,
       "2026-09": 256,
-      "2026-10": 307
+      "2026-10": 309
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15248,
+    "commits": 15250,
     "by_kind": {
       "organization": 5691,
       "one_person": 249,
-      "personal": 5583,
-      "hidden": 3696,
+      "personal": 5584,
+      "hidden": 3697,
       "unknown": 0,
       "bot": 29
     },
@@ -1036,8 +1037,8 @@
       "2026-Q4": {
         "organization": 105,
         "one_person": 3,
-        "personal": 91,
-        "hidden": 107,
+        "personal": 92,
+        "hidden": 108,
         "unknown": 0,
         "bot": 1
       }
@@ -1046,13 +1047,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1458,
-    "authors": 128,
-    "new_authors": 54,
+    "commits": 1460,
+    "authors": 129,
+    "new_authors": 55,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 15219,
+    "commits": 15221,
     "commits_by_year": {
       "2016": 118,
       "2017": 636,
@@ -1064,12 +1065,31 @@
       "2023": 1163,
       "2024": 924,
       "2025": 712,
-      "2026": 1347
+      "2026": 1349
     },
     "active_days": 2943
   },
+  "timezones": {
+    "+0000": 60,
+    "+0100": 427,
+    "+0200": 1095,
+    "+0300": 1001,
+    "+0400": 2,
+    "+0430": 1,
+    "+0530": 113,
+    "+0700": 2,
+    "+0800": 7060,
+    "+0900": 437,
+    "+1000": 6,
+    "-0300": 44,
+    "-0400": 109,
+    "-0500": 268,
+    "-0600": 214,
+    "-0700": 3051,
+    "-0800": 1360
+  },
   "source_lines": {
-    "added": 6308054,
-    "current": 1326815
+    "added": 6308159,
+    "current": 1326901
   }
 }

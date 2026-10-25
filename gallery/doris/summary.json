@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:45:47+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:34:40+00:00",
   "name": "Apache Doris",
   "report_path": "index.html",
   "first_commit": "2017-08-11 09:51:21",
-  "last_commit": "2026-10-24 08:34:31",
-  "age_days": 3361,
-  "active_days": 2653,
-  "total_commits": 32762,
+  "last_commit": "2026-10-25 03:55:43",
+  "age_days": 3362,
+  "active_days": 2654,
+  "total_commits": 32765,
   "total_authors": 776,
   "active_authors_12mo": 166,
-  "commits_last_12mo": 4458,
-  "total_files": 43561,
-  "total_lines": 11069499,
-  "lines_added": 16969908,
-  "lines_removed": 5900409,
+  "commits_last_12mo": 4461,
+  "total_files": 43565,
+  "total_lines": 11070167,
+  "lines_added": 16975388,
+  "lines_removed": 5905221,
   "total_tags": 3,
   "era": "steady",
   "top_authors": [
     {
       "name": "Mingyu Chen (Rayner)",
-      "commits": 1930
+      "commits": 1932
     },
     {
       "name": "Gabriel",
@@ -41,19 +41,19 @@
     }
   ],
   "author_commits": {
+    "Mingyu Chen (Rayner)": 1932,
+    "Chenyang Sun": 251,
     "Jack": 414,
     "Socrates": 210,
     "lihangyu": 483,
     "Gavin Chou": 195,
     "Oliveira": 17,
     "yujun": 436,
-    "Mingyu Chen (Rayner)": 1930,
     "wudi": 230,
     "daidai": 219,
     "Mryange": 667,
     "meiyi": 369,
     "linrrarity": 160,
-    "Chenyang Sun": 250,
     "minghong": 628,
     "bobhan1": 354,
     "Calvin Kirs": 442,
@@ -828,7 +828,7 @@
     "2023": 8087,
     "2024": 7748,
     "2025": 5271,
-    "2026": 3705
+    "2026": 3708
   },
   "ai_assisted": {
     "commits": 225,
@@ -888,16 +888,16 @@
       "2026-07": 431,
       "2026-08": 379,
       "2026-09": 513,
-      "2026-10": 389
+      "2026-10": 392
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 32762,
+    "commits": 32765,
     "by_kind": {
-      "organization": 9559,
+      "organization": 9560,
       "one_person": 179,
-      "personal": 15468,
+      "personal": 15470,
       "hidden": 7555,
       "unknown": 0,
       "bot": 1
@@ -907,11 +907,11 @@
     "top": [
       {
         "organization": "selectdb.com",
-        "commits": 8408,
-        "commits_last_12mo": 3602,
+        "commits": 8409,
+        "commits_last_12mo": 3603,
         "addresses": 71,
         "first_commit": "2023-01-22",
-        "last_commit": "2026-10-24"
+        "last_commit": "2026-10-25"
       },
       {
         "organization": "apache.org",
@@ -1012,9 +1012,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 272,
+        "organization": 273,
         "one_person": 5,
-        "personal": 95,
+        "personal": 97,
         "hidden": 17,
         "unknown": 0,
         "bot": 0
@@ -1024,13 +1024,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4458,
+    "commits": 4461,
     "authors": 164,
     "new_authors": 74,
     "half_of_commits": 17
   },
   "humans": {
-    "commits": 32761,
+    "commits": 32764,
     "commits_by_year": {
       "2017": 144,
       "2018": 196,
@@ -1041,12 +1041,28 @@
       "2023": 8087,
       "2024": 7748,
       "2025": 5271,
-      "2026": 3705
+      "2026": 3708
     },
-    "active_days": 2653
+    "active_days": 2654
+  },
+  "timezones": {
+    "+0000": 4,
+    "+0100": 32,
+    "+0200": 10,
+    "+0300": 9,
+    "+0530": 217,
+    "+0700": 25,
+    "+0800": 32043,
+    "+0900": 105,
+    "-0300": 1,
+    "-0400": 5,
+    "-0500": 142,
+    "-0600": 51,
+    "-0700": 107,
+    "-0800": 14
   },
   "source_lines": {
-    "added": 16851972,
-    "current": 10922623
+    "added": 16857452,
+    "current": 10923289
   }
 }

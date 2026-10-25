@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:39:39+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:28:17+00:00",
   "name": "CPython",
   "report_path": "index.html",
   "first_commit": "1990-08-09 14:25:15",
-  "last_commit": "2026-10-24 17:31:32",
+  "last_commit": "2026-10-25 05:18:16",
   "age_days": 13226,
-  "active_days": 11065,
-  "total_commits": 133969,
+  "active_days": 11066,
+  "total_commits": 133977,
   "total_authors": 3732,
-  "active_authors_12mo": 785,
-  "commits_last_12mo": 5019,
-  "total_files": 5825,
-  "total_lines": 3259862,
-  "lines_added": 11133765,
-  "lines_removed": 7873903,
+  "active_authors_12mo": 784,
+  "commits_last_12mo": 5027,
+  "total_files": 5829,
+  "total_lines": 3259787,
+  "lines_added": 11134666,
+  "lines_removed": 7874879,
   "total_tags": 312,
   "era": "steady",
   "top_authors": [
@@ -41,20 +41,22 @@
     }
   ],
   "author_commits": {
+    "Inada Naoki": 405,
+    "Gregory P. Smith": 1472,
+    "Jelle Zijlstra": 378,
+    "Christian Heimes": 1742,
+    "tonghuaroot (\u7ae5\u8bdd)": 48,
+    "Davi de Jesus": 4,
     "Zachary Ware": 764,
     "Nice Zombies": 51,
     "An Long": 122,
     "Neil Schemenauer": 413,
     "Aslan Osmanov": 2,
     "Pieter Eendebak": 108,
-    "Inada Naoki": 404,
     "Christian Aurich Zanettini Martins": 7,
     "Michael Newman": 6,
     "Liang Hu": 1,
-    "Christian Heimes": 1741,
-    "Jelle Zijlstra": 376,
     "Pengyu Lee": 24,
-    "Davi de Jesus": 3,
     "Peter Bierma": 183,
     "Eduardo Villalpando Mello": 8,
     "Tian Gao": 183,
@@ -74,7 +76,6 @@
     "Sergey B Kirpichev": 223,
     "Himesh Rupchandani": 2,
     "Victorien": 27,
-    "Gregory P. Smith": 1470,
     "Michele Angrisano": 5,
     "Russell Keith-Magee": 98,
     "Paul Ganssle": 49,
@@ -106,7 +107,6 @@
     "Timur Mamedov": 1,
     "rajorin": 1,
     "Furkan Onder": 58,
-    "tonghuaroot (\u7ae5\u8bdd)": 47,
     "Advit Arora": 2,
     "Jason G": 3,
     "Grant Herman": 3,
@@ -3811,7 +3811,7 @@
     "2023": 4459,
     "2024": 4743,
     "2025": 4871,
-    "2026": 4236
+    "2026": 4244
   },
   "ai_assisted": {
     "commits": 385,
@@ -3870,17 +3870,17 @@
       "2026-07": 503,
       "2026-08": 384,
       "2026-09": 466,
-      "2026-10": 529
+      "2026-10": 537
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 133969,
+    "commits": 133977,
     "by_kind": {
-      "organization": 43206,
-      "one_person": 40202,
-      "personal": 43880,
-      "hidden": 6520,
+      "organization": 43207,
+      "one_person": 40204,
+      "personal": 43883,
+      "hidden": 6522,
       "unknown": 82,
       "bot": 79
     },
@@ -3889,8 +3889,8 @@
     "top": [
       {
         "organization": "python.org",
-        "commits": 32362,
-        "commits_last_12mo": 953,
+        "commits": 32363,
+        "commits_last_12mo": 954,
         "addresses": 31,
         "first_commit": "1990-08-09",
         "last_commit": "2026-10-24"
@@ -4346,10 +4346,10 @@
         "bot": 3
       },
       "2026-Q4": {
-        "organization": 127,
-        "one_person": 115,
-        "personal": 178,
-        "hidden": 105,
+        "organization": 128,
+        "one_person": 117,
+        "personal": 181,
+        "hidden": 107,
         "unknown": 0,
         "bot": 4
       }
@@ -4358,13 +4358,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 5009,
+    "commits": 5017,
     "authors": 780,
     "new_authors": 489,
     "half_of_commits": 18
   },
   "humans": {
-    "commits": 133890,
+    "commits": 133898,
     "commits_by_year": {
       "1990": 105,
       "1991": 445,
@@ -4402,12 +4402,43 @@
       "2023": 4445,
       "2024": 4710,
       "2025": 4871,
-      "2026": 4226
+      "2026": 4234
     },
-    "active_days": 11065
+    "active_days": 11066
+  },
+  "timezones": {
+    "+0000": 67124,
+    "+0100": 11875,
+    "+0200": 17334,
+    "+0300": 7783,
+    "+0330": 29,
+    "+0400": 81,
+    "+0430": 5,
+    "+0500": 164,
+    "+0530": 1027,
+    "+0545": 6,
+    "+0600": 6,
+    "+0700": 77,
+    "+0800": 2077,
+    "+0900": 1297,
+    "+0930": 4,
+    "+1000": 603,
+    "+1030": 15,
+    "+1100": 121,
+    "+1200": 114,
+    "+1300": 31,
+    "-0200": 1,
+    "-0300": 395,
+    "-0400": 6767,
+    "-0500": 4898,
+    "-0600": 1660,
+    "-0700": 7504,
+    "-0800": 2957,
+    "-0900": 5,
+    "-1000": 17
   },
   "source_lines": {
-    "added": 13600618,
-    "current": 3174688
+    "added": 13601519,
+    "current": 3175081
   }
 }

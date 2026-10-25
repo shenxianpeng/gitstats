@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:47:08+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:36:07+00:00",
   "name": "Go",
   "report_path": "index.html",
   "first_commit": "1972-07-19 00:05:45",
   "last_commit": "2026-10-23 16:57:24",
   "age_days": 19820,
   "active_days": 6423,
-  "total_commits": 68191,
-  "total_authors": 2768,
-  "active_authors_12mo": 335,
-  "commits_last_12mo": 3461,
+  "total_commits": 68193,
+  "total_authors": 2769,
+  "active_authors_12mo": 336,
+  "commits_last_12mo": 3463,
   "total_files": 16120,
-  "total_lines": 3972639,
-  "lines_added": 9954968,
-  "lines_removed": 5982329,
+  "total_lines": 3972703,
+  "lines_added": 9955037,
+  "lines_removed": 5982334,
   "total_tags": 141,
   "era": "steady",
   "top_authors": [
@@ -33,7 +33,7 @@
     },
     {
       "name": "Ian Lance Taylor",
-      "commits": 2880
+      "commits": 2881
     },
     {
       "name": "Brad Fitzpatrick",
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Anderson": 1,
+    "Ian Lance Taylor": 2881,
     "David Chase": 750,
     "Nicholas S. Husin": 109,
     "Michael Matloob": 663,
@@ -74,7 +76,6 @@
     "Cherry Mui": 1816,
     "Joel Sing": 692,
     "Alberto Donizetti": 323,
-    "Ian Lance Taylor": 2880,
     "Jake Bailey": 46,
     "Alexander Musman": 72,
     "Madeline Kalil": 1,
@@ -2832,7 +2833,7 @@
     "2023": 3724,
     "2024": 3125,
     "2025": 3138,
-    "2026": 2863
+    "2026": 2865
   },
   "ai_assisted": {
     "commits": 15,
@@ -2891,17 +2892,17 @@
       "2026-07": 268,
       "2026-08": 316,
       "2026-09": 410,
-      "2026-10": 218
+      "2026-10": 220
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 68191,
+    "commits": 68193,
     "by_kind": {
-      "organization": 47362,
+      "organization": 47363,
       "one_person": 6064,
       "personal": 14656,
-      "hidden": 102,
+      "hidden": 103,
       "unknown": 7,
       "bot": 0
     },
@@ -2910,8 +2911,8 @@
     "top": [
       {
         "organization": "golang.org",
-        "commits": 29549,
-        "commits_last_12mo": 988,
+        "commits": 29550,
+        "commits_last_12mo": 989,
         "addresses": 62,
         "first_commit": "2008-03-03",
         "last_commit": "2026-10-23"
@@ -3383,10 +3384,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 150,
+        "organization": 151,
         "one_person": 14,
         "personal": 52,
-        "hidden": 2,
+        "hidden": 3,
         "unknown": 0,
         "bot": 0
       }
@@ -3395,13 +3396,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3461,
-    "authors": 330,
-    "new_authors": 181,
+    "commits": 3463,
+    "authors": 331,
+    "new_authors": 182,
     "half_of_commits": 15
   },
   "humans": {
-    "commits": 68191,
+    "commits": 68193,
     "commits_by_year": {
       "1972": 1,
       "1974": 1,
@@ -3424,12 +3425,43 @@
       "2023": 3724,
       "2024": 3125,
       "2025": 3138,
-      "2026": 2863
+      "2026": 2865
     },
     "active_days": 6423
   },
+  "timezones": {
+    "+0000": 6039,
+    "+0100": 2972,
+    "+0200": 3166,
+    "+0300": 796,
+    "+0330": 8,
+    "+0400": 606,
+    "+0430": 10,
+    "+0500": 19,
+    "+0530": 184,
+    "+0545": 1,
+    "+0600": 6,
+    "+0700": 847,
+    "+0800": 2261,
+    "+0900": 1144,
+    "+0930": 20,
+    "+1000": 2544,
+    "+1030": 21,
+    "+1100": 2658,
+    "+1200": 144,
+    "+1300": 111,
+    "-0200": 64,
+    "-0300": 151,
+    "-0400": 12692,
+    "-0500": 7284,
+    "-0600": 368,
+    "-0700": 15737,
+    "-0800": 8325,
+    "-0900": 8,
+    "-1000": 7
+  },
   "source_lines": {
-    "added": 8446585,
-    "current": 3105864
+    "added": 8446654,
+    "current": 3105928
   }
 }

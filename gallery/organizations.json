@@ -2,8 +2,8 @@
   "schema_version": 1,
   "title": "Commits by organization",
   "description": "Commits by the domain of the author's email address, added up across the repositories. An organization's commits in the last 12 months are those of the 12 months that end with each repository's last commit. A domain only one person commits from is counted apart, as are mail providers anyone can sign up for, code hosts' private noreply addresses and bots. A domain says where an address is, not who paid for the work.",
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:52:09+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:40:53+00:00",
   "quarters": [
     "2025-Q4",
     "2026-Q1",
@@ -13,8 +13,8 @@
   "organizations": [
     {
       "organization": "google.com",
-      "commits_last_12mo": 21933,
-      "commits": 237251,
+      "commits_last_12mo": 21937,
+      "commits": 237255,
       "repositories": [
         "Aider",
         "Angular",
@@ -90,11 +90,11 @@
         {
           "name": "JAX",
           "report": "jax/index.html",
-          "commits": 28329,
-          "commits_last_12mo": 7049,
+          "commits": 28332,
+          "commits_last_12mo": 7052,
           "addresses": 465,
           "first_commit": "2018-11-18",
-          "last_commit": "2026-10-24"
+          "last_commit": "2026-10-25"
         },
         {
           "name": "Kubernetes",
@@ -162,11 +162,11 @@
         {
           "name": "Rust",
           "report": "rust/index.html",
-          "commits": 1143,
-          "commits_last_12mo": 143,
+          "commits": 1144,
+          "commits_last_12mo": 144,
           "addresses": 130,
           "first_commit": "2014-05-12",
-          "last_commit": "2026-10-20"
+          "last_commit": "2026-10-23"
         },
         {
           "name": "Cilium",
@@ -760,8 +760,8 @@
     },
     {
       "organization": "microsoft.com",
-      "commits_last_12mo": 9120,
-      "commits": 126014,
+      "commits_last_12mo": 9136,
+      "commits": 126030,
       "repositories": [
         "Angular",
         "Apache Airflow",
@@ -812,8 +812,8 @@
         {
           "name": "VS Code",
           "report": "vscode/index.html",
-          "commits": 94059,
-          "commits_last_12mo": 8531,
+          "commits": 94075,
+          "commits_last_12mo": 8547,
           "addresses": 226,
           "first_commit": "2015-11-13",
           "last_commit": "2026-10-24"
@@ -1209,8 +1209,8 @@
     },
     {
       "organization": "meta.com",
-      "commits_last_12mo": 6543,
-      "commits": 59819,
+      "commits_last_12mo": 6545,
+      "commits": 59821,
       "repositories": [
         "Apache Arrow",
         "Apache Spark",
@@ -1235,11 +1235,11 @@
         {
           "name": "PyTorch",
           "report": "pytorch/index.html",
-          "commits": 54637,
-          "commits_last_12mo": 6180,
+          "commits": 54638,
+          "commits_last_12mo": 6181,
           "addresses": 2040,
           "first_commit": "2014-07-10",
-          "last_commit": "2026-10-24"
+          "last_commit": "2026-10-25"
         },
         {
           "name": "vLLM",
@@ -1253,11 +1253,11 @@
         {
           "name": "SGLang",
           "report": "sglang/index.html",
-          "commits": 55,
-          "commits_last_12mo": 51,
+          "commits": 56,
+          "commits_last_12mo": 52,
           "addresses": 16,
           "first_commit": "2024-11-16",
-          "last_commit": "2026-10-16"
+          "last_commit": "2026-10-25"
         },
         {
           "name": "CPython",
@@ -1398,8 +1398,8 @@
     },
     {
       "organization": "apache.org",
-      "commits_last_12mo": 6434,
-      "commits": 79041,
+      "commits_last_12mo": 6437,
+      "commits": 79044,
       "repositories": [
         "Apache Airflow",
         "Apache APISIX",
@@ -1454,8 +1454,8 @@
         {
           "name": "Apache Spark",
           "report": "spark/index.html",
-          "commits": 8339,
-          "commits_last_12mo": 1391,
+          "commits": 8341,
+          "commits_last_12mo": 1393,
           "addresses": 98,
           "first_commit": "2013-07-08",
           "last_commit": "2026-10-24"
@@ -1463,8 +1463,8 @@
         {
           "name": "Apache Airflow",
           "report": "airflow/index.html",
-          "commits": 5837,
-          "commits_last_12mo": 672,
+          "commits": 5838,
+          "commits_last_12mo": 673,
           "addresses": 27,
           "first_commit": "2014-10-06",
           "last_commit": "2026-10-24"
@@ -2046,8 +2046,8 @@
     },
     {
       "organization": "selectdb.com",
-      "commits_last_12mo": 3602,
-      "commits": 8408,
+      "commits_last_12mo": 3603,
+      "commits": 8409,
       "repositories": [
         "Apache Doris"
       ],
@@ -2055,18 +2055,18 @@
         {
           "name": "Apache Doris",
           "report": "doris/index.html",
-          "commits": 8408,
-          "commits_last_12mo": 3602,
+          "commits": 8409,
+          "commits_last_12mo": 3603,
           "addresses": 71,
           "first_commit": "2023-01-22",
-          "last_commit": "2026-10-24"
+          "last_commit": "2026-10-25"
         }
       ]
     },
     {
       "organization": "amd.com",
-      "commits_last_12mo": 3428,
-      "commits": 5375,
+      "commits_last_12mo": 3429,
+      "commits": 5376,
       "repositories": [
         "Diffusers",
         "JAX",
@@ -2083,11 +2083,11 @@
         {
           "name": "vLLM",
           "report": "vllm/index.html",
-          "commits": 1345,
-          "commits_last_12mo": 1260,
+          "commits": 1346,
+          "commits_last_12mo": 1261,
           "addresses": 165,
           "first_commit": "2024-04-03",
-          "last_commit": "2026-10-24"
+          "last_commit": "2026-10-25"
         },
         {
           "name": "PyTorch",
@@ -3736,8 +3736,8 @@
     },
     {
       "organization": "postgresql.org",
-      "commits_last_12mo": 1399,
-      "commits": 10273,
+      "commits_last_12mo": 1401,
+      "commits": 10275,
       "repositories": [
         "PostgreSQL"
       ],
@@ -3745,18 +3745,18 @@
         {
           "name": "PostgreSQL",
           "report": "postgres/index.html",
-          "commits": 10273,
-          "commits_last_12mo": 1399,
+          "commits": 10275,
+          "commits_last_12mo": 1401,
           "addresses": 21,
           "first_commit": "1998-01-15",
-          "last_commit": "2026-10-22"
+          "last_commit": "2026-10-24"
         }
       ]
     },
     {
       "organization": "databricks.com",
-      "commits_last_12mo": 1320,
-      "commits": 11907,
+      "commits_last_12mo": 1321,
+      "commits": 11908,
       "repositories": [
         "Apache Airflow",
         "Apache Arrow",
@@ -3774,8 +3774,8 @@
         {
           "name": "Apache Spark",
           "report": "spark/index.html",
-          "commits": 11161,
-          "commits_last_12mo": 871,
+          "commits": 11162,
+          "commits_last_12mo": 872,
           "addresses": 336,
           "first_commit": "2013-09-04",
           "last_commit": "2026-10-24"
@@ -4039,8 +4039,8 @@
     },
     {
       "organization": "huggingface.co",
-      "commits_last_12mo": 1058,
-      "commits": 2846,
+      "commits_last_12mo": 1059,
+      "commits": 2847,
       "repositories": [
         "Diffusers",
         "llama.cpp",
@@ -4051,8 +4051,8 @@
         {
           "name": "llama.cpp",
           "report": "llama-cpp/index.html",
-          "commits": 770,
-          "commits_last_12mo": 621,
+          "commits": 771,
+          "commits_last_12mo": 622,
           "addresses": 5,
           "first_commit": "2024-03-26",
           "last_commit": "2026-10-24"
@@ -4107,8 +4107,8 @@
     },
     {
       "organization": "python.org",
-      "commits_last_12mo": 997,
-      "commits": 32659,
+      "commits_last_12mo": 998,
+      "commits": 32660,
       "repositories": [
         "CPython",
         "curl",
@@ -4125,8 +4125,8 @@
         {
           "name": "CPython",
           "report": "cpython/index.html",
-          "commits": 32362,
-          "commits_last_12mo": 953,
+          "commits": 32363,
+          "commits_last_12mo": 954,
           "addresses": 31,
           "first_commit": "1990-08-09",
           "last_commit": "2026-10-24"
@@ -4216,8 +4216,8 @@
     },
     {
       "organization": "golang.org",
-      "commits_last_12mo": 988,
-      "commits": 29563,
+      "commits_last_12mo": 989,
+      "commits": 29564,
       "repositories": [
         "Apache Beam",
         "Go",
@@ -4228,8 +4228,8 @@
         {
           "name": "Go",
           "report": "go/index.html",
-          "commits": 29549,
-          "commits_last_12mo": 988,
+          "commits": 29550,
+          "commits_last_12mo": 989,
           "addresses": 62,
           "first_commit": "2008-03-03",
           "last_commit": "2026-10-23"
@@ -4334,8 +4334,8 @@
     },
     {
       "organization": "astral.sh",
-      "commits_last_12mo": 803,
-      "commits": 1594,
+      "commits_last_12mo": 804,
+      "commits": 1595,
       "repositories": [
         "Ruff",
         "uv"
@@ -4344,11 +4344,11 @@
         {
           "name": "Ruff",
           "report": "ruff/index.html",
-          "commits": 962,
-          "commits_last_12mo": 453,
+          "commits": 963,
+          "commits_last_12mo": 454,
           "addresses": 7,
           "first_commit": "2023-06-12",
-          "last_commit": "2026-10-23"
+          "last_commit": "2026-10-24"
         },
         {
           "name": "uv",
@@ -4936,8 +4936,8 @@
     },
     {
       "organization": "langchain.dev",
-      "commits_last_12mo": 588,
-      "commits": 2187,
+      "commits_last_12mo": 589,
+      "commits": 2188,
       "repositories": [
         "LangChain"
       ],
@@ -4945,11 +4945,11 @@
         {
           "name": "LangChain",
           "report": "langchain/index.html",
-          "commits": 2187,
-          "commits_last_12mo": 588,
+          "commits": 2188,
+          "commits_last_12mo": 589,
           "addresses": 18,
           "first_commit": "2023-07-25",
-          "last_commit": "2026-10-22"
+          "last_commit": "2026-10-24"
         }
       ]
     },
@@ -6235,8 +6235,8 @@
     },
     {
       "organization": "qualcomm.com",
-      "commits_last_12mo": 308,
-      "commits": 339,
+      "commits_last_12mo": 309,
+      "commits": 340,
       "repositories": [
         "llama.cpp",
         "PyTorch",
@@ -6247,11 +6247,11 @@
         {
           "name": "llama.cpp",
           "report": "llama-cpp/index.html",
-          "commits": 288,
-          "commits_last_12mo": 262,
+          "commits": 289,
+          "commits_last_12mo": 263,
           "addresses": 20,
           "first_commit": "2025-07-22",
-          "last_commit": "2026-10-23"
+          "last_commit": "2026-10-24"
         },
         {
           "name": "Rust",
@@ -6523,8 +6523,8 @@
     },
     {
       "organization": "inferact.ai",
-      "commits_last_12mo": 287,
-      "commits": 287,
+      "commits_last_12mo": 288,
+      "commits": 288,
       "repositories": [
         "vLLM"
       ],
@@ -6532,8 +6532,8 @@
         {
           "name": "vLLM",
           "report": "vllm/index.html",
-          "commits": 287,
-          "commits_last_12mo": 287,
+          "commits": 288,
+          "commits_last_12mo": 288,
           "addresses": 11,
           "first_commit": "2026-04-01",
           "last_commit": "2026-10-24"
@@ -7137,8 +7137,8 @@
     },
     {
       "organization": "astronomer.io",
-      "commits_last_12mo": 151,
-      "commits": 894,
+      "commits_last_12mo": 152,
+      "commits": 895,
       "repositories": [
         "Apache Airflow"
       ],
@@ -7146,11 +7146,11 @@
         {
           "name": "Apache Airflow",
           "report": "airflow/index.html",
-          "commits": 894,
-          "commits_last_12mo": 151,
+          "commits": 895,
+          "commits_last_12mo": 152,
           "addresses": 23,
           "first_commit": "2016-11-02",
-          "last_commit": "2026-10-22"
+          "last_commit": "2026-10-25"
         }
       ]
     },
@@ -40668,7 +40668,7 @@
       "organizations_last_12mo": [
         {
           "organization": "python.org",
-          "commits": 953
+          "commits": 954
         },
         {
           "organization": "meta.com",
@@ -41105,7 +41105,7 @@
       "organizations_last_12mo": [
         {
           "organization": "astral.sh",
-          "commits": 453
+          "commits": 454
         },
         {
           "organization": "openai.com",
@@ -41476,7 +41476,7 @@
       "organizations_last_12mo": [
         {
           "organization": "meta.com",
-          "commits": 6180
+          "commits": 6181
         },
         {
           "organization": "intel.com",
@@ -41548,7 +41548,7 @@
       "organizations_last_12mo": [
         {
           "organization": "langchain.dev",
-          "commits": 588
+          "commits": 589
         },
         {
           "organization": "perplexity.ai",
@@ -41612,7 +41612,7 @@
       "organizations_last_12mo": [
         {
           "organization": "google.com",
-          "commits": 7049
+          "commits": 7052
         },
         {
           "organization": "amd.com",
@@ -41648,7 +41648,7 @@
       "organizations_last_12mo": [
         {
           "organization": "amd.com",
-          "commits": 1260
+          "commits": 1261
         },
         {
           "organization": "redhat.com",
@@ -41664,7 +41664,7 @@
         },
         {
           "organization": "inferact.ai",
-          "commits": 287
+          "commits": 288
         }
       ],
       "group": "ai-ml"
@@ -41684,11 +41684,11 @@
       "organizations_last_12mo": [
         {
           "organization": "huggingface.co",
-          "commits": 621
+          "commits": 622
         },
         {
           "organization": "qualcomm.com",
-          "commits": 262
+          "commits": 263
         },
         {
           "organization": "nvidia.com",
@@ -42360,11 +42360,11 @@
       "organizations_last_12mo": [
         {
           "organization": "apache.org",
-          "commits": 672
+          "commits": 673
         },
         {
           "organization": "astronomer.io",
-          "commits": 151
+          "commits": 152
         },
         {
           "organization": "amazon.com",
@@ -42396,11 +42396,11 @@
       "organizations_last_12mo": [
         {
           "organization": "apache.org",
-          "commits": 1391
+          "commits": 1393
         },
         {
           "organization": "databricks.com",
-          "commits": 871
+          "commits": 872
         },
         {
           "organization": "baidu.com",
@@ -42456,11 +42456,11 @@
     {
       "name": "Apache Flink",
       "report": "flink/index.html",
-      "commits": 1398,
+      "commits": 1399,
       "by_kind": {
         "organization": 376,
         "one_person": 22,
-        "personal": 739,
+        "personal": 740,
         "hidden": 259,
         "unknown": 0,
         "bot": 2
@@ -42756,11 +42756,11 @@
     {
       "name": "Angular",
       "report": "angular/index.html",
-      "commits": 3954,
+      "commits": 3955,
       "by_kind": {
         "organization": 1035,
         "one_person": 442,
-        "personal": 1574,
+        "personal": 1575,
         "hidden": 903,
         "unknown": 0,
         "bot": 0
@@ -43031,7 +43031,7 @@
       "organizations_last_12mo": [
         {
           "organization": "selectdb.com",
-          "commits": 3602
+          "commits": 3603
         },
         {
           "organization": "apache.org",
@@ -43434,7 +43434,7 @@
       "organizations_last_12mo": [
         {
           "organization": "microsoft.com",
-          "commits": 8531
+          "commits": 8547
         },
         {
           "organization": "georgejames.com",
@@ -43494,10 +43494,10 @@
     {
       "name": "Rust",
       "report": "rust/index.html",
-      "commits": 33679,
+      "commits": 33681,
       "by_kind": {
         "organization": 2139,
-        "one_person": 11597,
+        "one_person": 11599,
         "personal": 15139,
         "hidden": 4491,
         "unknown": 22,
@@ -43522,7 +43522,7 @@
         },
         {
           "organization": "google.com",
-          "commits": 143
+          "commits": 144
         }
       ],
       "group": "devtools"
@@ -43542,7 +43542,7 @@
       "organizations_last_12mo": [
         {
           "organization": "golang.org",
-          "commits": 988
+          "commits": 989
         },
         {
           "organization": "google.com",
@@ -43806,7 +43806,7 @@
       "organizations_last_12mo": [
         {
           "organization": "postgresql.org",
-          "commits": 1399
+          "commits": 1401
         }
       ],
       "group": "devtools"

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:41:03+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:30:04+00:00",
   "name": "SGLang",
   "report_path": "index.html",
   "first_commit": "2023-10-09 22:41:15",
-  "last_commit": "2026-10-24 16:27:26",
-  "age_days": 1111,
-  "active_days": 935,
-  "total_commits": 20868,
-  "total_authors": 1925,
-  "active_authors_12mo": 1464,
-  "commits_last_12mo": 14439,
-  "total_files": 11296,
-  "total_lines": 3653996,
-  "lines_added": 5443157,
-  "lines_removed": 1789161,
+  "last_commit": "2026-10-25 05:10:20",
+  "age_days": 1112,
+  "active_days": 936,
+  "total_commits": 20885,
+  "total_authors": 1926,
+  "active_authors_12mo": 1463,
+  "commits_last_12mo": 14456,
+  "total_files": 11318,
+  "total_lines": 3662996,
+  "lines_added": 5453766,
+  "lines_removed": 1790770,
   "total_tags": 144,
   "era": "peak",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "Mick",
-      "commits": 903
+      "commits": 908
     },
     {
       "name": "fzyzcjy",
@@ -41,13 +41,21 @@
     }
   ],
   "author_commits": {
-    "Mick": 903,
-    "Ke Bao": 349,
+    "Baizhou Zhang": 467,
+    "Cheng Wan": 571,
+    "Ke Bao": 351,
+    "Kan Wu": 86,
+    "zijiexia": 119,
+    "maobaolong": 1,
+    "Shuwen Wang": 200,
+    "Rumit Desai": 4,
+    "Mick": 908,
+    "metamergebot": 142,
+    "Vladimir (Vova) Vagaytsev": 2,
     "Shijin Zhang": 10,
     "Yuan Luo": 146,
     "Xiaoyu Zhang": 639,
     "Shunkangz": 21,
-    "metamergebot": 141,
     "Alan Kao": 9,
     "Michael": 161,
     "triple-mu": 19,
@@ -63,8 +71,6 @@
     "weireweire": 45,
     "Khoa Pham": 157,
     "Qiaolin Yu": 179,
-    "Baizhou Zhang": 466,
-    "Cheng Wan": 569,
     "Ziang Li": 40,
     "Rohan Varma": 2,
     "Yuhao Yang": 131,
@@ -84,7 +90,6 @@
     "chuyeh": 13,
     "Sage": 16,
     "Xinyuan Tong": 262,
-    "Shuwen Wang": 199,
     "Ziru": 9,
     "Po-Han Huang (NVIDIA)": 45,
     "Yao Matrix": 2,
@@ -98,7 +103,6 @@
     "chenyang08056032": 4,
     "Lianmin Zheng": 1260,
     "YAMY": 134,
-    "zijiexia": 118,
     "JohnZhao01": 1,
     "HEJIAN SANG": 3,
     "Jayden Yu": 2,
@@ -154,7 +158,6 @@
     "Hongkuan Zhou": 2,
     "YC Yen-Ching Tseng": 165,
     "Junlin Wu": 14,
-    "Kan Wu": 85,
     "Qinghan Chen": 1,
     "kk": 98,
     "zydo": 1,
@@ -355,7 +358,6 @@
     "Hongsheng Jin": 1,
     "Max Kong": 1,
     "Jinbao Chen": 1,
-    "Rumit Desai": 3,
     "Joe": 6,
     "yunyang_nv": 1,
     "ADiL": 1,
@@ -1085,7 +1087,6 @@
     "pdasgup": 2,
     "Zaire": 1,
     "LHXuuu": 6,
-    "Vladimir (Vova) Vagaytsev": 1,
     "Chen, Zhentao": 4,
     "Alexis MacAskill": 1,
     "lawtherWu": 2,
@@ -1971,13 +1972,13 @@
     "2023": 1,
     "2024": 1619,
     "2025": 6794,
-    "2026": 12454
+    "2026": 12471
   },
   "ai_assisted": {
-    "commits": 1658,
+    "commits": 1662,
     "authored": 0,
     "assistants": {
-      "Claude": 1356,
+      "Claude": 1360,
       "Gemini": 177,
       "Cursor": 135,
       "GitHub Copilot": 16,
@@ -2010,7 +2011,7 @@
       "2026-07": 141,
       "2026-08": 260,
       "2026-09": 238,
-      "2026-10": 366
+      "2026-10": 370
     },
     "commits_by_month": {
       "2024-11": 268,
@@ -2036,17 +2037,17 @@
       "2026-07": 1237,
       "2026-08": 1615,
       "2026-09": 1645,
-      "2026-10": 1693
+      "2026-10": 1710
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20868,
+    "commits": 20885,
     "by_kind": {
-      "organization": 3119,
-      "one_person": 1325,
-      "personal": 9416,
-      "hidden": 7007,
+      "organization": 3120,
+      "one_person": 1326,
+      "personal": 9426,
+      "hidden": 7012,
       "unknown": 0,
       "bot": 1
     },
@@ -2143,11 +2144,11 @@
       },
       {
         "organization": "meta.com",
-        "commits": 55,
-        "commits_last_12mo": 51,
+        "commits": 56,
+        "commits_last_12mo": 52,
         "addresses": 16,
         "first_commit": "2024-11-16",
-        "last_commit": "2026-10-16"
+        "last_commit": "2026-10-25"
       },
       {
         "organization": "bytedance.com",
@@ -2488,10 +2489,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 293,
-        "one_person": 15,
-        "personal": 763,
-        "hidden": 622,
+        "organization": 294,
+        "one_person": 16,
+        "personal": 773,
+        "hidden": 627,
         "unknown": 0,
         "bot": 0
       }
@@ -2500,23 +2501,47 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 14439,
-    "authors": 1449,
-    "new_authors": 1198,
+    "commits": 14456,
+    "authors": 1450,
+    "new_authors": 1199,
     "half_of_commits": 25
   },
   "humans": {
-    "commits": 20867,
+    "commits": 20884,
     "commits_by_year": {
       "2023": 1,
       "2024": 1618,
       "2025": 6794,
-      "2026": 12454
+      "2026": 12471
     },
-    "active_days": 935
+    "active_days": 936
+  },
+  "timezones": {
+    "+0000": 143,
+    "+0100": 159,
+    "+0200": 229,
+    "+0300": 266,
+    "+0400": 15,
+    "+0500": 3,
+    "+0530": 354,
+    "+0700": 45,
+    "+0800": 9388,
+    "+0900": 115,
+    "+0930": 1,
+    "+1000": 92,
+    "+1100": 8,
+    "+1200": 1,
+    "+1300": 18,
+    "-0300": 1,
+    "-0400": 468,
+    "-0500": 363,
+    "-0600": 75,
+    "-0700": 7041,
+    "-0800": 2064,
+    "-1000": 36
   },
   "source_lines": {
-    "added": 5367799,
-    "current": 3598479
+    "added": 5377908,
+    "current": 3606998
   }
 }

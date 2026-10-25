@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:40:25+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:28:45+00:00",
   "name": "Ollama",
   "report_path": "index.html",
   "first_commit": "2023-06-22 16:45:31",
-  "last_commit": "2026-10-23 23:15:08",
-  "age_days": 1220,
-  "active_days": 1026,
-  "total_commits": 5945,
+  "last_commit": "2026-10-24 18:03:30",
+  "age_days": 1221,
+  "active_days": 1027,
+  "total_commits": 5946,
   "total_authors": 620,
   "active_authors_12mo": 112,
-  "commits_last_12mo": 1218,
+  "commits_last_12mo": 1219,
   "total_files": 1513,
-  "total_lines": 1037130,
-  "lines_added": 2283963,
-  "lines_removed": 1246833,
+  "total_lines": 1037180,
+  "lines_added": 2284030,
+  "lines_removed": 1246850,
   "total_tags": 655,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Daniel Hiltgen",
-      "commits": 1045
+      "commits": 1046
     },
     {
       "name": "Jeffrey Morgan",
@@ -41,8 +41,8 @@
     }
   ],
   "author_commits": {
+    "Daniel Hiltgen": 1046,
     "Jeffrey Morgan": 932,
-    "Daniel Hiltgen": 1045,
     "SynapShift": 1,
     "Eva H": 111,
     "J Berg": 17,
@@ -666,7 +666,7 @@
     "2023": 1681,
     "2024": 2083,
     "2025": 1146,
-    "2026": 1035
+    "2026": 1036
   },
   "ai_assisted": {
     "commits": 3,
@@ -725,17 +725,17 @@
       "2026-07": 91,
       "2026-08": 105,
       "2026-09": 109,
-      "2026-10": 135
+      "2026-10": 136
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5945,
+    "commits": 5946,
     "by_kind": {
       "organization": 972,
       "one_person": 645,
       "personal": 3016,
-      "hidden": 1295,
+      "hidden": 1296,
       "unknown": 17,
       "bot": 0
     },
@@ -844,7 +844,7 @@
         "organization": 32,
         "one_person": 3,
         "personal": 18,
-        "hidden": 70,
+        "hidden": 71,
         "unknown": 12,
         "bot": 0
       }
@@ -853,23 +853,51 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1218,
+    "commits": 1219,
     "authors": 111,
     "new_authors": 87,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 5945,
+    "commits": 5946,
     "commits_by_year": {
       "2023": 1681,
       "2024": 2083,
       "2025": 1146,
-      "2026": 1035
+      "2026": 1036
     },
-    "active_days": 1026
+    "active_days": 1027
+  },
+  "timezones": {
+    "+0000": 47,
+    "+0100": 159,
+    "+0200": 128,
+    "+0300": 29,
+    "+0330": 3,
+    "+0400": 4,
+    "+0500": 2,
+    "+0530": 59,
+    "+0545": 2,
+    "+0600": 2,
+    "+0630": 1,
+    "+0700": 25,
+    "+0800": 129,
+    "+0900": 24,
+    "+1000": 16,
+    "+1100": 9,
+    "+1200": 3,
+    "+1300": 1,
+    "-0300": 34,
+    "-0330": 1,
+    "-0400": 647,
+    "-0500": 310,
+    "-0600": 35,
+    "-0700": 3138,
+    "-0800": 1137,
+    "-1000": 1
   },
   "source_lines": {
-    "added": 1531295,
-    "current": 487160
+    "added": 1531362,
+    "current": 487210
   }
 }

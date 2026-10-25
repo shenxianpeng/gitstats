@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:38:51+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:26:40+00:00",
   "name": "pandas",
   "report_path": "index.html",
   "first_commit": "2009-07-31 15:07:16",
-  "last_commit": "2026-10-24 17:12:58",
+  "last_commit": "2026-10-25 00:04:46",
   "age_days": 6295,
-  "active_days": 5307,
-  "total_commits": 39609,
+  "active_days": 5308,
+  "total_commits": 39611,
   "total_authors": 4047,
-  "active_authors_12mo": 402,
-  "commits_last_12mo": 2942,
+  "active_authors_12mo": 401,
+  "commits_last_12mo": 2944,
   "total_files": 2689,
-  "total_lines": 1072112,
-  "lines_added": 3316537,
-  "lines_removed": 2244425,
+  "total_lines": 1072227,
+  "lines_added": 3316663,
+  "lines_removed": 2244436,
   "total_tags": 102,
   "era": "steady",
   "top_authors": [
     {
       "name": "jbrockmendel",
-      "commits": 6458
+      "commits": 6460
     },
     {
       "name": "Jeff Reback",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "jbrockmendel": 6458,
+    "jbrockmendel": 6460,
     "Minh Tuan Pham": 1,
     "Ammar Hassona": 1,
     "Breno Barreto": 1,
@@ -4107,13 +4107,13 @@
     "2023": 3017,
     "2024": 1769,
     "2025": 1097,
-    "2026": 2687
+    "2026": 2689
   },
   "ai_assisted": {
-    "commits": 1446,
+    "commits": 1448,
     "authored": 1,
     "assistants": {
-      "Claude": 1444,
+      "Claude": 1446,
       "Devin": 1,
       "GitHub Copilot": 1
     },
@@ -4141,7 +4141,7 @@
       "2026-07": 176,
       "2026-08": 167,
       "2026-09": 289,
-      "2026-10": 302
+      "2026-10": 304
     },
     "commits_by_month": {
       "2024-11": 115,
@@ -4167,16 +4167,16 @@
       "2026-07": 250,
       "2026-08": 275,
       "2026-09": 422,
-      "2026-10": 409
+      "2026-10": 411
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39609,
+    "commits": 39611,
     "by_kind": {
       "organization": 987,
       "one_person": 6674,
-      "personal": 23587,
+      "personal": 23589,
       "hidden": 8115,
       "unknown": 25,
       "bot": 221
@@ -4717,7 +4717,7 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 2,
-        "personal": 354,
+        "personal": 356,
         "hidden": 38,
         "unknown": 0,
         "bot": 14
@@ -4727,13 +4727,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2823,
+    "commits": 2825,
     "authors": 386,
     "new_authors": 319,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 39388,
+    "commits": 39390,
     "commits_by_year": {
       "2009": 100,
       "2010": 147,
@@ -4752,12 +4752,43 @@
       "2023": 2991,
       "2024": 1747,
       "2025": 1064,
-      "2026": 2573
+      "2026": 2575
     },
-    "active_days": 5299
+    "active_days": 5300
+  },
+  "timezones": {
+    "+0000": 1633,
+    "+0100": 4023,
+    "+0200": 3782,
+    "+0300": 700,
+    "+0330": 10,
+    "+0400": 60,
+    "+0430": 3,
+    "+0500": 13,
+    "+0530": 1252,
+    "+0545": 7,
+    "+0600": 11,
+    "+0700": 209,
+    "+0800": 609,
+    "+0900": 522,
+    "+0930": 2,
+    "+1000": 94,
+    "+1100": 66,
+    "+1200": 6,
+    "+1300": 4,
+    "+1400": 1,
+    "-0200": 11,
+    "-0300": 219,
+    "-0400": 8229,
+    "-0500": 5869,
+    "-0600": 709,
+    "-0700": 7262,
+    "-0800": 3943,
+    "-0900": 1,
+    "-1000": 361
   },
   "source_lines": {
-    "added": 3113806,
-    "current": 995515
+    "added": 3113932,
+    "current": 995630
   }
 }

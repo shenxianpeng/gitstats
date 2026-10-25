@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:40:24+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:28:33+00:00",
   "name": "LangChain",
   "report_path": "index.html",
   "first_commit": "2022-10-24 21:51:15",
-  "last_commit": "2026-10-24 01:53:49",
-  "age_days": 1461,
+  "last_commit": "2026-10-24 22:19:05",
+  "age_days": 1462,
   "active_days": 1311,
-  "total_commits": 17059,
+  "total_commits": 17067,
   "total_authors": 3594,
   "active_authors_12mo": 239,
-  "commits_last_12mo": 2379,
+  "commits_last_12mo": 2387,
   "total_files": 3192,
-  "total_lines": 558591,
-  "lines_added": 3843342,
-  "lines_removed": 3284751,
+  "total_lines": 558662,
+  "lines_added": 3843564,
+  "lines_removed": 3284902,
   "total_tags": 1309,
   "era": "steady",
   "top_authors": [
@@ -37,11 +37,11 @@
     },
     {
       "name": "Mason Daugherty",
-      "commits": 964
+      "commits": 965
     }
   ],
   "author_commits": {
-    "Mason Daugherty": 964,
+    "Mason Daugherty": 965,
     "Richard Scarrott": 11,
     "ccurme": 1173,
     "Vladislav Nechakhin": 1,
@@ -3641,7 +3641,7 @@
     "2023": 6342,
     "2024": 5701,
     "2025": 2693,
-    "2026": 2039
+    "2026": 2047
   },
   "ai_assisted": {
     "commits": 46,
@@ -3700,30 +3700,30 @@
       "2026-07": 145,
       "2026-08": 193,
       "2026-09": 187,
-      "2026-10": 185
+      "2026-10": 193
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17059,
+    "commits": 17067,
     "by_kind": {
-      "organization": 2492,
+      "organization": 2493,
       "one_person": 830,
       "personal": 7439,
       "hidden": 5431,
       "unknown": 0,
-      "bot": 867
+      "bot": 874
     },
     "organization_count": 35,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "langchain.dev",
-        "commits": 2187,
-        "commits_last_12mo": 588,
+        "commits": 2188,
+        "commits_last_12mo": 589,
         "addresses": 18,
         "first_commit": "2023-07-25",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-24"
       },
       {
         "organization": "unstructuredai.io",
@@ -4056,36 +4056,65 @@
         "bot": 214
       },
       "2026-Q4": {
-        "organization": 8,
+        "organization": 9,
         "one_person": 2,
         "personal": 32,
         "hidden": 4,
         "unknown": 0,
-        "bot": 139
+        "bot": 146
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1532,
+    "commits": 1533,
     "authors": 234,
     "new_authors": 192,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 16192,
+    "commits": 16193,
     "commits_by_year": {
       "2022": 284,
       "2023": 6340,
       "2024": 5700,
       "2025": 2672,
-      "2026": 1196
+      "2026": 1197
     },
-    "active_days": 1280
+    "active_days": 1281
+  },
+  "timezones": {
+    "+0000": 253,
+    "+0100": 1149,
+    "+0200": 1206,
+    "+0300": 258,
+    "+0330": 9,
+    "+0400": 30,
+    "+0430": 1,
+    "+0500": 140,
+    "+0530": 680,
+    "+0545": 13,
+    "+0600": 32,
+    "+0700": 55,
+    "+0800": 1068,
+    "+0900": 482,
+    "+1000": 118,
+    "+1030": 2,
+    "+1100": 17,
+    "+1200": 9,
+    "+1300": 8,
+    "-0100": 1,
+    "-0300": 147,
+    "-0400": 3596,
+    "-0500": 1440,
+    "-0600": 209,
+    "-0700": 4137,
+    "-0800": 2004,
+    "-1000": 3
   },
   "source_lines": {
-    "added": 2743697,
-    "current": 463973
+    "added": 2743861,
+    "current": 464016
   }
 }

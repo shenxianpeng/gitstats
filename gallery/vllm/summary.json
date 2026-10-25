@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:40:42+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:29:00+00:00",
   "name": "vLLM",
   "report_path": "index.html",
   "first_commit": "2023-02-09 11:24:15",
-  "last_commit": "2026-10-24 16:22:16",
+  "last_commit": "2026-10-25 04:47:31",
   "age_days": 1354,
-  "active_days": 1223,
-  "total_commits": 23740,
-  "total_authors": 3487,
-  "active_authors_12mo": 2312,
-  "commits_last_12mo": 12839,
-  "total_files": 8468,
-  "total_lines": 2703352,
-  "lines_added": 4301354,
-  "lines_removed": 1598002,
+  "active_days": 1224,
+  "total_commits": 23753,
+  "total_authors": 3489,
+  "active_authors_12mo": 2313,
+  "commits_last_12mo": 12852,
+  "total_files": 8469,
+  "total_lines": 2704135,
+  "lines_added": 4302447,
+  "lines_removed": 1598312,
   "total_tags": 110,
   "era": "peak",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Woosuk Kwon",
-      "commits": 877
+      "commits": 878
     },
     {
       "name": "Misha Goin",
@@ -41,17 +41,24 @@
     }
   ],
   "author_commits": {
-    "Jee Jee Li": 335,
+    "Roy Wang": 59,
+    "Chenxi Ma": 1,
+    "CharlesWu": 5,
+    "Ronald": 16,
+    "Jee Jee Li": 337,
+    "Juntian Liu": 25,
+    "Woosuk Kwon": 878,
+    "Giancarlo Delfin": 58,
+    "Wentao Ye": 459,
+    "Rushabh Lalwani": 1,
     "Kevin H. Luu": 311,
     "Sandeep Agrawal": 2,
-    "CharlesWu": 4,
     "frida-andersson": 11,
     "xiao-vllm_amd": 6,
     "xaguilar-amd": 12,
     "ukannika": 3,
     "Fangzhou Ai": 39,
     "TJian": 82,
-    "Roy Wang": 57,
     "Jared Wen": 34,
     "Andreas Karatzas": 444,
     "Isotr0py": 460,
@@ -68,11 +75,9 @@
     "Roberto L. Castro": 43,
     "Nishant Revur": 3,
     "Yicong Wang": 10,
-    "Wentao Ye": 458,
     "aditi-amd": 4,
     "hshrivastava-droid": 5,
     "Divakar Verma": 78,
-    "Woosuk Kwon": 877,
     "Shyamal Shah": 1,
     "Oxana Korzh": 22,
     "khryu": 1,
@@ -157,7 +162,6 @@
     "dskwe": 5,
     "Linze Shi": 5,
     "Sun": 7,
-    "Ronald": 14,
     "Thang Nguyen": 26,
     "Chauncey": 193,
     "Kein": 1,
@@ -196,7 +200,6 @@
     "YueshenZ": 3,
     "Denis Ovchinnikov": 1,
     "Tianmu Li": 17,
-    "Giancarlo Delfin": 57,
     "Micha\u0142 Ganczarenko": 12,
     "jiaqiang-dot-liu": 1,
     "zydo": 1,
@@ -218,7 +221,6 @@
     "James Meadlock": 1,
     "Liu Jinhao": 1,
     "Satvik Shrivas": 1,
-    "Juntian Liu": 24,
     "Jhao-Ting Chen": 8,
     "Sergey Shlyapnikov": 3,
     "Matej Sirovatka": 10,
@@ -3533,13 +3535,13 @@
     "2023": 614,
     "2024": 3354,
     "2025": 8634,
-    "2026": 11138
+    "2026": 11151
   },
   "ai_assisted": {
-    "commits": 2326,
+    "commits": 2330,
     "authored": 6,
     "assistants": {
-      "Claude": 1490,
+      "Claude": 1494,
       "Codex": 376,
       "Gemini": 309,
       "Cursor": 163,
@@ -3573,7 +3575,7 @@
       "2026-07": 224,
       "2026-08": 279,
       "2026-09": 467,
-      "2026-10": 661
+      "2026-10": 665
     },
     "commits_by_month": {
       "2024-11": 430,
@@ -3599,17 +3601,17 @@
       "2026-07": 1139,
       "2026-08": 1224,
       "2026-09": 1637,
-      "2026-10": 1463
+      "2026-10": 1476
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 23740,
+    "commits": 23753,
     "by_kind": {
-      "organization": 7959,
+      "organization": 7961,
       "one_person": 1844,
-      "personal": 6963,
-      "hidden": 6950,
+      "personal": 6970,
+      "hidden": 6954,
       "unknown": 0,
       "bot": 24
     },
@@ -3618,11 +3620,11 @@
     "top": [
       {
         "organization": "amd.com",
-        "commits": 1345,
-        "commits_last_12mo": 1260,
+        "commits": 1346,
+        "commits_last_12mo": 1261,
         "addresses": 165,
         "first_commit": "2024-04-03",
-        "last_commit": "2026-10-24"
+        "last_commit": "2026-10-25"
       },
       {
         "organization": "redhat.com",
@@ -3690,8 +3692,8 @@
       },
       {
         "organization": "inferact.ai",
-        "commits": 287,
-        "commits_last_12mo": 287,
+        "commits": 288,
+        "commits_last_12mo": 288,
         "addresses": 11,
         "first_commit": "2026-04-01",
         "last_commit": "2026-10-24"
@@ -4235,10 +4237,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 538,
+        "organization": 540,
         "one_person": 98,
-        "personal": 404,
-        "hidden": 423,
+        "personal": 411,
+        "hidden": 427,
         "unknown": 0,
         "bot": 0
       }
@@ -4247,23 +4249,49 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 12832,
-    "authors": 2299,
-    "new_authors": 1885,
+    "commits": 12845,
+    "authors": 2301,
+    "new_authors": 1887,
     "half_of_commits": 78
   },
   "humans": {
-    "commits": 23716,
+    "commits": 23729,
     "commits_by_year": {
       "2023": 614,
       "2024": 3346,
       "2025": 8621,
-      "2026": 11135
+      "2026": 11148
     },
-    "active_days": 1223
+    "active_days": 1224
+  },
+  "timezones": {
+    "+0000": 495,
+    "+0100": 1243,
+    "+0200": 1546,
+    "+0300": 556,
+    "+0330": 1,
+    "+0400": 103,
+    "+0500": 7,
+    "+0530": 375,
+    "+0600": 12,
+    "+0700": 74,
+    "+0800": 7084,
+    "+0900": 427,
+    "+1000": 33,
+    "+1100": 5,
+    "+1200": 1,
+    "+1300": 1,
+    "-0300": 105,
+    "-0400": 3040,
+    "-0500": 1974,
+    "-0600": 589,
+    "-0700": 4549,
+    "-0800": 1516,
+    "-0900": 1,
+    "-1000": 16
   },
   "source_lines": {
-    "added": 4265492,
-    "current": 2664842
+    "added": 4266585,
+    "current": 2665625
   }
 }

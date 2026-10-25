@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:47:50+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:37:39+00:00",
   "name": "VS Code",
   "report_path": "index.html",
   "first_commit": "2015-11-13 13:39:38",
-  "last_commit": "2026-10-24 17:31:10",
+  "last_commit": "2026-10-24 22:18:55",
   "age_days": 3999,
   "active_days": 3907,
-  "total_commits": 169021,
+  "total_commits": 169039,
   "total_authors": 2898,
   "active_authors_12mo": 461,
-  "commits_last_12mo": 27429,
-  "total_files": 21232,
-  "total_lines": 6931953,
-  "lines_added": 13251070,
-  "lines_removed": 6319117,
+  "commits_last_12mo": 27447,
+  "total_files": 21233,
+  "total_lines": 6933853,
+  "lines_added": 13253772,
+  "lines_removed": 6319919,
   "total_tags": 28,
   "era": "peak",
   "top_authors": [
@@ -41,17 +41,17 @@
     }
   ],
   "author_commits": {
-    "Ladislau Szomoru": 2822,
+    "Christof Marti": 1646,
+    "Jessie Houghton": 51,
+    "Ladislau Szomoru": 2823,
+    "Ben Villalobos": 154,
     "Benjamin Christopher Simmonds": 1554,
-    "Ben Villalobos": 153,
     "Connor Peet": 3722,
     "Alexandru Dima": 1990,
     "Giuseppe Cianci": 231,
-    "Christof Marti": 1631,
     "Bryan Chen": 267,
     "Dmitriy Vasyura": 939,
     "Ross Wollman": 76,
-    "Jessie Houghton": 50,
     "Megan Rogge": 5258,
     "roblourens": 7125,
     "TylerLeonhardt": 1272,
@@ -2952,13 +2952,13 @@
     "2023": 13128,
     "2024": 11064,
     "2025": 16682,
-    "2026": 23914
+    "2026": 23932
   },
   "ai_assisted": {
-    "commits": 8990,
+    "commits": 9004,
     "authored": 1129,
     "assistants": {
-      "GitHub Copilot": 8917,
+      "GitHub Copilot": 8931,
       "Claude": 72,
       "Cursor": 8
     },
@@ -2986,7 +2986,7 @@
       "2026-07": 884,
       "2026-08": 1216,
       "2026-09": 1497,
-      "2026-10": 1775
+      "2026-10": 1789
     },
     "commits_by_month": {
       "2024-11": 1004,
@@ -3012,17 +3012,17 @@
       "2026-07": 1910,
       "2026-08": 2076,
       "2026-09": 2316,
-      "2026-10": 2370
+      "2026-10": 2388
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 169021,
+    "commits": 169039,
     "by_kind": {
-      "organization": 94820,
+      "organization": 94836,
       "one_person": 6756,
       "personal": 41008,
-      "hidden": 25080,
+      "hidden": 25082,
       "unknown": 117,
       "bot": 1240
     },
@@ -3031,8 +3031,8 @@
     "top": [
       {
         "organization": "microsoft.com",
-        "commits": 94059,
-        "commits_last_12mo": 8531,
+        "commits": 94075,
+        "commits_last_12mo": 8547,
         "addresses": 226,
         "first_commit": "2015-11-13",
         "last_commit": "2026-10-24"
@@ -3368,10 +3368,10 @@
         "bot": 232
       },
       "2026-Q4": {
-        "organization": 923,
+        "organization": 939,
         "one_person": 24,
         "personal": 678,
-        "hidden": 698,
+        "hidden": 700,
         "unknown": 0,
         "bot": 47
       }
@@ -3380,13 +3380,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 26842,
+    "commits": 26860,
     "authors": 457,
     "new_authors": 338,
     "half_of_commits": 14
   },
   "humans": {
-    "commits": 167781,
+    "commits": 167799,
     "commits_by_year": {
       "2015": 1398,
       "2016": 12008,
@@ -3399,12 +3399,41 @@
       "2023": 13103,
       "2024": 11034,
       "2025": 16400,
-      "2026": 23083
+      "2026": 23101
     },
     "active_days": 3907
   },
+  "timezones": {
+    "+0000": 4303,
+    "+0100": 38178,
+    "+0200": 46920,
+    "+0300": 672,
+    "+0330": 34,
+    "+0400": 9,
+    "+0430": 23,
+    "+0500": 344,
+    "+0530": 881,
+    "+0545": 11,
+    "+0600": 39,
+    "+0700": 51,
+    "+0800": 1027,
+    "+0900": 1131,
+    "+1000": 687,
+    "+1030": 1,
+    "+1100": 587,
+    "+1200": 20,
+    "+1300": 50,
+    "-0200": 15,
+    "-0300": 248,
+    "-0400": 3421,
+    "-0500": 2429,
+    "-0600": 1499,
+    "-0700": 46690,
+    "-0800": 19749,
+    "-1000": 20
+  },
   "source_lines": {
-    "added": 14443348,
-    "current": 6600955
+    "added": 14446138,
+    "current": 6602855
   }
 }

@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "title": "How each repository compares",
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:52:09+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:40:53+00:00",
   "quarters": [
     "2025-Q4",
     "2026-Q1",
@@ -45,7 +45,7 @@
     {
       "name": "CPython",
       "values": {
-        "commits": 5019.0,
+        "commits": 5027.0,
         "authors": 780.0,
         "new_authors": 489.0,
         "half_of_commits": 18.0,
@@ -115,6 +115,16 @@
         }
       },
       "group": "python",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.23343576552001288,
+          "big": "23%",
+          "sentence": "Of the 13,601,519 lines ever written into CPython's own source, 23% are still there; the rest were rewritten or removed.",
+          "compared": "13th lowest of 97; the median project: 37%."
+        }
+      ],
       "page": "cpython/compare.html",
       "headline": "CPython had more organizations committing to it than any other of the 17 Python open source projects. It is also 2nd for new contributors."
     },
@@ -191,6 +201,7 @@
         }
       },
       "group": "python",
+      "insights": [],
       "page": "django/compare.html",
       "headline": "Django sits in the middle of the 17 Python open source projects; its highest place is 7th, for new contributors."
     },
@@ -267,6 +278,16 @@
         }
       },
       "group": "python",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.16906474820143885,
+          "big": "17%",
+          "sentence": "People made 17% as many commits to Flask in the last 12 months as in 2010, its busiest year (94 against 556).",
+          "compared": "9th lowest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "flask/compare.html",
       "headline": "Flask had fewer new contributors in the last 12 months than any other of the 17 Python open source projects."
     },
@@ -307,7 +328,7 @@
             17
           ],
           "all": [
-            85,
+            86,
             107
           ]
         },
@@ -343,6 +364,7 @@
         }
       },
       "group": "python",
+      "insights": [],
       "page": "fastapi/compare.html",
       "headline": "FastAPI sits in the middle of the 17 Python open source projects; its highest place is 9th, for commits."
     },
@@ -419,13 +441,31 @@
         }
       },
       "group": "python",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.06366459627329192,
+          "big": "6%",
+          "sentence": "People made 6% as many commits to Requests in the last 12 months as in 2011, its busiest year (82 against 1,288).",
+          "compared": "The lowest of the 90 GitStats Gallery projects."
+        },
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.17384590172200792,
+          "big": "17%",
+          "sentence": "Of the 158,652 lines ever written into Requests's own source, 17% are still there; the rest were rewritten or removed.",
+          "compared": "4th lowest of 97; the median project: 37%."
+        }
+      ],
       "page": "requests/compare.html",
       "headline": "Requests ranks below most of the 17 Python open source projects on every measure here; its highest place is 16th, for new contributors."
     },
     {
       "name": "pandas",
       "values": {
-        "commits": 2942.0,
+        "commits": 2944.0,
         "authors": 386.0,
         "new_authors": 319.0,
         "half_of_commits": 1.0,
@@ -495,13 +535,23 @@
         }
       },
       "group": "python",
+      "insights": [
+        {
+          "kind": "ai",
+          "label": "AI-assisted commits",
+          "value": 0.6859205776173285,
+          "big": "69%",
+          "sentence": "The share of pandas's commits that name an AI coding assistant went from 0% to 69% in a year.",
+          "compared": "3rd highest of 77; in the median project it rose by 5 points."
+        }
+      ],
       "page": "pandas/compare.html",
       "headline": "pandas had a larger share of commits that name an AI coding assistant than any other of the 17 Python open source projects. It is also 3rd for new contributors."
     },
     {
       "name": "NumPy",
       "values": {
-        "commits": 2474.0,
+        "commits": 2477.0,
         "authors": 235.0,
         "new_authors": 172.0,
         "half_of_commits": 3.0,
@@ -545,7 +595,7 @@
             17
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -571,15 +621,16 @@
         }
       },
       "group": "python",
+      "insights": [],
       "page": "numpy/compare.html",
       "headline": "NumPy is 4th of the 17 Python open source projects for organizations committing. It is also 5th for new contributors."
     },
     {
       "name": "SciPy",
       "values": {
-        "commits": 2234.0,
-        "authors": 224.0,
-        "new_authors": 161.0,
+        "commits": 2238.0,
+        "authors": 225.0,
+        "new_authors": 162.0,
         "half_of_commits": 6.0,
         "organizations": 17.0,
         "ai_share": 0.02045929018789144
@@ -647,6 +698,16 @@
         }
       },
       "group": "python",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.20838450420350335,
+          "big": "21%",
+          "sentence": "Of the 5,661,587 lines ever written into SciPy's own source, 21% are still there; the rest were rewritten or removed.",
+          "compared": "7th lowest of 97; the median project: 37%."
+        }
+      ],
       "page": "scipy/compare.html",
       "headline": "SciPy is 2nd of the 17 Python open source projects for organizations committing."
     },
@@ -723,6 +784,24 @@
         }
       },
       "group": "python",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.15450931541265622,
+          "big": "15%",
+          "sentence": "Of the 3,715,187 lines ever written into scikit-learn's own source, 15% are still there; the rest were rewritten or removed.",
+          "compared": "2nd lowest of 97; the median project: 37%."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.20028495827396703,
+          "big": "20%",
+          "sentence": "People made 20% as many commits to scikit-learn in the last 12 months as in 2011, its busiest year (984 against 4,913).",
+          "compared": "13th lowest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "scikit-learn/compare.html",
       "headline": "scikit-learn is 3rd of the 17 Python open source projects for how widely its commits are spread."
     },
@@ -773,7 +852,7 @@
             17
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -799,6 +878,7 @@
         }
       },
       "group": "python",
+      "insights": [],
       "page": "matplotlib/compare.html",
       "headline": "Matplotlib sits in the middle of the 17 Python open source projects; its highest place is 8th, for commits."
     },
@@ -875,15 +955,25 @@
         }
       },
       "group": "python",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.19628254607616186,
+          "big": "20%",
+          "sentence": "Of the 1,103,282 lines ever written into pip's own source, 20% are still there; the rest were rewritten or removed.",
+          "compared": "6th lowest of 97; the median project: 37%."
+        }
+      ],
       "page": "pip/compare.html",
       "headline": "pip ranks below most of the 17 Python open source projects on every measure here; its highest place is 11th, for organizations committing."
     },
     {
       "name": "pytest",
       "values": {
-        "commits": 886.0,
-        "authors": 120.0,
-        "new_authors": 99.0,
+        "commits": 893.0,
+        "authors": 121.0,
+        "new_authors": 100.0,
         "half_of_commits": 2.0,
         "organizations": 4.0,
         "ai_share": 0.09927611168562564
@@ -951,6 +1041,16 @@
         }
       },
       "group": "python",
+      "insights": [
+        {
+          "kind": "ai",
+          "label": "AI-assisted commits",
+          "value": 0.2676056338028169,
+          "big": "27%",
+          "sentence": "The share of pytest's commits that name an AI coding assistant went from 0% to 27% in a year.",
+          "compared": "12th highest of 77; in the median project it rose by 5 points."
+        }
+      ],
       "page": "pytest/compare.html",
       "headline": "pytest ranks below most of the 17 Python open source projects on every measure here; its highest place is 12th, for new contributors."
     },
@@ -1027,6 +1127,7 @@
         }
       },
       "group": "python",
+      "insights": [],
       "page": "sqlalchemy/compare.html",
       "headline": "SQLAlchemy ranks below most of the 17 Python open source projects on every measure here; its highest place is 13th, for new contributors."
     },
@@ -1103,6 +1204,7 @@
         }
       },
       "group": "python",
+      "insights": [],
       "page": "pydantic/compare.html",
       "headline": "Pydantic ranks below most of the 17 Python open source projects on every measure here; its highest place is 11th, for new contributors."
     },
@@ -1153,7 +1255,7 @@
             17
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -1179,13 +1281,14 @@
         }
       },
       "group": "python",
+      "insights": [],
       "page": "uv/compare.html",
       "headline": "uv is 4th of the 17 Python open source projects for commits."
     },
     {
       "name": "Ruff",
       "values": {
-        "commits": 5140.0,
+        "commits": 5145.0,
         "authors": 311.0,
         "new_authors": 230.0,
         "half_of_commits": 4.0,
@@ -1255,15 +1358,25 @@
         }
       },
       "group": "python",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.9538361508452535,
+          "big": "95%",
+          "sentence": "Ruff has had a commit by a person on 95% of the days since its first one: 1,467 days in 4 years.",
+          "compared": "7th highest of 97; the median project: 80% of days."
+        }
+      ],
       "page": "ruff/compare.html",
       "headline": "Ruff is 2nd of the 17 Python open source projects for commits."
     },
     {
       "name": "Home Assistant",
       "values": {
-        "commits": 20548.0,
-        "authors": 1403.0,
-        "new_authors": 933.0,
+        "commits": 20578.0,
+        "authors": 1409.0,
+        "new_authors": 938.0,
         "half_of_commits": 19.0,
         "organizations": 16.0,
         "ai_share": 0.14041592777688217
@@ -1295,7 +1408,7 @@
             17
           ],
           "all": [
-            6,
+            5,
             107
           ]
         },
@@ -1331,6 +1444,16 @@
         }
       },
       "group": "python",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.171383647798742,
+          "big": "1.2×",
+          "sentence": "Home Assistant's last 12 months were its busiest yet: 20,115 commits by people, more than in any full year before (17,172 in 2024).",
+          "compared": "9th highest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "home-assistant/compare.html",
       "headline": "Home Assistant had more new contributors in the last 12 months than any other of the 17 Python open source projects. It also had the most people behind half of its commits."
     },
@@ -1407,6 +1530,7 @@
         }
       },
       "group": "ai-coding",
+      "insights": [],
       "page": "codex/compare.html",
       "headline": "Codex CLI is 3rd of the 12 open source AI coding assistants for new contributors. It is also 3rd for how widely its commits are spread."
     },
@@ -1483,6 +1607,7 @@
         }
       },
       "group": "ai-coding",
+      "insights": [],
       "page": "gemini-cli/compare.html",
       "headline": "Gemini CLI had more people behind half of its commits than any other of the 12 open source AI coding assistants."
     },
@@ -1559,15 +1684,16 @@
         }
       },
       "group": "ai-coding",
+      "insights": [],
       "page": "claude-code/compare.html",
       "headline": "Claude Code ranks below most of the 12 open source AI coding assistants on every measure here; its highest place is 11th, for commits."
     },
     {
       "name": "OpenCode",
       "values": {
-        "commits": 17247.0,
-        "authors": 835.0,
-        "new_authors": 781.0,
+        "commits": 17275.0,
+        "authors": 837.0,
+        "new_authors": 782.0,
         "half_of_commits": 5.0,
         "organizations": 4.0,
         "ai_share": 0.0033102796004019627
@@ -1635,6 +1761,7 @@
         }
       },
       "group": "ai-coding",
+      "insights": [],
       "page": "opencode/compare.html",
       "headline": "OpenCode is 2nd of the 12 open source AI coding assistants for new contributors."
     },
@@ -1711,6 +1838,7 @@
         }
       },
       "group": "ai-coding",
+      "insights": [],
       "page": "aider/compare.html",
       "headline": "Aider ranks below most of the 12 open source AI coding assistants on every measure here; its highest place is 11th, for new contributors."
     },
@@ -1761,7 +1889,7 @@
             12
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -1787,6 +1915,7 @@
         }
       },
       "group": "ai-coding",
+      "insights": [],
       "page": "cline/compare.html",
       "headline": "Cline is 2nd of the 12 open source AI coding assistants for organizations committing."
     },
@@ -1837,7 +1966,7 @@
             12
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -1863,13 +1992,14 @@
         }
       },
       "group": "ai-coding",
+      "insights": [],
       "page": "continue/compare.html",
       "headline": "Continue sits in the middle of the 12 open source AI coding assistants; its highest place is 5th, for organizations committing."
     },
     {
       "name": "OpenHands",
       "values": {
-        "commits": 3275.0,
+        "commits": 3282.0,
         "authors": 204.0,
         "new_authors": 178.0,
         "half_of_commits": 5.0,
@@ -1939,13 +2069,23 @@
         }
       },
       "group": "ai-coding",
+      "insights": [
+        {
+          "kind": "ai",
+          "label": "AI-assisted commits",
+          "value": 0.3319812969145417,
+          "big": "45%",
+          "sentence": "The share of OpenHands's commits that name an AI coding assistant went from 12% to 45% in a year.",
+          "compared": "8th highest of 77; in the median project it rose by 5 points."
+        }
+      ],
       "page": "openhands/compare.html",
       "headline": "OpenHands had a larger share of commits that name an AI coding assistant than any other of the 12 open source AI coding assistants."
     },
     {
       "name": "goose",
       "values": {
-        "commits": 3204.0,
+        "commits": 3205.0,
         "authors": 417.0,
         "new_authors": 360.0,
         "half_of_commits": 10.0,
@@ -2015,15 +2155,16 @@
         }
       },
       "group": "ai-coding",
+      "insights": [],
       "page": "goose/compare.html",
       "headline": "goose is 2nd of the 12 open source AI coding assistants for how widely its commits are spread."
     },
     {
       "name": "Qwen Code",
       "values": {
-        "commits": 8938.0,
-        "authors": 320.0,
-        "new_authors": 310.0,
+        "commits": 8948.0,
+        "authors": 322.0,
+        "new_authors": 312.0,
         "half_of_commits": 4.0,
         "organizations": 2.0,
         "ai_share": 0.06818757921419519
@@ -2091,6 +2232,16 @@
         }
       },
       "group": "ai-coding",
+      "insights": [
+        {
+          "kind": "employer",
+          "label": "One company",
+          "value": 0.9994725738396625,
+          "big": "100%",
+          "sentence": "Of Qwen Code's commits from company addresses in the last 12 months, 100% came from one company: alibaba-inc.com.",
+          "compared": "3rd highest of 29; the median project: 91%."
+        }
+      ],
       "page": "qwen-code/compare.html",
       "headline": "Qwen Code sits in the middle of the 12 open source AI coding assistants; its highest place is 4th, for commits."
     },
@@ -2131,7 +2282,7 @@
             12
           ],
           "all": [
-            5,
+            6,
             107
           ]
         },
@@ -2167,6 +2318,7 @@
         }
       },
       "group": "ai-coding",
+      "insights": [],
       "page": "kilocode/compare.html",
       "headline": "Kilo Code had more new contributors in the last 12 months than any other of the 12 open source AI coding assistants. It also had the most organizations committing."
     },
@@ -2217,7 +2369,7 @@
             12
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -2243,13 +2395,14 @@
         }
       },
       "group": "ai-coding",
+      "insights": [],
       "page": "crush/compare.html",
       "headline": "Crush ranks below most of the 12 open source AI coding assistants on every measure here; its highest place is 9th, for new contributors."
     },
     {
       "name": "PyTorch",
       "values": {
-        "commits": 17697.0,
+        "commits": 17704.0,
         "authors": 1519.0,
         "new_authors": 995.0,
         "half_of_commits": 31.0,
@@ -2319,6 +2472,16 @@
         }
       },
       "group": "ai-ml",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.1789839108084652,
+          "big": "1.2×",
+          "sentence": "PyTorch's last 12 months were its busiest yet: 17,660 commits by people, more than in any full year before (14,979 in 2025).",
+          "compared": "7th highest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "pytorch/compare.html",
       "headline": "PyTorch had more commits in the last 12 months than any other of the 12 open source AI and machine learning projects. It is also 2nd for organizations committing."
     },
@@ -2395,13 +2558,14 @@
         }
       },
       "group": "ai-ml",
+      "insights": [],
       "page": "transformers/compare.html",
       "headline": "Transformers sits in the middle of the 12 open source AI and machine learning projects; its highest place is 4th, for organizations committing."
     },
     {
       "name": "LangChain",
       "values": {
-        "commits": 2379.0,
+        "commits": 2387.0,
         "authors": 234.0,
         "new_authors": 192.0,
         "half_of_commits": 2.0,
@@ -2471,13 +2635,23 @@
         }
       },
       "group": "ai-ml",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.1691106072793046,
+          "big": "17%",
+          "sentence": "Of the 2,743,861 lines ever written into LangChain's own source, 17% are still there; the rest were rewritten or removed.",
+          "compared": "3rd lowest of 97; the median project: 37%."
+        }
+      ],
       "page": "langchain/compare.html",
       "headline": "LangChain ranks below most of the 12 open source AI and machine learning projects on every measure here; its highest place is 9th, for new contributors."
     },
     {
       "name": "TensorFlow",
       "values": {
-        "commits": 15474.0,
+        "commits": 15475.0,
         "authors": 685.0,
         "new_authors": 371.0,
         "half_of_commits": 18.0,
@@ -2547,13 +2721,23 @@
         }
       },
       "group": "ai-ml",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.983270911360799,
+          "big": "98%",
+          "sentence": "TensorFlow has had a commit by a person on 98% of the days since its first one: 3,938 days in 11 years.",
+          "compared": "3rd highest of 97; the median project: 80% of days."
+        }
+      ],
       "page": "tensorflow/compare.html",
       "headline": "TensorFlow is 2nd of the 12 open source AI and machine learning projects for commits."
     },
     {
       "name": "JAX",
       "values": {
-        "commits": 7782.0,
+        "commits": 7785.0,
         "authors": 314.0,
         "new_authors": 155.0,
         "half_of_commits": 5.0,
@@ -2623,15 +2807,33 @@
         }
       },
       "group": "ai-ml",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.9478951000690131,
+          "big": "95%",
+          "sentence": "JAX has had a commit by a person on 95% of the days since its first one: 2,747 days in 8 years.",
+          "compared": "8th highest of 97; the median project: 80% of days."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.0137183172197544,
+          "big": "1.0×",
+          "sentence": "JAX's last 12 months were its busiest yet: 7,759 commits by people, more than in any full year before (7,654 in 2025).",
+          "compared": "14th highest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "jax/compare.html",
       "headline": "JAX sits in the middle of the 12 open source AI and machine learning projects; its highest place is 5th, for commits."
     },
     {
       "name": "vLLM",
       "values": {
-        "commits": 12839.0,
-        "authors": 2299.0,
-        "new_authors": 1885.0,
+        "commits": 12852.0,
+        "authors": 2301.0,
+        "new_authors": 1887.0,
         "half_of_commits": 78.0,
         "organizations": 63.0,
         "ai_share": 0.12826583932070543
@@ -2699,15 +2901,33 @@
         }
       },
       "group": "ai-ml",
+      "insights": [
+        {
+          "kind": "ai",
+          "label": "AI-assisted commits",
+          "value": 0.3253400968411344,
+          "big": "33%",
+          "sentence": "The share of vLLM's commits that name an AI coding assistant went from 0% to 33% in a year.",
+          "compared": "9th highest of 77; in the median project it rose by 5 points."
+        },
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.624767817821513,
+          "big": "62%",
+          "sentence": "62% of the 4,266,585 lines ever written into vLLM's own source are still there.",
+          "compared": "5th highest of 97; the median project: 37%."
+        }
+      ],
       "page": "vllm/compare.html",
       "headline": "vLLM had more new contributors in the last 12 months than any other of the 12 open source AI and machine learning projects. It also had the most people behind half of its commits."
     },
     {
       "name": "llama.cpp",
       "values": {
-        "commits": 4959.0,
-        "authors": 940.0,
-        "new_authors": 790.0,
+        "commits": 4963.0,
+        "authors": 941.0,
+        "new_authors": 791.0,
         "half_of_commits": 15.0,
         "organizations": 20.0,
         "ai_share": 0.03971661657363675
@@ -2775,13 +2995,23 @@
         }
       },
       "group": "ai-ml",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.9788679245283018,
+          "big": "98%",
+          "sentence": "llama.cpp has had a commit by a person on 98% of the days since its first one: 1,297 days in 4 years.",
+          "compared": "4th highest of 97; the median project: 80% of days."
+        }
+      ],
       "page": "llama-cpp/compare.html",
       "headline": "llama.cpp sits in the middle of the 12 open source AI and machine learning projects; its highest place is 4th, for new contributors."
     },
     {
       "name": "Ollama",
       "values": {
-        "commits": 1218.0,
+        "commits": 1219.0,
         "authors": 111.0,
         "new_authors": 87.0,
         "half_of_commits": 3.0,
@@ -2825,7 +3055,7 @@
             12
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -2851,6 +3081,7 @@
         }
       },
       "group": "ai-ml",
+      "insights": [],
       "page": "ollama/compare.html",
       "headline": "Ollama ranks below most of the 12 open source AI and machine learning projects on every measure here; its highest place is 10th, for commits."
     },
@@ -2891,7 +3122,7 @@
             12
           ],
           "all": [
-            41,
+            42,
             107
           ]
         },
@@ -2927,6 +3158,16 @@
         }
       },
       "group": "ai-ml",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.7220574412023981,
+          "big": "72%",
+          "sentence": "72% of the 1,642,584 lines ever written into Diffusers's own source are still there.",
+          "compared": "2nd highest of 97; the median project: 37%."
+        }
+      ],
       "page": "diffusers/compare.html",
       "headline": "Diffusers ranks below most of the 12 open source AI and machine learning projects on every measure here; its highest place is 10th, for new contributors."
     },
@@ -3003,6 +3244,24 @@
         }
       },
       "group": "ai-ml",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.5335606810492091,
+          "big": "53%",
+          "sentence": "53% of the 3,179,271 lines ever written into LlamaIndex's own source are still there.",
+          "compared": "9th highest of 97; the median project: 37%."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.2124567474048443,
+          "big": "21%",
+          "sentence": "People made 21% as many commits to LlamaIndex in the last 12 months as in 2024, its busiest year (614 against 2,890).",
+          "compared": "14th lowest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "llama-index/compare.html",
       "headline": "LlamaIndex is 2nd of the 12 open source AI and machine learning projects for how widely its commits are spread."
     },
@@ -3079,15 +3338,25 @@
         }
       },
       "group": "ai-ml",
+      "insights": [
+        {
+          "kind": "ai",
+          "label": "AI-assisted commits",
+          "value": 0.36627906976744184,
+          "big": "37%",
+          "sentence": "The share of Ray's commits that name an AI coding assistant went from 0% to 37% in a year.",
+          "compared": "7th highest of 77; in the median project it rose by 5 points."
+        }
+      ],
       "page": "ray/compare.html",
       "headline": "Ray had a larger share of commits that name an AI coding assistant than any other of the 12 open source AI and machine learning projects."
     },
     {
       "name": "SGLang",
       "values": {
-        "commits": 14439.0,
-        "authors": 1449.0,
-        "new_authors": 1198.0,
+        "commits": 14456.0,
+        "authors": 1450.0,
+        "new_authors": 1199.0,
         "half_of_commits": 25.0,
         "organizations": 45.0,
         "ai_share": 0.09359097278560366
@@ -3155,6 +3424,16 @@
         }
       },
       "group": "ai-ml",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.6707065275196229,
+          "big": "67%",
+          "sentence": "67% of the 5,377,908 lines ever written into SGLang's own source are still there.",
+          "compared": "3rd highest of 97; the median project: 37%."
+        }
+      ],
       "page": "sglang/compare.html",
       "headline": "SGLang is 2nd of the 12 open source AI and machine learning projects for new contributors. It is also 3rd for organizations committing."
     },
@@ -3175,7 +3454,7 @@
             15
           ],
           "all": [
-            13,
+            14,
             107
           ]
         },
@@ -3231,6 +3510,16 @@
         }
       },
       "group": "cncf",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.990714127791289,
+          "big": "99%",
+          "sentence": "Kubernetes has had a commit by a person on 99% of the days since its first one: 4,481 days in 12 years.",
+          "compared": "The highest of the 97 GitStats Gallery projects."
+        }
+      ],
       "page": "kubernetes/compare.html",
       "headline": "Kubernetes had more new contributors in the last 12 months than any other of the 15 CNCF graduated projects. It also had the most organizations committing."
     },
@@ -3307,13 +3596,14 @@
         }
       },
       "group": "cncf",
+      "insights": [],
       "page": "prometheus/compare.html",
       "headline": "Prometheus is 4th of the 15 CNCF graduated projects for commits."
     },
     {
       "name": "Envoy",
       "values": {
-        "commits": 3810.0,
+        "commits": 3813.0,
         "authors": 349.0,
         "new_authors": 215.0,
         "half_of_commits": 7.0,
@@ -3383,6 +3673,7 @@
         }
       },
       "group": "cncf",
+      "insights": [],
       "page": "envoy/compare.html",
       "headline": "Envoy is 2nd of the 15 CNCF graduated projects for organizations committing. It is also 3rd for new contributors."
     },
@@ -3429,11 +3720,11 @@
         },
         "half_of_commits": {
           "group": [
-            11,
+            10,
             15
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -3459,6 +3750,7 @@
         }
       },
       "group": "cncf",
+      "insights": [],
       "page": "etcd/compare.html",
       "headline": "etcd sits in the middle of the 15 CNCF graduated projects; its highest place is 7th, for commits."
     },
@@ -3535,6 +3827,7 @@
         }
       },
       "group": "cncf",
+      "insights": [],
       "page": "containerd/compare.html",
       "headline": "containerd is 4th of the 15 CNCF graduated projects for organizations committing."
     },
@@ -3581,11 +3874,11 @@
         },
         "half_of_commits": {
           "group": [
-            11,
+            10,
             15
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -3611,13 +3904,14 @@
         }
       },
       "group": "cncf",
+      "insights": [],
       "page": "helm/compare.html",
       "headline": "Helm sits in the middle of the 15 CNCF graduated projects; its highest place is 9th, for organizations committing."
     },
     {
       "name": "Istio",
       "values": {
-        "commits": 1229.0,
+        "commits": 1231.0,
         "authors": 164.0,
         "new_authors": 101.0,
         "half_of_commits": 6.0,
@@ -3687,15 +3981,25 @@
         }
       },
       "group": "cncf",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.21330356224424935,
+          "big": "21%",
+          "sentence": "Of the 3,412,259 lines ever written into Istio's own source, 21% are still there; the rest were rewritten or removed.",
+          "compared": "9th lowest of 97; the median project: 37%."
+        }
+      ],
       "page": "istio/compare.html",
       "headline": "Istio sits in the middle of the 15 CNCF graduated projects; its highest place is 6th, for new contributors."
     },
     {
       "name": "Argo CD",
       "values": {
-        "commits": 2280.0,
-        "authors": 381.0,
-        "new_authors": 287.0,
+        "commits": 2286.0,
+        "authors": 383.0,
+        "new_authors": 289.0,
         "half_of_commits": 15.0,
         "organizations": 11.0,
         "ai_share": 0.024965955515206535
@@ -3763,13 +4067,23 @@
         }
       },
       "group": "cncf",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.1918047079337402,
+          "big": "1.2×",
+          "sentence": "Argo CD's last 12 months were its busiest yet: 1,367 commits by people, more than in any full year before (1,147 in 2025).",
+          "compared": "5th highest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "argo-cd/compare.html",
       "headline": "Argo CD is 2nd of the 15 CNCF graduated projects for new contributors."
     },
     {
       "name": "Cilium",
       "values": {
-        "commits": 5237.0,
+        "commits": 5238.0,
         "authors": 340.0,
         "new_authors": 203.0,
         "half_of_commits": 13.0,
@@ -3839,16 +4153,17 @@
         }
       },
       "group": "cncf",
+      "insights": [],
       "page": "cilium/compare.html",
       "headline": "Cilium is 2nd of the 15 CNCF graduated projects for commits. It is also 3rd for how widely its commits are spread."
     },
     {
       "name": "CoreDNS",
       "values": {
-        "commits": 772.0,
+        "commits": 773.0,
         "authors": 93.0,
         "new_authors": 77.0,
-        "half_of_commits": 4.0,
+        "half_of_commits": 3.0,
         "organizations": 1.0,
         "ai_share": 0.00922266139657444
       },
@@ -3885,11 +4200,11 @@
         },
         "half_of_commits": {
           "group": [
-            9,
+            10,
             15
           ],
           "all": [
-            55,
+            62,
             107
           ]
         },
@@ -3915,6 +4230,16 @@
         }
       },
       "group": "cncf",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.5617924002781417,
+          "big": "56%",
+          "sentence": "56% of the 260,299 lines ever written into CoreDNS's own source are still there.",
+          "compared": "6th highest of 97; the median project: 37%."
+        }
+      ],
       "page": "coredns/compare.html",
       "headline": "CoreDNS sits in the middle of the 15 CNCF graduated projects; its highest place is 9th, for new contributors."
     },
@@ -3991,6 +4316,24 @@
         }
       },
       "group": "cncf",
+      "insights": [
+        {
+          "kind": "ai",
+          "label": "AI-assisted commits",
+          "value": 0.4148606811145511,
+          "big": "41%",
+          "sentence": "The share of Jaeger's commits that name an AI coding assistant went from 0% to 41% in a year.",
+          "compared": "5th highest of 77; in the median project it rose by 5 points."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.9475655430711611,
+          "big": "1.9×",
+          "sentence": "Jaeger's last 12 months were its busiest yet: 1,040 commits by people, more than in any full year before (534 in 2025).",
+          "compared": "The highest of the 90 GitStats Gallery projects."
+        }
+      ],
       "page": "jaeger/compare.html",
       "headline": "Jaeger had a larger share of commits that name an AI coding assistant than any other of the 15 CNCF graduated projects."
     },
@@ -4037,11 +4380,11 @@
         },
         "half_of_commits": {
           "group": [
-            11,
+            10,
             15
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -4067,13 +4410,23 @@
         }
       },
       "group": "cncf",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.169831223628692,
+          "big": "17%",
+          "sentence": "People made 17% as many commits to Linkerd in the last 12 months as in 2018, its busiest year (161 against 948).",
+          "compared": "10th lowest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "linkerd/compare.html",
       "headline": "Linkerd ranks below most of the 15 CNCF graduated projects on every measure here; its highest place is 11th, for commits."
     },
     {
       "name": "Harbor",
       "values": {
-        "commits": 418.0,
+        "commits": 419.0,
         "authors": 91.0,
         "new_authors": 75.0,
         "half_of_commits": 5.0,
@@ -4143,13 +4496,31 @@
         }
       },
       "group": "cncf",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.1371841155234657,
+          "big": "14%",
+          "sentence": "People made 14% as many commits to Harbor in the last 12 months as in 2019, its busiest year (342 against 2,493).",
+          "compared": "4th lowest of 90; the median project made 52% of its busiest year."
+        },
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.8728833217350963,
+          "big": "87%",
+          "sentence": "87% of Harbor's commits were made in one time zone, UTC+08:00, of the 21 it has commits from.",
+          "compared": "12th highest of 91; the median project: 34%."
+        }
+      ],
       "page": "harbor/compare.html",
       "headline": "Harbor sits in the middle of the 15 CNCF graduated projects; its highest place is 8th, for how widely its commits are spread."
     },
     {
       "name": "Flux",
       "values": {
-        "commits": 371.0,
+        "commits": 384.0,
         "authors": 49.0,
         "new_authors": 41.0,
         "half_of_commits": 2.0,
@@ -4163,7 +4534,7 @@
             15
           ],
           "all": [
-            95,
+            94,
             107
           ]
         },
@@ -4219,6 +4590,7 @@
         }
       },
       "group": "cncf",
+      "insights": [],
       "page": "flux/compare.html",
       "headline": "Flux ranks below most of the 15 CNCF graduated projects on every measure here; its highest place is 13th, for new contributors."
     },
@@ -4295,13 +4667,39 @@
         }
       },
       "group": "cncf",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.11499735029146795,
+          "big": "11%",
+          "sentence": "People made 11% as many commits to TiKV in the last 12 months as in 2016, its busiest year (217 against 1,887).",
+          "compared": "3rd lowest of 90; the median project made 52% of its busiest year."
+        },
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.8992502343017807,
+          "big": "90%",
+          "sentence": "90% of TiKV's commits were made in one time zone, UTC+08:00, of the 17 it has commits from.",
+          "compared": "11th highest of 91; the median project: 34%."
+        },
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.5289477102504959,
+          "big": "53%",
+          "sentence": "53% of the 1,585,894 lines ever written into TiKV's own source are still there.",
+          "compared": "10th highest of 97; the median project: 37%."
+        }
+      ],
       "page": "tikv/compare.html",
       "headline": "TiKV is 4th of the 15 CNCF graduated projects for how widely its commits are spread."
     },
     {
       "name": "Apache Airflow",
       "values": {
-        "commits": 8507.0,
+        "commits": 8525.0,
         "authors": 896.0,
         "new_authors": 698.0,
         "half_of_commits": 21.0,
@@ -4315,7 +4713,7 @@
             10
           ],
           "all": [
-            14,
+            13,
             107
           ]
         },
@@ -4371,13 +4769,23 @@
         }
       },
       "group": "apache",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.085502360080917,
+          "big": "1.1×",
+          "sentence": "Apache Airflow's last 12 months were its busiest yet: 8,049 commits by people, more than in any full year before (7,415 in 2025).",
+          "compared": "10th highest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "airflow/compare.html",
       "headline": "Apache Airflow had more new contributors in the last 12 months than any other of the 10 Apache projects. It also had the most people behind half of its commits."
     },
     {
       "name": "Apache Spark",
       "values": {
-        "commits": 4793.0,
+        "commits": 4798.0,
         "authors": 423.0,
         "new_authors": 256.0,
         "half_of_commits": 11.0,
@@ -4447,13 +4855,23 @@
         }
       },
       "group": "apache",
+      "insights": [
+        {
+          "kind": "ai",
+          "label": "AI-assisted commits",
+          "value": 0.716951215956144,
+          "big": "72%",
+          "sentence": "The share of Apache Spark's commits that name an AI coding assistant went from 0.5% to 72% in a year.",
+          "compared": "2nd highest of 77; in the median project it rose by 5 points."
+        }
+      ],
       "page": "spark/compare.html",
       "headline": "Apache Spark had more organizations committing to it than any other of the 10 Apache projects. It also had the largest share of AI-assisted commits."
     },
     {
       "name": "Apache Kafka",
       "values": {
-        "commits": 1989.0,
+        "commits": 1992.0,
         "authors": 253.0,
         "new_authors": 150.0,
         "half_of_commits": 19.0,
@@ -4523,18 +4941,28 @@
         }
       },
       "group": "apache",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.5258985291201389,
+          "big": "53%",
+          "sentence": "53% of the 3,509,736 lines ever written into Apache Kafka's own source are still there.",
+          "compared": "11th highest of 97; the median project: 37%."
+        }
+      ],
       "page": "kafka/compare.html",
       "headline": "Apache Kafka is 2nd of the 10 Apache projects for how widely its commits are spread."
     },
     {
       "name": "Apache Flink",
       "values": {
-        "commits": 1452.0,
+        "commits": 1454.0,
         "authors": 169.0,
         "new_authors": 90.0,
         "half_of_commits": 8.0,
         "organizations": 12.0,
-        "ai_share": 0.10586552217453506
+        "ai_share": 0.10650464617583988
       },
       "ranks": {
         "commits": {
@@ -4599,6 +5027,7 @@
         }
       },
       "group": "apache",
+      "insights": [],
       "page": "flink/compare.html",
       "headline": "Apache Flink ranks below most of the 10 Apache projects on every measure here; its highest place is 8th, for new contributors."
     },
@@ -4675,13 +5104,14 @@
         }
       },
       "group": "apache",
+      "insights": [],
       "page": "arrow/compare.html",
       "headline": "Apache Arrow sits in the middle of the 10 Apache projects; its highest place is 5th, for new contributors."
     },
     {
       "name": "Apache Superset",
       "values": {
-        "commits": 6023.0,
+        "commits": 6026.0,
         "authors": 468.0,
         "new_authors": 391.0,
         "half_of_commits": 6.0,
@@ -4751,6 +5181,24 @@
         }
       },
       "group": "apache",
+      "insights": [
+        {
+          "kind": "ai",
+          "label": "AI-assisted commits",
+          "value": 0.37695852534562213,
+          "big": "38%",
+          "sentence": "The share of Apache Superset's commits that name an AI coding assistant went from 0% to 38% in a year.",
+          "compared": "6th highest of 77; in the median project it rose by 5 points."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.334013605442177,
+          "big": "1.3×",
+          "sentence": "Apache Superset's last 12 months were its busiest yet: 3,922 commits by people, more than in any full year before (2,940 in 2021).",
+          "compared": "3rd highest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "superset/compare.html",
       "headline": "Apache Superset is 2nd of the 10 Apache projects for new contributors."
     },
@@ -4827,6 +5275,16 @@
         }
       },
       "group": "apache",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.5234562554574655,
+          "big": "52%",
+          "sentence": "52% of the 3,837,633 lines ever written into Apache Cassandra's own source are still there.",
+          "compared": "14th highest of 97; the median project: 37%."
+        }
+      ],
       "page": "cassandra/compare.html",
       "headline": "Apache Cassandra ranks below most of the 10 Apache projects on every measure here; its highest place is 7th, for organizations committing."
     },
@@ -4903,6 +5361,7 @@
         }
       },
       "group": "apache",
+      "insights": [],
       "page": "beam/compare.html",
       "headline": "Apache Beam sits in the middle of the 10 Apache projects; its highest place is 4th, for commits."
     },
@@ -4979,15 +5438,33 @@
         }
       },
       "group": "apache",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.0553250345781466,
+          "big": "1.1×",
+          "sentence": "Apache Iceberg's last 12 months were its busiest yet: 1,526 commits by people, more than in any full year before (1,446 in 2022).",
+          "compared": "12th highest of 90; the median project made 52% of its busiest year."
+        },
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.22565805479675077,
+          "big": "23%",
+          "sentence": "Of the 6,523,051 lines ever written into Apache Iceberg's own source, 23% are still there; the rest were rewritten or removed.",
+          "compared": "11th lowest of 97; the median project: 37%."
+        }
+      ],
       "page": "iceberg/compare.html",
       "headline": "Apache Iceberg is 3rd of the 10 Apache projects for how widely its commits are spread. It is also 3rd for organizations committing."
     },
     {
       "name": "Apache Pulsar",
       "values": {
-        "commits": 1472.0,
-        "authors": 128.0,
-        "new_authors": 54.0,
+        "commits": 1474.0,
+        "authors": 129.0,
+        "new_authors": 55.0,
         "half_of_commits": 2.0,
         "organizations": 5.0,
         "ai_share": 0.01800327332242226
@@ -5019,7 +5496,7 @@
             10
           ],
           "all": [
-            85,
+            84,
             107
           ]
         },
@@ -5055,6 +5532,16 @@
         }
       },
       "group": "apache",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.2103467905612398,
+          "big": "21%",
+          "sentence": "Of the 6,308,159 lines ever written into Apache Pulsar's own source, 21% are still there; the rest were rewritten or removed.",
+          "compared": "8th lowest of 97; the median project: 37%."
+        }
+      ],
       "page": "pulsar/compare.html",
       "headline": "Apache Pulsar ranks below most of the 10 Apache projects on every measure here; its highest place is 7th, for commits."
     },
@@ -5131,6 +5618,7 @@
         }
       },
       "group": "frontend",
+      "insights": [],
       "page": "react/compare.html",
       "headline": "React sits in the middle of the 11 open source web frontend projects; its highest place is 4th, for how widely its commits are spread."
     },
@@ -5207,13 +5695,23 @@
         }
       },
       "group": "frontend",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.5217276635398993,
+          "big": "52%",
+          "sentence": "52% of the 341,247 lines ever written into Vue's own source are still there.",
+          "compared": "15th highest of 97; the median project: 37%."
+        }
+      ],
       "page": "vue/compare.html",
       "headline": "Vue ranks below most of the 11 open source web frontend projects on every measure here; its highest place is 8th, for new contributors."
     },
     {
       "name": "Angular",
       "values": {
-        "commits": 3895.0,
+        "commits": 3900.0,
         "authors": 235.0,
         "new_authors": 157.0,
         "half_of_commits": 6.0,
@@ -5283,6 +5781,16 @@
         }
       },
       "group": "frontend",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.9459276018099547,
+          "big": "95%",
+          "sentence": "Angular has had a commit by a person on 95% of the days since its first one: 4,181 days in 12 years.",
+          "compared": "9th highest of 97; the median project: 80% of days."
+        }
+      ],
       "page": "angular/compare.html",
       "headline": "Angular is 2nd of the 11 open source web frontend projects for organizations committing. It is also 2nd for contributors."
     },
@@ -5359,13 +5867,23 @@
         }
       },
       "group": "frontend",
+      "insights": [
+        {
+          "kind": "employer",
+          "label": "One company",
+          "value": 1.0,
+          "big": "100%",
+          "sentence": "Of Svelte's commits from company addresses in the last 12 months, 100% came from one company: vercel.com.",
+          "compared": "The highest of the 29 GitStats Gallery projects."
+        }
+      ],
       "page": "svelte/compare.html",
       "headline": "Svelte sits in the middle of the 11 open source web frontend projects; its highest place is 6th, for new contributors."
     },
     {
       "name": "Next.js",
       "values": {
-        "commits": 4866.0,
+        "commits": 4871.0,
         "authors": 242.0,
         "new_authors": 177.0,
         "half_of_commits": 7.0,
@@ -5435,13 +5953,23 @@
         }
       },
       "group": "frontend",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.2228723642167539,
+          "big": "22%",
+          "sentence": "Of the 13,459,282 lines ever written into Next.js's own source, 22% are still there; the rest were rewritten or removed.",
+          "compared": "10th lowest of 97; the median project: 37%."
+        }
+      ],
       "page": "nextjs/compare.html",
       "headline": "Next.js had more new contributors in the last 12 months than any other of the 11 open source web frontend projects."
     },
     {
       "name": "Nuxt",
       "values": {
-        "commits": 1594.0,
+        "commits": 1595.0,
         "authors": 178.0,
         "new_authors": 119.0,
         "half_of_commits": 1.0,
@@ -5511,6 +6039,7 @@
         }
       },
       "group": "frontend",
+      "insights": [],
       "page": "nuxt/compare.html",
       "headline": "Nuxt sits in the middle of the 11 open source web frontend projects; its highest place is 5th, for new contributors."
     },
@@ -5587,6 +6116,7 @@
         }
       },
       "group": "frontend",
+      "insights": [],
       "page": "vite/compare.html",
       "headline": "Vite is 2nd of the 11 open source web frontend projects for new contributors."
     },
@@ -5663,6 +6193,7 @@
         }
       },
       "group": "frontend",
+      "insights": [],
       "page": "astro/compare.html",
       "headline": "Astro had more organizations committing to it than any other of the 11 open source web frontend projects. It is also 3rd for new contributors."
     },
@@ -5683,7 +6214,7 @@
             11
           ],
           "all": [
-            94,
+            95,
             107
           ]
         },
@@ -5739,13 +6270,14 @@
         }
       },
       "group": "frontend",
+      "insights": [],
       "page": "tailwindcss/compare.html",
       "headline": "Tailwind CSS ranks below most of the 11 open source web frontend projects on every measure here; its highest place is 10th, for new contributors."
     },
     {
       "name": "webpack",
       "values": {
-        "commits": 2013.0,
+        "commits": 2017.0,
         "authors": 48.0,
         "new_authors": 36.0,
         "half_of_commits": 1.0,
@@ -5815,6 +6347,7 @@
         }
       },
       "group": "frontend",
+      "insights": [],
       "page": "webpack/compare.html",
       "headline": "webpack sits in the middle of the 11 open source web frontend projects; its highest place is 4th, for commits."
     },
@@ -5865,7 +6398,7 @@
             11
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -5891,6 +6424,16 @@
         }
       },
       "group": "frontend",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.052053382144968956,
+          "big": "5%",
+          "sentence": "Of the 27,232,851 lines ever written into TypeScript's own source, 5% are still there; the rest were rewritten or removed.",
+          "compared": "The lowest of the 97 GitStats Gallery projects."
+        }
+      ],
       "page": "typescript/compare.html",
       "headline": "TypeScript had a larger share of commits that name an AI coding assistant than any other of the 11 open source web frontend projects."
     },
@@ -5967,6 +6510,16 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.09583333333333334,
+          "big": "10%",
+          "sentence": "People made 10% as many commits to Apache Dubbo in the last 12 months as in 2012, its busiest year (115 against 1,200).",
+          "compared": "2nd lowest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "dubbo/compare.html",
       "headline": "Apache Dubbo sits in the middle of the 16 open source projects from China; its highest place is 10th, for new contributors."
     },
@@ -6043,13 +6596,31 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.9736153554237322,
+          "big": "97%",
+          "sentence": "97% of Apache ShardingSphere's commits were made in one time zone, UTC+08:00, of the 20 it has commits from.",
+          "compared": "5th highest of 91; the median project: 34%."
+        },
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.22881480293407547,
+          "big": "23%",
+          "sentence": "Of the 6,596,422 lines ever written into Apache ShardingSphere's own source, 23% are still there; the rest were rewritten or removed.",
+          "compared": "12th lowest of 97; the median project: 37%."
+        }
+      ],
       "page": "shardingsphere/compare.html",
       "headline": "Apache ShardingSphere is 3rd of the 16 open source projects from China for commits."
     },
     {
       "name": "Apache Doris",
       "values": {
-        "commits": 4458.0,
+        "commits": 4461.0,
         "authors": 164.0,
         "new_authors": 74.0,
         "half_of_commits": 17.0,
@@ -6119,6 +6690,32 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "employer",
+          "label": "One company",
+          "value": 0.9994452149791956,
+          "big": "100%",
+          "sentence": "Of Apache Doris's commits from company addresses in the last 12 months, 100% came from one company: selectdb.com.",
+          "compared": "4th highest of 29; the median project: 91%."
+        },
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.9779642911643522,
+          "big": "98%",
+          "sentence": "98% of Apache Doris's commits were made in one time zone, UTC+08:00, of the 14 it has commits from.",
+          "compared": "4th highest of 91; the median project: 34%."
+        },
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.6479798370477341,
+          "big": "65%",
+          "sentence": "65% of the 16,857,452 lines ever written into Apache Doris's own source are still there.",
+          "compared": "4th highest of 97; the median project: 37%."
+        }
+      ],
       "page": "doris/compare.html",
       "headline": "Apache Doris had more people behind half of its commits than any other of the 16 open source projects from China. It is also 2nd for commits."
     },
@@ -6195,6 +6792,32 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.9648178410074018,
+          "big": "96%",
+          "sentence": "96% of Apache ECharts's commits were made in one time zone, UTC+08:00, of the 18 it has commits from.",
+          "compared": "7th highest of 91; the median project: 34%."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.14445910290237468,
+          "big": "14%",
+          "sentence": "People made 14% as many commits to Apache ECharts in the last 12 months as in 2020, its busiest year (219 against 1,516).",
+          "compared": "6th lowest of 90; the median project made 52% of its busiest year."
+        },
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.18544871883314962,
+          "big": "19%",
+          "sentence": "Of the 4,856,081 lines ever written into Apache ECharts's own source, 19% are still there; the rest were rewritten or removed.",
+          "compared": "5th lowest of 97; the median project: 37%."
+        }
+      ],
       "page": "echarts/compare.html",
       "headline": "Apache ECharts ranks below most of the 16 open source projects from China on every measure here; its highest place is 14th, for new contributors."
     },
@@ -6271,6 +6894,32 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.9858412907474481,
+          "big": "99%",
+          "sentence": "99% of Apache DolphinScheduler's commits were made in one time zone, UTC+08:00, of the 18 it has commits from.",
+          "compared": "3rd highest of 91; the median project: 34%."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.15006358626536667,
+          "big": "15%",
+          "sentence": "People made 15% as many commits to Apache DolphinScheduler in the last 12 months as in 2020, its busiest year (354 against 2,359).",
+          "compared": "8th lowest of 90; the median project made 52% of its busiest year."
+        },
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.24171132406733264,
+          "big": "24%",
+          "sentence": "Of the 1,829,484 lines ever written into Apache DolphinScheduler's own source, 24% are still there; the rest were rewritten or removed.",
+          "compared": "14th lowest of 97; the median project: 37%."
+        }
+      ],
       "page": "dolphinscheduler/compare.html",
       "headline": "Apache DolphinScheduler sits in the middle of the 16 open source projects from China; its highest place is 8th, for new contributors."
     },
@@ -6347,6 +6996,24 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.957099907493062,
+          "big": "96%",
+          "sentence": "96% of Apache SkyWalking's commits were made in one time zone, UTC+08:00, of the 17 it has commits from.",
+          "compared": "8th highest of 91; the median project: 34%."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.14482758620689656,
+          "big": "14%",
+          "sentence": "People made 14% as many commits to Apache SkyWalking in the last 12 months as in 2017, its busiest year (273 against 1,885).",
+          "compared": "7th lowest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "skywalking/compare.html",
       "headline": "Apache SkyWalking ranks below most of the 16 open source projects from China on every measure here; its highest place is 14th, for contributors."
     },
@@ -6423,6 +7090,24 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.9885343428880476,
+          "big": "99%",
+          "sentence": "99% of Apache RocketMQ's commits were made in one time zone, UTC+08:00, of the 12 it has commits from.",
+          "compared": "The highest of the 91 GitStats Gallery projects."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.1416630004399472,
+          "big": "14%",
+          "sentence": "People made 14% as many commits to Apache RocketMQ in the last 12 months as in 2013, its busiest year (322 against 2,273).",
+          "compared": "5th lowest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "rocketmq/compare.html",
       "headline": "Apache RocketMQ sits in the middle of the 16 open source projects from China; its highest place is 6th, for how widely its commits are spread."
     },
@@ -6499,6 +7184,32 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "employer",
+          "label": "One company",
+          "value": 1.0,
+          "big": "100%",
+          "sentence": "Of Apache APISIX's commits from company addresses in the last 12 months, 100% came from one company: api7.ai.",
+          "compared": "The highest of the 29 GitStats Gallery projects."
+        },
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.7670163161316929,
+          "big": "77%",
+          "sentence": "77% of the 790,506 lines ever written into Apache APISIX's own source are still there.",
+          "compared": "The highest of the 97 GitStats Gallery projects."
+        },
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.8460214231063504,
+          "big": "85%",
+          "sentence": "85% of Apache APISIX's commits were made in one time zone, UTC+08:00, of the 17 it has commits from.",
+          "compared": "14th highest of 91; the median project: 34%."
+        }
+      ],
       "page": "apisix/compare.html",
       "headline": "Apache APISIX sits in the middle of the 16 open source projects from China; its highest place is 9th, for commits."
     },
@@ -6575,6 +7286,16 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.9105219264716102,
+          "big": "91%",
+          "sentence": "91% of TiDB's commits were made in one time zone, UTC+08:00, of the 21 it has commits from.",
+          "compared": "9th highest of 91; the median project: 34%."
+        }
+      ],
       "page": "tidb/compare.html",
       "headline": "TiDB is 3rd of the 16 open source projects from China for organizations committing. It is also 4th for how widely its commits are spread."
     },
@@ -6651,6 +7372,24 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "ai",
+          "label": "AI-assisted commits",
+          "value": 0.3161290322580645,
+          "big": "32%",
+          "sentence": "The share of Milvus's commits that name an AI coding assistant went from 0% to 32% in a year.",
+          "compared": "10th highest of 77; in the median project it rose by 5 points."
+        },
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.9699652106687282,
+          "big": "97%",
+          "sentence": "97% of Milvus's commits were made in one time zone, UTC+08:00, of the 16 it has commits from.",
+          "compared": "6th highest of 91; the median project: 34%."
+        }
+      ],
       "page": "milvus/compare.html",
       "headline": "Milvus is 4th of the 16 open source projects from China for commits."
     },
@@ -6701,7 +7440,7 @@
             16
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -6727,6 +7466,24 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "ai",
+          "label": "AI-assisted commits",
+          "value": 0.717741935483871,
+          "big": "72%",
+          "sentence": "The share of Nacos's commits that name an AI coding assistant went from 0% to 72% in a year.",
+          "compared": "The highest of the 77 GitStats Gallery projects."
+        },
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.987391646966115,
+          "big": "99%",
+          "sentence": "99% of Nacos's commits were made in one time zone, UTC+08:00, of the 12 it has commits from.",
+          "compared": "2nd highest of 91; the median project: 34%."
+        }
+      ],
       "page": "nacos/compare.html",
       "headline": "Nacos had a larger share of commits that name an AI coding assistant than any other of the 16 open source projects from China."
     },
@@ -6803,6 +7560,16 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.9056934130290406,
+          "big": "91%",
+          "sentence": "91% of Ant Design's commits were made in one time zone, UTC+08:00, of the 28 it has commits from.",
+          "compared": "10th highest of 91; the median project: 34%."
+        }
+      ],
       "page": "ant-design/compare.html",
       "headline": "Ant Design is 2nd of the 16 open source projects from China for new contributors."
     },
@@ -6879,6 +7646,24 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "zone",
+          "label": "One time zone",
+          "value": 0.8656770269573734,
+          "big": "87%",
+          "sentence": "87% of PaddlePaddle's commits were made in one time zone, UTC+08:00, of the 17 it has commits from.",
+          "compared": "13th highest of 91; the median project: 34%."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.19200294822185368,
+          "big": "19%",
+          "sentence": "People made 19% as many commits to PaddlePaddle in the last 12 months as in 2018, its busiest year (2,084 against 10,854).",
+          "compared": "11th lowest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "paddle/compare.html",
       "headline": "PaddlePaddle is 2nd of the 16 open source projects from China for organizations committing. It is also 3rd for contributors."
     },
@@ -6955,6 +7740,16 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.524348118028873,
+          "big": "52%",
+          "sentence": "52% of the 536,140 lines ever written into KubeEdge's own source are still there.",
+          "compared": "13th highest of 97; the median project: 37%."
+        }
+      ],
       "page": "kubeedge/compare.html",
       "headline": "KubeEdge ranks below most of the 16 open source projects from China on every measure here; its highest place is 13th, for new contributors."
     },
@@ -7031,6 +7826,16 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.9303991811668373,
+          "big": "93%",
+          "sentence": "OpenHarmony ArkUI has had a commit by a person on 93% of the days since its first one: 1,818 days in 5 years.",
+          "compared": "13th highest of 97; the median project: 80% of days."
+        }
+      ],
       "page": "openharmony-arkui/compare.html",
       "headline": "OpenHarmony ArkUI had more new contributors in the last 12 months than any other of the 16 open source projects from China. It also had the most organizations committing."
     },
@@ -7107,6 +7912,16 @@
         }
       },
       "group": "china",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.19681908548707752,
+          "big": "20%",
+          "sentence": "People made 20% as many commits to OpenHarmony LiteOS-A in the last 12 months as in 2021, its busiest year (99 against 503).",
+          "compared": "12th lowest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "openharmony-liteos-a/compare.html",
       "headline": "OpenHarmony LiteOS-A had fewer contributors in the last 12 months than any other of the 16 open source projects from China."
     },
@@ -7157,7 +7972,7 @@
             14
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -7183,13 +7998,23 @@
         }
       },
       "group": "devtools",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.9335282155566853,
+          "big": "93%",
+          "sentence": "Git has had a commit by a person on 93% of the days since its first one: 7,345 days in 22 years.",
+          "compared": "11th highest of 97; the median project: 80% of days."
+        }
+      ],
       "page": "git/compare.html",
       "headline": "Git sits in the middle of the 14 open source languages and developer tools; its highest place is 5th, for organizations committing."
     },
     {
       "name": "VS Code",
       "values": {
-        "commits": 27429.0,
+        "commits": 27447.0,
         "authors": 457.0,
         "new_authors": 338.0,
         "half_of_commits": 14.0,
@@ -7259,13 +8084,39 @@
         }
       },
       "group": "devtools",
+      "insights": [
+        {
+          "kind": "ai",
+          "label": "AI-assisted commits",
+          "value": 0.6640117994100295,
+          "big": "66%",
+          "sentence": "The share of VS Code's commits that name an AI coding assistant went from 0% to 66% in a year.",
+          "compared": "4th highest of 77; in the median project it rose by 5 points."
+        },
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.9769942485621406,
+          "big": "98%",
+          "sentence": "VS Code has had a commit by a person on 98% of the days since its first one: 3,907 days in 11 years.",
+          "compared": "5th highest of 97; the median project: 80% of days."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.6378048780487804,
+          "big": "1.6×",
+          "sentence": "VS Code's last 12 months were its busiest yet: 26,860 commits by people, more than in any full year before (16,400 in 2025).",
+          "compared": "2nd highest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "vscode/compare.html",
       "headline": "VS Code had a larger share of commits that name an AI coding assistant than any other of the 14 open source languages and developer tools. It is also 2nd for commits."
     },
     {
       "name": "Node.js",
       "values": {
-        "commits": 3823.0,
+        "commits": 3829.0,
         "authors": 427.0,
         "new_authors": 269.0,
         "half_of_commits": 9.0,
@@ -7335,18 +8186,36 @@
         }
       },
       "group": "devtools",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.9447368421052632,
+          "big": "94%",
+          "sentence": "Node.js has had a commit by a person on 94% of the days since its first one: 6,103 days in 18 years.",
+          "compared": "10th highest of 97; the median project: 80% of days."
+        },
+        {
+          "kind": "ai",
+          "label": "AI-assisted commits",
+          "value": 0.3083929733246584,
+          "big": "31%",
+          "sentence": "The share of Node.js's commits that name an AI coding assistant went from 0% to 31% in a year.",
+          "compared": "11th highest of 77; in the median project it rose by 5 points."
+        }
+      ],
       "page": "nodejs/compare.html",
       "headline": "Node.js is 3rd of the 14 open source languages and developer tools for organizations committing. It is also 4th for new contributors."
     },
     {
       "name": "Rust",
       "values": {
-        "commits": 33339.0,
+        "commits": 33356.0,
         "authors": 1311.0,
         "new_authors": 778.0,
         "half_of_commits": 15.0,
         "organizations": 62.0,
-        "ai_share": 0.00041568930193889366
+        "ai_share": 0.00041566461803390633
       },
       "ranks": {
         "commits": {
@@ -7411,15 +8280,25 @@
         }
       },
       "group": "devtools",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.9901255230125523,
+          "big": "99%",
+          "sentence": "Rust has had a commit by a person on 99% of the days since its first one: 5,916 days in 16 years.",
+          "compared": "2nd highest of 97; the median project: 80% of days."
+        }
+      ],
       "page": "rust/compare.html",
       "headline": "Rust had more organizations committing to it than any other of the 14 open source languages and developer tools. It also had the most contributors."
     },
     {
       "name": "Go",
       "values": {
-        "commits": 3461.0,
-        "authors": 330.0,
-        "new_authors": 181.0,
+        "commits": 3463.0,
+        "authors": 331.0,
+        "new_authors": 182.0,
         "half_of_commits": 15.0,
         "organizations": 21.0,
         "ai_share": 0.003929273084479371
@@ -7487,6 +8366,7 @@
         }
       },
       "group": "devtools",
+      "insights": [],
       "page": "go/compare.html",
       "headline": "Go is 2nd of the 14 open source languages and developer tools for organizations committing."
     },
@@ -7563,6 +8443,16 @@
         }
       },
       "group": "devtools",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.1879576891781936,
+          "big": "1.2×",
+          "sentence": "Deno's last 12 months were its busiest yet: 2,920 commits by people, more than in any full year before (2,458 in 2024).",
+          "compared": "6th highest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "deno/compare.html",
       "headline": "Deno sits in the middle of the 14 open source languages and developer tools; its highest place is 7th, for new contributors."
     },
@@ -7639,15 +8529,41 @@
         }
       },
       "group": "devtools",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.9315476190476191,
+          "big": "93%",
+          "sentence": "Bun has had a commit by a person on 93% of the days since its first one: 1,878 days in 6 years.",
+          "compared": "12th highest of 97; the median project: 80% of days."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.2893258426966292,
+          "big": "1.3×",
+          "sentence": "Bun's last 12 months were its busiest yet: 4,590 commits by people, more than in any full year before (3,560 in 2023).",
+          "compared": "4th highest of 90; the median project made 52% of its busiest year."
+        },
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.525239943337379,
+          "big": "53%",
+          "sentence": "53% of the 9,710,105 lines ever written into Bun's own source are still there.",
+          "compared": "12th highest of 97; the median project: 37%."
+        }
+      ],
       "page": "bun/compare.html",
       "headline": "Bun sits in the middle of the 14 open source languages and developer tools; its highest place is 5th, for commits."
     },
     {
       "name": "Zed",
       "values": {
-        "commits": 8203.0,
-        "authors": 1169.0,
-        "new_authors": 990.0,
+        "commits": 8204.0,
+        "authors": 1170.0,
+        "new_authors": 991.0,
         "half_of_commits": 17.0,
         "organizations": 5.0,
         "ai_share": 0.016639889832453524
@@ -7715,13 +8631,23 @@
         }
       },
       "group": "devtools",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.9232995658465991,
+          "big": "92%",
+          "sentence": "Zed has had a commit by a person on 92% of the days since its first one: 1,914 days in 6 years.",
+          "compared": "15th highest of 97; the median project: 80% of days."
+        }
+      ],
       "page": "zed/compare.html",
       "headline": "Zed had more new contributors in the last 12 months than any other of the 14 open source languages and developer tools. It also had the most people behind half of its commits."
     },
     {
       "name": "Neovim",
       "values": {
-        "commits": 4198.0,
+        "commits": 4200.0,
         "authors": 285.0,
         "new_authors": 205.0,
         "half_of_commits": 2.0,
@@ -7791,13 +8717,23 @@
         }
       },
       "group": "devtools",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.9679569892473119,
+          "big": "97%",
+          "sentence": "Neovim has had a commit by a person on 97% of the days since its first one: 4,501 days in 13 years.",
+          "compared": "6th highest of 97; the median project: 80% of days."
+        }
+      ],
       "page": "neovim/compare.html",
       "headline": "Neovim sits in the middle of the 14 open source languages and developer tools; its highest place is 5th, for new contributors."
     },
     {
       "name": "Homebrew",
       "values": {
-        "commits": 6341.0,
+        "commits": 6349.0,
         "authors": 195.0,
         "new_authors": 129.0,
         "half_of_commits": 2.0,
@@ -7867,6 +8803,16 @@
         }
       },
       "group": "devtools",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.1723287151262098,
+          "big": "1.2×",
+          "sentence": "Homebrew's last 12 months were its busiest yet: 6,177 commits by people, more than in any full year before (5,269 in 2020).",
+          "compared": "8th highest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "homebrew/compare.html",
       "headline": "Homebrew is 4th of the 14 open source languages and developer tools for commits."
     },
@@ -7917,7 +8863,7 @@
             14
           ],
           "all": [
-            63,
+            62,
             107
           ]
         },
@@ -7943,13 +8889,23 @@
         }
       },
       "group": "devtools",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.5433932372889747,
+          "big": "54%",
+          "sentence": "54% of the 545,373 lines ever written into nginx's own source are still there.",
+          "compared": "8th highest of 97; the median project: 37%."
+        }
+      ],
       "page": "nginx/compare.html",
       "headline": "nginx ranks below most of the 14 open source languages and developer tools on every measure here; its highest place is 13th, for new contributors."
     },
     {
       "name": "curl",
       "values": {
-        "commits": 3539.0,
+        "commits": 3541.0,
         "authors": 188.0,
         "new_authors": 145.0,
         "half_of_commits": 2.0,
@@ -8019,6 +8975,24 @@
         }
       },
       "group": "devtools",
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.0194145758661888,
+          "big": "1.0×",
+          "sentence": "curl's last 12 months were its busiest yet: 3,413 commits by people, more than in any full year before (3,348 in 2025).",
+          "compared": "13th highest of 90; the median project made 52% of its busiest year."
+        },
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.2541883129545207,
+          "big": "25%",
+          "sentence": "Of the 1,948,756 lines ever written into curl's own source, 25% are still there; the rest were rewritten or removed.",
+          "compared": "15th lowest of 97; the median project: 37%."
+        }
+      ],
       "page": "curl/compare.html",
       "headline": "curl is 4th of the 14 open source languages and developer tools for organizations committing."
     },
@@ -8095,13 +9069,23 @@
         }
       },
       "group": "devtools",
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.5465758191967027,
+          "big": "55%",
+          "sentence": "55% of the 1,172,368 lines ever written into Redis's own source are still there.",
+          "compared": "7th highest of 97; the median project: 37%."
+        }
+      ],
       "page": "redis/compare.html",
       "headline": "Redis sits in the middle of the 14 open source languages and developer tools; its highest place is 8th, for organizations committing."
     },
     {
       "name": "PostgreSQL",
       "values": {
-        "commits": 3271.0,
+        "commits": 3274.0,
         "authors": 30.0,
         "new_authors": 0.0,
         "half_of_commits": 6.0,
@@ -8171,6 +9155,24 @@
         }
       },
       "group": "devtools",
+      "insights": [
+        {
+          "kind": "days",
+          "label": "Days with a commit",
+          "value": 0.9267962042476277,
+          "big": "93%",
+          "sentence": "PostgreSQL has had a commit by a person on 93% of the days since its first one: 10,255 days in 30 years.",
+          "compared": "14th highest of 97; the median project: 80% of days."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 1.0695851029075465,
+          "big": "1.1×",
+          "sentence": "PostgreSQL's last 12 months were its busiest yet: 3,274 commits by people, more than in any full year before (3,061 in 2001).",
+          "compared": "11th highest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "postgres/compare.html",
       "headline": "PostgreSQL sits in the middle of the 14 open source languages and developer tools; its highest place is 7th, for how widely its commits are spread."
     }

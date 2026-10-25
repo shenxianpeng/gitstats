@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:42:02+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:30:13+00:00",
   "name": "Istio",
   "report_path": "index.html",
   "first_commit": "2016-11-18 23:57:24",
-  "last_commit": "2026-10-24 16:53:34",
-  "age_days": 3627,
-  "active_days": 3350,
-  "total_commits": 26797,
+  "last_commit": "2026-10-25 02:52:35",
+  "age_days": 3628,
+  "active_days": 3351,
+  "total_commits": 26799,
   "total_authors": 1284,
   "active_authors_12mo": 165,
-  "commits_last_12mo": 1229,
+  "commits_last_12mo": 1231,
   "total_files": 6774,
   "total_lines": 989639,
-  "lines_added": 8127893,
-  "lines_removed": 7138254,
+  "lines_added": 8127895,
+  "lines_removed": 7138256,
   "total_tags": 54,
   "era": "steady",
   "top_authors": [
     {
       "name": "Istio Automation",
-      "commits": 4185
+      "commits": 4187
     },
     {
       "name": "John Howard",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Istio Automation": 4185,
+    "Istio Automation": 4187,
     "John Howard": 3640,
     "Max Xu": 1,
     "Michael Fraenkel": 24,
@@ -1337,7 +1337,7 @@
     "2023": 2538,
     "2024": 2341,
     "2025": 1459,
-    "2026": 1070
+    "2026": 1072
   },
   "ai_assisted": {
     "commits": 22,
@@ -1397,19 +1397,19 @@
       "2026-07": 95,
       "2026-08": 122,
       "2026-09": 137,
-      "2026-10": 111
+      "2026-10": 113
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 26797,
+    "commits": 26799,
     "by_kind": {
       "organization": 12976,
       "one_person": 919,
       "personal": 4499,
       "hidden": 4462,
       "unknown": 0,
-      "bot": 3941
+      "bot": 3943
     },
     "organization_count": 30,
     "last_12mo_from": "2025-11",
@@ -1718,14 +1718,14 @@
         "personal": 26,
         "hidden": 6,
         "unknown": 0,
-        "bot": 41
+        "bot": 43
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1225,
+    "commits": 1227,
     "authors": 164,
     "new_authors": 101,
     "half_of_commits": 6
@@ -1747,8 +1747,35 @@
     },
     "active_days": 3111
   },
+  "timezones": {
+    "+0000": 254,
+    "+0100": 496,
+    "+0200": 757,
+    "+0300": 275,
+    "+0330": 1,
+    "+0400": 6,
+    "+0500": 3,
+    "+0530": 1241,
+    "+0600": 1,
+    "+0700": 23,
+    "+0800": 3700,
+    "+0900": 105,
+    "+1000": 17,
+    "+1100": 6,
+    "+1200": 8,
+    "+1300": 11,
+    "-0200": 7,
+    "-0300": 142,
+    "-0400": 2274,
+    "-0500": 1506,
+    "-0600": 326,
+    "-0700": 10361,
+    "-0800": 5265,
+    "-0900": 1,
+    "-1000": 13
+  },
   "source_lines": {
-    "added": 3412257,
+    "added": 3412259,
     "current": 727847
   }
 }

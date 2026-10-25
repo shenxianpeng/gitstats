@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:42:50+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:31:13+00:00",
   "name": "PyTorch",
   "report_path": "index.html",
   "first_commit": "2012-01-25 13:55:20",
-  "last_commit": "2026-10-24 17:02:23",
+  "last_commit": "2026-10-25 04:50:26",
   "age_days": 5387,
-  "active_days": 4206,
-  "total_commits": 113016,
+  "active_days": 4207,
+  "total_commits": 113023,
   "total_authors": 5943,
-  "active_authors_12mo": 1538,
-  "commits_last_12mo": 17697,
+  "active_authors_12mo": 1535,
+  "commits_last_12mo": 17704,
   "total_files": 22742,
-  "total_lines": 5392253,
-  "lines_added": 14734032,
-  "lines_removed": 9341779,
-  "total_tags": 9515,
+  "total_lines": 5392502,
+  "lines_added": 14734363,
+  "lines_removed": 9341861,
+  "total_tags": 9526,
   "era": "peak",
   "top_authors": [
     {
@@ -41,6 +41,12 @@
     }
   ],
   "author_commits": {
+    "KarhouTam": 105,
+    "Xu Han": 240,
+    "PyTorch UpdateBot": 690,
+    "Aditya Venkataraman": 33,
+    "Richard Barnes": 472,
+    "Lee Si Yuan": 2,
     "drisspg": 534,
     "PyTorch MergeBot": 5801,
     "Daniel Galvez": 19,
@@ -48,11 +54,9 @@
     "Kapil Sharma": 26,
     "robertomeroni": 1,
     "Aidyn-A": 129,
-    "Richard Barnes": 471,
     "Edward Z. Yang": 3585,
     "Natalia Gimelshein": 620,
     "Nicolas Hug": 57,
-    "PyTorch UpdateBot": 689,
     "Bob Ren": 562,
     "haojiang.lh": 3,
     "George Hong": 47,
@@ -64,7 +68,6 @@
     "Oleksandr Stashuk": 10,
     "Andrey Talman": 589,
     "Lakshay Garg": 111,
-    "Lee Si Yuan": 1,
     "Kurt Mohler": 296,
     "Janani Sriram": 64,
     "Huy Do": 852,
@@ -86,7 +89,6 @@
     "Chi Zhang": 1,
     "Tu\u011frahan Karakad\u0131o\u011flu": 5,
     "jzluo": 1,
-    "KarhouTam": 103,
     "taochong": 18,
     "Jakub Kosno": 1,
     "Jeff Daily": 490,
@@ -219,7 +221,6 @@
     "Mick Tarsel": 2,
     "Sylvan Liu": 1,
     "Annop Wongwathanarat": 7,
-    "Xu Han": 239,
     "agrawal-aka": 3,
     "Yan Cao": 6,
     "Huy Phan": 2,
@@ -351,7 +352,6 @@
     "Rob Timpe": 85,
     "Sidharth Rajmohan": 6,
     "N0AHZACH": 6,
-    "Aditya Venkataraman": 32,
     "Andrey Bokovoy": 1,
     "Huanyu He": 9,
     "Chris Olivier": 1,
@@ -6000,13 +6000,13 @@
     "2023": 12593,
     "2024": 14893,
     "2025": 14993,
-    "2026": 15279
+    "2026": 15286
   },
   "ai_assisted": {
-    "commits": 835,
+    "commits": 836,
     "authored": 5,
     "assistants": {
-      "Claude": 684,
+      "Claude": 685,
       "Cursor": 65,
       "GitHub Copilot": 59,
       "Codex": 19,
@@ -6036,7 +6036,7 @@
       "2026-07": 112,
       "2026-08": 95,
       "2026-09": 269,
-      "2026-10": 161
+      "2026-10": 162
     },
     "commits_by_month": {
       "2024-11": 1254,
@@ -6062,17 +6062,17 @@
       "2026-07": 1693,
       "2026-08": 1307,
       "2026-09": 1908,
-      "2026-10": 1339
+      "2026-10": 1346
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 113016,
+    "commits": 113023,
     "by_kind": {
-      "organization": 71245,
+      "organization": 71246,
       "one_person": 3077,
-      "personal": 26903,
-      "hidden": 11441,
+      "personal": 26908,
+      "hidden": 11442,
       "unknown": 125,
       "bot": 225
     },
@@ -6081,11 +6081,11 @@
     "top": [
       {
         "organization": "meta.com",
-        "commits": 54637,
-        "commits_last_12mo": 6180,
+        "commits": 54638,
+        "commits_last_12mo": 6181,
         "addresses": 2040,
         "first_commit": "2014-07-10",
-        "last_commit": "2026-10-24"
+        "last_commit": "2026-10-25"
       },
       {
         "organization": "intel.com",
@@ -7138,10 +7138,10 @@
         "bot": 10
       },
       "2026-Q4": {
-        "organization": 749,
+        "organization": 750,
         "one_person": 83,
-        "personal": 336,
-        "hidden": 166,
+        "personal": 341,
+        "hidden": 167,
         "unknown": 0,
         "bot": 5
       }
@@ -7150,13 +7150,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 17653,
+    "commits": 17660,
     "authors": 1519,
     "new_authors": 995,
     "half_of_commits": 31
   },
   "humans": {
-    "commits": 112791,
+    "commits": 112798,
     "commits_by_year": {
       "2012": 198,
       "2013": 160,
@@ -7172,12 +7172,35 @@
       "2023": 12574,
       "2024": 14883,
       "2025": 14979,
-      "2026": 15236
+      "2026": 15243
     },
-    "active_days": 4205
+    "active_days": 4206
+  },
+  "timezones": {
+    "+0000": 44493,
+    "+0100": 1325,
+    "+0200": 651,
+    "+0300": 144,
+    "+0400": 27,
+    "+0500": 5,
+    "+0530": 116,
+    "+0700": 7,
+    "+0800": 1237,
+    "+0900": 66,
+    "+1000": 4,
+    "+1100": 6,
+    "+1300": 1,
+    "-0200": 3,
+    "-0300": 318,
+    "-0400": 2948,
+    "-0500": 1895,
+    "-0600": 96,
+    "-0700": 40937,
+    "-0800": 18736,
+    "-1000": 8
   },
   "source_lines": {
-    "added": 14704866,
-    "current": 5063186
+    "added": 14705197,
+    "current": 5063435
   }
 }

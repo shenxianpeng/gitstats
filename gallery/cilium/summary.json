@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:42:19+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:30:59+00:00",
   "name": "Cilium",
   "report_path": "index.html",
   "first_commit": "2015-12-16 12:33:31",
-  "last_commit": "2026-10-23 14:57:57",
-  "age_days": 3965,
-  "active_days": 3526,
-  "total_commits": 45262,
+  "last_commit": "2026-10-25 00:56:37",
+  "age_days": 3966,
+  "active_days": 3527,
+  "total_commits": 45263,
   "total_authors": 1343,
-  "active_authors_12mo": 346,
-  "commits_last_12mo": 5237,
+  "active_authors_12mo": 345,
+  "commits_last_12mo": 5238,
   "total_files": 27350,
-  "total_lines": 6719812,
-  "lines_added": 18946367,
-  "lines_removed": 12226555,
+  "total_lines": 6719897,
+  "lines_added": 18946464,
+  "lines_removed": 12226567,
   "total_tags": 142,
   "era": "steady",
   "top_authors": [
@@ -1397,7 +1397,7 @@
     "2023": 6497,
     "2024": 5768,
     "2025": 5811,
-    "2026": 4303
+    "2026": 4304
   },
   "ai_assisted": {
     "commits": 2,
@@ -1456,19 +1456,19 @@
       "2026-07": 552,
       "2026-08": 538,
       "2026-09": 537,
-      "2026-10": 261
+      "2026-10": 262
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 45262,
+    "commits": 45263,
     "by_kind": {
       "organization": 33617,
       "one_person": 3997,
       "personal": 4435,
       "hidden": 663,
       "unknown": 3,
-      "bot": 2547
+      "bot": 2548
     },
     "organization_count": 60,
     "last_12mo_from": "2025-11",
@@ -2017,7 +2017,7 @@
         "personal": 71,
         "hidden": 9,
         "unknown": 0,
-        "bot": 27
+        "bot": 28
       }
     }
   },
@@ -2047,8 +2047,36 @@
     },
     "active_days": 3502
   },
+  "timezones": {
+    "+0000": 5543,
+    "+0100": 10383,
+    "+0200": 15541,
+    "+0300": 1624,
+    "+0330": 6,
+    "+0400": 28,
+    "+0500": 26,
+    "+0530": 369,
+    "+0545": 2,
+    "+0600": 1,
+    "+0700": 71,
+    "+0800": 629,
+    "+0900": 544,
+    "+1000": 689,
+    "+1030": 2,
+    "+1100": 442,
+    "+1200": 14,
+    "+1300": 14,
+    "-0300": 30,
+    "-0400": 674,
+    "-0500": 489,
+    "-0600": 236,
+    "-0700": 5597,
+    "-0800": 2307,
+    "-0900": 1,
+    "-1000": 1
+  },
   "source_lines": {
-    "added": 3217558,
+    "added": 3217560,
     "current": 1378939
   }
 }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:38:56+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:27:31+00:00",
   "name": "Ruff",
   "report_path": "index.html",
   "first_commit": "2022-08-09 17:19:19",
-  "last_commit": "2026-10-23 23:32:27",
-  "age_days": 1537,
-  "active_days": 1469,
-  "total_commits": 17782,
+  "last_commit": "2026-10-25 02:52:44",
+  "age_days": 1538,
+  "active_days": 1471,
+  "total_commits": 17787,
   "total_authors": 948,
   "active_authors_12mo": 313,
-  "commits_last_12mo": 5140,
-  "total_files": 11265,
-  "total_lines": 2234193,
-  "lines_added": 4455476,
-  "lines_removed": 2221283,
+  "commits_last_12mo": 5145,
+  "total_files": 11266,
+  "total_lines": 2234649,
+  "lines_added": 4456031,
+  "lines_removed": 2221382,
   "total_tags": 432,
   "era": "steady",
   "top_authors": [
     {
       "name": "Charlie Marsh",
-      "commits": 4460
+      "commits": 4464
     },
     {
       "name": "Micha Reiser",
@@ -41,10 +41,10 @@
     }
   ],
   "author_commits": {
-    "Carl Meyer": 523,
+    "Charlie Marsh": 4464,
+    "Carl Meyer": 524,
     "Brent Westbrook": 513,
     "Anish Giri": 20,
-    "Charlie Marsh": 4460,
     "Douglas Creager": 206,
     "Zanie Blue": 302,
     "David Peter": 722,
@@ -995,7 +995,7 @@
     "2023": 4573,
     "2024": 2969,
     "2025": 4478,
-    "2026": 4357
+    "2026": 4362
   },
   "ai_assisted": {
     "commits": 70,
@@ -1054,16 +1054,16 @@
       "2026-07": 563,
       "2026-08": 488,
       "2026-09": 464,
-      "2026-10": 319
+      "2026-10": 324
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17782,
+    "commits": 17787,
     "by_kind": {
-      "organization": 974,
+      "organization": 975,
       "one_person": 3296,
-      "personal": 8912,
+      "personal": 8916,
       "hidden": 2743,
       "unknown": 0,
       "bot": 1857
@@ -1073,11 +1073,11 @@
     "top": [
       {
         "organization": "astral.sh",
-        "commits": 962,
-        "commits_last_12mo": 453,
+        "commits": 963,
+        "commits_last_12mo": 454,
         "addresses": 7,
         "first_commit": "2023-06-12",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-24"
       },
       {
         "organization": "openai.com",
@@ -1154,9 +1154,9 @@
         "bot": 205
       },
       "2026-Q4": {
-        "organization": 39,
+        "organization": 40,
         "one_person": 61,
-        "personal": 129,
+        "personal": 133,
         "hidden": 45,
         "unknown": 0,
         "bot": 45
@@ -1166,24 +1166,52 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4388,
+    "commits": 4393,
     "authors": 311,
     "new_authors": 230,
     "half_of_commits": 4
   },
   "humans": {
-    "commits": 15925,
+    "commits": 15930,
     "commits_by_year": {
       "2022": 1405,
       "2023": 4456,
       "2024": 2464,
       "2025": 3890,
-      "2026": 3710
+      "2026": 3715
     },
-    "active_days": 1465
+    "active_days": 1467
+  },
+  "timezones": {
+    "+0000": 1195,
+    "+0100": 2846,
+    "+0200": 2629,
+    "+0300": 195,
+    "+0330": 15,
+    "+0400": 11,
+    "+0500": 22,
+    "+0530": 836,
+    "+0545": 1,
+    "+0600": 24,
+    "+0700": 188,
+    "+0800": 192,
+    "+0900": 531,
+    "+0930": 1,
+    "+1000": 19,
+    "+1030": 1,
+    "+1100": 4,
+    "+1200": 2,
+    "+1300": 3,
+    "-0300": 103,
+    "-0400": 4164,
+    "-0500": 2963,
+    "-0600": 314,
+    "-0700": 1116,
+    "-0800": 411,
+    "-0900": 1
   },
   "source_lines": {
-    "added": 2791917,
-    "current": 1440024
+    "added": 2792472,
+    "current": 1440480
   }
 }

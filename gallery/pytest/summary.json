@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:37:53+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:26:17+00:00",
   "name": "pytest",
   "report_path": "index.html",
   "first_commit": "2007-01-24 14:24:01",
-  "last_commit": "2026-10-23 04:11:38",
-  "age_days": 7212,
-  "active_days": 4058,
-  "total_commits": 17834,
-  "total_authors": 1115,
-  "active_authors_12mo": 123,
-  "commits_last_12mo": 886,
-  "total_files": 730,
-  "total_lines": 183180,
-  "lines_added": 614451,
-  "lines_removed": 431271,
+  "last_commit": "2026-10-24 19:56:06",
+  "age_days": 7214,
+  "active_days": 4059,
+  "total_commits": 17841,
+  "total_authors": 1116,
+  "active_authors_12mo": 124,
+  "commits_last_12mo": 893,
+  "total_files": 731,
+  "total_lines": 183201,
+  "lines_added": 614496,
+  "lines_removed": 431295,
   "total_tags": 153,
   "era": "steady",
   "top_authors": [
@@ -33,7 +33,7 @@
     },
     {
       "name": "Ronny Pfannschmidt",
-      "commits": 1291
+      "commits": 1292
     },
     {
       "name": "Daniel Hahler",
@@ -41,7 +41,8 @@
     }
   ],
   "author_commits": {
-    "Ronny Pfannschmidt": 1291,
+    "Ronny Pfannschmidt": 1292,
+    "Paneendra Kumar": 5,
     "Pierre Sassoulas": 188,
     "Luana Bueno": 2,
     "Lothnic": 1,
@@ -1177,7 +1178,7 @@
     "2023": 640,
     "2024": 935,
     "2025": 680,
-    "2026": 716
+    "2026": 723
   },
   "ai_assisted": {
     "commits": 107,
@@ -1238,19 +1239,19 @@
       "2026-07": 108,
       "2026-08": 101,
       "2026-09": 64,
-      "2026-10": 41
+      "2026-10": 48
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17834,
+    "commits": 17841,
     "by_kind": {
       "organization": 1026,
-      "one_person": 8313,
-      "personal": 6023,
+      "one_person": 8314,
+      "personal": 6028,
       "hidden": 611,
       "unknown": 1084,
-      "bot": 777
+      "bot": 778
     },
     "organization_count": 21,
     "last_12mo_from": "2025-11",
@@ -1483,24 +1484,24 @@
       },
       "2026-Q4": {
         "organization": 1,
-        "one_person": 15,
-        "personal": 11,
+        "one_person": 16,
+        "personal": 16,
         "hidden": 4,
         "unknown": 0,
-        "bot": 10
+        "bot": 11
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 725,
-    "authors": 120,
-    "new_authors": 99,
+    "commits": 731,
+    "authors": 121,
+    "new_authors": 100,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 17057,
+    "commits": 17063,
     "commits_by_year": {
       "2007": 580,
       "2008": 175,
@@ -1521,12 +1522,40 @@
       "2023": 522,
       "2024": 770,
       "2025": 523,
-      "2026": 585
+      "2026": 591
     },
-    "active_days": 3885
+    "active_days": 3886
+  },
+  "timezones": {
+    "+0000": 939,
+    "+0100": 3863,
+    "+0200": 5336,
+    "+0300": 1362,
+    "+0330": 19,
+    "+0400": 3,
+    "+0430": 1,
+    "+0500": 6,
+    "+0530": 139,
+    "+0600": 8,
+    "+0700": 19,
+    "+0800": 74,
+    "+0900": 43,
+    "+0930": 2,
+    "+1000": 49,
+    "+1100": 48,
+    "+1200": 1,
+    "+1300": 2,
+    "-0200": 748,
+    "-0300": 3258,
+    "-0400": 432,
+    "-0500": 429,
+    "-0600": 86,
+    "-0700": 736,
+    "-0800": 231,
+    "-1000": 7
   },
   "source_lines": {
-    "added": 646553,
-    "current": 180225
+    "added": 646637,
+    "current": 180245
   }
 }

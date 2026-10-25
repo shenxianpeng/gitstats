@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0",
-  "generated_at": "2026-10-24T17:43:29+00:00",
+  "generated_by": "gitstats 2.12.0.post1.dev1",
+  "generated_at": "2026-10-25T05:31:53+00:00",
   "name": "Apache Airflow",
   "report_path": "index.html",
   "first_commit": "2014-10-06 21:29:38",
-  "last_commit": "2026-10-24 16:05:32",
-  "age_days": 4401,
-  "active_days": 4023,
-  "total_commits": 42426,
+  "last_commit": "2026-10-25 05:30:35",
+  "age_days": 4402,
+  "active_days": 4024,
+  "total_commits": 42444,
   "total_authors": 4359,
-  "active_authors_12mo": 908,
-  "commits_last_12mo": 8507,
-  "total_files": 15102,
-  "total_lines": 2934209,
-  "lines_added": 6303959,
-  "lines_removed": 3369750,
-  "total_tags": 9785,
+  "active_authors_12mo": 906,
+  "commits_last_12mo": 8525,
+  "total_files": 15131,
+  "total_lines": 2943865,
+  "lines_added": 6314384,
+  "lines_removed": 3370519,
+  "total_tags": 9812,
   "era": "surge",
   "top_authors": [
     {
       "name": "Jarek Potiuk",
-      "commits": 5174
+      "commits": 5184
     },
     {
       "name": "Kaxil Naik",
-      "commits": 2253
+      "commits": 2254
     },
     {
       "name": "Maxime Beauchemin",
@@ -41,13 +41,17 @@
     }
   ],
   "author_commits": {
+    "Brent Bovenzi": 648,
+    "Jarek Potiuk": 5184,
+    "Justin Pakzad": 56,
+    "Hussein Awala": 378,
+    "Kaxil Naik": 2254,
+    "Shahar Epstein": 322,
+    "raphaelauv": 104,
     "Henry Chen": 155,
-    "Jarek Potiuk": 5174,
     "Jason(Zhe-You) Liu": 361,
     "Parv Goyal": 3,
-    "Shahar Epstein": 320,
     "Jed Cunningham": 817,
-    "Kaxil Naik": 2253,
     "Ramit Kataria": 63,
     "Sean Ghaeli": 44,
     "Stephen Yang": 1,
@@ -66,7 +70,6 @@
     "Vincent Hsiao": 27,
     "Andrey Karazhev": 1,
     "Zach": 13,
-    "Brent Bovenzi": 647,
     "stephen-bracken": 23,
     "David Blain": 166,
     "Pierre Jeambrun": 654,
@@ -79,7 +82,6 @@
     "Yuseok Jo": 80,
     "Jens Scheffler": 758,
     "Anzin Mohammed": 2,
-    "Hussein Awala": 376,
     "Y-C": 58,
     "Baha Bouali": 11,
     "W. H. Wang": 8,
@@ -135,7 +137,6 @@
     "Ivan Tham": 1,
     "Yossi Eliaz": 17,
     "CyberNative AI LLC": 4,
-    "raphaelauv": 103,
     "Ajneesh": 1,
     "Weston King-Leatham": 2,
     "Jyun-An Chen": 54,
@@ -146,7 +147,6 @@
     "Wilson Josix Wang": 24,
     "Prajwal Agarwal": 5,
     "Kevin Yang": 79,
-    "Justin Pakzad": 55,
     "Sruthi": 2,
     "SHOUNAK SINHA": 1,
     "Karen Hsieh": 1,
@@ -4414,13 +4414,13 @@
     "2023": 4159,
     "2024": 4857,
     "2025": 7583,
-    "2026": 7378
+    "2026": 7396
   },
   "ai_assisted": {
-    "commits": 454,
+    "commits": 465,
     "authored": 0,
     "assistants": {
-      "Claude": 379,
+      "Claude": 390,
       "GitHub Copilot": 55,
       "Cursor": 22,
       "ChatGPT": 3,
@@ -4451,7 +4451,7 @@
       "2026-07": 27,
       "2026-08": 25,
       "2026-09": 83,
-      "2026-10": 132
+      "2026-10": 143
     },
     "commits_by_month": {
       "2024-11": 552,
@@ -4477,17 +4477,17 @@
       "2026-07": 788,
       "2026-08": 614,
       "2026-09": 829,
-      "2026-10": 826
+      "2026-10": 844
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 42426,
+    "commits": 42444,
     "by_kind": {
-      "organization": 8739,
-      "one_person": 8496,
-      "personal": 12049,
-      "hidden": 12396,
+      "organization": 8741,
+      "one_person": 8508,
+      "personal": 12050,
+      "hidden": 12399,
       "unknown": 40,
       "bot": 706
     },
@@ -4496,19 +4496,19 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 5837,
-        "commits_last_12mo": 672,
+        "commits": 5838,
+        "commits_last_12mo": 673,
         "addresses": 27,
         "first_commit": "2014-10-06",
         "last_commit": "2026-10-24"
       },
       {
         "organization": "astronomer.io",
-        "commits": 894,
-        "commits_last_12mo": 151,
+        "commits": 895,
+        "commits_last_12mo": 152,
         "addresses": 23,
         "first_commit": "2016-11-02",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-25"
       },
       {
         "organization": "amazon.com",
@@ -5241,10 +5241,10 @@
         "bot": 158
       },
       "2026-Q4": {
-        "organization": 251,
-        "one_person": 95,
-        "personal": 166,
-        "hidden": 259,
+        "organization": 253,
+        "one_person": 107,
+        "personal": 167,
+        "hidden": 262,
         "unknown": 0,
         "bot": 55
       }
@@ -5253,13 +5253,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 8031,
+    "commits": 8049,
     "authors": 896,
     "new_authors": 698,
     "half_of_commits": 21
   },
   "humans": {
-    "commits": 41720,
+    "commits": 41738,
     "commits_by_year": {
       "2014": 214,
       "2015": 2084,
@@ -5273,12 +5273,42 @@
       "2023": 4146,
       "2024": 4829,
       "2025": 7415,
-      "2026": 6916
+      "2026": 6934
     },
-    "active_days": 4023
+    "active_days": 4024
+  },
+  "timezones": {
+    "+0000": 2505,
+    "+0100": 8989,
+    "+0200": 8322,
+    "+0300": 1497,
+    "+0330": 22,
+    "+0400": 553,
+    "+0430": 9,
+    "+0500": 39,
+    "+0530": 3929,
+    "+0545": 124,
+    "+0600": 17,
+    "+0630": 9,
+    "+0700": 127,
+    "+0800": 3378,
+    "+0900": 1111,
+    "+1000": 154,
+    "+1100": 55,
+    "+1200": 11,
+    "+1300": 14,
+    "-0100": 5,
+    "-0200": 8,
+    "-0300": 283,
+    "-0400": 2566,
+    "-0500": 1705,
+    "-0600": 803,
+    "-0700": 4277,
+    "-0800": 1930,
+    "-1000": 2
   },
   "source_lines": {
-    "added": 5853681,
-    "current": 2824299
+    "added": 5864106,
+    "current": 2833955
   }
 }
