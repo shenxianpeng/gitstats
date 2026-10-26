@@ -8,6 +8,7 @@ import json
 import logging
 import os
 import re
+import shlex
 import socket
 import subprocess
 import sys
@@ -23,7 +24,7 @@ from typing import Any
 from urllib.parse import urlsplit
 
 import gitstats
-from gitstats import load_config, parse_config_value, time_start, utils
+from gitstats import check_git_settings, load_config, parse_config_value, time_start, utils
 from gitstats.aggregate import (
     AggregateReportCreator,
     _slugify_repo,
@@ -898,7 +899,11 @@ class GitDataCollector(DataCollector):
         """Count files, total size and lines per file extension at HEAD."""
         # extensions and size of files
         lines = get_pipe_output(
-            ["git ls-tree -r -l -z {}".format(get_commit_range("HEAD", end_only=True))]
+            [
+                "git ls-tree -r -l -z --end-of-options {}".format(
+                    shlex.quote(get_commit_range("HEAD", end_only=True))
+                )
+            ]
         ).split("\000")
         blobs_to_read = []
         # (path, blob id, extension) of every file whose lines are counted:
@@ -1787,9 +1792,11 @@ def get_parser() -> argparse.ArgumentParser:
         metavar="key=value",
         action="append",
         default=[],
-        # argparse formats a help with "%": a "%" in a setting is written "%%"
-        help="Override configuration value. Can be specified multiple times. "
-        "Default configuration: " + str(conf).replace("%", "%%"),
+        # the names only: the values can hold an API key
+        help=(
+            "Override configuration value. Can be specified multiple times. Keys: "
+            + ", ".join(sorted(conf))
+        ),
     )
 
     # Positional arguments
@@ -1970,6 +1977,7 @@ def main() -> int:
 
     try:
         _apply_config_from_args(conf, args)
+        check_git_settings(conf)
     except (ValueError, KeyError) as e:
         parser.error(str(e))
 

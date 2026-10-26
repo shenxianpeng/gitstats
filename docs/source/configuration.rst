@@ -3,6 +3,7 @@ Configuration
 =============
 
 You can create a ``gitstats.conf`` file in the current directory to customize the configuration.
+Some settings cannot be set in it: see `What gitstats.conf may set`_.
 
 * ``max_domains`` - Maximum number of domains to display in "Commits by domain". Default: ``10``.
 * ``max_ext_length`` - Maximum length of file extensions shown in statistics. Default: ``10``.
@@ -10,20 +11,20 @@ You can create a ``gitstats.conf`` file in the current directory to customize th
 * ``max_authors`` - Maximum number of authors to list in "Authors". Default: ``20``.
 * ``authors_top`` - Number of top authors to highlight. Default: ``5``.
 * ``max_tags_authors`` - Maximum number of authors to display per tag in "Tags" page. Set to ``-1`` to show all authors (no limit). Default: ``50``.
-* ``commit_begin`` - Start of commit range (empty = include all commits). A number ``N`` means the last ``N`` commits that lead to ``commit_end`` (all of them when the history has fewer): for example, ``10`` for the last 10 commits. Default: ``""`` (empty).
-* ``commit_end`` - End of commit range. Default: ``HEAD``.
+* ``commit_begin`` - Start of commit range (empty = include all commits). A number ``N`` means the last ``N`` commits that lead to ``commit_end`` (all of them when the history has fewer): for example, ``10`` for the last 10 commits. A git revision: it must not start with ``-`` or hold spaces, quotes, backslashes or control characters. Default: ``""`` (empty).
+* ``commit_end`` - End of commit range. A git revision, like ``commit_begin``. Default: ``HEAD``.
 * ``linear_linestats`` - Enable linear history for line statistics (``1`` = enabled, ``0`` = disabled). Default: ``1``.
 * ``project_name`` - Project name to display (default: repository directory name). Default: ``""`` (empty).
 * ``processes`` - Number of parallel processes to use when gathering data, at most; never more than the machine has processors. With ``1``, the git commands run one at a time. Default: ``8``.
-* ``start_date`` - Starting date for commits, passed as --since to Git (optional). Format: ``YYYY-MM-DD``. Default: ``""`` (empty).
-* ``end_date`` - Ending date for commits, passed as --until to Git (optional). Format: ``YYYY-MM-DD``. Default: ``""`` (empty).
+* ``start_date`` - Starting date for commits, passed as --since to Git (optional). Format: ``YYYY-MM-DD``. It must not start with ``-`` or hold control characters. Default: ``""`` (empty).
+* ``end_date`` - Ending date for commits, passed as --until to Git (optional). Format: ``YYYY-MM-DD``. It must not start with ``-`` or hold control characters. Default: ``""`` (empty).
 * ``authors`` - Comma-separated list of authors to filter commits. Only commits from these authors will be included (uses OR logic: commits from any of the listed authors). If empty, all authors are included. Default: ``""`` (empty).
 * ``exclude_exts`` - Comma-separated list of file extensions to exclude from line counting. If empty, no files are excluded. Files with null bytes in their content are automatically detected as binary and excluded from line counting. This detection occurs in addition to any extensions specified in exclude_exts. The Lines of Code of a report are those of the files at ``commit_end`` that are counted, whatever the date, author and range filters. Default: ``""`` (empty).
 * ``badge_metric`` - Badge written as the default ``badge.svg`` in the report output: ``commits``, ``last-commit``, ``authors``, ``files``, ``lines``, ``release``, ``active-days``, ``summary``, ``activity``, ``health`` or ``ai-assisted``. All of them are always pre-rendered in ``badges/<name>.svg`` regardless of this choice. Default: ``commits``.
 * ``badge_label`` - Left-side text of the generated badges. Default: ``gitstats``.
 * ``badge_color`` - Value-segment color of the generated badges: a shields.io color name (``brightgreen``, ``green``, ``yellowgreen``, ``yellow``, ``orange``, ``red``, ``blue``, ``lightgrey``), a hex value like ``#30a14e``, or any SVG color. Default: ``""`` (gitstats brand blue).
 * ``badge_style`` - Badge style: ``flat`` (rounded corners, subtle gradient), ``flat-square`` (sharp corners), ``terminal`` (monospace and square, like the report), ``for-the-badge`` (taller, bold, uppercase) or ``light`` (white and pale blue, for white READMEs). Default: ``flat``.
-* ``site_url`` - Public address of the report, such as ``https://owner.github.io/repo/``. The snippets on the report's Badges page point at it, and the run log prints the README badge. With several repositories, each report's address is this plus its subdirectory. Same as the ``--site-url`` option. Default: ``""`` (the Badges page reads the address from its own URL).
+* ``site_url`` - Public address of the report, such as ``https://owner.github.io/repo/``. The snippets on the report's Badges page point at it, and the run log prints the README badge. With several repositories, each report's address is this plus its subdirectory. Same as the ``--site-url`` option, and set with it or ``-c site_url=...``: ``gitstats.conf`` cannot set it. Default: ``""`` (the Badges page reads the address from its own URL).
 * ``share_card`` - With ``site_url`` set, make every page point to ``share-card.png``, the image shown with a link to the report where it is shared (X, Slack, LinkedIn, chat apps). gitstats writes the card as ``share-card.html``, 1200 by 630 pixels, and leaves the PNG to whoever publishes the report, for example ``google-chrome --headless=new --window-size=1200,630 --screenshot=share-card.png share-card.html``. Without it, the pages still carry a title and a description for such previews. Default: ``false``.
 
 Here is an example ``gitstats.conf`` file:
@@ -70,3 +71,33 @@ Filtering examples:
 
    # Combine multiple filters
    gitstats . -c start_date=2024-01-01 -c authors="John Doe"
+
+What gitstats.conf may set
+--------------------------
+
+gitstats reads ``gitstats.conf`` from the current directory, and that is often
+the repository being analyzed: whoever can commit to the repository can write
+the file. So the file is trusted with what the report counts and how it looks,
+and not with whether data leaves the machine, where it goes, or with which
+credentials:
+
+* Settings whose name starts with ``ai_`` or ``ollama_``, or ends with ``_url``
+  or ``_key`` (``ai_enabled``, ``ai_provider``, ``ai_api_key``,
+  ``ollama_base_url``, ``site_url``...), are ignored in ``gitstats.conf``, with
+  a warning that names them. Set them on the command line (``--ai``,
+  ``--ai-provider``, ``--ai-model``, ``--ai-language``, ``--site-url`` or
+  ``-c key=value``), and API keys in the environment (``OPENAI_API_KEY``,
+  ``ANTHROPIC_API_KEY``, ``GOOGLE_API_KEY``). See :doc:`ai-integration`.
+* ``commit_begin``, ``commit_end``, ``start_date``, ``end_date`` and
+  ``authors`` go on git's command line. gitstats stops with an error when one
+  of them could be read as something else (a revision that starts with ``-``
+  or holds spaces or quotes, a date that starts with ``-``, a control
+  character anywhere), passes each date and author as one argument, and puts
+  ``--end-of-options`` before the revisions, so git never takes a setting for
+  an option such as ``--output=<file>``. ``--end-of-options`` needs Git 2.24 or
+  later.
+* ``gitstats --help`` lists the names of the settings, never their values.
+
+Even so, run gitstats on an untrusted repository from another directory
+(``gitstats /path/to/repo output/``), so that a ``gitstats.conf`` inside it
+is not read at all.

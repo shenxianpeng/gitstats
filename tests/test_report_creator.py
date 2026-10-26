@@ -1202,6 +1202,31 @@ def test_create_ai_insights_with_error(mock_data_collector_with_ai_error, temp_d
     assert "API rate limit exceeded" in html
 
 
+def test_create_ai_insights_keeps_no_markup_a_committer_could_steer(mock_data_collector, temp_dir):
+    """The model is asked for HTML about author names and commit subjects:
+    a script in its answer, or markup in an error, does not reach the page."""
+    data = mock_data_collector
+    data.ai_summaries = {
+        "index": {"summary": "<p>ok</p><script src=https://evil.example/x.js></script>"},
+        "activity": {"error": "500 Server Error: <img src=x onerror=alert(1)>"},
+        "lines": {"summary": '<ul><li onclick="steal()"><strong>Lines</strong> grew</li></ul>'},
+    }
+    creator = HTMLReportCreator()
+    creator.title = data.project_name
+    creator.data = data
+    creator.create_ai_insights_html(data, temp_dir)
+
+    with open(f"{temp_dir}/ai-insights.html", encoding="utf-8") as f:
+        page = f.read()
+
+    assert "evil.example" not in page
+    assert "<img" not in page
+    assert "steal()" not in page
+    assert "<p>ok</p>" in page
+    assert "<ul><li><strong>Lines</strong> grew</li></ul>" in page
+    assert "500 Server Error: &lt;img src=x onerror=alert(1)&gt;" in page
+
+
 def test_create_ai_insights_no_ai_data(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
     creator.title = mock_data_collector.project_name
@@ -1239,6 +1264,20 @@ def test_get_ai_summary_html_error(mock_data_collector_with_ai_error):
     result = creator.get_ai_summary_html("index")
     assert "API rate limit exceeded" in result
     assert "unavailable" in result.lower()
+
+
+def test_get_ai_summary_html_keeps_no_markup_a_committer_could_steer(mock_data_collector):
+    creator = HTMLReportCreator()
+    creator.data = mock_data_collector
+    mock_data_collector.ai_summaries = {
+        "index": {"summary": "<p>ok</p><script>alert(1)</script>"},
+        "activity": {"error": "<img src=x onerror=alert(1)>"},
+    }
+    assert "<p>ok</p>" in creator.get_ai_summary_html("index")
+    assert "<script>" not in creator.get_ai_summary_html("index")
+    error = creator.get_ai_summary_html("activity")
+    assert "<img" not in error
+    assert "&lt;img src=x onerror=alert(1)&gt;" in error
 
 
 def test_get_ai_summary_html_missing_key(mock_data_collector_with_ai):

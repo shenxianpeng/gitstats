@@ -100,7 +100,7 @@ def test_load_config_from_file():
     """Load config from a temporary file."""
     content = """[gitstats]
 max_authors = 10
-ai_enabled = true
+share_card = true
 project_name = test-project
 """
     with tempfile.NamedTemporaryFile(mode="w", suffix=".conf", delete=False) as f:
@@ -115,7 +115,7 @@ project_name = test-project
 
         cfg = load_config(path)
         assert cfg["max_authors"] == 10
-        assert cfg["ai_enabled"] is True
+        assert cfg["share_card"] is True
         assert cfg["project_name"] == "test-project"
         # defaults still present
         assert cfg["max_domains"] == 10
@@ -130,8 +130,7 @@ def test_load_config_type_coercion():
 max_authors = 5
 processes = 16
 linear_linestats = 0
-ai_enabled = true
-ai_cache_enabled = false
+share_card = true
 """
     with tempfile.NamedTemporaryFile(mode="w", suffix=".conf", delete=False) as f:
         f.write(content)
@@ -147,8 +146,7 @@ ai_cache_enabled = false
         assert isinstance(cfg["max_authors"], int)
         assert cfg["processes"] == 16
         assert isinstance(cfg["processes"], int)
-        assert cfg["ai_enabled"] is True
-        assert cfg["ai_cache_enabled"] is False
+        assert cfg["share_card"] is True
     finally:
         gitstats._config = None
         os.unlink(path)
@@ -174,6 +172,101 @@ max_tags_authors = -1
     finally:
         gitstats._config = None
         os.unlink(path)
+
+
+def test_load_config_ignores_what_a_repository_could_use_against_its_reader(tmp_path, caplog):
+    """A gitstats.conf can come with the repository being analyzed: it does not
+    turn the AI on, choose where the data goes, or set a key or an address."""
+    import gitstats
+
+    path = tmp_path / "gitstats.conf"
+    path.write_text(
+        "[gitstats]\n"
+        "max_authors = 7\n"
+        "ai_enabled = true\n"
+        "ai_provider = ollama\n"
+        "ollama_base_url = http://attacker.example:11434\n"
+        "ai_api_key = sk-TEST-123\n"
+        "site_url = https://attacker.example/\n"
+        "some_setting = x\n",
+        encoding="utf-8",
+    )
+    gitstats._config = None
+    try:
+        with caplog.at_level("WARNING", logger="gitstats"):
+            cfg = load_config(str(path))
+        assert cfg["max_authors"] == 7
+        assert cfg["some_setting"] == "x"
+        for key in ("ai_enabled", "ai_provider", "ollama_base_url", "ai_api_key", "site_url"):
+            assert cfg[key] == DEFAULT_CONFIG[key], key
+        assert (
+            "ignoring ai_enabled, ai_provider, ollama_base_url, ai_api_key, site_url" in caplog.text
+        )
+        # the warning names the settings, never their values
+        assert "sk-TEST-123" not in caplog.text
+        assert "attacker" not in caplog.text
+    finally:
+        gitstats._config = None
+
+
+def test_load_config_says_nothing_when_nothing_is_ignored(tmp_path, caplog):
+    import gitstats
+
+    path = tmp_path / "gitstats.conf"
+    path.write_text("[gitstats]\nmax_authors = 7\n", encoding="utf-8")
+    gitstats._config = None
+    try:
+        with caplog.at_level("WARNING", logger="gitstats"):
+            assert load_config(str(path))["max_authors"] == 7
+        assert caplog.text == ""
+    finally:
+        gitstats._config = None
+
+
+# ── check_git_settings ───────────────────────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    "settings",
+    [
+        {},
+        {"commit_begin": 10, "commit_end": "HEAD"},
+        {"commit_begin": "v1.0.0", "commit_end": "origin/main"},
+        {"commit_begin": "HEAD~10", "commit_end": "HEAD^{commit}"},
+        {"start_date": "2024-01-01", "end_date": "2 weeks ago"},
+        {"authors": "John Doe, Jane Smith,-dash-handle"},
+    ],
+)
+def test_check_git_settings_takes_what_git_should_get(settings):
+    from gitstats import check_git_settings
+
+    check_git_settings({**DEFAULT_CONFIG, **settings})
+
+
+@pytest.mark.parametrize(
+    "key, value, message",
+    [
+        ("commit_end", "HEAD --output=/tmp/victim", "commit_end = 'HEAD --output=/tmp/victim'"),
+        ("commit_end", "--output=/tmp/victim", "is not a git revision"),
+        ("commit_begin", "-1", "commit_begin = '-1' is not a git revision"),
+        ("commit_begin", "HEAD\t~1", "is not a git revision"),
+        ("commit_end", 'HEAD"x', "is not a git revision"),
+        ("commit_end", "HEAD'x", "is not a git revision"),
+        ("commit_end", "HEAD\\x", "is not a git revision"),
+        ("commit_end", "HEAD\x00", "is not a git revision"),
+        ("start_date", "--output=/tmp/victim", 'or start with "-"'),
+        ("end_date", "2024-01-01\n--output=x", "must not contain control characters"),
+        ("authors", "Jane\x1b[31m", "authors = 'Jane\\x1b[31m' is not allowed"),
+    ],
+)
+def test_check_git_settings_refuses_what_git_could_take_for_an_option(key, value, message):
+    from gitstats import check_git_settings
+
+    with pytest.raises(ValueError) as error:
+        check_git_settings({**DEFAULT_CONFIG, key: value})
+    assert message in str(error.value)
+    if key == "authors":
+        assert "start with" not in str(error.value)
 
 
 @pytest.mark.parametrize(

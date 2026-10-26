@@ -17,7 +17,7 @@ from concurrent.futures import ThreadPoolExecutor
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any, NamedTuple
 
-from gitstats import ON_LINUX, exectime_external, load_config
+from gitstats import ON_LINUX, check_git_settings, exectime_external, load_config
 
 logger = logging.getLogger("gitstats")
 
@@ -156,7 +156,12 @@ def get_commit_range(defaultrange: str = "HEAD", end_only: bool = False) -> str:
     or without a ``commit_begin``. A ``commit_begin`` that is a number N
     means the last N commits that lead to ``commit_end``: all of them when
     the history has fewer (see last_commits_range()).
+
+    Raises ValueError when a setting that goes on git's command line could be
+    taken for something else (see check_git_settings()). Put the range after
+    ``--end-of-options``, so that git never reads it as an option.
     """
+    check_git_settings(load_config())
     commit_end = str(load_config()["commit_end"])
     if not commit_end:
         return defaultrange
@@ -189,7 +194,10 @@ def last_commits_range(end: str, count: int) -> str:
     key = (os.getcwd(), end, count)
     if key not in _last_commits:
         rows = get_pipe_output(
-            [f'git rev-list --topo-order --parents --max-count={count} "{end}"']
+            [
+                f"git rev-list --topo-order --parents --max-count={count} --end-of-options "
+                + shlex.quote(end)
+            ]
         ).split("\n")
         commits = {row.split(" ", 1)[0] for row in rows}
         parents = [parent for row in rows for parent in row.split()[1:]]
@@ -976,7 +984,12 @@ def history_graph(rev: str) -> History:
     prints for it.
     """
     rows = _HISTORY_ROW.findall(
-        get_pipe_output([f'git log --topo-order --format="%H%x09%T%x09%P%x09%at %aN" "{rev}"'])
+        get_pipe_output(
+            [
+                'git log --topo-order --format="%H%x09%T%x09%P%x09%at %aN" --end-of-options '
+                + shlex.quote(rev)
+            ]
+        )
     )
     place = {row[0]: index for index, row in enumerate(rows)}
     named = [row[2].split() for row in rows]
@@ -1051,15 +1064,19 @@ def get_stat_summary_counts(line: str) -> list[str | int]:
 
 
 def get_log_range(defaultrange: str = "HEAD", end_only: bool = True) -> str:
+    """The options and revisions of the commits to read, for a `git log` or
+    `git rev-list` command line: the date and author filters, then
+    ``--end-of-options`` (git 2.24 and later) and the range, each quoted for
+    shlex.split(). Nothing may follow it but ``-- <paths>``."""
     commit_range = get_commit_range(defaultrange, end_only)
     # Build git log options
     options = []
 
     # Date range filtering
     if len(load_config()["start_date"]) > 0:
-        options.append('--since="{}"'.format(load_config()["start_date"]))
+        options.append("--since=" + shlex.quote(load_config()["start_date"]))
     if len(load_config()["end_date"]) > 0:
-        options.append('--until="{}"'.format(load_config()["end_date"]))
+        options.append("--until=" + shlex.quote(load_config()["end_date"]))
 
     # Author filtering
     if len(load_config()["authors"]) > 0:
@@ -1067,16 +1084,13 @@ def get_log_range(defaultrange: str = "HEAD", end_only: bool = True) -> str:
             author.strip() for author in load_config()["authors"].split(",") if author.strip()
         ]
         for author in authors_list:
-            # Escape possible double quotes or special characters in author
-            safe_author = author.replace('"', r"\"")
-            options.append(f'--author="{safe_author}"')
+            options.append("--author=" + shlex.quote(author))
 
-    # Combine options with commit range, whose revisions are quoted one by one
-    if options:
-        return "{} {}".format(
-            " ".join(options), " ".join(f'"{part}"' for part in commit_range.split(" "))
-        )
-    return commit_range
+    # whatever the configuration says, git reads the range as revisions, each
+    # quoted on its own (the last commits are a tip and the commits they leave out)
+    return " ".join(
+        [*options, "--end-of-options", *(shlex.quote(part) for part in commit_range.split(" "))]
+    )
 
 
 def commit_local_time(stamp: float, utc_offset: str) -> datetime.datetime:
