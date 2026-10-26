@@ -2979,7 +2979,7 @@ def test_source_lines_are_counted_the_same_with_one_process_or_more(tmp_path, mo
 
 
 def test_a_commit_after_the_year_9999(tmp_path, monkeypatch):
-    """git takes it; it is counted at the end of the year 9999."""
+    """git takes it; it is counted at the latest moment a datetime can be."""
     repo = _history(
         tmp_path / "repo",
         [
@@ -2987,11 +2987,14 @@ def test_a_commit_after_the_year_9999(tmp_path, monkeypatch):
             (*ANN, "@253402300800 +0000", {"b": 1}),
         ],
     )
+    from gitstats.main import _LATEST_STAMP
+
+    latest = datetime.datetime.fromtimestamp(_LATEST_STAMP).year  # 9999, 2999 on Windows
     for processes in (8, 1):
         dc = _collected(repo, monkeypatch, processes)
-        assert dc.commits_by_year == {2021: 1, 9999: 1}
-        assert dc.get_last_commit_date().year == 9999
-        assert max(dc.files_by_stamp) == max(dc.changes_by_date) <= 253402300799
+        assert dc.commits_by_year == {2021: 1, latest: 1}
+        assert dc.get_last_commit_date().year == latest
+        assert max(dc.files_by_stamp) == max(dc.changes_by_date) == _LATEST_STAMP
 
 
 def test_a_commit_at_the_epoch_is_the_first(tmp_path, monkeypatch):

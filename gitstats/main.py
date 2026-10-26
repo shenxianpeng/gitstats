@@ -135,15 +135,16 @@ def _author_name(name: str) -> str:
     return unicodedata.normalize("NFC", name).strip()
 
 
-# 9999-12-01 00:00:00 UTC, a stamp that is in the year 9999 in every time zone
-_LATEST_STAMP = 253399622400
+# The latest stamp datetime.fromtimestamp() takes in every time zone:
+# 9999-12-01 00:00:00 UTC, or 3000-01-01 on Windows, whose clock ends there
+_LATEST_STAMP = 32503680000 if os.name == "nt" else 253399622400
 
 
 def _stamp(text: str) -> int:
     """A commit's stamp as git prints it (%at), no later than _LATEST_STAMP.
 
     git takes dates after the year 9999, which Python's datetime cannot hold:
-    such a commit is counted at the end of the year 9999.
+    such a commit is counted at the latest moment it can.
     """
     return min(int(text), _LATEST_STAMP)
 

@@ -1545,7 +1545,9 @@ def test_numstat_paths(printed, paths):
 def test_shortstat_logs_name_the_files_as_they_are(git_repo, monkeypatch, passes):
     """With core.quotePath=false, as `git -c core.quotePath=false log
     --name-only` prints them: git quotes only what it always quotes."""
-    for name in ("résumé.py", 'say"hi".py'):
+    # a Windows checkout cannot hold a name with a double quote
+    awkward = ["résumé.py"] + (['say"hi".py'] if os.name != "nt" else [])
+    for name in awkward:
         with open(os.path.join(git_repo, name), "w", encoding="utf-8") as f:
             f.write("x\n")
     _git(git_repo, "add", "-A")
@@ -1554,7 +1556,7 @@ def test_shortstat_logs_name_the_files_as_they_are(git_repo, monkeypatch, passes
     names = _names(passes, "HEAD")
     assert names == _names_command("HEAD")
     assert "résumé.py" in names
-    assert '"say\\"hi\\".py"' in names
+    assert os.name == "nt" or '"say\\"hi\\".py"' in names
 
 
 def test_shortstat_logs_count_the_root_commit_whatever_log_show_root_says(git_repo, monkeypatch):
