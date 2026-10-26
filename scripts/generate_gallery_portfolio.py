@@ -42,7 +42,7 @@ from gitstats.aggregate import AggregateReportCreator
 from gitstats.utils import get_version
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from gallery_ecosystems import FOLDER, in_a_sentence, write_ecosystems  # noqa: E402
+from gallery_ecosystems import FOLDER, INDEX, in_a_sentence, write_ecosystems  # noqa: E402
 from gallery_repos import Group, Repo, RepoListError, load_repos  # noqa: E402
 
 ACTION_URL = "https://github.com/shenxianpeng/gitstats-action"
@@ -383,6 +383,9 @@ def main(argv: list[str] | None = None) -> int:
         version=version,
         groups=[(group.id, group.name) for group in groups],
         group_titles={group.id: in_a_sentence(group.title) for group in groups},
+        # each listed repository is in a group: with groups, there are
+        # ecosystem pages, written below
+        nav=[(f"{FOLDER}/{INDEX}", "Ecosystems")] if groups else [],
     )
     ecosystems = write_ecosystems(
         gallery_root, groups, repos, summaries, site_url, args.share_card, version

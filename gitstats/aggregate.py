@@ -30,6 +30,7 @@ from gitstats.report_creator import (
     AI_ASSISTED_COUNTED,
     INSIGHTS_END,
     INSIGHTS_START,
+    REPORT_BRAND,
     THEME_INIT_SCRIPT,
     THEME_SCRIPT,
     THEME_TOGGLE_BUTTON,
@@ -475,7 +476,9 @@ def ai_rows(
     quarters = last_quarters(now)
     rows: list[AiRow] = []
     for summary in summaries:
-        ai = summary.get("ai_assisted")
+        # a summary kept from an earlier build counts the month it was made
+        # in up to that day: not a whole one
+        ai = compare.complete_ai(summary)
         counts = [
             _quarter_counts(ai, months) if isinstance(ai, dict) else None for _, months in quarters
         ]
@@ -540,14 +543,17 @@ def ai_dataset(
 
     For each repository whose summary counts them: its totals, and each
     complete month and quarter the summary covers, with all the commits of it.
+    A month is complete before this one, and before the one the summary was
+    made in: a summary kept from an earlier build has that month as it was
+    then.
     """
     this_month = f"{now.year:04d}-{now.month:02d}"
     quarters = last_quarters(now, _AI_MONTHS // 3)
     covered: set[str] = set()
     repositories = []
     for summary in sorted(summaries, key=lambda s: str(s.get("name", "")).lower()):
-        ai = summary.get("ai_assisted")
-        if not isinstance(ai, dict):
+        ai = compare.complete_ai(summary)
+        if ai is None:
             continue
         by_month, all_by_month = ai.get("by_month") or {}, ai.get("commits_by_month") or {}
         by_quarter = _ai_quarters(ai, quarters)
@@ -812,6 +818,7 @@ class AggregateReportCreator:
         version: str = "",
         groups: list[tuple[str, str]] | None = None,
         group_titles: dict[str, str] | None = None,
+        nav: list[tuple[str, str]] | None = None,
     ) -> None:
         """Write the portfolio's pages, and the share card of each: ``site_url``
         is the portfolio's public address, ending in "/", or "" when unknown;
@@ -821,8 +828,15 @@ class AggregateReportCreator:
         in the order the pages offer them: each summary names its group as
         ``"group"``. With them, the pages can be narrowed to one group.
         ``group_titles`` name each group's projects inside a sentence
-        ("Python open source projects"), for the comparison pages."""
+        ("Python open source projects"), for the comparison pages. ``nav``
+        adds (address from the output root, label) links to the nav bar of
+        every page, for pages written next to the portfolio's own, such as
+        the Gallery's ecosystems.
+
+        Each repository's report gets the way back to the portfolio, at the
+        start of its nav bar."""
         self.group_titles = dict(group_titles or {})
+        self.nav = list(nav or [])
         self._copy_assets(path)
         self.site_url = site_url
         self.version = version or get_version()
@@ -883,8 +897,11 @@ class AggregateReportCreator:
                 self._write_organization_files(path, row, title, len(summaries), ai)
         if len(summaries) >= compare.MIN_REPOSITORIES:
             self._write_comparisons(path, summaries, title, ai)
+        for summary in summaries:
+            self._link_back(path, summary, title)
 
     site_url = ""
+    nav: list[tuple[str, str]] = []
     organizations = False
     organization_page_names: set[str] = set()
     group_titles: dict[str, str] = {}
@@ -1446,6 +1463,32 @@ class AggregateReportCreator:
         )
 
     @staticmethod
+    def _link_back(path: str, summary: dict[str, Any], title: str) -> int:
+        """Make the brand of each page of a repository's report the way back
+        to the portfolio, "← GitStats Gallery"; how many pages changed. A page
+        changed before, by an earlier portfolio, keeps what it has."""
+        report = str(summary.get("report_path", "") or "")
+        folder = report[: -len("/index.html")] if report.endswith("/index.html") else ""
+        base = os.path.abspath(path)
+        target = os.path.abspath(os.path.join(base, folder))
+        # a plain folder name, the same a comparison page is written into
+        if not _COMPARE_FILE.fullmatch(f"{folder}/compare.html") or not os.path.isdir(target):
+            return 0
+        brand = f'<a href="../index.html" class="nav-brand nav-up">&larr; {html.escape(title)}</a>'
+        changed = 0
+        for entry in sorted(os.listdir(target)):
+            if not entry.endswith(".html") or entry.startswith(("compare", "share-card")):
+                continue
+            page = os.path.join(target, entry)
+            with open(page, encoding="utf-8") as f:
+                text = f.read()
+            if REPORT_BRAND in text:
+                with open(page, "w", encoding="utf-8") as f:
+                    f.write(text.replace(REPORT_BRAND, brand, 1))
+                changed += 1
+        return changed
+
+    @staticmethod
     def _fill_overview(path: str, folder: str, section: str) -> None:
         """Put ``section`` in the place a report's overview keeps for it,
         replacing what an earlier portfolio put there; nothing when the page
@@ -1738,7 +1781,7 @@ class AggregateReportCreator:
         strength = 0 if ratio <= 0 else 10 + 65 * min(1.0, ratio / 0.6) ** 0.5
         return (
             f'<td class="share" style="--share-strength: {strength:.0f}%">'
-            f"{share_text(part, whole) if part else '0'}"
+            f"{share_text(part, whole) if part else '0%'}"
             f"<small>{format_int(part)} / {format_int(whole)}</small></td>"
         )
 
@@ -1843,6 +1886,8 @@ class AggregateReportCreator:
         ai_link = nav_link(f"{prefix}ai.html", "AI-assisted commits", current=current) if ai else ""
         if self.organizations:
             ai_link += nav_link(f"{prefix}organizations.html", "Organizations", current=current)
+        for href, label in self.nav:
+            ai_link += nav_link(html.escape(f"{prefix}{href}", quote=True), html.escape(label))
         f.write(
             f"""
             <div class="nav">

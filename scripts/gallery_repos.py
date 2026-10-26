@@ -19,6 +19,9 @@ from dataclasses import dataclass
 # a report's folder, and the end of its address: never more than this
 _ID = re.compile(r"[a-z0-9][a-z0-9-]{0,62}")
 _URL = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9_.-]+")
+# folders of the gallery's own: a report there would mix with them, and the
+# deploy, which removes a report folder without a summary.json, would remove them
+RESERVED_IDS = frozenset({"ai", "orgs", "ecosystems"})
 DEFAULT_TIMEOUT = 90
 # GitHub Actions: a matrix has at most 256 jobs, and a job runs at most 6 hours
 MAX_REPOS = 256
@@ -51,7 +54,8 @@ def parse_repos(data: object) -> tuple[list[Group], list[Repo]]:
 
     Raises RepoListError for anything the workflow could not run or the
     pages could not name: a missing field, an id that is not a plain folder
-    name, an id used twice, a URL that is not owner/name.
+    name or is one of the gallery's own folders, an id used twice, a URL that
+    is not owner/name.
     """
     if not isinstance(data, dict) or not isinstance(data.get("groups"), list):
         raise RepoListError("expected a mapping with a list of groups")
@@ -97,6 +101,8 @@ def _parse_repo(entry: object, group_id: str) -> Repo:
     repo_id = _text(entry, "id", "repository")
     if not _ID.fullmatch(repo_id):
         raise RepoListError(f"bad repository id: {repo_id!r}")
+    if repo_id in RESERVED_IDS:
+        raise RepoListError(f"repository id {repo_id!r} is a folder of the gallery's own")
     url = _text(entry, "url", repo_id)
     if not _URL.fullmatch(url) or ".." in url:
         raise RepoListError(f"{repo_id}: url must be owner/name on GitHub, not {url!r}")

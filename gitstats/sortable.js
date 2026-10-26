@@ -77,55 +77,67 @@ function ts_getInnerText(el) {
 	return str;
 }
 
+// A cell with nothing to sort by: empty, or a dash that stands for no value.
+// Such cells go last, whichever way the column is sorted.
+function ts_isBlank(text) {
+	return text == "" || text == "\u2014" || text == "\u2013" || text == "-" || text.substr(0,4) == "<!--";
+}
+
+function ts_cellText(row, column) {
+	var cell = row.cells[column];
+	return cell ? trim(ts_getInnerText(cell)) : "";
+}
+
+// The sort a column takes, worked out once, from all its values: a later
+// click finds the rows in another order, and must not sort them another way.
+function ts_columnSort(t, column, rows) {
+	if (!t.ts_sorts) t.ts_sorts = {};
+	if (t.ts_sorts[column] !== undefined) return t.ts_sorts[column];
+	var numeric = 0, dates = 0, values = 0;
+	for (var r=0;r<rows.length;r++) {
+		var itm = ts_cellText(rows[r], column);
+		if (ts_isBlank(itm)) continue;
+		values++;
+		// numbers, ignoring stuff in () after them
+		if (itm.match(/^-?\d[\d,.]*(E[-+]\d+)?%?( \(.*\))?$/)) numeric++;
+		if (itm.match(/^\d\d[\/\.-][a-zA-Z][a-zA-Z][a-zA-Z][\/\.-]\d\d\d\d$/) || itm.match(/^\d\d[\/\.-]\d\d[\/\.-]\d\d(\d\d)?$/)) dates++;
+	}
+	var sortfn = null;
+	if (values) {
+		sortfn = ts_sort_caseinsensitive;
+		if (dates == values) sortfn = ts_sort_date;
+		else if (numeric == values) sortfn = ts_sort_numeric;
+	}
+	t.ts_sorts[column] = sortfn;
+	return sortfn;
+}
+
 function ts_resortTable(lnk, clid) {
 	var span;
 	for (var ci=0;ci<lnk.childNodes.length;ci++) {
 		if (lnk.childNodes[ci].tagName && lnk.childNodes[ci].tagName.toLowerCase() == 'span') span = lnk.childNodes[ci];
 	}
-	var spantext = ts_getInnerText(span);
 	var td = lnk.parentNode;
 	var column = clid || td.cellIndex;
 	var t = getParent(td,'TABLE');
-	// Work out a type for the column
 	if (t.rows.length <= 1) return;
-	var itm = "";
-	var i = 1;
-	while (itm == "" && i < t.tBodies[0].rows.length) {
-		var itm = ts_getInnerText(t.tBodies[0].rows[i].cells[column]);
-		itm = trim(itm);
-		if (itm.substr(0,4) == "<!--" || itm.length == 0) {
-			itm = "";
-		}
-		i++;
-	}
-	if (itm == "") return;
-	sortfn = ts_sort_caseinsensitive;
-	if (itm.match(/^\d\d[\/\.-][a-zA-z][a-zA-Z][a-zA-Z][\/\.-]\d\d\d\d$/)) sortfn = ts_sort_date;
-	if (itm.match(/^\d\d[\/\.-]\d\d[\/\.-]\d\d\d{2}?$/)) sortfn = ts_sort_date;
-	if (itm.match(/^-?[£$€Û¢´]\d/)) sortfn = ts_sort_numeric;
-	// ignore stuff in () after the numbers.
-	if (itm.match(/^-?(\d+[,\.]?)+(E[-+][\d]+)?%?( \(.*\))?$/)) sortfn = ts_sort_numeric;
-	SORT_COLUMN_INDEX = column;
-	var firstRow = new Array();
 	var newRows = new Array();
 	for (k=0;k<t.tBodies.length;k++) {
-		for (i=0;i<t.tBodies[k].rows[0].length;i++) {
-			firstRow[i] = t.tBodies[k].rows[0][i];
+		// without a <thead>, the first row of the body is the header: skip it
+		for (j=(thead ? 0 : 1);j<t.tBodies[k].rows.length;j++) {
+			newRows[newRows.length] = t.tBodies[k].rows[j];
 		}
 	}
-	for (k=0;k<t.tBodies.length;k++) {
-		if (!thead) {
-			// Skip the first row
-			for (j=1;j<t.tBodies[k].rows.length;j++) {
-				newRows[j-1] = t.tBodies[k].rows[j];
-			}
-		} else {
-			// Do NOT skip the first row
-			for (j=0;j<t.tBodies[k].rows.length;j++) {
-				newRows[j] = t.tBodies[k].rows[j];
-			}
-		}
+	var sortfn = ts_columnSort(t, column, newRows);
+	if (!sortfn) return;
+	SORT_COLUMN_INDEX = column;
+	var blankRows = new Array();
+	var valueRows = new Array();
+	for (i=0;i<newRows.length;i++) {
+		if (ts_isBlank(ts_cellText(newRows[i], column))) blankRows[blankRows.length] = newRows[i];
+		else valueRows[valueRows.length] = newRows[i];
 	}
+	newRows = valueRows;
 	newRows.sort(sortfn);
 	if (span.getAttribute("sortdir") == 'down') {
 			ARROW = 'desc';
@@ -135,6 +147,7 @@ function ts_resortTable(lnk, clid) {
 			ARROW = 'asc';
 			span.setAttribute('sortdir','down');
 	}
+	newRows = newRows.concat(blankRows);
     // We appendChild rows that already exist to the tbody, so it moves them rather than creating new ones
     // don't do sortbottom rows
     for (i=0; i<newRows.length; i++) {

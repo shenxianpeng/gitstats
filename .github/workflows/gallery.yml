@@ -189,9 +189,15 @@ jobs:
           done
 
       - name: Deploy to GitHub Pages
+        # gallery/ on the site's branch becomes what this build wrote: a page
+        # the build no longer writes (an organization that left the 200, a
+        # repository taken off the list) is removed, not left with old numbers.
+        # What is to stay was put back into ./gallery above: the ai/
+        # snapshots, and the reports of the repositories that failed this week.
         uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./gallery
           destination_dir: gallery
-          keep_files: true
+          # only gallery/ is cleaned: the rest of the branch is left as it is
+          keep_files: false

@@ -1663,7 +1663,8 @@ def _run_multi_repo(
     """
     summaries = []
     failures = []
-    seen_slugs: dict[str, int] = {}
+    # every folder given out, as compared: a file system may not tell "Foo" from "foo"
+    used_slugs: set[str] = set()
     for path in gitpaths:
         try:
             slug = _slugify_repo(path)
@@ -1671,10 +1672,13 @@ def _run_multi_repo(
             logger.warning(f"Skipping repository {path!r}: {e}")
             failures.append({"name": path, "path": path, "error": str(e)})
             continue
-        count = seen_slugs.get(slug, 0) + 1
-        seen_slugs[slug] = count
-        if count > 1:
-            slug = f"{slug}-{count}"
+        # "foo", then "foo-2", "foo-3"...: the first that no repository has,
+        # "foo-2" of a repository named so among them
+        base, count = slug, 1
+        while slug.casefold() in used_slugs:
+            count += 1
+            slug = f"{base}-{count}"
+        used_slugs.add(slug.casefold())
         repo_outdir = os.path.join(outputpath, slug)
         try:
             data = _run_single_repo(

@@ -48,7 +48,9 @@ def test_measures_of_a_full_summary():
         },
     )
     assert compare.measures_of(summary, QUARTERS) == {
-        "commits": 250.0,
+        # people's commits of the 12 months up to the last one, as the other
+        # measures: not commits_last_12mo, the 12 months up to the summary
+        "commits": 100.0,
         "authors": 10.0,
         "new_authors": 3.0,
         "half_of_commits": 2.0,
@@ -117,7 +119,9 @@ def test_comparisons_rank_in_group_and_in_all():
 
 def test_headline_first_and_second():
     summaries = [
-        _summary(f"p{n}", commits=100 - n, group="g", people_last_12mo=_people(authors=n))
+        _summary(
+            f"p{n}", commits=0, group="g", people_last_12mo=_people(authors=n, commits=100 - n)
+        )
         for n in range(6)
     ]
     rows = compare.comparisons(summaries, QUARTERS)
@@ -126,7 +130,7 @@ def test_headline_first_and_second():
         "p0 had more commits in the last 12 months than any other of the 6 Python open "
         "source projects."
     )
-    summaries[1]["people_last_12mo"] = _people(authors=99)
+    summaries[1]["people_last_12mo"] = _people(authors=99, commits=99)
     rows = compare.comparisons(summaries, QUARTERS)
     # 2nd for commits too, but commits rise with contributors: no second sentence
     assert compare.headline(rows[1], "Python open source projects") == (
@@ -220,7 +224,7 @@ def test_card_rows():
 def test_a_shared_place_is_not_named():
     # all at 4 contributors: none of them has "the most"
     summaries = [
-        _summary(f"p{n}", commits=100 - n, group="g", people_last_12mo=_people(authors=4))
+        _summary(f"p{n}", group="g", people_last_12mo=_people(authors=4, commits=100 - n))
         for n in range(6)
     ]
     rows = compare.comparisons(summaries, QUARTERS)
@@ -268,15 +272,44 @@ def test_ai_share_is_named_only_for_a_first_place():
     )
 
 
-def test_a_middle_sentence_names_a_people_measure_over_ai():
+def test_its_highest_place_counts_the_ai_share():
     summaries = [
         _summary(f"p{n}", commits=100 - 10 * n, ai_assisted=_ai([1, 2, 3, 8, 4, 9, 6][n]))
         for n in range(7)
     ]
     rows = compare.comparisons(summaries, QUARTERS)
-    # p3 is 2nd for AI, which isn't named, and 4th for commits, which is
+    # p3 is 4th for commits and 2nd for AI: its highest place is the 2nd, which
+    # a headline does not name for AI, but must not leave out
+    assert compare.headline(rows[3], "") == (
+        "p3's highest place among the 7 repositories is 2nd, for AI-assisted commits."
+    )
+    # on equal places, a people measure is named over the AI share
+    summaries[3]["ai_assisted"] = _ai(2)
+    rows = compare.comparisons(summaries, QUARTERS)
     assert compare.headline(rows[3], "") == (
         "p3 sits in the middle of the 7 repositories; its highest place is 4th, for commits."
+    )
+
+
+def test_its_highest_place_counts_shared_places():
+    # p4 shares the most people behind half of the commits: Vue's case
+    summaries = [
+        _summary(f"p{n}", people_last_12mo=_people(commits=100 - 10 * n, half=[1, 2, 3, 6, 6][n]))
+        for n in range(5)
+    ]
+    rows = compare.comparisons(summaries, QUARTERS)
+    assert rows[4]["shared"]["half_of_commits"] == 1
+    assert compare.headline(rows[4], "") == (
+        "p4's highest place among the 5 repositories is 1st, shared, for how widely its "
+        "commits are spread."
+    )
+    # shared low places: below most on every measure, ties said
+    summaries[3]["people_last_12mo"]["half_of_commits"] = 0
+    summaries[4]["people_last_12mo"]["half_of_commits"] = 0
+    rows = compare.comparisons(summaries, QUARTERS)
+    assert compare.headline(rows[3], "") == (
+        "p3 ranks below most of the 5 repositories on every measure here; its highest place "
+        "is 4th, shared, for how widely its commits are spread."
     )
 
 
@@ -288,3 +321,37 @@ def test_only_ai_to_name():
         "p2 sits in the middle of the 6 repositories; its highest place is 4th, for "
         "AI-assisted commits."
     )
+
+
+def test_complete_ai():
+    ai = {
+        "commits": 6,
+        "by_month": {"2026-08": 1, "2026-09": 2, "2026-10": 3},
+        "commits_by_month": {"2026-08": 10, "2026-09": 20, "2026-10": 5},
+    }
+    assert compare.complete_ai({}) is None
+    assert compare.complete_ai({"ai_assisted": "?"}) is None
+    # a summary that does not say when it was made: as it is
+    assert compare.complete_ai({"ai_assisted": ai}) is ai
+    assert compare.complete_ai({"ai_assisted": ai, "generated_at": "soon"}) is ai
+    # October, the month it was made in, was not over
+    done = compare.complete_ai({"ai_assisted": ai, "generated_at": "2026-10-05T04:00:00+00:00"})
+    assert done == {
+        "commits": 6,
+        "by_month": {"2026-08": 1, "2026-09": 2},
+        "commits_by_month": {"2026-08": 10, "2026-09": 20},
+    }
+    assert compare.complete_ai({"ai_assisted": {}, "generated_at": "2026-10-05"}) == {
+        "by_month": {},
+        "commits_by_month": {},
+    }
+
+
+def test_the_ai_share_of_a_summary_kept_from_an_earlier_build():
+    # made in May 2026: May was not over, and its commits are not counted
+    ai = {
+        "by_month": {"2026-04": 1, "2026-05": 9},
+        "commits_by_month": {"2026-04": 10, "2026-05": 10},
+    }
+    summary = _summary("a", ai_assisted=ai, generated_at="2026-05-14T04:00:00+00:00")
+    assert compare.measures_of(summary, QUARTERS)["ai_share"] == 0.1

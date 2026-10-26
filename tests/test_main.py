@@ -1217,6 +1217,28 @@ class TestRunIntegration:
         creator.return_value.create.assert_called_once()
         assert creator.return_value.create.call_args.kwargs["site_url"] == "https://example.com/p/"
 
+    def test_multi_repo_slugs_are_never_given_twice(self, temp_dir):
+        """x/foo, y/foo and z/foo-2: the second foo must not take foo-2, nor
+        "Foo" the folder of "foo" on a file system that does not tell them apart."""
+        from gitstats.main import _run_multi_repo
+
+        output = os.path.join(temp_dir, "portfolio")
+        paths = ["x/foo", "y/foo", "z/foo-2", "a/Foo"]
+        with (
+            patch("gitstats.main._run_single_repo") as single,
+            patch("gitstats.main.compute_repo_summary", return_value={}) as summary,
+            patch("gitstats.main.write_repo_summary"),
+            patch("gitstats.main.AggregateReportCreator"),
+        ):
+            assert _run_multi_repo(paths, output) == 0
+        folders = [call.args[1] for call in single.call_args_list]
+        slugs = ["foo", "foo-2", "foo-2-2", "Foo-3"]
+        assert folders == [os.path.join(output, slug) for slug in slugs]
+        assert [call.kwargs["project_name"] for call in single.call_args_list] == slugs
+        assert [call.args[1] for call in summary.call_args_list] == [
+            f"{slug}/index.html" for slug in slugs
+        ]
+
     def test_run_with_site_url(self, git_repo, temp_dir, caplog):
         """site_url fills in the Badges page and prints the README badge."""
         import json

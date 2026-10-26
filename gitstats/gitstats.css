@@ -611,6 +611,24 @@ table.tags td {
 	vertical-align: top;
 }
 
+/* A tag's other authors, folded away after the first three */
+details.tag-authors {
+	display: inline;
+}
+
+details.tag-authors > summary {
+	display: inline;
+	cursor: pointer;
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+	color: var(--link-color);
+	white-space: nowrap;
+}
+
+details.tag-authors[open] > summary {
+	margin-right: var(--space-1);
+}
+
 /* Dates, tag names and short phrases read badly when wrapped */
 .nowrap {
 	white-space: nowrap;
