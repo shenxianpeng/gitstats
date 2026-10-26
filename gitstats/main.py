@@ -22,7 +22,13 @@ from multiprocessing import Pool
 from typing import Any
 from urllib.parse import urlsplit
 
-from gitstats import exectime_external, load_config, parse_config_value, time_start
+from gitstats import (
+    check_git_settings,
+    exectime_external,
+    load_config,
+    parse_config_value,
+    time_start,
+)
 from gitstats.aggregate import (
     AggregateReportCreator,
     _slugify_repo,
@@ -850,7 +856,11 @@ class GitDataCollector(DataCollector):
         """Count files, total size and lines per file extension at HEAD."""
         # extensions and size of files
         lines = get_pipe_output(
-            ["git ls-tree -r -l -z {}".format(get_commit_range("HEAD", end_only=True))]
+            [
+                "git ls-tree -r -l -z --end-of-options {}".format(
+                    shlex.quote(get_commit_range("HEAD", end_only=True))
+                )
+            ]
         ).split("\000")
         blobs_to_read = []
         counted_files = []  # (path, blob id) of every file whose lines are counted
@@ -1723,7 +1733,11 @@ def get_parser() -> argparse.ArgumentParser:
         metavar="key=value",
         action="append",
         default=[],
-        help=f"Override configuration value. Can be specified multiple times. Default configuration: {conf}",
+        # the names only: the values can hold an API key
+        help=(
+            "Override configuration value. Can be specified multiple times. Keys: "
+            + ", ".join(sorted(conf))
+        ),
     )
 
     # Positional arguments
@@ -1901,6 +1915,7 @@ def main() -> int:
 
     try:
         _apply_config_from_args(conf, args)
+        check_git_settings(conf)
     except (ValueError, KeyError) as e:
         parser.error(str(e))
 

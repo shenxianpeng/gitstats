@@ -874,7 +874,7 @@ class TestCollectPhases:
         passes, log_range, workers, waiting, names, source, source_lines = spread.call_args.args
         assert (passes, log_range, workers, names) == (
             [("--first-parent", True), ("--date-order", False)],
-            "HEAD",
+            "--end-of-options HEAD",
             7,
             "COMMIT:%aN",
         )
@@ -1062,16 +1062,16 @@ class TestCollectPhases:
             ("--date-order", False),
         ]
         assert GitDataCollector._line_stats_command() == (
-            'git log --shortstat --first-parent -m --pretty=format:"%at %aN" HEAD'
+            'git log --shortstat --first-parent -m --pretty=format:"%at %aN" --end-of-options HEAD'
         )
         assert GitDataCollector._author_line_stats_command() == (
-            'git log --shortstat --date-order --pretty=format:"%at %aN" HEAD'
+            'git log --shortstat --date-order --pretty=format:"%at %aN" --end-of-options HEAD'
         )
         _use_config(linear_linestats=0)
         # every commit, and a merge is not compared with anything
         assert GitDataCollector._line_stat_passes() == [("", False), ("--date-order", False)]
         assert GitDataCollector._line_stats_command() == (
-            'git log --shortstat  --pretty=format:"%at %aN" HEAD'
+            'git log --shortstat  --pretty=format:"%at %aN" --end-of-options HEAD'
         )
 
 
@@ -1459,6 +1459,18 @@ class TestCLI:
         with pytest.raises(SystemExit):
             parser.parse_args(["-v"])
 
+    def test_help_names_the_settings_but_shows_no_value(self, monkeypatch):
+        """--help used to print the whole configuration, the API key with it."""
+        import gitstats.main
+
+        monkeypatch.setitem(gitstats.main.conf, "ai_api_key", "sk-TEST-123")
+        monkeypatch.setitem(gitstats.main.conf, "ollama_base_url", "http://user:pw@host")
+        text = " ".join(get_parser().format_help().split())
+        assert "sk-TEST-123" not in text
+        assert "user:pw" not in text
+        assert "ai_api_key" in text
+        assert "commit_end" in text
+
 
 # ── main() ───────────────────────────────────────────────────────────────
 
@@ -1564,6 +1576,35 @@ def test_main_with_config_override(git_repo_minimal, temp_dir):
     assert ret == 0
     # After run, main.conf should have the override
     assert gitstats.main.conf["max_authors"] == 10
+
+
+@pytest.mark.parametrize(
+    "setting", ["commit_end=HEAD --output={victim}", "start_date=--output={victim}"]
+)
+def test_main_refuses_a_setting_git_would_take_for_an_option(
+    git_repo_minimal, temp_dir, capsys, setting
+):
+    import sys
+
+    import gitstats
+    import gitstats.main
+
+    cfg = dict(gitstats.DEFAULT_CONFIG)
+    gitstats._config = cfg
+    gitstats.main.conf = cfg
+    victim = os.path.join(temp_dir, "victim.txt")
+    with open(victim, "w", encoding="utf-8") as f:
+        f.write("important data\n")
+    output = os.path.join(temp_dir, "report")
+
+    argv = ["gitstats", "-c", setting.format(victim=victim), git_repo_minimal, output]
+    with patch.object(sys, "argv", argv), pytest.raises(SystemExit) as exit_info:
+        main()
+    assert exit_info.value.code == 2
+    assert "gitstats: error: " in capsys.readouterr().err
+    with open(victim, encoding="utf-8") as f:
+        assert f.read() == "important data\n"
+    assert not os.path.exists(output)
 
 
 def test_main_with_negative_config_override(git_repo_minimal, temp_dir):
@@ -1732,9 +1773,9 @@ class TestCollectEdgeCases:
         assert dc.tags["v1"]["authors"] == {"Ann": 1}
         # one command reads the history, whatever the number of tags
         assert fake.calls == [
-            "git rev-list --topo-order HEAD",
+            "git rev-list --topo-order --end-of-options HEAD",
             "git show-ref --tags --dereference",
-            'git log --topo-order --format="%H%x09%T%x09%P%x09%at %aN" "HEAD"',
+            'git log --topo-order --format="%H%x09%T%x09%P%x09%at %aN" --end-of-options HEAD',
         ]
 
     def test_tags_outside_the_range_need_no_history(self, monkeypatch):

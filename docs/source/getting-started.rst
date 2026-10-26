@@ -7,7 +7,7 @@ Prerequisites
 Before using gitstats, ensure you have the following installed:
 
 - **Python 3.10+** - Download from https://www.python.org/downloads/
-- **Git** - Download from https://git-scm.com/
+- **Git 2.24+** - Download from https://git-scm.com/
 
 .. note::
 

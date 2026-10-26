@@ -44,20 +44,11 @@ The most popular AI service with GPT-4 and GPT-3.5-turbo models.
 
 1. Get your API key from `OpenAI <https://platform.openai.com/api-keys>`_
 
-2. Set environment variable or configuration:
+2. Set the environment variable:
 
 .. code-block:: bash
 
    export OPENAI_API_KEY=sk-...
-
-3. Configure in ``gitstats.conf``:
-
-.. code-block:: ini
-
-   [gitstats]
-   ai_enabled = true
-   ai_provider = openai
-   ai_model = gpt-4
 
 **Usage:**
 
@@ -80,15 +71,6 @@ High-quality AI models known for detailed analysis.
 
    export ANTHROPIC_API_KEY=sk-ant-...
 
-3. Configure in ``gitstats.conf``:
-
-.. code-block:: ini
-
-   [gitstats]
-   ai_enabled = true
-   ai_provider = claude
-   ai_model = claude-3-5-sonnet-20241022
-
 **Usage:**
 
 .. code-block:: bash
@@ -109,15 +91,6 @@ Google's advanced AI model for analysis and insights.
 .. code-block:: bash
 
    export GOOGLE_API_KEY=...
-
-3. Configure in ``gitstats.conf``:
-
-.. code-block:: ini
-
-   [gitstats]
-   ai_enabled = true
-   ai_provider = gemini
-   ai_model = gemini-pro
 
 **Usage:**
 
@@ -143,21 +116,14 @@ Run AI models locally without sending data to external services.
    ollama pull mistral
    ollama pull codellama
 
-3. Configure in ``gitstats.conf``:
-
-.. code-block:: ini
-
-   [gitstats]
-   ai_enabled = true
-   ai_provider = ollama
-   ai_model = llama2
-   ollama_base_url = http://localhost:11434
-
 **Usage:**
 
 .. code-block:: bash
 
    gitstats --ai --ai-provider ollama --ai-model llama2 /path/to/repo output/
+
+   # Ollama on another address
+   gitstats --ai --ai-provider ollama -c ollama_base_url=http://gpu-box:11434 /path/to/repo output/
 
 **Benefits:**
 
@@ -191,38 +157,41 @@ Command Line Options
    # Force refresh AI cache
    gitstats --ai --refresh-ai /path/to/repo output/
 
-Configuration File
-~~~~~~~~~~~~~~~~~~
+Not in gitstats.conf
+~~~~~~~~~~~~~~~~~~~~
 
-Edit ``gitstats.conf`` to set default AI options:
+The AI settings (``ai_*``, ``ollama_*``) are taken from the command line and
+the environment only. A ``gitstats.conf`` in the current directory is ignored
+for them, with a warning: it often comes with the repository being analyzed,
+and whoever commits to that repository could otherwise turn AI on and send its
+data to a server of their choosing (see :doc:`configuration`). Use the options
+above, ``-c key=value`` for the others, and an environment variable for the
+API key:
 
-.. code-block:: ini
+.. code-block:: bash
 
-   [gitstats]
-   # Enable AI features
-   ai_enabled = true
+   export OPENAI_API_KEY=sk-...
+   gitstats --ai --ai-provider openai --ai-model gpt-4 \
+     -c ai_cache_enabled=true -c ai_max_retries=3 -c ai_retry_delay=1 \
+     /path/to/repo output/
 
-   # AI provider: openai, claude, gemini, ollama
-   ai_provider = openai
+What Is Sent to the AI Provider
+-------------------------------
 
-   # API key (or use environment variable)
-   ai_api_key =
+The prompt holds the statistics of the report and, with them, text taken from
+the repository's history: the **names of the authors** (the top contributors,
+and the newcomers of each year) and a sample of **commit subjects** for each
+year. All of it goes to the provider you choose; with Ollama it stays on the
+machine that runs Ollama. Do not use a hosted provider for a repository whose
+author names or commit messages must not leave your organization.
 
-   # Model to use
-   ai_model = gpt-4
-
-   # Language for summaries (en, zh, ja, ko, es, fr, de)
-   ai_language = en
-
-   # Cache AI summaries to save costs
-   ai_cache_enabled = true
-
-   # Retry settings
-   ai_max_retries = 3
-   ai_retry_delay = 1
-
-   # Ollama base URL (for local LLM)
-   ollama_base_url = http://localhost:11434
+Anyone who can commit to the repository writes some of that text, and so can
+steer what the model answers. The answer is treated as untrusted: the report
+keeps only its paragraphs, lists and emphasis (``<p>``, ``<ul>``, ``<ol>``,
+``<li>``, ``<strong>``, ``<em>``, ``<code>``), without attributes, drops any
+``<script>`` or ``<style>`` with its content, and escapes the rest. Error
+messages are always escaped, and the History page shows its narration as
+plain text.
 
 Language Support
 ----------------
@@ -266,12 +235,9 @@ AI-generated summaries are cached by default to save API costs and time. The cac
 
 **Disable Caching:**
 
-In ``gitstats.conf``:
+.. code-block:: bash
 
-.. code-block:: ini
-
-   [gitstats]
-   ai_cache_enabled = false
+   gitstats --ai -c ai_cache_enabled=false /path/to/repo output/
 
 Error Handling
 --------------
@@ -315,7 +281,7 @@ Troubleshooting
 
 **Summaries not appearing in report**
 
-* Ensure ``--ai`` flag is used or ``ai_enabled = true`` in config
+* Ensure the ``--ai`` flag is used (``ai_enabled`` in ``gitstats.conf`` is ignored)
 * Check console output for error messages
 * Verify AI dependencies are installed
 
@@ -355,22 +321,13 @@ Examples
    export ANTHROPIC_API_KEY=sk-ant-...
    gitstats --ai --ai-provider claude --ai-model claude-3-5-sonnet-20241022 --ai-language zh /path/to/repo output/
 
-**Configuration-based Approach:**
+**Same Settings for Every Run:**
 
-Create ``gitstats.conf``:
-
-.. code-block:: ini
-
-   [gitstats]
-   ai_enabled = true
-   ai_provider = openai
-   ai_model = gpt-4
-   ai_language = en
-   ai_cache_enabled = true
-
-Then simply run:
+The AI settings cannot come from ``gitstats.conf``; a shell alias keeps them in
+one place:
 
 .. code-block:: bash
 
+   alias gitstats-ai='gitstats --ai --ai-provider openai --ai-model gpt-4 --ai-language en'
    export OPENAI_API_KEY=sk-...
-   gitstats /path/to/repo output/
+   gitstats-ai /path/to/repo output/
