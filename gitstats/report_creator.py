@@ -17,6 +17,7 @@ from gitstats import WEEKDAYS, get_i18n_text, load_config
 from gitstats.badge import AI_ASSISTED_LABEL, STYLE_NAMES, ai_assisted_share, create_badges
 from gitstats.employers import KIND_LABELS, KINDS, ORGANIZATION
 from gitstats.employers import summarize as summarize_organizations
+from gitstats.safe_html import sanitize_ai_html
 from gitstats.utils import (
     format_bytes,
     format_duration,
@@ -3028,13 +3029,16 @@ class HTMLReportCreator(ReportCreator):
                 f.write(f"""
                 <div class="ai-summary-error">
                     <p><strong>{get_i18n_text("analysis_unavailable", language)}</strong></p>
-                    <p><em>{error}</em></p>
+                    <p><em>{html.escape(str(error))}</em></p>
                 </div>
                 """)
             elif summary_text:
+                # the model's HTML, down to paragraphs, lists and emphasis: its
+                # data holds author names and commit subjects, which anyone who
+                # commits can write
                 f.write(f"""
                 <div class="ai-summary-content">
-                    {summary_text}
+                    {sanitize_ai_html(summary_text)}
                 </div>
                 """)
             else:
@@ -3457,7 +3461,7 @@ class HTMLReportCreator(ReportCreator):
             return f"""
             <div class="ai-summary ai-summary-error">
                 <h3>AI Insights</h3>
-                <p><em>AI analysis is currently unavailable: {error}</em></p>
+                <p><em>AI analysis is currently unavailable: {html.escape(str(error))}</em></p>
             </div>
             """
 
@@ -3468,7 +3472,7 @@ class HTMLReportCreator(ReportCreator):
         <div class="ai-summary">
             <h3>AI-Powered Insights</h3>
             <div class="ai-summary-content">
-                {summary_text}
+                {sanitize_ai_html(summary_text)}
             </div>
         </div>
         """

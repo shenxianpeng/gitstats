@@ -17,7 +17,7 @@ from concurrent.futures import ThreadPoolExecutor
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any, NamedTuple
 
-from gitstats import ON_LINUX, exectime_external, load_config
+from gitstats import ON_LINUX, check_git_settings, exectime_external, load_config
 
 logger = logging.getLogger("gitstats")
 
@@ -150,6 +150,13 @@ def get_pipe_output(cmds: list[str], quiet: bool = False) -> str:
 
 
 def get_commit_range(defaultrange: str = "HEAD", end_only: bool = False) -> str:
+    """The revisions the configuration asks for: ``commit_begin..commit_end``.
+
+    Raises ValueError when a setting that goes on git's command line could be
+    taken for something else (see check_git_settings()). Put the range after
+    ``--end-of-options``, so that git never reads it as an option.
+    """
+    check_git_settings(load_config())
     if len(load_config()["commit_end"]) > 0:
         commit_begin = load_config()["commit_begin"]
 
@@ -796,7 +803,12 @@ def history_graph(rev: str) -> History:
     prints for it.
     """
     rows = _HISTORY_ROW.findall(
-        get_pipe_output([f'git log --topo-order --format="%H%x09%T%x09%P%x09%at %aN" "{rev}"'])
+        get_pipe_output(
+            [
+                'git log --topo-order --format="%H%x09%T%x09%P%x09%at %aN" --end-of-options '
+                + shlex.quote(rev)
+            ]
+        )
     )
     place = {row[0]: index for index, row in enumerate(rows)}
     named = [row[2].split() for row in rows]
@@ -871,15 +883,19 @@ def get_stat_summary_counts(line: str) -> list[str | int]:
 
 
 def get_log_range(defaultrange: str = "HEAD", end_only: bool = True) -> str:
+    """The options and revisions of the commits to read, for a `git log` or
+    `git rev-list` command line: the date and author filters, then
+    ``--end-of-options`` (git 2.24 and later) and the range, each quoted for
+    shlex.split(). Nothing may follow it but ``-- <paths>``."""
     commit_range = get_commit_range(defaultrange, end_only)
     # Build git log options
     options = []
 
     # Date range filtering
     if len(load_config()["start_date"]) > 0:
-        options.append('--since="{}"'.format(load_config()["start_date"]))
+        options.append("--since=" + shlex.quote(load_config()["start_date"]))
     if len(load_config()["end_date"]) > 0:
-        options.append('--until="{}"'.format(load_config()["end_date"]))
+        options.append("--until=" + shlex.quote(load_config()["end_date"]))
 
     # Author filtering
     if len(load_config()["authors"]) > 0:
@@ -887,14 +903,10 @@ def get_log_range(defaultrange: str = "HEAD", end_only: bool = True) -> str:
             author.strip() for author in load_config()["authors"].split(",") if author.strip()
         ]
         for author in authors_list:
-            # Escape possible double quotes or special characters in author
-            safe_author = author.replace('"', r"\"")
-            options.append(f'--author="{safe_author}"')
+            options.append("--author=" + shlex.quote(author))
 
-    # Combine options with commit range
-    if options:
-        return '{} "{}"'.format(" ".join(options), commit_range)
-    return commit_range
+    # whatever the configuration says, git reads the range as revisions
+    return " ".join([*options, "--end-of-options", shlex.quote(commit_range)])
 
 
 def commit_local_time(stamp: float, utc_offset: str) -> datetime.datetime:

@@ -2,6 +2,7 @@
 # GPLv2 / GPLv3
 from __future__ import annotations
 
+import logging
 import platform
 import re
 import time
@@ -62,6 +63,23 @@ DEFAULT_CONFIG: dict[str, Any] = {
 
 
 _config: dict[str, Any] | None = None
+
+logger = logging.getLogger("gitstats")
+
+# gitstats.conf is read from the current directory, which is often the
+# repository being analyzed: whoever can commit to that repository writes it.
+# It may say what the report counts and how it looks, but not whether data
+# leaves the machine, where it goes or with which credentials: the AI and
+# Ollama settings and any *_url or *_key come from the command line or the
+# environment only (see docs/source/configuration.rst).
+_NOT_FROM_FILE = re.compile(r"(ai|ollama)_.*|.*_(url|key)")
+
+# Settings that end up on git's command line: commit_begin and commit_end as
+# revisions, the others as the values of --since, --until and --author
+_REVISION_SETTINGS = ("commit_begin", "commit_end")
+_OPTION_VALUE_SETTINGS = ("start_date", "end_date", "authors")
+_CONTROL = re.compile(r"[\x00-\x1f\x7f]")
+_NOT_IN_REVISION = re.compile(r"[\s\"'\\\x00-\x1f\x7f]")
 
 
 # Internationalization translations for AI Insights page
@@ -223,6 +241,47 @@ def load_config(file_path: str = "gitstats.conf") -> dict[str, Any]:
 
     if os.path.exists(file_path):
         config_parser.read(file_path)
+        ignored = []
         for k, v in config_parser["gitstats"].items():
+            if _NOT_FROM_FILE.fullmatch(k):
+                ignored.append(k)
+                continue
             _config[k] = parse_config_value(v)
+        if ignored:
+            logger.warning(
+                "%s: ignoring %s. A gitstats.conf can come with the repository being "
+                "analyzed, so AI settings and any *_url or *_key are only taken from the "
+                "command line (--ai, --ai-provider, -c key=value, --site-url) or environment "
+                "variables.",
+                file_path,
+                ", ".join(ignored),
+            )
     return _config
+
+
+def check_git_settings(config: dict[str, Any]) -> None:
+    """Raise ValueError when a setting gitstats passes to git could change the command.
+
+    ``commit_begin`` and ``commit_end`` are revisions: one word, which does not
+    start with "-" (git would read ``--output=<file>`` as an option, and write
+    that file) and holds no quotes, backslashes, whitespace or control
+    characters. ``start_date``, ``end_date`` and ``authors`` are the values of
+    ``--since``, ``--until`` and ``--author``: they may hold spaces ("2 weeks
+    ago", "Jane Doe") but no control characters, and a date does not start
+    with "-".
+    """
+    for key in _REVISION_SETTINGS:
+        value = str(config.get(key, ""))
+        if value.startswith("-") or _NOT_IN_REVISION.search(value):
+            raise ValueError(
+                f"{key} = {value!r} is not a git revision: use a branch, tag or commit "
+                '(such as HEAD or v1.0), which does not start with "-" and has no '
+                "spaces, quotes, backslashes or control characters"
+            )
+    for key in _OPTION_VALUE_SETTINGS:
+        value = str(config.get(key, ""))
+        if _CONTROL.search(value) or (key != "authors" and value.startswith("-")):
+            raise ValueError(
+                f"{key} = {value!r} is not allowed: it must not contain control characters"
+                + ("" if key == "authors" else ' or start with "-"')
+            )

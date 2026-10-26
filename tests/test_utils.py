@@ -219,7 +219,7 @@ def test_get_commit_range_without_commit_end_uses_the_default():
 
 def test_get_log_range_default():
     _set_config(start_date="", end_date="", authors="", commit_begin="", commit_end="HEAD")
-    assert get_log_range() == "HEAD"
+    assert get_log_range() == "--end-of-options HEAD"
 
 
 def test_get_log_range_with_dates():
@@ -230,16 +230,69 @@ def test_get_log_range_with_dates():
         commit_begin="",
         commit_end="HEAD",
     )
-    result = get_log_range()
-    assert '--since="2023-01-01"' in result
-    assert '--until="2023-12-31"' in result
+    assert get_log_range() == "--since=2023-01-01 --until=2023-12-31 --end-of-options HEAD"
 
 
 def test_get_log_range_with_authors():
     _set_config(start_date="", end_date="", authors="Alice,Hui", commit_begin="", commit_end="HEAD")
-    result = get_log_range()
-    assert '--author="Alice"' in result
-    assert '--author="Hui"' in result
+    assert get_log_range() == "--author=Alice --author=Hui --end-of-options HEAD"
+
+
+@pytest.mark.parametrize(
+    "key, value",
+    [
+        # one setting that would be read as two arguments, the second an option
+        ("start_date", '2000-01-01" --output={victim} "'),
+        ("end_date", '2100-01-01" --output={victim} "'),
+        ("authors", 'x\\" --output={victim} \\"'),
+    ],
+)
+def test_a_filter_setting_stays_one_argument(git_repo, tmp_path, monkeypatch, key, value):
+    """A gitstats.conf committed to the repository being analyzed sets these:
+    git gets each as the value of its option, and writes no file."""
+    victim = tmp_path / "victim.txt"
+    victim.write_text("important data\n", encoding="utf-8")
+    monkeypatch.chdir(git_repo)
+    _set_config(**{key: value.format(victim=victim)})
+
+    log_range = get_log_range("HEAD", False)
+    get_pipe_output([f"git log --format=%H {log_range}"])
+    get_pipe_output([f"git shortlog -s {log_range}", "wc -l"])
+
+    assert victim.read_text(encoding="utf-8") == "important data\n"
+    assert log_range.endswith(" --end-of-options HEAD")
+
+
+@pytest.mark.parametrize(
+    "key, value",
+    [
+        ("commit_end", "HEAD --output={victim}"),
+        ("commit_begin", "--output={victim}"),
+        ("start_date", "--output={victim}"),
+    ],
+)
+def test_a_setting_git_could_take_for_an_option_is_refused(
+    git_repo, tmp_path, monkeypatch, key, value
+):
+    victim = tmp_path / "victim.txt"
+    victim.write_text("important data\n", encoding="utf-8")
+    monkeypatch.chdir(git_repo)
+    _set_config(**{key: value.format(victim=victim)})
+
+    with pytest.raises(ValueError, match=f"^{key} = "):
+        get_log_range("HEAD", False)
+    with pytest.raises(ValueError, match=f"^{key} = "):
+        get_commit_range("HEAD", end_only=True)
+    assert victim.read_text(encoding="utf-8") == "important data\n"
+
+
+def test_history_graph_reads_its_revision_as_a_revision(git_repo, tmp_path, monkeypatch):
+    victim = tmp_path / "victim.txt"
+    victim.write_text("important data\n", encoding="utf-8")
+    monkeypatch.chdir(git_repo)
+
+    assert history_graph(f"--output={victim}").commits == []
+    assert victim.read_text(encoding="utf-8") == "important data\n"
 
 
 # ── format_int ───────────────────────────────────────────────────────────
