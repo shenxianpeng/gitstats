@@ -332,6 +332,18 @@ def test_compute_repo_summary_without_yearly_commits():
     assert summary["total_commits"] == 0
 
 
+def test_compute_repo_summary_with_a_first_commit_at_the_epoch():
+    class AtTheEpoch:
+        project_name = "old"
+        first_commit_stamp = 0
+        last_commit_stamp = 86400
+
+    summary = compute_repo_summary(AtTheEpoch(), "index.html")
+    assert summary["first_commit"] == datetime.datetime.fromtimestamp(0).isoformat(sep=" ")
+    assert summary["last_commit"] == datetime.datetime.fromtimestamp(86400).isoformat(sep=" ")
+    assert summary["age_days"] == 2
+
+
 def test_copy_assets_skips_a_missing_stylesheet(tmp_path):
     import gitstats
 

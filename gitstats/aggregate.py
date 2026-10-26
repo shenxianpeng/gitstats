@@ -113,8 +113,10 @@ def compute_repo_summary(data: Any, report_path: str) -> dict[str, Any]:
     last_stamp = int(getattr(data, "last_commit_stamp", 0) or 0)
     age_days = (last_stamp - first_stamp) // _SECONDS_PER_DAY + 1 if last_stamp else 0
 
+    # a repository without commits has neither; one whose first commit is at
+    # the epoch has a first stamp of 0, and a date for it all the same
     def _iso(stamp: int) -> str:
-        return datetime.datetime.fromtimestamp(stamp).isoformat(sep=" ") if stamp else ""
+        return datetime.datetime.fromtimestamp(stamp).isoformat(sep=" ") if last_stamp else ""
 
     recent_months = set()
     year, month = now.year, now.month
