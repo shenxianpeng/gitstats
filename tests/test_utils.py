@@ -32,8 +32,11 @@ from gitstats.utils import (
     get_version,
     history_graph,
     numstat_path,
+    numstat_paths,
     shortstat_logs,
     should_exclude_file,
+    source_lines_added,
+    unquote_path,
 )
 
 # ── get_stat_summary_counts ──────────────────────────────────────────────
@@ -202,10 +205,54 @@ def test_get_commit_range_end_only():
     assert get_commit_range("HEAD", end_only=True) == "HEAD"
 
 
-def test_get_commit_range_numeric_begin():
-    """commit_begin as a number means 'N commits ago from commit_end'."""
-    _set_config(commit_begin="10", commit_end="HEAD")
-    assert get_commit_range() == "HEAD~10..HEAD"
+def _commits_of(log_range):
+    return get_pipe_output([f"git rev-list {log_range}"]).split()
+
+
+def test_get_commit_range_numeric_begin(merged_repo, monkeypatch):
+    """commit_begin as a number N means the last N commits of commit_end."""
+    monkeypatch.chdir(merged_repo)
+    newest = _commits_of("--topo-order HEAD")
+    _set_config(commit_begin="3", commit_end="HEAD")
+    log_range = get_commit_range()
+    assert _commits_of(log_range) == _commits_of(f"--topo-order {log_range}") == newest[:3]
+    # the walk that follows first parents sees no more of them
+    assert set(_commits_of(f"--first-parent {log_range}")) <= set(newest[:3])
+    # and so does a walk with filters, which quotes them one by one
+    _set_config(commit_begin="3", commit_end="HEAD", start_date="2000-01-01")
+    assert _commits_of(get_log_range("HEAD", False)) == newest[:3]
+
+
+@pytest.mark.parametrize("count", ["99", "1000000"])
+def test_get_commit_range_numeric_begin_beyond_the_history(git_repo, monkeypatch, count):
+    """More commits than the history has: all of them, where HEAD~N failed."""
+    monkeypatch.chdir(git_repo)
+    _set_config(commit_begin=count, commit_end="HEAD")
+    assert get_commit_range() == "HEAD"
+    assert len(_commits_of(get_commit_range())) == 5
+
+
+def test_get_commit_range_numeric_begin_of_zero(git_repo, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    _set_config(commit_begin="0", commit_end="HEAD")
+    assert _commits_of(get_commit_range()) == []
+
+
+def test_get_commit_range_numeric_begin_is_read_once(git_repo, monkeypatch):
+    monkeypatch.chdir(git_repo)
+    _set_config(commit_begin="2", commit_end="HEAD")
+    with patch("gitstats.utils.get_pipe_output", side_effect=get_pipe_output) as asked:
+        first = get_commit_range()
+        assert get_commit_range() == first
+    asked.assert_called_once()
+    assert len(_commits_of(first)) == 2
+
+
+def test_get_commit_range_all_digit_commit_end(git_repo, monkeypatch):
+    """An all-digit commit_end, a short hash, is a revision: no TypeError."""
+    _set_config(commit_begin="", commit_end="1103142")
+    assert get_commit_range() == "1103142"
+    assert get_log_range("HEAD", False) == "1103142"
 
 
 def test_get_commit_range_without_commit_end_uses_the_default():
@@ -974,7 +1021,9 @@ CHURN = "COMMIT:%aN"
 
 def _names_command(log_range, header=CHURN):
     """What `git log --name-only` itself prints, blank lines aside."""
-    output = get_pipe_output([f'git log --format="{header}" --name-only {log_range}'])
+    output = get_pipe_output(
+        [f'git -c core.quotePath=false log --format="{header}" --name-only {log_range}']
+    )
     return [line for line in output.split("\n") if line]
 
 
@@ -1445,3 +1494,157 @@ def test_shortstat_logs_count_no_source_lines_unless_asked(vendored_repo):
     shortstat_logs(LINEAR, "HEAD", 2, None, None, is_source)  # nowhere to put them
     shortstat_logs(LINEAR, "HEAD", 2, None, None, None, found)  # no rule
     assert found == []
+
+
+# ── paths that git quotes ────────────────────────────────────────────────
+
+
+@pytest.mark.parametrize(
+    ("printed", "path"),
+    [
+        ("plain.py", "plain.py"),
+        ('"r\\303\\251sum\\303\\251.py"', "résumé.py"),  # core.quotePath
+        ('"say\\"hi\\".py"', 'say"hi".py'),
+        ('"tab\\there\\\\x\\n.py"', "tab\there\\x\n.py"),
+        ('"\\a\\b\\f\\v\\r"', "\a\b\f\v\r"),
+        ('"naïve \\"q\\".py"', 'naïve "q".py'),  # core.quotePath=false: only the quote
+        ('"\\377.bin"', "\ufffd.bin"),  # not UTF-8: as `git ls-tree -z` is read
+        ('"unclosed', '"unclosed'),
+        ('say"hi".py', 'say"hi".py'),
+        ('"', '"'),
+    ],
+)
+def test_unquote_path(printed, path):
+    assert unquote_path(printed) == path
+
+
+@pytest.mark.parametrize(
+    ("printed", "paths"),
+    [
+        ("src/a.py", ("src/a.py", "src/a.py")),
+        ("old.py => new.py", ("old.py", "new.py")),
+        ("src/{old => new}/a.py", ("src/old/a.py", "src/new/a.py")),
+        ("{vendor => }/lib.py", ("vendor/lib.py", "lib.py")),
+        ("src/{ => vendor}/a.py", ("src/a.py", "src/vendor/a.py")),
+        (
+            '"r\\303\\251sum\\303\\251.py" => "d/r\\303\\251sum\\303\\251.py"',
+            ("résumé.py", "d/résumé.py"),
+        ),
+        ('say.py => "say\\"q\\".py"', ("say.py", 'say"q".py')),
+        ('"say\\"q\\".py" => say.py', ('say"q".py', "say.py")),
+        ('"a => \\"b.py"', ('a => "b.py', 'a => "b.py')),
+        ('"say\\"q\\".py"', ('say"q".py', 'say"q".py')),
+    ],
+)
+def test_numstat_paths(printed, paths):
+    assert numstat_paths(printed) == paths
+    assert numstat_path(printed) == paths[1]
+
+
+@pytest.mark.parametrize("passes", [LINEAR, EVERY_COMMIT])
+def test_shortstat_logs_name_the_files_as_they_are(git_repo, monkeypatch, passes):
+    """With core.quotePath=false, as `git -c core.quotePath=false log
+    --name-only` prints them: git quotes only what it always quotes."""
+    for name in ("résumé.py", 'say"hi".py'):
+        with open(os.path.join(git_repo, name), "w", encoding="utf-8") as f:
+            f.write("x\n")
+    _git(git_repo, "add", "-A")
+    _git(git_repo, "commit", "-q", "-m", "names")
+    monkeypatch.chdir(git_repo)
+    names = _names(passes, "HEAD")
+    assert names == _names_command("HEAD")
+    assert "résumé.py" in names
+    assert '"say\\"hi\\".py"' in names
+
+
+def test_shortstat_logs_count_the_root_commit_whatever_log_show_root_says(git_repo, monkeypatch):
+    from gitstats.sources import is_source
+
+    _git(git_repo, "config", "log.showRoot", "false")
+    monkeypatch.chdir(git_repo)
+    found: list[int] = []
+    texts, _, names = shortstat_logs(LINEAR, "HEAD", 3, None, CHURN, is_source, found)
+    # the root commit's two files, README.md and main.py: 3 + 2 lines
+    assert texts[0].rstrip().endswith("2 files changed, 5 insertions(+)")
+    assert names.endswith("README.md\nmain.py")
+    # and of the source: README.md and main.py, utils.py, main.py rewritten, .gitignore
+    assert found == [3 + 2 + 5 + 3 + 2]
+
+
+# ── the lines of the source, moved in and out of it ──────────────────────
+
+
+@pytest.fixture
+def moving_repo(tmp_path, monkeypatch):
+    """A file moved into the source from vendor/, one renamed in it with a
+    change, and one moved out of it, in a history with a merge."""
+
+    def write(path, lines):
+        target = tmp_path / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text("".join(f"{path} {n}\n" for n in range(lines)))
+
+    def commit(*paths_removed):
+        for path in paths_removed:
+            _git(tmp_path, "rm", "-q", path)
+        _git(tmp_path, "add", "-A")
+        _git(tmp_path, "commit", "-q", "-m", "commit")
+
+    _git(tmp_path, "init", "-q", "-b", "main")
+    _git(tmp_path, "config", "user.name", "Ann")
+    _git(tmp_path, "config", "user.email", "ann@example.com")
+    write("src/a.py", 10)
+    write("vendor/lib.py", 100)
+    write("vendor/ü/x.py", 7)
+    commit()
+    _git(tmp_path, "mv", "vendor/lib.py", "lib.py")  # 100 lines into the source
+    _git(tmp_path, "mv", "vendor/ü/x.py", "ü.py")  # 7, under a name git quotes
+    commit()
+    _git(tmp_path, "checkout", "-q", "-b", "side")
+    _git(tmp_path, "mv", "src/a.py", "src/b.py")
+    with open(tmp_path / "src/b.py", "a") as f:
+        f.write("one more\n")  # 1 line added to a file of the source
+    commit()
+    _git(tmp_path, "checkout", "-q", "main")
+    (tmp_path / "third_party").mkdir()
+    _git(tmp_path, "mv", "lib.py", "third_party/lib.py")  # out of it: nothing
+    commit()
+    _git(tmp_path, "merge", "-q", "--no-edit", "side")
+    monkeypatch.chdir(tmp_path)
+    return tmp_path
+
+
+MOVED_SOURCE_LINES = 10 + 100 + 7 + 1
+
+
+def test_source_lines_added_count_the_files_moved_into_the_source(moving_repo):
+    from gitstats.sources import is_source
+
+    printed = get_pipe_output(["git -c core.quotePath=false log --root --numstat --format=%x01%H"])
+    assert source_lines_added(printed, is_source) == MOVED_SOURCE_LINES
+
+
+@pytest.mark.parametrize("per_process", [1, 1000])
+def test_shortstat_logs_count_the_files_moved_into_the_source(
+    moving_repo, monkeypatch, per_process
+):
+    from gitstats.sources import is_source
+
+    monkeypatch.setattr("gitstats.utils.SHORTSTAT_COMMITS_PER_PROCESS", per_process)
+    found: list[int] = []
+    shortstat_logs(LINEAR, "HEAD", 3, None, CHURN, is_source, found)
+    assert found == [MOVED_SOURCE_LINES]
+
+
+def test_source_lines_moved_in_when_git_fails(moving_repo):
+    from gitstats.sources import is_source
+
+    printed = get_pipe_output(["git -c core.quotePath=false log --root --numstat --format=%x01%H"])
+    with (
+        patch(
+            "gitstats.utils.subprocess.run",
+            side_effect=subprocess.CalledProcessError(128, ["git"]),
+        ),
+        pytest.raises(subprocess.CalledProcessError),
+    ):
+        source_lines_added(printed, is_source)

@@ -196,6 +196,115 @@ def test_parse_config_value(value, expected):
     assert parse_config_value(value) == expected
 
 
+@pytest.mark.parametrize(
+    "key, value, expected",
+    [
+        # a string setting stays a string, digits and all: a short hash
+        ("commit_end", "1103142", "1103142"),
+        ("commit_begin", "10", "10"),
+        ("project_name", "true", "true"),
+        ("badge_label", "-1", "-1"),
+        # an integer setting is an integer
+        ("processes", "4", 4),
+        ("max_tags_authors", "-1", -1),
+        ("linear_linestats", "0", 0),
+        # a boolean one, as ConfigParser.getboolean() reads it
+        ("ai_enabled", "true", True),
+        ("ai_enabled", "Yes", True),
+        ("share_card", "on", True),
+        ("share_card", "1", True),
+        ("ai_cache_enabled", "false", False),
+        ("ai_cache_enabled", "no", False),
+        ("ai_cache_enabled", "off", False),
+        ("ai_cache_enabled", "0", False),
+        # a key gitstats does not know is guessed at, as before
+        ("unknown", "5", 5),
+        ("unknown", "true", True),
+        ("unknown", "abc", "abc"),
+    ],
+)
+def test_parse_config_value_takes_the_type_of_the_default(key, value, expected):
+    from gitstats import parse_config_value
+
+    parsed = parse_config_value(value, key)
+    assert parsed == expected
+    assert type(parsed) is type(expected)
+
+
+@pytest.mark.parametrize(
+    "key, value, message",
+    [
+        ("processes", "abc", "processes must be a whole number, not 'abc'"),
+        ("max_authors", "1.5", "max_authors must be a whole number, not '1.5'"),
+        ("ai_enabled", "maybe", "ai_enabled must be true or false, not 'maybe'"),
+    ],
+)
+def test_parse_config_value_of_the_wrong_type(key, value, message):
+    from gitstats import parse_config_value
+
+    with pytest.raises(ValueError, match=message):
+        parse_config_value(value, key)
+
+
+def _load(tmp_path, text):
+    import gitstats
+
+    path = tmp_path / "gitstats.conf"
+    path.write_text(text, encoding="utf-8")
+    gitstats._config = None
+    try:
+        return load_config(str(path)), list(gitstats.config_errors), str(path)
+    finally:
+        gitstats._config = None
+
+
+def test_load_config_takes_a_percent_sign_as_it_is(tmp_path):
+    cfg, errors, _ = _load(tmp_path, "[gitstats]\nbadge_label = 100% done\nproject_name = %(x)s\n")
+    assert cfg["badge_label"] == "100% done"
+    assert cfg["project_name"] == "%(x)s"
+    assert errors == []
+
+
+@pytest.mark.parametrize("text", ["[other]\nkey = value\n", "processes = 2\n", ""])
+def test_load_config_without_a_gitstats_section(tmp_path, caplog, text):
+    """The defaults, and a warning: no KeyError when gitstats is imported."""
+    with caplog.at_level("WARNING", logger="gitstats"):
+        cfg, errors, path = _load(tmp_path, text)
+    assert cfg == DEFAULT_CONFIG
+    assert errors == []
+    assert f"{path} has no [gitstats] section" in caplog.text
+
+
+def test_load_config_keeps_the_default_of_a_value_of_the_wrong_type(tmp_path):
+    cfg, errors, path = _load(tmp_path, "[gitstats]\nprocesses = abc\nmax_authors = 7\n")
+    assert cfg["processes"] == DEFAULT_CONFIG["processes"]
+    assert cfg["max_authors"] == 7
+    assert errors == [f"{path}: processes must be a whole number, not 'abc'"]
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["[gitstats]\nprocesses = 2\nprocesses = 3\n", "[gitstats]\nnot a setting\n"],
+)
+def test_load_config_of_a_malformed_file(tmp_path, text):
+    cfg, errors, path = _load(tmp_path, text)
+    assert cfg == DEFAULT_CONFIG
+    assert len(errors) == 1 and errors[0].startswith(f"{path}: ")
+
+
+def test_load_config_that_is_not_utf8(tmp_path):
+    import gitstats
+
+    path = tmp_path / "gitstats.conf"
+    path.write_bytes(b"[gitstats]\nproject_name = \xff\n")
+    gitstats._config = None
+    try:
+        assert load_config(str(path)) == DEFAULT_CONFIG
+        assert gitstats.config_errors[0].startswith(f"{path}: ")
+    finally:
+        gitstats._config = None
+
+
 # ── get_i18n_text ────────────────────────────────────────────────────────
 
 

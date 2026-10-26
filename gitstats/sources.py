@@ -7,8 +7,8 @@ ever added are under vendor/; in Tailwind CSS most are generated CSS under
 fixtures/. Counted with them, "how much of what was written is still there"
 says more about a project's dependencies than about its code.
 
-The same rules give git a pathspec for the history and Python a test for the
-files of the last commit, so that both sides of a ratio count the same files.
+One test, is_source(), decides for the files of the history and for those of
+the last commit, so that both sides of a ratio count the same files.
 """
 
 from __future__ import annotations
@@ -43,14 +43,6 @@ EXCLUDED_NAMES: tuple[str, ...] = (
     "*_pb2.py",
     "*_pb2_grpc.py",
 )
-
-
-def pathspecs() -> list[str]:
-    """The pathspecs that leave these files out of a `git log`, after ``--``."""
-    specs = ["."]
-    specs += [f":(exclude,glob)**/{folder}/**" for folder in EXCLUDED_FOLDERS]
-    specs += [f":(exclude,glob)**/{name}" for name in EXCLUDED_NAMES]
-    return specs
 
 
 def is_source(path: str) -> bool:

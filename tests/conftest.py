@@ -458,6 +458,9 @@ def reset_config():
 
     cfg = gitstats.DEFAULT_CONFIG.copy()
     gitstats._config = cfg
+    gitstats.config_errors.clear()
+    # the last N commits found for one test's repository are not another's
+    gitstats.utils._last_commits.clear()
     gitstats.utils.conf = cfg
     gitstats.main.conf = cfg
     gitstats.report_creator.conf = cfg

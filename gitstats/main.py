@@ -8,12 +8,12 @@ import json
 import logging
 import os
 import re
-import shlex
 import socket
 import subprocess
 import sys
 import threading
 import time
+import unicodedata
 from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor
 from functools import partial
@@ -22,7 +22,8 @@ from multiprocessing import Pool
 from typing import Any
 from urllib.parse import urlsplit
 
-from gitstats import exectime_external, load_config, parse_config_value, time_start
+import gitstats
+from gitstats import load_config, parse_config_value, time_start, utils
 from gitstats.aggregate import (
     AggregateReportCreator,
     _slugify_repo,
@@ -33,8 +34,9 @@ from gitstats.ai_summarizer import AISummarizer
 from gitstats.assistants import AssistedCommit, assisted_commits
 from gitstats.employers import BOT, ORGANIZATION, Affiliation, classify
 from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
-from gitstats.sources import is_source, pathspecs
+from gitstats.sources import is_source
 from gitstats.utils import (
+    SOURCE_LINES_LOG,
     History,
     commit_local_time,
     commits_reached,
@@ -49,6 +51,8 @@ from gitstats.utils import (
     history_graph,
     shortstat_logs,
     should_exclude_file,
+    source_lines_added,
+    unquote_path,
 )
 from gitstats.wrapped import THEMES, WrappedCardGenerator
 
@@ -118,6 +122,30 @@ def _merge_period_aliases(
     for alias, canonical in name_to_canonical.items():
         if alias in period_authors:
             period_authors[canonical] = period_authors.get(canonical, 0) + period_authors.pop(alias)
+
+
+def _author_name(name: str) -> str:
+    """An author's name the way the report keys it, wherever git printed it.
+
+    In Unicode's composed form (NFC), so that an "ä" written as an "a" and a
+    combining diaeresis is one name with the "ä" written as one character,
+    and without the whitespace around it, a no-break space (U+00A0) or a
+    line separator (U+2028) as much as a space.
+    """
+    return unicodedata.normalize("NFC", name).strip()
+
+
+# 9999-12-01 00:00:00 UTC, a stamp that is in the year 9999 in every time zone
+_LATEST_STAMP = 253399622400
+
+
+def _stamp(text: str) -> int:
+    """A commit's stamp as git prints it (%at), no later than _LATEST_STAMP.
+
+    git takes dates after the year 9999, which Python's datetime cannot hold:
+    such a commit is counted at the end of the year 9999.
+    """
+    return min(int(text), _LATEST_STAMP)
 
 
 class DataCollector:
@@ -372,8 +400,8 @@ class GitDataCollector(DataCollector):
                 return counted[0]
 
             self._collect_tags(history)
-            email_to_latest, author_to_email = self._collect_commit_stats()
-            name_to_canonical = self._merge_author_aliases(email_to_latest, author_to_email)
+            identities = self._collect_commit_stats()
+            name_to_canonical = self._merge_author_aliases(identities)
             self._collect_extensions()
             # after the others: it waits for the line counts, which say what
             # files each commit adds
@@ -447,7 +475,7 @@ class GitDataCollector(DataCollector):
                 continue
             stamp = 0
             try:
-                stamp = int(headers[place[hash]].partition(" ")[0])
+                stamp = _stamp(headers[place[hash]].partition(" ")[0])
             except ValueError:
                 stamp = 0
             self.tags[tag] = {
@@ -486,7 +514,7 @@ class GitDataCollector(DataCollector):
             counts: dict[str, int] = {}
             for reached in commits_reached(parents, tip, prev):
                 if in_range[reached]:
-                    author = headers[reached].partition(" ")[2]
+                    author = _author_name(headers[reached].partition(" ")[2])
                     counts[author] = counts.get(author, 0) + 1
             if not counts:
                 continue
@@ -495,11 +523,11 @@ class GitDataCollector(DataCollector):
                 self.tags[tag]["commits"] += commits
                 self.tags[tag]["authors"][author] = commits
 
-    def _collect_commit_stats(self) -> tuple[dict[str, tuple[int, str]], dict[str, str]]:
+    def _collect_commit_stats(self) -> dict[tuple[str, str], int]:
         """Walk every commit, accumulating activity, domain and author stats.
 
-        Returns the two mappings needed to resolve author identities:
-        ``email -> (latest stamp, author name)`` and ``author name -> email``.
+        Returns what resolves author identities (see _merge_author_aliases()):
+        ``(author name, email) -> the stamp of its latest commit``.
         """
         # Outputs "<stamp> <date> <time> <timezone> <author> '<' <mail> '>'"
         lines = get_pipe_output(
@@ -510,9 +538,10 @@ class GitDataCollector(DataCollector):
                 "grep -v ^commit",
             ]
         ).split("\n")
-        # Track email<->author mappings to automatically merge identities that share an email
-        email_to_latest: dict[str, tuple[int, str]] = {}  # email -> (stamp, author_name)
-        author_to_email: dict[str, str] = {}  # author_name -> primary email
+        # the names and addresses used together, to merge the identities of one person
+        identities: dict[tuple[str, str], int] = {}  # (name, email) -> latest stamp
+        # the earliest stamp; None until there is one, as 0 is a commit at the epoch
+        first_stamp: int | None = None
         # the addresses and names of each organization, to count them: only the counts are kept
         addresses: dict[str, set[str]] = {}
         names: dict[str, set[str]] = {}
@@ -526,29 +555,26 @@ class GitDataCollector(DataCollector):
                 continue
             author = ""
             try:
-                stamp = int(parts[0])
+                stamp = _stamp(parts[0])
             except ValueError:
                 stamp = 0
             timezone = parts[3]
             author, mail = parts[4].split("<", 1)
-            author = author.rstrip()
+            author = _author_name(author)
             mail = mail.rstrip(">")
             domain = "?"
             if mail.find("@") != -1:
                 domain = mail.rsplit("@", 1)[1]
             date = datetime.datetime.fromtimestamp(float(stamp))
 
-            # Track email<->author mapping to later resolve identity aliases
-            if mail and (mail not in email_to_latest or int(stamp) > email_to_latest[mail][0]):
-                email_to_latest[mail] = (stamp, author)
-            if mail and author not in author_to_email:
-                author_to_email[author] = mail
+            # Track name<->email pairs to later resolve identity aliases
+            identities[author, mail] = max(identities.get((author, mail), stamp), stamp)
 
             # First and last commit stamp (may be in any order because of cherry-picking and patches)
             if stamp > self.last_commit_stamp:
                 self.last_commit_stamp = stamp
-            if self.first_commit_stamp == 0 or stamp < self.first_commit_stamp:
-                self.first_commit_stamp = stamp
+            if first_stamp is None or stamp < first_stamp:
+                first_stamp = stamp
 
             self._record_activity(date, commit_local_time(stamp, timezone))
 
@@ -573,9 +599,11 @@ class GitDataCollector(DataCollector):
             # timezone
             self.commits_by_timezone[timezone] = self.commits_by_timezone.get(timezone, 0) + 1
 
+        if first_stamp is not None:
+            self.first_commit_stamp = first_stamp
         self.organization_authors = {name: len(found) for name, found in addresses.items()}
         self.organization_people = {name: len(found) for name, found in names.items()}
-        return email_to_latest, author_to_email
+        return identities
 
     def _record_affiliation(
         self, author: str, mail: str, stamp: int, date: datetime.datetime
@@ -695,27 +723,46 @@ class GitDataCollector(DataCollector):
             self.last_active_day = yymmdd
             self.active_days.add(yymmdd)
 
-    def _merge_author_aliases(
-        self,
-        email_to_latest: dict[str, tuple[int, str]],
-        author_to_email: dict[str, str],
-    ) -> dict[str, str]:
-        """Fold authors that share an email into one canonical identity.
+    def _merge_author_aliases(self, identities: dict[tuple[str, str], int]) -> dict[str, str]:
+        """Fold the names of one person into one canonical identity.
+
+        ``identities`` maps each ``(name, email)`` used together in a commit
+        to the stamp of the latest such commit. Two names used with one
+        email are one person, and so are two emails used with one name,
+        however long the chain (jdoe and "John Doe" at work, "John Doe" and
+        "John D." at home): the names and emails are grouped by union-find,
+        whatever order the commits come in. A group goes by the name of its
+        most recent commit.
 
         Merges the alias entries in ``authors``, the per-period author dicts and
         the tag author dicts, then returns the ``alias -> canonical`` mapping so
         later phases can attribute their data to the same identities.
         """
-        # Build canonical name mapping: merge authors that share the same email
-        # (same person who committed with different name/email configurations)
-        email_to_canonical = {email: name for email, (_, name) in email_to_latest.items()}
+        # name or email -> the one it was joined to; a group's root is its own
+        joined: dict[tuple[str, str], tuple[str, str]] = {}
+
+        def root(node: tuple[str, str]) -> tuple[str, str]:
+            joined.setdefault(node, node)
+            while joined[node] != node:
+                joined[node] = joined[joined[node]]  # halve the way for next time
+                node = joined[node]
+            return node
+
+        newest: dict[str, tuple[int, str]] = {}  # name -> (latest stamp, name)
+        for (name, mail), stamp in identities.items():
+            newest[name] = max(newest.get(name, (stamp, name)), (stamp, name))
+            group = root(("name", name))
+            if mail:
+                joined[group] = root(("email", mail))
+        named: dict[tuple[str, str], tuple[int, str]] = {}  # group -> its most recent name
+        for name, latest in newest.items():
+            group = root(("name", name))
+            named[group] = max(named.get(group, latest), latest)
         name_to_canonical: dict[str, str] = {}
-        for name in self.authors.keys():
-            email = author_to_email.get(name)
-            if email:
-                canonical = email_to_canonical.get(email, name)
-                if canonical != name:
-                    name_to_canonical[name] = canonical
+        for name in newest:
+            canonical = named[root(("name", name))][1]
+            if canonical != name:
+                name_to_canonical[name] = canonical
 
         # Merge aliased author entries into their canonical entries
         for alias, canonical in name_to_canonical.items():
@@ -842,7 +889,7 @@ class GitDataCollector(DataCollector):
                 continue
             (stamp, files) = parts[0:2]
             try:
-                self.files_by_stamp[int(stamp)] = int(files)
+                self.files_by_stamp[_stamp(stamp)] = int(files)
             except ValueError:  # pragma: no cover - lines are built as "%d %d" above
                 logger.warning(f'Failed to parse line "{line}"')
 
@@ -853,12 +900,14 @@ class GitDataCollector(DataCollector):
             ["git ls-tree -r -l -z {}".format(get_commit_range("HEAD", end_only=True))]
         ).split("\000")
         blobs_to_read = []
-        counted_files = []  # (path, blob id) of every file whose lines are counted
+        # (path, blob id, extension) of every file whose lines are counted:
+        # None for a file without an extension, which is counted in the total only
+        counted_files: list[tuple[str, str, str | None]] = []
         lines_in_blob = self.cache.setdefault("lines_in_blob", {})
         for line in lines:
             if len(line) == 0:
                 continue
-            parts = re.split(r"\s+", line, 4)
+            parts = re.split(r"\s+", line, maxsplit=4)
             if parts[0] == "160000" and parts[3] == "-":
                 # skip submodules
                 continue
@@ -871,42 +920,39 @@ class GitDataCollector(DataCollector):
             self.head_files.append(fullpath)
 
             filename = fullpath.split("/")[-1]  # strip directories
-            if filename.find(".") == -1 or filename.rfind(".") == 0:
-                continue  # skip files without extension
-            else:
+            ext: str | None = None
+            if filename.find(".") != -1 and filename.rfind(".") != 0:
                 ext = filename[(filename.rfind(".") + 1) :]
-            if len(ext) > conf["max_ext_length"]:
-                ext = ""
+                if len(ext) > conf["max_ext_length"]:
+                    ext = ""
 
-            # Skip excluded files completely
-            if should_exclude_file(ext):
-                continue
+                # Skip excluded files completely
+                if should_exclude_file(ext):
+                    continue
 
-            if ext not in self.extensions:
-                self.extensions[ext] = {"files": 0, "lines": 0}
-            self.extensions[ext]["files"] += 1
-            counted_files.append((fullpath, blob_id))
+                if ext not in self.extensions:
+                    self.extensions[ext] = {"files": 0, "lines": 0}
+                self.extensions[ext]["files"] += 1
+            counted_files.append((fullpath, blob_id, ext))
             # the line count of a blob comes from the cache if it is there
-            if blob_id in lines_in_blob:
-                self.extensions[ext]["lines"] += lines_in_blob[blob_id]
-            else:
-                blobs_to_read.append((ext, blob_id))
+            if blob_id not in lines_in_blob:
+                blobs_to_read.append(blob_id)
 
         # One git process reads the blobs the cache does not have, where two
         # processes per blob took minutes on a tree of tens of thousands of files
-        counts = count_lines_in_blobs(blob_id for _, blob_id in blobs_to_read)
-        for ext, blob_id in blobs_to_read:
-            lines_in_blob[blob_id] = counts[blob_id]
-            self.extensions[ext]["lines"] += counts[blob_id]
+        lines_in_blob.update(count_lines_in_blobs(blobs_to_read))
 
-        # Per-file line counts for the hotspot analysis, from the cache filled
-        # above; refine() adds each file's churn and score
-        for fullpath, blob_id in counted_files:
-            self.hotspot_files[fullpath] = {
-                "lines": lines_in_blob.get(blob_id, 0),
-                "churn": 0,
-                "score": 0.0,
-            }
+        # The lines of code are those of these files: what the diffs add up
+        # to would count the excluded files, and only the commits that the
+        # date, author and range filters leave. Per-file line counts go to
+        # the hotspot analysis; refine() adds each file's churn and score.
+        for fullpath, blob_id, ext in counted_files:
+            lines = lines_in_blob[blob_id]
+            self.total_lines += lines
+            if ext is None:
+                continue  # files without extension
+            self.extensions[ext]["lines"] += lines
+            self.hotspot_files[fullpath] = {"lines": lines, "churn": 0, "score": 0.0}
 
     @staticmethod
     def _line_stat_passes() -> list[tuple[str, bool]]:
@@ -926,7 +972,7 @@ class GitDataCollector(DataCollector):
     def _line_stats_command(cls) -> str:
         """The `git log` that _collect_line_stats() reads."""
         walk, first_parent = cls._line_stat_passes()[0]
-        return 'git log --shortstat {} --pretty=format:"%at %aN" {}'.format(
+        return 'git log --root --shortstat {} --pretty=format:"%at %aN" {}'.format(
             walk + (" -m" if first_parent else ""), get_log_range("HEAD", False)
         )
 
@@ -934,7 +980,7 @@ class GitDataCollector(DataCollector):
     def _author_line_stats_command(cls) -> str:
         """The `git log` that _collect_per_author_line_stats() reads."""
         walk, _ = cls._line_stat_passes()[1]
-        return 'git log --shortstat {} --pretty=format:"%at %aN" {}'.format(
+        return 'git log --root --shortstat {} --pretty=format:"%at %aN" {}'.format(
             walk, get_log_range("HEAD", False)
         )
 
@@ -943,8 +989,9 @@ class GitDataCollector(DataCollector):
 
     @classmethod
     def _churn_command(cls) -> str:
-        """The `git log` that _collect_file_churn_and_ownership() reads."""
-        return 'git log --format="{}" --name-only {}'.format(
+        """The `git log` that _collect_file_churn_and_ownership() reads: the
+        paths as they are, but for those git always quotes (see unquote_path())."""
+        return 'git -c core.quotePath=false log --root --format="{}" --name-only {}'.format(
             cls.CHURN_FORMAT, get_log_range("HEAD", False)
         )
 
@@ -979,7 +1026,7 @@ class GitDataCollector(DataCollector):
                 pos = line.find(" ")
                 if pos != -1:
                     try:
-                        stamp = int(line[:pos])
+                        stamp = _stamp(line[:pos])
                         self.changes_by_date[stamp] = {
                             "files": files,
                             "ins": inserted,
@@ -1022,7 +1069,6 @@ class GitDataCollector(DataCollector):
                 else:
                     logger.warning(f'Failed to handle line "{line}"')
                     (files, inserted, deleted) = (0, 0, 0)
-        self.total_lines += total_lines
 
     def _collect_per_author_line_stats(
         self, name_to_canonical: dict[str, str], output: str | None = None
@@ -1055,7 +1101,7 @@ class GitDataCollector(DataCollector):
                 if pos != -1:
                     try:
                         oldstamp = stamp
-                        (stamp, author) = (int(line[:pos]), line[pos + 1 :])
+                        (stamp, author) = (_stamp(line[:pos]), _author_name(line[pos + 1 :]))
                         author = name_to_canonical.get(author, author)
                         if oldstamp > stamp:
                             # clock skew, keep old timestamp to avoid having ugly graph
@@ -1116,35 +1162,35 @@ class GitDataCollector(DataCollector):
             output = get_pipe_output([self._churn_command()])
         current_author = None
         for line in output.split("\n"):
-            line = line.strip()
             if not line:
                 continue
             if line.startswith("COMMIT:"):
-                current_author = name_to_canonical.get(line[7:], line[7:])
+                name = _author_name(line[7:])
+                current_author = name_to_canonical.get(name, name)
                 continue
-            # A changed-file line.
-            self.file_churn[line] = self.file_churn.get(line, 0) + 1
+            # A changed-file line: the path, as the files at HEAD have it
+            path = unquote_path(line)
+            self.file_churn[path] = self.file_churn.get(path, 0) + 1
             if current_author:
                 author_map = self.author_files.setdefault(current_author, {})
-                author_map[line] = author_map.get(line, 0) + 1
+                author_map[path] = author_map.get(path, 0) + 1
 
     @staticmethod
     def _source_lines_command() -> str:
         """What counts the lines ever added to the project's own source, when
         the diffs of the line counts did not (see shortstat_logs())."""
-        return "git log --no-merges --shortstat --format= {} -- {}".format(
-            get_log_range("HEAD", False), " ".join(shlex.quote(spec) for spec in pathspecs())
-        )
+        return f"git {SOURCE_LINES_LOG} {get_log_range('HEAD', False)}"
 
     def _source_lines(self) -> int | None:
         """The lines ever added to the project's own source, leaving out
         vendored dependencies, generated files, test fixtures and lock files
-        (see gitstats.sources); None when git could not count them."""
+        (see gitstats.sources), by the rules of the count the diffs of the
+        line counts make (see source_lines_added()); None when git could not
+        count them."""
         try:
-            output = get_pipe_output([self._source_lines_command()])
+            return source_lines_added(get_pipe_output([self._source_lines_command()]), is_source)
         except (OSError, subprocess.CalledProcessError):
             return None
-        return sum(int(found) for found in re.findall(r"(\d+) insertions?\(\+\)", output))
 
     @staticmethod
     def _assisted_commits() -> list[AssistedCommit]:
@@ -1163,7 +1209,9 @@ class GitDataCollector(DataCollector):
         for commit in commits:
             self.ai_assisted_commits += 1
             self.ai_assisted_authored += commit.authored
-            yymm = datetime.datetime.fromtimestamp(commit.stamp).strftime("%Y-%m")
+            yymm = datetime.datetime.fromtimestamp(min(commit.stamp, _LATEST_STAMP)).strftime(
+                "%Y-%m"
+            )
             self.ai_assisted_by_month[yymm] = self.ai_assisted_by_month.get(yymm, 0) + 1
             for place, name in enumerate(commit.assistants):
                 info = self.ai_assistants.setdefault(
@@ -1577,6 +1625,8 @@ def run(gitpath, outputpath, extra_fmt=None, wrapped_config=None) -> int:
 
     time_end = time.time()
     exectime_internal = time_end - time_start
+    # read off the module that adds to it, not a copy made when it was 0
+    exectime_external = utils.exectime_external
     logger.info(
         f"Execution time {exectime_internal:.5f} secs, {exectime_external:.5f} secs ({(100.0 * exectime_external) / exectime_internal:.2f} %) in external commands)"
     )
@@ -1703,6 +1753,19 @@ def _run_multi_repo(
     return 0
 
 
+def _port(text: str) -> int:
+    """A --port: 1 to 65535, or 0 for a free one."""
+    try:
+        port = int(text)
+    except ValueError:
+        port = -1
+    if not 0 <= port <= 65535:
+        raise argparse.ArgumentTypeError(
+            f"{text!r} is not a port: give 1 to 65535, or 0 for a free one"
+        )
+    return port
+
+
 def get_parser() -> argparse.ArgumentParser:
     """Get the parser for the command line arguments."""
     parser = argparse.ArgumentParser(
@@ -1723,7 +1786,9 @@ def get_parser() -> argparse.ArgumentParser:
         metavar="key=value",
         action="append",
         default=[],
-        help=f"Override configuration value. Can be specified multiple times. Default configuration: {conf}",
+        # argparse formats a help with "%": a "%" in a setting is written "%%"
+        help="Override configuration value. Can be specified multiple times. "
+        "Default configuration: " + str(conf).replace("%", "%%"),
     )
 
     # Positional arguments
@@ -1774,7 +1839,7 @@ def get_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--port",
-        type=int,
+        type=_port,
         default=8000,
         help="Port for the --serve server (default: 8000; 0 picks a free port)",
     )
@@ -1864,7 +1929,7 @@ def _apply_config_from_args(conf: dict, args) -> None:
         if key not in conf:
             raise KeyError(f'No such key "{key}" in config')
         # Convert the value the same way as the config file does
-        conf[key] = parse_config_value(value)
+        conf[key] = parse_config_value(value, key)
 
 
 def _apply_ai_args(conf: dict, args) -> None:
@@ -1884,6 +1949,9 @@ def main() -> int:
     parser = get_parser()
     args = parser.parse_args()
     configure_logging(verbose=args.verbose, quiet=args.quiet)
+    if gitstats.config_errors:
+        # what could not be read from gitstats.conf, before anything is done with it
+        parser.error("; ".join(gitstats.config_errors))
 
     # Resolve positional arguments: gitpath (nargs='+') consumes all positional args.
     # If outputpath is None and more than one arg was given, move the last arg from

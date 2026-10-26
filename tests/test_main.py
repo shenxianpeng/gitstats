@@ -31,6 +31,7 @@ from gitstats.main import (
     parallel_map_with_fallback,
     run,
 )
+from gitstats.utils import get_log_range
 from gitstats.wrapped import THEMES
 
 # ── DataCollector base class ─────────────────────────────────────────────
@@ -736,8 +737,7 @@ class TestCollectPhases:
 
         # both names share one email; the later stamp wins the canonical name
         mapping = dc._merge_author_aliases(
-            email_to_latest={"a@x.com": (400, "New Name")},
-            author_to_email={"old name": "a@x.com", "New Name": "a@x.com"},
+            {("old name", "a@x.com"): 200, ("New Name", "a@x.com"): 400}
         )
 
         assert mapping == {"old name": "New Name"}
@@ -758,10 +758,7 @@ class TestCollectPhases:
         dc = GitDataCollector()
         dc.authors = {"Ann": {"commits": 1}, "Bo": {"commits": 1}}
 
-        mapping = dc._merge_author_aliases(
-            email_to_latest={"a@x.com": (1, "Ann"), "b@x.com": (2, "Bo")},
-            author_to_email={"Ann": "a@x.com", "Bo": "b@x.com"},
-        )
+        mapping = dc._merge_author_aliases({("Ann", "a@x.com"): 1, ("Bo", "b@x.com"): 2})
 
         assert mapping == {}
         assert set(dc.authors) == {"Ann", "Bo"}
@@ -780,7 +777,7 @@ class TestCollectPhases:
             return _f
 
         dc._collect_tags = spy("tags")
-        dc._collect_commit_stats = spy("commits", ({}, {}))
+        dc._collect_commit_stats = spy("commits", {})
         dc._merge_author_aliases = spy("aliases", {})
         dc._collect_files_by_stamp = spy("files")
         dc._collect_extensions = spy("extensions")
@@ -1062,16 +1059,16 @@ class TestCollectPhases:
             ("--date-order", False),
         ]
         assert GitDataCollector._line_stats_command() == (
-            'git log --shortstat --first-parent -m --pretty=format:"%at %aN" HEAD'
+            'git log --root --shortstat --first-parent -m --pretty=format:"%at %aN" HEAD'
         )
         assert GitDataCollector._author_line_stats_command() == (
-            'git log --shortstat --date-order --pretty=format:"%at %aN" HEAD'
+            'git log --root --shortstat --date-order --pretty=format:"%at %aN" HEAD'
         )
         _use_config(linear_linestats=0)
         # every commit, and a merge is not compared with anything
         assert GitDataCollector._line_stat_passes() == [("", False), ("--date-order", False)]
         assert GitDataCollector._line_stats_command() == (
-            'git log --shortstat  --pretty=format:"%at %aN" HEAD'
+            'git log --root --shortstat  --pretty=format:"%at %aN" HEAD'
         )
 
 
@@ -1866,15 +1863,14 @@ class TestCollectEdgeCases:
         )
         monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
         dc = GitDataCollector()
-        email_to_latest, author_to_email = dc._collect_commit_stats()
+        identities = dc._collect_commit_stats()
 
         assert set(dc.authors) == {"Ann", "Bo"}
         assert dc.authors["Bo"]["first_commit_stamp"] == 0
         # an address without "@" has no domain
         assert dc.domains == {"example.com": {"commits": 1}, "?": {"commits": 1}}
         assert dc.commits_by_timezone == {"+0000": 1, "+0100": 1}
-        assert author_to_email == {"Ann": "ann@example.com", "Bo": "bo-at-nowhere"}
-        assert email_to_latest["ann@example.com"] == (1700000000, "Ann")
+        assert identities == {("Ann", "ann@example.com"): 1700000000, ("Bo", "bo-at-nowhere"): 0}
 
     def test_commit_stats_sort_addresses_by_organization(self, monkeypatch):
         fake = _fake_git(
@@ -1955,8 +1951,13 @@ class TestCollectEdgeCases:
             "Anonymous": {"commits": 1},  # no email at all
         }
         mapping = dc._merge_author_aliases(
-            email_to_latest={"n@x.com": (90, "Nick"), "a@x.com": (50, "Ann")},
-            author_to_email={"Old Nick": "n@x.com", "Ann": "a@x.com", "ann (laptop)": "a@x.com"},
+            {
+                ("Old Nick", "n@x.com"): 80,
+                ("Nick", "n@x.com"): 90,
+                ("Ann", "a@x.com"): 50,
+                ("ann (laptop)", "a@x.com"): 40,
+                ("Anonymous", ""): 5,
+            }
         )
 
         assert mapping == {"Old Nick": "Nick", "ann (laptop)": "Ann"}
@@ -1977,10 +1978,7 @@ class TestCollectEdgeCases:
             "Ann": {"commits": 1, "first_commit_stamp": 300, "last_commit_stamp": 300},
             "ann": {"commits": 1, "first_commit_stamp": 100, "last_commit_stamp": 900},
         }
-        dc._merge_author_aliases(
-            email_to_latest={"a@x.com": (300, "Ann")},
-            author_to_email={"Ann": "a@x.com", "ann": "a@x.com"},
-        )
+        dc._merge_author_aliases({("Ann", "a@x.com"): 300, ("ann", "a@x.com"): 200})
         assert dc.authors == {
             "Ann": {
                 "commits": 2,
@@ -2181,15 +2179,18 @@ class TestCollectEdgeCases:
         assert dc.total_files == 6
         assert dc.extensions[""] == {"files": 1, "lines": 2}
         assert dc.extensions["py"] == {"files": 2, "lines": 8}
-        # the five blobs with an extension were read and added to the cache
-        assert len(dc.cache["lines_in_blob"]) == 6
+        # the six blobs of the files, .gitignore without an extension among
+        # them, were read and added to the cache
+        assert len(dc.cache["lines_in_blob"]) == 7
+        # all of their lines are the lines of code: the binary logo has none
+        assert dc.total_lines == 3 + 2 + 8 + 2
 
     def test_line_stats_without_linear_history_and_with_stray_lines(self, monkeypatch, caplog):
         _use_config(linear_linestats=0)
         # git prints newest first; the collector reads the lines oldest first
         fake = _fake_git(
             {
-                "git log --shortstat": (
+                "git log --root --shortstat": (
                     "1700000300 Ann\n"
                     " 1 file changed, 5 insertions(+)\n"
                     "stray\n"
@@ -2207,7 +2208,8 @@ class TestCollectEdgeCases:
         assert "--first-parent" not in fake.calls[0]
         assert dc.changes_by_date[1700000100] == {"files": 0, "ins": 0, "del": 0, "lines": 0}
         assert dc.changes_by_date[1700000300] == {"files": 1, "ins": 5, "del": 0, "lines": 5}
-        assert dc.total_lines == 5
+        # the lines of code are those of the files, not what the diffs add up to
+        assert dc.total_lines == 0
         assert dc.total_lines_added == 5
         assert 'Unexpected line "stray"' in caplog.text
         assert 'Unexpected line "not-a-stamp Bo"' in caplog.text
@@ -2216,7 +2218,7 @@ class TestCollectEdgeCases:
     def test_per_author_line_stats_add_unknown_authors(self, monkeypatch, caplog):
         fake = _fake_git(
             {
-                "git log --shortstat --date-order": (
+                "git log --root --shortstat --date-order": (
                     "1700000300 Newcomer\n"
                     " 1 file changed, 4 insertions(+), 2 deletions(-)\n"
                     "stray\n"
@@ -2241,7 +2243,7 @@ class TestCollectEdgeCases:
     def test_file_churn_ignores_files_before_the_first_commit_marker(self, monkeypatch):
         fake = _fake_git(
             {
-                'git log --format="COMMIT:%aN"': (
+                'git -c core.quotePath=false log --root --format="COMMIT:%aN"': (
                     "orphan.txt\nCOMMIT:Ann\na.py\n\nCOMMIT:Bob\na.py\nb.py\n"
                 )
             }
@@ -2692,12 +2694,394 @@ def test_source_lines_when_git_fails(monkeypatch):
 
 def test_source_lines_count_insertions(monkeypatch):
     printed = (
-        " 2 files changed, 10 insertions(+), 3 deletions(-)\n\n"
-        " 1 file changed, 1 insertion(+)\n\n 1 file changed, 4 deletions(-)\n"
+        "\x01" + "a" * 40 + "\n\n10\t3\tsrc/a.py\n2\t0\tvendor/b.go\n-\t-\tlogo.png\n"
+        "\x01" + "b" * 40 + '\n\n1\t0\t"src/r\\303\\251sum\\303\\251.py"\n0\t4\tsrc/a.py\n'
     )
     seen = []
     monkeypatch.setattr(
         "gitstats.main.get_pipe_output", lambda cmds, quiet=False: seen.append(cmds) or printed
     )
     assert GitDataCollector()._source_lines() == 11
-    assert "':(exclude,glob)**/vendor/**'" in seen[0][0]
+    assert seen == [["git -c core.quotePath=false log --root --numstat --format=%x01%H HEAD"]]
+
+
+# ── what the numbers of a report are made of ─────────────────────────────
+
+
+def _history(repo, commits, **config):
+    """Make a repository at ``repo`` of ``commits``, each ``(name, email, date,
+    {path: lines or text, or None to delete it})``; ``config`` is set in its
+    .git/config."""
+    repo.mkdir()
+    _git(repo, "init", "-q")
+    for key, value in config.items():
+        _git(repo, "config", key, value)
+    for name, email, date, files in commits:
+        for path, content in files.items():
+            target = repo / path
+            if content is None:
+                target.unlink()
+                continue
+            target.parent.mkdir(parents=True, exist_ok=True)
+            if isinstance(content, int):
+                content = "".join(f"line {n}\n" for n in range(content))
+            target.write_text(content, encoding="utf-8")
+        subprocess.run(["git", "add", "-A"], cwd=repo, check=True, capture_output=True)
+        subprocess.run(
+            ["git", "commit", "-q", "--allow-empty", "-m", "commit"],
+            cwd=repo,
+            check=True,
+            capture_output=True,
+            env={
+                **os.environ,
+                "GIT_AUTHOR_NAME": name,
+                "GIT_AUTHOR_EMAIL": email,
+                "GIT_AUTHOR_DATE": date,
+                "GIT_COMMITTER_NAME": "Committer",
+                "GIT_COMMITTER_EMAIL": "committer@example.com",
+                "GIT_COMMITTER_DATE": date,
+            },
+        )
+    return repo
+
+
+def _collected(repo, monkeypatch, processes=8, **config):
+    """Collect and refine ``repo`` the way a run does, on a machine of eight
+    processors: with ``processes`` 1 each phase runs its own `git log`."""
+    _use_config(processes=processes, **config)
+    monkeypatch.chdir(repo)
+    dc = GitDataCollector()
+    with (
+        patch("gitstats.main.os.cpu_count", return_value=8),
+        patch(
+            "gitstats.main.parallel_map_with_fallback",
+            side_effect=lambda func, items: [func(item) for item in items],
+        ),
+    ):
+        dc.collect(str(repo))
+    dc.refine()
+    return dc
+
+
+ANN = ("Ann", "ann@example.com")
+
+
+@pytest.mark.parametrize("processes", [8, 1])
+def test_lines_of_code_leave_out_the_excluded_extensions(tmp_path, monkeypatch, processes):
+    """The lines of code are those of the files at the end of the range:
+    an excluded data file is not in them (it was, as diffs add up)."""
+    repo = _history(
+        tmp_path / "repo", [(*ANN, "2021-01-01T00:00:00", {"a.py": 10, "data.json": 5000})]
+    )
+    dc = _collected(repo, monkeypatch, processes, exclude_exts="json")
+    assert dc.get_total_loc() == 10
+    # what the diffs add stays what the history added
+    assert dc.total_lines_added == 5010
+
+
+@pytest.mark.parametrize(
+    "config",
+    [
+        {"start_date": "2021-01-01"},
+        {"authors": "Bo"},
+        {"end_date": "2020-06-01"},
+        {"commit_begin": "1"},
+    ],
+)
+def test_lines_of_code_are_those_of_the_last_commit_whatever_the_filters(
+    tmp_path, monkeypatch, config
+):
+    """Filters pick the commits, not the files: no negative lines of code."""
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (*ANN, "2020-01-01T00:00:00", {"big.txt": 1000}),
+            ("Bo", "bo@example.com", "2022-01-01T00:00:00", {"big.txt": 100}),
+        ],
+    )
+    dc = _collected(repo, monkeypatch, **config)
+    assert dc.get_total_loc() == 100
+
+
+AWKWARD = ["café.py", 'say"hi".py', "tab\there.py", "plain.py"]
+
+
+@pytest.mark.parametrize("processes", [8, 1])
+def test_churn_and_ownership_of_files_whose_names_git_quotes(tmp_path, monkeypatch, processes):
+    """A path git quotes is counted under the name the files at HEAD have."""
+    awkward = [name for name in AWKWARD if os.name != "nt" or not set(name) & set('"\t')]
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (*ANN, f"2021-01-0{day}T00:00:00", {name: f"{day}\n" * day for name in awkward})
+            for day in (1, 2, 3)
+        ],
+    )
+    dc = _collected(repo, monkeypatch, processes)
+    assert dc.file_churn == dict.fromkeys(awkward, 3)
+    assert dc.author_files == {"Ann": dict.fromkeys(awkward, 3)}
+    assert {path: info["churn"] for path, info in dc.hotspot_files.items()} == dict.fromkeys(
+        awkward, 3
+    )
+
+
+@pytest.mark.parametrize("processes", [8, 1])
+def test_source_lines_of_a_vendored_file_whose_name_git_quotes(tmp_path, monkeypatch, processes):
+    repo = _history(
+        tmp_path / "repo", [(*ANN, "2021-01-01T00:00:00", {"vendor/ü.py": 50, "a.py": 10})]
+    )
+    assert _collected(repo, monkeypatch, processes).source_lines_added == 10
+
+
+@pytest.mark.parametrize("space", [" ", " ", " "])
+@pytest.mark.parametrize("processes", [8, 1])
+def test_an_author_name_that_ends_in_unicode_whitespace(tmp_path, monkeypatch, space, processes):
+    """No KeyError: the name is the same name in every phase."""
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (f"Bob{space}", "bob@example.com", "2021-01-01T00:00:00", {"a.py": 3}),
+            ("Bob", "bob@example.com", "2021-01-02T00:00:00", {"b.py": 2}),
+        ],
+    )
+    dc = _collected(repo, monkeypatch, processes)
+    assert list(dc.authors) == ["Bob"]
+    assert dc.authors["Bob"]["commits"] == 2
+    assert dc.authors["Bob"]["lines_added"] == 5
+    assert dc.author_files == {"Bob": {"a.py": 1, "b.py": 1}}
+
+
+def test_a_name_written_composed_and_decomposed_is_one_author(tmp_path, monkeypatch):
+    repo = _history(
+        tmp_path / "repo",
+        [
+            ("Daniel Neuhäuser", "d1@example.com", "2021-01-01T00:00:00", {"a": 1}),
+            ("Daniel Neuhäuser", "d2@example.com", "2021-01-02T00:00:00", {"b": 1}),
+        ],
+    )
+    dc = _collected(repo, monkeypatch)
+    assert list(dc.authors) == ["Daniel Neuhäuser"]
+    assert dc.authors["Daniel Neuhäuser"]["commits"] == 2
+    assert dc.total_authors == 1
+
+
+JOHN = [
+    ("jdoe", "john@work.example"),
+    ("John Doe", "john@work.example"),
+    ("John Doe", "john@home.example"),
+    ("John D.", "john@home.example"),
+]
+
+
+@pytest.mark.parametrize("identities", [JOHN, JOHN[::-1]])
+def test_aliases_are_merged_through_a_chain_of_names_and_emails(tmp_path, monkeypatch, identities):
+    """jdoe and "John Doe" share a work address, "John Doe" and "John D." a
+    home one: one person, named as in the most recent commit, in any order."""
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (name, email, f"2021-01-0{day}T00:00:00", {f"f{day}": 1})
+            for day, (name, email) in enumerate(identities, 1)
+        ],
+    )
+    dc = _collected(repo, monkeypatch)
+    latest = identities[-1][0]
+    assert dc.total_authors == 1
+    assert {name: info["commits"] for name, info in dc.authors.items()} == {latest: 4}
+    assert dc.author_files == {latest: {f"f{day}": 1 for day in (1, 2, 3, 4)}}
+
+
+def test_merge_author_aliases_names_a_group_by_its_latest_commit():
+    dc = GitDataCollector()
+    dc.authors = {name: {"commits": 1} for name in ("a", "b", "c", "d", "Solo")}
+    mapping = dc._merge_author_aliases(
+        {
+            ("a", "x@example.com"): 10,
+            ("b", "x@example.com"): 40,
+            ("b", "y@example.com"): 20,
+            ("c", "y@example.com"): 30,
+            # two names of one address tied on the stamp: the larger name
+            ("c", "z@example.com"): 40,
+            ("Solo", "solo@example.com"): 50,
+            ("d", ""): 60,  # without an address, a name is only itself
+        }
+    )
+    assert mapping == {"a": "c", "b": "c"}
+    assert set(dc.authors) == {"c", "d", "Solo"}
+
+
+def test_commit_end_that_is_all_digits_from_the_command_line():
+    """-c commit_end=<a short hash of digits> stays a revision, not an int
+    that get_commit_range() cannot take the length of."""
+    import gitstats.main
+
+    args = get_parser().parse_args(["-c", "commit_end=1103142", "-c", "commit_begin=10", "x"])
+    gitstats.main._apply_config_from_args(gitstats.main.conf, args)
+    assert gitstats.main.conf["commit_end"] == "1103142"
+    assert gitstats.main.conf["commit_begin"] == "10"
+    gitstats.main.conf["commit_begin"] = ""
+    assert get_log_range("HEAD", False) == "1103142"
+
+
+@pytest.mark.parametrize("count, commits", [("2", 2), ("9", 4)])
+def test_commit_begin_is_the_last_commits(tmp_path, monkeypatch, count, commits):
+    """commit_begin = N: the last N commits, all of them when there are fewer."""
+    repo = _history(
+        tmp_path / "repo",
+        [(*ANN, f"2021-01-0{day}T00:00:00", {"a": day}) for day in (1, 2, 3, 4)],
+    )
+    dc = _collected(repo, monkeypatch, commit_begin=count)
+    assert dc.get_total_commits() == commits
+
+
+def test_commit_begin_after_a_merge(tmp_path, monkeypatch):
+    """The last 2 commits are 2, not the merged branch as well."""
+    repo = _history(
+        tmp_path / "repo",
+        [(*ANN, f"2021-01-0{day}T00:00:00", {"a": day}) for day in (1, 2)],
+    )
+    _git(repo, "checkout", "-q", "-b", "side", "HEAD~1")
+    for day in (3, 4, 5):
+        (repo / f"s{day}").write_text("s\n")
+        _git(repo, "add", "-A")
+        _git(repo, "commit", "-q", "-m", f"s{day}")
+    _git(repo, "checkout", "-q", "-")
+    _git(repo, "merge", "-q", "--no-ff", "-m", "merge", "side")
+    dc = _collected(repo, monkeypatch, commit_begin="2")
+    assert dc.get_total_commits() == 2
+
+
+SOURCE_MOVES = [
+    # what the project has: its own code, data, a vendored library
+    (*ANN, "2021-01-01T00:00:00", {"a.py": 10, "data.json": 5000, "vendor/lib.py": 100}),
+    # the library moved into the project: its lines are the project's now
+    (*ANN, "2021-01-02T00:00:00", {"vendor/lib.py": None, "lib.py": 100}),
+    # a file of the project moved, and changed: 3 lines added
+    (*ANN, "2021-01-03T00:00:00", {"a.py": None, "src/a.py": "".join(
+        f"line {n}\n" for n in range(13)
+    )}),
+    # and one moved out of it: nothing added to the project
+    (*ANN, "2021-01-04T00:00:00", {"lib.py": None, "third_party/lib.py": 100}),
+    # a file moved into the project with a change: 101 lines
+    (*ANN, "2021-01-05T00:00:00", {"third_party/lib.py": None, "lib2.py": "".join(
+        f"line {n}\n" for n in range(101)
+    )}),
+]  # fmt: skip
+
+
+def test_source_lines_are_counted_the_same_with_one_process_or_more(tmp_path, monkeypatch):
+    repo = _history(tmp_path / "repo", SOURCE_MOVES)
+    counts = {
+        processes: _collected(repo, monkeypatch, processes).source_lines_added
+        for processes in (4, 1)
+    }
+    assert counts == {4: 5000 + 10 + 100 + 3 + 101, 1: 5000 + 10 + 100 + 3 + 101}
+
+
+def test_a_commit_after_the_year_9999(tmp_path, monkeypatch):
+    """git takes it; it is counted at the end of the year 9999."""
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (*ANN, "2021-01-01T00:00:00", {"a": 1}),
+            (*ANN, "@253402300800 +0000", {"b": 1}),
+        ],
+    )
+    for processes in (8, 1):
+        dc = _collected(repo, monkeypatch, processes)
+        assert dc.commits_by_year == {2021: 1, 9999: 1}
+        assert dc.get_last_commit_date().year == 9999
+        assert max(dc.files_by_stamp) == max(dc.changes_by_date) <= 253402300799
+
+
+def test_a_commit_at_the_epoch_is_the_first(tmp_path, monkeypatch):
+    """A stamp of 0 is a commit, not "no commit yet", whatever order it comes in."""
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (*ANN, "2021-01-01T00:00:00 +0000", {"a": 1}),
+            (*ANN, "@0 +0000", {"b": 1}),
+        ],
+    )
+    dc = _collected(repo, monkeypatch)
+    assert dc.first_commit_stamp == 0
+    assert dc.authors["Ann"]["first_commit_stamp"] == 0
+
+
+@pytest.mark.parametrize("processes", [8, 1])
+def test_the_root_commit_counts_whatever_log_show_root_says(tmp_path, monkeypatch, processes):
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (*ANN, "2021-01-01T00:00:00", {"a.py": 100}),
+            (*ANN, "2021-01-02T00:00:00", {"b.py": 5}),
+        ],
+        **{"log.showRoot": "false"},
+    )
+    dc = _collected(repo, monkeypatch, processes)
+    assert dc.total_lines_added == 105
+    assert dc.authors["Ann"]["lines_added"] == 105
+    assert dc.file_churn == {"a.py": 1, "b.py": 1}
+    assert dc.source_lines_added == 105
+
+
+def test_run_reports_the_time_spent_in_git(git_repo, tmp_path, caplog, sequential_map):
+    with caplog.at_level(logging.INFO, logger="gitstats"):
+        assert run([git_repo], str(tmp_path / "report")) == 0
+    spent = re.search(r"secs, ([\d.]+) secs \(", caplog.text)
+    assert spent and float(spent[1]) > 0
+
+
+@pytest.mark.parametrize("port", ["0", "1", "8000", "65535"])
+def test_port_takes_a_port(port):
+    assert get_parser().parse_args(["--port", port, "repo"]).port == int(port)
+
+
+@pytest.mark.parametrize("port", ["70000", "-1", "65536", "http"])
+def test_port_refuses_what_is_not_a_port(port, capsys):
+    with pytest.raises(SystemExit) as stopped:
+        get_parser().parse_args(["--port", port, "repo"])
+    assert stopped.value.code == 2
+    assert "is not a port: give 1 to 65535, or 0 for a free one" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize(
+    "setting, message",
+    [
+        ("processes=abc", "processes must be a whole number, not 'abc'"),
+        ("ai_enabled=maybe", "ai_enabled must be true or false, not 'maybe'"),
+    ],
+)
+def test_a_setting_of_the_wrong_type_on_the_command_line(setting, message, capsys):
+    with (
+        patch.object(sys, "argv", ["gitstats", "-c", setting, "repo"]),
+        pytest.raises(SystemExit) as stopped,
+    ):
+        main()
+    assert stopped.value.code == 2
+    assert message in capsys.readouterr().err
+
+
+def test_what_gitstats_conf_could_not_say_stops_the_run(capsys):
+    import gitstats
+
+    gitstats.config_errors.append("gitstats.conf: processes must be a whole number, not 'abc'")
+    with (
+        patch.object(sys, "argv", ["gitstats", "repo"]),
+        patch("gitstats.main.run") as ran,
+        pytest.raises(SystemExit) as stopped,
+    ):
+        main()
+    assert stopped.value.code == 2
+    assert "gitstats.conf: processes must be a whole number" in capsys.readouterr().err
+    ran.assert_not_called()
+
+
+def test_help_with_a_percent_sign_in_a_setting(capsys):
+    _use_config(badge_label="100% done")
+    import gitstats.main
+
+    with patch.object(gitstats.main, "conf", {**gitstats.main.conf, "badge_label": "100% done"}):
+        with pytest.raises(SystemExit):
+            get_parser().parse_args(["--help"])
+    assert "100% done" in capsys.readouterr().out
