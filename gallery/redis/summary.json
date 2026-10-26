@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:36:38+00:00",
+  "generated_at": "2026-10-26T03:56:10+00:00",
   "name": "Redis",
   "report_path": "index.html",
   "first_commit": "2009-03-22 09:30:00",
-  "last_commit": "2026-10-24 15:30:33",
-  "age_days": 6426,
-  "active_days": 3842,
-  "total_commits": 13377,
+  "last_commit": "2026-10-26 02:01:33",
+  "age_days": 6427,
+  "active_days": 3843,
+  "total_commits": 13378,
   "total_authors": 910,
   "active_authors_12mo": 119,
-  "commits_last_12mo": 586,
+  "commits_last_12mo": 587,
   "total_files": 1941,
-  "total_lines": 664208,
-  "lines_added": 1053308,
-  "lines_removed": 389100,
+  "total_lines": 664215,
+  "lines_added": 1053316,
+  "lines_removed": 389101,
   "total_tags": 28,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Marcin Po\u017aniak": 2,
     "Vitah Lin": 81,
     "Lazizbek Ergashev": 4,
     "Salvatore Sanfilippo": 7214,
@@ -56,7 +57,6 @@
     "Tom Gabsow": 27,
     "GuyAv46": 8,
     "Filipe Oliveira (Redis)": 53,
-    "Marcin Po\u017aniak": 1,
     "Paulo Sousa": 4,
     "neoLsH": 2,
     "Moti Cohen": 103,
@@ -970,13 +970,13 @@
     "2023": 453,
     "2024": 321,
     "2025": 549,
-    "2026": 521
+    "2026": 522
   },
   "ai_assisted": {
-    "commits": 43,
+    "commits": 44,
     "authored": 0,
     "assistants": {
-      "Claude": 34,
+      "Claude": 35,
       "GitHub Copilot": 9,
       "Cursor": 1
     },
@@ -1004,7 +1004,7 @@
       "2026-07": 6,
       "2026-08": 1,
       "2026-09": 5,
-      "2026-10": 15
+      "2026-10": 16
     },
     "commits_by_month": {
       "2024-11": 13,
@@ -1030,14 +1030,14 @@
       "2026-07": 64,
       "2026-08": 53,
       "2026-09": 45,
-      "2026-10": 58
+      "2026-10": 59
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 13377,
+    "commits": 13378,
     "by_kind": {
-      "organization": 1914,
+      "organization": 1915,
       "one_person": 633,
       "personal": 10262,
       "hidden": 546,
@@ -1129,11 +1129,11 @@
       },
       {
         "organization": "intel.com",
-        "commits": 7,
-        "commits_last_12mo": 1,
+        "commits": 8,
+        "commits_last_12mo": 2,
         "addresses": 4,
         "first_commit": "2018-05-06",
-        "last_commit": "2026-10-17"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "soveran.com",
@@ -1226,7 +1226,7 @@
         "bot": 1
       },
       "2026-Q4": {
-        "organization": 16,
+        "organization": 17,
         "one_person": 0,
         "personal": 29,
         "hidden": 11,
@@ -1238,13 +1238,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 581,
+    "commits": 582,
     "authors": 118,
     "new_authors": 83,
     "half_of_commits": 9
   },
   "humans": {
-    "commits": 13360,
+    "commits": 13361,
     "commits_by_year": {
       "2009": 435,
       "2010": 1057,
@@ -1263,13 +1263,13 @@
       "2023": 450,
       "2024": 319,
       "2025": 549,
-      "2026": 516
+      "2026": 517
     },
-    "active_days": 3839
+    "active_days": 3840
   },
   "timezones": {
     "+0000": 145,
-    "+0100": 3789,
+    "+0100": 3790,
     "+0200": 5033,
     "+0300": 1159,
     "+0330": 3,
@@ -1294,7 +1294,7 @@
     "-0800": 191
   },
   "source_lines": {
-    "added": 1172368,
-    "current": 640788
+    "added": 1172376,
+    "current": 640795
   }
 }

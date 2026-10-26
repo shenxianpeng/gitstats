@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:31:46+00:00",
+  "generated_at": "2026-10-26T03:50:52+00:00",
   "name": "Apache Spark",
   "report_path": "index.html",
   "first_commit": "2010-03-29 23:17:55",
-  "last_commit": "2026-10-24 22:03:48",
-  "age_days": 6053,
-  "active_days": 5306,
-  "total_commits": 50694,
+  "last_commit": "2026-10-26 02:46:10",
+  "age_days": 6055,
+  "active_days": 5308,
+  "total_commits": 50702,
   "total_authors": 3085,
   "active_authors_12mo": 426,
-  "commits_last_12mo": 4798,
+  "commits_last_12mo": 4806,
   "total_files": 27599,
-  "total_lines": 4384431,
-  "lines_added": 7827490,
-  "lines_removed": 3443059,
+  "total_lines": 4384936,
+  "lines_added": 7828061,
+  "lines_removed": 3443125,
   "total_tags": 11,
   "era": "steady",
   "top_authors": [
     {
       "name": "Dongjoon Hyun",
-      "commits": 2625
+      "commits": 2632
     },
     {
       "name": "Ruifeng Zheng",
-      "commits": 2031
+      "commits": 2032
     },
     {
       "name": "Hyukjin Kwon",
@@ -41,9 +41,10 @@
     }
   ],
   "author_commits": {
+    "Ruifeng Zheng": 2032,
+    "Dongjoon Hyun": 2632,
     "Yicong Huang": 238,
     "Wenchen Fan": 1426,
-    "Dongjoon Hyun": 2625,
     "Liang-Chi Hsieh": 780,
     "Kumar Sambhav": 1,
     "Szehon Ho": 143,
@@ -51,7 +52,6 @@
     "bojana-db": 14,
     "hu hengrui": 1,
     "Luka Zdravi\u0107": 18,
-    "Ruifeng Zheng": 2031,
     "Hyukjin Kwon": 2030,
     "Peter Toth": 185,
     "Daniel Tenedorio": 127,
@@ -3144,15 +3144,15 @@
     "2023": 4113,
     "2024": 3762,
     "2025": 3411,
-    "2026": 4150
+    "2026": 4158
   },
   "ai_assisted": {
-    "commits": 2270,
+    "commits": 2278,
     "authored": 0,
     "assistants": {
-      "Claude": 1702,
-      "Codex": 371,
-      "ChatGPT": 369,
+      "Claude": 1709,
+      "Codex": 372,
+      "ChatGPT": 370,
       "Cursor": 215,
       "Gemini": 51,
       "GitHub Copilot": 40,
@@ -3186,7 +3186,7 @@
       "2026-07": 332,
       "2026-08": 359,
       "2026-09": 320,
-      "2026-10": 273
+      "2026-10": 281
     },
     "commits_by_month": {
       "2024-11": 250,
@@ -3212,14 +3212,14 @@
       "2026-07": 531,
       "2026-08": 536,
       "2026-09": 455,
-      "2026-10": 328
+      "2026-10": 336
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 50694,
+    "commits": 50702,
     "by_kind": {
-      "organization": 31017,
+      "organization": 31025,
       "one_person": 2303,
       "personal": 16406,
       "hidden": 799,
@@ -3239,11 +3239,11 @@
       },
       {
         "organization": "apache.org",
-        "commits": 8341,
-        "commits_last_12mo": 1393,
+        "commits": 8349,
+        "commits_last_12mo": 1401,
         "addresses": 98,
         "first_commit": "2013-07-08",
-        "last_commit": "2026-10-24"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "berkeley.edu",
@@ -4360,7 +4360,7 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 166,
+        "organization": 174,
         "one_person": 21,
         "personal": 106,
         "hidden": 35,
@@ -4372,13 +4372,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4798,
+    "commits": 4806,
     "authors": 423,
     "new_authors": 256,
     "half_of_commits": 11
   },
   "humans": {
-    "commits": 50694,
+    "commits": 50702,
     "commits_by_year": {
       "2010": 306,
       "2011": 326,
@@ -4396,9 +4396,9 @@
       "2023": 4113,
       "2024": 3762,
       "2025": 3411,
-      "2026": 4150
+      "2026": 4158
     },
-    "active_days": 5306
+    "active_days": 5308
   },
   "timezones": {
     "+0000": 2077,
@@ -4409,18 +4409,18 @@
     "+0500": 109,
     "+0530": 238,
     "+0700": 5,
-    "+0800": 9338,
+    "+0800": 9339,
     "+0900": 6763,
     "-0300": 5,
     "-0400": 541,
     "-0500": 1466,
     "-0600": 875,
-    "-0700": 17030,
+    "-0700": 17037,
     "-0800": 9104,
     "-1000": 10
   },
   "source_lines": {
-    "added": 15010698,
-    "current": 4175892
+    "added": 15011261,
+    "current": 4176397
   }
 }

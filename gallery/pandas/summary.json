@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:26:40+00:00",
+  "generated_at": "2026-10-26T03:46:02+00:00",
   "name": "pandas",
   "report_path": "index.html",
   "first_commit": "2009-07-31 15:07:16",
-  "last_commit": "2026-10-25 00:04:46",
-  "age_days": 6295,
+  "last_commit": "2026-10-25 23:14:28",
+  "age_days": 6296,
   "active_days": 5308,
-  "total_commits": 39611,
-  "total_authors": 4047,
-  "active_authors_12mo": 401,
-  "commits_last_12mo": 2944,
-  "total_files": 2689,
-  "total_lines": 1072227,
-  "lines_added": 3316663,
-  "lines_removed": 2244436,
+  "total_commits": 39619,
+  "total_authors": 4049,
+  "active_authors_12mo": 402,
+  "commits_last_12mo": 2952,
+  "total_files": 2688,
+  "total_lines": 1072711,
+  "lines_added": 3317254,
+  "lines_removed": 2244543,
   "total_tags": 102,
   "era": "steady",
   "top_authors": [
     {
       "name": "jbrockmendel",
-      "commits": 6460
+      "commits": 6465
     },
     {
       "name": "Jeff Reback",
@@ -37,11 +37,14 @@
     },
     {
       "name": "Matthew Roeschke",
-      "commits": 1549
+      "commits": 1550
     }
   ],
   "author_commits": {
-    "jbrockmendel": 6460,
+    "jbrockmendel": 6465,
+    "Junpei Zhang": 1,
+    "Matthew Roeschke": 1550,
+    "Ge Li": 1,
     "Minh Tuan Pham": 1,
     "Ammar Hassona": 1,
     "Breno Barreto": 1,
@@ -54,7 +57,6 @@
     "S.A": 1,
     "Chaimaa Abi": 2,
     "Ayush Kumar": 1,
-    "Matthew Roeschke": 1549,
     "Sugandh Garg": 1,
     "Fangchen Li": 182,
     "Mannava Daasaradhi": 1,
@@ -4107,13 +4109,13 @@
     "2023": 3017,
     "2024": 1769,
     "2025": 1097,
-    "2026": 2689
+    "2026": 2697
   },
   "ai_assisted": {
-    "commits": 1448,
+    "commits": 1453,
     "authored": 1,
     "assistants": {
-      "Claude": 1446,
+      "Claude": 1451,
       "Devin": 1,
       "GitHub Copilot": 1
     },
@@ -4141,7 +4143,7 @@
       "2026-07": 176,
       "2026-08": 167,
       "2026-09": 289,
-      "2026-10": 304
+      "2026-10": 309
     },
     "commits_by_month": {
       "2024-11": 115,
@@ -4167,17 +4169,17 @@
       "2026-07": 250,
       "2026-08": 275,
       "2026-09": 422,
-      "2026-10": 411
+      "2026-10": 419
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39611,
+    "commits": 39619,
     "by_kind": {
       "organization": 987,
       "one_person": 6674,
-      "personal": 23589,
-      "hidden": 8115,
+      "personal": 23595,
+      "hidden": 8117,
       "unknown": 25,
       "bot": 221
     },
@@ -4717,8 +4719,8 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 2,
-        "personal": 356,
-        "hidden": 38,
+        "personal": 362,
+        "hidden": 40,
         "unknown": 0,
         "bot": 14
       }
@@ -4727,13 +4729,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2825,
-    "authors": 386,
-    "new_authors": 319,
+    "commits": 2833,
+    "authors": 388,
+    "new_authors": 321,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 39390,
+    "commits": 39398,
     "commits_by_year": {
       "2009": 100,
       "2010": 147,
@@ -4752,7 +4754,7 @@
       "2023": 2991,
       "2024": 1747,
       "2025": 1064,
-      "2026": 2575
+      "2026": 2583
     },
     "active_days": 5300
   },
@@ -4769,7 +4771,7 @@
     "+0545": 7,
     "+0600": 11,
     "+0700": 209,
-    "+0800": 609,
+    "+0800": 610,
     "+0900": 522,
     "+0930": 2,
     "+1000": 94,
@@ -4779,16 +4781,16 @@
     "+1400": 1,
     "-0200": 11,
     "-0300": 219,
-    "-0400": 8229,
+    "-0400": 8230,
     "-0500": 5869,
     "-0600": 709,
-    "-0700": 7262,
+    "-0700": 7268,
     "-0800": 3943,
     "-0900": 1,
     "-1000": 361
   },
   "source_lines": {
-    "added": 3113932,
-    "current": 995630
+    "added": 3114523,
+    "current": 996114
   }
 }

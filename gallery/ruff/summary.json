@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:27:31+00:00",
+  "generated_at": "2026-10-26T03:46:11+00:00",
   "name": "Ruff",
   "report_path": "index.html",
   "first_commit": "2022-08-09 17:19:19",
-  "last_commit": "2026-10-25 02:52:44",
-  "age_days": 1538,
+  "last_commit": "2026-10-25 23:17:52",
+  "age_days": 1539,
   "active_days": 1471,
-  "total_commits": 17787,
+  "total_commits": 17792,
   "total_authors": 948,
   "active_authors_12mo": 313,
-  "commits_last_12mo": 5145,
+  "commits_last_12mo": 5150,
   "total_files": 11266,
-  "total_lines": 2234649,
-  "lines_added": 4456031,
-  "lines_removed": 2221382,
+  "total_lines": 2234916,
+  "lines_added": 4456560,
+  "lines_removed": 2221644,
   "total_tags": 432,
   "era": "steady",
   "top_authors": [
     {
       "name": "Charlie Marsh",
-      "commits": 4464
+      "commits": 4469
     },
     {
       "name": "Micha Reiser",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Charlie Marsh": 4464,
+    "Charlie Marsh": 4469,
     "Carl Meyer": 524,
     "Brent Westbrook": 513,
     "Anish Giri": 20,
@@ -995,7 +995,7 @@
     "2023": 4573,
     "2024": 2969,
     "2025": 4478,
-    "2026": 4362
+    "2026": 4367
   },
   "ai_assisted": {
     "commits": 70,
@@ -1054,16 +1054,16 @@
       "2026-07": 563,
       "2026-08": 488,
       "2026-09": 464,
-      "2026-10": 324
+      "2026-10": 329
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17787,
+    "commits": 17792,
     "by_kind": {
       "organization": 975,
       "one_person": 3296,
-      "personal": 8916,
+      "personal": 8921,
       "hidden": 2743,
       "unknown": 0,
       "bot": 1857
@@ -1156,7 +1156,7 @@
       "2026-Q4": {
         "organization": 40,
         "one_person": 61,
-        "personal": 133,
+        "personal": 138,
         "hidden": 45,
         "unknown": 0,
         "bot": 45
@@ -1166,19 +1166,19 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4393,
+    "commits": 4398,
     "authors": 311,
     "new_authors": 230,
     "half_of_commits": 4
   },
   "humans": {
-    "commits": 15930,
+    "commits": 15935,
     "commits_by_year": {
       "2022": 1405,
       "2023": 4456,
       "2024": 2464,
       "2025": 3890,
-      "2026": 3715
+      "2026": 3720
     },
     "active_days": 1467
   },
@@ -1203,7 +1203,7 @@
     "+1200": 2,
     "+1300": 3,
     "-0300": 103,
-    "-0400": 4164,
+    "-0400": 4169,
     "-0500": 2963,
     "-0600": 314,
     "-0700": 1116,
@@ -1211,7 +1211,7 @@
     "-0900": 1
   },
   "source_lines": {
-    "added": 2792472,
-    "current": 1440480
+    "added": 2793001,
+    "current": 1440752
   }
 }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:33:52+00:00",
+  "generated_at": "2026-10-26T03:52:49+00:00",
   "name": "Apache ShardingSphere",
   "report_path": "index.html",
   "first_commit": "2016-01-18 12:49:26",
-  "last_commit": "2026-10-24 14:06:25",
-  "age_days": 3933,
-  "active_days": 3425,
-  "total_commits": 50067,
+  "last_commit": "2026-10-26 03:39:19",
+  "age_days": 3934,
+  "active_days": 3426,
+  "total_commits": 50069,
   "total_authors": 744,
   "active_authors_12mo": 65,
-  "commits_last_12mo": 2894,
-  "total_files": 17839,
-  "total_lines": 1511905,
-  "lines_added": 4818621,
-  "lines_removed": 3306716,
+  "commits_last_12mo": 2896,
+  "total_files": 17853,
+  "total_lines": 1512756,
+  "lines_added": 4819596,
+  "lines_removed": 3306840,
   "total_tags": 37,
   "era": "steady",
   "top_authors": [
     {
       "name": "Liang Zhang",
-      "commits": 18866
+      "commits": 18868
     },
     {
       "name": "tristaZero",
@@ -41,8 +41,8 @@
     }
   ],
   "author_commits": {
+    "Liang Zhang": 18868,
     "Divyansh Yadav": 2,
-    "Liang Zhang": 18866,
     "Zhengqiang Duan": 1571,
     "Maxim Igoshin": 45,
     "Rain.": 1,
@@ -797,7 +797,7 @@
     "2023": 4028,
     "2024": 3620,
     "2025": 2956,
-    "2026": 2355
+    "2026": 2357
   },
   "ai_assisted": {
     "commits": 60,
@@ -856,14 +856,14 @@
       "2026-07": 263,
       "2026-08": 339,
       "2026-09": 298,
-      "2026-10": 259
+      "2026-10": 261
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 50067,
+    "commits": 50069,
     "by_kind": {
-      "organization": 15812,
+      "organization": 15814,
       "one_person": 526,
       "personal": 30558,
       "hidden": 3079,
@@ -875,11 +875,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 15347,
-        "commits_last_12mo": 2233,
+        "commits": 15349,
+        "commits_last_12mo": 2235,
         "addresses": 21,
         "first_commit": "2018-03-02",
-        "last_commit": "2026-10-24"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "huobi.com",
@@ -980,7 +980,7 @@
         "bot": 4
       },
       "2026-Q4": {
-        "organization": 205,
+        "organization": 207,
         "one_person": 0,
         "personal": 9,
         "hidden": 45,
@@ -992,13 +992,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2886,
+    "commits": 2888,
     "authors": 65,
     "new_authors": 44,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 50046,
+    "commits": 50048,
     "commits_by_year": {
       "2016": 399,
       "2017": 2025,
@@ -1010,9 +1010,9 @@
       "2023": 4025,
       "2024": 3617,
       "2025": 2953,
-      "2026": 2349
+      "2026": 2351
     },
-    "active_days": 3425
+    "active_days": 3426
   },
   "timezones": {
     "+0000": 14,
@@ -1023,7 +1023,7 @@
     "+0530": 480,
     "+0600": 1,
     "+0700": 49,
-    "+0800": 48746,
+    "+0800": 48748,
     "+0900": 104,
     "+1000": 8,
     "+1100": 5,
@@ -1037,7 +1037,7 @@
     "-0800": 10
   },
   "source_lines": {
-    "added": 6596422,
-    "current": 1509359
+    "added": 6597397,
+    "current": 1510210
   }
 }

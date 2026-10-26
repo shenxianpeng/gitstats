@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:28:59+00:00",
+  "generated_at": "2026-10-26T03:47:58+00:00",
   "name": "Transformers",
   "report_path": "index.html",
   "first_commit": "2018-10-29 13:56:02",
-  "last_commit": "2026-10-23 17:36:24",
-  "age_days": 2917,
-  "active_days": 2349,
-  "total_commits": 24487,
-  "total_authors": 3939,
-  "active_authors_12mo": 661,
-  "commits_last_12mo": 3480,
-  "total_files": 6644,
-  "total_lines": 2092923,
-  "lines_added": 4562939,
-  "lines_removed": 2470016,
+  "last_commit": "2026-10-26 02:14:12",
+  "age_days": 2919,
+  "active_days": 2351,
+  "total_commits": 24492,
+  "total_authors": 3941,
+  "active_authors_12mo": 663,
+  "commits_last_12mo": 3485,
+  "total_files": 6657,
+  "total_lines": 2097446,
+  "lines_added": 4567804,
+  "lines_removed": 2470358,
   "total_tags": 87,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,11 @@
     }
   ],
   "author_commits": {
+    "NIKHIL": 1,
+    "Srijan Roy": 1,
+    "Ryan Mullins": 23,
+    "guarin": 29,
+    "Wang, Yi": 103,
     "Steven Liu": 260,
     "Ilyas Moutawwakil": 74,
     "eustlb": 84,
@@ -83,7 +88,6 @@
     "Bob Ok": 6,
     "digit50": 2,
     "tritsystem": 1,
-    "Wang, Yi": 102,
     "BADAOUI Abdennacer": 39,
     "poojansatani": 1,
     "mrchatam": 4,
@@ -106,7 +110,6 @@
     "Arnav Singh": 1,
     "Arthur": 479,
     "Eric Schreiber": 1,
-    "guarin": 28,
     "Ita Zaporozhets": 54,
     "Tom Aarsen": 52,
     "Michael Benayoun": 57,
@@ -427,7 +430,6 @@
     "Gaurav Dubey": 1,
     "Remy": 3,
     "Joaquin Hui": 1,
-    "Ryan Mullins": 22,
     "Wing Lian": 44,
     "E. Ari\u00f1o de la Rubia": 1,
     "\u5a04\u5b97\u5fd7": 1,
@@ -3990,7 +3992,7 @@
     "2023": 3144,
     "2024": 2850,
     "2025": 3909,
-    "2026": 2912
+    "2026": 2917
   },
   "ai_assisted": {
     "commits": 285,
@@ -4053,17 +4055,17 @@
       "2026-07": 284,
       "2026-08": 277,
       "2026-09": 341,
-      "2026-10": 322
+      "2026-10": 327
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 24487,
+    "commits": 24492,
     "by_kind": {
-      "organization": 2608,
+      "organization": 2610,
       "one_person": 1945,
-      "personal": 8874,
-      "hidden": 10854,
+      "personal": 8876,
+      "hidden": 10855,
       "unknown": 14,
       "bot": 192
     },
@@ -4080,19 +4082,19 @@
       },
       {
         "organization": "intel.com",
-        "commits": 581,
-        "commits_last_12mo": 271,
+        "commits": 582,
+        "commits_last_12mo": 272,
         "addresses": 44,
         "first_commit": "2020-01-29",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-25"
       },
       {
         "organization": "google.com",
-        "commits": 56,
-        "commits_last_12mo": 11,
+        "commits": 57,
+        "commits_last_12mo": 12,
         "addresses": 15,
         "first_commit": "2019-11-20",
-        "last_commit": "2026-06-29"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "pku.edu.cn",
@@ -4593,10 +4595,10 @@
         "bot": 32
       },
       "2026-Q4": {
-        "organization": 53,
+        "organization": 55,
         "one_person": 18,
-        "personal": 39,
-        "hidden": 207,
+        "personal": 41,
+        "hidden": 208,
         "unknown": 0,
         "bot": 5
       }
@@ -4605,13 +4607,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3438,
-    "authors": 657,
-    "new_authors": 520,
+    "commits": 3443,
+    "authors": 659,
+    "new_authors": 522,
     "half_of_commits": 15
   },
   "humans": {
-    "commits": 24295,
+    "commits": 24300,
     "commits_by_year": {
       "2018": 345,
       "2019": 2582,
@@ -4621,12 +4623,12 @@
       "2023": 3108,
       "2024": 2780,
       "2025": 3898,
-      "2026": 2870
+      "2026": 2875
     },
-    "active_days": 2349
+    "active_days": 2351
   },
   "timezones": {
-    "+0000": 1552,
+    "+0000": 1557,
     "+0100": 5786,
     "+0200": 6026,
     "+0300": 493,
@@ -4655,7 +4657,7 @@
     "-1000": 6
   },
   "source_lines": {
-    "added": 4597076,
-    "current": 2079602
+    "added": 4601941,
+    "current": 2084125
   }
 }

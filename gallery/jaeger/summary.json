@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:30:24+00:00",
+  "generated_at": "2026-10-26T03:49:38+00:00",
   "name": "Jaeger",
   "report_path": "index.html",
   "first_commit": "2016-04-18 22:22:11",
-  "last_commit": "2026-10-24 00:50:26",
-  "age_days": 3841,
-  "active_days": 2034,
-  "total_commits": 4932,
-  "total_authors": 520,
-  "active_authors_12mo": 117,
-  "commits_last_12mo": 1059,
-  "total_files": 2003,
-  "total_lines": 302972,
-  "lines_added": 688314,
-  "lines_removed": 385342,
+  "last_commit": "2026-10-25 20:32:48",
+  "age_days": 3842,
+  "active_days": 2035,
+  "total_commits": 4937,
+  "total_authors": 521,
+  "active_authors_12mo": 118,
+  "commits_last_12mo": 1064,
+  "total_files": 2024,
+  "total_lines": 308589,
+  "lines_added": 695144,
+  "lines_removed": 386555,
   "total_tags": 121,
   "era": "peak",
   "top_authors": [
     {
       "name": "yurishkuro's AI bot",
-      "commits": 1198
+      "commits": 1202
     },
     {
       "name": "Mend Renovate",
@@ -41,11 +41,12 @@
     }
   ],
   "author_commits": {
+    "Ankit Garg": 1,
+    "yurishkuro's AI bot": 1202,
     "Haris": 2,
     "shantanu singh": 1,
     "Sublime monk": 3,
     "Ayush Kumar": 1,
-    "yurishkuro's AI bot": 1198,
     "Rishabh Kumar": 3,
     "Qingyuan Wang": 1,
     "Zarna Parekh": 3,
@@ -573,13 +574,13 @@
     "2023": 495,
     "2024": 788,
     "2025": 813,
-    "2026": 942
+    "2026": 947
   },
   "ai_assisted": {
-    "commits": 349,
+    "commits": 353,
     "authored": 66,
     "assistants": {
-      "Claude": 252,
+      "Claude": 256,
       "GitHub Copilot": 97,
       "Cursor": 9,
       "Codex": 1
@@ -608,7 +609,7 @@
       "2026-07": 62,
       "2026-08": 21,
       "2026-09": 64,
-      "2026-10": 49
+      "2026-10": 53
     },
     "commits_by_month": {
       "2024-11": 78,
@@ -634,19 +635,19 @@
       "2026-07": 103,
       "2026-08": 96,
       "2026-09": 144,
-      "2026-10": 83
+      "2026-10": 88
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 4932,
+    "commits": 4937,
     "by_kind": {
       "organization": 314,
       "one_person": 315,
-      "personal": 969,
+      "personal": 970,
       "hidden": 1914,
       "unknown": 0,
-      "bot": 1420
+      "bot": 1424
     },
     "organization_count": 10,
     "last_12mo_from": "2025-11",
@@ -792,23 +793,23 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 13,
-        "personal": 28,
+        "personal": 29,
         "hidden": 10,
         "unknown": 0,
-        "bot": 32
+        "bot": 36
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1040,
-    "authors": 116,
-    "new_authors": 97,
+    "commits": 1045,
+    "authors": 117,
+    "new_authors": 98,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 3512,
+    "commits": 3513,
     "commits_by_year": {
       "2016": 39,
       "2017": 338,
@@ -820,9 +821,9 @@
       "2023": 297,
       "2024": 494,
       "2025": 534,
-      "2026": 549
+      "2026": 550
     },
-    "active_days": 1805
+    "active_days": 1806
   },
   "timezones": {
     "+0000": 283,
@@ -832,7 +833,7 @@
     "+0330": 2,
     "+0400": 2,
     "+0500": 11,
-    "+0530": 627,
+    "+0530": 628,
     "+0545": 6,
     "+0700": 41,
     "+0800": 140,
@@ -841,14 +842,14 @@
     "+1100": 58,
     "+1300": 4,
     "-0300": 132,
-    "-0400": 1411,
+    "-0400": 1415,
     "-0500": 676,
     "-0600": 25,
     "-0700": 95,
     "-0800": 67
   },
   "source_lines": {
-    "added": 542572,
-    "current": 238634
+    "added": 549210,
+    "current": 244067
   }
 }

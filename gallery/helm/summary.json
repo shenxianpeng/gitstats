@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:29:50+00:00",
+  "generated_at": "2026-10-26T03:48:47+00:00",
   "name": "Helm",
   "report_path": "index.html",
   "first_commit": "2015-11-02 23:52:56",
-  "last_commit": "2026-10-21 20:35:27",
-  "age_days": 4006,
-  "active_days": 2440,
-  "total_commits": 10017,
-  "total_authors": 948,
-  "active_authors_12mo": 88,
-  "commits_last_12mo": 965,
+  "last_commit": "2026-10-26 00:19:58",
+  "age_days": 4011,
+  "active_days": 2442,
+  "total_commits": 10020,
+  "total_authors": 950,
+  "active_authors_12mo": 90,
+  "commits_last_12mo": 968,
   "total_files": 2048,
-  "total_lines": 134010,
-  "lines_added": 344734,
-  "lines_removed": 210724,
+  "total_lines": 134064,
+  "lines_added": 344905,
+  "lines_removed": 210841,
   "total_tags": 43,
   "era": "steady",
   "top_authors": [
@@ -41,7 +41,9 @@
     }
   ],
   "author_commits": {
-    "Terry Howe": 253,
+    "Terry Howe": 254,
+    "ump45nose": 1,
+    "Zain Qureshi": 1,
     "Gerard Louis Andres Recinto": 2,
     "George Jenkins": 309,
     "Ruslan Shaydullin": 2,
@@ -1002,14 +1004,14 @@
     "2023": 439,
     "2024": 618,
     "2025": 1342,
-    "2026": 757
+    "2026": 760
   },
   "ai_assisted": {
-    "commits": 29,
+    "commits": 30,
     "authored": 2,
     "assistants": {
       "GitHub Copilot": 18,
-      "Claude": 8,
+      "Claude": 9,
       "Grok": 2,
       "Cursor": 1
     },
@@ -1037,7 +1039,7 @@
       "2026-07": 8,
       "2026-08": 2,
       "2026-09": 0,
-      "2026-10": 1
+      "2026-10": 2
     },
     "commits_by_month": {
       "2024-11": 55,
@@ -1063,17 +1065,17 @@
       "2026-07": 180,
       "2026-08": 36,
       "2026-09": 37,
-      "2026-10": 16
+      "2026-10": 19
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 10017,
+    "commits": 10020,
     "by_kind": {
       "organization": 3711,
       "one_person": 2190,
-      "personal": 2775,
-      "hidden": 856,
+      "personal": 2776,
+      "hidden": 858,
       "unknown": 10,
       "bot": 475
     },
@@ -1405,8 +1407,8 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 1,
-        "personal": 7,
-        "hidden": 0,
+        "personal": 8,
+        "hidden": 2,
         "unknown": 0,
         "bot": 8
       }
@@ -1415,13 +1417,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 799,
-    "authors": 87,
-    "new_authors": 67,
+    "commits": 802,
+    "authors": 89,
+    "new_authors": 69,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 9542,
+    "commits": 9545,
     "commits_by_year": {
       "2015": 237,
       "2016": 2248,
@@ -1434,13 +1436,13 @@
       "2023": 383,
       "2024": 529,
       "2025": 1218,
-      "2026": 619
+      "2026": 622
     },
-    "active_days": 2368
+    "active_days": 2370
   },
   "timezones": {
     "+0000": 793,
-    "+0100": 751,
+    "+0100": 752,
     "+0200": 549,
     "+0300": 113,
     "+0330": 4,
@@ -1450,7 +1452,7 @@
     "+0530": 154,
     "+0600": 1,
     "+0700": 27,
-    "+0800": 381,
+    "+0800": 382,
     "+0900": 67,
     "+1000": 5,
     "+1100": 7,
@@ -1460,13 +1462,13 @@
     "-0300": 20,
     "-0400": 1133,
     "-0500": 768,
-    "-0600": 1666,
+    "-0600": 1667,
     "-0700": 2351,
     "-0800": 1176,
     "-1000": 1
   },
   "source_lines": {
-    "added": 318709,
-    "current": 112604
+    "added": 318880,
+    "current": 112658
   }
 }

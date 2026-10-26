@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:31:58+00:00",
+  "generated_at": "2026-10-26T03:51:03+00:00",
   "name": "Apache Pulsar",
   "report_path": "index.html",
   "first_commit": "2016-09-07 04:17:28",
-  "last_commit": "2026-10-24 23:17:41",
-  "age_days": 3700,
-  "active_days": 2945,
-  "total_commits": 15250,
+  "last_commit": "2026-10-26 01:08:09",
+  "age_days": 3701,
+  "active_days": 2947,
+  "total_commits": 15252,
   "total_authors": 774,
-  "active_authors_12mo": 130,
-  "commits_last_12mo": 1474,
+  "active_authors_12mo": 132,
+  "commits_last_12mo": 1476,
   "total_files": 6353,
-  "total_lines": 1334756,
-  "lines_added": 6323619,
-  "lines_removed": 4988863,
+  "total_lines": 1334881,
+  "lines_added": 6323772,
+  "lines_removed": 4988891,
   "total_tags": 6,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Ali Ahmed": 111,
+    "Aurora Twinkle": 7,
     "void-ptr974": 57,
     "LiuYC3213687107": 1,
     "Michael Marshall": 237,
@@ -184,7 +186,6 @@
     "pmupkin": 1,
     "Phineas": 2,
     "Joforde": 2,
-    "Aurora Twinkle": 6,
     "Apurva007": 5,
     "Andrey Yegorov": 78,
     "ChaoWang": 1,
@@ -305,7 +306,6 @@
     "Dave Maughan": 8,
     "Qiang Huang": 57,
     "Robert Barbey": 1,
-    "Ali Ahmed": 110,
     "xiaokang": 1,
     "0xflotus": 1,
     "Li Li": 189,
@@ -827,13 +827,13 @@
     "2023": 1165,
     "2024": 931,
     "2025": 719,
-    "2026": 1361
+    "2026": 1363
   },
   "ai_assisted": {
-    "commits": 32,
+    "commits": 33,
     "authored": 0,
     "assistants": {
-      "Claude": 23,
+      "Claude": 24,
       "GitHub Copilot": 8,
       "Cursor": 1
     },
@@ -861,7 +861,7 @@
       "2026-07": 1,
       "2026-08": 3,
       "2026-09": 3,
-      "2026-10": 3
+      "2026-10": 4
     },
     "commits_by_month": {
       "2024-11": 67,
@@ -887,16 +887,16 @@
       "2026-07": 81,
       "2026-08": 82,
       "2026-09": 256,
-      "2026-10": 309
+      "2026-10": 311
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15250,
+    "commits": 15252,
     "by_kind": {
       "organization": 5691,
-      "one_person": 249,
-      "personal": 5584,
+      "one_person": 250,
+      "personal": 5585,
       "hidden": 3697,
       "unknown": 0,
       "bot": 29
@@ -1036,8 +1036,8 @@
       },
       "2026-Q4": {
         "organization": 105,
-        "one_person": 3,
-        "personal": 92,
+        "one_person": 4,
+        "personal": 93,
         "hidden": 108,
         "unknown": 0,
         "bot": 1
@@ -1047,13 +1047,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1460,
-    "authors": 129,
+    "commits": 1462,
+    "authors": 131,
     "new_authors": 55,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 15221,
+    "commits": 15223,
     "commits_by_year": {
       "2016": 118,
       "2017": 636,
@@ -1065,9 +1065,9 @@
       "2023": 1163,
       "2024": 924,
       "2025": 712,
-      "2026": 1349
+      "2026": 1351
     },
-    "active_days": 2943
+    "active_days": 2945
   },
   "timezones": {
     "+0000": 60,
@@ -1078,18 +1078,18 @@
     "+0430": 1,
     "+0530": 113,
     "+0700": 2,
-    "+0800": 7060,
+    "+0800": 7061,
     "+0900": 437,
     "+1000": 6,
     "-0300": 44,
     "-0400": 109,
     "-0500": 268,
     "-0600": 214,
-    "-0700": 3051,
+    "-0700": 3052,
     "-0800": 1360
   },
   "source_lines": {
-    "added": 6308159,
-    "current": 1326901
+    "added": 6308312,
+    "current": 1327026
   }
 }

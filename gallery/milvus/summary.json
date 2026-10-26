@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:34:34+00:00",
+  "generated_at": "2026-10-26T03:53:18+00:00",
   "name": "Milvus",
   "report_path": "index.html",
   "first_commit": "2019-03-18 11:33:09",
-  "last_commit": "2026-10-23 22:15:53",
-  "age_days": 2777,
-  "active_days": 2300,
-  "total_commits": 25870,
+  "last_commit": "2026-10-26 03:49:19",
+  "age_days": 2779,
+  "active_days": 2301,
+  "total_commits": 25871,
   "total_authors": 383,
   "active_authors_12mo": 103,
-  "commits_last_12mo": 2500,
+  "commits_last_12mo": 2501,
   "total_files": 7273,
   "total_lines": 3523736,
-  "lines_added": 8017558,
-  "lines_removed": 4493822,
+  "lines_added": 8017562,
+  "lines_removed": 4493826,
   "total_tags": 35,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "James": 474,
     "sijie-ni-0214": 75,
     "Li Liu": 111,
     "cai.zhang": 833,
@@ -50,7 +51,6 @@
     "Gao": 96,
     "zhenshan.cao": 484,
     "Bingyi Sun": 382,
-    "James": 473,
     "zhuwenxing": 859,
     "sparknack": 90,
     "zhagnlu": 246,
@@ -433,7 +433,7 @@
     "2023": 2450,
     "2024": 2810,
     "2025": 2228,
-    "2026": 2086
+    "2026": 2087
   },
   "ai_assisted": {
     "commits": 697,
@@ -494,17 +494,17 @@
       "2026-07": 270,
       "2026-08": 219,
       "2026-09": 217,
-      "2026-10": 184
+      "2026-10": 185
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 25870,
+    "commits": 25871,
     "by_kind": {
       "organization": 18939,
       "one_person": 164,
       "personal": 2669,
-      "hidden": 4061,
+      "hidden": 4062,
       "unknown": 7,
       "bot": 30
     },
@@ -621,7 +621,7 @@
         "organization": 82,
         "one_person": 0,
         "personal": 55,
-        "hidden": 47,
+        "hidden": 48,
         "unknown": 0,
         "bot": 0
       }
@@ -630,13 +630,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2498,
+    "commits": 2499,
     "authors": 102,
     "new_authors": 56,
     "half_of_commits": 10
   },
   "humans": {
-    "commits": 25840,
+    "commits": 25841,
     "commits_by_year": {
       "2019": 4644,
       "2020": 1360,
@@ -645,9 +645,9 @@
       "2023": 2443,
       "2024": 2810,
       "2025": 2226,
-      "2026": 2084
+      "2026": 2085
     },
-    "active_days": 2300
+    "active_days": 2301
   },
   "timezones": {
     "+0000": 295,
@@ -657,7 +657,7 @@
     "+0400": 6,
     "+0530": 46,
     "+0700": 1,
-    "+0800": 25093,
+    "+0800": 25094,
     "+0900": 16,
     "+1000": 2,
     "-0300": 2,
@@ -668,7 +668,7 @@
     "-0800": 15
   },
   "source_lines": {
-    "added": 6225936,
+    "added": 6225940,
     "current": 2755788
   }
 }

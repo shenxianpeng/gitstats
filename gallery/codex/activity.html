@@ -462,18 +462,18 @@
 <details class="table-details"><summary>Table: commits and lines per month (19 months with commits)</summary><div class="table-scroll"><table><tr><th>Month</th><th class="num">Commits</th><th class="num">Lines added</th><th class="num">Lines removed</th></tr><tr><td>2026-10</td><td class="num">908</td><td class="num">254,731</td><td class="num">73,695</td></tr><tr><td>2026-09</td><td class="num">1,617</td><td class="num">650,776</td><td class="num">193,625</td></tr><tr><td>2026-08</td><td class="num">1,266</td><td class="num">438,344</td><td class="num">97,100</td></tr><tr><td>2026-07</td><td class="num">879</td><td class="num">266,960</td><td class="num">88,393</td></tr><tr><td>2026-06</td><td class="num">930</td><td class="num">263,892</td><td class="num">82,080</td></tr><tr><td>2026-05</td><td class="num">939</td><td class="num">328,537</td><td class="num">156,654</td></tr><tr><td>2026-04</td><td class="num">1,073</td><td class="num">388,025</td><td class="num">155,054</td></tr><tr><td>2026-03</td><td class="num">848</td><td class="num">578,852</td><td class="num">362,868</td></tr><tr><td>2026-02</td><td class="num">888</td><td class="num">334,642</td><td class="num">119,608</td></tr><tr><td>2026-01</td><td class="num">642</td><td class="num">130,853</td><td class="num">115,211</td></tr><tr><td>2025-12</td><td class="num">427</td><td class="num">129,116</td><td class="num">22,479</td></tr><tr><td>2025-11</td><td class="num">377</td><td class="num">59,297</td><td class="num">46,518</td></tr><tr><td>2025-10</td><td class="num">391</td><td class="num">78,294</td><td class="num">30,056</td></tr><tr><td>2025-09</td><td class="num">394</td><td class="num">94,193</td><td class="num">36,150</td></tr><tr><td>2025-08</td><td class="num">425</td><td class="num">87,834</td><td class="num">61,395</td></tr><tr><td>2025-07</td><td class="num">129</td><td class="num">19,729</td><td class="num">7,278</td></tr><tr><td>2025-06</td><td class="num">44</td><td class="num">5,450</td><td class="num">1,206</td></tr><tr><td>2025-05</td><td class="num">155</td><td class="num">24,875</td><td class="num">5,601</td></tr><tr><td>2025-04</td><td class="num">259</td><td class="num">75,114</td><td class="num">21,245</td></tr></table></div></details>
 <h2 id="weekly_activity"><a href="#weekly_activity">Weekly activity</a></h2>
 
-<p class="section-note">Last 32 weeks, from the week of Mar 16, 2026 to the week of Oct 19, 2026.</p><div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-weekly-activity"></canvas></div>
+<p class="section-note">Last 32 weeks, from the week of Mar 23, 2026 to the week of Oct 26, 2026.</p><div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-weekly-activity"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-weekly-activity').getContext('2d');
-  var labels = ["Mar 16", "Mar 23", "Mar 30", "Apr 6", "Apr 13", "Apr 20", "Apr 27", "May 4", "May 11", "May 18", "May 25", "Jun 1", "Jun 8", "Jun 15", "Jun 22", "Jun 29", "Jul 6", "Jul 13", "Jul 20", "Jul 27", "Aug 3", "Aug 10", "Aug 17", "Aug 24", "Aug 31", "Sep 7", "Sep 14", "Sep 21", "Sep 28", "Oct 5", "Oct 12", "Oct 19"];
+  var labels = ["Mar 23", "Mar 30", "Apr 6", "Apr 13", "Apr 20", "Apr 27", "May 4", "May 11", "May 18", "May 25", "Jun 1", "Jun 8", "Jun 15", "Jun 22", "Jun 29", "Jul 6", "Jul 13", "Jul 20", "Jul 27", "Aug 3", "Aug 10", "Aug 17", "Aug 24", "Aug 31", "Sep 7", "Sep 14", "Sep 21", "Sep 28", "Oct 5", "Oct 12", "Oct 19", "Oct 26"];
   var gap = null;
   applyChartTheme();
   new Chart(ctx, {
     type: 'bar',
     data: {
       labels: labels,
-      datasets: [{"label": "Commits", "data": [157, 234, 140, 205, 241, 295, 269, 247, 233, 220, 191, 217, 240, 214, 250, 24, 192, 216, 267, 202, 240, 298, 361, 306, 322, 353, 382, 430, 332, 281, 214, 259], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+      datasets: [{"label": "Commits", "data": [234, 140, 205, 241, 295, 269, 247, 233, 220, 191, 217, 240, 214, 250, 24, 192, 216, 267, 202, 240, 298, 361, 306, 322, 353, 382, 430, 332, 281, 214, 259, 0], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
     },
     options: {
       responsive: true,

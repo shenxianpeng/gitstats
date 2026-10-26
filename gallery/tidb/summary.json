@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:34:59+00:00",
+  "generated_at": "2026-10-26T03:53:36+00:00",
   "name": "TiDB",
   "report_path": "index.html",
   "first_commit": "2015-09-06 04:04:42",
-  "last_commit": "2026-10-24 11:51:56",
-  "age_days": 4067,
-  "active_days": 3410,
-  "total_commits": 28778,
+  "last_commit": "2026-10-26 03:13:58",
+  "age_days": 4068,
+  "active_days": 3411,
+  "total_commits": 28780,
   "total_authors": 993,
   "active_authors_12mo": 138,
-  "commits_last_12mo": 1708,
-  "total_files": 7838,
-  "total_lines": 2575264,
-  "lines_added": 9972744,
-  "lines_removed": 7397480,
+  "commits_last_12mo": 1710,
+  "total_files": 7844,
+  "total_lines": 2579722,
+  "lines_added": 9977264,
+  "lines_removed": 7397542,
   "total_tags": 54,
   "era": "steady",
   "top_authors": [
@@ -41,11 +41,12 @@
     }
   ],
   "author_commits": {
+    "flaky-claw": 95,
+    "xufei": 170,
     "Chao Wang": 495,
     "D3Hunter": 706,
     "Ruihao Chen": 124,
     "Jiong": 9,
-    "xufei": 169,
     "Vlad Dmitriev": 4,
     "dillon": 6,
     "expxiaoli": 24,
@@ -53,7 +54,6 @@
     "Yiding Cui": 480,
     "tongjian": 20,
     "YangKeao": 300,
-    "flaky-claw": 94,
     "Ray Yan": 5,
     "lucasliang": 2,
     "Mattias Jonsson": 209,
@@ -1047,7 +1047,7 @@
     "2023": 3184,
     "2024": 2840,
     "2025": 1979,
-    "2026": 1417
+    "2026": 1419
   },
   "ai_assisted": {
     "commits": 4,
@@ -1105,15 +1105,15 @@
       "2026-07": 123,
       "2026-08": 118,
       "2026-09": 157,
-      "2026-10": 87
+      "2026-10": 89
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 28778,
+    "commits": 28780,
     "by_kind": {
-      "organization": 4090,
-      "one_person": 1533,
+      "organization": 4091,
+      "one_person": 1534,
       "personal": 19673,
       "hidden": 3214,
       "unknown": 2,
@@ -1124,11 +1124,11 @@
     "top": [
       {
         "organization": "pingcap.com",
-        "commits": 3875,
-        "commits_last_12mo": 369,
+        "commits": 3876,
+        "commits_last_12mo": 370,
         "addresses": 55,
         "first_commit": "2016-10-11",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "breeswish.org",
@@ -1277,8 +1277,8 @@
         "bot": 2
       },
       "2026-Q4": {
-        "organization": 12,
-        "one_person": 14,
+        "organization": 13,
+        "one_person": 15,
         "personal": 39,
         "hidden": 22,
         "unknown": 0,
@@ -1289,13 +1289,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1690,
+    "commits": 1692,
     "authors": 138,
     "new_authors": 55,
     "half_of_commits": 9
   },
   "humans": {
-    "commits": 28512,
+    "commits": 28514,
     "commits_by_year": {
       "2015": 2528,
       "2016": 1541,
@@ -1308,9 +1308,9 @@
       "2023": 3099,
       "2024": 2767,
       "2025": 1904,
-      "2026": 1394
+      "2026": 1396
     },
-    "active_days": 3389
+    "active_days": 3390
   },
   "timezones": {
     "+0000": 206,
@@ -1321,7 +1321,7 @@
     "+0500": 1,
     "+0530": 40,
     "+0700": 11,
-    "+0800": 26203,
+    "+0800": 26205,
     "+0900": 165,
     "+1000": 9,
     "+1100": 8,
@@ -1336,7 +1336,7 @@
     "-0900": 1
   },
   "source_lines": {
-    "added": 8126550,
-    "current": 2420863
+    "added": 8131070,
+    "current": 2425321
   }
 }

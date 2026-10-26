@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:36:38+00:00",
+  "generated_at": "2026-10-26T03:55:13+00:00",
   "name": "curl",
   "report_path": "index.html",
   "first_commit": "1999-12-29 14:20:26",
   "last_commit": "2026-10-24 20:12:34",
   "age_days": 9797,
   "active_days": 7813,
-  "total_commits": 40249,
+  "total_commits": 40253,
   "total_authors": 1540,
   "active_authors_12mo": 189,
-  "commits_last_12mo": 3541,
-  "total_files": 4602,
-  "total_lines": 631655,
-  "lines_added": 1948742,
-  "lines_removed": 1317087,
+  "commits_last_12mo": 3545,
+  "total_files": 4604,
+  "total_lines": 631966,
+  "lines_added": 1949211,
+  "lines_removed": 1317245,
   "total_tags": 217,
   "era": "surge",
   "top_authors": [
     {
       "name": "Daniel Stenberg",
-      "commits": 20747
+      "commits": 20748
     },
     {
       "name": "Viktor Szakats",
@@ -41,16 +41,17 @@
     }
   ],
   "author_commits": {
+    "Daniel McCarney": 34,
+    "Daniel Stenberg": 20748,
+    "Michiel van Slobbe": 3,
     "Viktor Szakats": 3569,
     "Martin Mirchev": 9,
     "Armaan Sandhu": 3,
-    "Michiel van Slobbe": 2,
     "Stefan Eissing": 1279,
     "Dan Fandrich": 1471,
     "Derek Martin": 1,
     "matty69v": 3,
     "11soda11": 4,
-    "Daniel Stenberg": 20747,
     "Stephen Augustus": 1,
     "AP": 1,
     "Khaled": 1,
@@ -66,7 +67,6 @@
     "David H-yan": 1,
     "M\u00e1t\u00e9 Szab\u00f3": 1,
     "Vasiliy-Kkk": 3,
-    "Daniel McCarney": 32,
     "pszemus": 1,
     "David Bures": 1,
     "Jay Satiro": 794,
@@ -1610,7 +1610,7 @@
     "2023": 1905,
     "2024": 2436,
     "2025": 3477,
-    "2026": 2800
+    "2026": 2804
   },
   "ai_assisted": {
     "commits": 2,
@@ -1669,16 +1669,16 @@
       "2026-07": 173,
       "2026-08": 259,
       "2026-09": 355,
-      "2026-10": 285
+      "2026-10": 289
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 40249,
+    "commits": 40253,
     "by_kind": {
-      "organization": 22023,
-      "one_person": 10647,
-      "personal": 6893,
+      "organization": 22024,
+      "one_person": 10649,
+      "personal": 6894,
       "hidden": 313,
       "unknown": 60,
       "bot": 313
@@ -1688,8 +1688,8 @@
     "top": [
       {
         "organization": "haxx.se",
-        "commits": 20779,
-        "commits_last_12mo": 1038,
+        "commits": 20780,
+        "commits_last_12mo": 1039,
         "addresses": 3,
         "first_commit": "1999-12-29",
         "last_commit": "2026-10-22"
@@ -2201,9 +2201,9 @@
         "bot": 34
       },
       "2026-Q4": {
-        "organization": 51,
-        "one_person": 181,
-        "personal": 27,
+        "organization": 52,
+        "one_person": 183,
+        "personal": 28,
         "hidden": 15,
         "unknown": 0,
         "bot": 11
@@ -2213,13 +2213,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3413,
+    "commits": 3417,
     "authors": 188,
     "new_authors": 145,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 39936,
+    "commits": 39940,
     "commits_by_year": {
       "1999": 1,
       "2000": 710,
@@ -2248,14 +2248,14 @@
       "2023": 1905,
       "2024": 2354,
       "2025": 3348,
-      "2026": 2698
+      "2026": 2702
     },
     "active_days": 7809
   },
   "timezones": {
     "+0000": 14825,
     "+0100": 9170,
-    "+0200": 13003,
+    "+0200": 13005,
     "+0300": 311,
     "+0330": 8,
     "+0400": 25,
@@ -2277,7 +2277,7 @@
     "-0230": 4,
     "-0300": 35,
     "-0330": 1,
-    "-0400": 741,
+    "-0400": 743,
     "-0500": 501,
     "-0600": 108,
     "-0700": 741,
@@ -2285,7 +2285,7 @@
     "-1000": 1
   },
   "source_lines": {
-    "added": 1948756,
-    "current": 495351
+    "added": 1949225,
+    "current": 495643
   }
 }

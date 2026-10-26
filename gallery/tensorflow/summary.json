@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:30:49+00:00",
+  "generated_at": "2026-10-26T03:51:01+00:00",
   "name": "TensorFlow",
   "report_path": "index.html",
   "first_commit": "2015-11-07 00:27:58",
-  "last_commit": "2026-10-24 18:06:13",
-  "age_days": 4005,
-  "active_days": 3994,
-  "total_commits": 201997,
+  "last_commit": "2026-10-25 21:06:39",
+  "age_days": 4006,
+  "active_days": 3995,
+  "total_commits": 201998,
   "total_authors": 4617,
   "active_authors_12mo": 687,
-  "commits_last_12mo": 15475,
+  "commits_last_12mo": 15476,
   "total_files": 37489,
-  "total_lines": 11119666,
-  "lines_added": 29005013,
-  "lines_removed": 17885347,
+  "total_lines": 11119701,
+  "lines_added": 29005057,
+  "lines_removed": 17885356,
   "total_tags": 53,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Vlad Sytchenko": 87,
     "A. Unique TensorFlower": 61394,
     "Changming Sun CA": 83,
     "Christian Sigg": 916,
@@ -119,7 +120,6 @@
     "Ankit Vishwakarma": 13,
     "Adrian Kuegel": 1989,
     "Vladimir Suvorov": 3,
-    "Vlad Sytchenko": 86,
     "Dan Gnanapragasam": 1,
     "Hyeontaek Lim": 272,
     "Ricardo Torres": 27,
@@ -4671,7 +4671,7 @@
     "2023": 16742,
     "2024": 16193,
     "2025": 14683,
-    "2026": 13232
+    "2026": 13233
   },
   "ai_assisted": {
     "commits": 50,
@@ -4731,14 +4731,14 @@
       "2026-07": 1294,
       "2026-08": 1423,
       "2026-09": 1370,
-      "2026-10": 1971
+      "2026-10": 1972
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 201997,
+    "commits": 201998,
     "by_kind": {
-      "organization": 120237,
+      "organization": 120238,
       "one_person": 2710,
       "personal": 14143,
       "hidden": 4644,
@@ -4750,11 +4750,11 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 105714,
-        "commits_last_12mo": 7495,
+        "commits": 105715,
+        "commits_last_12mo": 7496,
         "addresses": 1238,
         "first_commit": "2015-11-07",
-        "last_commit": "2026-10-24"
+        "last_commit": "2026-10-25"
       },
       {
         "organization": "nvidia.com",
@@ -5615,7 +5615,7 @@
         "bot": 1092
       },
       "2026-Q4": {
-        "organization": 869,
+        "organization": 870,
         "one_person": 26,
         "personal": 464,
         "hidden": 102,
@@ -5627,13 +5627,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 15373,
+    "commits": 15374,
     "authors": 685,
     "new_authors": 371,
     "half_of_commits": 18
   },
   "humans": {
-    "commits": 141739,
+    "commits": 141740,
     "commits_by_year": {
       "2015": 529,
       "2016": 8947,
@@ -5646,9 +5646,9 @@
       "2023": 11888,
       "2024": 10492,
       "2025": 9298,
-      "2026": 9430
+      "2026": 9431
     },
-    "active_days": 3938
+    "active_days": 3939
   },
   "timezones": {
     "+0000": 4307,
@@ -5674,7 +5674,7 @@
     "-0400": 2012,
     "-0500": 1353,
     "-0600": 483,
-    "-0700": 113793,
+    "-0700": 113794,
     "-0800": 67501,
     "-1000": 2
   },

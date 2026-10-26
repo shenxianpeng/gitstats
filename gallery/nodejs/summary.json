@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:36:45+00:00",
+  "generated_at": "2026-10-26T03:56:02+00:00",
   "name": "Node.js",
   "report_path": "index.html",
   "first_commit": "2009-02-16 00:02:00",
-  "last_commit": "2026-10-24 19:50:34",
-  "age_days": 6460,
-  "active_days": 6111,
-  "total_commits": 49219,
+  "last_commit": "2026-10-25 23:33:24",
+  "age_days": 6461,
+  "active_days": 6112,
+  "total_commits": 49240,
   "total_authors": 4375,
   "active_authors_12mo": 433,
-  "commits_last_12mo": 3829,
-  "total_files": 56562,
-  "total_lines": 17922664,
-  "lines_added": 41968871,
-  "lines_removed": 24046207,
+  "commits_last_12mo": 3850,
+  "total_files": 56702,
+  "total_lines": 18165502,
+  "lines_added": 42958294,
+  "lines_removed": 24792792,
   "total_tags": 245,
   "era": "steady",
   "top_authors": [
@@ -41,27 +41,28 @@
     }
   ],
   "author_commits": {
-    "Filip Skokan": 632,
-    "Matteo Collina": 351,
+    "Node.js GitHub Bot": 1108,
+    "Lazizbek Ergashev": 19,
+    "Filip Skokan": 643,
+    "Guilherme Ara\u00fajo": 34,
+    "Christian Aurich Zanettini Martins": 25,
+    "Antoine du Hamel": 1212,
+    "Matteo Collina": 352,
+    "Trevor Burnham": 18,
+    "Trivikram Kamat": 213,
     "Robert Nagy": 354,
-    "Trivikram Kamat": 212,
     "Rafael Gonzaga": 478,
     "Chengzhong Wu": 399,
-    "Lazizbek Ergashev": 18,
     "Yuya Inoue": 26,
-    "Antoine du Hamel": 1211,
     "StefanStojanovic": 77,
     "Mert Can Altin": 55,
     "joao-oliveira-softtor": 2,
-    "Guilherme Ara\u00fajo": 33,
-    "Christian Aurich Zanettini Martins": 24,
     "Efe Karasakal": 25,
     "Tamir Duberstein": 1,
     "Ved Chaudhari": 4,
     "Evgenii Kliuchnikov": 1,
     "James M Snell": 1412,
     "Marco Ippolito": 210,
-    "Node.js GitHub Bot": 1105,
     "Ulises Gasc\u00f3n": 18,
     "Nigro Simone": 6,
     "Ryan Aslett": 1,
@@ -127,7 +128,6 @@
     "Dayun": 3,
     "Hubert Walczak": 1,
     "Xia Chao": 4,
-    "Trevor Burnham": 17,
     "Khaidi Chu": 54,
     "Junhwan Choi": 2,
     "Noah": 1,
@@ -4435,15 +4435,15 @@
     "2023": 2700,
     "2024": 2606,
     "2025": 2556,
-    "2026": 3439
+    "2026": 3460
   },
   "ai_assisted": {
-    "commits": 624,
+    "commits": 636,
     "authored": 0,
     "assistants": {
-      "Codex": 223,
+      "Codex": 233,
       "OpenCode": 181,
-      "Claude": 100,
+      "Claude": 102,
       "ChatGPT": 81,
       "Pi": 16,
       "Unnamed assistant": 15,
@@ -4475,10 +4475,10 @@
       "2026-04": 10,
       "2026-05": 61,
       "2026-06": 28,
-      "2026-07": 39,
-      "2026-08": 125,
+      "2026-07": 46,
+      "2026-08": 127,
       "2026-09": 217,
-      "2026-10": 132
+      "2026-10": 135
     },
     "commits_by_month": {
       "2024-11": 212,
@@ -4501,22 +4501,22 @@
       "2026-04": 276,
       "2026-05": 333,
       "2026-06": 279,
-      "2026-07": 341,
-      "2026-08": 623,
+      "2026-07": 348,
+      "2026-08": 626,
       "2026-09": 600,
-      "2026-10": 314
+      "2026-10": 325
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 49219,
+    "commits": 49240,
     "by_kind": {
       "organization": 3234,
-      "one_person": 17655,
-      "personal": 25608,
+      "one_person": 17657,
+      "personal": 25624,
       "hidden": 1236,
       "unknown": 23,
-      "bot": 1463
+      "bot": 1466
     },
     "organization_count": 84,
     "last_12mo_from": "2025-11",
@@ -5246,31 +5246,31 @@
       "2026-Q3": {
         "organization": 57,
         "one_person": 235,
-        "personal": 976,
+        "personal": 986,
         "hidden": 167,
         "unknown": 0,
         "bot": 129
       },
       "2026-Q4": {
         "organization": 3,
-        "one_person": 43,
-        "personal": 212,
+        "one_person": 45,
+        "personal": 218,
         "hidden": 23,
         "unknown": 0,
-        "bot": 33
+        "bot": 36
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3667,
+    "commits": 3688,
     "authors": 427,
     "new_authors": 269,
     "half_of_commits": 9
   },
   "humans": {
-    "commits": 47756,
+    "commits": 47774,
     "commits_by_year": {
       "2009": 915,
       "2010": 1954,
@@ -5289,19 +5289,19 @@
       "2023": 2421,
       "2024": 2294,
       "2025": 2272,
-      "2026": 3043
+      "2026": 3061
     },
-    "active_days": 6103
+    "active_days": 6104
   },
   "timezones": {
-    "+0000": 2084,
-    "+0100": 7316,
-    "+0200": 10216,
+    "+0000": 2086,
+    "+0100": 7319,
+    "+0200": 10226,
     "+0300": 1397,
     "+0330": 40,
     "+0400": 438,
     "+0430": 44,
-    "+0500": 81,
+    "+0500": 82,
     "+0530": 1187,
     "+0545": 1,
     "+0600": 63,
@@ -5317,17 +5317,17 @@
     "-0100": 2,
     "-0200": 44,
     "-0230": 1,
-    "-0300": 812,
-    "-0400": 3853,
+    "-0300": 814,
+    "-0400": 3855,
     "-0500": 2792,
     "-0600": 642,
-    "-0700": 8436,
+    "-0700": 8437,
     "-0800": 4595,
     "-0900": 2,
     "-1000": 40
   },
   "source_lines": {
-    "added": 35413225,
-    "current": 15006224
+    "added": 36402646,
+    "current": 15248659
   }
 }

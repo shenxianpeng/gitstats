@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:26:19+00:00",
+  "generated_at": "2026-10-26T03:45:26+00:00",
   "name": "scikit-learn",
   "report_path": "index.html",
   "first_commit": "2010-01-05 13:26:32",
-  "last_commit": "2026-10-23 13:36:06",
-  "age_days": 6136,
-  "active_days": 5127,
-  "total_commits": 34086,
-  "total_authors": 3370,
-  "active_authors_12mo": 191,
-  "commits_last_12mo": 989,
+  "last_commit": "2026-10-25 14:38:19",
+  "age_days": 6138,
+  "active_days": 5128,
+  "total_commits": 34087,
+  "total_authors": 3371,
+  "active_authors_12mo": 192,
+  "commits_last_12mo": 990,
   "total_files": 1859,
   "total_lines": 576867,
-  "lines_added": 2934260,
-  "lines_removed": 2357393,
+  "lines_added": 2934262,
+  "lines_removed": 2357395,
   "total_tags": 25,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Yuvraj Chirag": 1,
     "Mohd Maaz Khan": 2,
     "Arthur Lacote": 55,
     "Virgil Chan": 24,
@@ -3429,7 +3430,7 @@
     "2023": 1349,
     "2024": 1268,
     "2025": 1237,
-    "2026": 821
+    "2026": 822
   },
   "ai_assisted": {
     "commits": 9,
@@ -3489,16 +3490,16 @@
       "2026-07": 96,
       "2026-08": 77,
       "2026-09": 62,
-      "2026-10": 54
+      "2026-10": 55
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 34086,
+    "commits": 34087,
     "by_kind": {
       "organization": 9442,
       "one_person": 8391,
-      "personal": 12806,
+      "personal": 12807,
       "hidden": 3390,
       "unknown": 38,
       "bot": 19
@@ -4023,7 +4024,7 @@
       "2026-Q4": {
         "organization": 3,
         "one_person": 6,
-        "personal": 35,
+        "personal": 36,
         "hidden": 10,
         "unknown": 0,
         "bot": 0
@@ -4033,13 +4034,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 984,
-    "authors": 187,
-    "new_authors": 129,
-    "half_of_commits": 7
+    "commits": 985,
+    "authors": 188,
+    "new_authors": 130,
+    "half_of_commits": 8
   },
   "humans": {
-    "commits": 34067,
+    "commits": 34068,
     "commits_by_year": {
       "2010": 2604,
       "2011": 4913,
@@ -4057,9 +4058,9 @@
       "2023": 1349,
       "2024": 1262,
       "2025": 1230,
-      "2026": 817
+      "2026": 818
     },
-    "active_days": 5127
+    "active_days": 5128
   },
   "timezones": {
     "+0000": 1118,
@@ -4070,7 +4071,7 @@
     "+0400": 28,
     "+0430": 13,
     "+0500": 139,
-    "+0530": 1172,
+    "+0530": 1173,
     "+0545": 2,
     "+0600": 35,
     "+0700": 16,
@@ -4091,7 +4092,7 @@
     "-1000": 21
   },
   "source_lines": {
-    "added": 3715187,
+    "added": 3715189,
     "current": 574031
   }
 }

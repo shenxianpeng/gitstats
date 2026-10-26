@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:37:18+00:00",
+  "generated_at": "2026-10-26T03:55:59+00:00",
   "name": "Bun",
   "report_path": "index.html",
   "first_commit": "2021-04-17 22:21:31",
-  "last_commit": "2026-10-24 09:43:26",
-  "age_days": 2016,
-  "active_days": 1879,
-  "total_commits": 18563,
+  "last_commit": "2026-10-25 23:43:19",
+  "age_days": 2018,
+  "active_days": 1880,
+  "total_commits": 18564,
   "total_authors": 898,
   "active_authors_12mo": 86,
-  "commits_last_12mo": 4606,
+  "commits_last_12mo": 4607,
   "total_files": 24778,
-  "total_lines": 5693170,
-  "lines_added": 10589395,
-  "lines_removed": 4896225,
+  "total_lines": 5693274,
+  "lines_added": 10589509,
+  "lines_removed": 4896235,
   "total_tags": 262,
   "era": "peak",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "robobun",
-      "commits": 3087
+      "commits": 3088
     },
     {
       "name": "Dylan Conway",
@@ -41,8 +41,8 @@
     }
   ],
   "author_commits": {
+    "robobun": 3088,
     "Dylan Conway": 1267,
-    "robobun": 3087,
     "Alistair Smith": 333,
     "SUZUKI Sosuke": 87,
     "Jarred Sumner": 8689,
@@ -946,7 +946,7 @@
     "2023": 3560,
     "2024": 2944,
     "2025": 2983,
-    "2026": 4273
+    "2026": 4274
   },
   "ai_assisted": {
     "commits": 734,
@@ -1007,15 +1007,15 @@
       "2026-07": 752,
       "2026-08": 1043,
       "2026-09": 560,
-      "2026-10": 246
+      "2026-10": 247
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 18563,
+    "commits": 18564,
     "by_kind": {
       "organization": 876,
-      "one_person": 10580,
+      "one_person": 10581,
       "personal": 2618,
       "hidden": 4435,
       "unknown": 4,
@@ -1108,7 +1108,7 @@
       },
       "2026-Q4": {
         "organization": 6,
-        "one_person": 140,
+        "one_person": 141,
         "personal": 100,
         "hidden": 0,
         "unknown": 0,
@@ -1119,22 +1119,22 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4590,
+    "commits": 4591,
     "authors": 85,
     "new_authors": 62,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 18513,
+    "commits": 18514,
     "commits_by_year": {
       "2021": 1465,
       "2022": 3338,
       "2023": 3560,
       "2024": 2932,
       "2025": 2957,
-      "2026": 4261
+      "2026": 4262
     },
-    "active_days": 1878
+    "active_days": 1879
   },
   "timezones": {
     "+0000": 180,
@@ -1160,12 +1160,12 @@
     "-0400": 242,
     "-0500": 157,
     "-0600": 91,
-    "-0700": 11519,
+    "-0700": 11520,
     "-0800": 4658,
     "-1000": 1
   },
   "source_lines": {
-    "added": 9710105,
-    "current": 5100135
+    "added": 9710219,
+    "current": 5100239
   }
 }

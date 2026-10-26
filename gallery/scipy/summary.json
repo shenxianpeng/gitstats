@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:26:35+00:00",
+  "generated_at": "2026-10-26T03:45:37+00:00",
   "name": "SciPy",
   "report_path": "index.html",
   "first_commit": "2001-02-01 08:32:30",
-  "last_commit": "2026-10-24 21:37:37",
-  "age_days": 9397,
-  "active_days": 6829,
-  "total_commits": 38486,
-  "total_authors": 1947,
-  "active_authors_12mo": 227,
-  "commits_last_12mo": 2238,
-  "total_files": 2929,
-  "total_lines": 1137706,
-  "lines_added": 5258894,
-  "lines_removed": 4121188,
+  "last_commit": "2026-10-25 17:06:09",
+  "age_days": 9398,
+  "active_days": 6830,
+  "total_commits": 38500,
+  "total_authors": 1949,
+  "active_authors_12mo": 229,
+  "commits_last_12mo": 2252,
+  "total_files": 2928,
+  "total_lines": 1139901,
+  "lines_added": 5268590,
+  "lines_removed": 4128689,
   "total_tags": 5,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,10 @@
     }
   ],
   "author_commits": {
+    "Lucas Colley": 628,
+    "Jake Bowhay": 460,
+    "Enricoftw": 2,
+    "Kaushik Gunasekaren": 1,
     "Hannah Rittich": 1,
     "Matt Haberland": 2364,
     "Martin Schuck": 46,
@@ -52,9 +56,7 @@
     "Jash Ambaliya": 3,
     "Florian Bourgey": 172,
     "Tyler Reddy": 1419,
-    "Lucas Colley": 619,
     "Travis Fortney": 1,
-    "Jake Bowhay": 458,
     "pratik9751": 2,
     "Aadya Chinubhai": 16,
     "Senanur \u00c7etin": 1,
@@ -2015,13 +2017,13 @@
     "2023": 2061,
     "2024": 2957,
     "2025": 2335,
-    "2026": 1800
+    "2026": 1814
   },
   "ai_assisted": {
-    "commits": 53,
+    "commits": 55,
     "authored": 1,
     "assistants": {
-      "Claude": 43,
+      "Claude": 45,
       "Warp": 5,
       "GitHub Copilot": 4,
       "Devin": 1
@@ -2050,7 +2052,7 @@
       "2026-07": 5,
       "2026-08": 2,
       "2026-09": 3,
-      "2026-10": 4
+      "2026-10": 6
     },
     "commits_by_month": {
       "2024-11": 226,
@@ -2076,17 +2078,17 @@
       "2026-07": 171,
       "2026-08": 228,
       "2026-09": 171,
-      "2026-10": 89
+      "2026-10": 103
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38486,
+    "commits": 38500,
     "by_kind": {
       "organization": 3833,
-      "one_person": 3073,
-      "personal": 27080,
-      "hidden": 2680,
+      "one_person": 3074,
+      "personal": 27089,
+      "hidden": 2684,
       "unknown": 1820,
       "bot": 0
     },
@@ -2649,9 +2651,9 @@
       },
       "2026-Q4": {
         "organization": 1,
-        "one_person": 2,
-        "personal": 48,
-        "hidden": 38,
+        "one_person": 3,
+        "personal": 57,
+        "hidden": 42,
         "unknown": 0,
         "bot": 0
       }
@@ -2660,13 +2662,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2238,
-    "authors": 225,
-    "new_authors": 162,
+    "commits": 2252,
+    "authors": 227,
+    "new_authors": 164,
     "half_of_commits": 6
   },
   "humans": {
-    "commits": 38486,
+    "commits": 38500,
     "commits_by_year": {
       "2001": 286,
       "2002": 357,
@@ -2693,13 +2695,13 @@
       "2023": 2061,
       "2024": 2957,
       "2025": 2335,
-      "2026": 1800
+      "2026": 1814
     },
-    "active_days": 6829
+    "active_days": 6830
   },
   "timezones": {
-    "+0000": 7829,
-    "+0100": 5418,
+    "+0000": 7836,
+    "+0100": 5424,
     "+0200": 6560,
     "+0300": 2005,
     "+0330": 6,
@@ -2723,13 +2725,13 @@
     "-0400": 3381,
     "-0500": 2451,
     "-0600": 1328,
-    "-0700": 3714,
+    "-0700": 3715,
     "-0800": 1893,
     "-0900": 1,
     "-1000": 24
   },
   "source_lines": {
-    "added": 5661587,
-    "current": 1179787
+    "added": 5661863,
+    "current": 1179854
   }
 }

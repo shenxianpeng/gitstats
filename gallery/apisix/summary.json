@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:33:54+00:00",
+  "generated_at": "2026-10-26T03:52:53+00:00",
   "name": "Apache APISIX",
   "report_path": "index.html",
   "first_commit": "2019-04-10 02:02:06",
-  "last_commit": "2026-10-23 08:58:07",
-  "age_days": 2754,
-  "active_days": 1710,
-  "total_commits": 5228,
+  "last_commit": "2026-10-26 03:15:52",
+  "age_days": 2757,
+  "active_days": 1711,
+  "total_commits": 5230,
   "total_authors": 517,
   "active_authors_12mo": 59,
-  "commits_last_12mo": 615,
+  "commits_last_12mo": 617,
   "total_files": 2103,
-  "total_lines": 613538,
-  "lines_added": 813501,
-  "lines_removed": 199963,
+  "total_lines": 614857,
+  "lines_added": 814888,
+  "lines_removed": 200031,
   "total_tags": 14,
   "era": "steady",
   "top_authors": [
@@ -37,11 +37,11 @@
     },
     {
       "name": "Nic",
-      "commits": 166
+      "commits": 168
     }
   ],
   "author_commits": {
-    "Nic": 166,
+    "Nic": 168,
     "ruanweihong-aaa": 3,
     "Nimesh": 1,
     "lordcheng10": 1,
@@ -567,7 +567,7 @@
     "2023": 495,
     "2024": 231,
     "2025": 288,
-    "2026": 586
+    "2026": 588
   },
   "ai_assisted": {
     "commits": 1,
@@ -625,14 +625,14 @@
       "2026-07": 79,
       "2026-08": 69,
       "2026-09": 44,
-      "2026-10": 20
+      "2026-10": 22
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5228,
+    "commits": 5230,
     "by_kind": {
-      "organization": 479,
+      "organization": 481,
       "one_person": 85,
       "personal": 3809,
       "hidden": 747,
@@ -652,11 +652,11 @@
       },
       {
         "organization": "api7.ai",
-        "commits": 166,
-        "commits_last_12mo": 142,
+        "commits": 168,
+        "commits_last_12mo": 144,
         "addresses": 3,
         "first_commit": "2021-05-06",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "tencent.com",
@@ -725,7 +725,7 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 11,
+        "organization": 13,
         "one_person": 0,
         "personal": 8,
         "hidden": 1,
@@ -737,13 +737,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 598,
+    "commits": 600,
     "authors": 58,
     "new_authors": 36,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 5120,
+    "commits": 5122,
     "commits_by_year": {
       "2019": 753,
       "2020": 858,
@@ -752,9 +752,9 @@
       "2023": 466,
       "2024": 223,
       "2025": 279,
-      "2026": 573
+      "2026": 575
     },
-    "active_days": 1690
+    "active_days": 1691
   },
   "timezones": {
     "+0000": 3,
@@ -765,7 +765,7 @@
     "+0530": 292,
     "+0545": 142,
     "+0700": 1,
-    "+0800": 4423,
+    "+0800": 4425,
     "+0900": 26,
     "+1000": 62,
     "+1100": 1,
@@ -776,7 +776,7 @@
     "-0800": 14
   },
   "source_lines": {
-    "added": 790506,
-    "current": 606331
+    "added": 791893,
+    "current": 607650
   }
 }

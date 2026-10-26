@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:31:49+00:00",
+  "generated_at": "2026-10-26T03:51:03+00:00",
   "name": "Vue",
   "report_path": "index.html",
   "first_commit": "2018-09-19 15:35:38",
-  "last_commit": "2026-10-22 05:43:14",
-  "age_days": 2955,
-  "active_days": 1231,
-  "total_commits": 7234,
-  "total_authors": 642,
-  "active_authors_12mo": 108,
-  "commits_last_12mo": 428,
+  "last_commit": "2026-10-26 00:33:12",
+  "age_days": 2959,
+  "active_days": 1232,
+  "total_commits": 7235,
+  "total_authors": 643,
+  "active_authors_12mo": 109,
+  "commits_last_12mo": 429,
   "total_files": 703,
   "total_lines": 196722,
-  "lines_added": 474575,
-  "lines_removed": 277853,
+  "lines_added": 474577,
+  "lines_removed": 277855,
   "total_tags": 267,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Junpei Zhang": 1,
     "daiwei": 45,
     "Robby Russell": 1,
     "Valentin": 2,
@@ -693,7 +694,7 @@
     "2023": 867,
     "2024": 1027,
     "2025": 372,
-    "2026": 358
+    "2026": 359
   },
   "ai_assisted": {
     "commits": 0,
@@ -749,16 +750,16 @@
       "2026-07": 25,
       "2026-08": 42,
       "2026-09": 29,
-      "2026-10": 36
+      "2026-10": 37
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7234,
+    "commits": 7235,
     "by_kind": {
       "organization": 231,
       "one_person": 293,
-      "personal": 5034,
+      "personal": 5035,
       "hidden": 569,
       "unknown": 0,
       "bot": 1107
@@ -851,7 +852,7 @@
       "2026-Q4": {
         "organization": 5,
         "one_person": 3,
-        "personal": 15,
+        "personal": 16,
         "hidden": 7,
         "unknown": 0,
         "bot": 6
@@ -861,13 +862,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 297,
-    "authors": 108,
-    "new_authors": 81,
+    "commits": 298,
+    "authors": 109,
+    "new_authors": 82,
     "half_of_commits": 7
   },
   "humans": {
-    "commits": 6127,
+    "commits": 6128,
     "commits_by_year": {
       "2018": 223,
       "2019": 961,
@@ -877,9 +878,9 @@
       "2023": 786,
       "2024": 831,
       "2025": 243,
-      "2026": 244
+      "2026": 245
     },
-    "active_days": 1099
+    "active_days": 1100
   },
   "timezones": {
     "+0000": 495,
@@ -893,7 +894,7 @@
     "+0600": 4,
     "+0630": 1,
     "+0700": 11,
-    "+0800": 3441,
+    "+0800": 3442,
     "+0900": 60,
     "+1000": 5,
     "+1100": 8,
@@ -906,7 +907,7 @@
     "-0800": 3
   },
   "source_lines": {
-    "added": 341247,
+    "added": 341249,
     "current": 178038
   }
 }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:31:13+00:00",
+  "generated_at": "2026-10-26T03:49:18+00:00",
   "name": "PyTorch",
   "report_path": "index.html",
   "first_commit": "2012-01-25 13:55:20",
-  "last_commit": "2026-10-25 04:50:26",
-  "age_days": 5387,
-  "active_days": 4207,
-  "total_commits": 113023,
-  "total_authors": 5943,
-  "active_authors_12mo": 1535,
-  "commits_last_12mo": 17704,
-  "total_files": 22742,
-  "total_lines": 5392502,
-  "lines_added": 14734363,
-  "lines_removed": 9341861,
-  "total_tags": 9526,
+  "last_commit": "2026-10-26 01:24:36",
+  "age_days": 5388,
+  "active_days": 4208,
+  "total_commits": 113039,
+  "total_authors": 5944,
+  "active_authors_12mo": 1536,
+  "commits_last_12mo": 17720,
+  "total_files": 22743,
+  "total_lines": 5393722,
+  "lines_added": 14736164,
+  "lines_removed": 9342442,
+  "total_tags": 9552,
   "era": "peak",
   "top_authors": [
     {
       "name": "PyTorch MergeBot",
-      "commits": 5801
+      "commits": 5802
     },
     {
       "name": "Edward Z. Yang",
@@ -41,23 +41,29 @@
     }
   ],
   "author_commits": {
+    "twthighd": 8,
+    "Irakli Salia": 338,
+    "Sankalp Thakur": 1,
+    "Aidyn-A": 130,
+    "Laith Sakka": 439,
+    "Benjamin Demaille": 9,
+    "Tomasz Szulist": 22,
+    "Xu Han": 242,
+    "PyTorch MergeBot": 5802,
+    "Bob Ren": 564,
+    "xinan.lin": 239,
+    "Kapil Sharma": 27,
     "KarhouTam": 105,
-    "Xu Han": 240,
     "PyTorch UpdateBot": 690,
     "Aditya Venkataraman": 33,
     "Richard Barnes": 472,
     "Lee Si Yuan": 2,
     "drisspg": 534,
-    "PyTorch MergeBot": 5801,
     "Daniel Galvez": 19,
-    "Isalia20": 335,
-    "Kapil Sharma": 26,
     "robertomeroni": 1,
-    "Aidyn-A": 129,
     "Edward Z. Yang": 3585,
     "Natalia Gimelshein": 620,
     "Nicolas Hug": 57,
-    "Bob Ren": 562,
     "haojiang.lh": 3,
     "George Hong": 47,
     "jathu": 23,
@@ -95,7 +101,6 @@
     "Yixiao Yuan": 2,
     "Daniel Pogrebinsky": 2,
     "Xuehai Pan": 436,
-    "twthighd": 7,
     "Klaus Zimmermann": 74,
     "Richard Zou": 1868,
     "Mohit Nirmal": 2,
@@ -108,7 +113,6 @@
     "Konrad Drozd": 6,
     "Yufeng He": 17,
     "Yasin YILMAZ": 1,
-    "Tomasz Szulist": 21,
     "Indrajit swain": 4,
     "Lazar Stojiljkovic": 23,
     "Piotr Ponikowski": 4,
@@ -146,7 +150,6 @@
     "Piotr Bielak": 38,
     "Ivan Bogatyy": 11,
     "Jean Schmidt": 91,
-    "Laith Sakka": 438,
     "Sean McGovern": 39,
     "Fuzail Khan": 1,
     "Pian Pawakapan": 304,
@@ -166,7 +169,6 @@
     "justinchuby": 2,
     "Xin Tong": 9,
     "Andiry Xu": 3,
-    "Benjamin Demaille": 8,
     "Shuai Yang": 26,
     "Alexander Grund": 132,
     "Jake Stevens": 10,
@@ -261,7 +263,6 @@
     "Joel Schlosser": 326,
     "Geng Li": 2,
     "Lei Mao": 8,
-    "xinan.lin": 238,
     "Nikita Vedeneev": 173,
     "Odysseas YIAKOUMIS": 1,
     "Slawomir Siwek": 8,
@@ -6000,13 +6001,13 @@
     "2023": 12593,
     "2024": 14893,
     "2025": 14993,
-    "2026": 15286
+    "2026": 15302
   },
   "ai_assisted": {
-    "commits": 836,
+    "commits": 840,
     "authored": 5,
     "assistants": {
-      "Claude": 685,
+      "Claude": 689,
       "Cursor": 65,
       "GitHub Copilot": 59,
       "Codex": 19,
@@ -6036,7 +6037,7 @@
       "2026-07": 112,
       "2026-08": 95,
       "2026-09": 269,
-      "2026-10": 162
+      "2026-10": 166
     },
     "commits_by_month": {
       "2024-11": 1254,
@@ -6062,17 +6063,17 @@
       "2026-07": 1693,
       "2026-08": 1307,
       "2026-09": 1908,
-      "2026-10": 1346
+      "2026-10": 1362
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 113023,
+    "commits": 113039,
     "by_kind": {
-      "organization": 71246,
+      "organization": 71251,
       "one_person": 3077,
-      "personal": 26908,
-      "hidden": 11442,
+      "personal": 26918,
+      "hidden": 11443,
       "unknown": 125,
       "bot": 225
     },
@@ -6081,19 +6082,19 @@
     "top": [
       {
         "organization": "meta.com",
-        "commits": 54638,
-        "commits_last_12mo": 6181,
+        "commits": 54641,
+        "commits_last_12mo": 6184,
         "addresses": 2040,
         "first_commit": "2014-07-10",
         "last_commit": "2026-10-25"
       },
       {
         "organization": "intel.com",
-        "commits": 3491,
-        "commits_last_12mo": 838,
+        "commits": 3493,
+        "commits_last_12mo": 840,
         "addresses": 185,
         "first_commit": "2017-04-25",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-25"
       },
       {
         "organization": "amd.com",
@@ -7138,10 +7139,10 @@
         "bot": 10
       },
       "2026-Q4": {
-        "organization": 750,
+        "organization": 755,
         "one_person": 83,
-        "personal": 341,
-        "hidden": 167,
+        "personal": 351,
+        "hidden": 168,
         "unknown": 0,
         "bot": 5
       }
@@ -7150,13 +7151,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 17660,
-    "authors": 1519,
-    "new_authors": 995,
+    "commits": 17676,
+    "authors": 1520,
+    "new_authors": 996,
     "half_of_commits": 31
   },
   "humans": {
-    "commits": 112798,
+    "commits": 112814,
     "commits_by_year": {
       "2012": 198,
       "2013": 160,
@@ -7172,16 +7173,16 @@
       "2023": 12574,
       "2024": 14883,
       "2025": 14979,
-      "2026": 15243
+      "2026": 15259
     },
-    "active_days": 4206
+    "active_days": 4207
   },
   "timezones": {
-    "+0000": 44493,
+    "+0000": 44506,
     "+0100": 1325,
     "+0200": 651,
     "+0300": 144,
-    "+0400": 27,
+    "+0400": 30,
     "+0500": 5,
     "+0530": 116,
     "+0700": 7,
@@ -7200,7 +7201,7 @@
     "-1000": 8
   },
   "source_lines": {
-    "added": 14705197,
-    "current": 5063435
+    "added": 14706998,
+    "current": 5064655
   }
 }

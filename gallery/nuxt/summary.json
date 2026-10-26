@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:32:38+00:00",
+  "generated_at": "2026-10-26T03:51:48+00:00",
   "name": "Nuxt",
   "report_path": "index.html",
   "first_commit": "2016-10-26 11:18:47",
-  "last_commit": "2026-10-24 20:44:34",
-  "age_days": 3651,
-  "active_days": 2624,
-  "total_commits": 15849,
-  "total_authors": 1300,
-  "active_authors_12mo": 180,
-  "commits_last_12mo": 1595,
-  "total_files": 2487,
-  "total_lines": 217511,
-  "lines_added": 1011000,
-  "lines_removed": 793489,
+  "last_commit": "2026-10-25 20:24:50",
+  "age_days": 3652,
+  "active_days": 2625,
+  "total_commits": 15872,
+  "total_authors": 1303,
+  "active_authors_12mo": 182,
+  "commits_last_12mo": 1618,
+  "total_files": 2490,
+  "total_lines": 218467,
+  "lines_added": 1014026,
+  "lines_removed": 795559,
   "total_tags": 269,
   "era": "steady",
   "top_authors": [
     {
       "name": "Daniel Roe",
-      "commits": 3721
+      "commits": 3729
     },
     {
       "name": "Pooya Parsa",
@@ -41,8 +41,12 @@
     }
   ],
   "author_commits": {
-    "Max": 33,
-    "Daniel Roe": 3721,
+    "Daniel Roe": 3729,
+    "Max": 40,
+    "Volkan Akyel": 1,
+    "Bochkarev Ivan": 21,
+    "Felix Fang": 1,
+    "Maksim Zhukau": 1,
     "Gareth": 4,
     "S\u00e9bastien Chopin": 1315,
     "Baptiste Leproux": 4,
@@ -92,7 +96,6 @@
     "Norbiros": 4,
     "Vincent de Vreede": 1,
     "Robin": 27,
-    "Bochkarev Ivan": 18,
     "Austin Serb": 1,
     "Samuel Burkhard": 2,
     "Kenneth Sills": 1,
@@ -1353,13 +1356,13 @@
     "2023": 2123,
     "2024": 1825,
     "2025": 1398,
-    "2026": 1437
+    "2026": 1460
   },
   "ai_assisted": {
-    "commits": 20,
+    "commits": 21,
     "authored": 0,
     "assistants": {
-      "Claude": 14,
+      "Claude": 15,
       "CodeRabbit": 3,
       "GitHub Copilot": 3
     },
@@ -1387,7 +1390,7 @@
       "2026-07": 4,
       "2026-08": 2,
       "2026-09": 2,
-      "2026-10": 6
+      "2026-10": 7
     },
     "commits_by_month": {
       "2024-11": 110,
@@ -1413,19 +1416,19 @@
       "2026-07": 284,
       "2026-08": 182,
       "2026-09": 215,
-      "2026-10": 125
+      "2026-10": 148
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15849,
+    "commits": 15872,
     "by_kind": {
       "organization": 243,
-      "one_person": 6817,
-      "personal": 4781,
-      "hidden": 949,
+      "one_person": 6826,
+      "personal": 4792,
+      "hidden": 950,
       "unknown": 0,
-      "bot": 3059
+      "bot": 3061
     },
     "organization_count": 5,
     "last_12mo_from": "2025-11",
@@ -1530,24 +1533,24 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 85,
-        "personal": 20,
-        "hidden": 13,
+        "one_person": 94,
+        "personal": 31,
+        "hidden": 14,
         "unknown": 0,
-        "bot": 7
+        "bot": 9
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1372,
-    "authors": 178,
-    "new_authors": 119,
+    "commits": 1393,
+    "authors": 181,
+    "new_authors": 122,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 12790,
+    "commits": 12811,
     "commits_by_year": {
       "2016": 353,
       "2017": 1647,
@@ -1559,12 +1562,12 @@
       "2023": 1558,
       "2024": 1218,
       "2025": 1062,
-      "2026": 1244
+      "2026": 1265
     },
-    "active_days": 2451
+    "active_days": 2452
   },
   "timezones": {
-    "+0000": 2664,
+    "+0000": 2687,
     "+0100": 5771,
     "+0200": 3315,
     "+0300": 301,
@@ -1592,7 +1595,7 @@
     "-0800": 133
   },
   "source_lines": {
-    "added": 651705,
-    "current": 173131
+    "added": 653365,
+    "current": 174276
   }
 }

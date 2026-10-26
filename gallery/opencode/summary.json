@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:27:42+00:00",
+  "generated_at": "2026-10-26T03:46:50+00:00",
   "name": "OpenCode",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-10-25 05:15:11",
-  "age_days": 583,
-  "active_days": 570,
-  "total_commits": 20879,
+  "last_commit": "2026-10-26 03:37:24",
+  "age_days": 584,
+  "active_days": 571,
+  "total_commits": 20943,
   "total_authors": 1028,
-  "active_authors_12mo": 850,
-  "commits_last_12mo": 17275,
-  "total_files": 8638,
-  "total_lines": 1350622,
-  "lines_added": 4385242,
-  "lines_removed": 3034620,
+  "active_authors_12mo": 849,
+  "commits_last_12mo": 17339,
+  "total_files": 8644,
+  "total_lines": 1355552,
+  "lines_added": 4394885,
+  "lines_removed": 3039333,
   "total_tags": 918,
   "era": "steady",
   "top_authors": [
@@ -25,11 +25,11 @@
     },
     {
       "name": "Aiden Cline",
-      "commits": 2402
+      "commits": 2404
     },
     {
       "name": "Kit Langton",
-      "commits": 2174
+      "commits": 2198
     },
     {
       "name": "Adam",
@@ -41,9 +41,11 @@
     }
   ],
   "author_commits": {
-    "Dax": 439,
-    "Aiden Cline": 2402,
-    "Kit Langton": 2174,
+    "Luke Parker": 636,
+    "Dax": 445,
+    "Kit Langton": 2198,
+    "Victor Navarro": 107,
+    "Aiden Cline": 2404,
     "Anmol": 1,
     "Adam": 1483,
     "Irish Joseph": 1,
@@ -51,10 +53,8 @@
     "DS": 24,
     "kernel-oops": 1,
     "James Long": 356,
-    "Victor Navarro": 105,
     "Filip": 120,
     "opencode": 633,
-    "Luke Parker": 621,
     "Simon Klee": 131,
     "Brendan Allan": 542,
     "Imamuzzaki Abu Salam": 1,
@@ -1072,7 +1072,7 @@
   },
   "commits_by_year": {
     "2025": 6529,
-    "2026": 14350
+    "2026": 14414
   },
   "ai_assisted": {
     "commits": 136,
@@ -1134,19 +1134,19 @@
       "2026-07": 1581,
       "2026-08": 1996,
       "2026-09": 1496,
-      "2026-10": 1065
+      "2026-10": 1129
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20879,
+    "commits": 20943,
     "by_kind": {
       "organization": 1703,
-      "one_person": 3982,
-      "personal": 5538,
-      "hidden": 6060,
+      "one_person": 3988,
+      "personal": 5564,
+      "hidden": 6077,
       "unknown": 1,
-      "bot": 3595
+      "bot": 3610
     },
     "organization_count": 4,
     "last_12mo_from": "2025-11",
@@ -1243,33 +1243,33 @@
       },
       "2026-Q4": {
         "organization": 46,
-        "one_person": 66,
-        "personal": 288,
-        "hidden": 463,
+        "one_person": 72,
+        "personal": 314,
+        "hidden": 480,
         "unknown": 0,
-        "bot": 202
+        "bot": 217
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 14666,
+    "commits": 14715,
     "authors": 837,
     "new_authors": 782,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 17284,
+    "commits": 17333,
     "commits_by_year": {
       "2025": 5787,
-      "2026": 11497
+      "2026": 11546
     },
     "active_days": 569
   },
   "timezones": {
-    "+0000": 4122,
-    "+0100": 553,
+    "+0000": 4135,
+    "+0100": 556,
     "+0200": 975,
     "+0300": 77,
     "+0330": 2,
@@ -1280,21 +1280,21 @@
     "+0700": 46,
     "+0800": 1001,
     "+0900": 73,
-    "+1000": 719,
+    "+1000": 734,
     "+1030": 2,
     "+1100": 24,
     "+1200": 1,
     "+1300": 2,
     "-0300": 84,
-    "-0400": 5705,
-    "-0500": 4221,
+    "-0400": 5711,
+    "-0500": 4224,
     "-0600": 2045,
-    "-0700": 328,
+    "-0700": 352,
     "-0800": 150,
     "-1000": 4
   },
   "source_lines": {
-    "added": 4721456,
-    "current": 1325182
+    "added": 4730465,
+    "current": 1330019
   }
 }

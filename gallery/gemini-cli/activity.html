@@ -462,18 +462,18 @@
 <details class="table-details"><summary>Table: commits and lines per month (19 months with commits)</summary><div class="table-scroll"><table><tr><th>Month</th><th class="num">Commits</th><th class="num">Lines added</th><th class="num">Lines removed</th></tr><tr><td>2026-10</td><td class="num">81</td><td class="num">28,939</td><td class="num">3,378</td></tr><tr><td>2026-09</td><td class="num">62</td><td class="num">24,323</td><td class="num">2,733</td></tr><tr><td>2026-08</td><td class="num">60</td><td class="num">15,441</td><td class="num">1,268</td></tr><tr><td>2026-07</td><td class="num">48</td><td class="num">18,591</td><td class="num">2,925</td></tr><tr><td>2026-06</td><td class="num">49</td><td class="num">15,544</td><td class="num">3,848</td></tr><tr><td>2026-05</td><td class="num">234</td><td class="num">50,859</td><td class="num">18,211</td></tr><tr><td>2026-04</td><td class="num">378</td><td class="num">927,439</td><td class="num">30,777</td></tr><tr><td>2026-03</td><td class="num">680</td><td class="num">155,623</td><td class="num">61,901</td></tr><tr><td>2026-02</td><td class="num">587</td><td class="num">145,796</td><td class="num">49,383</td></tr><tr><td>2026-01</td><td class="num">611</td><td class="num">116,209</td><td class="num">48,650</td></tr><tr><td>2025-12</td><td class="num">274</td><td class="num">54,475</td><td class="num">16,653</td></tr><tr><td>2025-11</td><td class="num">318</td><td class="num">84,528</td><td class="num">26,084</td></tr><tr><td>2025-10</td><td class="num">546</td><td class="num">77,610</td><td class="num">40,609</td></tr><tr><td>2025-09</td><td class="num">533</td><td class="num">87,747</td><td class="num">31,233</td></tr><tr><td>2025-08</td><td class="num">547</td><td class="num">105,419</td><td class="num">44,611</td></tr><tr><td>2025-07</td><td class="num">420</td><td class="num">77,516</td><td class="num">27,148</td></tr><tr><td>2025-06</td><td class="num">557</td><td class="num">69,343</td><td class="num">27,509</td></tr><tr><td>2025-05</td><td class="num">329</td><td class="num">43,154</td><td class="num">17,144</td></tr><tr><td>2025-04</td><td class="num">220</td><td class="num">41,449</td><td class="num">19,803</td></tr></table></div></details>
 <h2 id="weekly_activity"><a href="#weekly_activity">Weekly activity</a></h2>
 
-<p class="section-note">Last 32 weeks, from the week of Mar 16, 2026 to the week of Oct 19, 2026.</p><div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-weekly-activity"></canvas></div>
+<p class="section-note">Last 32 weeks, from the week of Mar 23, 2026 to the week of Oct 26, 2026.</p><div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-weekly-activity"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-weekly-activity').getContext('2d');
-  var labels = ["Mar 16", "Mar 23", "Mar 30", "Apr 6", "Apr 13", "Apr 20", "Apr 27", "May 4", "May 11", "May 18", "May 25", "Jun 1", "Jun 8", "Jun 15", "Jun 22", "Jun 29", "Jul 6", "Jul 13", "Jul 20", "Jul 27", "Aug 3", "Aug 10", "Aug 17", "Aug 24", "Aug 31", "Sep 7", "Sep 14", "Sep 21", "Sep 28", "Oct 5", "Oct 12", "Oct 19"];
+  var labels = ["Mar 23", "Mar 30", "Apr 6", "Apr 13", "Apr 20", "Apr 27", "May 4", "May 11", "May 18", "May 25", "Jun 1", "Jun 8", "Jun 15", "Jun 22", "Jun 29", "Jul 6", "Jul 13", "Jul 20", "Jul 27", "Aug 3", "Aug 10", "Aug 17", "Aug 24", "Aug 31", "Sep 7", "Sep 14", "Sep 21", "Sep 28", "Oct 5", "Oct 12", "Oct 19", "Oct 26"];
   var gap = null;
   applyChartTheme();
   new Chart(ctx, {
     type: 'bar',
     data: {
       labels: labels,
-      datasets: [{"label": "Commits", "data": [127, 153, 133, 108, 60, 48, 93, 85, 68, 49, 10, 9, 11, 16, 11, 4, 13, 9, 12, 12, 23, 14, 16, 7, 11, 9, 16, 16, 19, 22, 25, 25], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+      datasets: [{"label": "Commits", "data": [153, 133, 108, 60, 48, 93, 85, 68, 49, 10, 9, 11, 16, 11, 4, 13, 9, 12, 12, 23, 14, 16, 7, 11, 9, 16, 16, 19, 22, 25, 25, 0], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
     },
     options: {
       responsive: true,

@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:35:46+00:00",
+  "generated_at": "2026-10-26T03:55:09+00:00",
   "name": "Homebrew",
   "report_path": "index.html",
   "first_commit": "2009-05-20 23:04:11",
-  "last_commit": "2026-10-24 20:08:56",
-  "age_days": 6366,
-  "active_days": 5602,
-  "total_commits": 53341,
+  "last_commit": "2026-10-25 13:24:54",
+  "age_days": 6367,
+  "active_days": 5603,
+  "total_commits": 53345,
   "total_authors": 1323,
   "active_authors_12mo": 196,
-  "commits_last_12mo": 6349,
+  "commits_last_12mo": 6353,
   "total_files": 3437,
-  "total_lines": 535672,
-  "lines_added": 1963322,
-  "lines_removed": 1427650,
+  "total_lines": 535677,
+  "lines_added": 1963336,
+  "lines_removed": 1427659,
   "total_tags": 538,
   "era": "peak",
   "top_authors": [
     {
       "name": "Mike McQuaid",
-      "commits": 14588
+      "commits": 14590
     },
     {
       "name": "BrewTestBot",
-      "commits": 3343
+      "commits": 3344
     },
     {
       "name": "Markus Reiter",
@@ -41,7 +41,9 @@
     }
   ],
   "author_commits": {
-    "Mike McQuaid": 14588,
+    "Mike McQuaid": 14590,
+    "BrewTestBot": 3344,
+    "Thierry Moisan": 64,
     "Andrew Nesbitt": 108,
     "Justin Krehel": 54,
     "Aktan Azat": 1,
@@ -49,7 +51,6 @@
     "Maksym Tymoshyk": 1,
     "xucian": 1,
     "Anton Melnikov": 197,
-    "BrewTestBot": 3343,
     "QuillVot": 1,
     "Izaak Beekman": 14,
     "Patrick Linnane": 1550,
@@ -70,7 +71,6 @@
     "Caleb Xu": 90,
     "Rui Chen": 47,
     "Michael Cho": 601,
-    "Thierry Moisan": 63,
     "Nanda H Krishna": 545,
     "rawsun007": 18,
     "Michka Popoff": 221,
@@ -1383,7 +1383,7 @@
     "2023": 4255,
     "2024": 5411,
     "2025": 4570,
-    "2026": 5592
+    "2026": 5596
   },
   "ai_assisted": {
     "commits": 218,
@@ -1444,17 +1444,17 @@
       "2026-07": 971,
       "2026-08": 640,
       "2026-09": 761,
-      "2026-10": 367
+      "2026-10": 371
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 53341,
+    "commits": 53345,
     "by_kind": {
       "organization": 1125,
-      "one_person": 26937,
-      "personal": 15805,
-      "hidden": 6869,
+      "one_person": 26939,
+      "personal": 15806,
+      "hidden": 6870,
       "unknown": 49,
       "bot": 2556
     },
@@ -1673,9 +1673,9 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 263,
-        "personal": 53,
-        "hidden": 35,
+        "one_person": 265,
+        "personal": 54,
+        "hidden": 36,
         "unknown": 0,
         "bot": 16
       }
@@ -1684,13 +1684,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 6177,
+    "commits": 6181,
     "authors": 195,
     "new_authors": 129,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 50785,
+    "commits": 50789,
     "commits_by_year": {
       "2009": 617,
       "2010": 567,
@@ -1709,12 +1709,12 @@
       "2023": 4098,
       "2024": 4850,
       "2025": 4188,
-      "2026": 5433
+      "2026": 5437
     },
-    "active_days": 5599
+    "active_days": 5600
   },
   "timezones": {
-    "+0000": 16577,
+    "+0000": 16580,
     "+0100": 12427,
     "+0200": 3701,
     "+0300": 277,
@@ -1735,7 +1735,7 @@
     "-0200": 2,
     "-0230": 1,
     "-0300": 89,
-    "-0400": 3866,
+    "-0400": 3867,
     "-0500": 4477,
     "-0600": 927,
     "-0700": 3937,
@@ -1743,7 +1743,7 @@
     "-1000": 6
   },
   "source_lines": {
-    "added": 1822862,
-    "current": 466043
+    "added": 1822876,
+    "current": 466048
   }
 }

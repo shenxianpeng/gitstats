@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:27:46+00:00",
+  "generated_at": "2026-10-26T03:46:48+00:00",
   "name": "OpenHands",
   "report_path": "index.html",
   "first_commit": "2024-03-13 03:36:30",
-  "last_commit": "2026-10-25 02:21:18",
-  "age_days": 956,
+  "last_commit": "2026-10-25 23:03:22",
+  "age_days": 957,
   "active_days": 907,
-  "total_commits": 8743,
+  "total_commits": 8751,
   "total_authors": 573,
   "active_authors_12mo": 211,
-  "commits_last_12mo": 3282,
-  "total_files": 2800,
-  "total_lines": 565461,
-  "lines_added": 2176938,
-  "lines_removed": 1611477,
+  "commits_last_12mo": 3290,
+  "total_files": 2828,
+  "total_lines": 566710,
+  "lines_added": 2178311,
+  "lines_removed": 1611601,
   "total_tags": 104,
   "era": "steady",
   "top_authors": [
@@ -37,11 +37,11 @@
     },
     {
       "name": "Engel Nyst",
-      "commits": 549
+      "commits": 557
     }
   ],
   "author_commits": {
-    "Engel Nyst": 549,
+    "Engel Nyst": 557,
     "Nelson Spence": 4,
     "Irhas Abdul Rosyid": 2,
     "dymux": 1,
@@ -618,13 +618,13 @@
   "commits_by_year": {
     "2024": 2995,
     "2025": 2790,
-    "2026": 2958
+    "2026": 2966
   },
   "ai_assisted": {
-    "commits": 2539,
+    "commits": 2540,
     "authored": 17,
     "assistants": {
-      "OpenHands": 2343,
+      "OpenHands": 2344,
       "Claude": 183,
       "Cursor": 38,
       "GitHub Copilot": 5,
@@ -656,7 +656,7 @@
       "2026-07": 108,
       "2026-08": 63,
       "2026-09": 161,
-      "2026-10": 136
+      "2026-10": 137
     },
     "commits_by_month": {
       "2024-11": 245,
@@ -682,16 +682,16 @@
       "2026-07": 258,
       "2026-08": 179,
       "2026-09": 250,
-      "2026-10": 370
+      "2026-10": 378
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8743,
+    "commits": 8751,
     "by_kind": {
       "organization": 967,
       "one_person": 1177,
-      "personal": 3240,
+      "personal": 3248,
       "hidden": 2237,
       "unknown": 0,
       "bot": 1122
@@ -784,7 +784,7 @@
       "2026-Q4": {
         "organization": 28,
         "one_person": 29,
-        "personal": 237,
+        "personal": 245,
         "hidden": 64,
         "unknown": 0,
         "bot": 12
@@ -794,23 +794,23 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3063,
+    "commits": 3071,
     "authors": 204,
     "new_authors": 178,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 7621,
+    "commits": 7629,
     "commits_by_year": {
       "2024": 2270,
       "2025": 2591,
-      "2026": 2760
+      "2026": 2768
     },
     "active_days": 907
   },
   "timezones": {
     "+0000": 423,
-    "+0100": 281,
+    "+0100": 289,
     "+0200": 1100,
     "+0300": 103,
     "+0330": 4,
@@ -833,7 +833,7 @@
     "-0800": 90
   },
   "source_lines": {
-    "added": 1859958,
-    "current": 540778
+    "added": 1861331,
+    "current": 542027
   }
 }

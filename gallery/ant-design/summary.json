@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:34:44+00:00",
+  "generated_at": "2026-10-26T03:53:44+00:00",
   "name": "Ant Design",
   "report_path": "index.html",
   "first_commit": "2015-05-07 10:50:36",
-  "last_commit": "2026-10-24 12:29:27",
-  "age_days": 4189,
-  "active_days": 3836,
-  "total_commits": 33126,
+  "last_commit": "2026-10-26 03:03:50",
+  "age_days": 4190,
+  "active_days": 3838,
+  "total_commits": 33132,
   "total_authors": 2619,
-  "active_authors_12mo": 194,
-  "commits_last_12mo": 2349,
-  "total_files": 5040,
-  "total_lines": 1751523,
-  "lines_added": 6293617,
-  "lines_removed": 4542094,
-  "total_tags": 757,
+  "active_authors_12mo": 193,
+  "commits_last_12mo": 2355,
+  "total_files": 5042,
+  "total_lines": 1751602,
+  "lines_added": 6293884,
+  "lines_removed": 4542282,
+  "total_tags": 758,
   "era": "steady",
   "top_authors": [
     {
       "name": "afc163",
-      "commits": 10851
+      "commits": 10854
     },
     {
       "name": "\u4e8c\u8d27\u7231\u5403\u767d\u841d\u535c",
@@ -29,7 +29,7 @@
     },
     {
       "name": "lijianan",
-      "commits": 1525
+      "commits": 1526
     },
     {
       "name": "Benjy Cui",
@@ -41,6 +41,9 @@
     }
   ],
   "author_commits": {
+    "lijianan": 1526,
+    "afc163": 10854,
+    "zoomdong": 54,
     "\u591a\u683c": 56,
     "\u9ad8\u8273\u5175": 329,
     "Enes Uygur": 1,
@@ -48,7 +51,6 @@
     "Otto": 1,
     "YeYiChen": 3,
     "Amumu": 221,
-    "lijianan": 1525,
     "SaltyC": 996,
     "Fatih \u00c7ak\u0131r": 2,
     "Chaoqi": 8,
@@ -76,7 +78,6 @@
     "Bhumin Paladiya": 3,
     "Lazizbek Ergashev": 4,
     "Bao Nguyen": 4,
-    "zoomdong": 53,
     "EmilyyyLiu": 89,
     "Long": 4,
     "Carl Chen": 2,
@@ -89,7 +90,6 @@
     "NoiseFan": 5,
     "darkingtail": 1,
     "lee": 3,
-    "afc163": 10851,
     "Nicol\u00f2 Zandarin": 6,
     "water": 2,
     "QdabuliuQ": 16,
@@ -2673,7 +2673,7 @@
     "2023": 2676,
     "2024": 2021,
     "2025": 2248,
-    "2026": 1923
+    "2026": 1929
   },
   "ai_assisted": {
     "commits": 334,
@@ -2735,19 +2735,19 @@
       "2026-07": 219,
       "2026-08": 175,
       "2026-09": 133,
-      "2026-10": 86
+      "2026-10": 92
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 33126,
+    "commits": 33132,
     "by_kind": {
       "organization": 911,
       "one_person": 683,
-      "personal": 27061,
+      "personal": 27066,
       "hidden": 2533,
       "unknown": 5,
-      "bot": 1933
+      "bot": 1934
     },
     "organization_count": 16,
     "last_12mo_from": "2025-11",
@@ -2941,23 +2941,23 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 1,
-        "personal": 42,
+        "personal": 47,
         "hidden": 34,
         "unknown": 0,
-        "bot": 9
+        "bot": 10
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1785,
+    "commits": 1790,
     "authors": 192,
     "new_authors": 143,
     "half_of_commits": 4
   },
   "humans": {
-    "commits": 31193,
+    "commits": 31198,
     "commits_by_year": {
       "2015": 3342,
       "2016": 3938,
@@ -2970,9 +2970,9 @@
       "2023": 2426,
       "2024": 1693,
       "2025": 1828,
-      "2026": 1454
+      "2026": 1459
     },
-    "active_days": 3797
+    "active_days": 3799
   },
   "timezones": {
     "+0000": 980,
@@ -2987,7 +2987,7 @@
     "+0545": 12,
     "+0600": 9,
     "+0700": 143,
-    "+0800": 30002,
+    "+0800": 30008,
     "+0900": 116,
     "+0930": 7,
     "+1000": 40,
@@ -3005,7 +3005,7 @@
     "-1000": 1
   },
   "source_lines": {
-    "added": 1190300,
-    "current": 360222
+    "added": 1190567,
+    "current": 360301
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:29:49+00:00",
+  "generated_at": "2026-10-26T03:48:53+00:00",
   "name": "Prometheus",
   "report_path": "index.html",
   "first_commit": "2012-11-24 11:14:12",
-  "last_commit": "2026-10-23 14:30:15",
-  "age_days": 5082,
-  "active_days": 3774,
-  "total_commits": 19092,
+  "last_commit": "2026-10-25 16:49:59",
+  "age_days": 5084,
+  "active_days": 3775,
+  "total_commits": 19098,
   "total_authors": 1342,
   "active_authors_12mo": 275,
-  "commits_last_12mo": 2690,
+  "commits_last_12mo": 2696,
   "total_files": 1713,
-  "total_lines": 618030,
-  "lines_added": 4510094,
-  "lines_removed": 3892064,
+  "total_lines": 618281,
+  "lines_added": 4510410,
+  "lines_removed": 3892129,
   "total_tags": 480,
   "era": "surge",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Joe Adams": 28,
     "Bartlomiej Plotka": 489,
     "Arve Knudsen": 261,
     "Bartek Plotka": 83,
@@ -82,6 +83,7 @@
     "Andrew Hall": 14,
     "Jyotirmoy Roy": 1,
     "Ajay Kumar": 2,
+    "Will Bollock": 9,
     "git-jxj": 1,
     "Mauro Stettler": 7,
     "nikhil2004": 1,
@@ -100,7 +102,6 @@
     "Jeremy Schoemaker": 2,
     "Lea Anthony": 1,
     "Perfloop Agent": 3,
-    "Joe Adams": 27,
     "Eugene Kalinin": 26,
     "Pranshu Srivastava": 11,
     "Shota Yoshimura": 1,
@@ -233,7 +234,6 @@
     "Peter Nguyen": 1,
     "avilevy18": 2,
     "alex boten": 2,
-    "Will Bollock": 4,
     "Allison Maheu": 2,
     "Frederic Branczyk": 222,
     "Jorge Creixell": 2,
@@ -1399,7 +1399,7 @@
     "2023": 1401,
     "2024": 2727,
     "2025": 1788,
-    "2026": 2400
+    "2026": 2406
   },
   "ai_assisted": {
     "commits": 69,
@@ -1460,17 +1460,17 @@
       "2026-06": 261,
       "2026-07": 231,
       "2026-08": 302,
-      "2026-09": 260,
-      "2026-10": 285
+      "2026-09": 263,
+      "2026-10": 288
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 19092,
+    "commits": 19098,
     "by_kind": {
-      "organization": 5386,
-      "one_person": 1704,
-      "personal": 8505,
+      "organization": 5389,
+      "one_person": 1705,
+      "personal": 8507,
       "hidden": 2218,
       "unknown": 8,
       "bot": 1271
@@ -1647,6 +1647,14 @@
         "last_commit": "2021-12-16"
       },
       {
+        "organization": "akamai.com",
+        "commits": 6,
+        "commits_last_12mo": 3,
+        "addresses": 3,
+        "first_commit": "2024-05-27",
+        "last_commit": "2026-09-30"
+      },
+      {
         "organization": "debian.org",
         "commits": 6,
         "commits_last_12mo": 0,
@@ -1741,14 +1749,6 @@
         "addresses": 2,
         "first_commit": "2017-10-10",
         "last_commit": "2019-01-23"
-      },
-      {
-        "organization": "akamai.com",
-        "commits": 3,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2024-05-27",
-        "last_commit": "2025-05-12"
       },
       {
         "organization": "before.tech",
@@ -1897,7 +1897,7 @@
         "bot": 41
       },
       "2026-Q3": {
-        "organization": 87,
+        "organization": 90,
         "one_person": 36,
         "personal": 271,
         "hidden": 250,
@@ -1906,8 +1906,8 @@
       },
       "2026-Q4": {
         "organization": 55,
-        "one_person": 12,
-        "personal": 119,
+        "one_person": 13,
+        "personal": 121,
         "hidden": 69,
         "unknown": 0,
         "bot": 30
@@ -1917,13 +1917,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2393,
+    "commits": 2399,
     "authors": 271,
     "new_authors": 196,
     "half_of_commits": 7
   },
   "humans": {
-    "commits": 17821,
+    "commits": 17827,
     "commits_by_year": {
       "2012": 26,
       "2013": 841,
@@ -1939,9 +1939,9 @@
       "2023": 1318,
       "2024": 2404,
       "2025": 1390,
-      "2026": 2138
+      "2026": 2144
     },
-    "active_days": 3754
+    "active_days": 3755
   },
   "timezones": {
     "+0000": 1973,
@@ -1962,14 +1962,14 @@
     "+1300": 3,
     "-0200": 6,
     "-0300": 157,
-    "-0400": 570,
+    "-0400": 576,
     "-0500": 277,
     "-0600": 135,
     "-0700": 716,
     "-0800": 304
   },
   "source_lines": {
-    "added": 1004544,
-    "current": 469158
+    "added": 1004880,
+    "current": 469409
   }
 }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:29:17+00:00",
+  "generated_at": "2026-10-26T03:47:56+00:00",
   "name": "JAX",
   "report_path": "index.html",
   "first_commit": "2018-11-18 02:03:33",
-  "last_commit": "2026-10-25 01:08:12",
-  "age_days": 2898,
+  "last_commit": "2026-10-25 21:06:39",
+  "age_days": 2899,
   "active_days": 2747,
-  "total_commits": 39396,
+  "total_commits": 39399,
   "total_authors": 1069,
   "active_authors_12mo": 316,
-  "commits_last_12mo": 7785,
+  "commits_last_12mo": 7788,
   "total_files": 2032,
-  "total_lines": 898075,
-  "lines_added": 2002535,
-  "lines_removed": 1104460,
+  "total_lines": 898099,
+  "lines_added": 2002577,
+  "lines_removed": 1104478,
   "total_tags": 263,
   "era": "surge",
   "top_authors": [
     {
       "name": "jax authors",
-      "commits": 11076
+      "commits": 11077
     },
     {
       "name": "Peter Hawkins",
@@ -41,10 +41,11 @@
     }
   ],
   "author_commits": {
-    "Vlad Sytchenko": 16,
+    "Vlad Sytchenko": 17,
+    "George Necula": 1313,
+    "jax authors": 11077,
     "Yash Katariya": 2364,
     "Jake VanderPlas": 2987,
-    "jax authors": 11076,
     "Robert Dyro": 119,
     "Peter Hawkins": 3900,
     "Matthew Johnson": 3044,
@@ -60,7 +61,6 @@
     "Anxhelo Xhebraj": 2,
     "Sam Ginzburg": 9,
     "Yue Sheng": 101,
-    "George Necula": 1312,
     "Anselm Levskaya": 82,
     "guptaishaan": 1,
     "Ayaka Mikazuki": 91,
@@ -1120,7 +1120,7 @@
     "2023": 4502,
     "2024": 6118,
     "2025": 7667,
-    "2026": 6818
+    "2026": 6821
   },
   "ai_assisted": {
     "commits": 8,
@@ -1178,14 +1178,14 @@
       "2026-07": 696,
       "2026-08": 625,
       "2026-09": 692,
-      "2026-10": 652
+      "2026-10": 655
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39396,
+    "commits": 39399,
     "by_kind": {
-      "organization": 29745,
+      "organization": 29748,
       "one_person": 269,
       "personal": 2554,
       "hidden": 6745,
@@ -1197,8 +1197,8 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 28332,
-        "commits_last_12mo": 7052,
+        "commits": 28335,
+        "commits_last_12mo": 7055,
         "addresses": 465,
         "first_commit": "2018-11-18",
         "last_commit": "2026-10-25"
@@ -1406,7 +1406,7 @@
         "bot": 7
       },
       "2026-Q4": {
-        "organization": 620,
+        "organization": 623,
         "one_person": 1,
         "personal": 26,
         "hidden": 5,
@@ -1418,13 +1418,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 7759,
+    "commits": 7762,
     "authors": 314,
     "new_authors": 155,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 39313,
+    "commits": 39316,
     "commits_by_year": {
       "2018": 469,
       "2019": 2953,
@@ -1434,7 +1434,7 @@
       "2023": 4499,
       "2024": 6085,
       "2025": 7654,
-      "2026": 6794
+      "2026": 6797
     },
     "active_days": 2747
   },
@@ -1457,11 +1457,11 @@
     "-0400": 1623,
     "-0500": 1098,
     "-0600": 110,
-    "-0700": 22597,
+    "-0700": 22600,
     "-0800": 9785
   },
   "source_lines": {
-    "added": 2027752,
-    "current": 879261
+    "added": 2027794,
+    "current": 879284
   }
 }

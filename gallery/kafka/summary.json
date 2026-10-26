@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:31:46+00:00",
+  "generated_at": "2026-10-26T03:50:31+00:00",
   "name": "Apache Kafka",
   "report_path": "index.html",
   "first_commit": "2011-08-01 23:41:24",
-  "last_commit": "2026-10-25 05:00:40",
+  "last_commit": "2026-10-25 17:19:58",
   "age_days": 5564,
   "active_days": 4190,
-  "total_commits": 18509,
-  "total_authors": 1548,
-  "active_authors_12mo": 255,
-  "commits_last_12mo": 1992,
+  "total_commits": 18512,
+  "total_authors": 1549,
+  "active_authors_12mo": 256,
+  "commits_last_12mo": 1995,
   "total_files": 7633,
-  "total_lines": 1850806,
-  "lines_added": 3482558,
-  "lines_removed": 1631752,
+  "total_lines": 1851242,
+  "lines_added": 3483057,
+  "lines_removed": 1631815,
   "total_tags": 2,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,9 @@
     }
   ],
   "author_commits": {
+    "Alan Lau": 20,
+    "SunMin Lee": 6,
+    "ryanwaha": 1,
     "Parker Chang": 23,
     "Yen-Ting Li": 4,
     "gabriellafu": 26,
@@ -54,12 +57,10 @@
     "Sushant Mahajan": 123,
     "Doyeon Kim": 4,
     "Dejan Stojadinovi\u0107": 37,
-    "SunMin Lee": 5,
     "ChickenchickenLove": 29,
     "Omnia Ibrahim": 48,
     "Christo Lolov": 73,
     "Lyphixia Wang": 1,
-    "Alan Lau": 19,
     "I-Chau (David) Wang": 1,
     "Gergely Harmadas": 17,
     "Jian": 18,
@@ -1606,7 +1607,7 @@
     "2023": 1474,
     "2024": 2451,
     "2025": 2182,
-    "2026": 1708
+    "2026": 1711
   },
   "ai_assisted": {
     "commits": 87,
@@ -1668,17 +1669,17 @@
       "2026-07": 201,
       "2026-08": 171,
       "2026-09": 212,
-      "2026-10": 147
+      "2026-10": 150
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 18509,
+    "commits": 18512,
     "by_kind": {
       "organization": 6963,
       "one_person": 1624,
-      "personal": 7401,
-      "hidden": 2501,
+      "personal": 7402,
+      "hidden": 2503,
       "unknown": 17,
       "bot": 3
     },
@@ -2050,8 +2051,8 @@
       "2026-Q4": {
         "organization": 61,
         "one_person": 2,
-        "personal": 55,
-        "hidden": 29,
+        "personal": 56,
+        "hidden": 31,
         "unknown": 0,
         "bot": 0
       }
@@ -2060,13 +2061,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1990,
-    "authors": 253,
-    "new_authors": 150,
+    "commits": 1993,
+    "authors": 254,
+    "new_authors": 151,
     "half_of_commits": 19
   },
   "humans": {
-    "commits": 18506,
+    "commits": 18509,
     "commits_by_year": {
       "2011": 116,
       "2012": 286,
@@ -2083,7 +2084,7 @@
       "2023": 1474,
       "2024": 2451,
       "2025": 2181,
-      "2026": 1706
+      "2026": 1709
     },
     "active_days": 4190
   },
@@ -2098,14 +2099,14 @@
     "+0530": 1036,
     "+0545": 3,
     "+0700": 7,
-    "+0800": 2697,
-    "+0900": 340,
+    "+0800": 2698,
+    "+0900": 341,
     "+1000": 13,
     "+1100": 12,
     "+1200": 18,
     "+1300": 9,
     "-0300": 22,
-    "-0400": 848,
+    "-0400": 849,
     "-0500": 908,
     "-0600": 182,
     "-0700": 4703,
@@ -2113,7 +2114,7 @@
     "-1000": 3
   },
   "source_lines": {
-    "added": 3509736,
-    "current": 1845765
+    "added": 3510235,
+    "current": 1846201
   }
 }

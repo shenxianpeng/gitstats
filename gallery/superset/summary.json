@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:32:47+00:00",
+  "generated_at": "2026-10-26T03:51:07+00:00",
   "name": "Apache Superset",
   "report_path": "index.html",
   "first_commit": "2015-07-02 22:16:59",
-  "last_commit": "2026-10-25 04:30:14",
-  "age_days": 4133,
-  "active_days": 3320,
-  "total_commits": 23978,
-  "total_authors": 1728,
+  "last_commit": "2026-10-26 02:49:19",
+  "age_days": 4134,
+  "active_days": 3321,
+  "total_commits": 23991,
+  "total_authors": 1729,
   "active_authors_12mo": 470,
-  "commits_last_12mo": 6026,
-  "total_files": 11457,
-  "total_lines": 3048939,
-  "lines_added": 8715974,
-  "lines_removed": 5667035,
+  "commits_last_12mo": 6039,
+  "total_files": 11458,
+  "total_lines": 3048855,
+  "lines_added": 8717710,
+  "lines_removed": 5668855,
   "total_tags": 232,
   "era": "peak",
   "top_authors": [
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "\u0288\u1d43\u1d62": 172,
+    "Jason Draper": 1,
     "Amin Ghadersohi": 381,
     "Mike Bridge": 219,
     "Evan Rusackas": 1332,
@@ -189,7 +191,6 @@
     "Facundo Parodi": 1,
     "khaa-dv": 1,
     "mkramer5454": 4,
-    "\u0288\u1d43\u1d62": 171,
     "Jyun-An Chen": 1,
     "Robin Emer\u0161i\u010d": 1,
     "K HARSHAVARDHAN": 1,
@@ -1782,7 +1783,7 @@
     "2023": 1594,
     "2024": 2068,
     "2025": 1996,
-    "2026": 5608
+    "2026": 5621
   },
   "ai_assisted": {
     "commits": 2117,
@@ -1843,19 +1844,19 @@
       "2026-07": 808,
       "2026-08": 728,
       "2026-09": 841,
-      "2026-10": 601
+      "2026-10": 614
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 23978,
+    "commits": 23991,
     "by_kind": {
-      "organization": 3970,
+      "organization": 3971,
       "one_person": 1377,
       "personal": 9078,
-      "hidden": 5777,
+      "hidden": 5778,
       "unknown": 0,
-      "bot": 3776
+      "bot": 3787
     },
     "organization_count": 16,
     "last_12mo_from": "2025-11",
@@ -1878,11 +1879,11 @@
       },
       {
         "organization": "apache.org",
-        "commits": 49,
-        "commits_last_12mo": 8,
+        "commits": 50,
+        "commits_last_12mo": 9,
         "addresses": 7,
         "first_commit": "2016-06-10",
-        "last_commit": "2026-09-04"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "berkeley.edu",
@@ -2047,25 +2048,25 @@
         "bot": 778
       },
       "2026-Q4": {
-        "organization": 203,
+        "organization": 204,
         "one_person": 16,
         "personal": 138,
-        "hidden": 77,
+        "hidden": 78,
         "unknown": 0,
-        "bot": 167
+        "bot": 178
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3922,
-    "authors": 468,
-    "new_authors": 391,
+    "commits": 3924,
+    "authors": 469,
+    "new_authors": 392,
     "half_of_commits": 6
   },
   "humans": {
-    "commits": 20202,
+    "commits": 20204,
     "commits_by_year": {
       "2015": 432,
       "2016": 1167,
@@ -2078,12 +2079,12 @@
       "2023": 1368,
       "2024": 1393,
       "2025": 1447,
-      "2026": 3662
+      "2026": 3664
     },
-    "active_days": 3296
+    "active_days": 3298
   },
   "timezones": {
-    "+0000": 475,
+    "+0000": 480,
     "+0100": 1332,
     "+0200": 1685,
     "+0300": 1376,
@@ -2094,7 +2095,7 @@
     "+0530": 465,
     "+0545": 1,
     "+0600": 2,
-    "+0700": 817,
+    "+0700": 823,
     "+0800": 684,
     "+0900": 89,
     "+0930": 1,
@@ -2107,13 +2108,13 @@
     "-0300": 1257,
     "-0400": 1197,
     "-0500": 706,
-    "-0600": 863,
-    "-0700": 9250,
+    "-0600": 864,
+    "-0700": 9251,
     "-0800": 3358,
     "-1000": 49
   },
   "source_lines": {
-    "added": 6972774,
-    "current": 2974263
+    "added": 6972909,
+    "current": 2974321
   }
 }

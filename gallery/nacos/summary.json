@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:34:04+00:00",
+  "generated_at": "2026-10-26T03:53:07+00:00",
   "name": "Nacos",
   "report_path": "index.html",
   "first_commit": "2018-07-20 16:27:23",
-  "last_commit": "2026-10-23 08:29:03",
-  "age_days": 3017,
-  "active_days": 1586,
-  "total_commits": 6345,
+  "last_commit": "2026-10-26 03:38:07",
+  "age_days": 3020,
+  "active_days": 1587,
+  "total_commits": 6346,
   "total_authors": 538,
   "active_authors_12mo": 81,
-  "commits_last_12mo": 767,
-  "total_files": 7173,
-  "total_lines": 1286051,
-  "lines_added": 2538366,
-  "lines_removed": 1252315,
+  "commits_last_12mo": 768,
+  "total_files": 7177,
+  "total_lines": 1287119,
+  "lines_added": 2539457,
+  "lines_removed": 1252338,
   "total_tags": 67,
   "era": "steady",
   "top_authors": [
     {
       "name": "\u6768\u7fca SionYang",
-      "commits": 1162
+      "commits": 1163
     },
     {
       "name": "nkorange",
@@ -41,9 +41,9 @@
     }
   ],
   "author_commits": {
+    "\u6768\u7fca SionYang": 1163,
     "lsmlhi_25": 1,
     "sai": 63,
-    "\u6768\u7fca SionYang": 1162,
     "abin": 3,
     "Zhengcy05": 12,
     "neoLsH": 5,
@@ -589,14 +589,14 @@
     "2023": 396,
     "2024": 337,
     "2025": 398,
-    "2026": 724
+    "2026": 725
   },
   "ai_assisted": {
-    "commits": 288,
+    "commits": 289,
     "authored": 0,
     "assistants": {
       "Claude": 252,
-      "Codex": 39,
+      "Codex": 40,
       "ChatGPT": 8,
       "Kiro": 5,
       "Cursor": 3,
@@ -626,7 +626,7 @@
       "2026-07": 60,
       "2026-08": 57,
       "2026-09": 23,
-      "2026-10": 9
+      "2026-10": 10
     },
     "commits_by_month": {
       "2024-11": 38,
@@ -652,14 +652,14 @@
       "2026-07": 80,
       "2026-08": 73,
       "2026-09": 35,
-      "2026-10": 16
+      "2026-10": 17
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 6345,
+    "commits": 6346,
     "by_kind": {
-      "organization": 1226,
+      "organization": 1227,
       "one_person": 370,
       "personal": 3896,
       "hidden": 818,
@@ -671,11 +671,11 @@
     "top": [
       {
         "organization": "alibaba-inc.com",
-        "commits": 1108,
-        "commits_last_12mo": 371,
+        "commits": 1109,
+        "commits_last_12mo": 372,
         "addresses": 21,
         "first_commit": "2018-07-20",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "apache.org",
@@ -768,7 +768,7 @@
         "bot": 2
       },
       "2026-Q4": {
-        "organization": 7,
+        "organization": 8,
         "one_person": 0,
         "personal": 2,
         "hidden": 7,
@@ -780,13 +780,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 762,
+    "commits": 763,
     "authors": 81,
     "new_authors": 60,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 6323,
+    "commits": 6324,
     "commits_by_year": {
       "2018": 700,
       "2019": 1338,
@@ -796,9 +796,9 @@
       "2023": 394,
       "2024": 332,
       "2025": 396,
-      "2026": 719
+      "2026": 720
     },
-    "active_days": 1584
+    "active_days": 1585
   },
   "timezones": {
     "+0000": 7,
@@ -807,7 +807,7 @@
     "+0300": 8,
     "+0400": 4,
     "+0530": 1,
-    "+0800": 6265,
+    "+0800": 6266,
     "+0900": 3,
     "-0400": 1,
     "-0500": 33,
@@ -815,7 +815,7 @@
     "-0700": 3
   },
   "source_lines": {
-    "added": 3943215,
-    "current": 1252669
+    "added": 3944306,
+    "current": 1253737
   }
 }

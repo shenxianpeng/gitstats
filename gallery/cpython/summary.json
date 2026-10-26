@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
   "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-25T05:28:17+00:00",
+  "generated_at": "2026-10-26T03:46:54+00:00",
   "name": "CPython",
   "report_path": "index.html",
   "first_commit": "1990-08-09 14:25:15",
-  "last_commit": "2026-10-25 05:18:16",
-  "age_days": 13226,
-  "active_days": 11066,
-  "total_commits": 133977,
+  "last_commit": "2026-10-26 00:29:42",
+  "age_days": 13227,
+  "active_days": 11067,
+  "total_commits": 133992,
   "total_authors": 3732,
   "active_authors_12mo": 784,
-  "commits_last_12mo": 5027,
-  "total_files": 5829,
-  "total_lines": 3259787,
-  "lines_added": 11134666,
-  "lines_removed": 7874879,
+  "commits_last_12mo": 5042,
+  "total_files": 5842,
+  "total_lines": 3260439,
+  "lines_added": 11135556,
+  "lines_removed": 7875117,
   "total_tags": 312,
   "era": "steady",
   "top_authors": [
@@ -41,26 +41,30 @@
     }
   ],
   "author_commits": {
+    "Sergey B Kirpichev": 224,
+    "Gregory P. Smith": 1478,
+    "sobolevn": 842,
+    "tonghuaroot (\u7ae5\u8bdd)": 49,
+    "Pengyu Lee": 26,
+    "Thomas Kowalski": 20,
+    "Ivy Xu": 19,
+    "Lysandros Nikolaou": 147,
+    "An Long": 123,
     "Inada Naoki": 405,
-    "Gregory P. Smith": 1472,
     "Jelle Zijlstra": 378,
     "Christian Heimes": 1742,
-    "tonghuaroot (\u7ae5\u8bdd)": 48,
     "Davi de Jesus": 4,
     "Zachary Ware": 764,
     "Nice Zombies": 51,
-    "An Long": 122,
     "Neil Schemenauer": 413,
     "Aslan Osmanov": 2,
     "Pieter Eendebak": 108,
     "Christian Aurich Zanettini Martins": 7,
     "Michael Newman": 6,
     "Liang Hu": 1,
-    "Pengyu Lee": 24,
     "Peter Bierma": 183,
     "Eduardo Villalpando Mello": 8,
     "Tian Gao": 183,
-    "Lysandros Nikolaou": 146,
     "Baptiste Mispelon": 2,
     "B\u00e9n\u00e9dikt Tran": 440,
     "Zanie Blue": 24,
@@ -73,7 +77,6 @@
     "Brittany Reynoso": 15,
     "Osama Abdelkader": 2,
     "Semyon Moroz": 48,
-    "Sergey B Kirpichev": 223,
     "Himesh Rupchandani": 2,
     "Victorien": 27,
     "Michele Angrisano": 5,
@@ -98,7 +101,6 @@
     "Shamil": 33,
     "Vasiliy Kiryanov": 9,
     "Edward Xu": 8,
-    "sobolevn": 841,
     "Savannah Ostrowski": 109,
     "Lazizbek Ergashev": 9,
     "Serhiy Storchaka": 5828,
@@ -251,7 +253,6 @@
     "felix": 1,
     "Aarni Koskela": 3,
     "James Morris": 3,
-    "Ivy Xu": 18,
     "Tomasz Kazimierczak": 1,
     "A5rocks": 1,
     "cui fliter": 5,
@@ -261,7 +262,6 @@
     "sai": 1,
     "Aradhya Gupta": 1,
     "David Vo": 1,
-    "Thomas Kowalski": 19,
     "Eugene Amirov": 1,
     "Evan A Mavrin": 1,
     "sundeep8967": 1,
@@ -3811,7 +3811,7 @@
     "2023": 4459,
     "2024": 4743,
     "2025": 4871,
-    "2026": 4244
+    "2026": 4259
   },
   "ai_assisted": {
     "commits": 385,
@@ -3870,17 +3870,17 @@
       "2026-07": 503,
       "2026-08": 384,
       "2026-09": 466,
-      "2026-10": 537
+      "2026-10": 552
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 133977,
+    "commits": 133992,
     "by_kind": {
       "organization": 43207,
-      "one_person": 40204,
-      "personal": 43883,
-      "hidden": 6522,
+      "one_person": 40207,
+      "personal": 43888,
+      "hidden": 6529,
       "unknown": 82,
       "bot": 79
     },
@@ -4347,9 +4347,9 @@
       },
       "2026-Q4": {
         "organization": 128,
-        "one_person": 117,
-        "personal": 181,
-        "hidden": 107,
+        "one_person": 120,
+        "personal": 186,
+        "hidden": 114,
         "unknown": 0,
         "bot": 4
       }
@@ -4358,13 +4358,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 5017,
+    "commits": 5032,
     "authors": 780,
     "new_authors": 489,
     "half_of_commits": 18
   },
   "humans": {
-    "commits": 133898,
+    "commits": 133913,
     "commits_by_year": {
       "1990": 105,
       "1991": 445,
@@ -4402,15 +4402,15 @@
       "2023": 4445,
       "2024": 4710,
       "2025": 4871,
-      "2026": 4234
+      "2026": 4249
     },
-    "active_days": 11066
+    "active_days": 11067
   },
   "timezones": {
     "+0000": 67124,
-    "+0100": 11875,
+    "+0100": 11876,
     "+0200": 17334,
-    "+0300": 7783,
+    "+0300": 7785,
     "+0330": 29,
     "+0400": 81,
     "+0430": 5,
@@ -4419,8 +4419,8 @@
     "+0545": 6,
     "+0600": 6,
     "+0700": 77,
-    "+0800": 2077,
-    "+0900": 1297,
+    "+0800": 2081,
+    "+0900": 1298,
     "+0930": 4,
     "+1000": 603,
     "+1030": 15,
@@ -4432,13 +4432,13 @@
     "-0400": 6767,
     "-0500": 4898,
     "-0600": 1660,
-    "-0700": 7504,
+    "-0700": 7511,
     "-0800": 2957,
     "-0900": 5,
     "-1000": 17
   },
   "source_lines": {
-    "added": 13601519,
-    "current": 3175081
+    "added": 13602409,
+    "current": 3175707
   }
 }
