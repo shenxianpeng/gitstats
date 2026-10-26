@@ -1764,12 +1764,14 @@ class TestNavigation:
             self._report(temp_dir, "repo0", page)
         with open(os.path.join(temp_dir, "repo0", "notes.txt"), "w", encoding="utf-8") as f:
             f.write(REPORT_BRAND)
+        os.makedirs(os.path.join(temp_dir, "repo0", "folder.html"))  # not a page
         summaries = self._summaries()
         AggregateReportCreator().create(summaries, [], temp_dir, title="My <Gallery>")
         back = '<a href="../index.html" class="nav-brand nav-up">&larr; My &lt;Gallery&gt;</a>'
         for page in ("index.html", "tags.html"):
             text = self._read(temp_dir, f"repo0/{page}")
-            assert back in text and REPORT_BRAND not in text
+            assert back in text
+            assert REPORT_BRAND not in text
         # its comparison page, its share card and what is not a page: left alone
         for name in ("compare-old.html", "share-card.html", "notes.txt"):
             assert REPORT_BRAND in self._read(temp_dir, f"repo0/{name}")

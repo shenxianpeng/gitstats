@@ -759,6 +759,13 @@ _ORGANIZATION_FILE = re.compile(rf"orgs/{_DOMAIN}\.(?:html|svg|json)")
 _COMPARE_FILE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*/compare(?:-card)?\.html")
 
 
+def _report_folder(report_path: str) -> str:
+    """The folder of a report in a portfolio: "flask" for "flask/index.html";
+    "" for one that is not in a folder of its own."""
+    end = "/index.html"
+    return report_path[: -len(end)] if report_path.endswith(end) else ""
+
+
 def organization_pages(dataset: dict[str, Any]) -> list[dict[str, Any]]:
     """The organizations of ``organizations_dataset`` that get a page and a
     badge: the first _ORGANIZATION_PAGES whose domain can name a file."""
@@ -1249,7 +1256,7 @@ class AggregateReportCreator:
         for row, found in zip(rows, stand_out):
             summary = row["summary"]
             report = str(summary.get("report_path", "") or "")
-            folder = report[: -len("/index.html")] if report.endswith("/index.html") else ""
+            folder = _report_folder(report)
             group = str(summary.get("group", "") or "")
             entry: dict[str, Any] = {
                 "name": summary.get("name", ""),
@@ -1467,19 +1474,24 @@ class AggregateReportCreator:
         """Make the brand of each page of a repository's report the way back
         to the portfolio, "← GitStats Gallery"; how many pages changed. A page
         changed before, by an earlier portfolio, keeps what it has."""
-        report = str(summary.get("report_path", "") or "")
-        folder = report[: -len("/index.html")] if report.endswith("/index.html") else ""
+        folder = _report_folder(str(summary.get("report_path", "") or ""))
         base = os.path.abspath(path)
         target = os.path.abspath(os.path.join(base, folder))
         # a plain folder name, the same a comparison page is written into
-        if not _COMPARE_FILE.fullmatch(f"{folder}/compare.html") or not os.path.isdir(target):
+        if (
+            not _COMPARE_FILE.fullmatch(f"{folder}/compare.html")
+            or os.path.commonpath([base, target]) != base
+            or not os.path.isdir(target)
+        ):
             return 0
         brand = f'<a href="../index.html" class="nav-brand nav-up">&larr; {html.escape(title)}</a>'
         changed = 0
         for entry in sorted(os.listdir(target)):
             if not entry.endswith(".html") or entry.startswith(("compare", "share-card")):
                 continue
-            page = os.path.join(target, entry)
+            page = os.path.abspath(os.path.join(target, entry))
+            if os.path.commonpath([target, page]) != target or not os.path.isfile(page):
+                continue
             with open(page, encoding="utf-8") as f:
                 text = f.read()
             if REPORT_BRAND in text:

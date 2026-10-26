@@ -1136,13 +1136,14 @@ class HTMLReportCreator(ReportCreator):
         last_commit = (
             datetime.datetime.fromtimestamp(stamp) if isinstance(stamp, int) and stamp else now
         )
-        quiet = last_commit.strftime("%Y-%W") < now.strftime("%Y-%W")
+        week = "%Y-%W"  # the key the commits of a week are kept under
+        quiet = last_commit.strftime(week) < now.strftime(week)
         deltaweek = datetime.timedelta(7)
         weeks: list[str] = []
         mondays: list[datetime.date] = []
         stampcur = last_commit if quiet else now
         for _ in range(weeks_count):
-            weeks.insert(0, stampcur.strftime("%Y-%W"))
+            weeks.insert(0, stampcur.strftime(week))
             mondays.insert(0, (stampcur - datetime.timedelta(days=stampcur.weekday())).date())
             stampcur -= deltaweek
 
@@ -1358,10 +1359,10 @@ class HTMLReportCreator(ReportCreator):
                 f'<tr><td>{yy}</td><td class="num">{format_int(commits)} '
                 f"({100.0 * commits / total:.1f}%)</td>{lines}</tr>"
             )
-        f.write("</table></div>")
-        if uncounted_years:
-            f.write(f'<p class="section-note">&mdash;: {FIRST_PARENT_LINES}</p>')
-        f.write("</details>")
+        note = (
+            f'<p class="section-note">&mdash;: {FIRST_PARENT_LINES}</p>' if uncounted_years else ""
+        )
+        f.write(f"</table></div>{note}</details>")
 
     def _write_commits_by_timezone_section(self, f, data) -> None:
         """Commits per UTC offset, west to east, as horizontal bars."""

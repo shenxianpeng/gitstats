@@ -94,13 +94,13 @@ function ts_columnSort(t, column, rows) {
 	if (!t.ts_sorts) t.ts_sorts = {};
 	if (t.ts_sorts[column] !== undefined) return t.ts_sorts[column];
 	var numeric = 0, dates = 0, values = 0;
-	for (var r=0;r<rows.length;r++) {
-		var itm = ts_cellText(rows[r], column);
+	for (var row of rows) {
+		var itm = ts_cellText(row, column);
 		if (ts_isBlank(itm)) continue;
 		values++;
 		// numbers, ignoring stuff in () after them
 		if (itm.match(/^-?\d[\d,.]*(E[-+]\d+)?%?( \(.*\))?$/)) numeric++;
-		if (itm.match(/^\d\d[\/\.-][a-zA-Z][a-zA-Z][a-zA-Z][\/\.-]\d\d\d\d$/) || itm.match(/^\d\d[\/\.-]\d\d[\/\.-]\d\d(\d\d)?$/)) dates++;
+		if (itm.match(/^\d\d[/.-][a-zA-Z]{3}[/.-]\d{4}$/) || itm.match(/^\d\d[/.-]\d\d[/.-]\d\d(\d\d)?$/)) dates++;
 	}
 	var sortfn = null;
 	if (values) {
@@ -113,7 +113,7 @@ function ts_columnSort(t, column, rows) {
 }
 
 function ts_resortTable(lnk, clid) {
-	var span;
+	var span, i, j, k;
 	for (var ci=0;ci<lnk.childNodes.length;ci++) {
 		if (lnk.childNodes[ci].tagName && lnk.childNodes[ci].tagName.toLowerCase() == 'span') span = lnk.childNodes[ci];
 	}
