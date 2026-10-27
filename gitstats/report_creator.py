@@ -1126,8 +1126,9 @@ class HTMLReportCreator(ReportCreator):
         commit when that is earlier: a repository without commits for months
         would show 32 empty weeks.
 
-        Weeks are labelled by the Monday they start on ("Feb 16"); the "%Y-%W"
-        keys the data is stored under read like months ("2026-07").
+        Weeks are labelled by the Monday they start on ("Feb 16"), with the
+        year ("Dec 26, 2022") when the weeks are not all in this one; the
+        "%Y-%W" keys the data is stored under read like months ("2026-07").
         """
         weeks_count = 32
         f.write(html_header(2, "Weekly activity"))
@@ -1165,11 +1166,13 @@ class HTMLReportCreator(ReportCreator):
             + "</p>"
         )
         weekly_values = [data.activity_by_year_week.get(w, 0) for w in weeks]
+        # "Dec 26" alone could be any year's, in the axis and in the tooltip
+        with_year = any(m.year != now.year for m in mondays)
         f.write(
             self._render_chartjs(
                 "chart-weekly-activity",
                 "bar",
-                [day(m) for m in mondays],
+                [f"{day(m)}, {m.year}" if with_year else day(m) for m in mondays],
                 [{"label": "Commits", "data": weekly_values}],
                 aspect_ratio=5,
             )
@@ -3294,7 +3297,12 @@ class HTMLReportCreator(ReportCreator):
                     "grid: { color: monthAxisGrid } }"
                 )
             else:
-                x_ticks = "maxRotation: 45, minRotation: 45" if x_ticks_rotate else "maxRotation: 0"
+                # unrotated labels keep a gap between them, as on the time axes
+                x_ticks = (
+                    "maxRotation: 45, minRotation: 45"
+                    if x_ticks_rotate
+                    else "maxRotation: 0, autoSkipPadding: 12"
+                )
                 if collapsed:
                     x_ticks += ", callback: categoryTick"
                 # each bar is its own category: a gridline per bar is only noise

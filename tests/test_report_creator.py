@@ -866,8 +866,9 @@ def test_weekly_activity_labels_weeks_by_monday(mock_data_collector, monkeypatch
     HTMLReportCreator()._write_weekly_activity_section(f, mock_data_collector)
     html = f.getvalue()
 
-    # Labels are the weeks' Mondays, not "2026-38" (which reads like a month)
-    assert "Feb 16" in html and "Sep 21" in html
+    # Labels are the weeks' Mondays, not "2026-38" (which reads like a month),
+    # without the year when all of them are in this one
+    assert '"Feb 16", "Feb 23"' in html and '"Sep 21"]' in html
     assert '"2026-38"' not in html
     assert "Last 32 weeks, from the week of Feb 16, 2026 to the week of Sep 21, 2026." in html
     # The value for the current week is still found under its "%Y-%W" key
@@ -897,6 +898,10 @@ def test_weekly_activity_ends_at_the_last_commit(mock_data_collector, monkeypatc
         "Apr 26, 2021: there has been none since."
     ) in html
     assert '"data": [' + "0, " * 30 + "3, 0]" in html
+    # weeks of other years carry their year, in the axis and in the tooltip
+    assert '["Sep 21, 2020", "Sep 28, 2020", ' in html
+    assert '"Dec 28, 2020", "Jan 4, 2021", ' in html
+    assert '"Apr 26, 2021"]' in html
     # without a last commit to go by, the weeks end today
     mock_data_collector.last_commit_stamp = 0
     f = StringIO()
@@ -2956,7 +2961,7 @@ def test_bar_charts_drop_redundant_lines():
     creator = HTMLReportCreator()
     bars = creator._render_chartjs("b", "bar", ["a", "b"], [{"label": "C", "data": [1, 2]}])
     # no gridline per category bar; the y gridlines stay
-    assert "x: { ticks: { maxRotation: 0 }, grid: { display: false } }" in bars
+    assert "x: { ticks: { maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } }" in bars
     assert "y: { beginAtZero: true, ticks: { precision: 0 } }" in bars
     line = creator._render_chartjs("l", "line", ["a", "b"], [{"label": "C", "data": [1, 2]}])
     assert "grid: { display: false }" not in line

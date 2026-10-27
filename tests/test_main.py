@@ -1360,6 +1360,14 @@ class TestCLI:
         assert args.host == "127.0.0.1"
         assert args.port == 8000
 
+    def test_every_option_is_in_the_getting_started_page(self):
+        # an option added to the parser and not to the docs fails here
+        page = Path(__file__).parents[1] / "docs" / "source" / "getting-started.rst"
+        documented = set(re.findall(r"``(-[^`]*)``", page.read_text(encoding="utf-8")))
+        documented = {flag for item in documented for flag in re.findall(r"--?[\w-]+", item)}
+        options = {flag for action in get_parser()._actions for flag in action.option_strings}
+        assert options - documented == set()
+
     def test_parser_serve_flags(self):
         parser = get_parser()
         args = parser.parse_args(["--serve", "--host", "0.0.0.0", "--port", "0", "repo"])

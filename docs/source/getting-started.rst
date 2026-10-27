@@ -84,42 +84,49 @@ Basic Syntax
 
 **Arguments:**
 
-- ``<gitpath>`` - Path to your Git repository (e.g., ``.`` for current directory)
+- ``<gitpath>`` - Path to your Git repository (e.g., ``.`` for current directory).
+  Give several to analyze each one and get a portfolio page that compares them;
+  with two or more paths, the last one is the output directory.
 - ``<outputpath>`` - Directory where the report will be generated (default: ``gitstats-report``)
 
 **Options:**
 
 - ``-h, --help`` - Show help message and exit
 - ``-v, --version`` - Show program version number
-- ``-c key=value, --config key=value`` - Override configuration values (can be used multiple times)
-- ``-f {json}, --format {json}`` - Generate additional output format
+- ``-c key=value, --config key=value`` - Override a configuration value (can be used
+  multiple times). ``gitstats --help`` lists the keys; :doc:`configuration` explains them.
+- ``-f {json}, --format {json}`` - Also write the report's data as JSON
+- ``--site-url URL`` - Public address of the report, e.g. ``https://owner.github.io/repo/``.
+  The snippets on the Badges page point at it, and the run log prints the README badge.
 - ``--verbose`` - Enable debug logging, including command-level details
 - ``--quiet`` - Only show warnings and errors
 
-Full Help Output
-~~~~~~~~~~~~~~~~
+**Viewing the report:**
 
-.. code-block:: text
+- ``--serve`` - After generating the report, serve it over HTTP until Ctrl+C
+- ``--host HOST`` - Address the ``--serve`` server binds to (default: ``127.0.0.1``, this
+  computer only; ``0.0.0.0`` makes it reachable from the network)
+- ``--port PORT`` - Port of the ``--serve`` server, 1 to 65535 (default: ``8000``;
+  ``0`` picks a free one)
 
-    usage: gitstats [-h] [-v] [-c key=value] [-f {json}] [--verbose | --quiet]
-                    <gitpath> [<gitpath> ...] [<outputpath>]
+**AI summaries** (see :doc:`ai-integration`):
 
-    Generate statistics for a Git repository.
+- ``--ai, --no-ai`` - Turn AI-generated summaries on or off for this run
+- ``--ai-provider {openai,claude,gemini,ollama}`` - AI provider to use
+- ``--ai-model AI_MODEL`` - Model to use, as the provider names it
+- ``--ai-language AI_LANGUAGE`` - Language of the summaries (``en``, ``zh``, ``ja``, ...)
+- ``--refresh-ai`` - Ask the provider again instead of using cached summaries
 
-    positional arguments:
-      <gitpath>             Path(s) to the Git repository
-      <outputpath>          Path to the output directory (default: gitstats-report)
+**Repo Wrapped card:**
 
-    options:
-      -h, --help            show this help message and exit
-      -v, --version         show program's version number and exit
-      -c key=value, --config key=value
-                            Override configuration value. Can be specified multiple
-                            times. See configuration documentation for available options.
-      -f {json}, --format {json}
-                            Generate additional output format.
-      --verbose             Enable debug logging
-      --quiet               Only show warnings and errors
+- ``--wrapped`` - Also write a shareable "Repo Wrapped" SVG card next to the report
+- ``--wrapped-year YEAR`` - Year the card is for (default: the current year); a year
+  without commits gets no card
+- ``--wrapped-theme {midnight,sunset,clean}`` - Color theme of the card (default: ``midnight``)
+- ``--wrapped-output PATH`` - File to write the card to, in an existing directory (default:
+  ``<outputpath>/wrapped-<year>.svg``); single repository only
+
+``gitstats --help`` prints the same list.
 
 Examples
 --------
@@ -159,6 +166,18 @@ Show only warnings and errors:
 .. code-block:: bash
 
     gitstats --quiet .
+
+Generate the report and open it in a browser at http://127.0.0.1:8000/:
+
+.. code-block:: bash
+
+    gitstats . --serve
+
+Also write this year's Repo Wrapped card:
+
+.. code-block:: bash
+
+    gitstats . --wrapped --wrapped-theme sunset
 
 Override configuration values:
 
