@@ -168,7 +168,8 @@ def test_render_chartjs_single_dataset():
         ["A", "B", "C"],
         [{"label": "Commits", "data": [1, 2, 3]}],
     )
-    assert '<canvas id="chart-test">' in result
+    # a canvas is an image to a screen reader, said in words
+    assert '<canvas id="chart-test" role="img" aria-label="Bar chart, A to C">' in result
     assert "type: 'bar'" in result
     # Labels should be JSON-encoded
     assert '"A"' in result
@@ -377,16 +378,21 @@ def test_monthly_charts_use_the_month_axis(mock_data_collector, temp_dir):
     ):
         with open(os.path.join(temp_dir, page), encoding="utf-8") as f:
             html = f.read()
-        script = html[html.index(f'<canvas id="{chart}">') :]
+        script = html[html.index(f'<canvas id="{chart}" role="img"') :]
         script = script[: script.index("</script>")]
         assert "callback: monthAxisTick" in script, chart
 
 
 def test_render_chartjs_lines_have_no_point_markers():
     creator = HTMLReportCreator()
-    single = creator._render_chartjs("c1", "line", ["X", "Y"], [{"label": "L", "data": [1, 2]}])
+    single = creator._render_chartjs(
+        "c1", "line", ["X", "Y", "Z"], [{"label": "L", "data": [1, 2, 3]}]
+    )
     multi = creator._render_chartjs(
-        "c2", "line", ["X"], [{"label": "A", "data": [1]}, {"label": "B", "data": [2]}]
+        "c2",
+        "line",
+        ["X", "Y", "Z"],
+        [{"label": "A", "data": [1, 2, 3]}, {"label": "B", "data": [2, 3, 4]}],
     )
     for result in (single, multi):
         assert '"pointRadius": 0' in result
@@ -636,7 +642,10 @@ def test_create_index_html(mock_data_collector, temp_dir):
     assert "Project Age" not in html
 
     # Commits per year across the whole history
-    assert '<canvas id="chart-overview-yearly">' in html
+    assert (
+        '<canvas id="chart-overview-yearly" role="img" aria-label="Bar chart of commits per '
+        'year, 2023">'
+    ) in html
     assert 'href="activity.html">Activity in detail &rarr;</a>' in html
 
     # Top contributors: commits, share, and a bar relative to the top author
@@ -833,7 +842,7 @@ def test_create_activity_html(mock_data_collector, temp_dir):
     for gone in ("Yearly activity", "Hour of Day", "Day of Week", "Hour of Week"):
         assert f">{gone}</a></h2>" not in html
     for chart in ("chart-yearly-activity", "chart-hour-of-day", "chart-day-of-week"):
-        assert f'<canvas id="{chart}">' not in html
+        assert f'<canvas id="{chart}"' not in html
     # ...but their anchors still exist, next to the sections that replaced them
     for anchor in ("yearly_activity", "hour_of_day", "day_of_week", "hour_of_week"):
         assert f'<span id="{anchor}"></span>' in html
@@ -851,6 +860,8 @@ def test_weekly_activity_labels_weeks_by_monday(mock_data_collector, monkeypatch
 
     monkeypatch.setattr("gitstats.report_creator.datetime.datetime", FixedDatetime)
     mock_data_collector.activity_by_year_week = {"2026-38": 7}  # "%Y-%W" of 2026-09-21
+    # the last commit in the same week
+    mock_data_collector.last_commit_stamp = int(FixedDatetime(2026, 9, 22, 9, 0).timestamp())
     f = StringIO()
     HTMLReportCreator()._write_weekly_activity_section(f, mock_data_collector)
     html = f.getvalue()
@@ -858,12 +869,39 @@ def test_weekly_activity_labels_weeks_by_monday(mock_data_collector, monkeypatch
     # Labels are the weeks' Mondays, not "2026-38" (which reads like a month)
     assert "Feb 16" in html and "Sep 21" in html
     assert '"2026-38"' not in html
-    assert "from the week of Feb 16, 2026 to the week of Sep 21, 2026" in html
+    assert "Last 32 weeks, from the week of Feb 16, 2026 to the week of Sep 21, 2026." in html
     # The value for the current week is still found under its "%Y-%W" key
     assert (
         '"data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7]'
         in html
     )
+
+
+def test_weekly_activity_ends_at_the_last_commit(mock_data_collector, monkeypatch):
+    import datetime as real_datetime
+
+    class FixedDatetime(real_datetime.datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls(2026, 9, 25, 12, 0)
+
+    monkeypatch.setattr("gitstats.report_creator.datetime.datetime", FixedDatetime)
+    # nothing since May 2021: 32 weeks up to today would all be empty
+    mock_data_collector.last_commit_stamp = int(FixedDatetime(2021, 5, 1, 10, 0).timestamp())
+    mock_data_collector.activity_by_year_week = {"2021-16": 3}  # the week of 2021-04-19
+    f = StringIO()
+    HTMLReportCreator()._write_weekly_activity_section(f, mock_data_collector)
+    html = f.getvalue()
+    assert (
+        "The 32 weeks up to the last commit, from the week of Sep 21, 2020 to the week of "
+        "Apr 26, 2021: there has been none since."
+    ) in html
+    assert '"data": [' + "0, " * 30 + "3, 0]" in html
+    # without a last commit to go by, the weeks end today
+    mock_data_collector.last_commit_stamp = 0
+    f = StringIO()
+    HTMLReportCreator()._write_weekly_activity_section(f, mock_data_collector)
+    assert "Last 32 weeks" in f.getvalue()
 
 
 def test_activity_summary_and_section_links(mock_data_collector, temp_dir):
@@ -971,7 +1009,7 @@ def test_activity_monthly_table_is_folded(mock_data_collector, temp_dir):
     )
     assert summary in html
     # The chart comes first, outside the folded table
-    assert html.index('<canvas id="chart-commits-by-year-month">') < html.index(summary)
+    assert html.index('<canvas id="chart-commits-by-year-month"') < html.index(summary)
 
 
 # ── HTMLReportCreator.create_authors_html ────────────────────────────────
@@ -1024,7 +1062,7 @@ def test_authors_contributor_timeline(mock_data_collector, temp_dir):
         html = f.read()
 
     # Replaces the cumulative commits line chart; the old anchor still lands here
-    assert '<canvas id="chart-commits-by-author">' not in html
+    assert '<canvas id="chart-commits-by-author"' not in html
     assert ">Commits per Author</a></h2>" not in html
     assert html.index('<span id="commits_per_author"></span>') < html.index(
         'id="contributor_timeline"'
@@ -1842,7 +1880,10 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
 
     # the scatter plot: every file as [path, lines, churn, score], highest score first
     assert '<div class="chart-box has-legend"' in content
-    assert '<canvas id="chart-hotspots"></canvas>' in content
+    assert (
+        '<canvas id="chart-hotspots" role="img" aria-label="Scatter plot of 4 files by size in '
+        'lines and number of changes, both on logarithmic scales"></canvas>'
+    ) in content
     assert _hotspot_points(content) == {
         "medianLines": 120,
         "medianChurn": 10,
@@ -3321,7 +3362,7 @@ def test_tags_page_limits_the_authors_listed(mock_data_collector, temp_dir):
     creator.create_tags_html(mock_data_collector, temp_dir)
 
     page = _read_page(temp_dir, "tags.html")
-    assert "<em>and 1 more authors</em>" in page
+    assert "<em>and 1 more author</em>" in page
 
 
 def test_badges_page_falls_back_to_the_default_style_and_metric(mock_data_collector, temp_dir):
@@ -3812,3 +3853,167 @@ def test_overview_keeps_an_empty_place_for_what_stands_out(mock_data_collector, 
     assert INSIGHTS_START + INSIGHTS_END in page
     # under the heading and its meta line, above the tiles
     assert page.index('class="page-meta"') < page.index(INSIGHTS_START) < page.index("stat-tiles")
+
+
+# ── counts, charts and tags said right ───────────────────────────────────
+
+
+def test_plural():
+    from gitstats.report_creator import plural
+
+    assert plural(1, "commit") == "1 commit"
+    assert plural(0, "commit") == "0 commits"
+    assert plural(1234, "file") == "1,234 files"
+    assert plural(2, "person", "people") == "2 people"
+    assert plural(1, "author", number=False) == "author"
+    assert plural(3, "author", number=False) == "authors"
+
+
+def test_a_one_commit_report_says_its_counts_in_the_singular(mock_data_collector, temp_dir):
+    data = mock_data_collector
+    data.total_commits = 1
+    data.get_total_commits = lambda: 1
+    data.get_total_files = lambda: 1
+    data.commits_by_year = {2023: 1}
+    data.activity_by_hour_of_day = {10: 1}
+    data.activity_by_day_of_week = {1: 1}
+    data.activity_by_hour_of_week = {1: {10: 1}}
+    HTMLReportCreator().create(data, temp_dir)
+    text = " ".join(
+        re.sub(r"<[^>]+>", " ", _read_page(temp_dir, page))
+        for page in ("index.html", "activity.html", "lines.html", "history.html")
+    )
+    text = re.sub(r"\s+", " ", text)
+    for wrong in ("1 commits", "in 1 files"):
+        assert wrong not in text
+    assert "in 1 file " in text
+
+
+def test_chart_label():
+    from gitstats.report_creator import chart_label
+
+    assert chart_label("chart-commits-by-year", "bar", [2019, 2026]) == (
+        "Bar chart of commits per year, 2019 to 2026"
+    )
+    assert chart_label("chart-x", "line", ["2026-10"]) == "Line chart, 2026-10"
+    assert chart_label("chart-x", "bar", []) == "Bar chart"
+    stamp = int(datetime.datetime(2026, 10, 20, 12).timestamp())
+    assert chart_label("chart-lines-of-code", "line", [stamp], time_axis=True) == (
+        "Line chart of lines of code over time, 2026-10-20"
+    )
+
+
+def test_render_chartjs_shows_the_points_of_a_short_line():
+    """One or two points: a line chart draws nothing, or a bare line, without them."""
+    creator = HTMLReportCreator()
+    one = creator._render_chartjs(
+        "c1", "line", [1792479600], [{"label": "L", "data": [1]}], time_axis=True
+    )
+    two = creator._render_chartjs(
+        "c2",
+        "line",
+        ["X", "Y"],
+        [{"label": "A", "data": [1, None, 2]}, {"label": "B", "data": [2]}],
+    )
+    highlight = creator._render_chartjs(
+        "c3", "line", ["X"], [{"label": "A", "data": [1]}, {"label": "B", "data": [2]}], highlight=1
+    )
+    for result in (one, two, highlight):
+        assert '"pointRadius": 3' in result
+        assert '"pointRadius": 0' not in result
+
+
+def test_time_axis_widens_around_a_single_moment():
+    from gitstats.report_creator import CHART_SCRIPT
+
+    assert "if (xs.length && min === max) {" in CHART_SCRIPT
+    assert "min -= 15 * 864e5;" in CHART_SCRIPT
+
+
+@pytest.mark.parametrize(
+    ("count", "limit", "expected"),
+    [
+        (2, 50, "A0 (10), A1 (9)"),
+        (3, -1, "A0 (10), A1 (9), A2 (8)"),
+        (2, 1, "A0 (10), <em>and 1 more author</em>"),
+        (2, 0, "<em>and 2 more authors</em>"),
+        (
+            5,
+            50,
+            'A0 (10), A1 (9), A2 (8) <details class="tag-authors"><summary>+2 more</summary>'
+            "A3 (7), A4 (6)</details>",
+        ),
+        (
+            6,
+            4,
+            'A0 (10), A1 (9), A2 (8) <details class="tag-authors"><summary>+3 more</summary>'
+            "A3 (7), <em>and 2 more authors</em></details>",
+        ),
+    ],
+)
+def test_tag_authors_html(count, limit, expected):
+    from gitstats.report_creator import tag_authors_html
+
+    names = [f"A{n}" for n in range(count)]
+    commits = {name: 10 - n for n, name in enumerate(names)}
+    assert tag_authors_html(names, commits, limit) == expected
+
+
+def test_tags_page_folds_long_author_lists(mock_data_collector, temp_dir):
+    authors = {f"Author {n}": 100 - n for n in range(20)}
+    mock_data_collector.tags = {"v1.0": {"date": "2023-05-01", "commits": 2000, "authors": authors}}
+    creator = HTMLReportCreator()
+    creator.title = mock_data_collector.project_name
+    creator.data = mock_data_collector
+    creator.create_tags_html(mock_data_collector, temp_dir)
+    page = _read_page(temp_dir, "tags.html")
+    assert '<details class="tag-authors"><summary>+17 more</summary>' in page
+    css_path = os.path.join(os.path.dirname(__file__), "..", "gitstats", "gitstats.css")
+    with open(css_path, encoding="utf-8") as f:
+        assert "details.tag-authors > summary {" in f.read()
+
+
+def test_a_year_whose_lines_count_in_a_later_one(mock_data_collector, temp_dir):
+    """Along the main line of history, a branch's lines count in the year it
+    is merged: the years of its commits show a dash, and why."""
+    from gitstats.report_creator import FIRST_PARENT_LINES
+
+    data = mock_data_collector
+    data.commits_by_year = {2023: 50, 2024: 2}
+    data.lines_added_by_year = {2023: 3000}
+    data.lines_removed_by_year = {2023: 1000}
+    data.author_of_year = {2023: {"Alice Smith": 50}, 2024: {"Bob": 2}}
+    creator = HTMLReportCreator()
+    creator.title = data.project_name
+    creator.data = data
+    creator.create_history_html(data, temp_dir)
+    creator.create_activity_html(data, temp_dir)
+    history = _read_page(temp_dir, "history.html")
+    assert "2 commits (3.8%) &middot; lines &mdash; &middot; 1 author" in history
+    assert "+3,000 / &minus;1,000 lines" in history
+    assert f'<p class="history-people">{FIRST_PARENT_LINES}</p>' in history
+    activity = _read_page(temp_dir, "activity.html")
+    assert '<tr><td>2024</td><td class="num">2 (4.0%)</td><td class="num">&mdash;</td>' in activity
+    assert f'<p class="section-note">&mdash;: {FIRST_PARENT_LINES}</p>' in activity
+
+
+def test_lines_uncounted_only_along_the_main_line(monkeypatch):
+    import gitstats
+    from gitstats.report_creator import lines_uncounted
+
+    assert lines_uncounted(2, 0, 0) is True
+    assert lines_uncounted(2, 1, 0) is False
+    assert lines_uncounted(0, 0, 0) is False
+    # every commit counted: no lines is no lines
+    monkeypatch.setitem(gitstats._config, "linear_linestats", 0)
+    assert lines_uncounted(2, 0, 0) is False
+
+
+def test_report_nav_starts_with_its_brand(mock_data_collector):
+    from gitstats.report_creator import REPORT_BRAND
+
+    creator = HTMLReportCreator()
+    creator.data = mock_data_collector
+    f = StringIO()
+    creator.print_nav(f, "index.html")
+    assert REPORT_BRAND in f.getvalue()

@@ -29,6 +29,7 @@ from typing import Any
 from gallery_repos import Group, Repo
 
 from gitstats.aggregate import last_quarters, quarter_id
+from gitstats.compare import complete_ai
 from gitstats.report_creator import (
     AI_ASSISTED_COUNTED,
     THEME_INIT_SCRIPT,
@@ -99,14 +100,16 @@ def rank_rows(
     """The rows of one group's table, ranked: the largest share in the last
     complete quarter first, then by that quarter's commits, then by name;
     repositories without a share in that quarter last. Repositories without a
-    report are left out."""
+    report are left out. A summary's counts stop before the month it was made
+    in, which was not over: a summary kept from an earlier build does not
+    count it as a whole month."""
     (_, previous), (_, latest) = last_quarters(now, 2)
     rows = []
     for repo in repos:
         summary = summaries.get(repo.id)
         if summary is None:
             continue
-        ai = summary.get("ai_assisted")
+        ai = complete_ai(summary)
         counts = quarter_counts(ai, latest)
         rows.append(
             {

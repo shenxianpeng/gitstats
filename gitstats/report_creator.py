@@ -355,10 +355,18 @@ CHART_SCRIPT = """<script>
 	// boundaries, so gaps in history take up the space they really span;
 	// only a gap handed in as `gap` is cut short (see squeezeTime).
 	function timeAxis(xs, gap) {
+		var min = xs.length ? squeezeTime(gap, xs[0]) : undefined;
+		var max = xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined;
+		// one point in time (a single commit) has no width: give it a month
+		// around it, or the point has no place on the axis and is not drawn
+		if (xs.length && min === max) {
+			min -= 15 * 864e5;
+			max += 15 * 864e5;
+		}
 		return {
 			type: 'linear',
-			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
-			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			min: min,
+			max: max,
 			afterBuildTicks: function(scale) {
 				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
 				const from = new Date(first), to = new Date(last);
@@ -429,6 +437,27 @@ NAV_PAGES = (
     ("tags.html", "Tags"),
     ("badges.html", "Badges"),
 )
+
+
+# What each chart of a report shows, for screen readers: a canvas has no text.
+# The chart adds the span its labels cover ("…, 2019 to 2026").
+CHART_DESCRIPTIONS = {
+    "chart-overview-yearly": "Bar chart of commits per year",
+    "chart-weekly-activity": "Bar chart of commits per week",
+    "chart-month-of-year": "Bar chart of commits by month of the year",
+    "chart-commits-by-year-month": "Bar chart of commits per month",
+    "chart-commits-by-year": "Bar chart of commits per year",
+    "chart-ai-assisted": "Bar chart of AI-assisted commits per month",
+    "chart-contributor-growth": "Line chart of the number of contributors over time",
+    "chart-loc-by-author": "Line chart of lines of code added by the top authors over time",
+    "chart-files-by-date": "Line chart of the number of files over time",
+    "chart-lines-of-code": "Line chart of lines of code over time",
+    "chart-lines-by-month": "Bar chart of lines added and removed per month",
+}
+
+# The brand at the start of a report's nav bar. A portfolio that puts the
+# report in one of its folders replaces it with the way back to itself.
+REPORT_BRAND = '<a href="index.html" class="nav-brand">GitStats</a>'
 
 
 def nav_link(href: str, label: str, current: str | None = None) -> str:
@@ -906,16 +935,16 @@ class HTMLReportCreator(ReportCreator):
                     (
                         "Files",
                         format_int(data.get_total_files()),
-                        f"{extensions} extension{'' if extensions == 1 else 's'}",
+                        plural(extensions, "extension"),
                     ),
                     (
                         "Active Days",
                         format_int(active_days),
-                        f"of {format_int(delta_days)} days &middot; {100.0 * active_days / delta_days:.1f}%",
+                        f"of {plural(delta_days, 'day')} &middot; {100.0 * active_days / delta_days:.1f}%",
                     ),
                     (
                         "Longest Streak",
-                        f"{streak} day{'' if streak == 1 else 's'}",
+                        plural(streak, "day"),
                         "consecutive active days",
                     ),
                 ]
@@ -1068,20 +1097,20 @@ class HTMLReportCreator(ReportCreator):
             (
                 "Commits",
                 format_int(data.get_total_commits()),
-                f"on {format_int(active)} active day{'' if active == 1 else 's'}",
+                f"on {plural(active, 'active day')}",
             ),
             (
                 "Longest Streak",
-                f"{streak} day{'' if streak == 1 else 's'}",
+                plural(streak, "day"),
                 "consecutive active days",
             ),
         ]
         if hours:
             hour = max(hours, key=lambda h: (hours[h], -h))
-            tiles.append(("Busiest Hour", f"{hour:02d}:00", f"{format_int(hours[hour])} commits"))
+            tiles.append(("Busiest Hour", f"{hour:02d}:00", plural(hours[hour], "commit")))
         if days:
             day = max(days, key=lambda d: (days[d], -d))
-            tiles.append(("Busiest Day", full_days[day], f"{format_int(days[day])} commits"))
+            tiles.append(("Busiest Day", full_days[day], plural(days[day], "commit")))
         f.write(stat_tiles_html(tiles))
         links = "".join(
             f'<a href="#{html_linkify(title)}">{label}</a>'
@@ -1093,7 +1122,9 @@ class HTMLReportCreator(ReportCreator):
         )
 
     def _write_weekly_activity_section(self, f, data) -> None:
-        """Commits per week for the last 32 weeks.
+        """Commits per week for the last 32 weeks, up to the week of the last
+        commit when that is earlier: a repository without commits for months
+        would show 32 empty weeks.
 
         Weeks are labelled by the Monday they start on ("Feb 16"); the "%Y-%W"
         keys the data is stored under read like months ("2026-07").
@@ -1102,22 +1133,36 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Weekly activity"))
 
         now = datetime.datetime.now()
+        stamp = getattr(data, "last_commit_stamp", 0)
+        last_commit = (
+            datetime.datetime.fromtimestamp(stamp) if isinstance(stamp, int) and stamp else now
+        )
+        week = "%Y-%W"  # the key the commits of a week are kept under
+        quiet = last_commit.strftime(week) < now.strftime(week)
         deltaweek = datetime.timedelta(7)
         weeks: list[str] = []
         mondays: list[datetime.date] = []
-        stampcur = now
+        stampcur = last_commit if quiet else now
         for _ in range(weeks_count):
-            weeks.insert(0, stampcur.strftime("%Y-%W"))
+            weeks.insert(0, stampcur.strftime(week))
             mondays.insert(0, (stampcur - datetime.timedelta(days=stampcur.weekday())).date())
             stampcur -= deltaweek
 
         def day(d: datetime.date) -> str:
             return f"{d:%b} {d.day}"
 
+        span = (
+            f"from the week of {day(mondays[0])}, {mondays[0].year} "
+            f"to the week of {day(mondays[-1])}, {mondays[-1].year}"
+        )
         f.write(
             '<p class="section-note">'
-            f"Last {weeks_count} weeks, from the week of {day(mondays[0])}, {mondays[0].year} "
-            f"to the week of {day(mondays[-1])}, {mondays[-1].year}.</p>"
+            + (
+                f"The {weeks_count} weeks up to the last commit, {span}: there has been none since."
+                if quiet
+                else f"Last {weeks_count} weeks, {span}."
+            )
+            + "</p>"
         )
         weekly_values = [data.activity_by_year_week.get(w, 0) for w in weeks]
         f.write(
@@ -1166,7 +1211,7 @@ class HTMLReportCreator(ReportCreator):
             commits = hour_totals.get(hour, 0)
             height = round(40 * commits / busiest_hour) if commits else 0
             f.write(
-                f'<td title="{hour:02d}:00 &middot; {format_int(commits)} commits &middot; '
+                f'<td title="{hour:02d}:00 &middot; {plural(commits, "commit")} &middot; '
                 f'{100.0 * commits / total:.1f}%"><div class="punch-vbar">'
                 f'<span class="punch-vbar-value">{format_int(commits) if commits else ""}</span>'
                 f'<span class="punch-vbar-fill" style="height: {max(height, 1 if commits else 0)}px">'
@@ -1298,18 +1343,27 @@ class HTMLReportCreator(ReportCreator):
             '<th class="num">Lines added</th><th class="num">Lines removed</th></tr>'
         )
         total = data.get_total_commits() or 1
+        uncounted_years = 0
         for yy in years:
-            f.write(
-                '<tr><td>%s</td><td class="num">%s (%.1f%%)</td><td class="num">%s</td><td class="num">%s</td></tr>'
-                % (
-                    yy,
-                    format_int(data.commits_by_year.get(yy, 0)),
-                    (100.0 * data.commits_by_year.get(yy, 0)) / total,
-                    format_int(data.lines_added_by_year.get(yy, 0)),
-                    format_int(data.lines_removed_by_year.get(yy, 0)),
+            commits = data.commits_by_year.get(yy, 0)
+            added = data.lines_added_by_year.get(yy, 0)
+            removed = data.lines_removed_by_year.get(yy, 0)
+            if lines_uncounted(commits, added, removed):
+                uncounted_years += 1
+                lines = '<td class="num">&mdash;</td><td class="num">&mdash;</td>'
+            else:
+                lines = (
+                    f'<td class="num">{format_int(added)}</td>'
+                    f'<td class="num">{format_int(removed)}</td>'
                 )
+            f.write(
+                f'<tr><td>{yy}</td><td class="num">{format_int(commits)} '
+                f"({100.0 * commits / total:.1f}%)</td>{lines}</tr>"
             )
-        f.write("</table></div></details>")
+        note = (
+            f'<p class="section-note">&mdash;: {FIRST_PARENT_LINES}</p>' if uncounted_years else ""
+        )
+        f.write(f"</table></div>{note}</details>")
 
     def _write_commits_by_timezone_section(self, f, data) -> None:
         """Commits per UTC offset, west to east, as horizontal bars."""
@@ -1467,13 +1521,12 @@ class HTMLReportCreator(ReportCreator):
                     size = min(18.0, 4 + 2.2 * math.sqrt(count))
                     marks.append(
                         f'<span class="timeline-mark" style="left: {left(index[month] + 0.5)}; '
-                        f'--size: {size:.1f}px" title="{month}: {format_int(count)} '
-                        f'commit{"" if count == 1 else "s"}"></span>'
+                        f'--size: {size:.1f}px" title="{month}: {plural(count, "commit")}"></span>'
                     )
-                label = f"{name}: {format_int(commits)} commits, {active[0]} to {active[-1]}"
+                label = f"{name}: {plural(commits, 'commit')}, {active[0]} to {active[-1]}"
             else:
                 marks = []
-                label = f"{name}: {format_int(commits)} commits"
+                label = f"{name}: {plural(commits, 'commit')}"
             bot = " bot" if is_bot(author) else ""
             rows.append(
                 f'<div class="timeline-row{bot}" role="img" aria-label="{label}">'
@@ -1507,9 +1560,7 @@ class HTMLReportCreator(ReportCreator):
             (
                 "Authors",
                 format_int(len(everyone)),
-                f"incl. {bots} bot account{'' if bots == 1 else 's'}"
-                if bots
-                else "no bot accounts",
+                f"incl. {plural(bots, 'bot account')}" if bots else "no bot accounts",
             )
         ]
         last = data.get_last_commit_date()
@@ -1531,7 +1582,7 @@ class HTMLReportCreator(ReportCreator):
                 (
                     "AI-assisted Commits",
                     share_text(assisted, data.get_total_commits()),
-                    f"at least {format_int(assisted)} commit{'' if assisted == 1 else 's'}",
+                    f"at least {plural(assisted, 'commit')}",
                 )
             )
         else:
@@ -1551,7 +1602,7 @@ class HTMLReportCreator(ReportCreator):
         parts = [html_header(2, "AI-assisted commits")]
 
         note = (
-            f"{format_int(assisted)} of {format_int(total)} commits "
+            f"{format_int(assisted)} of {plural(total, 'commit')} "
             f"({share_text(assisted, total)}) name{'s' if assisted == 1 else ''} an AI coding "
             "assistant: as their author, as a co-author, or in the line it signs with."
         )
@@ -1651,9 +1702,9 @@ class HTMLReportCreator(ReportCreator):
         count = overview["organization_count"]
         parts = [html_header(2, "Commits by organization")]
         parts.append(
-            f'<p class="section-note">{format_int(from_orgs)} of {format_int(total)} commits '
+            f'<p class="section-note">{format_int(from_orgs)} of {plural(total, "commit")} '
             f"({share_text(from_orgs, total)}) come from an address at "
-            f"{format_int(count)} organization{'' if count == 1 else 's'}, counted by the "
+            f"{plural(count, 'organization')}, counted by the "
             "domain of the address and committed from by two people or more. Domains of "
             "one person (most often that person's own), personal mail providers, hidden "
             "noreply addresses and bots are counted apart, below.</p>"
@@ -1907,7 +1958,7 @@ class HTMLReportCreator(ReportCreator):
             (
                 "Files",
                 format_int(total_files),
-                f"{extensions} extension{'' if extensions == 1 else 's'}",
+                plural(extensions, "extension"),
             ),
             (
                 "Lines of Code",
@@ -2051,7 +2102,7 @@ class HTMLReportCreator(ReportCreator):
                     (
                         "Lines of Code",
                         format_int(data.get_total_loc()),
-                        f"in {format_int(data.get_total_files())} files",
+                        f"in {plural(data.get_total_files(), 'file')}",
                     ),
                     (
                         "Lines Added",
@@ -2149,7 +2200,7 @@ class HTMLReportCreator(ReportCreator):
                         (
                             "Commits per Tag",
                             f"{data.get_total_commits() / len(data.tags):.1f}",
-                            f"{format_int(data.get_total_commits())} commits in total",
+                            f"{plural(data.get_total_commits(), 'commit')} in total",
                         ),
                     ]
                 )
@@ -2170,30 +2221,18 @@ class HTMLReportCreator(ReportCreator):
             )
             max_tags_authors = load_config()["max_tags_authors"]
             for tag in tags_newest_first(data.tags):
-                authorinfo = []
                 self.authors_by_commits = get_keys_sorted_by_values(data.tags[tag]["authors"])
-                authors_reversed = list(reversed(self.authors_by_commits))
-                # max_tags_authors < 0 (e.g., -1) means no limit
-                if max_tags_authors >= 0 and len(authors_reversed) > max_tags_authors:
-                    authors_shown = authors_reversed[:max_tags_authors]
-                    remaining = len(authors_reversed) - max_tags_authors
-                    for i in authors_shown:
-                        authorinfo.append(
-                            f"{author_html(i)} ({format_int(data.tags[tag]['authors'][i])})"
-                        )
-                    authorinfo.append("<em>and %d more authors</em>" % remaining)
-                else:
-                    for i in authors_reversed:
-                        authorinfo.append(
-                            f"{author_html(i)} ({format_int(data.tags[tag]['authors'][i])})"
-                        )
                 f.write(
                     '<tr><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="num">%s</td><td>%s</td></tr>'
                     % (
                         html.escape(tag),
                         data.tags[tag]["date"],
                         format_int(data.tags[tag]["commits"]),
-                        ", ".join(authorinfo),
+                        tag_authors_html(
+                            list(reversed(self.authors_by_commits)),
+                            data.tags[tag]["authors"],
+                            max_tags_authors,
+                        ),
                     )
                 )
             f.write("</table></div>")
@@ -2441,7 +2480,7 @@ class HTMLReportCreator(ReportCreator):
         bus_factor = ownership["bus_factor"]
         bus_owned = (
             f"primary owner of {format_int(ownership['bus_factor_files'])} "
-            f"of {format_int(total)} files"
+            f"of {plural(total, 'file')}"
         )
         f.write(
             stat_tiles_html(
@@ -2466,7 +2505,8 @@ class HTMLReportCreator(ReportCreator):
                     (
                         "Contributors",
                         format_int(len(ownership["authors"])),
-                        "authors who changed files",
+                        plural(len(ownership["authors"]), "author", number=False)
+                        + " who changed files",
                     ),
                 ]
             )
@@ -2640,12 +2680,12 @@ class HTMLReportCreator(ReportCreator):
             ),
             (
                 "Median File Size",
-                f"{format_int(median_lines)} line{'' if median_lines == 1 else 's'}",
+                plural(median_lines, "line"),
                 "half of the files are at least this large",
             ),
             (
                 "Median Changes",
-                f"{format_int(median_churn)} commit{'' if median_churn == 1 else 's'}",
+                plural(median_churn, "commit"),
                 "half of the files changed at least this often",
             ),
         ]
@@ -2686,7 +2726,9 @@ class HTMLReportCreator(ReportCreator):
         }
         f.write(
             '<div class="chart-box has-legend" style="--chart-ratio: 2.4">'
-            '<canvas id="chart-hotspots"></canvas></div>'
+            '<canvas id="chart-hotspots" role="img" aria-label="Scatter plot of '
+            f"{plural(len(plotted), 'file')} by size in lines and number of changes, "
+            'both on logarithmic scales"></canvas></div>'
         )
         # "<" is escaped whole: a path is repository content, and must not be
         # able to end or re-open the script element it is embedded in
@@ -2756,7 +2798,7 @@ class HTMLReportCreator(ReportCreator):
         if len(files) > len(top_files):
             count = len(files)
             what = (
-                f"all {format_int(count)} files"
+                f"all {plural(count, 'file')}"
                 if count <= 100
                 else f"the 100 highest-scoring of {format_int(count)} files"
             )
@@ -2821,12 +2863,12 @@ class HTMLReportCreator(ReportCreator):
                     (
                         "Span",
                         f"{history['first_year']} – {history['last_year']}",
-                        f"{span} year{'s' if span != 1 else ''}",
+                        plural(span, "year"),
                     ),
                     (
                         "Peak Year",
                         str(history["peak_year"]),
-                        f"{format_int(peak_commits)} commits",
+                        plural(peak_commits, "commit"),
                     ),
                     (
                         "Releases",
@@ -2919,22 +2961,28 @@ class HTMLReportCreator(ReportCreator):
             )
 
             if entry["commits"]:
-                facts = "%s commits (%s%%) &middot; +%s / &minus;%s lines &middot; %s author%s" % (
-                    format_int(entry["commits"]),
-                    entry["commits_pct"],
-                    format_int(entry["lines_added"]),
-                    format_int(entry["lines_removed"]),
-                    format_int(entry["active_authors"]),
-                    "s" if entry["active_authors"] != 1 else "",
+                uncounted = lines_uncounted(
+                    entry["commits"], entry["lines_added"], entry["lines_removed"]
+                )
+                lines = (
+                    "lines &mdash;"
+                    if uncounted
+                    else f"+{format_int(entry['lines_added'])} / "
+                    f"&minus;{format_int(entry['lines_removed'])} lines"
+                )
+                facts = (
+                    f"{plural(entry['commits'], 'commit')} ({entry['commits_pct']}%) &middot; "
+                    f"{lines} &middot; {plural(entry['active_authors'], 'author')}"
                 )
                 f.write(f'<p class="history-facts">{facts}</p>')
+                if uncounted:
+                    f.write(f'<p class="history-people">{FIRST_PARENT_LINES}</p>')
                 if entry["top_author"]:
                     f.write(
-                        '<p class="history-people">Led by <strong>%s</strong> (%s commit%s)</p>'
+                        '<p class="history-people">Led by <strong>%s</strong> (%s)</p>'
                         % (
                             html.escape(entry["top_author"]),
-                            format_int(entry["top_author_commits"]),
-                            "" if entry["top_author_commits"] == 1 else "s",
+                            plural(entry["top_author_commits"], "commit"),
                         )
                     )
                 if entry["newcomers"]:
@@ -3147,13 +3195,17 @@ class HTMLReportCreator(ReportCreator):
         for i, ds in enumerate(datasets):
             series = i % self.SERIES_COLORS + 1
             entry = dict(ds)
+            # a line is drawn between points: one or two of them would leave
+            # an empty chart, or a bare line, without their dots
+            known = [value for value in entry.get("data") or [] if value is not None]
+            radius = 3 if len(known) <= 2 else 0
             if "colorVar" in entry:
                 entry["backgroundColor"] = entry["borderColor"] = f"__CSSVAR:{entry['colorVar']}__"
             if is_multi and highlight is not None and i >= highlight:
                 entry.setdefault("borderColor", self.OTHER_SERIES_COLOR)
                 entry.setdefault("backgroundColor", self.OTHER_SERIES_COLOR)
                 entry.setdefault("fill", False)
-                entry.setdefault("pointRadius", 0)
+                entry.setdefault("pointRadius", radius)
                 entry.setdefault("borderWidth", 1)
                 entry.setdefault("order", 1)  # higher order is drawn first, i.e. behind
             elif is_multi:
@@ -3163,7 +3215,7 @@ class HTMLReportCreator(ReportCreator):
                     entry["series"] = series
                 entry.setdefault("fill", False)
                 entry.setdefault("tension", 0.1)
-                entry.setdefault("pointRadius", 0)
+                entry.setdefault("pointRadius", radius)
                 entry.setdefault("pointHoverRadius", 3)
                 entry.setdefault("borderWidth", 1.5)
                 if highlight is not None:
@@ -3175,13 +3227,14 @@ class HTMLReportCreator(ReportCreator):
                 entry["themed"] = True
                 if chart_type == "line":
                     entry.setdefault("borderWidth", 1.5)
-                    entry.setdefault("pointRadius", 0)
+                    entry.setdefault("pointRadius", radius)
                     entry.setdefault("pointHoverRadius", 3)
             if time_axis and chart_type == "line":
                 entry.setdefault("stepped", True)
             js_datasets.append(entry)
 
         gap_json = "null"
+        shown_labels = list(labels)
         if time_axis:
             labels = [int(stamp) * 1000 for stamp in labels]
             if annotations:
@@ -3305,7 +3358,8 @@ class HTMLReportCreator(ReportCreator):
         # The chart fills a .chart-box that keeps aspect_ratio on wide screens
         # but has a minimum height, so phones don't get a flattened plot.
         box_class = "chart-box has-legend" if is_multi else "chart-box"
-        return f"""<div class="{box_class}" style="--chart-ratio: {aspect_ratio}"><canvas id="{chart_id}"></canvas></div>
+        aria = html.escape(chart_label(chart_id, chart_type, shown_labels, time_axis), quote=True)
+        return f"""<div class="{box_class}" style="--chart-ratio: {aspect_ratio}"><canvas id="{chart_id}" role="img" aria-label="{aria}"></canvas></div>
 <script>
 (function() {{
   var ctx = document.getElementById('{chart_id}').getContext('2d');
@@ -3426,7 +3480,7 @@ class HTMLReportCreator(ReportCreator):
         file.write(
             f"""
             <div class="nav">
-            <a href="index.html" class="nav-brand">GitStats</a>
+            {REPORT_BRAND}
             <ul>
             {links}
             {ai_link}
@@ -4190,10 +4244,7 @@ def report_share_description(data: Any) -> str:
     """One sentence about the repository, for the pages' share tags."""
     commits, authors = data.get_total_commits(), data.get_total_authors()
     first, last = data.get_first_commit_date(), data.get_last_commit_date()
-    text = (
-        f"{data.project_name}: {format_int(commits)} commit{'' if commits == 1 else 's'} by "
-        f"{format_int(authors)} author{'' if authors == 1 else 's'}"
-    )
+    text = f"{data.project_name}: {plural(commits, 'commit')} by {plural(authors, 'author')}"
     if isinstance(first, datetime.datetime) and isinstance(last, datetime.datetime):
         text += f", {first.year}" + (f" to {last.year}" if last.year != first.year else "")
     return text + ". A report made with gitstats."
@@ -4270,6 +4321,69 @@ def months_back(month: str, count: int) -> str:
 def sum_since(by_month: dict[str, int], month: str) -> int:
     """What ``by_month`` ("YYYY-MM" -> count) adds up to from ``month`` on."""
     return sum(count for key, count in by_month.items() if key >= month)
+
+
+# Why a year with commits can have no lines: see lines_uncounted()
+FIRST_PARENT_LINES = (
+    "No lines counted: lines are counted along the main line of history (each "
+    "commit against its first parent), where the lines of a branch count in the "
+    "year it was merged, not in the years its commits were made."
+)
+
+
+# A tag's authors the Tags page lists before folding the rest away: a release
+# with 200 authors made the page tens of thousands of pixels tall on a phone
+TAG_AUTHORS_SHOWN = 3
+
+
+def tag_authors_html(names: list[str], commits: dict[str, int], limit: int) -> str:
+    """A tag's authors, the most commits first, each with its commits: the
+    first TAG_AUTHORS_SHOWN, and the others folded under "+N more". At most
+    ``limit`` are named (none is a limit when below 0); the rest are
+    counted."""
+    named = names if limit < 0 else names[:limit]
+    items = [f"{author_html(name)} ({format_int(commits[name])})" for name in named]
+    hidden = len(names) - len(named)
+    unnamed = f"<em>and {plural(hidden, 'more author')}</em>" if hidden else ""
+    shown, folded = items[:TAG_AUTHORS_SHOWN], items[TAG_AUTHORS_SHOWN:]
+    text = ", ".join(shown)
+    if not folded:
+        return ", ".join(part for part in (text, unnamed) if part)
+    rest = ", ".join(folded + ([unnamed] if unnamed else []))
+    return (
+        f'{text} <details class="tag-authors"><summary>+{len(names) - len(shown)} more'
+        f"</summary>{rest}</details>"
+    )
+
+
+def chart_label(chart_id: str, chart_type: str, labels: list, time_axis: bool = False) -> str:
+    """What a chart shows, for its canvas's aria-label: its description and
+    the span of its labels, "Bar chart of commits per year, 2019 to 2026"."""
+    text = CHART_DESCRIPTIONS.get(chart_id, f"{chart_type.capitalize()} chart")
+    if time_axis:
+        labels = [
+            datetime.datetime.fromtimestamp(int(stamp)).strftime("%Y-%m-%d") for stamp in labels
+        ]
+    if not labels:
+        return text
+    first, last = str(labels[0]), str(labels[-1])
+    return f"{text}, {first}" if first == last else f"{text}, {first} to {last}"
+
+
+def lines_uncounted(commits: int, added: int, removed: int) -> bool:
+    """Whether a period with ``commits`` has no lines because of how they are
+    counted, not because none changed: along the main line of history
+    (``linear_linestats``), a branch's lines count when it is merged, and its
+    commits' own years show none."""
+    return bool(commits) and not added and not removed and bool(load_config()["linear_linestats"])
+
+
+def plural(count: int, word: str, many: str = "", number: bool = True) -> str:
+    """A count and the word for what it counts, singular for one: "1 commit",
+    "1,234 commits"; ``many`` when adding "s" is not the plural. Without
+    ``number``, the word alone."""
+    noun = word if count == 1 else many or f"{word}s"
+    return f"{format_int(count)} {noun}" if number else noun
 
 
 def share_text(part: int, whole: int) -> str:

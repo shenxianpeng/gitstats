@@ -15,6 +15,7 @@ from gitstats.aggregate import (
     ai_assisted_summary,
     ai_csv,
     ai_dataset,
+    ai_rows,
     compute_repo_summary,
     humans_summary,
     last_quarters,
@@ -542,7 +543,8 @@ class TestAiAssistedPage:
         assert 'href="beta/authors.html"' in page
         # a cell: the share, shaded, over the two counts
         assert '--share-strength: 75%">60.0%<small>6 / 10</small></td>' in page
-        assert '--share-strength: 0%">0<small>0 / 10</small></td>' in page
+        # no AI-assisted commit: a share like the others, "0%"
+        assert '--share-strength: 0%">0%<small>0 / 10</small></td>' in page
         assert page.count('<td class="share">&ndash;</td>') == 4
         # the assistants named most in each repository
         assert "<td>GitHub Copilot, Claude</td>" in page
@@ -784,6 +786,24 @@ class TestAiDataset:
         assert data["repositories"][0]["quarters"] == {}
         assert data["repositories"][0]["months"] == {"2001-01": {"commits": 10, "ai_assisted": 1}}
         assert data["repositories"][0]["all_time"]["assistants"] == {}
+
+    def test_a_summary_kept_from_an_earlier_build(self):
+        # made on 2026-09-14 and kept, its report failing since: September was
+        # not over, and is not a month to count, nor the quarter it ends
+        ai = self._ai({"2026-07": (3, 10), "2026-09": (9, 9)})
+        for key in ("by_month", "commits_by_month"):
+            del ai[key]["2026-10"]
+        kept = _summary("kept", 10, {}, ai_assisted=ai, generated_at="2026-09-14T04:00:00+00:00")
+        fresh = _summary("fresh", 10, {}, ai_assisted=self._ai({}))
+        data = ai_dataset([kept, fresh], self.NOW)
+        assert data["quarters"][-1] == "2026-Q3"  # from the fresh one
+        repository = data["repositories"][1]
+        assert repository["name"] == "kept"
+        assert "2026-Q3" not in repository["quarters"]
+        assert list(repository["months"])[-1] == "2026-08"
+        rows, _ = ai_rows([kept], self.NOW)
+        assert rows[0][2][-1] is None  # Jul–Sep 2026: not known
+        assert rows[0][2][-2] == (0, 30)  # Apr–Jun 2026
 
     def test_csv(self):
         ai = self._ai({"2026-09": (4, 8)})
@@ -1690,7 +1710,90 @@ class TestWhatStandsOut:
         # the card shows the ranks instead
         assert '<div class="bars ranks">' in self._read(temp_dir, "p6/compare-card.html")
 
+    def test_a_portfolio_too_small_to_say_what_stands_out(self, temp_dir):
+        # five to nine projects: a comparison page, and the way to it from the
+        # top of each report, the only page that links to it
+        from gitstats.report_creator import INSIGHTS_END, INSIGHTS_START
+
+        summaries = self._summaries(5)
+        for summary in summaries:
+            self._overview(temp_dir, summary["name"], f"{INSIGHTS_START}{INSIGHTS_END}")
+        AggregateReportCreator().create(summaries, [], temp_dir, title="Portfolio")
+        assert os.path.exists(os.path.join(temp_dir, "p0", "compare.html"))
+        assert (
+            '<p class="more-link" id="how-it-compares"><a href="compare.html">How p0 compares '
+            "with the 4 other projects of Portfolio &rarr;</a></p>"
+        ) in self._read(temp_dir, "p0/index.html")
+
     def test_overview_outside_the_portfolio_is_left_alone(self, temp_dir):
         AggregateReportCreator._fill_overview(temp_dir, "../elsewhere", "<p>x</p>")
         AggregateReportCreator._fill_overview(temp_dir, "missing", "<p>x</p>")
         assert not os.path.exists(os.path.join(temp_dir, "missing"))
+
+
+class TestNavigation:
+    """Every page of a portfolio leads to the others, and each report back to it."""
+
+    @staticmethod
+    def _summaries():
+        return TestComparisonPages._summaries()
+
+    @staticmethod
+    def _report(temp_dir, folder, page="index.html"):
+        from gitstats.report_creator import REPORT_BRAND
+
+        os.makedirs(os.path.join(temp_dir, folder), exist_ok=True)
+        with open(os.path.join(temp_dir, folder, page), "w", encoding="utf-8") as f:
+            f.write(f'<div class="nav">{REPORT_BRAND}<ul></ul></div><h1>{folder}</h1>')
+
+    @staticmethod
+    def _read(temp_dir, name):
+        with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
+            return f.read()
+
+    def test_links_given_to_the_nav_bar(self, temp_dir):
+        summaries = self._summaries()
+        summaries[0]["ai_assisted"] = _ai([(1, 10)] * 4, {"Claude": 1})
+        summaries[0]["organizations"] = _orgs([("acme.com", 50, 10), ("beta.com", 40, 9)])
+        AggregateReportCreator().create(
+            summaries, [], temp_dir, nav=[("ecosystems/index.html", "Ecosystems")]
+        )
+        link = '<li><a href="ecosystems/index.html">Ecosystems</a></li>'
+        for page in ("index.html", "ai.html", "organizations.html"):
+            assert link in self._read(temp_dir, page), page
+        up = '<li><a href="../ecosystems/index.html">Ecosystems</a></li>'
+        assert up in self._read(temp_dir, "repo0/compare.html")
+        assert up in self._read(temp_dir, "orgs/acme.com.html")
+
+    def test_no_links_unless_given(self, temp_dir):
+        AggregateReportCreator().create(self._summaries(), [], temp_dir)
+        assert "Ecosystems" not in self._read(temp_dir, "index.html")
+
+    def test_each_report_leads_back(self, temp_dir):
+        from gitstats.report_creator import REPORT_BRAND
+
+        for page in ("index.html", "tags.html", "compare-old.html", "share-card.html"):
+            self._report(temp_dir, "repo0", page)
+        with open(os.path.join(temp_dir, "repo0", "notes.txt"), "w", encoding="utf-8") as f:
+            f.write(REPORT_BRAND)
+        os.makedirs(os.path.join(temp_dir, "repo0", "folder.html"))  # not a page
+        summaries = self._summaries()
+        AggregateReportCreator().create(summaries, [], temp_dir, title="My <Gallery>")
+        back = '<a href="../index.html" class="nav-brand nav-up">&larr; My &lt;Gallery&gt;</a>'
+        for page in ("index.html", "tags.html"):
+            text = self._read(temp_dir, f"repo0/{page}")
+            assert back in text
+            assert REPORT_BRAND not in text
+        # its comparison page, its share card and what is not a page: left alone
+        for name in ("compare-old.html", "share-card.html", "notes.txt"):
+            assert REPORT_BRAND in self._read(temp_dir, f"repo0/{name}")
+        # a page a portfolio changed before keeps its link
+        assert AggregateReportCreator._link_back(temp_dir, summaries[0], "Other") == 0
+        assert back in self._read(temp_dir, "repo0/index.html")
+
+    def test_a_report_outside_a_folder_is_left_alone(self, temp_dir):
+        assert AggregateReportCreator._link_back(temp_dir, {"report_path": "index.html"}, "G") == 0
+        summary = {"report_path": "../elsewhere/index.html"}
+        assert AggregateReportCreator._link_back(temp_dir, summary, "G") == 0
+        summary = {"report_path": "missing/index.html"}
+        assert AggregateReportCreator._link_back(temp_dir, summary, "G") == 0

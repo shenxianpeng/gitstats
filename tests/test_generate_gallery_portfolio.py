@@ -138,6 +138,8 @@ def test_main_writes_the_portfolio_page(gallery_script, temp_dir, monkeypatch, c
     with open(os.path.join(temp_dir, "index.html"), encoding="utf-8") as f:
         page = f.read()
     assert "GitStats Gallery" in page
+    # without the list of repositories, no ecosystem pages to lead to
+    assert "Ecosystems" not in page
     assert 'href="cpython/index.html"' in page
     assert 'href="git/index.html"' in page
     assert "Portfolio page written for 2 repositories" in capsys.readouterr().out
@@ -470,6 +472,8 @@ def test_repos_write_the_ecosystem_pages_and_link_them(gallery_script, temp_dir,
     index = _read(gallery, "index.html")
     assert '<a href="ecosystems/index.html">Ecosystems ranked by AI-assisted commits' in index
     assert '<a href="ecosystems/python.html">Python</a>' in index
+    # and their nav bars, as the ecosystem pages' own do
+    assert '<li><a href="ecosystems/index.html">Ecosystems</a></li>' in index
     assert (
         '<a href="../ecosystems/python.html">How Django ranks among Python projects by '
         "AI-assisted commits &rarr;</a>"

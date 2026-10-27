@@ -114,7 +114,9 @@ AI-assisted commits
 of the `AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ai.html>`_
 page, month by month and quarter by quarter, for every repository of the
 gallery; ``ai/<YYYY>-Q<n>.json`` keeps each quarter as it was first
-published.
+published. A month counts once it is over: a repository whose report failed
+keeps the one published before, which counts only the months that were over
+when it was made.
 
 Organizations
 -------------
@@ -149,6 +151,9 @@ badge that is made again with every build: ``orgs/<domain>.svg``, and
 
    [![GitStats Gallery](https://shenxianpeng.dev/gitstats/gallery/orgs/google.com.svg)](https://shenxianpeng.dev/gitstats/gallery/orgs/google.com.html)
 
+An organization that is no longer among the 200 loses its page and badge with
+the next build, rather than keeping numbers that are no longer true.
+
 In ``organizations.json``, each organization's ``by_repository`` lists the
 repositories it committed to, each with its ``commits``, ``commits_last_12mo``,
 ``addresses``, ``first_commit`` and ``last_commit``.
@@ -160,7 +165,7 @@ Each project has a page, ``<id>/compare.html``, that puts it next to the
 other projects of its ecosystem and of the whole Gallery, on six measures of
 the 12 months up to its last commit:
 
-- **Commits**.
+- **Commits**: people's; bots' are left out, as for contributors.
 - **Contributors**: people who made a commit; bots are left out.
 - **New contributors**: of them, those whose first commit to the project was
   in those months.
@@ -172,8 +177,9 @@ the 12 months up to its last commit:
 
 Every project is a dot on a strip for each measure, its own in the accent
 color, with its rank in its ecosystem and overall. A sentence at the top says
-where it stands out: only a place it holds alone, above zero, is named. A rank
-is a position, not a score: more is not better.
+where it stands out: only a place it holds alone, above zero, is named; with
+none of those near the top, it says its highest place on any measure, shared
+or not. A rank is a position, not a score: more is not better.
 
 `compare.json <https://shenxianpeng.dev/gitstats/gallery/compare.json>`_ has
 the numbers: ``measures`` (``id``, ``label``, ``definition``), and for each
@@ -211,7 +217,8 @@ number and a sentence, said only where the project is in the top or bottom
 15% of the Gallery. Six kinds are looked at:
 
 - **AI-assisted commits**: the share of commits that name an AI coding
-  assistant, three months a year ago against the last three.
+  assistant, the last three complete months against the same three months a
+  year before.
 - **Days with a commit**: days with a commit by a person, of all days since the
   first.
 - **Against its busiest year**: people's commits of the last 12 months against

@@ -4,15 +4,27 @@ import pytest
 
 from gitstats import insights
 
-MONTHS = [f"2025-{m:02d}" for m in range(10, 13)] + [f"2026-{m:02d}" for m in range(1, 10)]
+# what a summary made on 2026-10-05 keeps: 24 months and the one it was made in
+MONTHS = [f"{y}-{m:02d}" for y in (2024, 2025, 2026) for m in range(1, 13)]
+MONTHS = [month for month in MONTHS if "2024-10" <= month <= "2026-10"]
+MADE = "2026-10-05T04:00:00+00:00"
 
 
 def _ai(before, after, commits=100):
-    """An ai_assisted block: ``before`` share in the first three months,
-    ``after`` in the last three, ``commits`` a month."""
+    """An ai_assisted block: ``before`` share in Jul–Sep 2025, ``after`` in
+    Jul–Sep 2026, the last three complete months; ``commits`` a month. The
+    oldest months, and October 2026, not over when the summary was made, at
+    90%: what ai_change must not compare."""
     by_month = {}
-    for index, month in enumerate(MONTHS):
-        share = before if index < 3 else after if index >= 9 else 0
+    for month in MONTHS:
+        if "2025-07" <= month <= "2025-09":
+            share = before
+        elif "2026-07" <= month <= "2026-09":
+            share = after
+        elif month < "2025-01" or month == "2026-10":
+            share = 0.9
+        else:
+            share = 0
         by_month[month] = round(share * commits)
     return {"by_month": by_month, "commits_by_month": dict.fromkeys(MONTHS, commits)}
 
@@ -23,6 +35,7 @@ def _summary(n, **extra):
     summary = {
         "name": f"p{n}",
         "report_path": f"p{n}/index.html",
+        "generated_at": MADE,
         "last_commit": "2026-09-30 12:00:00",
         "age_days": 4380,
         "commits_last_12mo": 1000,
@@ -76,6 +89,12 @@ def test_possessive_keeps_the_name_whole():
 
 def test_ai_change_and_rise():
     summary = _summary(0, ai_assisted=_ai(0.1, 0.4))
+    # the last three complete months against the same three a year before:
+    # not the oldest months a summary keeps, nor the month it was made in
+    assert insights.ai_windows(summary) == (
+        ["2025-07", "2025-08", "2025-09"],
+        ["2026-07", "2026-08", "2026-09"],
+    )
     assert insights.ai_change(summary) == (0.1, 0.4)
     assert insights.ai_rise(summary) == pytest.approx(0.3)
     # a fall is not news here
@@ -87,12 +106,30 @@ def test_ai_change_and_rise():
     [
         None,
         {"by_month": {}, "commits_by_month": dict.fromkeys(MONTHS[:6], 100)},  # six months
+        {"by_month": {}, "commits_by_month": dict.fromkeys(MONTHS[-3:], 100)},  # not a year
         _ai(0.1, 0.2, commits=5),  # too few commits
     ],
 )
 def test_ai_change_without_enough(ai):
     assert insights.ai_change(_summary(0, ai_assisted=ai)) is None
     assert insights.ai_rise(_summary(0, ai_assisted=ai)) is None
+
+
+def test_ai_change_of_a_summary_kept_from_an_earlier_build():
+    # made on 2026-08-20: August was not over, and July is its last complete month
+    summary = _summary(0, ai_assisted=_ai(0.1, 0.4), generated_at="2026-08-20T04:00:00+00:00")
+    assert insights.ai_windows(summary) == (
+        ["2025-05", "2025-06", "2025-07"],
+        ["2026-05", "2026-06", "2026-07"],
+    )
+    # a summary that does not say when it was made: every month it has
+    del summary["generated_at"]
+    assert insights.ai_windows(summary)[1] == ["2026-08", "2026-09", "2026-10"]
+
+
+def test_months_label():
+    assert insights.months_label(["2026-07", "2026-08", "2026-09"]) == "Jul\u2013Sep 2026"
+    assert insights.months_label(["2025-11", "2025-12", "2026-01"]) == "Nov 2025\u2013Jan 2026"
 
 
 def test_active_days():
@@ -230,8 +267,8 @@ def test_sentences():
     p11 = _summary(11)
     assert _said("ai", p11) == (
         "11%",
-        "The share of p11's commits that name an AI coding assistant went from 0% to 11% "
-        "in a year.",
+        "The share of p11's commits that name an AI coding assistant went from 0% in "
+        "Jul\u2013Sep 2025 to 11% in Jul\u2013Sep 2026.",
     )
     assert _said("days", p11) == (
         "71%",
@@ -293,4 +330,8 @@ def test_overview_html():
     assert "My &lt;Portfolio&gt;" in section
     assert "&lt;p11&gt;" in section and "<p11>" not in section
     assert '<a href="compare.html">How &lt;p11&gt; compares' in section
-    assert insights.overview_html("x", [], 11, "y") == ""
+    # with nothing that stands out, the way to the comparison all the same
+    assert insights.overview_html("<x>", [], 11, "<y>") == (
+        '<p class="more-link" id="how-it-compares"><a href="compare.html">How &lt;x&gt; '
+        "compares with the 11 other projects of &lt;y&gt; &rarr;</a></p>"
+    )

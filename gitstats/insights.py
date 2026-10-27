@@ -31,7 +31,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-from gitstats.compare import ordinal
+from gitstats.compare import complete_ai, ordinal
 from gitstats.report_creator import html_header
 
 EXTREME = 0.85  # in the top or bottom 15% of the portfolio
@@ -68,17 +68,52 @@ def _flat(text: str) -> str:
 # ── the measures: one value per summary, None when it can't be worked out ──
 
 
+_MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+
+def _year_before(month: str) -> str:
+    """ "2026-07" -> "2025-07"."""
+    return f"{int(month[:4]) - 1:04d}{month[4:]}"
+
+
+def months_label(months: list[str]) -> str:
+    """["2026-07", "2026-08", "2026-09"] -> "Jul–Sep 2026"; "Nov 2025–Jan 2026"
+    across a new year."""
+    first, last = months[0], months[-1]
+
+    def name(month: str) -> str:
+        return _MONTHS[int(month[5:7]) - 1]
+
+    if first[:4] == last[:4]:
+        return f"{name(first)}\u2013{name(last)} {last[:4]}"
+    return f"{name(first)} {first[:4]}\u2013{name(last)} {last[:4]}"
+
+
+def ai_windows(summary: dict[str, Any]) -> tuple[list[str], list[str]] | None:
+    """The months ai_change compares: the last three complete ones a summary
+    has, and the same three a year before. None when it does not have both."""
+    ai = complete_ai(summary)
+    if ai is None:
+        return None
+    all_by_month = ai.get("commits_by_month") or {}
+    last = sorted(all_by_month)[-3:]
+    first = [_year_before(month) for month in last]
+    if len(last) < 3 or any(month not in all_by_month for month in first):
+        return None
+    return first, last
+
+
 def ai_change(summary: dict[str, Any]) -> tuple[float, float] | None:
-    """The AI-assisted share of the first three of the last twelve months, and
-    of the last three: each with 30 commits at least."""
-    ai = summary.get("ai_assisted")
-    if not isinstance(ai, dict):
+    """The AI-assisted share of the same three months a year apart: the last
+    three complete months, and those a year before them; each with 30
+    commits at least. The month a summary is made in is not over, and is
+    left out."""
+    windows = ai_windows(summary)
+    if windows is None:
         return None
+    first, last = windows
+    ai = complete_ai(summary) or {}
     by_month, all_by_month = ai.get("by_month") or {}, ai.get("commits_by_month") or {}
-    months = sorted(all_by_month)
-    if len(months) < 12:
-        return None
-    first, last = months[:3], months[-3:]
     before = sum(int(all_by_month[m]) for m in first)
     after = sum(int(all_by_month[m]) for m in last)
     if before < 30 or after < 30:
@@ -250,9 +285,10 @@ def _zone(zone: str) -> str:
 
 def _say_ai(s: dict[str, Any], v: float) -> str:
     before, after = ai_change(s)  # type: ignore[misc]
+    first, last = ai_windows(s)  # type: ignore[misc]
     return (
         f"The share of {_owns(s)} commits that name an AI coding assistant went from "
-        f"{pct(before)} to {pct(after)} in a year."
+        f"{pct(before)} in {months_label(first)} to {pct(after)} in {months_label(last)}."
     )
 
 
@@ -397,9 +433,15 @@ def facts_html(found: list[dict[str, Any]]) -> str:
 
 
 def overview_html(name: str, found: list[dict[str, Any]], others: int, portfolio: str) -> str:
-    """The section a portfolio puts at the top of a report's overview."""
+    """The section a portfolio puts at the top of a report's overview: what
+    stands out, or, with nothing that does, the way to the comparison page,
+    which no other page of a portfolio links to."""
     if not found:
-        return ""
+        return (
+            '<p class="more-link" id="how-it-compares"><a href="compare.html">How '
+            f"{html.escape(name)} compares with the {others} other projects of "
+            f"{html.escape(portfolio)} &rarr;</a></p>"
+        )
     return (
         '<section class="insights-section" id="what-stands-out">'
         f"{html_header(2, 'What stands out')}"

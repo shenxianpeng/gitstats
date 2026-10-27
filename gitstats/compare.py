@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import html
 import math
+import re
 from dataclasses import dataclass
 from typing import Any
 
@@ -48,7 +49,7 @@ MEASURES: tuple[Measure, ...] = (
         "commits",
         "the most commits",
         "fewer commits in the last 12 months",
-        "Commits in the 12 months up to the last one.",
+        "Commits in the 12 months up to the last one; bots' are left out.",
     ),
     Measure(
         "authors",
@@ -124,6 +125,27 @@ def _related(first: str, second: str) -> bool:
     return any(first in family and second in family for family in FAMILIES)
 
 
+def complete_ai(summary: dict[str, Any]) -> dict[str, Any] | None:
+    """A summary's ``ai_assisted`` block with its complete months only: those
+    before the month the summary was made in (``generated_at``), which was
+    not over yet. A summary kept from an earlier build has that month as it
+    was then, and must not count it as a whole one. None without the block;
+    the block as it is when the summary does not say when it was made."""
+    ai = summary.get("ai_assisted")
+    if not isinstance(ai, dict):
+        return None
+    made = str(summary.get("generated_at", "") or "")[:7]
+    if not re.fullmatch(r"\d{4}-\d{2}", made):
+        return ai
+    return {
+        **ai,
+        "by_month": {m: n for m, n in (ai.get("by_month") or {}).items() if m < made},
+        "commits_by_month": {
+            m: n for m, n in (ai.get("commits_by_month") or {}).items() if m < made
+        },
+    }
+
+
 def measures_of(summary: dict[str, Any], quarters: list[list[str]]) -> dict[str, float | None]:
     """A repository's value of each measure, None where its summary doesn't
     have what the measure needs. ``quarters`` are the months of the last
@@ -132,7 +154,11 @@ def measures_of(summary: dict[str, Any], quarters: list[list[str]]) -> dict[str,
     people: dict[str, Any] = block if isinstance(block, dict) else {}
     organizations = summary.get("organizations")
     values: dict[str, float | None] = {
-        "commits": float(summary.get("commits_last_12mo", 0) or 0),
+        # the 12 months up to the last commit, as the other measures; summaries
+        # from before people_last_12mo had those up to the day they were made
+        "commits": _number(people, "commits")
+        if "commits" in people
+        else float(summary.get("commits_last_12mo", 0) or 0),
         # summaries from before people_last_12mo counted the active authors
         "authors": _number(people, "authors")
         if "authors" in people
@@ -146,7 +172,7 @@ def measures_of(summary: dict[str, Any], quarters: list[list[str]]) -> dict[str,
         values["organizations"] = float(
             sum(1 for row in organizations.get("top") or [] if row.get("commits_last_12mo"))
         )
-    ai = summary.get("ai_assisted")
+    ai = complete_ai(summary)
     if isinstance(ai, dict):
         by_month, all_by_month = ai.get("by_month") or {}, ai.get("commits_by_month") or {}
         months = [month for quarter in quarters for month in quarter]
@@ -204,12 +230,21 @@ def comparisons(summaries: list[dict[str, Any]], quarters: list[list[str]]) -> l
             measure: _alone(own[measure], [other[measure] for other in around])
             for measure in MEASURE_IDS
         }
+        # how many others have the same value: its place is theirs too
+        ties = {
+            measure: sum(1 for other in around if other[measure] == own[measure]) - 1
+            if own[measure] is not None
+            else 0
+            for measure in MEASURE_IDS
+        }
         rows.append(
             {
                 "summary": summary,
                 "values": own,
                 # a place it holds alone, with a value above zero: one a sentence can name
                 "alone": alone,
+                # how many other repositories share its place
+                "shared": ties,
                 "ranks": {
                     measure: {
                         "group": rank(own[measure], [peer[measure] for peer in peers])
@@ -250,19 +285,7 @@ def headline(row: dict[str, Any], projects: str) -> str:
             top.append(item)
             break
     if not top:
-        # its best place, on a measure a sentence names at any place
-        position, (place, of), measure = next(
-            (item for item in standing if item[2].id not in FIRST_ONLY), standing[0]
-        )
-        if place == of:
-            # last even on its best measure: say so plainly
-            return f"{name} had {measure.fewer} than any other of the {of} {projects}."
-        where = (
-            f"sits in the middle of the {of} {projects}"
-            if position <= 0.6
-            else f"ranks below most of the {of} {projects} on every measure here"
-        )
-        return f"{name} {where}; its highest place is {ordinal(place)}, for {measure.short}."
+        return _best_place(row, scope, name, projects)
     _, (place, of), measure = top[0]
     if place == 1:
         text = f"{name} had {measure.more} than any other of the {of} {projects}."
@@ -275,6 +298,39 @@ def headline(row: dict[str, Any], projects: str) -> str:
         else:
             text += f" It is also {ordinal(place)} for {measure.short}."
     return text
+
+
+def _best_place(row: dict[str, Any], scope: str, name: str, projects: str) -> str:
+    """Where a repository stands with no place to name in its headline: its
+    highest place on any measure, the AI-assisted share and shared places
+    too, so that the sentence never leaves out a higher one."""
+    places = []
+    for measure in MEASURES:
+        place = row["ranks"][measure.id][scope]
+        ties = row["shared"][measure.id]
+        # a place all of them share says nothing about any
+        if place and place[1] >= MIN_REPOSITORIES and ties < place[1] - 1:
+            places.append(((place[0] - 1) / (place[1] - 1), place, measure))
+    # never empty: a headline is only made with a place held alone
+    position, (place, of), measure = min(
+        places, key=lambda item: (item[0], SENTENCE_ORDER.index(item[2].id))
+    )
+    tied = row["shared"][measure.id] > 0
+    if place == of and not tied:
+        # last even on its best measure: say so plainly
+        return f"{name} had {measure.fewer} than any other of the {of} {projects}."
+    highest = f"{ordinal(place)}{', shared' if tied else ''}, for {measure.short}"
+    if position > 0.6:
+        # its best place is in the bottom part, and so is every other
+        return (
+            f"{name} ranks below most of the {of} {projects} on every measure here; "
+            f"its highest place is {highest}."
+        )
+    if position > 0.25:
+        return f"{name} sits in the middle of the {of} {projects}; its highest place is {highest}."
+    # a high place the headline could not name: shared, or a second place on
+    # a measure named only for a first
+    return f"{name}'s highest place among the {of} {projects} is {highest}."
 
 
 def show(value: float | None, measure: Measure) -> str:

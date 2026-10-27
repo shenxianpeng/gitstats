@@ -108,6 +108,16 @@ def test_rank_rows_by_the_last_quarter():
     assert none["assistants"] == []
 
 
+def test_rank_rows_of_a_summary_kept_from_an_earlier_build():
+    # made on 2026-09-14, its report failing since: September was not over,
+    # and Jul–Sep is not a quarter it can count
+    kept = _summary("kept", "Kept", _ai((5, 10)), generated_at="2026-09-14T04:00:00+00:00")
+    fresh = _summary("fresh", "Fresh", _ai((1, 10)), generated_at="2026-10-19T04:00:00+00:00")
+    rows = eco.rank_rows([_repo("kept"), _repo("fresh")], {"kept": kept, "fresh": fresh}, NOW)
+    assert [(row["id"], row["quarter"]) for row in rows] == [("fresh", (1, 10)), ("kept", None)]
+    assert rows[1]["previous_quarter"] == (0, 10)
+
+
 def test_group_summary():
     rows = eco.rank_rows(
         [_repo(r) for r in "abcd"],
