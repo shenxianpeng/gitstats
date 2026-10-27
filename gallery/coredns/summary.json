@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:49:13+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:33:26+00:00",
   "name": "CoreDNS",
   "report_path": "index.html",
   "first_commit": "2016-03-18 20:57:35",
-  "last_commit": "2026-10-25 23:08:32",
+  "last_commit": "2026-10-26 08:22:35",
   "age_days": 3874,
-  "active_days": 1678,
-  "total_commits": 5197,
-  "total_authors": 514,
+  "active_days": 1679,
+  "total_commits": 5199,
+  "total_authors": 513,
   "active_authors_12mo": 93,
-  "commits_last_12mo": 775,
-  "total_files": 1059,
-  "total_lines": 147777,
-  "lines_added": 15101842,
-  "lines_removed": 14954065,
+  "commits_last_12mo": 777,
+  "total_files": 1060,
+  "total_lines": 148287,
+  "lines_added": 15102455,
+  "lines_removed": 14954095,
   "total_tags": 85,
   "era": "peak",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Yong Tang",
-      "commits": 358
+      "commits": 359
     },
     {
       "name": "Chris O'Haver",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Ville Vesilehto",
-      "commits": 155
+      "commits": 157
     },
     {
       "name": "John Belamaric",
@@ -41,10 +41,10 @@
     }
   ],
   "author_commits": {
-    "Ville Vesilehto": 155,
+    "Ville Vesilehto": 157,
     "ump45nose": 10,
     "houyuwushang": 38,
-    "Yong Tang": 358,
+    "Yong Tang": 359,
     "Pujitha Paladugu": 3,
     "Baltasar Blanco": 8,
     "Ahmad Mehrabi": 1,
@@ -383,7 +383,6 @@
     "Jonathan Nagy": 1,
     "Antonio Ojea": 1,
     "DrmagicE": 1,
-    "yongtang": 1,
     "miekg": 1,
     "Gonzalo Paniagua Javier": 2,
     "Guangming Wang": 7,
@@ -567,7 +566,7 @@
     "2023": 299,
     "2024": 234,
     "2025": 493,
-    "2026": 659
+    "2026": 661
   },
   "ai_assisted": {
     "commits": 8,
@@ -626,15 +625,15 @@
       "2026-07": 134,
       "2026-08": 81,
       "2026-09": 82,
-      "2026-10": 57
+      "2026-10": 59
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5197,
+    "commits": 5199,
     "by_kind": {
       "organization": 594,
-      "one_person": 1693,
+      "one_person": 1695,
       "personal": 751,
       "hidden": 338,
       "unknown": 0,
@@ -799,7 +798,7 @@
       },
       "2026-Q4": {
         "organization": 5,
-        "one_person": 5,
+        "one_person": 7,
         "personal": 13,
         "hidden": 14,
         "unknown": 0,
@@ -810,13 +809,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 390,
+    "commits": 392,
     "authors": 93,
     "new_authors": 77,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 3376,
+    "commits": 3378,
     "commits_by_year": {
       "2016": 480,
       "2017": 509,
@@ -828,14 +827,14 @@
       "2023": 91,
       "2024": 68,
       "2025": 184,
-      "2026": 349
+      "2026": 351
     },
-    "active_days": 1460
+    "active_days": 1461
   },
   "timezones": {
     "+0000": 744,
     "+0100": 872,
-    "+0200": 514,
+    "+0200": 516,
     "+0300": 300,
     "+0330": 6,
     "+0400": 16,
@@ -860,7 +859,7 @@
     "-0800": 405
   },
   "source_lines": {
-    "added": 260312,
-    "current": 146245
+    "added": 260925,
+    "current": 146828
   }
 }

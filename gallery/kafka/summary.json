@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:50:31+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:35:12+00:00",
   "name": "Apache Kafka",
   "report_path": "index.html",
   "first_commit": "2011-08-01 23:41:24",
-  "last_commit": "2026-10-25 17:19:58",
-  "age_days": 5564,
-  "active_days": 4190,
-  "total_commits": 18512,
-  "total_authors": 1549,
+  "last_commit": "2026-10-26 19:19:06",
+  "age_days": 5565,
+  "active_days": 4191,
+  "total_commits": 18521,
+  "total_authors": 1544,
   "active_authors_12mo": 256,
-  "commits_last_12mo": 1995,
+  "commits_last_12mo": 2004,
   "total_files": 7633,
-  "total_lines": 1851242,
-  "lines_added": 3483057,
-  "lines_removed": 1631815,
+  "total_lines": 1851526,
+  "lines_added": 3483857,
+  "lines_removed": 1632208,
   "total_tags": 2,
   "era": "steady",
   "top_authors": [
@@ -41,15 +41,20 @@
     }
   ],
   "author_commits": {
+    "Aditya Kousik": 11,
+    "Eric Chang": 22,
+    "Yen-Ting Li": 5,
+    "gabriellafu": 27,
+    "Andrew Schofield": 203,
+    "Apoorv Mittal": 171,
+    "Russole Chen": 18,
+    "Alieh Saeedi": 81,
     "Alan Lau": 20,
     "SunMin Lee": 6,
     "ryanwaha": 1,
     "Parker Chang": 23,
-    "Yen-Ting Li": 4,
-    "gabriellafu": 26,
     "Sean Quah": 104,
     "Junpei Zhang": 1,
-    "Apoorv Mittal": 169,
     "Kevin Wu": 34,
     "Evan Zhou": 18,
     "Federico Valeri": 71,
@@ -64,20 +69,17 @@
     "I-Chau (David) Wang": 1,
     "Gergely Harmadas": 17,
     "Jian": 18,
-    "Russole Chen": 17,
     "hysu": 6,
     "S.Y. Wang": 10,
     "Murali Basani": 52,
     "Mykyta Bozhenko": 2,
     "Ritika Reddy": 45,
-    "Andrew Schofield": 202,
     "majialong": 84,
     "Ken Huang": 273,
     "gomudayya": 5,
     "Bill Bejeck": 256,
     "Kuan-Po Tseng": 124,
     "KhyatiVaghamshi": 4,
-    "Aditya Kousik": 10,
     "Andy Huang": 6,
     "Ramu": 1,
     "Pranav Siby": 2,
@@ -89,12 +91,10 @@
     "Gavin Wang": 12,
     "rishi-rana": 3,
     "Maros Orsak": 37,
-    "Alieh Saeedi": 80,
     "Edmond Abraham": 1,
     "Chang-Chi Hsu": 30,
     "Tamas Barnabas Egyed": 3,
     "nileshkumar3": 16,
-    "Eric Chang": 21,
     "liuliu": 4,
     "PoAn Yang": 260,
     "Alyssa Huang": 42,
@@ -243,7 +243,7 @@
     "Viktor Somogyi-Vass": 41,
     "Chang-Yu Huang": 9,
     "Giuseppe Lillo": 1,
-    "Xuan-Zhang Gong": 36,
+    "Xuan-Zhang Gong": 57,
     "Fiore Mario Vitale": 3,
     "Artem Livshits": 12,
     "Dale Lane": 1,
@@ -475,7 +475,6 @@
     "Arnout Engelen": 4,
     "Xiduo You": 2,
     "Shawn Hsu": 1,
-    "gongxuanzhang": 21,
     "Ian McDonald": 1,
     "Pavel Pozdeev": 1,
     "Wang Xiaoqing": 1,
@@ -961,7 +960,7 @@
     "Radai Rosenblatt": 14,
     "belugabehr": 9,
     "Jeremy Custenborder": 10,
-    "Richard Yu": 12,
+    "Richard Yu": 15,
     "fantayeneh": 1,
     "sebwills": 1,
     "Jeff Widman": 8,
@@ -1049,7 +1048,7 @@
     "Tirtha Chatterjee": 1,
     "pkleindl": 2,
     "SuryaTeja Duggi": 1,
-    "Micha\u0142 Borowiecki": 2,
+    "Micha\u0142 Borowiecki": 9,
     "slim": 2,
     "Nacho Mu\u00f1oz G\u00f3mez": 1,
     "Rajan Chauhan": 1,
@@ -1226,7 +1225,6 @@
     "Sean McCauliff": 3,
     "Tanvi Jaywant": 1,
     "Kamil Szyma\u0144ski": 3,
-    "RichardYuSTUG": 3,
     "ekenny": 1,
     "Elyahou": 1,
     "Travis Wellman": 1,
@@ -1274,7 +1272,6 @@
     "Eno Thereska": 99,
     "Sebastian Gavril": 1,
     "Holden Karau": 1,
-    "Michal Borowiecki": 7,
     "radzish": 1,
     "dongeforever": 1,
     "Balint Molnar": 12,
@@ -1307,7 +1304,7 @@
     "Dana Powers": 6,
     "Kyle Winkelman": 3,
     "Ivan A. Melnikov": 1,
-    "Jaikiran Pai": 7,
+    "Jaikiran Pai": 10,
     "Wim Van Leuven": 1,
     "Amit Daga": 1,
     "Ryan P": 8,
@@ -1521,7 +1518,6 @@
     "Yaguo Zhou": 3,
     "Ted Malaska": 2,
     "Eric Olander": 1,
-    "jaikiran pai": 3,
     "Anatoly Fayngelerin": 1,
     "Chris Cope": 1,
     "Dave Parfitt": 1,
@@ -1558,14 +1554,13 @@
     "Martin Kleppmann": 1,
     "Rajasekar Elango": 2,
     "Nathan Brown": 1,
-    "Sriram Subramanian": 35,
+    "Sriram Subramanian": 67,
     "Moritz Schw\u00f6rer": 1,
     "Jason Rosenberg": 1,
     "Ahmy Yulrizka": 1,
     "Evelina Stepanova": 1,
     "Philp K. Warren": 1,
     "Ailing Zhang": 1,
-    "Swapnil Ghike": 32,
     "Jie Huang": 1,
     "drunkedcat": 1,
     "Alan Vasile": 1,
@@ -1607,13 +1602,13 @@
     "2023": 1474,
     "2024": 2451,
     "2025": 2182,
-    "2026": 1711
+    "2026": 1720
   },
   "ai_assisted": {
-    "commits": 87,
+    "commits": 89,
     "authored": 0,
     "assistants": {
-      "Claude": 71,
+      "Claude": 73,
       "GitHub Copilot": 15,
       "ChatGPT": 1,
       "Codex": 1,
@@ -1643,7 +1638,7 @@
       "2026-07": 11,
       "2026-08": 6,
       "2026-09": 14,
-      "2026-10": 31
+      "2026-10": 33
     },
     "commits_by_month": {
       "2024-11": 246,
@@ -1669,17 +1664,17 @@
       "2026-07": 201,
       "2026-08": 171,
       "2026-09": 212,
-      "2026-10": 150
+      "2026-10": 159
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 18512,
+    "commits": 18521,
     "by_kind": {
-      "organization": 6963,
+      "organization": 6965,
       "one_person": 1624,
-      "personal": 7402,
-      "hidden": 2503,
+      "personal": 7406,
+      "hidden": 2506,
       "unknown": 17,
       "bot": 3
     },
@@ -1688,11 +1683,11 @@
     "top": [
       {
         "organization": "confluent.io",
-        "commits": 4257,
-        "commits_last_12mo": 446,
+        "commits": 4258,
+        "commits_last_12mo": 447,
         "addresses": 109,
         "first_commit": "2015-06-12",
-        "last_commit": "2026-10-24"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "apache.org",
@@ -1744,11 +1739,11 @@
       },
       {
         "organization": "apple.com",
-        "commits": 75,
-        "commits_last_12mo": 21,
+        "commits": 76,
+        "commits_last_12mo": 22,
         "addresses": 5,
         "first_commit": "2018-01-15",
-        "last_commit": "2026-10-16"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "uber.com",
@@ -2049,10 +2044,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 61,
+        "organization": 63,
         "one_person": 2,
-        "personal": 56,
-        "hidden": 31,
+        "personal": 60,
+        "hidden": 34,
         "unknown": 0,
         "bot": 0
       }
@@ -2061,13 +2056,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1993,
+    "commits": 2002,
     "authors": 254,
     "new_authors": 151,
     "half_of_commits": 19
   },
   "humans": {
-    "commits": 18509,
+    "commits": 18518,
     "commits_by_year": {
       "2011": 116,
       "2012": 286,
@@ -2084,13 +2079,13 @@
       "2023": 1474,
       "2024": 2451,
       "2025": 2181,
-      "2026": 1709
+      "2026": 1718
     },
-    "active_days": 4190
+    "active_days": 4191
   },
   "timezones": {
-    "+0000": 1070,
-    "+0100": 2303,
+    "+0000": 1073,
+    "+0100": 2304,
     "+0200": 1384,
     "+0300": 151,
     "+0400": 7,
@@ -2099,22 +2094,22 @@
     "+0530": 1036,
     "+0545": 3,
     "+0700": 7,
-    "+0800": 2698,
+    "+0800": 2701,
     "+0900": 341,
     "+1000": 13,
     "+1100": 12,
     "+1200": 18,
     "+1300": 9,
     "-0300": 22,
-    "-0400": 849,
+    "-0400": 850,
     "-0500": 908,
     "-0600": 182,
-    "-0700": 4703,
+    "-0700": 4704,
     "-0800": 2735,
     "-1000": 3
   },
   "source_lines": {
-    "added": 3510235,
-    "current": 1846201
+    "added": 3511035,
+    "current": 1846608
   }
 }

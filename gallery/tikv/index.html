@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - TiKV</title>
-	<meta name="description" content="TiKV: 8,536 commits by 474 authors, 2016 to 2026. A report made with gitstats.">
+	<meta name="description" content="TiKV: 8,538 commits by 473 authors, 2016 to 2026. A report made with gitstats.">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="GitStats">
 	<meta property="og:title" content="TiKV">
-	<meta property="og:description" content="TiKV: 8,536 commits by 474 authors, 2016 to 2026. A report made with gitstats.">
+	<meta property="og:description" content="TiKV: 8,538 commits by 473 authors, 2016 to 2026. A report made with gitstats.">
 	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/tikv/">
 	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/tikv/share-card.png">
 	<meta property="og:image:width" content="1200">
@@ -16,12 +16,12 @@
 	<meta property="og:image:alt" content="TiKV">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="TiKV">
-	<meta name="twitter:description" content="TiKV: 8,536 commits by 474 authors, 2016 to 2026. A report made with gitstats.">
+	<meta name="twitter:description" content="TiKV: 8,538 commits by 473 authors, 2016 to 2026. A report made with gitstats.">
 	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/tikv/share-card.png">
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.12.0.post1.dev1">
+	<meta name="generator" content="GitStats 2.12.1">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -339,10 +339,18 @@
 	// boundaries, so gaps in history take up the space they really span;
 	// only a gap handed in as `gap` is cut short (see squeezeTime).
 	function timeAxis(xs, gap) {
+		var min = xs.length ? squeezeTime(gap, xs[0]) : undefined;
+		var max = xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined;
+		// one point in time (a single commit) has no width: give it a month
+		// around it, or the point has no place on the axis and is not drawn
+		if (xs.length && min === max) {
+			min -= 15 * 864e5;
+			max += 15 * 864e5;
+		}
 		return {
 			type: 'linear',
-			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
-			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			min: min,
+			max: max,
 			afterBuildTicks: function(scale) {
 				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
 				const from = new Date(first), to = new Date(last);
@@ -380,7 +388,7 @@
 <body>
 
             <div class="nav">
-            <a href="index.html" class="nav-brand">GitStats</a>
+            <a href="../index.html" class="nav-brand nav-up">&larr; GitStats Gallery</a>
             <ul>
             <li><a href="index.html" class="active" aria-current="page">General</a></li>
             <li><a href="activity.html">Activity</a></li>
@@ -399,13 +407,13 @@
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>TiKV</h1><p class="page-meta">2016-01-07 &rarr; 2026-10-23 &middot; generated 2026-10-26 03:50:01 in 5 s &middot; gitstats 2.12.0.post1.dev1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><!-- gitstats:insights --><section class="insights-section" id="what-stands-out">
+            <h1>TiKV</h1><p class="page-meta">2016-01-07 &rarr; 2026-10-26 &middot; generated 2026-10-27 01:34:31 in 7 s &middot; gitstats 2.12.1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><!-- gitstats:insights --><section class="insights-section" id="what-stands-out">
 <h2 id="what_stands_out"><a href="#what_stands_out">What stands out</a></h2>
 
-<p class="section-note">Next to the 106 other projects of <a href="../index.html">GitStats Gallery</a>: where TiKV is in the top or bottom 15%.</p><ul class="insights"><li class="insight"><span class="insight-big">11%</span><div><span class="insight-label">Against its busiest year</span><p class="insight-sentence">People made 11% as many commits to TiKV in the last 12 months as in 2016, its busiest year (217 against 1,887).</p><p class="insight-compared">3rd lowest of 90; the median project made 52% of its busiest year.</p></div></li><li class="insight"><span class="insight-big">90%</span><div><span class="insight-label">One time zone</span><p class="insight-sentence">90% of TiKV&#x27;s commits were made in one time zone, UTC+08:00, of the 17 it has commits from.</p><p class="insight-compared">11th highest of 91; the median project: 34%.</p></div></li><li class="insight"><span class="insight-big">53%</span><div><span class="insight-label">Code still there</span><p class="insight-sentence">53% of the 1,585,894 lines ever written into TiKV&#x27;s own source are still there.</p><p class="insight-compared">10th highest of 97; the median project: 37%.</p></div></li></ul><p class="more-link"><a href="compare.html">How TiKV compares, measure by measure &rarr;</a></p></section><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">8,536</dd><dd class="stat-note"><span class="nowrap">3.3 per active day</span>&nbsp;&middot; <span class="nowrap">2.2 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">474</dd><dd class="stat-note">18.0 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">850,722</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+1,601,649</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−750,927</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">1,552</dd><dd class="stat-note">21 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">2,600</dd><dd class="stat-note"><span class="nowrap">of 3,943 days</span>&nbsp;&middot; <span class="nowrap">65.9%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">66 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
+<p class="section-note">Next to the 106 other projects of <a href="../index.html">GitStats Gallery</a>: where TiKV is in the top or bottom 15%.</p><ul class="insights"><li class="insight"><span class="insight-big">12%</span><div><span class="insight-label">Against its busiest year</span><p class="insight-sentence">People made 12% as many commits to TiKV in the last 12 months as in 2016, its busiest year (219 against 1,887).</p><p class="insight-compared">4th lowest of 90; the median project made 52% of its busiest year.</p></div></li><li class="insight"><span class="insight-big">90%</span><div><span class="insight-label">One time zone</span><p class="insight-sentence">90% of TiKV&#x27;s commits were made in one time zone, UTC+08:00, of the 17 it has commits from.</p><p class="insight-compared">11th highest of 91; the median project: 34%.</p></div></li><li class="insight"><span class="insight-big">53%</span><div><span class="insight-label">Code still there</span><p class="insight-sentence">53% of the 1,585,921 lines ever written into TiKV&#x27;s own source are still there.</p><p class="insight-compared">10th highest of 97; the median project: 37%.</p></div></li></ul><p class="more-link"><a href="compare.html">How TiKV compares, measure by measure &rarr;</a></p></section><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">8,538</dd><dd class="stat-note"><span class="nowrap">3.3 per active day</span>&nbsp;&middot; <span class="nowrap">2.2 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">473</dd><dd class="stat-note">18.1 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">850,740</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+1,601,782</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−751,036</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">1,552</dd><dd class="stat-note">21 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">2,601</dd><dd class="stat-note"><span class="nowrap">of 3,946 days</span>&nbsp;&middot; <span class="nowrap">65.9%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">66 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
 <h2 id="commits_per_year"><a href="#commits_per_year">Commits per year</a></h2>
 
-<div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly"></canvas></div>
+<div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly" role="img" aria-label="Bar chart of commits per year, 2016 to 2026"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-overview-yearly').getContext('2d');
@@ -416,7 +424,7 @@
     type: 'bar',
     data: {
       labels: labels,
-      datasets: [{"label": "Commits", "data": [1887, 703, 721, 1092, 1062, 767, 715, 642, 509, 253, 185], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+      datasets: [{"label": "Commits", "data": [1887, 703, 721, 1092, 1062, 767, 715, 642, 509, 253, 187], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
     },
     options: {
       responsive: true,
@@ -425,7 +433,7 @@
         legend: { display: false }
       },
       scales: {
-        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
+        x: { ticks: { maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } },
         y: { beginAtZero: true, ticks: { precision: 0 } }
       }
     }
@@ -435,7 +443,7 @@
 <p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p><div class="two-columns"><section>
 <h2 id="top_contributors"><a href="#top_contributors">Top contributors</a></h2>
 
-<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>Jay</td><td class="num">945</td><td class="num">11.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>siddontang</td><td class="num">658</td><td class="num">7.7%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 69.6%"></span></span></td></tr><tr><td>Neil Shen</td><td class="num">503</td><td class="num">5.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 53.2%"></span></span></td></tr><tr><td>disksing</td><td class="num">286</td><td class="num">3.4%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 30.3%"></span></span></td></tr><tr><td>qupeng</td><td class="num">280</td><td class="num">3.3%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 29.6%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 474 authors &rarr;</a></p></section><section>
+<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>Jay</td><td class="num">945</td><td class="num">11.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>siddontang</td><td class="num">658</td><td class="num">7.7%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 69.6%"></span></span></td></tr><tr><td>Neil Shen</td><td class="num">503</td><td class="num">5.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 53.2%"></span></span></td></tr><tr><td>disksing</td><td class="num">286</td><td class="num">3.3%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 30.3%"></span></span></td></tr><tr><td>qupeng</td><td class="num">280</td><td class="num">3.3%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 29.6%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 473 authors &rarr;</a></p></section><section>
 <h2 id="latest_releases"><a href="#latest_releases">Latest releases</a></h2>
 
 <div class="table-scroll"><table class="share-table"><tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr><tr><td class="nowrap">v9.0.0-beta.2.pre</td><td class="nowrap">2025-06-26</td><td class="num">140</td><td>Neil Shen, lucasliang +39</td></tr><tr><td class="nowrap">v9.0.0-beta.1.pre</td><td class="nowrap">2024-12-25</td><td class="num">65</td><td>lucasliang, glorv +21</td></tr><tr><td class="nowrap">v8.5.0-alpha</td><td class="nowrap">2024-10-29</td><td class="num">110</td><td>Spade  A, glorv +23</td></tr><tr><td class="nowrap">v8.4.0-alpha</td><td class="nowrap">2024-08-20</td><td class="num">24</td><td>Spade  A, Connor +12</td></tr><tr><td class="nowrap">v8.3.0-alpha</td><td class="nowrap">2024-07-25</td><td class="num">121</td><td>Spade  A, Neil Shen +32</td></tr></table></div><p class="more-link"><a href="tags.html">All 47 tags &rarr;</a></p></section></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How TiKV compares with other CNCF graduated projects &rarr;</a></p><p class="more-link"><a href="../ecosystems/cncf.html">How TiKV ranks among CNCF graduated projects by AI-assisted commits &rarr;</a></p><h2>Badge for your README</h2><p class="section-note">The share of the last 12 months&rsquo; commits that name an AI coding assistant, a lower bound, updated every week with this report.</p><div class="badge-list"><div class="badge-row"><div class="badge-info"><img src="badges/ai-assisted.svg" alt="AI-assisted commits"></div><pre class="badge-code">[![AI-assisted commits: TiKV](https://shenxianpeng.dev/gitstats/gallery/tikv/badges/ai-assisted.svg)](https://shenxianpeng.dev/gitstats/gallery/tikv/)</pre><button type="button" class="badge-copy" aria-label="Copy the Markdown of the badge"><span>Copy</span></button></div></div><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml

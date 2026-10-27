@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:46:45+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:30:43+00:00",
   "name": "Crush",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-10-25 15:23:12",
-  "age_days": 583,
-  "active_days": 509,
-  "total_commits": 4352,
-  "total_authors": 168,
-  "active_authors_12mo": 107,
-  "commits_last_12mo": 2442,
-  "total_files": 1266,
-  "total_lines": 196342,
-  "lines_added": 1622243,
-  "lines_removed": 1425901,
+  "last_commit": "2026-10-26 20:06:23",
+  "age_days": 585,
+  "active_days": 510,
+  "total_commits": 4360,
+  "total_authors": 167,
+  "active_authors_12mo": 106,
+  "commits_last_12mo": 2450,
+  "total_files": 1275,
+  "total_lines": 202590,
+  "lines_added": 1624498,
+  "lines_removed": 1426742,
   "total_tags": 208,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Andrey Nering",
-      "commits": 750
+      "commits": 751
     },
     {
       "name": "Christian Rocha",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Charm",
-      "commits": 451
+      "commits": 452
     },
     {
       "name": "Ayman Bagabas",
@@ -41,12 +41,11 @@
     }
   ],
   "author_commits": {
-    "Charm": 451,
+    "Charm": 452,
+    "Kieran Klukas": 287,
+    "Andrey Nering": 751,
     "Christian Rocha": 611,
-    "Kieran Klukas": 281,
-    "drew": 19,
-    "Andrey Nering": 750,
-    "Drew Smirnoff": 37,
+    "drew": 56,
     "Kevin": 1,
     "cloudcodec": 1,
     "PatricioCobelo": 1,
@@ -212,7 +211,7 @@
   },
   "commits_by_year": {
     "2025": 2294,
-    "2026": 2058
+    "2026": 2066
   },
   "ai_assisted": {
     "commits": 55,
@@ -273,17 +272,17 @@
       "2026-07": 298,
       "2026-08": 117,
       "2026-09": 186,
-      "2026-10": 86
+      "2026-10": 94
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 4352,
+    "commits": 4360,
     "by_kind": {
       "organization": 0,
-      "one_person": 1175,
+      "one_person": 1182,
       "personal": 1477,
-      "hidden": 1593,
+      "hidden": 1594,
       "unknown": 0,
       "bot": 107
     },
@@ -349,9 +348,9 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 52,
+        "one_person": 59,
         "personal": 5,
-        "hidden": 29,
+        "hidden": 30,
         "unknown": 0,
         "bot": 0
       }
@@ -360,21 +359,21 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2374,
-    "authors": 106,
-    "new_authors": 90,
+    "commits": 2382,
+    "authors": 105,
+    "new_authors": 89,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 4245,
+    "commits": 4253,
     "commits_by_year": {
       "2025": 2244,
-      "2026": 2001
+      "2026": 2009
     },
-    "active_days": 508
+    "active_days": 509
   },
   "timezones": {
-    "+0000": 157,
+    "+0000": 158,
     "+0100": 208,
     "+0200": 798,
     "+0300": 72,
@@ -389,8 +388,8 @@
     "+1000": 3,
     "+1100": 1,
     "+1200": 1,
-    "-0300": 1456,
-    "-0400": 1054,
+    "-0300": 1457,
+    "-0400": 1060,
     "-0500": 300,
     "-0600": 29,
     "-0700": 103,
@@ -398,7 +397,7 @@
     "-1000": 1
   },
   "source_lines": {
-    "added": 388639,
-    "current": 191276
+    "added": 390894,
+    "current": 192690
   }
 }

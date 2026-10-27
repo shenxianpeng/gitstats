@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - scikit-learn</title>
-	<meta name="description" content="scikit-learn: 34,087 commits by 3,372 authors, 2010 to 2026. A report made with gitstats.">
+	<meta name="description" content="scikit-learn: 34,093 commits by 3,370 authors, 2010 to 2026. A report made with gitstats.">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="GitStats">
 	<meta property="og:title" content="scikit-learn: Badges">
-	<meta property="og:description" content="scikit-learn: 34,087 commits by 3,372 authors, 2010 to 2026. A report made with gitstats.">
+	<meta property="og:description" content="scikit-learn: 34,093 commits by 3,370 authors, 2010 to 2026. A report made with gitstats.">
 	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/scikit-learn/badges.html">
 	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/scikit-learn/share-card.png">
 	<meta property="og:image:width" content="1200">
@@ -16,12 +16,12 @@
 	<meta property="og:image:alt" content="scikit-learn: Badges">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="scikit-learn: Badges">
-	<meta name="twitter:description" content="scikit-learn: 34,087 commits by 3,372 authors, 2010 to 2026. A report made with gitstats.">
+	<meta name="twitter:description" content="scikit-learn: 34,093 commits by 3,370 authors, 2010 to 2026. A report made with gitstats.">
 	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/scikit-learn/share-card.png">
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.12.0.post1.dev1">
+	<meta name="generator" content="GitStats 2.12.1">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -339,10 +339,18 @@
 	// boundaries, so gaps in history take up the space they really span;
 	// only a gap handed in as `gap` is cut short (see squeezeTime).
 	function timeAxis(xs, gap) {
+		var min = xs.length ? squeezeTime(gap, xs[0]) : undefined;
+		var max = xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined;
+		// one point in time (a single commit) has no width: give it a month
+		// around it, or the point has no place on the axis and is not drawn
+		if (xs.length && min === max) {
+			min -= 15 * 864e5;
+			max += 15 * 864e5;
+		}
 		return {
 			type: 'linear',
-			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
-			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			min: min,
+			max: max,
 			afterBuildTicks: function(scale) {
 				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
 				const from = new Date(first), to = new Date(last);
@@ -380,7 +388,7 @@
 <body>
 
             <div class="nav">
-            <a href="index.html" class="nav-brand">GitStats</a>
+            <a href="../index.html" class="nav-brand nav-up">&larr; GitStats Gallery</a>
             <ul>
             <li><a href="index.html">General</a></li>
             <li><a href="activity.html">Activity</a></li>

@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:53:07+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:37:53+00:00",
   "name": "Nacos",
   "report_path": "index.html",
   "first_commit": "2018-07-20 16:27:23",
-  "last_commit": "2026-10-26 03:38:07",
+  "last_commit": "2026-10-26 10:13:52",
   "age_days": 3020,
   "active_days": 1587,
-  "total_commits": 6346,
-  "total_authors": 538,
-  "active_authors_12mo": 81,
-  "commits_last_12mo": 768,
-  "total_files": 7177,
-  "total_lines": 1287119,
-  "lines_added": 2539457,
-  "lines_removed": 1252338,
+  "total_commits": 6348,
+  "total_authors": 536,
+  "active_authors_12mo": 82,
+  "commits_last_12mo": 770,
+  "total_files": 7179,
+  "total_lines": 1289208,
+  "lines_added": 2543262,
+  "lines_removed": 1254022,
   "total_tags": 67,
   "era": "steady",
   "top_authors": [
     {
       "name": "\u6768\u7fca SionYang",
-      "commits": 1163
+      "commits": 1164
     },
     {
-      "name": "nkorange",
-      "commits": 735
+      "name": "Peter Zhu",
+      "commits": 791
     },
     {
       "name": "liaochuntao",
@@ -41,7 +41,8 @@
     }
   ],
   "author_commits": {
-    "\u6768\u7fca SionYang": 1163,
+    "\u6768\u7fca SionYang": 1164,
+    "Pavel Pletnev": 1,
     "lsmlhi_25": 1,
     "sai": 63,
     "abin": 3,
@@ -59,7 +60,7 @@
     "Cuthbert": 64,
     "Gerard": 2,
     "shalk(xiao kun)": 64,
-    "\u9648\u6d69 Nineteen": 9,
+    "\u9648\u6d69 Nineteen": 18,
     "\u5434\u4e16\u5143": 8,
     "laomei": 2,
     "Lukman Fateh": 4,
@@ -189,7 +190,6 @@
     "XS": 3,
     "liqipeng": 15,
     "\u82e5\u5ff5\u83ab\u5ff5": 2,
-    "chaos": 9,
     "chen10038": 1,
     "laokou": 1,
     "Plato": 1,
@@ -216,7 +216,7 @@
     "brother-\u620e": 5,
     "linqiuping": 5,
     "heihei180": 1,
-    "Peter Zhu": 56,
+    "Peter Zhu": 791,
     "dingjiefei": 1,
     "lcmarvin": 1,
     "xxc": 115,
@@ -481,7 +481,6 @@
     "wanyuyichen": 1,
     "wfnuser": 32,
     "jiangcaijun": 1,
-    "nkorange": 735,
     "wolfdriver": 1,
     "theonefx": 2,
     "lkxiaolou": 4,
@@ -513,14 +512,13 @@
     "universefeeler": 20,
     "wangchenjun": 6,
     "xianlaioy": 5,
-    "pbting": 47,
+    "pbting": 71,
     "ezlippi.ouyang": 2,
     "zyy": 1,
     "Yangkai.Shen": 1,
     "\u8d75\u79b9\u5149": 53,
     "Thomas Perkins": 1,
     "Eric Hettiaratchi": 2,
-    "\u5f97\u5c11": 24,
     "mingyixu": 10,
     "aikin": 1,
     "xiaochun.xxc": 34,
@@ -589,14 +587,14 @@
     "2023": 396,
     "2024": 337,
     "2025": 398,
-    "2026": 725
+    "2026": 727
   },
   "ai_assisted": {
-    "commits": 289,
+    "commits": 291,
     "authored": 0,
     "assistants": {
-      "Claude": 252,
-      "Codex": 40,
+      "Claude": 253,
+      "Codex": 41,
       "ChatGPT": 8,
       "Kiro": 5,
       "Cursor": 3,
@@ -626,7 +624,7 @@
       "2026-07": 60,
       "2026-08": 57,
       "2026-09": 23,
-      "2026-10": 10
+      "2026-10": 12
     },
     "commits_by_month": {
       "2024-11": 38,
@@ -652,17 +650,17 @@
       "2026-07": 80,
       "2026-08": 73,
       "2026-09": 35,
-      "2026-10": 17
+      "2026-10": 19
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 6346,
+    "commits": 6348,
     "by_kind": {
-      "organization": 1227,
+      "organization": 1228,
       "one_person": 370,
       "personal": 3896,
-      "hidden": 818,
+      "hidden": 819,
       "unknown": 13,
       "bot": 22
     },
@@ -671,8 +669,8 @@
     "top": [
       {
         "organization": "alibaba-inc.com",
-        "commits": 1109,
-        "commits_last_12mo": 372,
+        "commits": 1110,
+        "commits_last_12mo": 373,
         "addresses": 21,
         "first_commit": "2018-07-20",
         "last_commit": "2026-10-26"
@@ -768,10 +766,10 @@
         "bot": 2
       },
       "2026-Q4": {
-        "organization": 8,
+        "organization": 9,
         "one_person": 0,
         "personal": 2,
-        "hidden": 7,
+        "hidden": 8,
         "unknown": 0,
         "bot": 0
       }
@@ -780,13 +778,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 763,
-    "authors": 81,
-    "new_authors": 60,
+    "commits": 765,
+    "authors": 82,
+    "new_authors": 61,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 6324,
+    "commits": 6326,
     "commits_by_year": {
       "2018": 700,
       "2019": 1338,
@@ -796,7 +794,7 @@
       "2023": 394,
       "2024": 332,
       "2025": 396,
-      "2026": 720
+      "2026": 722
     },
     "active_days": 1585
   },
@@ -804,10 +802,10 @@
     "+0000": 7,
     "+0100": 9,
     "+0200": 4,
-    "+0300": 8,
+    "+0300": 9,
     "+0400": 4,
     "+0530": 1,
-    "+0800": 6266,
+    "+0800": 6267,
     "+0900": 3,
     "-0400": 1,
     "-0500": 33,
@@ -815,7 +813,7 @@
     "-0700": 3
   },
   "source_lines": {
-    "added": 3944306,
-    "current": 1253737
+    "added": 3947645,
+    "current": 1255587
   }
 }

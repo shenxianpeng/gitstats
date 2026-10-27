@@ -1,31 +1,35 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:47:43+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:31:29+00:00",
   "name": "Kilo Code",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-10-23 17:16:37",
-  "age_days": 581,
-  "active_days": 566,
-  "total_commits": 33816,
-  "total_authors": 1208,
-  "active_authors_12mo": 1022,
-  "commits_last_12mo": 30024,
-  "total_files": 11030,
-  "total_lines": 1911751,
-  "lines_added": 4257512,
-  "lines_removed": 2345761,
-  "total_tags": 250,
+  "last_commit": "2026-10-26 16:30:50",
+  "age_days": 584,
+  "active_days": 567,
+  "total_commits": 33829,
+  "total_authors": 1203,
+  "active_authors_12mo": 1015,
+  "commits_last_12mo": 30037,
+  "total_files": 11032,
+  "total_lines": 1911923,
+  "lines_added": 4258007,
+  "lines_removed": 2346090,
+  "total_tags": 251,
   "era": "steady",
   "top_authors": [
     {
       "name": "Marius",
-      "commits": 4364
+      "commits": 4373
     },
     {
-      "name": "kirillk",
-      "commits": 2145
+      "name": "Kirill Kalishev",
+      "commits": 2836
+    },
+    {
+      "name": "Adam",
+      "commits": 2040
     },
     {
       "name": "Dax Raad",
@@ -34,32 +38,26 @@
     {
       "name": "Mark IJbema",
       "commits": 1806
-    },
-    {
-      "name": "Aiden Cline",
-      "commits": 1451
     }
   ],
   "author_commits": {
+    "Marius": 4373,
+    "Christiaan Arnoldus": 480,
     "Andrea Giammarchi": 176,
     "arrrkady": 24,
-    "Kirill Kalishev": 691,
-    "kirillk": 2145,
+    "Kirill Kalishev": 2836,
     "Bruno Agat\u00e3o": 290,
     "Joshua Lambert": 296,
-    "Marius": 4364,
     "Josh Lambert": 394,
     "Igor \u0160\u0107eki\u0107": 526,
     "Evgeny Shurakov": 90,
     "Emilie Lima Schario": 80,
     "Mihaela Stoica": 3,
-    "Christiaan Arnoldus": 479,
     "Emilie Schario": 37,
     "Pedro Heyerdahl": 30,
     "Lennard": 14,
     "hdcode.dev": 28,
-    "matt wilkie": 41,
-    "maphew": 42,
+    "matt wilkie": 83,
     "Thomas Brugman": 58,
     "Cathryn Lavery": 1,
     "mardausdennis": 37,
@@ -96,7 +94,7 @@
     "Jason Allen": 2,
     "Jannis Leidel": 3,
     "BambinoSK": 1,
-    "grandmaster451": 4,
+    "grandmaster451": 6,
     "L\u00e1szl\u00f3 Monda": 1,
     "Christopher Pruijsen": 1,
     "Emergency Self-Construct": 1,
@@ -109,7 +107,7 @@
     "Roscoe A. Bartlett": 1,
     "Filip": 65,
     "KevinZhou": 1,
-    "Adam": 1444,
+    "Adam": 2040,
     "Victor Navarro": 50,
     "Whitebeard": 5,
     "Jack": 73,
@@ -239,7 +237,6 @@
     "Jason Quense": 4,
     "Keefe Tang": 1,
     "Z User": 7,
-    "adamelmore": 596,
     "RAMA": 2,
     "Githubguy132010": 1,
     "kape": 1,
@@ -372,7 +369,7 @@
     "Tang Xinyao": 2,
     "tangxinyao": 2,
     "Annie Surla": 1,
-    "Ryan Vogel": 43,
+    "Ryan Vogel": 46,
     "rasdani": 1,
     "Ismail Ghallou": 1,
     "Jen Person": 1,
@@ -459,7 +456,6 @@
     "max tomashevsky": 1,
     "John Mylchreest": 1,
     "xinxin": 1,
-    "Jilaz": 2,
     "SOUMITRA-SAHA": 1,
     "bhaktatejas922": 2,
     "adam jones": 1,
@@ -626,7 +622,6 @@
     "mohammad": 1,
     "Jigar": 1,
     "Mathias Beugnon": 3,
-    "R44VC0RP": 3,
     "Aaron Iker": 10,
     "Sumit Srivastava": 1,
     "Rohan Godha": 9,
@@ -1252,7 +1247,7 @@
   },
   "commits_by_year": {
     "2025": 6919,
-    "2026": 26897
+    "2026": 26910
   },
   "ai_assisted": {
     "commits": 171,
@@ -1316,30 +1311,30 @@
       "2026-07": 2275,
       "2026-08": 2481,
       "2026-09": 2277,
-      "2026-10": 943
+      "2026-10": 956
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 33816,
+    "commits": 33829,
     "by_kind": {
-      "organization": 11846,
+      "organization": 11855,
       "one_person": 3444,
-      "personal": 8571,
+      "personal": 8572,
       "hidden": 5515,
       "unknown": 53,
-      "bot": 4387
+      "bot": 4390
     },
     "organization_count": 11,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "kilocode.ai",
-        "commits": 9470,
-        "commits_last_12mo": 9440,
+        "commits": 9479,
+        "commits_last_12mo": 9449,
         "addresses": 15,
         "first_commit": "2025-08-27",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "sst.dev",
@@ -1480,34 +1475,34 @@
         "bot": 761
       },
       "2026-Q4": {
-        "organization": 456,
+        "organization": 465,
         "one_person": 12,
-        "personal": 198,
+        "personal": 199,
         "hidden": 176,
         "unknown": 15,
-        "bot": 86
+        "bot": 89
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 26640,
-    "authors": 1008,
-    "new_authors": 935,
-    "half_of_commits": 8
+    "commits": 26650,
+    "authors": 1003,
+    "new_authors": 931,
+    "half_of_commits": 7
   },
   "humans": {
-    "commits": 29429,
+    "commits": 29439,
     "commits_by_year": {
       "2025": 6174,
-      "2026": 23255
+      "2026": 23265
     },
-    "active_days": 565
+    "active_days": 566
   },
   "timezones": {
-    "+0000": 5771,
-    "+0100": 3181,
+    "+0000": 5774,
+    "+0100": 3191,
     "+0200": 7558,
     "+0300": 669,
     "+0330": 26,
@@ -1532,7 +1527,7 @@
     "-1000": 4
   },
   "source_lines": {
-    "added": 6627880,
-    "current": 1689357
+    "added": 6628328,
+    "current": 1689525
   }
 }

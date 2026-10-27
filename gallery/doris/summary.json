@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:53:42+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:37:29+00:00",
   "name": "Apache Doris",
   "report_path": "index.html",
   "first_commit": "2017-08-11 09:51:21",
-  "last_commit": "2026-10-26 03:34:09",
-  "age_days": 3363,
-  "active_days": 2655,
-  "total_commits": 32790,
-  "total_authors": 776,
-  "active_authors_12mo": 165,
-  "commits_last_12mo": 4486,
-  "total_files": 43681,
-  "total_lines": 11094535,
-  "lines_added": 17001114,
-  "lines_removed": 5906579,
+  "last_commit": "2026-10-27 00:35:10",
+  "age_days": 3364,
+  "active_days": 2656,
+  "total_commits": 32817,
+  "total_authors": 774,
+  "active_authors_12mo": 164,
+  "commits_last_12mo": 4513,
+  "total_files": 43738,
+  "total_lines": 11089431,
+  "lines_added": 17017197,
+  "lines_removed": 5909911,
   "total_tags": 3,
   "era": "steady",
   "top_authors": [
     {
       "name": "Mingyu Chen (Rayner)",
-      "commits": 1944
+      "commits": 1951
     },
     {
       "name": "Gabriel",
-      "commits": 1140
+      "commits": 1144
     },
     {
       "name": "Pxl",
@@ -41,43 +41,43 @@
     }
   ],
   "author_commits": {
+    "Mingyu Chen (Rayner)": 1951,
+    "Calvin Kirs": 443,
+    "Gabriel": 1144,
+    "Jack": 419,
+    "HappenLee": 654,
+    "Jerry Hu": 459,
+    "guptashivam04": 2,
+    "924060929": 248,
+    "Jamie": 296,
+    "shuke": 267,
+    "daidai": 220,
+    "deardeng": 308,
     "hui lai": 457,
     "Gavin Chou": 197,
     "TengJianPing": 359,
     "Oliveira": 18,
-    "Gabriel": 1140,
     "zyp-V": 5,
-    "Jerry Hu": 458,
-    "Mingyu Chen (Rayner)": 1944,
-    "Jack": 415,
     "Chenyang Sun": 251,
     "Socrates": 210,
     "lihangyu": 483,
     "yujun": 436,
     "wudi": 230,
-    "daidai": 219,
     "Mryange": 667,
     "meiyi": 369,
     "linrrarity": 160,
     "minghong": 628,
     "bobhan1": 354,
-    "Calvin Kirs": 442,
     "Yixuan Wang": 197,
-    "deardeng": 307,
     "feiniaofeiafei": 197,
     "zgxme": 38,
-    "Jamie": 294,
     "re20052": 4,
-    "Refrain": 63,
-    "HappenLee": 653,
-    "guptashivam04": 1,
-    "shuke": 266,
+    "Refrain": 68,
     "foxtail463": 29,
     "Shekhar Rajak": 1,
     "Aranya Singh Chauhan": 1,
     "TsukiokaKogane": 20,
     "Tran Ngoc Tuan": 1,
-    "924060929": 245,
     "YangJie": 2,
     "zy-kkk": 482,
     "Raghvendra Singh": 6,
@@ -170,7 +170,6 @@
     "Fy": 8,
     "hi folk": 1,
     "walter": 522,
-    "\u9ec4\u745e\u946b": 5,
     "tomz-alt": 1,
     "Tony Wasson": 1,
     "MoanasDaddyXu": 9,
@@ -714,7 +713,7 @@
     "yuliangwan": 1,
     "bookee": 1,
     "Yuan Liu": 1,
-    "lichaoyong": 137,
+    "lichaoyong": 140,
     "wyb": 21,
     "Ben": 1,
     "jolly king": 1,
@@ -815,8 +814,7 @@
     "chenhao16": 8,
     "Aegeaner": 1,
     "Greg Lee": 1,
-    "Hongxu Ma": 1,
-    "\u674e\u8d85\u52c7": 3
+    "Hongxu Ma": 1
   },
   "commits_by_year": {
     "2017": 144,
@@ -828,13 +826,13 @@
     "2023": 8087,
     "2024": 7748,
     "2025": 5271,
-    "2026": 3733
+    "2026": 3760
   },
   "ai_assisted": {
-    "commits": 225,
+    "commits": 226,
     "authored": 1,
     "assistants": {
-      "Claude": 160,
+      "Claude": 161,
       "GitHub Copilot": 65,
       "Cursor": 1
     },
@@ -862,7 +860,7 @@
       "2026-07": 9,
       "2026-08": 30,
       "2026-09": 28,
-      "2026-10": 32
+      "2026-10": 33
     },
     "commits_by_month": {
       "2024-11": 587,
@@ -888,17 +886,17 @@
       "2026-07": 431,
       "2026-08": 379,
       "2026-09": 513,
-      "2026-10": 417
+      "2026-10": 444
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 32790,
+    "commits": 32817,
     "by_kind": {
-      "organization": 9571,
+      "organization": 9590,
       "one_person": 179,
-      "personal": 15482,
-      "hidden": 7557,
+      "personal": 15489,
+      "hidden": 7558,
       "unknown": 0,
       "bot": 1
     },
@@ -907,8 +905,8 @@
     "top": [
       {
         "organization": "selectdb.com",
-        "commits": 8420,
-        "commits_last_12mo": 3614,
+        "commits": 8439,
+        "commits_last_12mo": 3633,
         "addresses": 71,
         "first_commit": "2023-01-22",
         "last_commit": "2026-10-26"
@@ -1012,10 +1010,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 284,
+        "organization": 303,
         "one_person": 5,
-        "personal": 109,
-        "hidden": 19,
+        "personal": 116,
+        "hidden": 20,
         "unknown": 0,
         "bot": 0
       }
@@ -1024,13 +1022,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4486,
-    "authors": 164,
-    "new_authors": 74,
+    "commits": 4513,
+    "authors": 163,
+    "new_authors": 73,
     "half_of_commits": 16
   },
   "humans": {
-    "commits": 32789,
+    "commits": 32816,
     "commits_by_year": {
       "2017": 144,
       "2018": 196,
@@ -1041,18 +1039,18 @@
       "2023": 8087,
       "2024": 7748,
       "2025": 5271,
-      "2026": 3733
+      "2026": 3760
     },
-    "active_days": 2655
+    "active_days": 2656
   },
   "timezones": {
-    "+0000": 16,
+    "+0000": 23,
     "+0100": 32,
     "+0200": 10,
     "+0300": 9,
-    "+0530": 217,
+    "+0530": 218,
     "+0700": 25,
-    "+0800": 32056,
+    "+0800": 32075,
     "+0900": 105,
     "-0300": 1,
     "-0400": 5,
@@ -1062,7 +1060,7 @@
     "-0800": 14
   },
   "source_lines": {
-    "added": 16883178,
-    "current": 10947651
+    "added": 16899038,
+    "current": 10960090
   }
 }

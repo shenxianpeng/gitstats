@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:49:19+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:33:25+00:00",
   "name": "Istio",
   "report_path": "index.html",
   "first_commit": "2016-11-18 23:57:24",
-  "last_commit": "2026-10-25 02:52:35",
-  "age_days": 3628,
-  "active_days": 3351,
-  "total_commits": 26799,
-  "total_authors": 1284,
+  "last_commit": "2026-10-26 20:22:55",
+  "age_days": 3629,
+  "active_days": 3352,
+  "total_commits": 26805,
+  "total_authors": 1280,
   "active_authors_12mo": 165,
-  "commits_last_12mo": 1231,
-  "total_files": 6774,
-  "total_lines": 989639,
-  "lines_added": 8127895,
-  "lines_removed": 7138256,
+  "commits_last_12mo": 1237,
+  "total_files": 6781,
+  "total_lines": 985824,
+  "lines_added": 8129589,
+  "lines_removed": 7138647,
   "total_tags": 54,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "John Howard",
-      "commits": 3640
+      "commits": 3642
     },
     {
       "name": "Tiger Xu / Zhonghu Xu",
@@ -41,8 +41,12 @@
     }
   ],
   "author_commits": {
+    "Jack Kawell": 8,
+    "Aditya Menon": 3,
+    "John Howard": 3642,
+    "Maxim Babushkin": 30,
+    "Sebastian Schepens": 87,
     "Istio Automation": 4187,
-    "John Howard": 3640,
     "Max Xu": 1,
     "Michael Fraenkel": 24,
     "Petr McAllister": 89,
@@ -55,7 +59,6 @@
     "Rudrakh Panigrahi": 22,
     "Yuri Shcherbakov": 2,
     "Nick Fox": 5,
-    "Sebastian Schepens": 86,
     "Matej Kralik": 9,
     "Jackson Greer": 19,
     "Rama Chavali": 872,
@@ -77,7 +80,6 @@
     "Gustavo Meira": 8,
     "Sandeep Varma": 3,
     "Rajat Vig": 1,
-    "Jack Kawell": 7,
     "Steven Jin": 73,
     "Kuromesi": 10,
     "Immanuel Tikhonov": 3,
@@ -106,7 +108,6 @@
     "Yossi Mesika": 212,
     "Shubham": 2,
     "Konstantin Adzer": 1,
-    "Maxim Babushkin": 29,
     "Kapil Agrawal": 1,
     "Grant Spence": 1,
     "Dmitry Kartsev": 3,
@@ -133,7 +134,6 @@
     "Santiago Pappier": 1,
     "J. Conrad Hanson": 8,
     "Rohan Sood": 2,
-    "Aditya Menon": 2,
     "Nick": 11,
     "Jaiveer Katariya": 3,
     "Kaio Cunha": 3,
@@ -304,7 +304,7 @@
     "MaYuanyuan": 3,
     "Eitan Suez": 1,
     "Andrew J. Brown": 1,
-    "Craig Box": 7,
+    "Craig Box": 14,
     "keithfz": 1,
     "dan-m8t": 1,
     "Satbir Chahal": 1,
@@ -417,7 +417,7 @@
     "\ucd5c\uc724\uc11d": 1,
     "Michael": 2,
     "YonkaFang": 12,
-    "Greg Hanson": 30,
+    "Greg Hanson": 138,
     "Yang": 39,
     "Hyeonjun Kim": 1,
     "Tony Allen": 3,
@@ -628,7 +628,6 @@
     "lll": 2,
     "yangson1": 2,
     "Pengyuan Bian": 289,
-    "craigbox": 7,
     "vishalpowar": 4,
     "tafkam": 1,
     "lgadban": 2,
@@ -636,7 +635,6 @@
     "Eren Ali Dal": 1,
     "ycai-aspen": 2,
     "Tareq Sharafy": 1,
-    "Gregory Hanson": 108,
     "Mark McLoughlin": 1,
     "Etienne Fontaine": 3,
     "Hoang Quoc Trung": 1,
@@ -945,7 +943,7 @@
     "Dinar Valeev": 2,
     "Ashlin Eldridge": 1,
     "Phillip Quy Le": 64,
-    "mtail": 14,
+    "mtail": 467,
     "Juraci Paix\u00e3o Kr\u00f6hling": 2,
     "Can Yucel": 6,
     "Sergii Koshel": 1,
@@ -964,7 +962,6 @@
     "Michael Burman": 2,
     "Aditya Harindar": 1,
     "Todd Short": 1,
-    "Martin Taillefer": 453,
     "Steve Hipwell": 2,
     "Serguei Bezverkhi": 33,
     "Rajesh Rajendran": 1,
@@ -1106,7 +1103,7 @@
     "Andrew Jenkins": 1,
     "Robert Faulk": 1,
     "Hao Song": 1,
-    "Andy Lai": 130,
+    "Andy Lai": 145,
     "alexburnos": 5,
     "Andra Cismaru": 172,
     "Alex DiCarlo": 2,
@@ -1119,7 +1116,6 @@
     "DavadDi": 1,
     "cclauss": 1,
     "Naseem": 1,
-    "hklai": 15,
     "Shiva": 3,
     "Jon Allie": 1,
     "Sterchele Ernest": 1,
@@ -1337,7 +1333,7 @@
     "2023": 2538,
     "2024": 2341,
     "2025": 1459,
-    "2026": 1072
+    "2026": 1078
   },
   "ai_assisted": {
     "commits": 22,
@@ -1397,15 +1393,15 @@
       "2026-07": 95,
       "2026-08": 122,
       "2026-09": 137,
-      "2026-10": 113
+      "2026-10": 119
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 26799,
+    "commits": 26805,
     "by_kind": {
-      "organization": 12976,
-      "one_person": 919,
+      "organization": 12981,
+      "one_person": 920,
       "personal": 4499,
       "hidden": 4462,
       "unknown": 0,
@@ -1416,11 +1412,11 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 6879,
-        "commits_last_12mo": 41,
+        "commits": 6881,
+        "commits_last_12mo": 43,
         "addresses": 85,
         "first_commit": "2016-11-18",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "ibm.com",
@@ -1448,11 +1444,11 @@
       },
       {
         "organization": "redhat.com",
-        "commits": 657,
-        "commits_last_12mo": 54,
+        "commits": 658,
+        "commits_last_12mo": 55,
         "addresses": 37,
         "first_commit": "2017-08-15",
-        "last_commit": "2026-10-13"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "daocloud.io",
@@ -1464,11 +1460,11 @@
       },
       {
         "organization": "solo.io",
-        "commits": 269,
-        "commits_last_12mo": 80,
+        "commits": 270,
+        "commits_last_12mo": 81,
         "addresses": 22,
         "first_commit": "2021-02-24",
-        "last_commit": "2026-10-21"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "microsoft.com",
@@ -1512,11 +1508,11 @@
       },
       {
         "organization": "mercadolibre.com",
-        "commits": 87,
-        "commits_last_12mo": 57,
+        "commits": 88,
+        "commits_last_12mo": 58,
         "addresses": 2,
         "first_commit": "2022-06-13",
-        "last_commit": "2026-10-14"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "tetrate.io",
@@ -1713,8 +1709,8 @@
         "bot": 86
       },
       "2026-Q4": {
-        "organization": 30,
-        "one_person": 8,
+        "organization": 35,
+        "one_person": 9,
         "personal": 26,
         "hidden": 6,
         "unknown": 0,
@@ -1725,13 +1721,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1227,
+    "commits": 1233,
     "authors": 164,
     "new_authors": 101,
     "half_of_commits": 6
   },
   "humans": {
-    "commits": 22856,
+    "commits": 22862,
     "commits_by_year": {
       "2016": 134,
       "2017": 2811,
@@ -1743,14 +1739,14 @@
       "2023": 1702,
       "2024": 1497,
       "2025": 849,
-      "2026": 741
+      "2026": 747
     },
-    "active_days": 3111
+    "active_days": 3112
   },
   "timezones": {
     "+0000": 254,
-    "+0100": 496,
-    "+0200": 757,
+    "+0100": 497,
+    "+0200": 758,
     "+0300": 275,
     "+0330": 1,
     "+0400": 6,
@@ -1765,9 +1761,9 @@
     "+1200": 8,
     "+1300": 11,
     "-0200": 7,
-    "-0300": 142,
+    "-0300": 143,
     "-0400": 2274,
-    "-0500": 1506,
+    "-0500": 1509,
     "-0600": 326,
     "-0700": 10361,
     "-0800": 5265,
@@ -1775,7 +1771,7 @@
     "-1000": 13
   },
   "source_lines": {
-    "added": 3412259,
-    "current": 727847
+    "added": 3422660,
+    "current": 728757
   }
 }

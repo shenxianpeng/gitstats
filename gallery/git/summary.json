@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:54:05+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:39:04+00:00",
   "name": "Git",
   "report_path": "index.html",
   "first_commit": "2005-04-07 22:13:13",
-  "last_commit": "2026-10-22 14:23:16",
-  "age_days": 7868,
-  "active_days": 7345,
-  "total_commits": 82563,
-  "total_authors": 2368,
-  "active_authors_12mo": 221,
-  "commits_last_12mo": 3625,
+  "last_commit": "2026-10-26 14:28:01",
+  "age_days": 7872,
+  "active_days": 7347,
+  "total_commits": 82605,
+  "total_authors": 2371,
+  "active_authors_12mo": 225,
+  "commits_last_12mo": 3667,
   "total_files": 4856,
-  "total_lines": 1691632,
-  "lines_added": 3900825,
-  "lines_removed": 2209193,
+  "total_lines": 1692138,
+  "lines_added": 3901784,
+  "lines_removed": 2209479,
   "total_tags": 1010,
   "era": "steady",
   "top_authors": [
     {
       "name": "Junio C Hamano",
-      "commits": 28671
+      "commits": 28683
     },
     {
       "name": "Jeff King",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Patrick Steinhardt",
-      "commits": 2452
+      "commits": 2474
     },
     {
       "name": "\u00c6var Arnfj\u00f6r\u00f0 Bjarmason",
@@ -41,13 +41,17 @@
     }
   ],
   "author_commits": {
-    "Junio C Hamano": 28671,
+    "Junio C Hamano": 28683,
+    "Julia Evans": 37,
+    "Patrick Steinhardt": 2474,
+    "Isabella Caselli": 3,
+    "Marc Becker": 1,
+    "Andy Koppe": 13,
     "Okhuomon Ajayi": 1,
+    "Ravi Mistry": 2,
     "Phillip Wood": 373,
     "Beat Bolli": 77,
-    "Julia Evans": 36,
     "Harald Nordgren": 46,
-    "Patrick Steinhardt": 2452,
     "Kristofer Karlsson": 33,
     "Karthik Nayak": 259,
     "D. Ben Knoble": 37,
@@ -473,7 +477,6 @@
     "Marcel Krause": 1,
     "Josh Brobst": 1,
     "Arthur Chan": 2,
-    "Andy Koppe": 12,
     "Simon Ser": 1,
     "Aditya Neelamraju": 1,
     "Robert Coup": 9,
@@ -1288,7 +1291,7 @@
     "Remi Lespinet": 14,
     "Antoine Delaite": 4,
     "Brian Degenhardt": 1,
-    "Zoe\u0308 Blade": 1,
+    "Zo\u00eb Blade": 1,
     "Ilya Bobyr": 6,
     "Simon A. Eugster": 1,
     "Guillaume Pag\u00e8s": 4,
@@ -2432,7 +2435,7 @@
     "2023": 2835,
     "2024": 3967,
     "2025": 3491,
-    "2026": 3165
+    "2026": 3207
   },
   "ai_assisted": {
     "commits": 96,
@@ -2491,17 +2494,17 @@
       "2026-06": 308,
       "2026-07": 411,
       "2026-08": 278,
-      "2026-09": 264,
-      "2026-10": 128
+      "2026-09": 272,
+      "2026-10": 162
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 82563,
+    "commits": 82605,
     "by_kind": {
-      "organization": 3996,
-      "one_person": 22823,
-      "personal": 55740,
+      "organization": 3998,
+      "one_person": 22846,
+      "personal": 55757,
       "hidden": 4,
       "unknown": 0,
       "bot": 0
@@ -2511,11 +2514,11 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 627,
-        "commits_last_12mo": 26,
-        "addresses": 36,
+        "commits": 629,
+        "commits_last_12mo": 28,
+        "addresses": 37,
         "first_commit": "2006-08-14",
-        "last_commit": "2026-07-24"
+        "last_commit": "2026-10-13"
       },
       {
         "organization": "microsoft.com",
@@ -3193,16 +3196,16 @@
       },
       "2026-Q3": {
         "organization": 24,
-        "one_person": 348,
-        "personal": 580,
+        "one_person": 355,
+        "personal": 581,
         "hidden": 1,
         "unknown": 0,
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 0,
-        "one_person": 39,
-        "personal": 89,
+        "organization": 2,
+        "one_person": 55,
+        "personal": 105,
         "hidden": 0,
         "unknown": 0,
         "bot": 0
@@ -3212,13 +3215,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3625,
-    "authors": 219,
-    "new_authors": 134,
+    "commits": 3667,
+    "authors": 223,
+    "new_authors": 137,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 82563,
+    "commits": 82605,
     "commits_by_year": {
       "2005": 3137,
       "2006": 4551,
@@ -3241,14 +3244,14 @@
       "2023": 2835,
       "2024": 3967,
       "2025": 3491,
-      "2026": 3165
+      "2026": 3207
     },
-    "active_days": 7345
+    "active_days": 7347
   },
   "timezones": {
-    "+0000": 7778,
-    "+0100": 9109,
-    "+0200": 11647,
+    "+0000": 7782,
+    "+0100": 9110,
+    "+0200": 11669,
     "+0300": 570,
     "+0400": 259,
     "+0430": 2,
@@ -3266,16 +3269,16 @@
     "+1300": 81,
     "-0100": 23,
     "-0200": 15,
-    "-0300": 228,
+    "-0300": 231,
     "-0400": 6782,
     "-0500": 4898,
     "-0600": 958,
-    "-0700": 22186,
+    "-0700": 22198,
     "-0800": 10855,
     "-0900": 12
   },
   "source_lines": {
-    "added": 4074297,
-    "current": 1655125
+    "added": 4075275,
+    "current": 1655798
   }
 }

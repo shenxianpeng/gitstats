@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Apache ShardingSphere</title>
-	<meta name="description" content="Apache ShardingSphere: 50,069 commits by 745 authors, 2016 to 2026. A report made with gitstats.">
+	<meta name="description" content="Apache ShardingSphere: 50,070 commits by 737 authors, 2016 to 2026. A report made with gitstats.">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="GitStats">
 	<meta property="og:title" content="Apache ShardingSphere">
-	<meta property="og:description" content="Apache ShardingSphere: 50,069 commits by 745 authors, 2016 to 2026. A report made with gitstats.">
+	<meta property="og:description" content="Apache ShardingSphere: 50,070 commits by 737 authors, 2016 to 2026. A report made with gitstats.">
 	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/shardingsphere/">
 	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/shardingsphere/share-card.png">
 	<meta property="og:image:width" content="1200">
@@ -16,12 +16,12 @@
 	<meta property="og:image:alt" content="Apache ShardingSphere">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="Apache ShardingSphere">
-	<meta name="twitter:description" content="Apache ShardingSphere: 50,069 commits by 745 authors, 2016 to 2026. A report made with gitstats.">
+	<meta name="twitter:description" content="Apache ShardingSphere: 50,070 commits by 737 authors, 2016 to 2026. A report made with gitstats.">
 	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/shardingsphere/share-card.png">
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.12.0.post1.dev1">
+	<meta name="generator" content="GitStats 2.12.1">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -339,10 +339,18 @@
 	// boundaries, so gaps in history take up the space they really span;
 	// only a gap handed in as `gap` is cut short (see squeezeTime).
 	function timeAxis(xs, gap) {
+		var min = xs.length ? squeezeTime(gap, xs[0]) : undefined;
+		var max = xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined;
+		// one point in time (a single commit) has no width: give it a month
+		// around it, or the point has no place on the axis and is not drawn
+		if (xs.length && min === max) {
+			min -= 15 * 864e5;
+			max += 15 * 864e5;
+		}
 		return {
 			type: 'linear',
-			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
-			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			min: min,
+			max: max,
 			afterBuildTicks: function(scale) {
 				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
 				const from = new Date(first), to = new Date(last);
@@ -380,7 +388,7 @@
 <body>
 
             <div class="nav">
-            <a href="index.html" class="nav-brand">GitStats</a>
+            <a href="../index.html" class="nav-brand nav-up">&larr; GitStats Gallery</a>
             <ul>
             <li><a href="index.html" class="active" aria-current="page">General</a></li>
             <li><a href="activity.html">Activity</a></li>
@@ -399,13 +407,13 @@
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Apache ShardingSphere</h1><p class="page-meta">2016-01-18 &rarr; 2026-10-26 &middot; generated 2026-10-26 03:52:49 in 29 s &middot; gitstats 2.12.0.post1.dev1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><!-- gitstats:insights --><section class="insights-section" id="what-stands-out">
+            <h1>Apache ShardingSphere</h1><p class="page-meta">2016-01-18 &rarr; 2026-10-26 &middot; generated 2026-10-27 01:37:18 in 31 s &middot; gitstats 2.12.1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><!-- gitstats:insights --><section class="insights-section" id="what-stands-out">
 <h2 id="what_stands_out"><a href="#what_stands_out">What stands out</a></h2>
 
-<p class="section-note">Next to the 106 other projects of <a href="../index.html">GitStats Gallery</a>: where Apache ShardingSphere is in the top or bottom 15%.</p><ul class="insights"><li class="insight"><span class="insight-big">97%</span><div><span class="insight-label">One time zone</span><p class="insight-sentence">97% of Apache ShardingSphere&#x27;s commits were made in one time zone, UTC+08:00, of the 20 it has commits from.</p><p class="insight-compared">5th highest of 91; the median project: 34%.</p></div></li><li class="insight"><span class="insight-big">23%</span><div><span class="insight-label">Code still there</span><p class="insight-sentence">Of the 6,597,397 lines ever written into Apache ShardingSphere&#x27;s own source, 23% are still there; the rest were rewritten or removed.</p><p class="insight-compared">12th lowest of 97; the median project: 37%.</p></div></li></ul><p class="more-link"><a href="compare.html">How Apache ShardingSphere compares, measure by measure &rarr;</a></p></section><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">50,069</dd><dd class="stat-note"><span class="nowrap">14.6 per active day</span>&nbsp;&middot; <span class="nowrap">12.7 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">745</dd><dd class="stat-note">67.2 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">1,512,756</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+4,819,596</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−3,306,840</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">17,853</dd><dd class="stat-note">44 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">3,426</dd><dd class="stat-note"><span class="nowrap">of 3,934 days</span>&nbsp;&middot; <span class="nowrap">87.1%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">357 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
+<p class="section-note">Next to the 106 other projects of <a href="../index.html">GitStats Gallery</a>: where Apache ShardingSphere is in the top or bottom 15%.</p><ul class="insights"><li class="insight"><span class="insight-big">97%</span><div><span class="insight-label">One time zone</span><p class="insight-sentence">97% of Apache ShardingSphere&#x27;s commits were made in one time zone, UTC+08:00, of the 20 it has commits from.</p><p class="insight-compared">5th highest of 91; the median project: 34%.</p></div></li><li class="insight"><span class="insight-big">23%</span><div><span class="insight-label">Code still there</span><p class="insight-sentence">Of the 6,597,463 lines ever written into Apache ShardingSphere&#x27;s own source, 23% are still there; the rest were rewritten or removed.</p><p class="insight-compared">12th lowest of 97; the median project: 37%.</p></div></li></ul><p class="more-link"><a href="compare.html">How Apache ShardingSphere compares, measure by measure &rarr;</a></p></section><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">50,070</dd><dd class="stat-note"><span class="nowrap">14.6 per active day</span>&nbsp;&middot; <span class="nowrap">12.7 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">737</dd><dd class="stat-note">67.9 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">1,512,973</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+4,819,630</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−3,306,882</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">17,853</dd><dd class="stat-note">44 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">3,426</dd><dd class="stat-note"><span class="nowrap">of 3,934 days</span>&nbsp;&middot; <span class="nowrap">87.1%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">357 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
 <h2 id="commits_per_year"><a href="#commits_per_year">Commits per year</a></h2>
 
-<div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly"></canvas></div>
+<div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly" role="img" aria-label="Bar chart of commits per year, 2016 to 2026"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-overview-yearly').getContext('2d');
@@ -416,7 +424,7 @@
     type: 'bar',
     data: {
       labels: labels,
-      datasets: [{"label": "Commits", "data": [399, 2025, 11722, 9681, 4007, 3367, 5907, 4028, 3620, 2956, 2357], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+      datasets: [{"label": "Commits", "data": [399, 2025, 11722, 9681, 4007, 3367, 5907, 4028, 3620, 2956, 2358], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
     },
     options: {
       responsive: true,
@@ -425,7 +433,7 @@
         legend: { display: false }
       },
       scales: {
-        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
+        x: { ticks: { maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } },
         y: { beginAtZero: true, ticks: { precision: 0 } }
       }
     }
@@ -435,10 +443,10 @@
 <p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p><div class="two-columns"><section>
 <h2 id="top_contributors"><a href="#top_contributors">Top contributors</a></h2>
 
-<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>Liang Zhang</td><td class="num">18,868</td><td class="num">37.7%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>tristaZero</td><td class="num">8,125</td><td class="num">16.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 43.1%"></span></span></td></tr><tr><td>Zhang Yonglun</td><td class="num">1,934</td><td class="num">3.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 10.3%"></span></span></td></tr><tr><td>zhaojun</td><td class="num">1,598</td><td class="num">3.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 8.5%"></span></span></td></tr><tr><td>Zhengqiang Duan</td><td class="num">1,571</td><td class="num">3.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 8.3%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 745 authors &rarr;</a></p></section><section>
+<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>Liang Zhang</td><td class="num">18,869</td><td class="num">37.7%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>Juan Pan(Trista)</td><td class="num">8,731</td><td class="num">17.4%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 46.3%"></span></span></td></tr><tr><td>Zhang Yonglun</td><td class="num">1,934</td><td class="num">3.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 10.2%"></span></span></td></tr><tr><td>zhaojun</td><td class="num">1,598</td><td class="num">3.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 8.5%"></span></span></td></tr><tr><td>Zhengqiang Duan</td><td class="num">1,571</td><td class="num">3.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 8.3%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 737 authors &rarr;</a></p></section><section>
 <h2 id="latest_releases"><a href="#latest_releases">Latest releases</a></h2>
 
-<div class="table-scroll"><table class="share-table"><tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr><tr><td class="nowrap">4.0.0-RC2</td><td class="nowrap">2019-08-17</td><td class="num">3,235</td><td>tristaZero, Liang Zhang +28</td></tr><tr><td class="nowrap">4.0.0-RC1</td><td class="nowrap">2019-04-12</td><td class="num">4,084</td><td>tristaZero, Liang Zhang +20</td></tr><tr><td class="nowrap">3.1.0</td><td class="nowrap">2019-01-03</td><td class="num">555</td><td>tristaZero, Liang Zhang +4</td></tr><tr><td class="nowrap">3.1.0.M1</td><td class="nowrap">2018-12-19</td><td class="num">3,394</td><td>tristaZero, zhaojun +14</td></tr><tr><td class="nowrap">3.0.0</td><td class="nowrap">2018-10-23</td><td class="num">296</td><td>tristaZero, Liang Zhang +5</td></tr></table></div><p class="more-link"><a href="tags.html">All 37 tags &rarr;</a></p></section></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How Apache ShardingSphere compares with other open source projects from China &rarr;</a></p><p class="more-link"><a href="../ecosystems/china.html">How Apache ShardingSphere ranks among open source projects from China by AI-assisted commits &rarr;</a></p><h2>Badge for your README</h2><p class="section-note">The share of the last 12 months&rsquo; commits that name an AI coding assistant, a lower bound, updated every week with this report.</p><div class="badge-list"><div class="badge-row"><div class="badge-info"><img src="badges/ai-assisted.svg" alt="AI-assisted commits"></div><pre class="badge-code">[![AI-assisted commits: Apache ShardingSphere](https://shenxianpeng.dev/gitstats/gallery/shardingsphere/badges/ai-assisted.svg)](https://shenxianpeng.dev/gitstats/gallery/shardingsphere/)</pre><button type="button" class="badge-copy" aria-label="Copy the Markdown of the badge"><span>Copy</span></button></div></div><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+<div class="table-scroll"><table class="share-table"><tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr><tr><td class="nowrap">4.0.0-RC2</td><td class="nowrap">2019-08-17</td><td class="num">3,235</td><td>Juan Pan(Trista), Liang Zhang +27</td></tr><tr><td class="nowrap">4.0.0-RC1</td><td class="nowrap">2019-04-12</td><td class="num">4,084</td><td>Juan Pan(Trista), Liang Zhang +18</td></tr><tr><td class="nowrap">3.1.0</td><td class="nowrap">2019-01-03</td><td class="num">555</td><td>Juan Pan(Trista), Liang Zhang +4</td></tr><tr><td class="nowrap">3.1.0.M1</td><td class="nowrap">2018-12-19</td><td class="num">3,394</td><td>Juan Pan(Trista), zhaojun +13</td></tr><tr><td class="nowrap">3.0.0</td><td class="nowrap">2018-10-23</td><td class="num">296</td><td>Juan Pan(Trista), Chris Cao +4</td></tr></table></div><p class="more-link"><a href="tags.html">All 37 tags &rarr;</a></p></section></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How Apache ShardingSphere compares with other open source projects from China &rarr;</a></p><p class="more-link"><a href="../ecosystems/china.html">How Apache ShardingSphere ranks among open source projects from China by AI-assisted commits &rarr;</a></p><h2>Badge for your README</h2><p class="section-note">The share of the last 12 months&rsquo; commits that name an AI coding assistant, a lower bound, updated every week with this report.</p><div class="badge-list"><div class="badge-row"><div class="badge-info"><img src="badges/ai-assisted.svg" alt="AI-assisted commits"></div><pre class="badge-code">[![AI-assisted commits: Apache ShardingSphere](https://shenxianpeng.dev/gitstats/gallery/shardingsphere/badges/ai-assisted.svg)](https://shenxianpeng.dev/gitstats/gallery/shardingsphere/)</pre><button type="button" class="badge-copy" aria-label="Copy the Markdown of the badge"><span>Copy</span></button></div></div><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
 name: GitStats Report
 on:
   push:

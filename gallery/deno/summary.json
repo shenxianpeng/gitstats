@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:54:28+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:39:30+00:00",
   "name": "Deno",
   "report_path": "index.html",
   "first_commit": "2018-05-14 03:32:01",
-  "last_commit": "2026-10-25 12:06:20",
-  "age_days": 3087,
-  "active_days": 2799,
-  "total_commits": 17397,
-  "total_authors": 1220,
-  "active_authors_12mo": 198,
-  "commits_last_12mo": 2935,
-  "total_files": 14957,
-  "total_lines": 1773259,
-  "lines_added": 4430004,
-  "lines_removed": 2656745,
+  "last_commit": "2026-10-26 11:27:08",
+  "age_days": 3088,
+  "active_days": 2800,
+  "total_commits": 17398,
+  "total_authors": 1219,
+  "active_authors_12mo": 197,
+  "commits_last_12mo": 2936,
+  "total_files": 14954,
+  "total_lines": 1770959,
+  "lines_added": 4430296,
+  "lines_removed": 2659005,
   "total_tags": 284,
   "era": "peak",
   "top_authors": [
     {
       "name": "Bartek Iwa\u0144czuk",
-      "commits": 3273
+      "commits": 3274
     },
     {
       "name": "David Sherret",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Bartek Iwa\u0144czuk": 3273,
+    "Bartek Iwa\u0144czuk": 3274,
     "Divy": 853,
     "denobot": 178,
     "David Sherret": 1808,
@@ -78,7 +78,7 @@
     "minato32": 6,
     "crowlbot": 64,
     "Yash Bavadiya": 1,
-    "Jake": 1,
+    "Jake": 4,
     "Yusuke Tanaka": 99,
     "subotac": 1,
     "maoyouaa": 1,
@@ -233,7 +233,6 @@
     "Sravanth": 1,
     "Tugrul Ates": 1,
     "Adriano": 1,
-    "Jake Champion": 3,
     "prempyla": 1,
     "amitihere": 1,
     "Lucas Wang": 1,
@@ -388,7 +387,7 @@
     "Coty": 1,
     "Bob Callaway": 1,
     "Caleb Lloyd": 2,
-    "S\u029c\u026a\u1d0d\u1d1c\u0280\u1d00 Yu\u0304": 1,
+    "S\u029c\u026a\u1d0d\u1d1c\u0280\u1d00 Y\u016b": 1,
     "Armaan Salam": 1,
     "seb": 1,
     "melbourne2991": 1,
@@ -1271,7 +1270,7 @@
     "2023": 2066,
     "2024": 2462,
     "2025": 1758,
-    "2026": 2697
+    "2026": 2698
   },
   "ai_assisted": {
     "commits": 431,
@@ -1332,16 +1331,16 @@
       "2026-07": 308,
       "2026-08": 150,
       "2026-09": 35,
-      "2026-10": 23
+      "2026-10": 24
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17397,
+    "commits": 17398,
     "by_kind": {
       "organization": 904,
       "one_person": 3845,
-      "personal": 9145,
+      "personal": 9146,
       "hidden": 3473,
       "unknown": 0,
       "bot": 30
@@ -1466,7 +1465,7 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 3,
-        "personal": 14,
+        "personal": 15,
         "hidden": 4,
         "unknown": 0,
         "bot": 1
@@ -1476,13 +1475,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2921,
-    "authors": 196,
-    "new_authors": 155,
+    "commits": 2922,
+    "authors": 195,
+    "new_authors": 154,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 17367,
+    "commits": 17368,
     "commits_by_year": {
       "2018": 1128,
       "2019": 1463,
@@ -1492,13 +1491,13 @@
       "2023": 2061,
       "2024": 2458,
       "2025": 1751,
-      "2026": 2683
+      "2026": 2684
     },
-    "active_days": 2799
+    "active_days": 2800
   },
   "timezones": {
     "+0000": 533,
-    "+0100": 2910,
+    "+0100": 2911,
     "+0200": 3741,
     "+0300": 238,
     "+0330": 9,
@@ -1525,7 +1524,7 @@
     "-1000": 1
   },
   "source_lines": {
-    "added": 4212462,
-    "current": 1707337
+    "added": 4228396,
+    "current": 1705369
   }
 }

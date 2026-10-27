@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:56:40+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:40:14+00:00",
   "name": "TypeScript",
   "report_path": "index.html",
   "first_commit": "2014-07-08 00:08:16",
-  "last_commit": "2026-10-24 16:26:34",
-  "age_days": 4492,
-  "active_days": 3925,
-  "total_commits": 39593,
-  "total_authors": 995,
+  "last_commit": "2026-10-26 16:08:24",
+  "age_days": 4494,
+  "active_days": 3926,
+  "total_commits": 39594,
+  "total_authors": 989,
   "active_authors_12mo": 137,
-  "commits_last_12mo": 1797,
-  "total_files": 67951,
-  "total_lines": 6420173,
-  "lines_added": 25811886,
-  "lines_removed": 19391713,
+  "commits_last_12mo": 1798,
+  "total_files": 67957,
+  "total_lines": 6395069,
+  "lines_added": 25812217,
+  "lines_removed": 19391716,
   "total_tags": 16,
   "era": "steady",
   "top_authors": [
@@ -41,12 +41,12 @@
     }
   ],
   "author_commits": {
+    "Mateusz Burzy\u0144ski": 586,
     "Jake Bailey": 1436,
     "Anders Hejlsberg": 4128,
     "John Favret": 43,
     "Wesley Wigham": 1780,
     "Oleksandr Tarasiuk": 590,
-    "Mateusz Burzy\u0144ski": 585,
     "Andrew Branch": 869,
     "Joaquin Jares": 2,
     "Max Schwenk": 6,
@@ -226,7 +226,7 @@
     "Vitaly": 12,
     "Gabriel Luiz": 1,
     "Fr\u00f3\u00f0i Karlsson": 11,
-    "Alexander": 57,
+    "Alexander": 366,
     "Derek Stavis": 1,
     "kevincatty": 1,
     "Samuel Attard": 1,
@@ -528,7 +528,6 @@
     "Ben Lichtman": 159,
     "Michael": 3,
     "Vincent Boivin": 5,
-    "Alex T": 306,
     "Mauro Bringolf": 1,
     "Niklas Mollenhauer": 1,
     "ikokostya": 1,
@@ -561,7 +560,7 @@
     "Alexey Shvayka": 1,
     "Kan Adachi": 1,
     "Jacob Bandes-Storch": 7,
-    "Noj Vek": 7,
+    "Noj Vek": 8,
     "Dmitri": 1,
     "Tierney Cyren": 1,
     "rockcs1992": 1,
@@ -669,7 +668,7 @@
     "Suhas": 1,
     "Yoshiki Shibukawa": 1,
     "gb714us": 2,
-    "Paul van Brenk": 169,
+    "Paul van Brenk": 273,
     "Dhruv Rajvanshi": 8,
     "Anix": 1,
     "Jeff Wilcox": 1,
@@ -797,7 +796,6 @@
     "Eric Grube": 1,
     "Herrington Darkholme": 48,
     "Adnan Chowdhury": 1,
-    "Manoj Patel": 1,
     "Stephan Ginth\u00f6r": 5,
     "Esakki Raj": 1,
     "Philippe Voinov": 1,
@@ -837,15 +835,13 @@
     "Tycho Grouwstra": 6,
     "Matt Mitchell": 2,
     "Jan Melcher": 2,
-    "Yui": 244,
+    "Yui": 1369,
     "Tingan Ho": 99,
     "ikatyang": 7,
     "gcnew": 5,
-    "Kanchalai Tanglertsampan": 1125,
     "Arnaud Tournier": 1,
     "t_": 3,
     "Maxwell Paul Brickner": 1,
-    "Dick van den Brink": 63,
     "Oleg Mihailik": 14,
     "Chuck Jazdzewski": 3,
     "William Orr": 1,
@@ -947,7 +943,7 @@
     "Blake Embrey": 1,
     "Ivo Gabe de Wolff": 34,
     "Anil Anar": 2,
-    "Oskar Segersva\u0308rd": 3,
+    "Oskar Segersv\u00e4rd": 3,
     "Evan Martin": 1,
     "Josh Soref": 5,
     "AbubakerB": 23,
@@ -986,7 +982,6 @@
     "progre": 1,
     "Graeme Wicksted": 2,
     "tien": 6,
-    "Tien Nguyen": 41,
     "Adi Dahiya": 2,
     "Tarik": 1,
     "Schmavery": 2,
@@ -1034,8 +1029,7 @@
     "milkisevil": 1,
     "Simon H\u00fcrlimann": 1,
     "Max Deepfield": 1,
-    "Jonathan Turner": 3,
-    "Alexander T": 3
+    "Jonathan Turner": 3
   },
   "commits_by_year": {
     "2014": 3328,
@@ -1050,7 +1044,7 @@
     "2023": 1305,
     "2024": 1085,
     "2025": 1465,
-    "2026": 1569
+    "2026": 1570
   },
   "ai_assisted": {
     "commits": 445,
@@ -1110,16 +1104,16 @@
       "2026-07": 118,
       "2026-08": 137,
       "2026-09": 153,
-      "2026-10": 111
+      "2026-10": 112
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39593,
+    "commits": 39594,
     "by_kind": {
       "organization": 25463,
       "one_person": 1221,
-      "personal": 5823,
+      "personal": 5824,
       "hidden": 6939,
       "unknown": 10,
       "bot": 137
@@ -1252,7 +1246,7 @@
       "2026-Q4": {
         "organization": 16,
         "one_person": 0,
-        "personal": 28,
+        "personal": 29,
         "hidden": 62,
         "unknown": 0,
         "bot": 5
@@ -1262,13 +1256,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1746,
+    "commits": 1747,
     "authors": 137,
     "new_authors": 98,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 39456,
+    "commits": 39457,
     "commits_by_year": {
       "2014": 3328,
       "2015": 6550,
@@ -1282,12 +1276,12 @@
       "2023": 1301,
       "2024": 1053,
       "2025": 1409,
-      "2026": 1526
+      "2026": 1527
     },
-    "active_days": 3923
+    "active_days": 3924
   },
   "timezones": {
-    "+0000": 2021,
+    "+0000": 2022,
     "+0100": 848,
     "+0200": 1171,
     "+0300": 803,
@@ -1314,7 +1308,7 @@
     "-1000": 238
   },
   "source_lines": {
-    "added": 27232851,
-    "current": 1417562
+    "added": 27232856,
+    "current": 1417564
   }
 }

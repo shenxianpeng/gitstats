@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:55:13+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:40:28+00:00",
   "name": "curl",
   "report_path": "index.html",
   "first_commit": "1999-12-29 14:20:26",
-  "last_commit": "2026-10-24 20:12:34",
-  "age_days": 9797,
-  "active_days": 7813,
-  "total_commits": 40253,
-  "total_authors": 1540,
-  "active_authors_12mo": 189,
-  "commits_last_12mo": 3545,
-  "total_files": 4604,
-  "total_lines": 631966,
-  "lines_added": 1949211,
-  "lines_removed": 1317245,
+  "last_commit": "2026-10-26 20:11:53",
+  "age_days": 9799,
+  "active_days": 7815,
+  "total_commits": 40272,
+  "total_authors": 1542,
+  "active_authors_12mo": 190,
+  "commits_last_12mo": 3564,
+  "total_files": 4610,
+  "total_lines": 634150,
+  "lines_added": 1950287,
+  "lines_removed": 1317453,
   "total_tags": 217,
   "era": "surge",
   "top_authors": [
     {
       "name": "Daniel Stenberg",
-      "commits": 20748
+      "commits": 20754
     },
     {
       "name": "Viktor Szakats",
-      "commits": 3569
+      "commits": 3573
     },
     {
       "name": "Yang Tse",
@@ -41,10 +41,14 @@
     }
   ],
   "author_commits": {
-    "Daniel McCarney": 34,
-    "Daniel Stenberg": 20748,
-    "Michiel van Slobbe": 3,
-    "Viktor Szakats": 3569,
+    "Daniel McCarney": 35,
+    "Viktor Szakats": 3573,
+    "Max Dymond": 69,
+    "Michiel van Slobbe": 4,
+    "Daniel Stenberg": 20754,
+    "Sai Harsha": 1,
+    "Treston Cuzzort": 2,
+    "akashdeshmukh-git": 3,
     "Martin Mirchev": 9,
     "Armaan Sandhu": 3,
     "Stefan Eissing": 1279,
@@ -55,7 +59,6 @@
     "Stephen Augustus": 1,
     "AP": 1,
     "Khaled": 1,
-    "akashdeshmukh-git": 2,
     "Martin Vlach": 2,
     "Jon DeVree": 4,
     "Rhino": 6,
@@ -79,7 +82,6 @@
     "Nicolas Grekas": 1,
     "Jorge Rocamora": 4,
     "Renan Pimentel": 1,
-    "Max Dymond": 67,
     "Johannes Schindelin": 51,
     "xhon-pelushi": 4,
     "Marcel Raad": 407,
@@ -1610,7 +1612,7 @@
     "2023": 1905,
     "2024": 2436,
     "2025": 3477,
-    "2026": 2804
+    "2026": 2823
   },
   "ai_assisted": {
     "commits": 2,
@@ -1669,30 +1671,30 @@
       "2026-07": 173,
       "2026-08": 259,
       "2026-09": 355,
-      "2026-10": 289
+      "2026-10": 308
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 40253,
+    "commits": 40272,
     "by_kind": {
-      "organization": 22024,
-      "one_person": 10649,
-      "personal": 6894,
-      "hidden": 313,
+      "organization": 22031,
+      "one_person": 10654,
+      "personal": 6899,
+      "hidden": 314,
       "unknown": 60,
-      "bot": 313
+      "bot": 314
     },
     "organization_count": 57,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "haxx.se",
-        "commits": 20780,
-        "commits_last_12mo": 1039,
+        "commits": 20786,
+        "commits_last_12mo": 1045,
         "addresses": 3,
         "first_commit": "1999-12-29",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "teamviewer.com",
@@ -1847,6 +1849,14 @@
         "last_commit": "2019-02-25"
       },
       {
+        "organization": "amazon.com",
+        "commits": 8,
+        "commits_last_12mo": 2,
+        "addresses": 7,
+        "first_commit": "2021-06-11",
+        "last_commit": "2026-10-22"
+      },
+      {
         "organization": "cisco.com",
         "commits": 8,
         "commits_last_12mo": 2,
@@ -1861,14 +1871,6 @@
         "addresses": 3,
         "first_commit": "2015-03-24",
         "last_commit": "2026-05-20"
-      },
-      {
-        "organization": "amazon.com",
-        "commits": 7,
-        "commits_last_12mo": 1,
-        "addresses": 6,
-        "first_commit": "2021-06-11",
-        "last_commit": "2026-06-24"
       },
       {
         "organization": "sonos.com",
@@ -2201,25 +2203,25 @@
         "bot": 34
       },
       "2026-Q4": {
-        "organization": 52,
-        "one_person": 183,
-        "personal": 28,
-        "hidden": 15,
+        "organization": 59,
+        "one_person": 188,
+        "personal": 33,
+        "hidden": 16,
         "unknown": 0,
-        "bot": 11
+        "bot": 12
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3417,
-    "authors": 188,
-    "new_authors": 145,
+    "commits": 3435,
+    "authors": 190,
+    "new_authors": 147,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 39940,
+    "commits": 39958,
     "commits_by_year": {
       "1999": 1,
       "2000": 710,
@@ -2248,13 +2250,13 @@
       "2023": 1905,
       "2024": 2354,
       "2025": 3348,
-      "2026": 2702
+      "2026": 2720
     },
-    "active_days": 7809
+    "active_days": 7811
   },
   "timezones": {
-    "+0000": 14825,
-    "+0100": 9170,
+    "+0000": 14830,
+    "+0100": 9181,
     "+0200": 13005,
     "+0300": 311,
     "+0330": 8,
@@ -2277,15 +2279,15 @@
     "-0230": 4,
     "-0300": 35,
     "-0330": 1,
-    "-0400": 743,
-    "-0500": 501,
+    "-0400": 744,
+    "-0500": 503,
     "-0600": 108,
     "-0700": 741,
     "-0800": 243,
     "-1000": 1
   },
   "source_lines": {
-    "added": 1949225,
-    "current": 495643
+    "added": 1950301,
+    "current": 496126
   }
 }

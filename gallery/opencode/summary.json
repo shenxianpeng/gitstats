@@ -1,39 +1,39 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:46:50+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:30:50+00:00",
   "name": "OpenCode",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-10-26 03:37:24",
-  "age_days": 584,
-  "active_days": 571,
-  "total_commits": 20943,
-  "total_authors": 1028,
-  "active_authors_12mo": 849,
-  "commits_last_12mo": 17339,
-  "total_files": 8644,
-  "total_lines": 1355552,
-  "lines_added": 4394885,
-  "lines_removed": 3039333,
+  "last_commit": "2026-10-27 00:54:50",
+  "age_days": 585,
+  "active_days": 572,
+  "total_commits": 21429,
+  "total_authors": 1029,
+  "active_authors_12mo": 848,
+  "commits_last_12mo": 17825,
+  "total_files": 8977,
+  "total_lines": 1420534,
+  "lines_added": 4503302,
+  "lines_removed": 3082767,
   "total_tags": 918,
   "era": "steady",
   "top_authors": [
     {
       "name": "Dax Raad",
-      "commits": 2472
+      "commits": 2515
     },
     {
       "name": "Aiden Cline",
-      "commits": 2404
+      "commits": 2433
     },
     {
       "name": "Kit Langton",
-      "commits": 2198
+      "commits": 2386
     },
     {
       "name": "Adam",
-      "commits": 1483
+      "commits": 2081
     },
     {
       "name": "Github Action",
@@ -41,22 +41,29 @@
     }
   ],
   "author_commits": {
-    "Luke Parker": 636,
-    "Dax": 445,
-    "Kit Langton": 2198,
+    "Luke Parker": 701,
+    "Filip": 123,
+    "Aiden Cline": 2433,
+    "Kit Langton": 2386,
+    "Dax": 450,
+    "OpeOginni": 88,
+    "James Long": 377,
+    "Ryan Vogel": 48,
+    "Jo\u00e3o Pedro Munhoz Pavaneti": 1,
+    "Simon Klee": 133,
+    "Vladimir Glafirov": 41,
+    "Dax Raad": 2515,
     "Victor Navarro": 107,
-    "Aiden Cline": 2404,
     "Anmol": 1,
-    "Adam": 1483,
+    "Adam": 2081,
     "Irish Joseph": 1,
     "Walter": 10,
     "DS": 24,
     "kernel-oops": 1,
-    "James Long": 356,
-    "Filip": 120,
+    "usrnk1": 134,
+    "Aarav Sareen": 94,
+    "Brendan Allan": 549,
     "opencode": 633,
-    "Simon Klee": 131,
-    "Brendan Allan": 542,
     "Imamuzzaki Abu Salam": 1,
     "ANSH SINGH": 1,
     "ANIRUDDHA ADAK": 1,
@@ -64,13 +71,13 @@
     "MohammadAlMasalmeh": 1,
     "Frank": 924,
     "Rhys Sullivan": 5,
-    "Aarav Sareen": 86,
     "Rich Rauenzahn": 1,
     "Lane Wagner": 1,
     "Finn763": 1,
     "Andrei Vince": 1,
     "J\u00e9r\u00f4me Benoit": 35,
     "F\u00e1bio D. Batista": 1,
+    "thdxr": 4,
     "Divanshu": 1,
     "tobwen": 3,
     "Jack": 126,
@@ -88,13 +95,10 @@
     "Luca Barbato": 1,
     "vprdev": 12,
     "Stefan Avram": 6,
-    "usrnk1": 71,
     "Tommy D. Rossi": 26,
     "uyencss": 1,
-    "OpeOginni": 87,
     "Max Weinbach": 1,
     "Bence Ferdinandy": 2,
-    "Dax Raad": 2472,
     "Henri-Maxime Ducoulombier": 1,
     "Shoubhit Dash": 477,
     "Daniel Chen": 11,
@@ -106,7 +110,6 @@
     "David Hill": 626,
     "Dmitrii": 1,
     "Max Coplan": 1,
-    "Vladimir Glafirov": 40,
     "Jordan Lee": 1,
     "mlimarenko": 1,
     "R\u00e9my Sanchez": 1,
@@ -122,6 +125,7 @@
     "Chris Yang": 8,
     "Cestercian": 1,
     "Brendan Duke": 1,
+    "Brendonovich": 4,
     "Daniel Polito": 52,
     "Matthew Feroz": 2,
     "Mohammad A": 1,
@@ -196,7 +200,6 @@
     "Grant Martin": 2,
     "Jason Quense": 4,
     "Keefe Tang": 1,
-    "adamelmore": 596,
     "RAMA": 2,
     "santigc6": 1,
     "Tony Worm": 1,
@@ -284,7 +287,6 @@
     "Mathews Bryan": 1,
     "Rahul Iyer": 1,
     "Annie Surla": 1,
-    "Ryan Vogel": 43,
     "rasdani": 1,
     "Ismail Ghallou": 1,
     "Jen Person": 1,
@@ -479,7 +481,6 @@
     "mohammad": 1,
     "Jigar": 1,
     "Mathias Beugnon": 3,
-    "R44VC0RP": 3,
     "Aaron Iker": 10,
     "Sumit Srivastava": 1,
     "Rohan Godha": 9,
@@ -1072,7 +1073,7 @@
   },
   "commits_by_year": {
     "2025": 6529,
-    "2026": 14414
+    "2026": 14900
   },
   "ai_assisted": {
     "commits": 136,
@@ -1133,20 +1134,20 @@
       "2026-06": 1122,
       "2026-07": 1581,
       "2026-08": 1996,
-      "2026-09": 1496,
-      "2026-10": 1129
+      "2026-09": 1504,
+      "2026-10": 1607
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20943,
+    "commits": 21429,
     "by_kind": {
       "organization": 1703,
-      "one_person": 3988,
-      "personal": 5564,
-      "hidden": 6077,
+      "one_person": 4041,
+      "personal": 5773,
+      "hidden": 6264,
       "unknown": 1,
-      "bot": 3610
+      "bot": 3647
     },
     "organization_count": 4,
     "last_12mo_from": "2025-11",
@@ -1237,64 +1238,64 @@
         "organization": 269,
         "one_person": 716,
         "personal": 1360,
-        "hidden": 1613,
+        "hidden": 1619,
         "unknown": 1,
-        "bot": 1114
+        "bot": 1116
       },
       "2026-Q4": {
         "organization": 46,
-        "one_person": 72,
-        "personal": 314,
-        "hidden": 480,
+        "one_person": 125,
+        "personal": 523,
+        "hidden": 661,
         "unknown": 0,
-        "bot": 217
+        "bot": 252
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 14715,
-    "authors": 837,
-    "new_authors": 782,
+    "commits": 15164,
+    "authors": 838,
+    "new_authors": 784,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 17333,
+    "commits": 17782,
     "commits_by_year": {
       "2025": 5787,
-      "2026": 11546
+      "2026": 11995
     },
-    "active_days": 569
+    "active_days": 571
   },
   "timezones": {
-    "+0000": 4135,
-    "+0100": 556,
-    "+0200": 975,
+    "+0000": 4166,
+    "+0100": 563,
+    "+0200": 1042,
     "+0300": 77,
     "+0330": 2,
     "+0400": 7,
     "+0500": 3,
-    "+0530": 731,
+    "+0530": 739,
     "+0600": 4,
     "+0700": 46,
-    "+0800": 1001,
+    "+0800": 1012,
     "+0900": 73,
-    "+1000": 734,
+    "+1000": 801,
     "+1030": 2,
     "+1100": 24,
     "+1200": 1,
     "+1300": 2,
-    "-0300": 84,
-    "-0400": 5711,
-    "-0500": 4224,
+    "-0300": 87,
+    "-0400": 5780,
+    "-0500": 4258,
     "-0600": 2045,
-    "-0700": 352,
+    "-0700": 541,
     "-0800": 150,
     "-1000": 4
   },
   "source_lines": {
-    "added": 4730465,
-    "current": 1330019
+    "added": 4872012,
+    "current": 1394439
   }
 }

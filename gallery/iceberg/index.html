@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Apache Iceberg</title>
-	<meta name="description" content="Apache Iceberg: 9,503 commits by 840 authors, 2017 to 2026. A report made with gitstats.">
+	<meta name="description" content="Apache Iceberg: 9,507 commits by 839 authors, 2017 to 2026. A report made with gitstats.">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="GitStats">
 	<meta property="og:title" content="Apache Iceberg">
-	<meta property="og:description" content="Apache Iceberg: 9,503 commits by 840 authors, 2017 to 2026. A report made with gitstats.">
+	<meta property="og:description" content="Apache Iceberg: 9,507 commits by 839 authors, 2017 to 2026. A report made with gitstats.">
 	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/iceberg/">
 	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/iceberg/share-card.png">
 	<meta property="og:image:width" content="1200">
@@ -16,12 +16,12 @@
 	<meta property="og:image:alt" content="Apache Iceberg">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="Apache Iceberg">
-	<meta name="twitter:description" content="Apache Iceberg: 9,503 commits by 840 authors, 2017 to 2026. A report made with gitstats.">
+	<meta name="twitter:description" content="Apache Iceberg: 9,507 commits by 839 authors, 2017 to 2026. A report made with gitstats.">
 	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/iceberg/share-card.png">
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.12.0.post1.dev1">
+	<meta name="generator" content="GitStats 2.12.1">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -339,10 +339,18 @@
 	// boundaries, so gaps in history take up the space they really span;
 	// only a gap handed in as `gap` is cut short (see squeezeTime).
 	function timeAxis(xs, gap) {
+		var min = xs.length ? squeezeTime(gap, xs[0]) : undefined;
+		var max = xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined;
+		// one point in time (a single commit) has no width: give it a month
+		// around it, or the point has no place on the axis and is not drawn
+		if (xs.length && min === max) {
+			min -= 15 * 864e5;
+			max += 15 * 864e5;
+		}
 		return {
 			type: 'linear',
-			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
-			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			min: min,
+			max: max,
 			afterBuildTicks: function(scale) {
 				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
 				const from = new Date(first), to = new Date(last);
@@ -380,7 +388,7 @@
 <body>
 
             <div class="nav">
-            <a href="index.html" class="nav-brand">GitStats</a>
+            <a href="../index.html" class="nav-brand nav-up">&larr; GitStats Gallery</a>
             <ul>
             <li><a href="index.html" class="active" aria-current="page">General</a></li>
             <li><a href="activity.html">Activity</a></li>
@@ -399,13 +407,13 @@
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Apache Iceberg</h1><p class="page-meta">2017-12-13 &rarr; 2026-10-25 &middot; generated 2026-10-26 03:50:48 in 5 s &middot; gitstats 2.12.0.post1.dev1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><!-- gitstats:insights --><section class="insights-section" id="what-stands-out">
+            <h1>Apache Iceberg</h1><p class="page-meta">2017-12-13 &rarr; 2026-10-26 &middot; generated 2026-10-27 01:35:04 in 6 s &middot; gitstats 2.12.1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><!-- gitstats:insights --><section class="insights-section" id="what-stands-out">
 <h2 id="what_stands_out"><a href="#what_stands_out">What stands out</a></h2>
 
-<p class="section-note">Next to the 106 other projects of <a href="../index.html">GitStats Gallery</a>: where Apache Iceberg is in the top or bottom 15%.</p><ul class="insights"><li class="insight"><span class="insight-big">1.1×</span><div><span class="insight-label">Against its busiest year</span><p class="insight-sentence">Apache Iceberg&#x27;s last 12 months were its busiest yet: 1,526 commits by people, more than in any full year before (1,446 in 2022).</p><p class="insight-compared">12th highest of 90; the median project made 52% of its busiest year.</p></div></li><li class="insight"><span class="insight-big">23%</span><div><span class="insight-label">Code still there</span><p class="insight-sentence">Of the 6,523,074 lines ever written into Apache Iceberg&#x27;s own source, 23% are still there; the rest were rewritten or removed.</p><p class="insight-compared">11th lowest of 97; the median project: 37%.</p></div></li></ul><p class="more-link"><a href="compare.html">How Apache Iceberg compares, measure by measure &rarr;</a></p></section><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">9,503</dd><dd class="stat-note"><span class="nowrap">4.1 per active day</span>&nbsp;&middot; <span class="nowrap">2.9 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">840</dd><dd class="stat-note">11.3 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">1,495,034</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+6,764,499</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−5,269,465</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">6,617</dd><dd class="stat-note">31 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">2,291</dd><dd class="stat-note"><span class="nowrap">of 3,238 days</span>&nbsp;&middot; <span class="nowrap">70.7%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">57 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
+<p class="section-note">Next to the 106 other projects of <a href="../index.html">GitStats Gallery</a>: where Apache Iceberg is in the top or bottom 15%.</p><ul class="insights"><li class="insight"><span class="insight-big">1.1×</span><div><span class="insight-label">Against its busiest year</span><p class="insight-sentence">Apache Iceberg&#x27;s last 12 months were its busiest yet: 1,530 commits by people, more than in any full year before (1,446 in 2022).</p><p class="insight-compared">12th highest of 90; the median project made 52% of its busiest year.</p></div></li><li class="insight"><span class="insight-big">23%</span><div><span class="insight-label">Code still there</span><p class="insight-sentence">Of the 6,523,233 lines ever written into Apache Iceberg&#x27;s own source, 23% are still there; the rest were rewritten or removed.</p><p class="insight-compared">11th lowest of 97; the median project: 37%.</p></div></li></ul><p class="more-link"><a href="compare.html">How Apache Iceberg compares, measure by measure &rarr;</a></p></section><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">9,507</dd><dd class="stat-note"><span class="nowrap">4.1 per active day</span>&nbsp;&middot; <span class="nowrap">2.9 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">839</dd><dd class="stat-note">11.3 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">1,495,044</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+6,764,658</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−5,269,570</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">6,617</dd><dd class="stat-note">31 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">2,292</dd><dd class="stat-note"><span class="nowrap">of 3,239 days</span>&nbsp;&middot; <span class="nowrap">70.7%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">57 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
 <h2 id="commits_per_year"><a href="#commits_per_year">Commits per year</a></h2>
 
-<div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly"></canvas></div>
+<div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly" role="img" aria-label="Bar chart of commits per year, 2017 to 2026"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-overview-yearly').getContext('2d');
@@ -416,7 +424,7 @@
     type: 'bar',
     data: {
       labels: labels,
-      datasets: [{"label": "Commits", "data": [17, 264, 359, 712, 825, 1492, 1472, 1231, 1512, 1619], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+      datasets: [{"label": "Commits", "data": [17, 264, 359, 712, 825, 1492, 1472, 1231, 1512, 1623], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
     },
     options: {
       responsive: true,
@@ -425,7 +433,7 @@
         legend: { display: false }
       },
       scales: {
-        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
+        x: { ticks: { maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } },
         y: { beginAtZero: true, ticks: { precision: 0 } }
       }
     }
@@ -435,7 +443,7 @@
 <p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p><div class="two-columns"><section>
 <h2 id="top_contributors"><a href="#top_contributors">Top contributors</a></h2>
 
-<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>dependabot <span class="badge" title="dependabot[bot]">bot</span></td><td class="num">1,114</td><td class="num">11.7%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>Ryan Blue</td><td class="num">768</td><td class="num">8.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 68.9%"></span></span></td></tr><tr><td>Eduard Tudenhoefner</td><td class="num">565</td><td class="num">5.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 50.7%"></span></span></td></tr><tr><td>Anton Okolnychyi</td><td class="num">502</td><td class="num">5.3%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 45.1%"></span></span></td></tr><tr><td>Fokko Driesprong</td><td class="num">463</td><td class="num">4.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 41.6%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 840 authors &rarr;</a></p></section><section>
+<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>dependabot <span class="badge" title="dependabot[bot]">bot</span></td><td class="num">1,114</td><td class="num">11.7%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>Ryan Blue</td><td class="num">768</td><td class="num">8.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 68.9%"></span></span></td></tr><tr><td>Eduard Tudenhoefner</td><td class="num">565</td><td class="num">5.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 50.7%"></span></span></td></tr><tr><td>Anton Okolnychyi</td><td class="num">502</td><td class="num">5.3%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 45.1%"></span></span></td></tr><tr><td>Fokko Driesprong</td><td class="num">463</td><td class="num">4.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 41.6%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 839 authors &rarr;</a></p></section><section>
 <h2 id="latest_releases"><a href="#latest_releases">Latest releases</a></h2>
 
 <div class="table-scroll"><table class="share-table"><tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr><tr><td class="nowrap">apache-iceberg-1.12.0</td><td class="nowrap">2026-09-25</td><td class="num">16</td><td>Kevin Liu, Ryan Blue +12</td></tr><tr><td class="nowrap">apache-iceberg-1.12.0-rc2</td><td class="nowrap">2026-09-25</td><td class="num">0</td><td></td></tr><tr><td class="nowrap">apache-iceberg-1.12.0-rc1</td><td class="nowrap">2026-09-21</td><td class="num">24</td><td>dependabot <span class="badge" title="dependabot[bot]">bot</span>, pvary +12</td></tr><tr><td class="nowrap">apache-iceberg-1.12.0-rc0</td><td class="nowrap">2026-09-17</td><td class="num">737</td><td>dependabot <span class="badge" title="dependabot[bot]">bot</span>, Uros +128</td></tr><tr><td class="nowrap">apache-iceberg-1.11.0</td><td class="nowrap">2026-05-15</td><td class="num">16</td><td>Talat UYARER, Dong Wang +7</td></tr></table></div><p class="more-link"><a href="tags.html">All 20 tags &rarr;</a></p></section></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How Apache Iceberg compares with other Apache projects &rarr;</a></p><p class="more-link"><a href="../ecosystems/apache.html">How Apache Iceberg ranks among Apache projects by AI-assisted commits &rarr;</a></p><h2>Badge for your README</h2><p class="section-note">The share of the last 12 months&rsquo; commits that name an AI coding assistant, a lower bound, updated every week with this report.</p><div class="badge-list"><div class="badge-row"><div class="badge-info"><img src="badges/ai-assisted.svg" alt="AI-assisted commits"></div><pre class="badge-code">[![AI-assisted commits: Apache Iceberg](https://shenxianpeng.dev/gitstats/gallery/iceberg/badges/ai-assisted.svg)](https://shenxianpeng.dev/gitstats/gallery/iceberg/)</pre><button type="button" class="badge-copy" aria-label="Copy the Markdown of the badge"><span>Copy</span></button></div></div><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml

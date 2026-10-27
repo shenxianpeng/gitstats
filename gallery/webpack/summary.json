@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:52:14+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:36:37+00:00",
   "name": "webpack",
   "report_path": "index.html",
   "first_commit": "2012-03-10 12:11:23",
-  "last_commit": "2026-10-26 00:29:37",
-  "age_days": 5343,
+  "last_commit": "2026-10-26 12:53:12",
+  "age_days": 5344,
   "active_days": 3258,
-  "total_commits": 20178,
-  "total_authors": 938,
-  "active_authors_12mo": 48,
-  "commits_last_12mo": 2030,
-  "total_files": 21788,
-  "total_lines": 1119767,
-  "lines_added": 2094337,
-  "lines_removed": 974570,
+  "total_commits": 20187,
+  "total_authors": 933,
+  "active_authors_12mo": 46,
+  "commits_last_12mo": 2039,
+  "total_files": 21849,
+  "total_lines": 1132471,
+  "lines_added": 2108932,
+  "lines_removed": 976267,
   "total_tags": 654,
   "era": "surge",
   "top_authors": [
@@ -25,11 +25,7 @@
     },
     {
       "name": "Alexander Akait",
-      "commits": 1883
-    },
-    {
-      "name": "alexander-akait",
-      "commits": 1082
+      "commits": 3069
     },
     {
       "name": "Sean Larkin",
@@ -38,16 +34,19 @@
     {
       "name": "Ivan Kopeykin",
       "commits": 347
+    },
+    {
+      "name": "Tim Sebastian",
+      "commits": 330
     }
   ],
   "author_commits": {
-    "Raj Aryan": 94,
-    "Alexander Akait": 1883,
-    "Sebastian Beltran": 96,
+    "Alexander Akait": 3069,
+    "Raj Aryan": 95,
     "Lazizbek Ergashev": 3,
-    "Xiao": 160,
+    "Xiao": 169,
     "Siddharth S": 1,
-    "hai-x": 215,
+    "hai-x": 218,
     "Eshiv": 6,
     "Qingyuan Wang": 1,
     "Manit Roy": 1,
@@ -65,7 +64,6 @@
     "Nikhil Kumar Rajak": 1,
     "zoomdong": 2,
     "Mohamed Shams El-Deen": 1,
-    "alexander-akait": 1082,
     "Ian McCausland": 1,
     "magic-akari": 5,
     "Abdulaziz Hamzah": 1,
@@ -89,7 +87,6 @@
     "Yuki Okita": 1,
     "Gaurav G": 1,
     "Bulat Murtazin": 1,
-    "Hai": 3,
     "Claudio Wunder": 4,
     "Qingyu Wang": 3,
     "fregante": 1,
@@ -99,7 +96,6 @@
     "Rafael Gonzaga": 1,
     "Sergei Slipchenko": 2,
     "Ryuya": 5,
-    "xiaoxiaojx": 9,
     "lizhihua": 1,
     "Ertu\u011frul Noyan Keremo\u011flu": 1,
     "Nicol\u00f2 Ribaudo": 1,
@@ -125,7 +121,7 @@
     "Tim Fish": 12,
     "Muthukumar M": 1,
     "daxpedda": 1,
-    "Zack Jackson": 6,
+    "Zack Jackson": 16,
     "faga": 2,
     "Mikhail Shipov": 3,
     "Roman Gusev": 3,
@@ -374,7 +370,6 @@
     "Albus Dumbledore": 51,
     "Yury Michurin": 11,
     "Yuta Hiroto": 26,
-    "zackjackson": 10,
     "Kirill Mesnyankin": 1,
     "Varun Varada": 1,
     "himanshu010": 2,
@@ -907,7 +902,7 @@
     "Alberto Leal": 4,
     "Ahmet Katranc\u0131": 1,
     "Kinka Huang": 1,
-    "Juan Loma\u0301n": 6,
+    "Juan Lom\u00e1n": 6,
     "Kamil Szot": 1,
     "Avi Haiat": 19,
     "Maxime Thirouin": 1,
@@ -995,13 +990,13 @@
     "2023": 1153,
     "2024": 1152,
     "2025": 681,
-    "2026": 1899
+    "2026": 1908
   },
   "ai_assisted": {
-    "commits": 243,
+    "commits": 246,
     "authored": 2,
     "assistants": {
-      "Claude": 232,
+      "Claude": 235,
       "CodeRabbit": 8,
       "GitHub Copilot": 4
     },
@@ -1029,7 +1024,7 @@
       "2026-07": 7,
       "2026-08": 2,
       "2026-09": 30,
-      "2026-10": 178
+      "2026-10": 181
     },
     "commits_by_month": {
       "2024-11": 130,
@@ -1055,17 +1050,17 @@
       "2026-07": 203,
       "2026-08": 238,
       "2026-09": 383,
-      "2026-10": 453
+      "2026-10": 462
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20178,
+    "commits": 20187,
     "by_kind": {
       "organization": 331,
       "one_person": 1503,
-      "personal": 14233,
-      "hidden": 2488,
+      "personal": 14235,
+      "hidden": 2495,
       "unknown": 6,
       "bot": 1617
     },
@@ -1253,8 +1248,8 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 1,
-        "personal": 58,
-        "hidden": 360,
+        "personal": 60,
+        "hidden": 367,
         "unknown": 0,
         "bot": 34
       }
@@ -1263,13 +1258,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1786,
-    "authors": 48,
-    "new_authors": 36,
+    "commits": 1795,
+    "authors": 46,
+    "new_authors": 35,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 18561,
+    "commits": 18570,
     "commits_by_year": {
       "2012": 274,
       "2013": 306,
@@ -1285,7 +1280,7 @@
       "2023": 1088,
       "2024": 1053,
       "2025": 587,
-      "2026": 1684
+      "2026": 1693
     },
     "active_days": 3126
   },
@@ -1293,11 +1288,11 @@
     "+0000": 1402,
     "+0100": 4713,
     "+0200": 6308,
-    "+0300": 3843,
+    "+0300": 3849,
     "+0330": 1,
     "+0400": 38,
     "+0500": 7,
-    "+0530": 684,
+    "+0530": 685,
     "+0600": 1,
     "+0700": 56,
     "+0800": 907,
@@ -1308,13 +1303,13 @@
     "-0200": 5,
     "-0300": 20,
     "-0400": 224,
-    "-0500": 397,
+    "-0500": 399,
     "-0600": 221,
     "-0700": 628,
     "-0800": 206
   },
   "source_lines": {
-    "added": 1749010,
-    "current": 900962
+    "added": 1760760,
+    "current": 911061
   }
 }

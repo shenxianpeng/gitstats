@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:51:28+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:35:27+00:00",
   "name": "Svelte",
   "report_path": "index.html",
   "first_commit": "2016-11-16 00:33:17",
-  "last_commit": "2026-10-22 19:47:11",
-  "age_days": 3628,
-  "active_days": 2117,
-  "total_commits": 11454,
-  "total_authors": 957,
+  "last_commit": "2026-10-26 18:09:41",
+  "age_days": 3632,
+  "active_days": 2118,
+  "total_commits": 11455,
+  "total_authors": 956,
   "active_authors_12mo": 142,
-  "commits_last_12mo": 764,
-  "total_files": 9270,
-  "total_lines": 288084,
-  "lines_added": 1032352,
-  "lines_removed": 744268,
-  "total_tags": 1015,
+  "commits_last_12mo": 765,
+  "total_files": 9264,
+  "total_lines": 287868,
+  "lines_added": 1032370,
+  "lines_removed": 744300,
+  "total_tags": 1016,
   "era": "steady",
   "top_authors": [
     {
@@ -37,7 +37,7 @@
     },
     {
       "name": "Tan Li Hau",
-      "commits": 320
+      "commits": 324
     }
   ],
   "author_commits": {
@@ -236,7 +236,7 @@
     "Robert Gieseke": 1,
     "henrykrinkle01": 1,
     "Garik Asplund": 1,
-    "E\u0301ric NICOLAS": 1,
+    "\u00c9ric NICOLAS": 1,
     "D.V. Colomban": 1,
     "Maple": 1,
     "Trevor N. Suarez": 3,
@@ -339,7 +339,7 @@
     "Jeremiasz Major": 4,
     "Craig Jennings": 1,
     "Vaibhav Rai": 5,
-    "Tan Li Hau": 320,
+    "Tan Li Hau": 324,
     "Azarattum": 1,
     "Daniel": 1,
     "Ben M": 1,
@@ -506,7 +506,6 @@
     "Shawn": 1,
     "Xiao Chuan": 1,
     "MCMXC": 1,
-    "tanhauhau": 4,
     "Shinobu Hayashi": 4,
     "schelv": 1,
     "Yosuke Ota": 3,
@@ -1010,7 +1009,7 @@
     "2023": 860,
     "2024": 2054,
     "2025": 955,
-    "2026": 659
+    "2026": 660
   },
   "ai_assisted": {
     "commits": 23,
@@ -1070,19 +1069,19 @@
       "2026-07": 27,
       "2026-08": 102,
       "2026-09": 32,
-      "2026-10": 35
+      "2026-10": 36
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11454,
+    "commits": 11455,
     "by_kind": {
       "organization": 967,
       "one_person": 1331,
       "personal": 5964,
       "hidden": 2476,
       "unknown": 16,
-      "bot": 700
+      "bot": 701
     },
     "organization_count": 2,
     "last_12mo_from": "2025-11",
@@ -1167,7 +1166,7 @@
         "personal": 9,
         "hidden": 7,
         "unknown": 0,
-        "bot": 3
+        "bot": 4
       }
     }
   },
@@ -1219,7 +1218,7 @@
     "-0200": 4,
     "-0230": 1,
     "-0300": 82,
-    "-0400": 4343,
+    "-0400": 4344,
     "-0500": 2313,
     "-0600": 107,
     "-0700": 543,
@@ -1227,7 +1226,7 @@
     "-1000": 14
   },
   "source_lines": {
-    "added": 824526,
-    "current": 283150
+    "added": 824544,
+    "current": 283136
   }
 }

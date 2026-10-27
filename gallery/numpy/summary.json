@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:45:43+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:28:55+00:00",
   "name": "NumPy",
   "report_path": "index.html",
   "first_commit": "2001-12-18 15:45:10",
-  "last_commit": "2026-10-24 17:56:04",
-  "age_days": 9077,
-  "active_days": 6829,
-  "total_commits": 42440,
-  "total_authors": 2109,
+  "last_commit": "2026-10-26 08:18:16",
+  "age_days": 9078,
+  "active_days": 6830,
+  "total_commits": 42443,
+  "total_authors": 2108,
   "active_authors_12mo": 237,
-  "commits_last_12mo": 2477,
-  "total_files": 2424,
-  "total_lines": 1007868,
-  "lines_added": 2791717,
-  "lines_removed": 1783849,
+  "commits_last_12mo": 2480,
+  "total_files": 2423,
+  "total_lines": 1007472,
+  "lines_added": 2791718,
+  "lines_removed": 1783944,
   "total_tags": 16,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Andrew Nelson": 95,
+    "Ganesh Kathiresan": 161,
     "Tyler Reddy": 199,
     "Charles Harris": 7292,
     "Fun-Projects-Learn": 2,
@@ -61,7 +63,6 @@
     "Inessa Pawson": 51,
     "aryangorde6": 1,
     "Matti Picus": 3035,
-    "Ganesh Kathiresan": 159,
     "Michael Zhan": 4,
     "sukeyzhou": 2,
     "bymasha": 1,
@@ -71,7 +72,6 @@
     "Likhitha J": 1,
     "Raghuveer Devulapalli": 330,
     "Lakshay Garg": 5,
-    "Andrew Nelson": 94,
     "Pratham Hole": 58,
     "Eugenio \"Jay\" Zuccarelli": 1,
     "Rayson Yeap": 1,
@@ -369,7 +369,7 @@
     "Roy Smart": 4,
     "Aditi Juneja": 4,
     "Adam J. Stewart": 4,
-    "Guan Ming(Wesley) Chiu": 6,
+    "Guan Ming(Wesley) Chiu": 30,
     "Nicholas Christensen": 1,
     "J. Steven Dodge": 1,
     "!karl3wm": 1,
@@ -378,7 +378,6 @@
     "Rob Timpe": 1,
     "Jiuding Tan (\u8c2d\u4e5d\u9f0e)": 2,
     "Saraswathy Kalaiselvan": 1,
-    "GUAN MING": 24,
     "Robert Kern": 243,
     "Th\u00e9otime Grohens": 1,
     "Colin Gilgenbach": 1,
@@ -642,7 +641,7 @@
     "Aditi Saluja": 1,
     "!undermyumbrella1": 8,
     "Edward Yang": 1,
-    "Brigitta Sipo\u030bcz": 40,
+    "Brigitta Sip\u0151cz": 40,
     "Matthew Barber": 16,
     "Shen Zhou": 3,
     "Paul Reece": 1,
@@ -2177,7 +2176,7 @@
     "2023": 3422,
     "2024": 3054,
     "2025": 2543,
-    "2026": 2076
+    "2026": 2079
   },
   "ai_assisted": {
     "commits": 38,
@@ -2237,16 +2236,16 @@
       "2026-07": 241,
       "2026-08": 229,
       "2026-09": 333,
-      "2026-10": 204
+      "2026-10": 207
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 42440,
+    "commits": 42443,
     "by_kind": {
       "organization": 2800,
       "one_person": 6066,
-      "personal": 31204,
+      "personal": 31207,
       "hidden": 1270,
       "unknown": 486,
       "bot": 614
@@ -2875,7 +2874,7 @@
       "2026-Q4": {
         "organization": 6,
         "one_person": 2,
-        "personal": 165,
+        "personal": 168,
         "hidden": 21,
         "unknown": 0,
         "bot": 10
@@ -2885,13 +2884,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2296,
+    "commits": 2299,
     "authors": 235,
     "new_authors": 172,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 41826,
+    "commits": 41829,
     "commits_by_year": {
       "2001": 8,
       "2002": 408,
@@ -2918,9 +2917,9 @@
       "2023": 3343,
       "2024": 2947,
       "2025": 2423,
-      "2026": 1920
+      "2026": 1923
     },
-    "active_days": 6826
+    "active_days": 6827
   },
   "timezones": {
     "+0000": 9547,
@@ -2931,7 +2930,7 @@
     "+0400": 45,
     "+0430": 2,
     "+0500": 50,
-    "+0530": 1103,
+    "+0530": 1105,
     "+0545": 1,
     "+0600": 15,
     "+0700": 15,
@@ -2939,7 +2938,7 @@
     "+0900": 289,
     "+1000": 104,
     "+1030": 2,
-    "+1100": 144,
+    "+1100": 145,
     "+1200": 45,
     "+1300": 58,
     "-0100": 1,
@@ -2954,7 +2953,7 @@
     "-1000": 14
   },
   "source_lines": {
-    "added": 3219330,
-    "current": 1005376
+    "added": 3219332,
+    "current": 1005282
   }
 }

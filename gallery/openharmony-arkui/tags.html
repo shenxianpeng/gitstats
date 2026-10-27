@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - OpenHarmony ArkUI</title>
-	<meta name="description" content="OpenHarmony ArkUI: 111,193 commits by 1,716 authors, 2021 to 2026. A report made with gitstats.">
+	<meta name="description" content="OpenHarmony ArkUI: 111,193 commits by 1,675 authors, 2021 to 2026. A report made with gitstats.">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="GitStats">
 	<meta property="og:title" content="OpenHarmony ArkUI: Tags">
-	<meta property="og:description" content="OpenHarmony ArkUI: 111,193 commits by 1,716 authors, 2021 to 2026. A report made with gitstats.">
+	<meta property="og:description" content="OpenHarmony ArkUI: 111,193 commits by 1,675 authors, 2021 to 2026. A report made with gitstats.">
 	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/openharmony-arkui/tags.html">
 	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/openharmony-arkui/share-card.png">
 	<meta property="og:image:width" content="1200">
@@ -16,12 +16,12 @@
 	<meta property="og:image:alt" content="OpenHarmony ArkUI: Tags">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="OpenHarmony ArkUI: Tags">
-	<meta name="twitter:description" content="OpenHarmony ArkUI: 111,193 commits by 1,716 authors, 2021 to 2026. A report made with gitstats.">
+	<meta name="twitter:description" content="OpenHarmony ArkUI: 111,193 commits by 1,675 authors, 2021 to 2026. A report made with gitstats.">
 	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/openharmony-arkui/share-card.png">
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.12.0.post1.dev1">
+	<meta name="generator" content="GitStats 2.12.1">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -339,10 +339,18 @@
 	// boundaries, so gaps in history take up the space they really span;
 	// only a gap handed in as `gap` is cut short (see squeezeTime).
 	function timeAxis(xs, gap) {
+		var min = xs.length ? squeezeTime(gap, xs[0]) : undefined;
+		var max = xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined;
+		// one point in time (a single commit) has no width: give it a month
+		// around it, or the point has no place on the axis and is not drawn
+		if (xs.length && min === max) {
+			min -= 15 * 864e5;
+			max += 15 * 864e5;
+		}
 		return {
 			type: 'linear',
-			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
-			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			min: min,
+			max: max,
 			afterBuildTicks: function(scale) {
 				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
 				const from = new Date(first), to = new Date(last);
@@ -380,7 +388,7 @@
 <body>
 
             <div class="nav">
-            <a href="index.html" class="nav-brand">GitStats</a>
+            <a href="../index.html" class="nav-brand nav-up">&larr; GitStats Gallery</a>
             <ul>
             <li><a href="index.html">General</a></li>
             <li><a href="activity.html">Activity</a></li>
@@ -402,7 +410,7 @@
             <h1>Tags</h1><dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">4</dd><dd class="stat-note"><span class="nowrap">latest weekly_20240115-v</span>&nbsp;&middot; <span class="nowrap">2024-01-14</span></dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">27798.2</dd><dd class="stat-note">111,193 commits in total</dd></div></dl>
 <h2 id="all_tags"><a href="#all_tags">All tags</a></h2>
 
-<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th>Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">weekly_20240115-v</td><td class="nowrap">2024-01-14</td><td class="num">1,431</td><td>openharmony_ci (636), 王关 (64), houdisheng (21), huangdong (20), zhuxiantao99 (19), lijuan124 (15), Tianer Zhou (15), tzcurtain (12), zhou-chaobo (10), hw_wyx (10), c00613227 (10), Xing Guang (10), xi-heqiong (9), wangchensu (9), tomkl123 (9), zhang1596479078 (8), g00649947 (8), FredTT (8), 春华秋实 (7), 易宝软件 (7), 常耀中 (7), zhouyan (7), zhanghangkai@huawei.com (7), wanglichao (7), littlewhite-tf (7), chenyuchi (7), chenchen (7), 徐钦锋 (6), yujiang (6), wangsh88 (6), sunbees (6), lzr (6), lyq (6), luoying_ace_admin (6), jao_liu (6), guanzengkun (6), fengjituo111 (6), fan_pan (6), carnivore233 (6), Adriandyln (6), zhoulianhai (5), zengshenglan (5), wangtao (5), w00584494 (5), shi-hongjie (5), s30052571 (5), lvzikai (5), chenwenchang (5), chenjiafeng-opneharmony (5), chen-xiaoxue299 (5), <em>and 157 more authors</em></td></tr><tr><td class="nowrap">master-v</td><td class="nowrap">2024-01-02</td><td class="num">31,997</td><td>openharmony_ci (14,472), Tianer Zhou (547), xiexiyun (428), limeng (396), sunjiakun (395), huangdong (353), yylong (317), lijuan124 (308), zhou-chaobo (276), zhaoxinyu (261), zhangxiao150 (259), zcdqs (251), xuzhidan (250), yaoyuchi (244), caocan (244), Xing Guang (231), bixuefeng (221), tengfan (218), zhangrongjie (194), aryawang (193), CCFFWW (191), sunfei (190), jiangdayuan (183), zhengqiyi (175), guozejun (173), hehongyang3 (168), yan-shuifeng (166), chensi10 (163), Hu_ZeQi (154), yujiadong (151), yangfan229 (148), huangzejia1 (143), sunbees (140), liyujie43@huawei.com (138), quguiren (135), ZhangYu (135), wangzezhen (134), kangchongtao (133), hct95 (130), wangchensu (128), jyj-0306 (128), lushi (118), zhangbingce (117), zhuzijia (112), qpzeng (111), luoying_ace_admin (106), wanglichao (105), shanshurong (105), FredTT (102), likunhui (101), <em>and 671 more authors</em></td></tr><tr><td class="nowrap">OpenHarmony-v3.0-Beta1</td><td class="nowrap">2021-08-17</td><td class="num">63</td><td>openharmony_ci (28), songcongyi (8), tusi_fly (5), theretherehuh (4), dutie123 (4), zhanghaibo (2), sunfei (2), sharpshooter (2), Nesbeer P N (2), Kishore Kumar M V (2), yan-shuifeng (1), kukixi (1), hwzjq (1), chenqiuyao (1)</td></tr><tr><td class="nowrap">OpenHarmony-2.0-Canary</td><td class="nowrap">2021-06-01</td><td class="num">2</td><td>mamingshuai (2)</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How OpenHarmony ArkUI compares with other open source projects from China &rarr;</a></p><p class="more-link"><a href="../ecosystems/china.html">How OpenHarmony ArkUI ranks among open source projects from China by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th>Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">weekly_20240115-v</td><td class="nowrap">2024-01-14</td><td class="num">1,431</td><td>openharmony_ci (636), zhangquanchao (64), houdisheng (21) <details class="tag-authors"><summary>+199 more</summary>huangdong (20), zhuxiantao99 (19), lijuan124 (15), Tianer Zhou (15), tzcurtain (12), zhou-chaobo (10), hw_wyx (10), c00613227 (10), Xing Guang (10), xuqinfeng1 (9), xi-heqiong (9), wangchensu (9), tomkl123 (9), zhourenfeng (8), zhang1596479078 (8), g00649947 (8), chenyuchi (8), 春华秋实 (7), 易宝软件 (7), 常耀中 (7), zhouyan (7), zhanghangkai@huawei.com (7), wangxiuxiu (7), wanglichao (7), littlewhite-tf (7), chenchen (7), yujiang (6), wangsh88 (6), sunbees (6), lzr (6), lyq (6), luoying_ace_admin (6), javafreemanbao (6), jao_liu (6), guanzengkun (6), fengjituo111 (6), fan_pan (6), carnivore233 (6), Adriandyln (6), zhoulianhai (5), zengshenglan (5), wangtao (5), w00584494 (5), shi-hongjie (5), s30052571 (5), lvzikai (5), chenwenchang (5), <em>and 152 more authors</em></details></td></tr><tr><td class="nowrap">master-v</td><td class="nowrap">2024-01-02</td><td class="num">31,997</td><td>openharmony_ci (14,472), Tianer Zhou (547), xiexiyun (428) <details class="tag-authors"><summary>+703 more</summary>limeng (396), sunjiakun (395), huangdong (355), yylong (317), lijuan124 (308), zhou-chaobo (276), zhaoxinyu (261), zhangxiao150 (259), zcdqs (251), xuzhidan (250), wangxiuxiu (247), yaoyuchi (244), caocan (244), Xing Guang (231), bixuefeng (221), zhangrongjie (194), aryawang (193), CCFFWW (191), sunfei (190), jiangdayuan (183), zhengqiyi (175), guozejun (173), hehongyang3 (168), yan-shuifeng (166), chensi10 (163), Hu_ZeQi (154), yujiadong (151), zhangyu (149), yangfan229 (148), huangzejia1 (143), sunbees (140), liyujie43@huawei.com (138), quguiren (135), wangzezhen (134), kangchongtao (133), hct95 (130), wangchensu (128), jyj-0306 (128), lushi (118), zhangbingce (117), zhuzijia (112), qpzeng (111), luoying_ace_admin (106), wanglichao (105), shanshurong (105), zhourenfeng (102), likunhui (101), <em>and 656 more authors</em></details></td></tr><tr><td class="nowrap">OpenHarmony-v3.0-Beta1</td><td class="nowrap">2021-08-17</td><td class="num">63</td><td>openharmony_ci (28), songcongyi (8), tusi_fly (5) <details class="tag-authors"><summary>+11 more</summary>theretherehuh (4), dutie123 (4), zhanghaibo (2), sunfei (2), sharpshooter (2), Nesbeer P N (2), Kishore Kumar M V (2), yan-shuifeng (1), kukixi (1), hwzjq (1), chenqiuyao (1)</details></td></tr><tr><td class="nowrap">OpenHarmony-2.0-Canary</td><td class="nowrap">2021-06-01</td><td class="num">2</td><td>mamingshuai (2)</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How OpenHarmony ArkUI compares with other open source projects from China &rarr;</a></p><p class="more-link"><a href="../ecosystems/china.html">How OpenHarmony ArkUI ranks among open source projects from China by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
 name: GitStats Report
 on:
   push:

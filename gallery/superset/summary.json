@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:51:07+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:35:47+00:00",
   "name": "Apache Superset",
   "report_path": "index.html",
   "first_commit": "2015-07-02 22:16:59",
-  "last_commit": "2026-10-26 02:49:19",
-  "age_days": 4134,
+  "last_commit": "2026-10-26 23:06:15",
+  "age_days": 4135,
   "active_days": 3321,
-  "total_commits": 23991,
-  "total_authors": 1729,
-  "active_authors_12mo": 470,
-  "commits_last_12mo": 6039,
-  "total_files": 11458,
-  "total_lines": 3048855,
-  "lines_added": 8717710,
-  "lines_removed": 5668855,
+  "total_commits": 24016,
+  "total_authors": 1730,
+  "active_authors_12mo": 472,
+  "commits_last_12mo": 6064,
+  "total_files": 11466,
+  "total_lines": 3064363,
+  "lines_added": 8722824,
+  "lines_removed": 5670008,
   "total_tags": 232,
   "era": "peak",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Evan Rusackas",
-      "commits": 1332
+      "commits": 1657
     },
     {
       "name": "Ville Brofeldt",
@@ -41,12 +41,15 @@
     }
   ],
   "author_commits": {
+    "Evan Rusackas": 1657,
+    "Mike Bridge": 226,
+    "Akshat Lakhera": 1,
+    "Shubham kumar": 1,
+    "Ahmed Semih \u00d6zmekik": 1,
+    "Hugh A. Miles II": 288,
     "\u0288\u1d43\u1d62": 172,
     "Jason Draper": 1,
     "Amin Ghadersohi": 381,
-    "Mike Bridge": 219,
-    "Evan Rusackas": 1332,
-    "Joe Li": 316,
     "Sam Firke": 84,
     "SBIN2010": 58,
     "Rafael Benitez": 37,
@@ -227,7 +230,6 @@
     "SkinnyPigeon": 13,
     "Stepan": 20,
     "Evan Gruhlkey": 1,
-    "Hugh A. Miles II": 287,
     "Mike Ma": 1,
     "Herestothegamers": 1,
     "Bandar": 1,
@@ -1175,8 +1177,7 @@
     "Andreas Lordos": 1,
     "Conglei Shi": 22,
     "Christopher Guan": 3,
-    "michellethomas": 100,
-    "Michelle Thomas": 16,
+    "michellethomas": 116,
     "Christine Chambers": 48,
     "Robert Harris": 2,
     "Hamel Husain": 3,
@@ -1783,13 +1784,13 @@
     "2023": 1594,
     "2024": 2068,
     "2025": 1996,
-    "2026": 5621
+    "2026": 5646
   },
   "ai_assisted": {
-    "commits": 2117,
+    "commits": 2128,
     "authored": 0,
     "assistants": {
-      "Claude": 2085,
+      "Claude": 2096,
       "GitHub Copilot": 34,
       "Cursor": 12,
       "Devin": 7
@@ -1818,7 +1819,7 @@
       "2026-07": 301,
       "2026-08": 258,
       "2026-09": 347,
-      "2026-10": 213
+      "2026-10": 224
     },
     "commits_by_month": {
       "2024-11": 191,
@@ -1844,30 +1845,30 @@
       "2026-07": 808,
       "2026-08": 728,
       "2026-09": 841,
-      "2026-10": 614
+      "2026-10": 639
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 23991,
+    "commits": 24016,
     "by_kind": {
-      "organization": 3971,
+      "organization": 3987,
       "one_person": 1377,
-      "personal": 9078,
+      "personal": 9082,
       "hidden": 5778,
       "unknown": 0,
-      "bot": 3787
+      "bot": 3792
     },
     "organization_count": 16,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "preset.io",
-        "commits": 2112,
-        "commits_last_12mo": 1295,
+        "commits": 2128,
+        "commits_last_12mo": 1311,
         "addresses": 12,
         "first_commit": "2019-06-09",
-        "last_commit": "2026-10-24"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "airbnb.com",
@@ -2048,25 +2049,25 @@
         "bot": 778
       },
       "2026-Q4": {
-        "organization": 204,
+        "organization": 220,
         "one_person": 16,
-        "personal": 138,
+        "personal": 142,
         "hidden": 78,
         "unknown": 0,
-        "bot": 178
+        "bot": 183
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3924,
-    "authors": 469,
-    "new_authors": 392,
-    "half_of_commits": 6
+    "commits": 3944,
+    "authors": 471,
+    "new_authors": 395,
+    "half_of_commits": 5
   },
   "humans": {
-    "commits": 20204,
+    "commits": 20224,
     "commits_by_year": {
       "2015": 432,
       "2016": 1167,
@@ -2079,20 +2080,20 @@
       "2023": 1368,
       "2024": 1393,
       "2025": 1447,
-      "2026": 3664
+      "2026": 3684
     },
     "active_days": 3298
   },
   "timezones": {
-    "+0000": 480,
+    "+0000": 493,
     "+0100": 1332,
     "+0200": 1685,
-    "+0300": 1376,
+    "+0300": 1377,
     "+0330": 19,
     "+0400": 10,
     "+0430": 8,
     "+0500": 52,
-    "+0530": 465,
+    "+0530": 467,
     "+0545": 1,
     "+0600": 2,
     "+0700": 823,
@@ -2106,15 +2107,15 @@
     "+1300": 70,
     "-0200": 1,
     "-0300": 1257,
-    "-0400": 1197,
+    "-0400": 1198,
     "-0500": 706,
-    "-0600": 864,
-    "-0700": 9251,
+    "-0600": 871,
+    "-0700": 9252,
     "-0800": 3358,
     "-1000": 49
   },
   "source_lines": {
-    "added": 6972909,
-    "current": 2974321
+    "added": 6978175,
+    "current": 2978282
   }
 }

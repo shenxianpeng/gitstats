@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:51:48+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:36:28+00:00",
   "name": "Nuxt",
   "report_path": "index.html",
   "first_commit": "2016-10-26 11:18:47",
-  "last_commit": "2026-10-25 20:24:50",
-  "age_days": 3652,
-  "active_days": 2625,
-  "total_commits": 15872,
-  "total_authors": 1303,
+  "last_commit": "2026-10-27 01:15:48",
+  "age_days": 3653,
+  "active_days": 2627,
+  "total_commits": 15891,
+  "total_authors": 1300,
   "active_authors_12mo": 182,
-  "commits_last_12mo": 1618,
-  "total_files": 2490,
-  "total_lines": 218467,
-  "lines_added": 1014026,
-  "lines_removed": 795559,
+  "commits_last_12mo": 1637,
+  "total_files": 2497,
+  "total_lines": 219221,
+  "lines_added": 1016381,
+  "lines_removed": 796650,
   "total_tags": 269,
   "era": "steady",
   "top_authors": [
     {
       "name": "Daniel Roe",
-      "commits": 3729
+      "commits": 3743
     },
     {
       "name": "Pooya Parsa",
@@ -29,7 +29,7 @@
     },
     {
       "name": "S\u00e9bastien Chopin",
-      "commits": 1315
+      "commits": 1588
     },
     {
       "name": "Xin Du (Clark)",
@@ -41,14 +41,14 @@
     }
   ],
   "author_commits": {
-    "Daniel Roe": 3729,
-    "Max": 40,
+    "Daniel Roe": 3743,
+    "Felix Fang": 2,
+    "Max": 41,
     "Volkan Akyel": 1,
     "Bochkarev Ivan": 21,
-    "Felix Fang": 1,
     "Maksim Zhukau": 1,
     "Gareth": 4,
-    "S\u00e9bastien Chopin": 1315,
+    "S\u00e9bastien Chopin": 1588,
     "Baptiste Leproux": 4,
     "Hugo": 8,
     "Eduardo San Martin Morote": 15,
@@ -243,7 +243,7 @@
     "Romain Hamel": 1,
     "Jacky Lam": 1,
     "letianpailove": 1,
-    "Alexander": 6,
+    "Alexander": 10,
     "Yizack Rangel": 3,
     "RDistinct": 1,
     "Oskar Lebuda": 1,
@@ -258,7 +258,6 @@
     "dwood-csi": 1,
     "Chriest Yu": 1,
     "Andrei Hudalla": 1,
-    "Alex": 3,
     "Sigrid Huemer": 1,
     "Ibrahimm": 1,
     "Ali Soueidan": 2,
@@ -676,7 +675,6 @@
     "Markus": 1,
     "John Jenkins": 1,
     "Asher White": 1,
-    "Alexander B": 1,
     "scscgit": 2,
     "Andrew Luca": 4,
     "Louis Haftmann": 2,
@@ -1262,7 +1260,7 @@
     "devneko": 5,
     "Philo van Kemenade": 1,
     "cinwell.li": 3,
-    "Libor Vane\u030ck": 1,
+    "Libor Van\u011bk": 1,
     "Hana Shiro": 5,
     "Erik Campobadal": 1,
     "jason": 1,
@@ -1294,7 +1292,6 @@
     "yasark": 2,
     "Gomah": 3,
     "Thomas Marrec": 1,
-    "Atinux": 273,
     "John Fischer": 1,
     "FieryCod": 2,
     "sdras": 2,
@@ -1356,7 +1353,7 @@
     "2023": 2123,
     "2024": 1825,
     "2025": 1398,
-    "2026": 1460
+    "2026": 1479
   },
   "ai_assisted": {
     "commits": 21,
@@ -1416,19 +1413,19 @@
       "2026-07": 284,
       "2026-08": 182,
       "2026-09": 215,
-      "2026-10": 148
+      "2026-10": 167
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15872,
+    "commits": 15891,
     "by_kind": {
       "organization": 243,
-      "one_person": 6826,
-      "personal": 4792,
-      "hidden": 950,
+      "one_person": 6840,
+      "personal": 4793,
+      "hidden": 951,
       "unknown": 0,
-      "bot": 3061
+      "bot": 3064
     },
     "organization_count": 5,
     "last_12mo_from": "2025-11",
@@ -1533,24 +1530,24 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 94,
-        "personal": 31,
-        "hidden": 14,
+        "one_person": 108,
+        "personal": 32,
+        "hidden": 15,
         "unknown": 0,
-        "bot": 9
+        "bot": 12
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1393,
+    "commits": 1409,
     "authors": 181,
     "new_authors": 122,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 12811,
+    "commits": 12827,
     "commits_by_year": {
       "2016": 353,
       "2017": 1647,
@@ -1562,12 +1559,12 @@
       "2023": 1558,
       "2024": 1218,
       "2025": 1062,
-      "2026": 1265
+      "2026": 1281
     },
-    "active_days": 2452
+    "active_days": 2454
   },
   "timezones": {
-    "+0000": 2687,
+    "+0000": 2702,
     "+0100": 5771,
     "+0200": 3315,
     "+0300": 301,
@@ -1588,14 +1585,14 @@
     "+1300": 3,
     "-0200": 40,
     "-0300": 81,
-    "-0400": 97,
+    "-0400": 101,
     "-0500": 159,
     "-0600": 46,
     "-0700": 189,
     "-0800": 133
   },
   "source_lines": {
-    "added": 653365,
-    "current": 174276
+    "added": 655234,
+    "current": 175638
   }
 }

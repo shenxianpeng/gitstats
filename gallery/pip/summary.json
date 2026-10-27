@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:45:13+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:28:35+00:00",
   "name": "pip",
   "report_path": "index.html",
   "first_commit": "2008-10-15 22:02:57",
-  "last_commit": "2026-10-23 00:46:44",
-  "age_days": 6582,
-  "active_days": 3538,
-  "total_commits": 16333,
-  "total_authors": 850,
+  "last_commit": "2026-10-26 04:22:54",
+  "age_days": 6585,
+  "active_days": 3540,
+  "total_commits": 16348,
+  "total_authors": 848,
   "active_authors_12mo": 67,
-  "commits_last_12mo": 734,
-  "total_files": 1085,
-  "total_lines": 217314,
-  "lines_added": 1052888,
-  "lines_removed": 835574,
+  "commits_last_12mo": 749,
+  "total_files": 1087,
+  "total_lines": 217268,
+  "lines_added": 1052952,
+  "lines_removed": 835669,
   "total_tags": 162,
   "era": "steady",
   "top_authors": [
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Damian Shaw": 645,
+    "Damian Shaw": 660,
     "Seth Michael Larson": 24,
     "Gregory P. Smith": 1,
     "Kevin Turcios": 14,
@@ -93,7 +93,7 @@
     "Ellen Marie Dash": 41,
     "Phil Elson": 18,
     "oxygen dioxide": 1,
-    "Roman Donchenko": 7,
+    "Roman Donchenko": 16,
     "Nothing-991": 1,
     "MUTHUSRIHEMADHARSHINI S A": 1,
     "Guido Diepen": 4,
@@ -219,7 +219,6 @@
     "Dale": 1,
     "Itamar Turner-Trauring": 24,
     "Wu Zhenyu": 2,
-    "\u0420\u043e\u043c\u0430\u043d \u0414\u043e\u043d\u0447\u0435\u043d\u043a\u043e": 9,
     "Shantanu": 6,
     "Lukas Geiger": 1,
     "Shahar Epstein": 1,
@@ -326,7 +325,7 @@
     "Nathan Houghton": 1,
     "ziebam": 4,
     "Blazej Michalik": 4,
-    "Noah Gorny": 34,
+    "Noah Gorny": 36,
     "Niyas Sait": 1,
     "ronaudinho": 7,
     "Jesse Rittner": 1,
@@ -367,7 +366,7 @@
     "Quentin Lee": 2,
     "David Hewitt": 1,
     "cjc7373": 7,
-    "Martin Ha\u0308cker": 3,
+    "Martin H\u00e4cker": 3,
     "\u202erekc\u00e4H nitraM\u202e": 1,
     "Denise Yu": 1,
     "Jim Fisher": 3,
@@ -389,7 +388,6 @@
     "Devesh Kumar Singh": 178,
     "Emmanuel Arias": 7,
     "Daan De Meyer": 1,
-    "Noah": 2,
     "Chris Hunt": 758,
     "Laurie O": 2,
     "Jussi Kukkonen": 3,
@@ -911,7 +909,7 @@
     "2023": 764,
     "2024": 627,
     "2025": 765,
-    "2026": 643
+    "2026": 658
   },
   "ai_assisted": {
     "commits": 4,
@@ -971,16 +969,16 @@
       "2026-07": 117,
       "2026-08": 52,
       "2026-09": 18,
-      "2026-10": 45
+      "2026-10": 60
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 16333,
+    "commits": 16348,
     "by_kind": {
       "organization": 348,
       "one_person": 4273,
-      "personal": 10843,
+      "personal": 10858,
       "hidden": 777,
       "unknown": 24,
       "bot": 68
@@ -1185,7 +1183,7 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 1,
-        "personal": 40,
+        "personal": 55,
         "hidden": 1,
         "unknown": 0,
         "bot": 2
@@ -1195,13 +1193,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 703,
+    "commits": 718,
     "authors": 67,
     "new_authors": 45,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 16265,
+    "commits": 16280,
     "commits_by_year": {
       "2008": 39,
       "2009": 357,
@@ -1221,9 +1219,9 @@
       "2023": 761,
       "2024": 624,
       "2025": 728,
-      "2026": 618
+      "2026": 633
     },
-    "active_days": 3526
+    "active_days": 3528
   },
   "timezones": {
     "+0000": 992,
@@ -1244,7 +1242,7 @@
     "+1300": 43,
     "-0200": 21,
     "-0300": 183,
-    "-0400": 2725,
+    "-0400": 2740,
     "-0500": 1632,
     "-0600": 261,
     "-0700": 1428,
@@ -1252,7 +1250,7 @@
     "-1000": 1
   },
   "source_lines": {
-    "added": 1103282,
-    "current": 216555
+    "added": 1148145,
+    "current": 216524
   }
 }

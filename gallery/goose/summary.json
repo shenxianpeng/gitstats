@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:46:49+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:30:36+00:00",
   "name": "goose",
   "report_path": "index.html",
   "first_commit": "2024-08-23 23:39:04",
-  "last_commit": "2026-10-25 20:24:29",
-  "age_days": 793,
-  "active_days": 646,
-  "total_commits": 5884,
-  "total_authors": 649,
-  "active_authors_12mo": 429,
-  "commits_last_12mo": 3206,
-  "total_files": 2531,
-  "total_lines": 1089118,
-  "lines_added": 2315155,
-  "lines_removed": 1226037,
+  "last_commit": "2026-10-26 16:31:39",
+  "age_days": 794,
+  "active_days": 647,
+  "total_commits": 5891,
+  "total_authors": 651,
+  "active_authors_12mo": 431,
+  "commits_last_12mo": 3213,
+  "total_files": 2530,
+  "total_lines": 1088068,
+  "lines_added": 2316150,
+  "lines_removed": 1228030,
   "total_tags": 93,
   "era": "steady",
   "top_authors": [
@@ -29,11 +29,11 @@
     },
     {
       "name": "Lifei Zhou",
-      "commits": 304
+      "commits": 306
     },
     {
       "name": "Jack Amadeo",
-      "commits": 285
+      "commits": 286
     },
     {
       "name": "Michael Neale",
@@ -41,21 +41,23 @@
     }
   ],
   "author_commits": {
+    "Jack Amadeo": 286,
+    "KetchupZ": 1,
+    "Cassian433": 2,
+    "Thymeed": 1,
+    "Seydi Charyyev": 21,
+    "Lifei Zhou": 306,
     "Jasper": 232,
     "Abhijay Jain": 98,
     "Will Pfleger": 29,
     "James Dumay": 5,
-    "Lifei Zhou": 304,
     "Stefan Kuhn": 1,
-    "Jack Amadeo": 285,
     "Diem Nguyen": 1,
     "Douwe Osinga": 322,
-    "Seydi Charyyev": 20,
     "GokayAI": 2,
     "Alex Hancock": 311,
     "Salman Mohammed": 82,
     "nosmile99": 1,
-    "Cassian433": 1,
     "Jeffrey Aven": 1,
     "Michael Neale": 258,
     "filip": 38,
@@ -694,7 +696,7 @@
   "commits_by_year": {
     "2024": 187,
     "2025": 2859,
-    "2026": 2838
+    "2026": 2845
   },
   "ai_assisted": {
     "commits": 288,
@@ -757,17 +759,17 @@
       "2026-07": 287,
       "2026-08": 348,
       "2026-09": 199,
-      "2026-10": 123
+      "2026-10": 130
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5884,
+    "commits": 5891,
     "by_kind": {
-      "organization": 2178,
+      "organization": 2181,
       "one_person": 413,
-      "personal": 1285,
-      "hidden": 1649,
+      "personal": 1287,
+      "hidden": 1651,
       "unknown": 0,
       "bot": 359
     },
@@ -776,19 +778,19 @@
     "top": [
       {
         "organization": "squareup.com",
-        "commits": 1077,
-        "commits_last_12mo": 464,
+        "commits": 1079,
+        "commits_last_12mo": 466,
         "addresses": 36,
         "first_commit": "2024-08-24",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "block.xyz",
-        "commits": 1008,
-        "commits_last_12mo": 686,
+        "commits": 1009,
+        "commits_last_12mo": 687,
         "addresses": 9,
         "first_commit": "2025-01-26",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "redhat.com",
@@ -873,10 +875,10 @@
         "bot": 138
       },
       "2026-Q4": {
-        "organization": 67,
+        "organization": 70,
         "one_person": 7,
-        "personal": 32,
-        "hidden": 11,
+        "personal": 34,
+        "hidden": 13,
         "unknown": 0,
         "bot": 6
       }
@@ -885,22 +887,22 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2875,
-    "authors": 417,
-    "new_authors": 360,
+    "commits": 2882,
+    "authors": 419,
+    "new_authors": 362,
     "half_of_commits": 10
   },
   "humans": {
-    "commits": 5525,
+    "commits": 5532,
     "commits_by_year": {
       "2024": 187,
       "2025": 2821,
-      "2026": 2517
+      "2026": 2524
     },
-    "active_days": 644
+    "active_days": 645
   },
   "timezones": {
-    "+0000": 680,
+    "+0000": 687,
     "+0100": 202,
     "+0200": 241,
     "+0300": 35,
@@ -925,7 +927,7 @@
     "-1000": 8
   },
   "source_lines": {
-    "added": 2099249,
-    "current": 1031951
+    "added": 2101821,
+    "current": 1031252
   }
 }

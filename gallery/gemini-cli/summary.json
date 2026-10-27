@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:46:26+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:30:13+00:00",
   "name": "Gemini CLI",
   "report_path": "index.html",
   "first_commit": "2025-04-16 04:41:08",
-  "last_commit": "2026-10-23 20:43:47",
-  "age_days": 556,
-  "active_days": 481,
-  "total_commits": 6534,
-  "total_authors": 686,
-  "active_authors_12mo": 417,
-  "commits_last_12mo": 3382,
+  "last_commit": "2026-10-26 20:12:43",
+  "age_days": 559,
+  "active_days": 482,
+  "total_commits": 6538,
+  "total_authors": 687,
+  "active_authors_12mo": 418,
+  "commits_last_12mo": 3386,
   "total_files": 3036,
-  "total_lines": 1666137,
-  "lines_added": 2140005,
-  "lines_removed": 473868,
+  "total_lines": 1666657,
+  "lines_added": 2140552,
+  "lines_removed": 473874,
   "total_tags": 13,
   "era": "steady",
   "top_authors": [
@@ -41,13 +41,14 @@
     }
   ],
   "author_commits": {
-    "urielefrenvirtusa": 14,
+    "Diego Godinez": 17,
+    "urielefrenvirtusa": 15,
+    "duvanka-prasad": 1,
+    "jesussamuel-byte": 23,
     "villahernandez-coder": 14,
     "elberthc-byte": 10,
-    "jesussamuel-byte": 22,
     "amelidev": 20,
     "jvargassanchez-dot": 17,
-    "Diego Godinez": 16,
     "luisfelipe-alt": 26,
     "gemini-cli-robot": 181,
     "gurusai-voleti": 1,
@@ -730,7 +731,7 @@
   },
   "commits_by_year": {
     "2025": 3744,
-    "2026": 2790
+    "2026": 2794
   },
   "ai_assisted": {
     "commits": 272,
@@ -790,17 +791,17 @@
       "2026-07": 48,
       "2026-08": 60,
       "2026-09": 62,
-      "2026-10": 81
+      "2026-10": 85
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 6534,
+    "commits": 6538,
     "by_kind": {
-      "organization": 2470,
+      "organization": 2473,
       "one_person": 302,
       "personal": 2234,
-      "hidden": 1510,
+      "hidden": 1511,
       "unknown": 0,
       "bot": 18
     },
@@ -809,11 +810,11 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 2461,
-        "commits_last_12mo": 1390,
-        "addresses": 112,
+        "commits": 2464,
+        "commits_last_12mo": 1393,
+        "addresses": 113,
         "first_commit": "2025-04-16",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "github.com",
@@ -874,10 +875,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 71,
+        "organization": 74,
         "one_person": 0,
         "personal": 0,
-        "hidden": 10,
+        "hidden": 11,
         "unknown": 0,
         "bot": 0
       }
@@ -886,21 +887,21 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3377,
-    "authors": 407,
-    "new_authors": 342,
+    "commits": 3381,
+    "authors": 408,
+    "new_authors": 343,
     "half_of_commits": 15
   },
   "humans": {
-    "commits": 6516,
+    "commits": 6520,
     "commits_by_year": {
       "2025": 3730,
-      "2026": 2786
+      "2026": 2790
     },
-    "active_days": 481
+    "active_days": 482
   },
   "timezones": {
-    "+0000": 635,
+    "+0000": 639,
     "+0100": 105,
     "+0200": 134,
     "+0300": 17,
@@ -923,7 +924,7 @@
     "-1000": 4
   },
   "source_lines": {
-    "added": 2032280,
-    "current": 1614994
+    "added": 2049637,
+    "current": 1615535
   }
 }

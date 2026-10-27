@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:52:53+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:37:26+00:00",
   "name": "Apache APISIX",
   "report_path": "index.html",
   "first_commit": "2019-04-10 02:02:06",
-  "last_commit": "2026-10-26 03:15:52",
+  "last_commit": "2026-10-26 10:03:31",
   "age_days": 2757,
   "active_days": 1711,
-  "total_commits": 5230,
-  "total_authors": 517,
+  "total_commits": 5237,
+  "total_authors": 515,
   "active_authors_12mo": 59,
-  "commits_last_12mo": 617,
-  "total_files": 2103,
-  "total_lines": 614857,
-  "lines_added": 814888,
-  "lines_removed": 200031,
+  "commits_last_12mo": 624,
+  "total_files": 2111,
+  "total_lines": 618423,
+  "lines_added": 818712,
+  "lines_removed": 200227,
   "total_tags": 14,
   "era": "steady",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "Shreemaan Abhishek",
-      "commits": 274
+      "commits": 276
     },
     {
       "name": "Ming Wen",
@@ -37,16 +37,16 @@
     },
     {
       "name": "Nic",
-      "commits": 168
+      "commits": 170
     }
   ],
   "author_commits": {
-    "Nic": 168,
+    "Nic": 170,
+    "Shreemaan Abhishek": 276,
+    "AlinsRan": 120,
     "ruanweihong-aaa": 3,
     "Nimesh": 1,
     "lordcheng10": 1,
-    "AlinsRan": 117,
-    "Shreemaan Abhishek": 274,
     "Zeping Bai": 76,
     "Yilia Lin": 65,
     "Mohammad Izzraff Janius": 39,
@@ -62,7 +62,7 @@
     "J.A.": 1,
     "prasun srivastav": 1,
     "YapWC": 3,
-    "Zhi Yuan Ju": 44,
+    "Zhi Yuan Ju": 46,
     "Traky Deng": 106,
     "Tim Wellbrock": 1,
     "Rafael Rivero Garc\u00eda": 2,
@@ -434,7 +434,7 @@
     "qian0817": 1,
     "Cliff Su": 6,
     "Dhawal Kamdar": 1,
-    "Lien Li": 20,
+    "Lien Li": 21,
     "Yousa": 21,
     "idbeta": 18,
     "Kafilat Adeleke": 1,
@@ -555,9 +555,7 @@
     "vkill": 5,
     "\u5e0c\u671b\u4e4b\u77f3": 2,
     "Tinywan": 1,
-    "orangleliu": 1,
-    "Lien": 1,
-    "\u741a\u81f4\u8fdc": 2
+    "orangleliu": 1
   },
   "commits_by_year": {
     "2019": 753,
@@ -567,7 +565,7 @@
     "2023": 495,
     "2024": 231,
     "2025": 288,
-    "2026": 588
+    "2026": 595
   },
   "ai_assisted": {
     "commits": 1,
@@ -625,16 +623,16 @@
       "2026-07": 79,
       "2026-08": 69,
       "2026-09": 44,
-      "2026-10": 22
+      "2026-10": 29
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5230,
+    "commits": 5237,
     "by_kind": {
-      "organization": 481,
+      "organization": 486,
       "one_person": 85,
-      "personal": 3809,
+      "personal": 3811,
       "hidden": 747,
       "unknown": 0,
       "bot": 108
@@ -644,16 +642,16 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 309,
-        "commits_last_12mo": 101,
+        "commits": 312,
+        "commits_last_12mo": 104,
         "addresses": 13,
         "first_commit": "2019-10-31",
-        "last_commit": "2026-10-15"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "api7.ai",
-        "commits": 168,
-        "commits_last_12mo": 144,
+        "commits": 170,
+        "commits_last_12mo": 146,
         "addresses": 3,
         "first_commit": "2021-05-06",
         "last_commit": "2026-10-26"
@@ -725,9 +723,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 13,
+        "organization": 18,
         "one_person": 0,
-        "personal": 8,
+        "personal": 10,
         "hidden": 1,
         "unknown": 0,
         "bot": 0
@@ -737,13 +735,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 600,
+    "commits": 607,
     "authors": 58,
     "new_authors": 36,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 5122,
+    "commits": 5129,
     "commits_by_year": {
       "2019": 753,
       "2020": 858,
@@ -752,7 +750,7 @@
       "2023": 466,
       "2024": 223,
       "2025": 279,
-      "2026": 575
+      "2026": 582
     },
     "active_days": 1691
   },
@@ -765,7 +763,7 @@
     "+0530": 292,
     "+0545": 142,
     "+0700": 1,
-    "+0800": 4425,
+    "+0800": 4432,
     "+0900": 26,
     "+1000": 62,
     "+1100": 1,
@@ -776,7 +774,7 @@
     "-0800": 14
   },
   "source_lines": {
-    "added": 791893,
-    "current": 607650
+    "added": 795520,
+    "current": 611081
   }
 }

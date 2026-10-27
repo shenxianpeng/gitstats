@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:51:03+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:35:17+00:00",
   "name": "Apache Airflow",
   "report_path": "index.html",
   "first_commit": "2014-10-06 21:29:38",
-  "last_commit": "2026-10-26 03:48:35",
+  "last_commit": "2026-10-26 21:12:02",
   "age_days": 4403,
   "active_days": 4025,
-  "total_commits": 42466,
-  "total_authors": 4360,
-  "active_authors_12mo": 905,
-  "commits_last_12mo": 8547,
-  "total_files": 15154,
-  "total_lines": 2952472,
-  "lines_added": 6323618,
-  "lines_removed": 3371146,
+  "total_commits": 42495,
+  "total_authors": 4355,
+  "active_authors_12mo": 909,
+  "commits_last_12mo": 8576,
+  "total_files": 15174,
+  "total_lines": 2966187,
+  "lines_added": 6339403,
+  "lines_removed": 3372840,
   "total_tags": 9812,
   "era": "surge",
   "top_authors": [
     {
       "name": "Jarek Potiuk",
-      "commits": 5196
+      "commits": 5204
     },
     {
       "name": "Kaxil Naik",
@@ -37,11 +37,23 @@
     },
     {
       "name": "Amogh Desai",
-      "commits": 979
+      "commits": 981
     }
   ],
   "author_commits": {
-    "Jarek Potiuk": 5196,
+    "Sean Ghaeli": 45,
+    "Wei Lee": 610,
+    "Jarek Potiuk": 5204,
+    "Dev-iL": 119,
+    "Jens Scheffler": 759,
+    "Vuong Hoang": 2,
+    "Mike Barry": 3,
+    "CA": 8,
+    "Kacper Muda": 241,
+    "Amogh Desai": 981,
+    "Jignesh Jain": 1,
+    "Aboulfoul": 1,
+    "ChickenBenny": 3,
     "Shahar Epstein": 324,
     "Omar Massfih": 1,
     "Andrew Chang": 64,
@@ -59,20 +71,17 @@
     "Parv Goyal": 3,
     "Jed Cunningham": 817,
     "Ramit Kataria": 63,
-    "Sean Ghaeli": 44,
     "Stephen Yang": 1,
     "PoAn Yang": 127,
     "Shivam Rastogi": 38,
     "Jingi Kim": 4,
-    "Kacper Muda": 239,
     "\uae40\ub09c\ud76c": 1,
     "Zhen-Lun (Kevin) Hong": 49,
-    "CA": 6,
     "Rahul Vats": 204,
     "Mohamed Laghdaf Dadda": 1,
     "Jeff(Wei-Hao) Lu": 10,
     "Alejandro Morgante": 20,
-    "Niko Oliveira": 271,
+    "Niko Oliveira": 272,
     "Vincent Hsiao": 27,
     "Andrey Karazhev": 1,
     "Zach": 13,
@@ -81,11 +90,8 @@
     "Pierre Jeambrun": 654,
     "Arthur": 8,
     "Anmol Mishra": 14,
-    "ChickenBenny": 2,
-    "Wei Lee": 603,
     "Himanshu Chawla": 6,
     "Souradeep Biswas": 1,
-    "Jens Scheffler": 758,
     "Anzin Mohammed": 2,
     "Baha Bouali": 11,
     "W. H. Wang": 8,
@@ -100,7 +106,6 @@
     "Ephraim Anierobi": 689,
     "Pankaj Singh": 115,
     "Tom Ron": 2,
-    "Dev-iL": 118,
     "Aaryan Mahajan": 8,
     "Vincent Gromakowski": 3,
     "safaehar": 4,
@@ -210,7 +215,6 @@
     "Sejal Gupta": 4,
     "Guillaume Lostis": 2,
     "HeroCC": 1,
-    "Amogh Desai": 979,
     "Vardhman Gupta": 1,
     "Meghana Gangarapu": 1,
     "Samina": 12,
@@ -372,7 +376,7 @@
     "Digvijay": 1,
     "SreeramaYeshwanthGowd": 2,
     "Bramhanand Lingala": 7,
-    "Daniel": 2,
+    "Daniel": 5,
     "Ei Sandi Aung": 6,
     "Mingjie Zhao": 2,
     "Harjoth Khara": 1,
@@ -884,7 +888,7 @@
     "Gary Hsu": 15,
     "Prakhar Srivastava": 2,
     "Damian Shaw": 10,
-    "Madison Swain-Bowden": 7,
+    "Madison Swain-Bowden": 18,
     "Waldo": 1,
     "queryjin": 1,
     "Jo": 1,
@@ -983,7 +987,7 @@
     "Ian Buss": 9,
     "uti": 1,
     "Anuj Arora": 1,
-    "Bolke de Bruin": 536,
+    "Bolke de Bruin": 539,
     "andwct": 1,
     "Javier Herrer Torres": 2,
     "Marc Lherbette": 1,
@@ -1144,7 +1148,6 @@
     "Sean Rose": 4,
     "Will Yang": 1,
     "Denis Krivenko": 11,
-    "Vuong Hoang": 1,
     "Jason": 13,
     "fuatcakici": 3,
     "Laityned": 1,
@@ -1220,7 +1223,7 @@
     "Adrian Perea": 1,
     "Jonathan Lynch": 1,
     "Amol Saini": 4,
-    "Tom": 2,
+    "Tom": 3,
     "Fedor Kobak": 1,
     "Balthazar Rouberol": 8,
     "Niklas Rousset": 2,
@@ -1388,7 +1391,6 @@
     "Venkat VJ": 1,
     "Doug Guthrie": 1,
     "Eilon Goldberg": 1,
-    "Mike": 2,
     "WS Hoekstra": 2,
     "Gyandeep Singh": 1,
     "Biswamitra Biswas": 1,
@@ -1943,7 +1945,6 @@
     "Jisuk Byun": 1,
     "Sai Pragna Etikyala": 3,
     "Sanjay M": 1,
-    "Daniel Hoherd": 3,
     "Richard Goodman": 2,
     "Sumesh Premraj": 2,
     "Louis Mackie": 3,
@@ -2199,7 +2200,7 @@
     "Dalei Li": 2,
     "jordanjeremy": 2,
     "domagojrazum": 2,
-    "Jacob": 3,
+    "Jacob": 4,
     "Deepu Yadav": 1,
     "Mingshi": 4,
     "Cons Sh": 1,
@@ -3265,7 +3266,6 @@
     "cong-zhu": 2,
     "Louis Simoneau": 1,
     "Tom Augspurger": 1,
-    "Jakub Guzik": 1,
     "Ian Maddox": 1,
     "Todd de Quincey": 1,
     "AurimasGr": 1,
@@ -3322,7 +3322,6 @@
     "Quentin Lemaire": 2,
     "Kousuke Saruta": 5,
     "Ray": 2,
-    "Matthew Bowden": 11,
     "Alexandros Nafas": 1,
     "rconroy293": 1,
     "Manu NALEPA": 1,
@@ -3580,7 +3579,6 @@
     "Christian Gagnon": 1,
     "Fran": 1,
     "Shubham Parekh": 1,
-    "Tomme": 1,
     "Rodrigo Chaparro Plata Hernandez": 1,
     "Bryan Yang": 5,
     "Sid Anand": 216,
@@ -3934,7 +3932,7 @@
     "John Arnold (AZURE)": 6,
     "Sathyaprakash Govindasamy": 1,
     "Sam Sen": 1,
-    "Sergio Di\u0301az Bautista": 1,
+    "Sergio D\u00edaz Bautista": 1,
     "Tamu": 1,
     "charlesverdad": 1,
     "Thomas Buida": 4,
@@ -4039,7 +4037,6 @@
     "Stas": 1,
     "Jas Sohi": 1,
     "jfantom": 1,
-    "root": 3,
     "Matthew Schmoyer": 2,
     "Maria Janczak": 1,
     "Arthur Vigil": 1,
@@ -4230,7 +4227,7 @@
     "Tsuyoshi Ozawa": 2,
     "Eric Stern": 4,
     "sherwian_williamson": 1,
-    "withnale": 1,
+    "withnale": 3,
     "Kevin Lin": 1,
     "luke.maycock": 1,
     "Damien Lejeune": 1,
@@ -4263,7 +4260,6 @@
     "Yuanfei Zhu": 1,
     "johnnason": 1,
     "Matt Pelland": 3,
-    "Paul Rhodes": 2,
     "Angel Gao": 1,
     "Adrian Bridgett": 23,
     "Sean McIntyre": 1,
@@ -4399,8 +4395,7 @@
     "Marc Abramowitz": 1,
     "LDAP/arthur_wiedmer": 1,
     "LDAP/paul_yang": 3,
-    "Krishna Puttaswamy": 22,
-    "Niko": 1
+    "Krishna Puttaswamy": 22
   },
   "commits_by_year": {
     "2014": 214,
@@ -4415,13 +4410,13 @@
     "2023": 4159,
     "2024": 4857,
     "2025": 7583,
-    "2026": 7418
+    "2026": 7447
   },
   "ai_assisted": {
-    "commits": 478,
+    "commits": 488,
     "authored": 0,
     "assistants": {
-      "Claude": 403,
+      "Claude": 413,
       "GitHub Copilot": 55,
       "Cursor": 22,
       "ChatGPT": 3,
@@ -4452,7 +4447,7 @@
       "2026-07": 27,
       "2026-08": 25,
       "2026-09": 83,
-      "2026-10": 156
+      "2026-10": 166
     },
     "commits_by_month": {
       "2024-11": 552,
@@ -4478,17 +4473,17 @@
       "2026-07": 788,
       "2026-08": 614,
       "2026-09": 829,
-      "2026-10": 866
+      "2026-10": 895
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 42466,
+    "commits": 42495,
     "by_kind": {
-      "organization": 8741,
-      "one_person": 8520,
-      "personal": 12052,
-      "hidden": 12407,
+      "organization": 8749,
+      "one_person": 8528,
+      "personal": 12059,
+      "hidden": 12413,
       "unknown": 40,
       "bot": 706
     },
@@ -4497,11 +4492,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 5838,
-        "commits_last_12mo": 673,
+        "commits": 5845,
+        "commits_last_12mo": 680,
         "addresses": 27,
         "first_commit": "2014-10-06",
-        "last_commit": "2026-10-24"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "astronomer.io",
@@ -4521,11 +4516,11 @@
       },
       {
         "organization": "google.com",
-        "commits": 352,
-        "commits_last_12mo": 55,
-        "addresses": 40,
+        "commits": 353,
+        "commits_last_12mo": 56,
+        "addresses": 41,
         "first_commit": "2017-01-26",
-        "last_commit": "2026-10-09"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "airbnb.com",
@@ -5242,10 +5237,10 @@
         "bot": 158
       },
       "2026-Q4": {
-        "organization": 253,
-        "one_person": 119,
-        "personal": 169,
-        "hidden": 270,
+        "organization": 261,
+        "one_person": 127,
+        "personal": 176,
+        "hidden": 276,
         "unknown": 0,
         "bot": 55
       }
@@ -5254,13 +5249,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 8071,
-    "authors": 897,
-    "new_authors": 699,
+    "commits": 8100,
+    "authors": 901,
+    "new_authors": 701,
     "half_of_commits": 21
   },
   "humans": {
-    "commits": 41760,
+    "commits": 41789,
     "commits_by_year": {
       "2014": 214,
       "2015": 2084,
@@ -5274,25 +5269,25 @@
       "2023": 4146,
       "2024": 4829,
       "2025": 7415,
-      "2026": 6956
+      "2026": 6985
     },
     "active_days": 4025
   },
   "timezones": {
     "+0000": 2506,
-    "+0100": 9002,
-    "+0200": 8324,
+    "+0100": 9014,
+    "+0200": 8325,
     "+0300": 1497,
     "+0330": 22,
     "+0400": 553,
     "+0430": 9,
     "+0500": 39,
-    "+0530": 3929,
+    "+0530": 3931,
     "+0545": 124,
     "+0600": 17,
     "+0630": 9,
-    "+0700": 127,
-    "+0800": 3380,
+    "+0700": 128,
+    "+0800": 3390,
     "+0900": 1115,
     "+1000": 154,
     "+1100": 55,
@@ -5301,15 +5296,15 @@
     "-0100": 5,
     "-0200": 8,
     "-0300": 283,
-    "-0400": 2566,
+    "-0400": 2567,
     "-0500": 1705,
     "-0600": 803,
-    "-0700": 4277,
+    "-0700": 4279,
     "-0800": 1930,
     "-1000": 2
   },
   "source_lines": {
-    "added": 5873296,
-    "current": 2842520
+    "added": 5889012,
+    "current": 2856549
   }
 }

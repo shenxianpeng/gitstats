@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Apache Arrow</title>
-	<meta name="description" content="Apache Arrow: 19,445 commits by 1,479 authors, 2014 to 2026. A report made with gitstats.">
+	<meta name="description" content="Apache Arrow: 19,451 commits by 1,473 authors, 2014 to 2026. A report made with gitstats.">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="GitStats">
 	<meta property="og:title" content="Apache Arrow">
-	<meta property="og:description" content="Apache Arrow: 19,445 commits by 1,479 authors, 2014 to 2026. A report made with gitstats.">
+	<meta property="og:description" content="Apache Arrow: 19,451 commits by 1,473 authors, 2014 to 2026. A report made with gitstats.">
 	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/arrow/">
 	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/arrow/share-card.png">
 	<meta property="og:image:width" content="1200">
@@ -16,12 +16,12 @@
 	<meta property="og:image:alt" content="Apache Arrow">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="Apache Arrow">
-	<meta name="twitter:description" content="Apache Arrow: 19,445 commits by 1,479 authors, 2014 to 2026. A report made with gitstats.">
+	<meta name="twitter:description" content="Apache Arrow: 19,451 commits by 1,473 authors, 2014 to 2026. A report made with gitstats.">
 	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/arrow/share-card.png">
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.12.0.post1.dev1">
+	<meta name="generator" content="GitStats 2.12.1">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -339,10 +339,18 @@
 	// boundaries, so gaps in history take up the space they really span;
 	// only a gap handed in as `gap` is cut short (see squeezeTime).
 	function timeAxis(xs, gap) {
+		var min = xs.length ? squeezeTime(gap, xs[0]) : undefined;
+		var max = xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined;
+		// one point in time (a single commit) has no width: give it a month
+		// around it, or the point has no place on the axis and is not drawn
+		if (xs.length && min === max) {
+			min -= 15 * 864e5;
+			max += 15 * 864e5;
+		}
 		return {
 			type: 'linear',
-			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
-			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			min: min,
+			max: max,
 			afterBuildTicks: function(scale) {
 				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
 				const from = new Date(first), to = new Date(last);
@@ -380,7 +388,7 @@
 <body>
 
             <div class="nav">
-            <a href="index.html" class="nav-brand">GitStats</a>
+            <a href="../index.html" class="nav-brand nav-up">&larr; GitStats Gallery</a>
             <ul>
             <li><a href="index.html" class="active" aria-current="page">General</a></li>
             <li><a href="activity.html">Activity</a></li>
@@ -399,10 +407,10 @@
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Apache Arrow</h1><p class="page-meta">2014-06-03 &rarr; 2026-10-26 &middot; generated 2026-10-26 03:50:29 in 9 s &middot; gitstats 2.12.0.post1.dev1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><!-- gitstats:insights --><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">19,445</dd><dd class="stat-note"><span class="nowrap">5.8 per active day</span>&nbsp;&middot; <span class="nowrap">4.3 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">1,479</dd><dd class="stat-note">13.1 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">1,463,991</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+4,605,614</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−3,141,623</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">5,327</dd><dd class="stat-note">86 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">3,380</dd><dd class="stat-note"><span class="nowrap">of 4,528 days</span>&nbsp;&middot; <span class="nowrap">74.6%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">138 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
+            <h1>Apache Arrow</h1><p class="page-meta">2014-06-03 &rarr; 2026-10-26 &middot; generated 2026-10-27 01:34:48 in 11 s &middot; gitstats 2.12.1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><!-- gitstats:insights --><p class="more-link" id="how-it-compares"><a href="compare.html">How Apache Arrow compares with the 106 other projects of GitStats Gallery &rarr;</a></p><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">19,451</dd><dd class="stat-note"><span class="nowrap">5.8 per active day</span>&nbsp;&middot; <span class="nowrap">4.3 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">1,473</dd><dd class="stat-note">13.2 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">1,463,717</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+4,605,842</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−3,141,982</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">5,327</dd><dd class="stat-note">86 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">3,380</dd><dd class="stat-note"><span class="nowrap">of 4,529 days</span>&nbsp;&middot; <span class="nowrap">74.6%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">138 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
 <h2 id="commits_per_year"><a href="#commits_per_year">Commits per year</a></h2>
 
-<div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly"></canvas></div>
+<div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly" role="img" aria-label="Bar chart of commits per year, 2014 to 2026"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-overview-yearly').getContext('2d');
@@ -413,7 +421,7 @@
     type: 'bar',
     data: {
       labels: labels,
-      datasets: [{"label": "Commits", "data": [1, 1, 405, 1246, 1610, 2403, 2540, 2430, 2257, 2227, 1938, 1285, 1102], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+      datasets: [{"label": "Commits", "data": [1, 1, 405, 1246, 1610, 2403, 2540, 2430, 2257, 2227, 1938, 1285, 1108], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
     },
     options: {
       responsive: true,
@@ -422,7 +430,7 @@
         legend: { display: false }
       },
       scales: {
-        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
+        x: { ticks: { maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } },
         y: { beginAtZero: true, ticks: { precision: 0 } }
       }
     }
@@ -432,7 +440,7 @@
 <p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p><div class="two-columns"><section>
 <h2 id="top_contributors"><a href="#top_contributors">Top contributors</a></h2>
 
-<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>Sutou Kouhei</td><td class="num">1,970</td><td class="num">10.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>Antoine Pitrou</td><td class="num">1,403</td><td class="num">7.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 71.2%"></span></span></td></tr><tr><td>Wes McKinney</td><td class="num">1,320</td><td class="num">6.8%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 67.0%"></span></span></td></tr><tr><td>Krisztián Szűcs</td><td class="num">616</td><td class="num">3.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 31.3%"></span></span></td></tr><tr><td>dependabot <span class="badge" title="dependabot[bot]">bot</span></td><td class="num">563</td><td class="num">2.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 28.6%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 1,479 authors &rarr;</a></p></section><section>
+<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>Sutou Kouhei</td><td class="num">1,972</td><td class="num">10.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>Antoine Pitrou</td><td class="num">1,403</td><td class="num">7.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 71.1%"></span></span></td></tr><tr><td>Wes McKinney</td><td class="num">1,320</td><td class="num">6.8%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 66.9%"></span></span></td></tr><tr><td>Krisztián Szűcs</td><td class="num">616</td><td class="num">3.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 31.2%"></span></span></td></tr><tr><td>dependabot <span class="badge" title="dependabot[bot]">bot</span></td><td class="num">563</td><td class="num">2.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 28.5%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 1,473 authors &rarr;</a></p></section><section>
 <h2 id="latest_releases"><a href="#latest_releases">Latest releases</a></h2>
 
 <div class="table-scroll"><table class="share-table"><tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr><tr><td class="nowrap">apache-arrow-27.0.0.dev</td><td class="nowrap">2026-10-13</td><td class="num">374</td><td>Hiroyuki Sato, Nic Crane +112</td></tr><tr><td class="nowrap">apache-arrow-26.0.0.dev</td><td class="nowrap">2026-07-10</td><td class="num">272</td><td>Raúl Cumplido, Antoine Pitrou +66</td></tr><tr><td class="nowrap">apache-arrow-25.0.0.dev</td><td class="nowrap">2026-04-21</td><td class="num">329</td><td>Sutou Kouhei, Raúl Cumplido +56</td></tr><tr><td class="nowrap">apache-arrow-24.0.0.dev</td><td class="nowrap">2026-01-18</td><td class="num">376</td><td>Hyukjin Kwon, Sutou Kouhei +64</td></tr><tr><td class="nowrap">apache-arrow-23.0.0.dev</td><td class="nowrap">2025-10-24</td><td class="num">249</td><td>Sutou Kouhei, Raúl Cumplido +56</td></tr></table></div><p class="more-link"><a href="tags.html">All 49 tags &rarr;</a></p></section></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How Apache Arrow compares with other Apache projects &rarr;</a></p><p class="more-link"><a href="../ecosystems/apache.html">How Apache Arrow ranks among Apache projects by AI-assisted commits &rarr;</a></p><h2>Badge for your README</h2><p class="section-note">The share of the last 12 months&rsquo; commits that name an AI coding assistant, a lower bound, updated every week with this report.</p><div class="badge-list"><div class="badge-row"><div class="badge-info"><img src="badges/ai-assisted.svg" alt="AI-assisted commits"></div><pre class="badge-code">[![AI-assisted commits: Apache Arrow](https://shenxianpeng.dev/gitstats/gallery/arrow/badges/ai-assisted.svg)](https://shenxianpeng.dev/gitstats/gallery/arrow/)</pre><button type="button" class="badge-copy" aria-label="Copy the Markdown of the badge"><span>Copy</span></button></div></div><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml

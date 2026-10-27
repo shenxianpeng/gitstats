@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:51:57+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:36:43+00:00",
   "name": "React",
   "report_path": "index.html",
   "first_commit": "2013-05-28 17:04:45",
-  "last_commit": "2026-10-23 15:00:24",
-  "age_days": 4896,
-  "active_days": 3811,
-  "total_commits": 21740,
-  "total_authors": 1939,
+  "last_commit": "2026-10-26 11:40:42",
+  "age_days": 4899,
+  "active_days": 3812,
+  "total_commits": 21743,
+  "total_authors": 1936,
   "active_authors_12mo": 100,
-  "commits_last_12mo": 609,
-  "total_files": 7268,
-  "total_lines": 1174355,
-  "lines_added": 3044593,
-  "lines_removed": 1870238,
+  "commits_last_12mo": 612,
+  "total_files": 7282,
+  "total_lines": 1172205,
+  "lines_added": 3045370,
+  "lines_removed": 1870246,
   "total_tags": 73,
   "era": "quiet",
   "top_authors": [
@@ -32,8 +32,8 @@
       "commits": 1736
     },
     {
-      "name": "Dan Abramov",
-      "commits": 1638
+      "name": "dan",
+      "commits": 1688
     },
     {
       "name": "Andrew Clark",
@@ -41,9 +41,9 @@
     }
   ],
   "author_commits": {
-    "Gourav Kumar Dhiman": 1,
-    "The number one sword cultivator in the south of the sky": 3,
-    "Cheng": 2,
+    "Cheng": 3,
+    "The number one sword cultivator in the south of the sky": 4,
+    "Gourav Kumar Dhiman": 2,
     "Sebastian \"Sebbie\" Silbermann": 478,
     "Hendrik Liebau": 69,
     "Josh Story": 260,
@@ -79,7 +79,7 @@
     "Jack Pope": 146,
     "Joey Arhar": 4,
     "Leo": 4,
-    "dan": 50,
+    "dan": 1688,
     "ronnakamoto": 1,
     "BIKI DAS": 20,
     "Minh Vu": 6,
@@ -102,7 +102,7 @@
     "Ulises Jeremias": 1,
     "Michael Hart": 1,
     "Sam Zhou": 9,
-    "Joseph Savona": 219,
+    "Joseph Savona": 1165,
     "Janka Uryga": 4,
     "zxuhan7": 1,
     "petertdinh": 1,
@@ -172,7 +172,6 @@
     "Niklas Mollenhauer": 9,
     "YongSeok Jang (\uc7a5\uc6a9\uc11d)": 1,
     "Stephen Zhou": 1,
-    "Joe Savona": 946,
     "Jorge (Hezi) Cohen": 1,
     "Piotr Tomczewski": 2,
     "Jordan Eldredge": 2,
@@ -362,7 +361,6 @@
     "Billy Janitsch": 3,
     "sunderls": 2,
     "Afzal Sayed": 1,
-    "Dan Abramov": 1638,
     "zhoulixiang": 2,
     "Zhongjan": 1,
     "Stephen Cyron": 1,
@@ -608,7 +606,7 @@
     "Rane Wallin": 1,
     "Rango Yuan": 1,
     "David Huang": 2,
-    "Jessica Franco": 2,
+    "Jessica Franco": 6,
     "halvves": 1,
     "Kuba Juszczyk": 1,
     "Pavlo Tymchuk": 1,
@@ -679,7 +677,6 @@
     "Matt Thomson": 1,
     "Michael Orishich": 1,
     "Josh R": 1,
-    "Jessica": 4,
     "overlookmotel": 1,
     "Rodrigo Ribeiro": 1,
     "Alexey Raspopov": 7,
@@ -1995,13 +1992,13 @@
     "2023": 1955,
     "2024": 2173,
     "2025": 1434,
-    "2026": 489
+    "2026": 492
   },
   "ai_assisted": {
-    "commits": 37,
+    "commits": 38,
     "authored": 0,
     "assistants": {
-      "Claude": 34,
+      "Claude": 35,
       "Cursor": 3,
       "Amp": 1
     },
@@ -2029,7 +2026,7 @@
       "2026-07": 14,
       "2026-08": 13,
       "2026-09": 5,
-      "2026-10": 3
+      "2026-10": 4
     },
     "commits_by_month": {
       "2024-11": 88,
@@ -2055,16 +2052,16 @@
       "2026-07": 69,
       "2026-08": 45,
       "2026-09": 48,
-      "2026-10": 31
+      "2026-10": 34
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 21740,
+    "commits": 21743,
     "by_kind": {
       "organization": 4451,
       "one_person": 7603,
-      "personal": 7339,
+      "personal": 7342,
       "hidden": 2242,
       "unknown": 7,
       "bot": 98
@@ -2237,7 +2234,7 @@
       "2026-Q4": {
         "organization": 4,
         "one_person": 9,
-        "personal": 15,
+        "personal": 18,
         "hidden": 3,
         "unknown": 0,
         "bot": 0
@@ -2247,13 +2244,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 605,
+    "commits": 608,
     "authors": 99,
     "new_authors": 65,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 21642,
+    "commits": 21645,
     "commits_by_year": {
       "2013": 1412,
       "2014": 1946,
@@ -2268,9 +2265,9 @@
       "2023": 1938,
       "2024": 2146,
       "2025": 1432,
-      "2026": 485
+      "2026": 488
     },
-    "active_days": 3811
+    "active_days": 3812
   },
   "timezones": {
     "+0000": 1287,
@@ -2281,11 +2278,11 @@
     "+0400": 39,
     "+0430": 11,
     "+0500": 23,
-    "+0530": 172,
+    "+0530": 173,
     "+0545": 3,
     "+0600": 3,
     "+0700": 14,
-    "+0800": 315,
+    "+0800": 317,
     "+0900": 406,
     "+0930": 1,
     "+1000": 42,
@@ -2303,7 +2300,7 @@
     "-1100": 1
   },
   "source_lines": {
-    "added": 2287298,
-    "current": 798382
+    "added": 2290199,
+    "current": 798679
   }
 }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:49:46+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:33:48+00:00",
   "name": "Flux",
   "report_path": "index.html",
   "first_commit": "2020-04-24 09:38:22",
-  "last_commit": "2026-10-25 09:05:49",
-  "age_days": 2375,
-  "active_days": 1050,
-  "total_commits": 4118,
-  "total_authors": 226,
+  "last_commit": "2026-10-26 14:20:36",
+  "age_days": 2377,
+  "active_days": 1051,
+  "total_commits": 4123,
+  "total_authors": 224,
   "active_authors_12mo": 49,
-  "commits_last_12mo": 388,
-  "total_files": 837,
-  "total_lines": 72383,
-  "lines_added": 154604,
-  "lines_removed": 82221,
-  "total_tags": 184,
+  "commits_last_12mo": 393,
+  "total_files": 835,
+  "total_lines": 72485,
+  "lines_added": 154859,
+  "lines_removed": 82330,
+  "total_tags": 185,
   "era": "steady",
   "top_authors": [
     {
       "name": "Stefan Prodan",
-      "commits": 1889
+      "commits": 1892
     },
     {
       "name": "Hidde Beydals",
@@ -29,11 +29,11 @@
     },
     {
       "name": "Matheus Pimenta",
-      "commits": 243
+      "commits": 244
     },
     {
       "name": "fluxcdbot",
-      "commits": 190
+      "commits": 191
     },
     {
       "name": "Somtochi Onyekwere",
@@ -41,9 +41,9 @@
     }
   ],
   "author_commits": {
-    "Stefan Prodan": 1889,
-    "Matheus Pimenta": 243,
-    "fluxcdbot": 190,
+    "Stefan Prodan": 1892,
+    "Matheus Pimenta": 244,
+    "fluxcdbot": 191,
     "NUAAwqy": 1,
     "rycli": 6,
     "sai pranav": 1,
@@ -113,7 +113,6 @@
     "laiminhtrung1997": 1,
     "Awar Abdulkarim": 1,
     "Yvan": 1,
-    "Soule BA": 33,
     "Sjors Holtrop": 4,
     "Scott Rigby": 6,
     "Sunny": 45,
@@ -126,7 +125,7 @@
     "Max Tantow": 1,
     "harshitasao": 2,
     "Viktor Nagy": 1,
-    "souleb": 4,
+    "souleb": 37,
     "Sanskar Jaiswal": 36,
     "avoidalone": 1,
     "frekw": 1,
@@ -149,7 +148,7 @@
     "Ilya Dmitrichenko": 2,
     "Gergely Brautigam": 2,
     "Son Bui": 2,
-    "Ste\u0301phane Este-Gracias": 2,
+    "St\u00e9phane Este-Gracias": 2,
     "Marcus Weiner": 1,
     "Katsunori Tanaka": 1,
     "Horacio Granillo": 1,
@@ -249,7 +248,7 @@
     "Jose Javier Se\u00f1aris": 1,
     "Terdunov Vyacheslav": 1,
     "Alexei Ledenev": 1,
-    "Le\u0301opold Jacquot": 1,
+    "L\u00e9opold Jacquot": 2,
     "Sylvain Rabot": 2,
     "Viktor Farcic": 1,
     "George Tseres": 2,
@@ -257,7 +256,6 @@
     "Sebastian Karasek": 1,
     "nguyenductoan": 1,
     "Daniel Morgan": 1,
-    "L\u00e9opold Jacquot": 1,
     "\u201cAnton": 7,
     "Sora Morimoto": 1,
     "Nanik": 1,
@@ -275,7 +273,7 @@
     "2023": 652,
     "2024": 242,
     "2025": 325,
-    "2026": 365
+    "2026": 370
   },
   "ai_assisted": {
     "commits": 25,
@@ -338,17 +336,17 @@
       "2026-07": 36,
       "2026-08": 11,
       "2026-09": 17,
-      "2026-10": 106
+      "2026-10": 111
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 4118,
+    "commits": 4123,
     "by_kind": {
       "organization": 243,
       "one_person": 517,
-      "personal": 2556,
-      "hidden": 659,
+      "personal": 2560,
+      "hidden": 660,
       "unknown": 0,
       "bot": 143
     },
@@ -464,8 +462,8 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 3,
-        "personal": 96,
-        "hidden": 6,
+        "personal": 100,
+        "hidden": 7,
         "unknown": 0,
         "bot": 1
       }
@@ -474,13 +472,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 381,
+    "commits": 386,
     "authors": 49,
     "new_authors": 41,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 3975,
+    "commits": 3980,
     "commits_by_year": {
       "2020": 891,
       "2021": 1016,
@@ -488,14 +486,14 @@
       "2023": 560,
       "2024": 222,
       "2025": 317,
-      "2026": 358
+      "2026": 363
     },
-    "active_days": 1044
+    "active_days": 1045
   },
   "timezones": {
-    "+0000": 569,
-    "+0100": 789,
-    "+0200": 1231,
+    "+0000": 571,
+    "+0100": 790,
+    "+0200": 1233,
     "+0300": 1235,
     "+0330": 1,
     "+0400": 2,
@@ -515,7 +513,7 @@
     "-0800": 19
   },
   "source_lines": {
-    "added": 136910,
-    "current": 63667
+    "added": 137157,
+    "current": 63823
   }
 }

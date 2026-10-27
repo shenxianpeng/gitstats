@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:57:26+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:41:39+00:00",
   "name": "PostgreSQL",
   "report_path": "index.html",
   "first_commit": "1996-07-09 06:22:35",
-  "last_commit": "2026-10-26 02:32:04",
-  "age_days": 11066,
+  "last_commit": "2026-10-26 22:11:21",
+  "age_days": 11067,
   "active_days": 10257,
-  "total_commits": 65743,
+  "total_commits": 65753,
   "total_authors": 58,
   "active_authors_12mo": 30,
-  "commits_last_12mo": 3284,
+  "commits_last_12mo": 3294,
   "total_files": 7723,
-  "total_lines": 4390619,
-  "lines_added": 13932111,
-  "lines_removed": 9541492,
+  "total_lines": 4389979,
+  "lines_added": 13932283,
+  "lines_removed": 9541508,
   "total_tags": 103,
   "era": "steady",
   "top_authors": [
     {
       "name": "Tom Lane",
-      "commits": 16928
+      "commits": 16931
     },
     {
       "name": "Bruce Momjian",
@@ -29,11 +29,11 @@
     },
     {
       "name": "Peter Eisentraut",
-      "commits": 6616
+      "commits": 6617
     },
     {
       "name": "Michael Paquier",
-      "commits": 2657
+      "commits": 2658
     },
     {
       "name": "Robert Haas",
@@ -41,21 +41,21 @@
     }
   ],
   "author_commits": {
+    "Jeff Davis": 441,
+    "Tom Lane": 16931,
+    "Daniel Gustafsson": 544,
+    "Peter Geoghegan": 541,
+    "Peter Eisentraut": 6617,
+    "Michael Paquier": 2658,
     "Richard Guo": 174,
-    "Michael Paquier": 2657,
-    "Daniel Gustafsson": 541,
-    "Tom Lane": 16928,
-    "Peter Eisentraut": 6616,
     "\u00c1lvaro Herrera": 2233,
     "Amit Langote": 156,
     "Fujii Masao": 861,
     "Amit Kapila": 728,
     "Masahiko Sawada": 202,
-    "Jeff Davis": 440,
     "David Rowley": 620,
     "Noah Misch": 559,
     "John Naylor": 205,
-    "Peter Geoghegan": 540,
     "Robert Haas": 2634,
     "Heikki Linnakangas": 1948,
     "Bruce Momjian": 14115,
@@ -131,7 +131,7 @@
     "2023": 2209,
     "2024": 2722,
     "2025": 2816,
-    "2026": 2764
+    "2026": 2774
   },
   "ai_assisted": {
     "commits": 0,
@@ -187,15 +187,15 @@
       "2026-07": 307,
       "2026-08": 317,
       "2026-09": 282,
-      "2026-10": 234
+      "2026-10": 244
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 65743,
+    "commits": 65753,
     "by_kind": {
-      "organization": 10278,
-      "one_person": 48260,
+      "organization": 10282,
+      "one_person": 48266,
       "personal": 7205,
       "hidden": 0,
       "unknown": 0,
@@ -206,8 +206,8 @@
     "top": [
       {
         "organization": "postgresql.org",
-        "commits": 10278,
-        "commits_last_12mo": 1404,
+        "commits": 10282,
+        "commits_last_12mo": 1408,
         "addresses": 21,
         "first_commit": "1998-01-15",
         "last_commit": "2026-10-26"
@@ -271,8 +271,8 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 115,
-        "one_person": 106,
+        "organization": 119,
+        "one_person": 112,
         "personal": 13,
         "hidden": 0,
         "unknown": 0,
@@ -283,13 +283,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3284,
+    "commits": 3294,
     "authors": 30,
     "new_authors": 0,
     "half_of_commits": 6
   },
   "humans": {
-    "commits": 65743,
+    "commits": 65753,
     "commits_by_year": {
       "1996": 876,
       "1997": 1698,
@@ -321,20 +321,20 @@
       "2023": 2209,
       "2024": 2722,
       "2025": 2816,
-      "2026": 2764
+      "2026": 2774
     },
     "active_days": 10257
   },
   "timezones": {
     "+0000": 30856,
-    "+0100": 2410,
+    "+0100": 2414,
     "+0200": 3854,
     "+0300": 1797,
     "+0400": 3,
     "+0530": 709,
     "+0700": 177,
     "+0800": 6,
-    "+0900": 4142,
+    "+0900": 4143,
     "+0930": 2,
     "+1030": 10,
     "+1100": 8,
@@ -342,14 +342,14 @@
     "+1300": 634,
     "-0200": 2,
     "-0300": 937,
-    "-0400": 10909,
+    "-0400": 10913,
     "-0500": 5832,
     "-0600": 158,
-    "-0700": 1884,
+    "-0700": 1885,
     "-0800": 788
   },
   "source_lines": {
-    "added": 13082796,
-    "current": 4187765
+    "added": 13082968,
+    "current": 4187921
   }
 }

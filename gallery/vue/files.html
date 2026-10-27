@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Vue</title>
-	<meta name="description" content="Vue: 7,235 commits by 646 authors, 2018 to 2026. A report made with gitstats.">
+	<meta name="description" content="Vue: 7,235 commits by 645 authors, 2018 to 2026. A report made with gitstats.">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="GitStats">
 	<meta property="og:title" content="Vue: Files">
-	<meta property="og:description" content="Vue: 7,235 commits by 646 authors, 2018 to 2026. A report made with gitstats.">
+	<meta property="og:description" content="Vue: 7,235 commits by 645 authors, 2018 to 2026. A report made with gitstats.">
 	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/vue/files.html">
 	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/vue/share-card.png">
 	<meta property="og:image:width" content="1200">
@@ -16,12 +16,12 @@
 	<meta property="og:image:alt" content="Vue: Files">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="Vue: Files">
-	<meta name="twitter:description" content="Vue: 7,235 commits by 646 authors, 2018 to 2026. A report made with gitstats.">
+	<meta name="twitter:description" content="Vue: 7,235 commits by 645 authors, 2018 to 2026. A report made with gitstats.">
 	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/vue/share-card.png">
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.12.0.post1.dev1">
+	<meta name="generator" content="GitStats 2.12.1">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -339,10 +339,18 @@
 	// boundaries, so gaps in history take up the space they really span;
 	// only a gap handed in as `gap` is cut short (see squeezeTime).
 	function timeAxis(xs, gap) {
+		var min = xs.length ? squeezeTime(gap, xs[0]) : undefined;
+		var max = xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined;
+		// one point in time (a single commit) has no width: give it a month
+		// around it, or the point has no place on the axis and is not drawn
+		if (xs.length && min === max) {
+			min -= 15 * 864e5;
+			max += 15 * 864e5;
+		}
 		return {
 			type: 'linear',
-			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
-			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			min: min,
+			max: max,
 			afterBuildTicks: function(scale) {
 				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
 				const from = new Date(first), to = new Date(last);
@@ -380,7 +388,7 @@
 <body>
 
             <div class="nav">
-            <a href="index.html" class="nav-brand">GitStats</a>
+            <a href="../index.html" class="nav-brand nav-up">&larr; GitStats Gallery</a>
             <ul>
             <li><a href="index.html">General</a></li>
             <li><a href="activity.html">Activity</a></li>
@@ -402,7 +410,7 @@
             <h1>Files</h1><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Files</dt><dd class="stat-value">703</dd><dd class="stat-note">19 extensions</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">196,722</dd><dd class="stat-note">280 per file</dd></div><div class="stat-tile"><dt>Average File Size</dt><dd class="stat-value">9.0 KB</dd><dd class="stat-note">6.2 MB in total</dd></div></dl>
 <h2 id="file_count_by_date"><a href="#file_count_by_date">File count by date</a></h2>
 
-<div class="chart-box" style="--chart-ratio: 3"><canvas id="chart-files-by-date"></canvas></div>
+<div class="chart-box" style="--chart-ratio: 3"><canvas id="chart-files-by-date" role="img" aria-label="Line chart of the number of files over time, 2018-09-19 to 2026-10-26"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-files-by-date').getContext('2d');

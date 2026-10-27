@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:50:02+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:34:31+00:00",
   "name": "TiKV",
   "report_path": "index.html",
   "first_commit": "2016-01-07 05:02:04",
-  "last_commit": "2026-10-23 21:37:29",
-  "age_days": 3943,
-  "active_days": 2600,
-  "total_commits": 8536,
-  "total_authors": 474,
-  "active_authors_12mo": 66,
-  "commits_last_12mo": 217,
+  "last_commit": "2026-10-26 13:10:02",
+  "age_days": 3946,
+  "active_days": 2601,
+  "total_commits": 8538,
+  "total_authors": 473,
+  "active_authors_12mo": 67,
+  "commits_last_12mo": 219,
   "total_files": 1552,
-  "total_lines": 850722,
-  "lines_added": 1601649,
-  "lines_removed": 750927,
+  "total_lines": 850740,
+  "lines_added": 1601782,
+  "lines_removed": 751036,
   "total_tags": 47,
   "era": "quiet",
   "top_authors": [
@@ -41,10 +41,11 @@
     }
   ],
   "author_commits": {
+    "YangKeao": 28,
+    "lucasliang": 120,
     "mittalrishabh": 13,
     "Vlad Dmitriev": 5,
     "Sanket Kedia": 2,
-    "lucasliang": 119,
     "ris": 7,
     "Dongpo Liu": 10,
     "expxiaoli": 1,
@@ -119,7 +120,6 @@
     "Hangjie Mo": 9,
     "DogDu": 2,
     "tongjian": 48,
-    "YangKeao": 27,
     "hongyunyan": 3,
     "Zequan": 4,
     "Calvin Neo": 26,
@@ -362,7 +362,7 @@
     "Yixuan Zhao": 2,
     "xinhua5": 1,
     "Steven": 1,
-    "Ana Hobden": 45,
+    "Ana Hobden": 51,
     "Ben Ye": 1,
     "KaiYu Feng": 1,
     "mooncake": 1,
@@ -513,8 +513,7 @@
     "Jonathan Boulle": 1,
     "Guanqun Lu": 1,
     "ngaut": 141,
-    "LeeJay": 4,
-    "A. Hobden": 6
+    "LeeJay": 4
   },
   "commits_by_year": {
     "2016": 1887,
@@ -527,7 +526,7 @@
     "2023": 642,
     "2024": 509,
     "2025": 253,
-    "2026": 185
+    "2026": 187
   },
   "ai_assisted": {
     "commits": 4,
@@ -586,16 +585,16 @@
       "2026-07": 21,
       "2026-08": 35,
       "2026-09": 12,
-      "2026-10": 10
+      "2026-10": 12
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8536,
+    "commits": 8538,
     "by_kind": {
       "organization": 1003,
-      "one_person": 747,
-      "personal": 5326,
+      "one_person": 748,
+      "personal": 5327,
       "hidden": 1408,
       "unknown": 4,
       "bot": 48
@@ -695,8 +694,8 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 0,
-        "personal": 9,
+        "one_person": 1,
+        "personal": 10,
         "hidden": 1,
         "unknown": 0,
         "bot": 0
@@ -706,13 +705,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 217,
-    "authors": 66,
+    "commits": 219,
+    "authors": 67,
     "new_authors": 29,
     "half_of_commits": 11
   },
   "humans": {
-    "commits": 8488,
+    "commits": 8490,
     "commits_by_year": {
       "2016": 1887,
       "2017": 703,
@@ -724,9 +723,9 @@
       "2023": 642,
       "2024": 501,
       "2025": 247,
-      "2026": 178
+      "2026": 180
     },
-    "active_days": 2591
+    "active_days": 2592
   },
   "timezones": {
     "+0000": 9,
@@ -735,7 +734,7 @@
     "+0300": 5,
     "+0530": 26,
     "+0700": 4,
-    "+0800": 7676,
+    "+0800": 7678,
     "+0900": 26,
     "+1000": 1,
     "+1200": 27,
@@ -748,7 +747,7 @@
     "-0800": 102
   },
   "source_lines": {
-    "added": 1585894,
-    "current": 838855
+    "added": 1585921,
+    "current": 838879
   }
 }

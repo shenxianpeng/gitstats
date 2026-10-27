@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:45:26+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:29:00+00:00",
   "name": "scikit-learn",
   "report_path": "index.html",
   "first_commit": "2010-01-05 13:26:32",
-  "last_commit": "2026-10-25 14:38:19",
-  "age_days": 6138,
-  "active_days": 5128,
-  "total_commits": 34087,
-  "total_authors": 3371,
-  "active_authors_12mo": 192,
-  "commits_last_12mo": 990,
-  "total_files": 1859,
-  "total_lines": 576867,
-  "lines_added": 2934262,
-  "lines_removed": 2357395,
+  "last_commit": "2026-10-26 14:13:29",
+  "age_days": 6139,
+  "active_days": 5129,
+  "total_commits": 34093,
+  "total_authors": 3369,
+  "active_authors_12mo": 193,
+  "commits_last_12mo": 996,
+  "total_files": 1860,
+  "total_lines": 577161,
+  "lines_added": 2934367,
+  "lines_removed": 2357456,
   "total_tags": 25,
   "era": "steady",
   "top_authors": [
@@ -41,16 +41,17 @@
     }
   ],
   "author_commits": {
+    "Michelle": 1,
+    "Arthur Lacote": 56,
+    "scikit-learn-bot": 533,
+    "Loic Esteve": 654,
     "Yuvraj Chirag": 1,
     "Mohd Maaz Khan": 2,
-    "Arthur Lacote": 55,
     "Virgil Chan": 24,
-    "Loic Esteve": 653,
     "Fran\u00e7ois Paugam": 45,
     "Erwan Le Pennec": 1,
     "Christian Lorentzen": 284,
     "Copilot": 3,
-    "scikit-learn-bot": 530,
     "Sanjay": 1,
     "Adam Li": 35,
     "Stefanie Senger": 130,
@@ -310,7 +311,7 @@
     "kryggird": 1,
     "Lakshmi Krishnan": 2,
     "Luis": 1,
-    "Hleb Levitski": 15,
+    "Hleb Levitski": 16,
     "Shashank S": 1,
     "NotAceNinja": 1,
     "Marek Pokropi\u0144ski": 1,
@@ -806,7 +807,7 @@
     "Joey Ortiz": 2,
     "futurewarning": 1,
     "Dominic Fox": 1,
-    "Marc Torrellas Socastro": 1,
+    "Marc Torrellas Socastro": 4,
     "precondition": 1,
     "Nishu Choudhary": 2,
     "Shiva chauhan": 4,
@@ -1035,7 +1036,7 @@
     "Gl\u00f2ria Maci\u00e0 Mu\u00f1oz": 4,
     "Paulo Sergio  Soares": 2,
     "aman kumar": 1,
-    "Iglesys": 2,
+    "Iglesys": 5,
     "Varun Jain": 1,
     "Tyler Egashira": 1,
     "Aravindh R": 2,
@@ -1167,7 +1168,6 @@
     "sakinaOuisrani": 2,
     "Fatima GASMI": 1,
     "Brenden Kadota": 3,
-    "Gauthier I": 3,
     "poloso": 1,
     "Matteo Francia": 1,
     "Gabor Berei": 1,
@@ -1958,7 +1958,6 @@
     "DatenBergwerk": 1,
     "veerlosar": 3,
     "federicopisanu": 1,
-    "Marc Torrellas": 3,
     "Danna Naser": 1,
     "Jesper Dramsch": 2,
     "Paolo Toccaceli": 1,
@@ -3125,7 +3124,7 @@
     "sethdandridge": 1,
     "Paolo Puggioni": 1,
     "gpassino": 1,
-    "Javier Lo\u0301pez Pen\u0303a": 3,
+    "Javier L\u00f3pez Pe\u00f1a": 3,
     "Thomas Delteil": 1,
     "Xinfan Meng": 8,
     "Vjacheslav Murashkin": 1,
@@ -3410,8 +3409,7 @@
     "Kamel Ibn Hassen Derouiche": 1,
     "Ron Weiss": 63,
     "Anne-Laure Fouque": 3,
-    "Matthieu Brucher": 1,
-    "Gleb Levitski": 1
+    "Matthieu Brucher": 1
   },
   "commits_by_year": {
     "2010": 2604,
@@ -3430,7 +3428,7 @@
     "2023": 1349,
     "2024": 1268,
     "2025": 1237,
-    "2026": 822
+    "2026": 828
   },
   "ai_assisted": {
     "commits": 9,
@@ -3490,16 +3488,16 @@
       "2026-07": 96,
       "2026-08": 77,
       "2026-09": 62,
-      "2026-10": 55
+      "2026-10": 61
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 34087,
+    "commits": 34093,
     "by_kind": {
-      "organization": 9442,
+      "organization": 9443,
       "one_person": 8391,
-      "personal": 12807,
+      "personal": 12812,
       "hidden": 3390,
       "unknown": 38,
       "bot": 19
@@ -3525,11 +3523,11 @@
       },
       {
         "organization": "ymail.com",
-        "commits": 655,
-        "commits_last_12mo": 40,
+        "commits": 656,
+        "commits_last_12mo": 41,
         "addresses": 3,
         "first_commit": "2014-07-16",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "nyu.edu",
@@ -4022,9 +4020,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 3,
+        "organization": 4,
         "one_person": 6,
-        "personal": 36,
+        "personal": 41,
         "hidden": 10,
         "unknown": 0,
         "bot": 0
@@ -4034,13 +4032,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 985,
-    "authors": 188,
-    "new_authors": 130,
-    "half_of_commits": 8
+    "commits": 991,
+    "authors": 189,
+    "new_authors": 131,
+    "half_of_commits": 7
   },
   "humans": {
-    "commits": 34068,
+    "commits": 34074,
     "commits_by_year": {
       "2010": 2604,
       "2011": 4913,
@@ -4058,13 +4056,13 @@
       "2023": 1349,
       "2024": 1262,
       "2025": 1230,
-      "2026": 818
+      "2026": 824
     },
-    "active_days": 5128
+    "active_days": 5129
   },
   "timezones": {
     "+0000": 1118,
-    "+0100": 8395,
+    "+0100": 8401,
     "+0200": 11673,
     "+0300": 940,
     "+0330": 24,
@@ -4092,7 +4090,7 @@
     "-1000": 21
   },
   "source_lines": {
-    "added": 3715189,
-    "current": 574031
+    "added": 3715254,
+    "current": 574074
   }
 }

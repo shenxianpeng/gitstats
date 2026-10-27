@@ -21,7 +21,7 @@
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.12.0.post1.dev1">
+	<meta name="generator" content="GitStats 2.12.1">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -339,10 +339,18 @@
 	// boundaries, so gaps in history take up the space they really span;
 	// only a gap handed in as `gap` is cut short (see squeezeTime).
 	function timeAxis(xs, gap) {
+		var min = xs.length ? squeezeTime(gap, xs[0]) : undefined;
+		var max = xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined;
+		// one point in time (a single commit) has no width: give it a month
+		// around it, or the point has no place on the axis and is not drawn
+		if (xs.length && min === max) {
+			min -= 15 * 864e5;
+			max += 15 * 864e5;
+		}
 		return {
 			type: 'linear',
-			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
-			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			min: min,
+			max: max,
 			afterBuildTicks: function(scale) {
 				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
 				const from = new Date(first), to = new Date(last);
@@ -380,7 +388,7 @@
 <body>
 
             <div class="nav">
-            <a href="index.html" class="nav-brand">GitStats</a>
+            <a href="../index.html" class="nav-brand nav-up">&larr; GitStats Gallery</a>
             <ul>
             <li><a href="index.html" class="active" aria-current="page">General</a></li>
             <li><a href="activity.html">Activity</a></li>
@@ -399,10 +407,10 @@
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Tailwind CSS</h1><p class="page-meta">2017-07-20 &rarr; 2026-10-19 &middot; generated 2026-10-26 03:52:12 in 23 s &middot; gitstats 2.12.0.post1.dev1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><!-- gitstats:insights --><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">6,877</dd><dd class="stat-note"><span class="nowrap">4.4 per active day</span>&nbsp;&middot; <span class="nowrap">2.0 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">380</dd><dd class="stat-note">18.1 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">199,730</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+5,231,526</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−5,031,796</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">558</dd><dd class="stat-note">22 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">1,561</dd><dd class="stat-note"><span class="nowrap">of 3,379 days</span>&nbsp;&middot; <span class="nowrap">46.2%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">43 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
+            <h1>Tailwind CSS</h1><p class="page-meta">2017-07-20 &rarr; 2026-10-19 &middot; generated 2026-10-27 01:36:43 in 24 s &middot; gitstats 2.12.1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><!-- gitstats:insights --><p class="more-link" id="how-it-compares"><a href="compare.html">How Tailwind CSS compares with the 106 other projects of GitStats Gallery &rarr;</a></p><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">6,877</dd><dd class="stat-note"><span class="nowrap">4.4 per active day</span>&nbsp;&middot; <span class="nowrap">2.0 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">380</dd><dd class="stat-note">18.1 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">199,730</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+5,231,526</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−5,031,796</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">558</dd><dd class="stat-note">22 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">1,561</dd><dd class="stat-note"><span class="nowrap">of 3,379 days</span>&nbsp;&middot; <span class="nowrap">46.2%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">43 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
 <h2 id="commits_per_year"><a href="#commits_per_year">Commits per year</a></h2>
 
-<div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly"></canvas></div>
+<div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly" role="img" aria-label="Bar chart of commits per year, 2017 to 2026"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-overview-yearly').getContext('2d');
@@ -422,7 +430,7 @@
         legend: { display: false }
       },
       scales: {
-        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
+        x: { ticks: { maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } },
         y: { beginAtZero: true, ticks: { precision: 0 } }
       }
     }

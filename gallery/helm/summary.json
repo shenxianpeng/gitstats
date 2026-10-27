@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:48:47+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:32:48+00:00",
   "name": "Helm",
   "report_path": "index.html",
   "first_commit": "2015-11-02 23:52:56",
-  "last_commit": "2026-10-26 00:19:58",
+  "last_commit": "2026-10-26 22:29:20",
   "age_days": 4011,
   "active_days": 2442,
-  "total_commits": 10020,
-  "total_authors": 950,
-  "active_authors_12mo": 90,
-  "commits_last_12mo": 968,
+  "total_commits": 10024,
+  "total_authors": 947,
+  "active_authors_12mo": 89,
+  "commits_last_12mo": 972,
   "total_files": 2048,
-  "total_lines": 134064,
-  "lines_added": 344905,
-  "lines_removed": 210841,
+  "total_lines": 133911,
+  "lines_added": 345068,
+  "lines_removed": 211072,
   "total_tags": 43,
   "era": "steady",
   "top_authors": [
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Terry Howe": 254,
+    "Terry Howe": 255,
     "ump45nose": 1,
     "Zain Qureshi": 1,
     "Gerard Louis Andres Recinto": 2,
@@ -75,8 +75,7 @@
     "Akanksha Trehun": 3,
     "LarytheLord": 2,
     "Mahesh Sadupalli": 1,
-    "kimsungmin1": 7,
-    "kimsm28": 8,
+    "kimsungmin1": 15,
     "Will Noble": 2,
     "s3onghyun": 1,
     "devShaik010": 1,
@@ -492,8 +491,7 @@
     "Jon Huhn": 3,
     "Salim Salaues": 1,
     "Nandor Kracser": 4,
-    "zh168654": 4,
-    "zhangye15": 2,
+    "zh168654": 6,
     "knrt10": 2,
     "Aayush Joglekar": 1,
     "Chris Wells": 2,
@@ -504,7 +502,7 @@
     "Erik Sundell": 6,
     "Janario Oliveira": 2,
     "Li Zhijian": 8,
-    "Mikula\u0301s\u030c Di\u0301te\u030c": 1,
+    "Mikul\u00e1\u0161 D\u00edt\u011b": 1,
     "zouyu": 4,
     "Abhilash Gnan": 17,
     "lemonli": 1,
@@ -692,8 +690,7 @@
     "Ryan Hartje": 2,
     "Zack Williams": 1,
     "Gijs Kunze": 1,
-    "Brian": 49,
-    "fibonacci1729": 77,
+    "Brian": 126,
     "ReSearchITEng": 3,
     "John Koleszar": 1,
     "Shredgar": 2,
@@ -1004,7 +1001,7 @@
     "2023": 439,
     "2024": 618,
     "2025": 1342,
-    "2026": 760
+    "2026": 764
   },
   "ai_assisted": {
     "commits": 30,
@@ -1065,19 +1062,19 @@
       "2026-07": 180,
       "2026-08": 36,
       "2026-09": 37,
-      "2026-10": 19
+      "2026-10": 23
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 10020,
+    "commits": 10024,
     "by_kind": {
       "organization": 3711,
       "one_person": 2190,
-      "personal": 2776,
+      "personal": 2777,
       "hidden": 858,
       "unknown": 10,
-      "bot": 475
+      "bot": 478
     },
     "organization_count": 33,
     "last_12mo_from": "2025-11",
@@ -1407,23 +1404,23 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 1,
-        "personal": 8,
+        "personal": 9,
         "hidden": 2,
         "unknown": 0,
-        "bot": 8
+        "bot": 11
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 802,
-    "authors": 89,
-    "new_authors": 69,
+    "commits": 803,
+    "authors": 88,
+    "new_authors": 68,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 9545,
+    "commits": 9546,
     "commits_by_year": {
       "2015": 237,
       "2016": 2248,
@@ -1436,7 +1433,7 @@
       "2023": 383,
       "2024": 529,
       "2025": 1218,
-      "2026": 622
+      "2026": 623
     },
     "active_days": 2370
   },
@@ -1462,13 +1459,13 @@
     "-0300": 20,
     "-0400": 1133,
     "-0500": 768,
-    "-0600": 1667,
+    "-0600": 1671,
     "-0700": 2351,
     "-0800": 1176,
     "-1000": 1
   },
   "source_lines": {
-    "added": 318880,
-    "current": 112658
+    "added": 319037,
+    "current": 112590
   }
 }

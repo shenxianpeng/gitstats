@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:48:04+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:31:51+00:00",
   "name": "Qwen Code",
   "report_path": "index.html",
   "first_commit": "2025-04-16 04:41:08",
-  "last_commit": "2026-10-26 03:24:20",
-  "age_days": 558,
-  "active_days": 517,
-  "total_commits": 11520,
-  "total_authors": 613,
-  "active_authors_12mo": 327,
-  "commits_last_12mo": 9018,
-  "total_files": 13142,
-  "total_lines": 6292012,
-  "lines_added": 8180090,
-  "lines_removed": 1888078,
+  "last_commit": "2026-10-27 01:19:50",
+  "age_days": 559,
+  "active_days": 518,
+  "total_commits": 11559,
+  "total_authors": 612,
+  "active_authors_12mo": 326,
+  "commits_last_12mo": 9057,
+  "total_files": 13236,
+  "total_lines": 6327201,
+  "lines_added": 8221294,
+  "lines_removed": 1894077,
   "total_tags": 98,
   "era": "steady",
   "top_authors": [
     {
       "name": "\u6613\u826f",
-      "commits": 1598
+      "commits": 1613
     },
     {
       "name": "Shaojin Wen",
-      "commits": 1490
+      "commits": 1495
     },
     {
       "name": "tanzhenxin",
@@ -33,25 +33,30 @@
     },
     {
       "name": "jinye",
-      "commits": 606
+      "commits": 611
     },
     {
       "name": "qqqys",
-      "commits": 526
+      "commits": 530
     }
   ],
   "author_commits": {
-    "qqqys": 526,
-    "jinye": 606,
-    "\u6613\u826f": 1598,
-    "Shaojin Wen": 1490,
+    "Shaojin Wen": 1495,
+    "jinye": 611,
+    "ChiGao": 130,
+    "Dragon": 134,
+    "Wayner Barrios": 2,
+    "\u6613\u826f": 1613,
+    "qqqys": 530,
+    "rockybot2026": 2,
+    "ytahdn": 252,
+    "Edenman": 29,
     "sxl-lucky7": 2,
     "Heyang Wang": 20,
     "qwen-code-dev-bot": 253,
     "Kun De": 4,
     "Barry": 7,
     "Aling33": 1,
-    "ChiGao": 127,
     "EthDing": 1,
     "Bob.qwencode": 27,
     "\u66f9\u6f47\u7f24": 10,
@@ -59,7 +64,6 @@
     "callmeYe": 89,
     "Yaroslav Sivakov": 3,
     "Qiu": 6,
-    "ytahdn": 249,
     "Yufeng He": 57,
     "Mohammed Alkindi": 2,
     "Xiaonan Li": 3,
@@ -68,7 +72,6 @@
     "zjgzx1988": 10,
     "\u70fd\u5b81": 6,
     "\u987e\u76fc": 376,
-    "Edenman": 28,
     "Sergey Bessonov": 1,
     "Lilian0122": 6,
     "ZedingZhang": 2,
@@ -104,7 +107,6 @@
     "destire-mio": 15,
     "Hsiao-nan Cheung": 1,
     "tanzhenxin": 1059,
-    "Wayner Barrios": 1,
     "holny": 4,
     "\u58a8\u7da0BG": 3,
     "theater": 2,
@@ -125,7 +127,6 @@
     "now-ing": 7,
     "Tianyuan": 12,
     "elizabethbrunette21": 1,
-    "Dragon": 133,
     "\u5bb6\u5a03": 2,
     "LeiZhang": 2,
     "Harjoth Khara": 14,
@@ -178,7 +179,6 @@
     "\uc2e0\ub3d9\uc11d": 1,
     "DDDonut": 3,
     "Maddock-MDF": 1,
-    "rockybot2026": 1,
     "tomatotomata": 1,
     "LHMQ878": 1,
     "OrbitZore": 6,
@@ -304,8 +304,7 @@
     "\u601d\u6657": 2,
     "KULIKRCH_HUAWEI\\rocks": 1,
     "\u79e6\u5947": 1,
-    "Mingholy": 130,
-    "mingholy.lmh": 241,
+    "Mingholy": 371,
     "JohnKeating1997": 5,
     "cris": 7,
     "Qwen Code Bot": 2,
@@ -657,7 +656,7 @@
   },
   "commits_by_year": {
     "2025": 3155,
-    "2026": 8365
+    "2026": 8404
   },
   "ai_assisted": {
     "commits": 625,
@@ -721,17 +720,17 @@
       "2026-07": 1315,
       "2026-08": 1068,
       "2026-09": 1181,
-      "2026-10": 1178
+      "2026-10": 1217
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11520,
+    "commits": 11559,
     "by_kind": {
-      "organization": 2805,
+      "organization": 2810,
       "one_person": 494,
-      "personal": 6961,
-      "hidden": 1138,
+      "personal": 6993,
+      "hidden": 1140,
       "unknown": 31,
       "bot": 91
     },
@@ -740,11 +739,11 @@
     "top": [
       {
         "organization": "alibaba-inc.com",
-        "commits": 1944,
-        "commits_last_12mo": 1909,
+        "commits": 1949,
+        "commits_last_12mo": 1914,
         "addresses": 19,
         "first_commit": "2025-06-26",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-10-27"
       },
       {
         "organization": "google.com",
@@ -813,10 +812,10 @@
         "bot": 33
       },
       "2026-Q4": {
-        "organization": 408,
+        "organization": 413,
         "one_person": 96,
-        "personal": 633,
-        "hidden": 40,
+        "personal": 665,
+        "hidden": 42,
         "unknown": 0,
         "bot": 1
       }
@@ -825,18 +824,18 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 9014,
-    "authors": 323,
+    "commits": 9053,
+    "authors": 322,
     "new_authors": 313,
     "half_of_commits": 4
   },
   "humans": {
-    "commits": 11429,
+    "commits": 11468,
     "commits_by_year": {
       "2025": 3140,
-      "2026": 8289
+      "2026": 8328
     },
-    "active_days": 517
+    "active_days": 518
   },
   "timezones": {
     "+0000": 2663,
@@ -848,19 +847,19 @@
     "+0530": 73,
     "+0545": 1,
     "+0700": 6,
-    "+0800": 6488,
+    "+0800": 6526,
     "+0900": 86,
     "+1000": 17,
     "+1100": 3,
     "-0300": 7,
-    "-0400": 407,
+    "-0400": 408,
     "-0500": 44,
     "-0600": 18,
     "-0700": 1342,
     "-0800": 101
   },
   "source_lines": {
-    "added": 8353499,
-    "current": 6224167
+    "added": 8395371,
+    "current": 6259293
   }
 }

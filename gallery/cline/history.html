@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Cline</title>
-	<meta name="description" content="Cline: 7,701 commits by 353 authors, 2024 to 2026. A report made with gitstats.">
+	<meta name="description" content="Cline: 7,705 commits by 350 authors, 2024 to 2026. A report made with gitstats.">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="GitStats">
 	<meta property="og:title" content="Cline: History">
-	<meta property="og:description" content="Cline: 7,701 commits by 353 authors, 2024 to 2026. A report made with gitstats.">
+	<meta property="og:description" content="Cline: 7,705 commits by 350 authors, 2024 to 2026. A report made with gitstats.">
 	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/cline/history.html">
 	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/cline/share-card.png">
 	<meta property="og:image:width" content="1200">
@@ -16,12 +16,12 @@
 	<meta property="og:image:alt" content="Cline: History">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="Cline: History">
-	<meta name="twitter:description" content="Cline: 7,701 commits by 353 authors, 2024 to 2026. A report made with gitstats.">
+	<meta name="twitter:description" content="Cline: 7,705 commits by 350 authors, 2024 to 2026. A report made with gitstats.">
 	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/cline/share-card.png">
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.12.0.post1.dev1">
+	<meta name="generator" content="GitStats 2.12.1">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -339,10 +339,18 @@
 	// boundaries, so gaps in history take up the space they really span;
 	// only a gap handed in as `gap` is cut short (see squeezeTime).
 	function timeAxis(xs, gap) {
+		var min = xs.length ? squeezeTime(gap, xs[0]) : undefined;
+		var max = xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined;
+		// one point in time (a single commit) has no width: give it a month
+		// around it, or the point has no place on the axis and is not drawn
+		if (xs.length && min === max) {
+			min -= 15 * 864e5;
+			max += 15 * 864e5;
+		}
 		return {
 			type: 'linear',
-			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
-			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			min: min,
+			max: max,
 			afterBuildTicks: function(scale) {
 				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
 				const from = new Date(first), to = new Date(last);
@@ -380,7 +388,7 @@
 <body>
 
             <div class="nav">
-            <a href="index.html" class="nav-brand">GitStats</a>
+            <a href="../index.html" class="nav-brand nav-up">&larr; GitStats Gallery</a>
             <ul>
             <li><a href="index.html">General</a></li>
             <li><a href="activity.html">Activity</a></li>
@@ -399,7 +407,7 @@
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>History</h1><p class="section-note">The project's life, one year at a time, told from the commit record: how activity rose and fell against the project's own baseline, who arrived when, and what was released.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Span</dt><dd class="stat-value">2024 – 2026</dd><dd class="stat-note">3 years</dd></div><div class="stat-tile"><dt>Peak Year</dt><dd class="stat-value">2025</dd><dd class="stat-note">3,336 commits</dd></div><div class="stat-tile"><dt>Releases</dt><dd class="stat-value">772</dd><dd class="stat-note">latest in 2026</dd></div></dl><div class="history-year"><div class="history-year-head"><span class="history-year-num">2024</span><span class="history-era history-era-birth">BIRTH</span><span class="history-era-desc">first commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:32.0%"></div></div><p class="history-facts">1,067 commits (13.9%) &middot; +123,479 / &minus;64,716 lines &middot; 14 authors</p><p class="history-people">Led by <strong>Saoud Rizwan</strong> (1,049 commits)</p><p class="history-people">First commits: Saoud Rizwan, Mark Percival, Philip Fung, Matt Rubens, Hanzen Shou, techknowlogick (+8 more)</p><p class="history-people">Released: v1.0.4, v1.0.51, v1.0.6, v1.0.61, v1.0.62 (+38 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2025</span><span class="history-era history-era-peak">PEAK</span><span class="history-era-desc">busiest year</span></div><div class="history-bar-track"><div class="history-bar" style="width:100.0%"></div></div><p class="history-facts">3,336 commits (43.3%) &middot; +659,054 / &minus;386,766 lines &middot; 250 authors</p><p class="history-people">Led by <strong>Saoud Rizwan</strong> (647 commits)</p><p class="history-people">First commits: celestial-vault, Sarah Fortune, Bee, pashpashpash, canvrno, Ara (+234 more)</p><p class="history-people">Released: v3.1.0, v3.2.0, v3.2.6, v3.2.7, v3.2.8 (+157 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2026</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:98.9%"></div></div><p class="history-facts">3,298 commits (42.8%) &middot; +1,966,493 / &minus;1,085,786 lines &middot; 126 authors</p><p class="history-people">Led by <strong>Saoud Rizwan</strong> (1,165 commits)</p><p class="history-people">First commits: abeatrix, Mikołaj Kondratek, John Choi, Max Paulus 🥪, BarreiroT, Haley Park (+88 more)</p><p class="history-people">Released: v3.47.0, v3.48.0, v3.49.0, v3.49.1, v3.50.0 (+562 more)</p></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How Cline compares with other open source AI coding assistants &rarr;</a></p><p class="more-link"><a href="../ecosystems/ai-coding.html">How Cline ranks among open source AI coding assistants by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+            <h1>History</h1><p class="section-note">The project's life, one year at a time, told from the commit record: how activity rose and fell against the project's own baseline, who arrived when, and what was released.</p><dl class="stat-tiles" style="--cols: 3; --cols-md: 3; --cols-sm: 2; --span-sm: 2"><div class="stat-tile"><dt>Span</dt><dd class="stat-value">2024 – 2026</dd><dd class="stat-note">3 years</dd></div><div class="stat-tile"><dt>Peak Year</dt><dd class="stat-value">2025</dd><dd class="stat-note">3,336 commits</dd></div><div class="stat-tile"><dt>Releases</dt><dd class="stat-value">775</dd><dd class="stat-note">latest in 2026</dd></div></dl><div class="history-year"><div class="history-year-head"><span class="history-year-num">2024</span><span class="history-era history-era-birth">BIRTH</span><span class="history-era-desc">first commits</span></div><div class="history-bar-track"><div class="history-bar" style="width:32.0%"></div></div><p class="history-facts">1,067 commits (13.8%) &middot; +123,479 / &minus;64,716 lines &middot; 14 authors</p><p class="history-people">Led by <strong>Saoud Rizwan</strong> (1,049 commits)</p><p class="history-people">First commits: Saoud Rizwan, Mark Percival, Philip Fung, Matt Rubens, Hanzen Shou, techknowlogick (+8 more)</p><p class="history-people">Released: v1.0.4, v1.0.51, v1.0.6, v1.0.61, v1.0.62 (+38 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2025</span><span class="history-era history-era-peak">PEAK</span><span class="history-era-desc">busiest year</span></div><div class="history-bar-track"><div class="history-bar" style="width:100.0%"></div></div><p class="history-facts">3,336 commits (43.3%) &middot; +659,054 / &minus;386,766 lines &middot; 249 authors</p><p class="history-people">Led by <strong>Saoud Rizwan</strong> (878 commits)</p><p class="history-people">First commits: celestial-vault, Sarah Fortune, pashpashpash, canvrno, Ara, Toshii (+233 more)</p><p class="history-people">Released: v3.1.0, v3.2.0, v3.2.6, v3.2.7, v3.2.8 (+157 more)</p></div><div class="history-year"><div class="history-year-head"><span class="history-year-num">2026</span><span class="history-era history-era-steady">STEADY</span></div><div class="history-bar-track"><div class="history-bar" style="width:99.0%"></div></div><p class="history-facts">3,302 commits (42.9%) &middot; +1,966,581 / &minus;1,085,796 lines &middot; 123 authors</p><p class="history-people">Led by <strong>Saoud Rizwan</strong> (1,688 commits)</p><p class="history-people">First commits: abeatrix, John Choi, Max Paulus 🥪, BarreiroT, alex-lum, TheRealSpencer (+86 more)</p><p class="history-people">Released: v3.47.0, v3.48.0, v3.49.0, v3.49.1, v3.50.0 (+565 more)</p></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How Cline compares with other open source AI coding assistants &rarr;</a></p><p class="more-link"><a href="../ecosystems/ai-coding.html">How Cline ranks among open source AI coding assistants by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
 name: GitStats Report
 on:
   push:

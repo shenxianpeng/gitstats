@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:49:43+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:33:46+00:00",
   "name": "Linkerd",
   "report_path": "index.html",
   "first_commit": "2017-12-05 00:17:02",
-  "last_commit": "2026-10-20 16:08:34",
-  "age_days": 3242,
-  "active_days": 1996,
-  "total_commits": 9192,
-  "total_authors": 401,
-  "active_authors_12mo": 32,
-  "commits_last_12mo": 776,
+  "last_commit": "2026-10-26 22:32:24",
+  "age_days": 3248,
+  "active_days": 1997,
+  "total_commits": 9193,
+  "total_authors": 402,
+  "active_authors_12mo": 33,
+  "commits_last_12mo": 777,
   "total_files": 1469,
-  "total_lines": 442339,
-  "lines_added": 1209190,
-  "lines_removed": 766851,
+  "total_lines": 442187,
+  "lines_added": 1209199,
+  "lines_removed": 766860,
   "total_tags": 422,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "toidiu": 1,
     "Allison Richardet": 6,
     "Raymond Kroeker": 9,
     "Matt Bailey": 1,
@@ -453,7 +454,7 @@
     "2023": 1054,
     "2024": 1235,
     "2025": 1042,
-    "2026": 659
+    "2026": 660
   },
   "ai_assisted": {
     "commits": 2,
@@ -511,15 +512,15 @@
       "2026-07": 102,
       "2026-08": 42,
       "2026-09": 59,
-      "2026-10": 12
+      "2026-10": 13
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9192,
+    "commits": 9193,
     "by_kind": {
       "organization": 2920,
-      "one_person": 705,
+      "one_person": 706,
       "personal": 815,
       "hidden": 347,
       "unknown": 0,
@@ -620,7 +621,7 @@
       },
       "2026-Q4": {
         "organization": 3,
-        "one_person": 0,
+        "one_person": 1,
         "personal": 1,
         "hidden": 2,
         "unknown": 0,
@@ -631,13 +632,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 161,
-    "authors": 32,
-    "new_authors": 24,
+    "commits": 162,
+    "authors": 33,
+    "new_authors": 25,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 4787,
+    "commits": 4788,
     "commits_by_year": {
       "2017": 65,
       "2018": 948,
@@ -648,9 +649,9 @@
       "2023": 387,
       "2024": 322,
       "2025": 231,
-      "2026": 99
+      "2026": 100
     },
-    "active_days": 1691
+    "active_days": 1692
   },
   "timezones": {
     "+0000": 339,
@@ -669,12 +670,12 @@
     "-0400": 370,
     "-0500": 2133,
     "-0600": 274,
-    "-0700": 3319,
+    "-0700": 3320,
     "-0800": 1454,
     "-1000": 114
   },
   "source_lines": {
-    "added": 573973,
+    "added": 574089,
     "current": 263141
   }
 }

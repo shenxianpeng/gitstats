@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:47:55+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:31:27+00:00",
   "name": "LangChain",
   "report_path": "index.html",
   "first_commit": "2022-10-24 21:51:15",
-  "last_commit": "2026-10-25 20:37:41",
-  "age_days": 1462,
-  "active_days": 1312,
-  "total_commits": 17076,
+  "last_commit": "2026-10-26 23:00:03",
+  "age_days": 1464,
+  "active_days": 1313,
+  "total_commits": 17083,
   "total_authors": 3594,
   "active_authors_12mo": 239,
-  "commits_last_12mo": 2396,
+  "commits_last_12mo": 2403,
   "total_files": 3275,
-  "total_lines": 575139,
-  "lines_added": 3865864,
-  "lines_removed": 3290725,
-  "total_tags": 1309,
+  "total_lines": 575809,
+  "lines_added": 3868638,
+  "lines_removed": 3292828,
+  "total_tags": 1310,
   "era": "steady",
   "top_authors": [
     {
@@ -29,7 +29,7 @@
     },
     {
       "name": "ccurme",
-      "commits": 1173
+      "commits": 1175
     },
     {
       "name": "Erick Friis",
@@ -37,14 +37,14 @@
     },
     {
       "name": "Mason Daugherty",
-      "commits": 970
+      "commits": 971
     }
   ],
   "author_commits": {
-    "Mason Daugherty": 970,
+    "ccurme": 1175,
+    "Mason Daugherty": 971,
     "John Kennedy": 23,
     "Richard Scarrott": 11,
-    "ccurme": 1173,
     "Vladislav Nechakhin": 1,
     "Ant White": 2,
     "Christophe Bornet": 419,
@@ -3641,7 +3641,7 @@
     "2023": 6342,
     "2024": 5701,
     "2025": 2693,
-    "2026": 2056
+    "2026": 2063
   },
   "ai_assisted": {
     "commits": 46,
@@ -3700,30 +3700,30 @@
       "2026-07": 145,
       "2026-08": 193,
       "2026-09": 187,
-      "2026-10": 202
+      "2026-10": 209
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17076,
+    "commits": 17083,
     "by_kind": {
-      "organization": 2498,
+      "organization": 2499,
       "one_person": 830,
-      "personal": 7439,
+      "personal": 7441,
       "hidden": 5432,
       "unknown": 0,
-      "bot": 877
+      "bot": 881
     },
     "organization_count": 35,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "langchain.dev",
-        "commits": 2193,
-        "commits_last_12mo": 594,
+        "commits": 2194,
+        "commits_last_12mo": 595,
         "addresses": 18,
         "first_commit": "2023-07-25",
-        "last_commit": "2026-10-25"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "unstructuredai.io",
@@ -4056,36 +4056,36 @@
         "bot": 214
       },
       "2026-Q4": {
-        "organization": 14,
+        "organization": 15,
         "one_person": 2,
-        "personal": 32,
+        "personal": 34,
         "hidden": 5,
         "unknown": 0,
-        "bot": 149
+        "bot": 153
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1539,
+    "commits": 1542,
     "authors": 234,
     "new_authors": 192,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 16199,
+    "commits": 16202,
     "commits_by_year": {
       "2022": 284,
       "2023": 6340,
       "2024": 5700,
       "2025": 2672,
-      "2026": 1203
+      "2026": 1206
     },
-    "active_days": 1282
+    "active_days": 1283
   },
   "timezones": {
-    "+0000": 253,
+    "+0000": 254,
     "+0100": 1149,
     "+0200": 1206,
     "+0300": 258,
@@ -4106,7 +4106,7 @@
     "+1300": 8,
     "-0100": 1,
     "-0300": 147,
-    "-0400": 3603,
+    "-0400": 3609,
     "-0500": 1440,
     "-0600": 209,
     "-0700": 4137,
@@ -4114,7 +4114,7 @@
     "-1000": 3
   },
   "source_lines": {
-    "added": 2760410,
-    "current": 480304
+    "added": 2761275,
+    "current": 480799
   }
 }

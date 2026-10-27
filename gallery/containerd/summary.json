@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:49:07+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:33:10+00:00",
   "name": "containerd",
   "report_path": "index.html",
   "first_commit": "2015-11-05 23:29:53",
-  "last_commit": "2026-10-26 02:21:37",
+  "last_commit": "2026-10-26 22:58:40",
   "age_days": 4008,
-  "active_days": 3145,
-  "total_commits": 17516,
+  "active_days": 3147,
+  "total_commits": 17526,
   "total_authors": 807,
   "active_authors_12mo": 128,
-  "commits_last_12mo": 1684,
-  "total_files": 6749,
-  "total_lines": 1780554,
-  "lines_added": 4025029,
-  "lines_removed": 2244475,
+  "commits_last_12mo": 1694,
+  "total_files": 6750,
+  "total_lines": 1782947,
+  "lines_added": 4030110,
+  "lines_removed": 2247054,
   "total_tags": 132,
   "era": "steady",
   "top_authors": [
     {
       "name": "Derek McGowan",
-      "commits": 2143
+      "commits": 2144
     },
     {
       "name": "Michael Crosby",
@@ -29,7 +29,7 @@
     },
     {
       "name": "Phil Estes",
-      "commits": 1593
+      "commits": 1594
     },
     {
       "name": "Lantao Liu",
@@ -37,14 +37,16 @@
     },
     {
       "name": "Maksym Pavlenko",
-      "commits": 1215
+      "commits": 1219
     }
   ],
   "author_commits": {
+    "Derek McGowan": 2144,
+    "Maksym Pavlenko": 1219,
+    "Phil Estes": 1594,
+    "Michael Zappa": 9,
     "Davanum Srinivas": 101,
-    "Maksym Pavlenko": 1215,
     "Sebastiaan van Stijn": 770,
-    "Phil Estes": 1593,
     "Samuel Karp": 442,
     "Pawe\u0142 Gronowski": 48,
     "Justin Terry": 110,
@@ -62,7 +64,6 @@
     "Nan Liu": 1,
     "Chris Henzie": 36,
     "CrazyMax": 3,
-    "Derek McGowan": 2143,
     "Jing Chen": 1,
     "Pablo Garcia Caceres": 1,
     "Robert Cronin": 1,
@@ -146,7 +147,6 @@
     "Luke Hinds": 2,
     "Fabiano Fid\u00eancio": 8,
     "Paulo Oliveira": 3,
-    "Michael Zappa": 8,
     "Danny Canter": 67,
     "Shiv Tyagi": 3,
     "Rodrigo Campos": 67,
@@ -861,7 +861,7 @@
     "2023": 1659,
     "2024": 1433,
     "2025": 1366,
-    "2026": 1455
+    "2026": 1465
   },
   "ai_assisted": {
     "commits": 26,
@@ -923,19 +923,19 @@
       "2026-07": 144,
       "2026-08": 184,
       "2026-09": 165,
-      "2026-10": 81
+      "2026-10": 91
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17516,
+    "commits": 17526,
     "by_kind": {
       "organization": 4734,
-      "one_person": 3834,
-      "personal": 8379,
+      "one_person": 3835,
+      "personal": 8385,
       "hidden": 46,
       "unknown": 2,
-      "bot": 521
+      "bot": 524
     },
     "organization_count": 46,
     "last_12mo_from": "2025-11",
@@ -1368,24 +1368,24 @@
       },
       "2026-Q4": {
         "organization": 11,
-        "one_person": 30,
-        "personal": 31,
+        "one_person": 31,
+        "personal": 37,
         "hidden": 0,
         "unknown": 0,
-        "bot": 9
+        "bot": 12
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1510,
+    "commits": 1517,
     "authors": 127,
     "new_authors": 81,
     "half_of_commits": 4
   },
   "humans": {
-    "commits": 16995,
+    "commits": 17002,
     "commits_by_year": {
       "2015": 151,
       "2016": 589,
@@ -1398,12 +1398,12 @@
       "2023": 1629,
       "2024": 1279,
       "2025": 1165,
-      "2026": 1319
+      "2026": 1326
     },
-    "active_days": 3126
+    "active_days": 3127
   },
   "timezones": {
-    "+0000": 3610,
+    "+0000": 3618,
     "+0100": 571,
     "+0200": 899,
     "+0300": 155,
@@ -1419,13 +1419,13 @@
     "-0300": 30,
     "-0400": 1724,
     "-0500": 1223,
-    "-0600": 158,
-    "-0700": 4355,
+    "-0600": 159,
+    "-0700": 4356,
     "-0800": 2258,
     "-0900": 3
   },
   "source_lines": {
-    "added": 703556,
-    "current": 339507
+    "added": 711295,
+    "current": 339776
   }
 }

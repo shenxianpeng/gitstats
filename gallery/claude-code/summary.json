@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:46:09+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:30:02+00:00",
   "name": "Claude Code",
   "report_path": "index.html",
   "first_commit": "2025-02-22 17:23:42",
-  "last_commit": "2026-10-25 20:11:24",
-  "age_days": 611,
-  "active_days": 371,
-  "total_commits": 945,
+  "last_commit": "2026-10-26 21:51:04",
+  "age_days": 612,
+  "active_days": 372,
+  "total_commits": 948,
   "total_authors": 60,
   "active_authors_12mo": 39,
-  "commits_last_12mo": 634,
-  "total_files": 1615,
-  "total_lines": 99920,
-  "lines_added": 114284,
-  "lines_removed": 14364,
-  "total_tags": 257,
+  "commits_last_12mo": 637,
+  "total_files": 1601,
+  "total_lines": 93204,
+  "lines_added": 114493,
+  "lines_removed": 21284,
+  "total_tags": 258,
   "era": "steady",
   "top_authors": [
     {
-      "name": "GitHub Actions (publish-mods)",
-      "commits": 492
+      "name": "GitHub Actions",
+      "commits": 494
     },
     {
       "name": "Alice T'Poteat",
@@ -41,7 +41,8 @@
     }
   ],
   "author_commits": {
-    "GitHub Actions (publish-mods)": 492,
+    "GitHub Actions": 494,
+    "Mohamed Hegazy": 5,
     "Sarah Deaton": 5,
     "Alice T'Poteat": 113,
     "Qing Wang": 1,
@@ -54,7 +55,6 @@
     "Roy Arsan": 6,
     "Miguel": 1,
     "Ashwin Bhat": 21,
-    "Mohamed Hegazy": 4,
     "Sid Bidasaria": 7,
     "Joe Portner": 1,
     "Octavian Guzu": 14,
@@ -104,7 +104,7 @@
   },
   "commits_by_year": {
     "2025": 405,
-    "2026": 540
+    "2026": 543
   },
   "ai_assisted": {
     "commits": 80,
@@ -162,19 +162,19 @@
       "2026-07": 27,
       "2026-08": 30,
       "2026-09": 155,
-      "2026-10": 46
+      "2026-10": 49
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 945,
+    "commits": 948,
     "by_kind": {
       "organization": 245,
       "one_person": 10,
       "personal": 31,
-      "hidden": 166,
+      "hidden": 167,
       "unknown": 0,
-      "bot": 493
+      "bot": 495
     },
     "organization_count": 1,
     "last_12mo_from": "2025-11",
@@ -249,30 +249,30 @@
         "organization": 3,
         "one_person": 0,
         "personal": 0,
-        "hidden": 2,
+        "hidden": 3,
         "unknown": 0,
-        "bot": 41
+        "bot": 43
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 633,
+    "commits": 636,
     "authors": 37,
     "new_authors": 24,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 452,
+    "commits": 453,
     "commits_by_year": {
       "2025": 234,
-      "2026": 218
+      "2026": 219
     },
-    "active_days": 149
+    "active_days": 150
   },
   "timezones": {
-    "+0000": 523,
+    "+0000": 525,
     "+0100": 7,
     "+0200": 5,
     "+0300": 3,
@@ -283,11 +283,11 @@
     "-0400": 2,
     "-0500": 17,
     "-0600": 1,
-    "-0700": 302,
+    "-0700": 303,
     "-0800": 70
   },
   "source_lines": {
-    "added": 111110,
-    "current": 94001
+    "added": 111319,
+    "current": 87294
   }
 }

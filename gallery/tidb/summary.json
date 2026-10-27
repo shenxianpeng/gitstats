@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:53:36+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:40:13+00:00",
   "name": "TiDB",
   "report_path": "index.html",
   "first_commit": "2015-09-06 04:04:42",
-  "last_commit": "2026-10-26 03:13:58",
-  "age_days": 4068,
+  "last_commit": "2026-10-26 19:27:20",
+  "age_days": 4069,
   "active_days": 3411,
-  "total_commits": 28780,
+  "total_commits": 28789,
   "total_authors": 993,
   "active_authors_12mo": 138,
-  "commits_last_12mo": 1710,
-  "total_files": 7844,
-  "total_lines": 2579722,
-  "lines_added": 9977264,
-  "lines_removed": 7397542,
+  "commits_last_12mo": 1719,
+  "total_files": 7848,
+  "total_lines": 2581413,
+  "lines_added": 9981930,
+  "lines_removed": 7399745,
   "total_tags": 54,
   "era": "steady",
   "top_authors": [
@@ -41,23 +41,25 @@
     }
   ],
   "author_commits": {
+    "YangKeao": 301,
+    "Dongpo Liu": 368,
+    "Yiding Cui": 481,
+    "D3Hunter": 708,
+    "ris": 40,
+    "Sanket Kedia": 2,
+    "Jiong": 10,
+    "xufei": 171,
     "flaky-claw": 95,
-    "xufei": 170,
     "Chao Wang": 495,
-    "D3Hunter": 706,
     "Ruihao Chen": 124,
-    "Jiong": 9,
     "Vlad Dmitriev": 4,
     "dillon": 6,
     "expxiaoli": 24,
     "Elsa": 48,
-    "Yiding Cui": 480,
     "tongjian": 20,
-    "YangKeao": 300,
     "Ray Yan": 5,
     "lucasliang": 2,
     "Mattias Jonsson": 209,
-    "Dongpo Liu": 367,
     "Jianjun Liao": 214,
     "lhy1024": 15,
     "Jinlong Liu": 39,
@@ -90,7 +92,6 @@
     "Dorian JAMINAIS": 1,
     "wuhuizuo": 49,
     "Ping Yu": 41,
-    "Sanket Kedia": 1,
     "DanielSwift1992": 1,
     "Ti Chi Robot": 55,
     "july2993": 10,
@@ -116,7 +117,6 @@
     "habitssss": 1,
     "Lynn": 1011,
     "Teruya Ono": 1,
-    "ris": 39,
     "Zhou Kunqin": 185,
     "\u8c22\u667a": 1,
     "Yang Zhang": 5,
@@ -1047,7 +1047,7 @@
     "2023": 3184,
     "2024": 2840,
     "2025": 1979,
-    "2026": 1419
+    "2026": 1428
   },
   "ai_assisted": {
     "commits": 4,
@@ -1105,17 +1105,17 @@
       "2026-07": 123,
       "2026-08": 118,
       "2026-09": 157,
-      "2026-10": 89
+      "2026-10": 98
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 28780,
+    "commits": 28789,
     "by_kind": {
       "organization": 4091,
-      "one_person": 1534,
-      "personal": 19673,
-      "hidden": 3214,
+      "one_person": 1536,
+      "personal": 19679,
+      "hidden": 3215,
       "unknown": 2,
       "bot": 266
     },
@@ -1278,9 +1278,9 @@
       },
       "2026-Q4": {
         "organization": 13,
-        "one_person": 15,
-        "personal": 39,
-        "hidden": 22,
+        "one_person": 17,
+        "personal": 45,
+        "hidden": 23,
         "unknown": 0,
         "bot": 0
       }
@@ -1289,13 +1289,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1692,
+    "commits": 1701,
     "authors": 138,
     "new_authors": 55,
     "half_of_commits": 9
   },
   "humans": {
-    "commits": 28514,
+    "commits": 28523,
     "commits_by_year": {
       "2015": 2528,
       "2016": 1541,
@@ -1308,20 +1308,20 @@
       "2023": 3099,
       "2024": 2767,
       "2025": 1904,
-      "2026": 1396
+      "2026": 1405
     },
     "active_days": 3390
   },
   "timezones": {
     "+0000": 206,
-    "+0100": 230,
+    "+0100": 231,
     "+0200": 390,
     "+0300": 39,
     "+0330": 1,
     "+0500": 1,
     "+0530": 40,
     "+0700": 11,
-    "+0800": 26205,
+    "+0800": 26212,
     "+0900": 165,
     "+1000": 9,
     "+1100": 8,
@@ -1331,12 +1331,12 @@
     "-0400": 117,
     "-0500": 384,
     "-0600": 384,
-    "-0700": 432,
+    "-0700": 433,
     "-0800": 130,
     "-0900": 1
   },
   "source_lines": {
-    "added": 8131070,
-    "current": 2425321
+    "added": 8519409,
+    "current": 2427760
   }
 }

@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Kubernetes</title>
-	<meta name="description" content="Kubernetes: 142,522 commits by 4,906 authors, 2014 to 2026. A report made with gitstats.">
+	<meta name="description" content="Kubernetes: 142,568 commits by 4,866 authors, 2014 to 2026. A report made with gitstats.">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="GitStats">
 	<meta property="og:title" content="Kubernetes">
-	<meta property="og:description" content="Kubernetes: 142,522 commits by 4,906 authors, 2014 to 2026. A report made with gitstats.">
+	<meta property="og:description" content="Kubernetes: 142,568 commits by 4,866 authors, 2014 to 2026. A report made with gitstats.">
 	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/kubernetes/">
 	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/kubernetes/share-card.png">
 	<meta property="og:image:width" content="1200">
@@ -16,12 +16,12 @@
 	<meta property="og:image:alt" content="Kubernetes">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="Kubernetes">
-	<meta name="twitter:description" content="Kubernetes: 142,522 commits by 4,906 authors, 2014 to 2026. A report made with gitstats.">
+	<meta name="twitter:description" content="Kubernetes: 142,568 commits by 4,866 authors, 2014 to 2026. A report made with gitstats.">
 	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/kubernetes/share-card.png">
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.12.0.post1.dev1">
+	<meta name="generator" content="GitStats 2.12.1">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -339,10 +339,18 @@
 	// boundaries, so gaps in history take up the space they really span;
 	// only a gap handed in as `gap` is cut short (see squeezeTime).
 	function timeAxis(xs, gap) {
+		var min = xs.length ? squeezeTime(gap, xs[0]) : undefined;
+		var max = xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined;
+		// one point in time (a single commit) has no width: give it a month
+		// around it, or the point has no place on the axis and is not drawn
+		if (xs.length && min === max) {
+			min -= 15 * 864e5;
+			max += 15 * 864e5;
+		}
 		return {
 			type: 'linear',
-			min: xs.length ? squeezeTime(gap, xs[0]) : undefined,
-			max: xs.length ? squeezeTime(gap, xs[xs.length - 1]) : undefined,
+			min: min,
+			max: max,
 			afterBuildTicks: function(scale) {
 				const first = stretchTime(gap, scale.min), last = stretchTime(gap, scale.max);
 				const from = new Date(first), to = new Date(last);
@@ -380,7 +388,7 @@
 <body>
 
             <div class="nav">
-            <a href="index.html" class="nav-brand">GitStats</a>
+            <a href="../index.html" class="nav-brand nav-up">&larr; GitStats Gallery</a>
             <ul>
             <li><a href="index.html" class="active" aria-current="page">General</a></li>
             <li><a href="activity.html">Activity</a></li>
@@ -399,13 +407,13 @@
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </div>
-            <h1>Kubernetes</h1><p class="page-meta">2014-06-06 &rarr; 2026-10-26 &middot; generated 2026-10-26 03:51:52 in 142 s &middot; gitstats 2.12.0.post1.dev1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><!-- gitstats:insights --><section class="insights-section" id="what-stands-out">
+            <h1>Kubernetes</h1><p class="page-meta">2014-06-06 &rarr; 2026-10-27 &middot; generated 2026-10-27 01:35:58 in 143 s &middot; gitstats 2.12.1, git version 2.55.0 &middot; <a href="badges.html">Badge for your README</a></p><!-- gitstats:insights --><section class="insights-section" id="what-stands-out">
 <h2 id="what_stands_out"><a href="#what_stands_out">What stands out</a></h2>
 
-<p class="section-note">Next to the 106 other projects of <a href="../index.html">GitStats Gallery</a>: where Kubernetes is in the top or bottom 15%.</p><ul class="insights"><li class="insight"><span class="insight-big">99%</span><div><span class="insight-label">Days with a commit</span><p class="insight-sentence">Kubernetes has had a commit by a person on 99% of the days since its first one: 4,481 days in 12 years.</p><p class="insight-compared">The highest of the 97 GitStats Gallery projects.</p></div></li></ul><p class="more-link"><a href="compare.html">How Kubernetes compares, measure by measure &rarr;</a></p></section><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">142,522</dd><dd class="stat-note"><span class="nowrap">31.8 per active day</span>&nbsp;&middot; <span class="nowrap">31.5 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">4,906</dd><dd class="stat-note">29.1 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">7,317,185</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+28,021,245</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−20,704,060</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">31,507</dd><dd class="stat-note">74 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">4,483</dd><dd class="stat-note"><span class="nowrap">of 4,525 days</span>&nbsp;&middot; <span class="nowrap">99.1%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">1304 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
+<p class="section-note">Next to the 106 other projects of <a href="../index.html">GitStats Gallery</a>: where Kubernetes is in the top or bottom 15%.</p><ul class="insights"><li class="insight"><span class="insight-big">99%</span><div><span class="insight-label">Days with a commit</span><p class="insight-sentence">Kubernetes has had a commit by a person on 99% of the days since its first one: 4,482 days in 12 years.</p><p class="insight-compared">2nd highest of 97; the median project: 80% of days.</p></div></li></ul><p class="more-link"><a href="compare.html">How Kubernetes compares, measure by measure &rarr;</a></p></section><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">142,568</dd><dd class="stat-note"><span class="nowrap">31.8 per active day</span>&nbsp;&middot; <span class="nowrap">31.5 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">4,866</dd><dd class="stat-note">29.3 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">7,325,295</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+28,027,273</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−20,705,463</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">31,509</dd><dd class="stat-note">74 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">4,484</dd><dd class="stat-note"><span class="nowrap">of 4,526 days</span>&nbsp;&middot; <span class="nowrap">99.1%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">1,304 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
 <h2 id="commits_per_year"><a href="#commits_per_year">Commits per year</a></h2>
 
-<div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly"></canvas></div>
+<div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly" role="img" aria-label="Bar chart of commits per year, 2014 to 2026"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-overview-yearly').getContext('2d');
@@ -416,7 +424,7 @@
     type: 'bar',
     data: {
       labels: labels,
-      datasets: [{"label": "Commits", "data": [4577, 18247, 18787, 18378, 13447, 13865, 9638, 8968, 7239, 7533, 7044, 7152, 7647], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+      datasets: [{"label": "Commits", "data": [4577, 18247, 18787, 18378, 13447, 13865, 9638, 8968, 7239, 7533, 7044, 7152, 7693], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
     },
     options: {
       responsive: true,
@@ -425,7 +433,7 @@
         legend: { display: false }
       },
       scales: {
-        x: { ticks: { maxRotation: 0 }, grid: { display: false } },
+        x: { ticks: { maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } },
         y: { beginAtZero: true, ticks: { precision: 0 } }
       }
     }
@@ -435,10 +443,10 @@
 <p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p><div class="two-columns"><section>
 <h2 id="top_contributors"><a href="#top_contributors">Top contributors</a></h2>
 
-<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>Kubernetes Prow Robot</td><td class="num">27,325</td><td class="num">19.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>Kubernetes Submit Queue</td><td class="num">15,244</td><td class="num">10.7%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 55.8%"></span></span></td></tr><tr><td>k8s-merge-robot</td><td class="num">4,953</td><td class="num">3.5%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 18.1%"></span></span></td></tr><tr><td>Jordan Liggitt</td><td class="num">2,221</td><td class="num">1.6%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 8.1%"></span></span></td></tr><tr><td>Tim Hockin</td><td class="num">2,103</td><td class="num">1.5%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 7.7%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 4,906 authors &rarr;</a></p></section><section>
+<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr><tr><td>Kubernetes Prow Robot</td><td class="num">27,325</td><td class="num">19.2%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>Kubernetes Submit Queue</td><td class="num">15,244</td><td class="num">10.7%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 55.8%"></span></span></td></tr><tr><td>k8s-merge-robot</td><td class="num">4,953</td><td class="num">3.5%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 18.1%"></span></span></td></tr><tr><td>Davanum Srinivas</td><td class="num">2,366</td><td class="num">1.7%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 8.7%"></span></span></td></tr><tr><td>Jordan Liggitt</td><td class="num">2,221</td><td class="num">1.6%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 8.1%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 4,866 authors &rarr;</a></p></section><section>
 <h2 id="latest_releases"><a href="#latest_releases">Latest releases</a></h2>
 
-<div class="table-scroll"><table class="share-table"><tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr><tr><td class="nowrap">v1.38.0-alpha.2</td><td class="nowrap">2026-10-07</td><td class="num">315</td><td>kubernetes-prow <span class="badge" title="kubernetes-prow[bot]">bot</span>, Marek Siarkowicz +63</td></tr><tr><td class="nowrap">v1.38.0-alpha.1</td><td class="nowrap">2026-09-28</td><td class="num">1,194</td><td>kubernetes-prow <span class="badge" title="kubernetes-prow[bot]">bot</span>, Yongrui Lin +186</td></tr><tr><td class="nowrap">v1.38.0-alpha.0</td><td class="nowrap">2026-08-05</td><td class="num">566</td><td>kubernetes-prow <span class="badge" title="kubernetes-prow[bot]">bot</span>, Praveen Krishna +99</td></tr><tr><td class="nowrap">v1.37.0-beta.0</td><td class="nowrap">2026-07-20</td><td class="num">564</td><td>kubernetes-prow <span class="badge" title="kubernetes-prow[bot]">bot</span>, Lalit Chauhan +102</td></tr><tr><td class="nowrap">v1.37.0-alpha.3</td><td class="nowrap">2026-07-08</td><td class="num">392</td><td>kubernetes-prow <span class="badge" title="kubernetes-prow[bot]">bot</span>, Lalit Chauhan +85</td></tr></table></div><p class="more-link"><a href="tags.html">All 215 tags &rarr;</a></p></section></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How Kubernetes compares with other CNCF graduated projects &rarr;</a></p><p class="more-link"><a href="../ecosystems/cncf.html">How Kubernetes ranks among CNCF graduated projects by AI-assisted commits &rarr;</a></p><h2>Badge for your README</h2><p class="section-note">The share of the last 12 months&rsquo; commits that name an AI coding assistant, a lower bound, updated every week with this report.</p><div class="badge-list"><div class="badge-row"><div class="badge-info"><img src="badges/ai-assisted.svg" alt="AI-assisted commits"></div><pre class="badge-code">[![AI-assisted commits: Kubernetes](https://shenxianpeng.dev/gitstats/gallery/kubernetes/badges/ai-assisted.svg)](https://shenxianpeng.dev/gitstats/gallery/kubernetes/)</pre><button type="button" class="badge-copy" aria-label="Copy the Markdown of the badge"><span>Copy</span></button></div></div><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+<div class="table-scroll"><table class="share-table"><tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr><tr><td class="nowrap">v1.38.0-alpha.2</td><td class="nowrap">2026-10-07</td><td class="num">315</td><td>kubernetes-prow <span class="badge" title="kubernetes-prow[bot]">bot</span>, Marek Siarkowicz +63</td></tr><tr><td class="nowrap">v1.38.0-alpha.1</td><td class="nowrap">2026-09-28</td><td class="num">1,194</td><td>kubernetes-prow <span class="badge" title="kubernetes-prow[bot]">bot</span>, Yongrui Lin +186</td></tr><tr><td class="nowrap">v1.38.0-alpha.0</td><td class="nowrap">2026-08-05</td><td class="num">566</td><td>kubernetes-prow <span class="badge" title="kubernetes-prow[bot]">bot</span>, Praveen Krishna +98</td></tr><tr><td class="nowrap">v1.37.0-beta.0</td><td class="nowrap">2026-07-20</td><td class="num">564</td><td>kubernetes-prow <span class="badge" title="kubernetes-prow[bot]">bot</span>, Lalit Chauhan +102</td></tr><tr><td class="nowrap">v1.37.0-alpha.3</td><td class="nowrap">2026-07-08</td><td class="num">392</td><td>kubernetes-prow <span class="badge" title="kubernetes-prow[bot]">bot</span>, Lalit Chauhan +84</td></tr></table></div><p class="more-link"><a href="tags.html">All 215 tags &rarr;</a></p></section></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How Kubernetes compares with other CNCF graduated projects &rarr;</a></p><p class="more-link"><a href="../ecosystems/cncf.html">How Kubernetes ranks among CNCF graduated projects by AI-assisted commits &rarr;</a></p><h2>Badge for your README</h2><p class="section-note">The share of the last 12 months&rsquo; commits that name an AI coding assistant, a lower bound, updated every week with this report.</p><div class="badge-list"><div class="badge-row"><div class="badge-info"><img src="badges/ai-assisted.svg" alt="AI-assisted commits"></div><pre class="badge-code">[![AI-assisted commits: Kubernetes](https://shenxianpeng.dev/gitstats/gallery/kubernetes/badges/ai-assisted.svg)](https://shenxianpeng.dev/gitstats/gallery/kubernetes/)</pre><button type="button" class="badge-copy" aria-label="Copy the Markdown of the badge"><span>Copy</span></button></div></div><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
 name: GitStats Report
 on:
   push:

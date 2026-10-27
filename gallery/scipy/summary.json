@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:45:37+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:29:08+00:00",
   "name": "SciPy",
   "report_path": "index.html",
   "first_commit": "2001-02-01 08:32:30",
-  "last_commit": "2026-10-25 17:06:09",
-  "age_days": 9398,
-  "active_days": 6830,
-  "total_commits": 38500,
-  "total_authors": 1949,
+  "last_commit": "2026-10-26 22:58:36",
+  "age_days": 9399,
+  "active_days": 6831,
+  "total_commits": 38507,
+  "total_authors": 1948,
   "active_authors_12mo": 229,
-  "commits_last_12mo": 2252,
+  "commits_last_12mo": 2259,
   "total_files": 2928,
-  "total_lines": 1139901,
-  "lines_added": 5268590,
-  "lines_removed": 4128689,
+  "total_lines": 1238683,
+  "lines_added": 5268703,
+  "lines_removed": 4128820,
   "total_tags": 5,
   "era": "steady",
   "top_authors": [
@@ -33,7 +33,7 @@
     },
     {
       "name": "Evgeni Burovski",
-      "commits": 2179
+      "commits": 2180
     },
     {
       "name": "Tyler Reddy",
@@ -41,9 +41,14 @@
     }
   ],
   "author_commits": {
+    "Agriya Khetarpal": 19,
+    "Will": 2,
+    "berce": 1,
+    "Daniel Schmitz": 197,
+    "Enricoftw": 3,
+    "Jake Bowhay": 461,
+    "Evgeni Burovski": 2180,
     "Lucas Colley": 628,
-    "Jake Bowhay": 460,
-    "Enricoftw": 2,
     "Kaushik Gunasekaren": 1,
     "Hannah Rittich": 1,
     "Matt Haberland": 2364,
@@ -52,7 +57,6 @@
     "Andrew Nelson": 1031,
     "Cl\u00e9ment_Basdevant": 1,
     "Dietrich Brunn": 76,
-    "Evgeni Burovski": 2179,
     "Jash Ambaliya": 3,
     "Florian Bourgey": 172,
     "Tyler Reddy": 1419,
@@ -66,7 +70,6 @@
     "Max Gorbuk": 1,
     "Warren Weckesser": 1217,
     "Tryndaron": 1,
-    "Will": 1,
     "Arthur Lacote": 4,
     "vsaraikin": 1,
     "Basil Liekens": 26,
@@ -82,9 +85,7 @@
     "Mohd Maaz Khan": 2,
     "Sylvanus Chinedu Egbosiuba": 1,
     "Pamphile Roy": 583,
-    "Agriya Khetarpal": 18,
     "Albert Steppi": 378,
-    "Daniel Schmitz": 160,
     "Thomas Schmelzer": 5,
     "Nicholas Riley": 1,
     "Swapnil-J20": 1,
@@ -108,7 +109,6 @@
     "Albert Yau": 1,
     "nightcityblade": 2,
     "Christian Veenhuis": 14,
-    "dschmitz89": 36,
     "Tom Ragonneau": 4,
     "Nilesh Patil": 1,
     "Tekin Ertekin": 3,
@@ -623,8 +623,7 @@
     "akeemlh": 2,
     "Omar Salman": 21,
     "Bijay Nayak": 1,
-    "Paul": 2,
-    "Paul Estano": 5,
+    "Paul": 7,
     "mkiffer": 1,
     "Kevin Topolski": 1,
     "Dipansh Uikey": 1,
@@ -2017,13 +2016,13 @@
     "2023": 2061,
     "2024": 2957,
     "2025": 2335,
-    "2026": 1814
+    "2026": 1821
   },
   "ai_assisted": {
-    "commits": 55,
+    "commits": 56,
     "authored": 1,
     "assistants": {
-      "Claude": 45,
+      "Claude": 46,
       "Warp": 5,
       "GitHub Copilot": 4,
       "Devin": 1
@@ -2052,7 +2051,7 @@
       "2026-07": 5,
       "2026-08": 2,
       "2026-09": 3,
-      "2026-10": 6
+      "2026-10": 7
     },
     "commits_by_month": {
       "2024-11": 226,
@@ -2078,17 +2077,17 @@
       "2026-07": 171,
       "2026-08": 228,
       "2026-09": 171,
-      "2026-10": 103
+      "2026-10": 110
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38500,
+    "commits": 38507,
     "by_kind": {
       "organization": 3833,
       "one_person": 3074,
-      "personal": 27089,
-      "hidden": 2684,
+      "personal": 27090,
+      "hidden": 2690,
       "unknown": 1820,
       "bot": 0
     },
@@ -2652,8 +2651,8 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 3,
-        "personal": 57,
-        "hidden": 42,
+        "personal": 58,
+        "hidden": 48,
         "unknown": 0,
         "bot": 0
       }
@@ -2662,13 +2661,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2252,
+    "commits": 2259,
     "authors": 227,
-    "new_authors": 164,
+    "new_authors": 165,
     "half_of_commits": 6
   },
   "humans": {
-    "commits": 38500,
+    "commits": 38507,
     "commits_by_year": {
       "2001": 286,
       "2002": 357,
@@ -2695,20 +2694,20 @@
       "2023": 2061,
       "2024": 2957,
       "2025": 2335,
-      "2026": 1814
+      "2026": 1821
     },
-    "active_days": 6830
+    "active_days": 6831
   },
   "timezones": {
-    "+0000": 7836,
-    "+0100": 5424,
+    "+0000": 7837,
+    "+0100": 5427,
     "+0200": 6560,
-    "+0300": 2005,
+    "+0300": 2006,
     "+0330": 6,
     "+0400": 20,
     "+0430": 4,
     "+0500": 261,
-    "+0530": 729,
+    "+0530": 730,
     "+0600": 28,
     "+0700": 16,
     "+0800": 477,
@@ -2725,13 +2724,13 @@
     "-0400": 3381,
     "-0500": 2451,
     "-0600": 1328,
-    "-0700": 3715,
+    "-0700": 3716,
     "-0800": 1893,
     "-0900": 1,
     "-1000": 24
   },
   "source_lines": {
-    "added": 5661863,
-    "current": 1179854
+    "added": 5661976,
+    "current": 1179836
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:45:03+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:28:25+00:00",
   "name": "Requests",
   "report_path": "index.html",
   "first_commit": "2011-02-13 18:41:18",
-  "last_commit": "2026-09-21 20:22:33",
-  "age_days": 5700,
-  "active_days": 1695,
-  "total_commits": 6495,
-  "total_authors": 770,
+  "last_commit": "2026-10-26 17:14:41",
+  "age_days": 5734,
+  "active_days": 1696,
+  "total_commits": 6496,
+  "total_authors": 769,
   "active_authors_12mo": 22,
-  "commits_last_12mo": 115,
+  "commits_last_12mo": 116,
   "total_files": 130,
-  "total_lines": 28186,
-  "lines_added": 149346,
-  "lines_removed": 121160,
+  "total_lines": 28184,
+  "lines_added": 149350,
+  "lines_removed": 121164,
   "total_tags": 159,
   "era": "steady",
   "top_authors": [
@@ -324,7 +324,7 @@
     "Lutz Horn": 1,
     "Victor Pfautz": 1,
     "David Fontenot": 1,
-    "Mislav Cimpers\u030cak": 1,
+    "Mislav Cimper\u0161ak": 1,
     "John L. Villalovos": 1,
     "mattkohl": 6,
     "TetraEtc": 2,
@@ -734,7 +734,7 @@
     "Jonathan Drosdeck": 1,
     "Pinkerton": 1,
     "chadnickbok@gmail.com": 2,
-    "Johannes Gorset": 10,
+    "Johannes Gorset": 27,
     "Jakub Wieczorek": 1,
     "Brendan Maguire": 2,
     "asciimoo": 1,
@@ -745,7 +745,6 @@
     "Telofy": 1,
     "Brendon Crawford": 1,
     "David Kemp (Work)": 2,
-    "Johannes": 17,
     "Ronny Pfannschmidt": 5,
     "Hank Gay": 1,
     "Frank Kumro": 1,
@@ -778,7 +777,7 @@
     "Dan Head": 1,
     "Douglas Morrison": 2,
     "Pat Nakajima": 1,
-    "Je\u0301re\u0301my Bethmont": 23,
+    "J\u00e9r\u00e9my Bethmont": 23,
     "Michael Van Veen": 4,
     "Daniel Schauenberg": 10,
     "Mike Waldner": 18,
@@ -800,7 +799,7 @@
     "Juarez Bochi": 1,
     "Simon Sapin": 1,
     "Gul\u00e1csi Tam\u00e1s": 4,
-    "Rube\u0301n Abad": 1,
+    "Rub\u00e9n Abad": 1,
     "Xu Pan": 1,
     "Alberto Paro": 1,
     "Richard Boulton": 5,
@@ -828,7 +827,7 @@
     "2023": 109,
     "2024": 82,
     "2025": 53,
-    "2026": 115
+    "2026": 116
   },
   "ai_assisted": {
     "commits": 1,
@@ -886,22 +885,22 @@
       "2026-07": 7,
       "2026-08": 5,
       "2026-09": 2,
-      "2026-10": 0
+      "2026-10": 1
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 6495,
+    "commits": 6496,
     "by_kind": {
       "organization": 66,
       "one_person": 3904,
       "personal": 2232,
       "hidden": 212,
       "unknown": 16,
-      "bot": 65
+      "bot": 66
     },
     "organization_count": 15,
-    "last_12mo_from": "2025-10",
+    "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "rackspace.com",
@@ -1025,14 +1024,6 @@
       }
     ],
     "quarters": {
-      "2024-Q4": {
-        "organization": 0,
-        "one_person": 0,
-        "personal": 6,
-        "hidden": 1,
-        "unknown": 0,
-        "bot": 2
-      },
       "2025-Q1": {
         "organization": 0,
         "one_person": 4,
@@ -1088,13 +1079,21 @@
         "hidden": 1,
         "unknown": 0,
         "bot": 12
+      },
+      "2026-Q4": {
+        "organization": 0,
+        "one_person": 0,
+        "personal": 0,
+        "hidden": 0,
+        "unknown": 0,
+        "bot": 1
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-10",
-    "to": "2026-09",
-    "commits": 82,
+    "from": "2025-11",
+    "to": "2026-10",
+    "commits": 81,
     "authors": 22,
     "new_authors": 18,
     "half_of_commits": 1
@@ -1143,13 +1142,13 @@
     "-0300": 34,
     "-0400": 1794,
     "-0500": 1352,
-    "-0600": 316,
+    "-0600": 317,
     "-0700": 812,
     "-0800": 483,
     "-1000": 1
   },
   "source_lines": {
-    "added": 158652,
+    "added": 158656,
     "current": 27581
   }
 }

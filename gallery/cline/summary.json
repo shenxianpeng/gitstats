@@ -1,31 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:46:34+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:30:26+00:00",
   "name": "Cline",
   "report_path": "index.html",
   "first_commit": "2024-07-06 00:51:41",
-  "last_commit": "2026-10-26 02:46:40",
+  "last_commit": "2026-10-26 15:02:16",
   "age_days": 843,
   "active_days": 745,
-  "total_commits": 7701,
-  "total_authors": 348,
-  "active_authors_12mo": 152,
-  "commits_last_12mo": 3786,
+  "total_commits": 7705,
+  "total_authors": 345,
+  "active_authors_12mo": 149,
+  "commits_last_12mo": 3790,
   "total_files": 4399,
-  "total_lines": 1211758,
-  "lines_added": 2749026,
-  "lines_removed": 1537268,
-  "total_tags": 772,
+  "total_lines": 1211831,
+  "lines_added": 2749114,
+  "lines_removed": 1537278,
+  "total_tags": 775,
   "era": "steady",
   "top_authors": [
     {
       "name": "Saoud Rizwan",
-      "commits": 2861
-    },
-    {
-      "name": "Bee",
-      "commits": 734
+      "commits": 3615
     },
     {
       "name": "celestial-vault",
@@ -38,23 +34,25 @@
     {
       "name": "abeatrix",
       "commits": 275
+    },
+    {
+      "name": "Sarah Fortune",
+      "commits": 272
     }
   ],
   "author_commits": {
-    "Saoud Rizwan": 2861,
+    "Dante": 3,
+    "Saoud Rizwan": 3615,
     "Max": 102,
-    "Bee": 734,
     "Tom\u00e1s Barreiro": 252,
-    "Miko\u0142aj Kondratek": 106,
+    "Miko\u0142aj Kondratek": 220,
     "John Choi": 76,
     "zurrll": 1,
-    "Dominic Cooney": 114,
     "Lucien": 2,
     "TheRealSpencer": 11,
     "WANG JIANFEI": 1,
     "Fenil Modi": 2,
     "Younes Beriane": 1,
-    "Dante": 2,
     "Mark Cockram": 1,
     "Nemanja Marinkovic": 1,
     "Darsh Nandu": 1,
@@ -72,7 +70,6 @@
     "Renee Huang": 29,
     "Asem ahmed": 1,
     "Timothy Franceschi": 1,
-    "Haley Park": 17,
     "charles": 1,
     "alex-lum": 14,
     "Etisha Garg": 5,
@@ -393,7 +390,7 @@
   "commits_by_year": {
     "2024": 1067,
     "2025": 3336,
-    "2026": 3298
+    "2026": 3302
   },
   "ai_assisted": {
     "commits": 167,
@@ -453,17 +450,17 @@
       "2026-07": 355,
       "2026-08": 392,
       "2026-09": 323,
-      "2026-10": 201
+      "2026-10": 205
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7701,
+    "commits": 7705,
     "by_kind": {
       "organization": 911,
       "one_person": 256,
-      "personal": 1215,
-      "hidden": 5131,
+      "personal": 1216,
+      "hidden": 5134,
       "unknown": 0,
       "bot": 188
     },
@@ -579,8 +576,8 @@
       "2026-Q4": {
         "organization": 13,
         "one_person": 2,
-        "personal": 15,
-        "hidden": 170,
+        "personal": 16,
+        "hidden": 173,
         "unknown": 0,
         "bot": 1
       }
@@ -589,17 +586,17 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3725,
-    "authors": 148,
-    "new_authors": 117,
-    "half_of_commits": 3
+    "commits": 3729,
+    "authors": 145,
+    "new_authors": 115,
+    "half_of_commits": 2
   },
   "humans": {
-    "commits": 7513,
+    "commits": 7517,
     "commits_by_year": {
       "2024": 1067,
       "2025": 3188,
-      "2026": 3258
+      "2026": 3262
     },
     "active_days": 744
   },
@@ -612,7 +609,7 @@
     "+0500": 4,
     "+0530": 59,
     "+0700": 18,
-    "+0800": 211,
+    "+0800": 212,
     "+0900": 161,
     "+1000": 5,
     "+1100": 1,
@@ -621,12 +618,12 @@
     "-0400": 968,
     "-0500": 111,
     "-0600": 66,
-    "-0700": 3819,
+    "-0700": 3822,
     "-0800": 1494,
     "-1000": 60
   },
   "source_lines": {
-    "added": 2635471,
-    "current": 1169453
+    "added": 2635556,
+    "current": 1169531
   }
 }

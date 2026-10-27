@@ -1,31 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:45:27+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:29:26+00:00",
   "name": "uv",
   "report_path": "index.html",
   "first_commit": "2023-10-04 19:33:47",
-  "last_commit": "2026-10-25 22:51:11",
-  "age_days": 1118,
-  "active_days": 1025,
-  "total_commits": 11243,
-  "total_authors": 600,
-  "active_authors_12mo": 185,
-  "commits_last_12mo": 3493,
-  "total_files": 1880,
-  "total_lines": 885331,
-  "lines_added": 1816795,
-  "lines_removed": 931464,
-  "total_tags": 327,
+  "last_commit": "2026-10-26 23:59:05",
+  "age_days": 1119,
+  "active_days": 1026,
+  "total_commits": 11265,
+  "total_authors": 601,
+  "active_authors_12mo": 186,
+  "commits_last_12mo": 3515,
+  "total_files": 1882,
+  "total_lines": 891272,
+  "lines_added": 1839146,
+  "lines_removed": 947863,
+  "total_tags": 328,
   "era": "steady",
   "top_authors": [
     {
       "name": "Charlie Marsh",
-      "commits": 3456
-    },
-    {
-      "name": "Zanie Blue",
-      "commits": 2166
+      "commits": 3457
     },
     {
       "name": "konsti",
@@ -38,19 +34,25 @@
     {
       "name": "William Woodruff",
       "commits": 214
+    },
+    {
+      "name": "zaniebot",
+      "commits": 148
     }
   ],
   "author_commits": {
+    "Jonathan J. Helmus": 5,
+    "Tomasz Kramkowski": 128,
+    "Arpit Sahoo": 1,
+    "Micha\u0142 Fox": 1,
+    "Charlie Marsh": 3457,
     "Zsolt Dollenstein": 130,
     "William Woodruff": 214,
     "zaniebot": 148,
-    "Charlie Marsh": 3456,
-    "Zanie Blue": 2166,
     "Pasit Nusso": 1,
     "konsti": 1213,
     "Alex Waygood": 19,
     "Josh Cazalas": 2,
-    "Tomasz Kramkowski": 126,
     "ethernet": 1,
     "Laurent Cheylus": 1,
     "Mateusz Hajder": 1,
@@ -109,7 +111,6 @@
     "Wei Li": 1,
     "Sanjay Santhanam": 1,
     "Yiqi Yang": 1,
-    "Jonathan J. Helmus": 4,
     "Tim Felgentreff": 5,
     "LuNoX": 1,
     "LJX-xixi": 1,
@@ -646,7 +647,7 @@
     "2023": 496,
     "2024": 4780,
     "2025": 2770,
-    "2026": 3197
+    "2026": 3219
   },
   "ai_assisted": {
     "commits": 155,
@@ -707,30 +708,30 @@
       "2026-07": 505,
       "2026-08": 317,
       "2026-09": 422,
-      "2026-10": 528
+      "2026-10": 550
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11243,
+    "commits": 11265,
     "by_kind": {
-      "organization": 652,
-      "one_person": 2631,
-      "personal": 5519,
-      "hidden": 529,
+      "organization": 654,
+      "one_person": 2632,
+      "personal": 5521,
+      "hidden": 530,
       "unknown": 0,
-      "bot": 1912
+      "bot": 1928
     },
     "organization_count": 4,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "astral.sh",
-        "commits": 632,
-        "commits_last_12mo": 350,
+        "commits": 634,
+        "commits_last_12mo": 352,
         "addresses": 5,
         "first_commit": "2023-11-07",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "prefix.dev",
@@ -815,36 +816,36 @@
         "bot": 461
       },
       "2026-Q4": {
-        "organization": 42,
-        "one_person": 74,
-        "personal": 183,
-        "hidden": 6,
+        "organization": 44,
+        "one_person": 75,
+        "personal": 185,
+        "hidden": 7,
         "unknown": 0,
-        "bot": 223
+        "bot": 239
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2368,
-    "authors": 178,
-    "new_authors": 136,
+    "commits": 1752,
+    "authors": 179,
+    "new_authors": 138,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 9331,
+    "commits": 9337,
     "commits_by_year": {
       "2023": 496,
       "2024": 4456,
       "2025": 2265,
-      "2026": 2114
+      "2026": 2120
     },
-    "active_days": 1019
+    "active_days": 1020
   },
   "timezones": {
-    "+0000": 829,
-    "+0100": 1090,
+    "+0000": 831,
+    "+0100": 1091,
     "+0200": 1073,
     "+0300": 47,
     "+0330": 6,
@@ -862,14 +863,14 @@
     "+1300": 5,
     "-0300": 14,
     "-0400": 3405,
-    "-0500": 2946,
+    "-0500": 2948,
     "-0600": 785,
-    "-0700": 458,
+    "-0700": 475,
     "-0800": 242,
     "-1000": 21
   },
   "source_lines": {
-    "added": 1625376,
-    "current": 783855
+    "added": 1647521,
+    "current": 789800
   }
 }

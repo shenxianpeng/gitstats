@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:55:14+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:40:07+00:00",
   "name": "Neovim",
   "report_path": "index.html",
   "first_commit": "2014-01-31 13:39:15",
-  "last_commit": "2026-10-26 00:38:03",
+  "last_commit": "2026-10-26 10:17:06",
   "age_days": 4651,
   "active_days": 4502,
-  "total_commits": 38560,
-  "total_authors": 1505,
+  "total_commits": 38561,
+  "total_authors": 1503,
   "active_authors_12mo": 288,
-  "commits_last_12mo": 4206,
+  "commits_last_12mo": 4207,
   "total_files": 3940,
-  "total_lines": 1739057,
-  "lines_added": 3708503,
-  "lines_removed": 1969446,
+  "total_lines": 1738920,
+  "lines_added": 3708510,
+  "lines_removed": 1969453,
   "total_tags": 26,
   "era": "steady",
   "top_authors": [
@@ -37,15 +37,15 @@
     },
     {
       "name": "Christian Clason",
-      "commits": 1632
+      "commits": 1633
     }
   ],
   "author_commits": {
+    "Christian Clason": 1633,
     "zeertzjq": 7153,
     "Douglas Camata": 1,
     "Andrea Covelli": 1,
     "Justin M. Keyes": 5057,
-    "Christian Clason": 1632,
     "awss": 1,
     "glepnir": 346,
     "Tom Dobson": 2,
@@ -204,7 +204,7 @@
     "Jackson Ludwig": 1,
     "Michele Campeotto": 3,
     "Will Lillis": 2,
-    "Luis Calle": 12,
+    "Luis Calle": 15,
     "Alexej Kowalew": 2,
     "Szymon Wilczek": 3,
     "Quentin": 1,
@@ -523,7 +523,6 @@
     "alex-tdrn": 1,
     "Matt Fellenz": 1,
     "Tom Praschan": 14,
-    "TheLeoP": 3,
     "yuyk": 1,
     "Rafael Kitover": 2,
     "Jerry": 1,
@@ -566,7 +565,7 @@
     "Colin Watson": 1,
     "George Zhao": 21,
     "\u518d\u751f\u82b1": 6,
-    "rktjmp": 1,
+    "rktjmp": 16,
     "Vu Nhat Chuong": 1,
     "itchyny": 2,
     "Nacho Nieva": 2,
@@ -620,7 +619,6 @@
     "Bogdan Grigoru\u021b\u0103": 2,
     "Tom Blake": 1,
     "tj-moody": 1,
-    "Oliver Marriott": 15,
     "Ibby": 25,
     "J\u0119drzej Boczar": 1,
     "sid-6581": 1,
@@ -945,7 +943,7 @@
     "Thiago Mota Martins": 2,
     "C\u00e9dric Barreteau": 7,
     "Aaron Wu": 1,
-    "Mickae\u0308l Menu": 1,
+    "Micka\u00ebl Menu": 1,
     "Raymond W. Ko": 3,
     "disrupted": 2,
     "jing": 8,
@@ -1274,7 +1272,7 @@
     "Ryan Prichard": 1,
     "Sebastian Parborg": 6,
     "Jonathan de Boyne Pollard": 74,
-    "Peter Renstro\u0308m": 1,
+    "Peter Renstr\u00f6m": 1,
     "d10n": 1,
     "Jakob Schnitzer": 23,
     "David Galeano": 1,
@@ -1406,7 +1404,7 @@
     "Wander Nauta": 2,
     "Hettomei": 12,
     "Nick Hynes": 5,
-    "Eliseo Marti\u0301nez": 265,
+    "Eliseo Mart\u00ednez": 265,
     "Ismail Badawi": 1,
     "alecbrooks": 1,
     "Nathan Wilson": 1,
@@ -1560,7 +1558,7 @@
     "2023": 3985,
     "2024": 3283,
     "2025": 3384,
-    "2026": 3681
+    "2026": 3682
   },
   "ai_assisted": {
     "commits": 57,
@@ -1619,15 +1617,15 @@
       "2026-07": 420,
       "2026-08": 428,
       "2026-09": 404,
-      "2026-10": 223
+      "2026-10": 224
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38560,
+    "commits": 38561,
     "by_kind": {
       "organization": 34,
-      "one_person": 6593,
+      "one_person": 6594,
       "personal": 29900,
       "hidden": 1857,
       "unknown": 17,
@@ -1760,7 +1758,7 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 35,
+        "one_person": 36,
         "personal": 170,
         "hidden": 11,
         "unknown": 0,
@@ -1771,13 +1769,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4097,
+    "commits": 4098,
     "authors": 285,
     "new_authors": 205,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 38401,
+    "commits": 38402,
     "commits_by_year": {
       "2014": 2640,
       "2015": 2124,
@@ -1791,13 +1789,13 @@
       "2023": 3971,
       "2024": 3279,
       "2025": 3354,
-      "2026": 3582
+      "2026": 3583
     },
     "active_days": 4502
   },
   "timezones": {
     "+0000": 1118,
-    "+0100": 6146,
+    "+0100": 6147,
     "+0200": 7780,
     "+0300": 1873,
     "+0330": 2,
@@ -1824,7 +1822,7 @@
     "-0800": 616
   },
   "source_lines": {
-    "added": 3672513,
+    "added": 3675054,
     "current": 1703188
   }
 }

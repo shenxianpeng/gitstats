@@ -1,50 +1,60 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:48:07+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:31:59+00:00",
   "name": "llama.cpp",
   "report_path": "index.html",
   "first_commit": "2023-03-10 18:40:58",
-  "last_commit": "2026-10-25 23:08:22",
-  "age_days": 1326,
-  "active_days": 1297,
-  "total_commits": 11889,
-  "total_authors": 2058,
-  "active_authors_12mo": 952,
-  "commits_last_12mo": 4982,
-  "total_files": 3914,
-  "total_lines": 1637224,
-  "lines_added": 3401913,
-  "lines_removed": 1764689,
-  "total_tags": 8123,
+  "last_commit": "2026-10-26 23:56:01",
+  "age_days": 1327,
+  "active_days": 1298,
+  "total_commits": 11913,
+  "total_authors": 2054,
+  "active_authors_12mo": 949,
+  "commits_last_12mo": 5006,
+  "total_files": 3916,
+  "total_lines": 1639584,
+  "lines_added": 3406952,
+  "lines_removed": 1767259,
+  "total_tags": 8142,
   "era": "peak",
   "top_authors": [
     {
-      "name": "Georgi Gerganov",
-      "commits": 2047
+      "name": "Sigbj\u00f8rn Skj\u00e6ret",
+      "commits": 2482
     },
     {
-      "name": "Xuan-Son Nguyen",
-      "commits": 510
+      "name": "Pascal",
+      "commits": 997
     },
     {
       "name": "Johannes G\u00e4\u00dfler",
       "commits": 402
     },
     {
-      "name": "Sigbj\u00f8rn Skj\u00e6ret",
-      "commits": 388
+      "name": "Diego Devesa",
+      "commits": 362
     },
     {
-      "name": "Diego Devesa",
-      "commits": 355
+      "name": "Jeff Bolz",
+      "commits": 317
     }
   ],
   "author_commits": {
+    "Ehsan Bateni": 3,
+    "begcdn": 1,
+    "Sigbj\u00f8rn Skj\u00e6ret": 2482,
+    "Hongqiang Wang": 38,
+    "Max Krasnyansky": 77,
+    "Pascal": 997,
+    "virajwad": 3,
+    "Titaniumtown": 27,
+    "Captain-Tripps": 3,
+    "KyleHagy": 3,
+    "Evan Huus": 8,
+    "feni6": 1,
+    "Aman Gupta": 190,
     "Adrien Gallou\u00ebt": 197,
-    "Xuan-Son Nguyen": 510,
-    "Georgi Gerganov": 2047,
-    "Aman Gupta": 189,
     "Masashi Yoshimura": 43,
     "Trunk Trick": 1,
     "Anthony Wang": 1,
@@ -53,13 +63,10 @@
     "anujj": 3,
     "Jeff Bolz": 317,
     "Ian McKellar": 2,
-    "Max Krasnyansky": 76,
     "lhez": 105,
     "Yuri Khrustalev": 18,
     "Joseph Patricio": 1,
-    "Ehsan Bateni": 2,
     "Katara": 1,
-    "Aleksander Grygier": 283,
     "Satyam Thakur": 1,
     "Alexey Kopytko": 10,
     "Daniel Bevenius": 290,
@@ -72,9 +79,7 @@
     "Sreeram": 1,
     "Christian Loehnert": 1,
     "Kartik Gulia": 8,
-    "Sigbj\u00f8rn Skj\u00e6ret": 388,
     "Raul Torres": 9,
-    "Titaniumtown": 25,
     "Pranesh Gonegandla": 8,
     "Takamichi Ohara": 3,
     "Todd Malsbary": 11,
@@ -125,7 +130,6 @@
     "A-Raphie": 1,
     "Kashif Rasul": 4,
     "Aldehir Rojas": 83,
-    "Evan Huus": 7,
     "Johannes G\u00e4\u00dfler": 402,
     "Joel": 1,
     "fzowl": 1,
@@ -134,7 +138,6 @@
     "Jhen-Jie Hong": 41,
     "Andrea Rossetti": 1,
     "Todor Boinovski": 19,
-    "Pascal": 199,
     "Xue Zhenliang": 1,
     "Sandro Hanea": 3,
     "Marcus": 1,
@@ -160,7 +163,6 @@
     "Nathan Wilson": 3,
     "cqderek": 4,
     "Ethan Guo": 3,
-    "Hongqiang Wang": 37,
     "stormy": 1,
     "Leebr Data Consulting": 2,
     "Francisco Herrera": 6,
@@ -173,7 +175,6 @@
     "Pranav Dhinakar": 5,
     "Adam Caldwell": 1,
     "homeofe": 1,
-    "Oliver Simons": 40,
     "Animesh": 2,
     "Muhammad Saad": 2,
     "Pratyush Kumar": 3,
@@ -186,7 +187,6 @@
     "Ploo": 1,
     "Mikolaj Kucharski": 4,
     "David Friehs": 13,
-    "Captain-Tripps": 2,
     "Dante": 1,
     "Martin Emrich": 1,
     "Anav Prasad": 11,
@@ -222,7 +222,6 @@
     "Ihar Hrachyshka": 3,
     "Ravi Panchumarthy": 9,
     "Aparna M P": 15,
-    "virajwad": 2,
     "Giovanni Rivera": 1,
     "Konrad Moren": 2,
     "Yufeng He": 1,
@@ -461,7 +460,6 @@
     "Talha Adnan": 1,
     "mgroeber9110": 10,
     "akleine": 2,
-    "KyleHagy": 2,
     "Nico": 1,
     "Anand Patil": 1,
     "Sachin Sharma": 4,
@@ -632,7 +630,7 @@
     "Judd": 11,
     "CrispStrobe": 3,
     "Steve Lhomme": 1,
-    "Holger Voormann": 1,
+    "Holger Voormann": 5,
     "kubawoo": 1,
     "Omer Ozarslan": 1,
     "Sid Shaytay": 1,
@@ -947,7 +945,7 @@
     "Mahekk Shaikh": 1,
     "Haiyue Wang": 5,
     "Igor Smirnov": 1,
-    "Diego Devesa": 355,
+    "Diego Devesa": 362,
     "Fredrik Hultin": 1,
     "matt23654": 2,
     "Han Qingzhe": 1,
@@ -1612,7 +1610,6 @@
     "hxer7963": 1,
     "Ziang Wu": 5,
     "hutli": 6,
-    "howlger": 4,
     "Kawrakow": 100,
     "Joseph Stahl": 1,
     "Christian K\u00f6gler": 1,
@@ -2097,22 +2094,21 @@
     "Oleksandr Nikitin": 1,
     "deepdiffuser": 1,
     "Simon Willison": 1,
-    "Jean-Micha\u00ebl Celerier": 1,
-    "slaren": 7
+    "Jean-Micha\u00ebl Celerier": 1
   },
   "commits_by_year": {
     "2023": 1743,
     "2024": 2662,
     "2025": 3193,
-    "2026": 4291
+    "2026": 4315
   },
   "ai_assisted": {
-    "commits": 289,
+    "commits": 292,
     "authored": 2,
     "assistants": {
-      "Pi": 116,
-      "Claude": 107,
-      "Codex": 36,
+      "Pi": 117,
+      "Claude": 108,
+      "Codex": 37,
       "OpenCode": 20,
       "GitHub Copilot": 11,
       "ChatGPT": 8,
@@ -2145,7 +2141,7 @@
       "2026-07": 17,
       "2026-08": 50,
       "2026-09": 92,
-      "2026-10": 101
+      "2026-10": 104
     },
     "commits_by_month": {
       "2024-11": 229,
@@ -2171,17 +2167,17 @@
       "2026-07": 365,
       "2026-08": 513,
       "2026-09": 582,
-      "2026-10": 578
+      "2026-10": 602
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11889,
+    "commits": 11913,
     "by_kind": {
-      "organization": 2209,
-      "one_person": 1999,
-      "personal": 5593,
-      "hidden": 2080,
+      "organization": 2215,
+      "one_person": 2001,
+      "personal": 5606,
+      "hidden": 2083,
       "unknown": 0,
       "bot": 8
     },
@@ -2190,11 +2186,11 @@
     "top": [
       {
         "organization": "huggingface.co",
-        "commits": 773,
-        "commits_last_12mo": 624,
+        "commits": 776,
+        "commits_last_12mo": 627,
         "addresses": 5,
         "first_commit": "2024-03-26",
-        "last_commit": "2026-10-25"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "nvidia.com",
@@ -2206,11 +2202,11 @@
       },
       {
         "organization": "qualcomm.com",
-        "commits": 292,
-        "commits_last_12mo": 266,
+        "commits": 295,
+        "commits_last_12mo": 269,
         "addresses": 20,
         "first_commit": "2025-07-22",
-        "last_commit": "2026-10-25"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "ibm.com",
@@ -2447,10 +2443,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 192,
-        "one_person": 78,
-        "personal": 206,
-        "hidden": 102,
+        "organization": 198,
+        "one_person": 80,
+        "personal": 219,
+        "hidden": 105,
         "unknown": 0,
         "bot": 0
       }
@@ -2459,25 +2455,25 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 4982,
-    "authors": 945,
-    "new_authors": 795,
-    "half_of_commits": 15
+    "commits": 5006,
+    "authors": 943,
+    "new_authors": 796,
+    "half_of_commits": 11
   },
   "humans": {
-    "commits": 11881,
+    "commits": 11905,
     "commits_by_year": {
       "2023": 1743,
       "2024": 2654,
       "2025": 3193,
-      "2026": 4291
+      "2026": 4315
     },
-    "active_days": 1297
+    "active_days": 1298
   },
   "timezones": {
     "+0000": 407,
-    "+0100": 1648,
-    "+0200": 3625,
+    "+0100": 1655,
+    "+0200": 3630,
     "+0300": 1579,
     "+0330": 7,
     "+0400": 18,
@@ -2486,7 +2482,7 @@
     "+0530": 317,
     "+0600": 3,
     "+0700": 44,
-    "+0800": 1369,
+    "+0800": 1371,
     "+0900": 260,
     "+0930": 2,
     "+1000": 48,
@@ -2497,16 +2493,16 @@
     "-0100": 1,
     "-0230": 1,
     "-0300": 111,
-    "-0400": 532,
-    "-0500": 567,
-    "-0600": 296,
-    "-0700": 795,
+    "-0400": 534,
+    "-0500": 568,
+    "-0600": 297,
+    "-0700": 801,
     "-0800": 180,
     "-1000": 3,
     "-1100": 1
   },
   "source_lines": {
-    "added": 3312915,
-    "current": 1447683
+    "added": 3317954,
+    "current": 1450152
   }
 }

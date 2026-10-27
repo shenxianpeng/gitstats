@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:50:12+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:33:37+00:00",
   "name": "Argo CD",
   "report_path": "index.html",
   "first_commit": "2018-02-15 00:53:07",
-  "last_commit": "2026-10-26 01:05:51",
+  "last_commit": "2026-10-26 21:02:42",
   "age_days": 3176,
   "active_days": 2446,
-  "total_commits": 11799,
-  "total_authors": 2031,
-  "active_authors_12mo": 385,
-  "commits_last_12mo": 2288,
-  "total_files": 6170,
-  "total_lines": 3347334,
-  "lines_added": 8436905,
-  "lines_removed": 5089571,
+  "total_commits": 11814,
+  "total_authors": 2030,
+  "active_authors_12mo": 386,
+  "commits_last_12mo": 2303,
+  "total_files": 6173,
+  "total_lines": 3348742,
+  "lines_added": 8440758,
+  "lines_removed": 5091699,
   "total_tags": 21,
   "era": "peak",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Michael Crenshaw",
-      "commits": 728
+      "commits": 729
     },
     {
       "name": "Jesse Suen",
@@ -41,13 +41,18 @@
     }
   ],
   "author_commits": {
+    "Blake Pettersson": 144,
+    "Afzal Ansari": 11,
+    "Jan Ku\u010dera": 14,
+    "Soumya Ghosh Dastidar": 50,
+    "Cecil W\u00f6bker": 2,
+    "Jaewoo Choi": 65,
+    "Michael Crenshaw": 729,
+    "gaurang_mishra": 1,
     "Dhruv P.": 1,
-    "Michael Crenshaw": 728,
     "Sunil Mehta": 1,
     "David Backeus": 1,
-    "Soumya Ghosh Dastidar": 49,
     "vitaly-sinev": 1,
-    "Blake Pettersson": 142,
     "berce": 3,
     "anant": 2,
     "Rayan Alyasi": 1,
@@ -62,14 +67,12 @@
     "Rick Brouwer": 17,
     "dudinea": 55,
     "KR Ravindra": 2,
-    "Jaewoo Choi": 64,
     "Atif Ali": 30,
     "Manenimabasi Udoh (Dev Mani)": 1,
     "Julian-Chu": 3,
     "Prashant Nakhate": 3,
     "Ganesh Gurudu": 3,
     "Simon Cho": 2,
-    "Jan Ku\u010dera": 13,
     "\u0141ukasz Szczepaniak": 4,
     "Bisman Singh": 2,
     "Farhan Ramadhan": 1,
@@ -115,7 +118,7 @@
     "Tyler": 1,
     "maithilijoshi20": 1,
     "Alexander Matyushentsev": 1496,
-    "rumstead": 61,
+    "rumstead": 62,
     "Son Hyunbin": 1,
     "mrchatam": 1,
     "jwinters01": 18,
@@ -207,7 +210,6 @@
     "RealFakeAccount": 1,
     "Nikhil J": 1,
     "Omar": 2,
-    "Cecil W\u00f6bker": 1,
     "Rishabh Pandey": 7,
     "Julie Vogelman": 7,
     "Matthias Baur": 1,
@@ -250,7 +252,7 @@
     "nmirasch": 3,
     "boostrack": 2,
     "Christian Hernandez": 14,
-    "chansuke": 1,
+    "chansuke": 12,
     "Michele Baldessari": 3,
     "kbweave": 1,
     "George Pchelkin": 1,
@@ -376,7 +378,6 @@
     "Ekene Chris": 2,
     "QingHe": 1,
     "Jesse Hitch": 5,
-    "Afzal Ansari": 10,
     "Alexander": 2,
     "Ryan Wu": 1,
     "Piyush Khobragade": 1,
@@ -434,7 +435,6 @@
     "Dobromir Zahariev": 1,
     "downfa11": 7,
     "Jakub Ciolek": 2,
-    "Yusuke Abe": 11,
     "jiwlee": 6,
     "Andreas Schramm": 1,
     "Rianov Viacheslav": 1,
@@ -1326,7 +1326,6 @@
     "Ian Delahorne": 1,
     "Peter Macdonald": 1,
     "\uc815\uc2b9\uc6d0": 1,
-    "Ryan Umstead": 1,
     "Mahesh Baliga": 4,
     "jiwonaid": 1,
     "Chris Reilly": 2,
@@ -2082,13 +2081,13 @@
     "2023": 1237,
     "2024": 1639,
     "2025": 1759,
-    "2026": 2003
+    "2026": 2018
   },
   "ai_assisted": {
-    "commits": 74,
+    "commits": 77,
     "authored": 0,
     "assistants": {
-      "Claude": 32,
+      "Claude": 35,
       "Cursor": 27,
       "GitHub Copilot": 15
     },
@@ -2116,7 +2115,7 @@
       "2026-07": 8,
       "2026-08": 6,
       "2026-09": 17,
-      "2026-10": 19
+      "2026-10": 22
     },
     "commits_by_month": {
       "2024-11": 105,
@@ -2142,19 +2141,19 @@
       "2026-07": 206,
       "2026-08": 179,
       "2026-09": 252,
-      "2026-10": 190
+      "2026-10": 205
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11799,
+    "commits": 11814,
     "by_kind": {
       "organization": 2174,
-      "one_person": 1278,
-      "personal": 2845,
-      "hidden": 3126,
+      "one_person": 1279,
+      "personal": 2850,
+      "hidden": 3129,
       "unknown": 0,
-      "bot": 2376
+      "bot": 2382
     },
     "organization_count": 21,
     "last_12mo_from": "2025-11",
@@ -2387,24 +2386,24 @@
       },
       "2026-Q4": {
         "organization": 7,
-        "one_person": 7,
-        "personal": 39,
-        "hidden": 66,
+        "one_person": 8,
+        "personal": 44,
+        "hidden": 69,
         "unknown": 0,
-        "bot": 71
+        "bot": 77
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1368,
-    "authors": 384,
+    "commits": 1377,
+    "authors": 385,
     "new_authors": 290,
     "half_of_commits": 15
   },
   "humans": {
-    "commits": 9423,
+    "commits": 9432,
     "commits_by_year": {
       "2018": 871,
       "2019": 1073,
@@ -2414,29 +2413,29 @@
       "2023": 1001,
       "2024": 1078,
       "2025": 1147,
-      "2026": 1190
+      "2026": 1199
     },
-    "active_days": 2380
+    "active_days": 2381
   },
   "timezones": {
-    "+0000": 506,
-    "+0100": 726,
+    "+0000": 508,
+    "+0100": 732,
     "+0200": 1619,
     "+0300": 826,
     "+0330": 7,
     "+0400": 6,
     "+0500": 22,
-    "+0530": 689,
+    "+0530": 694,
     "+0545": 3,
     "+0700": 27,
     "+0800": 342,
-    "+0900": 404,
+    "+0900": 405,
     "+1000": 53,
     "+1100": 21,
     "+1200": 2,
     "+1300": 4,
     "-0300": 43,
-    "-0400": 1918,
+    "-0400": 1919,
     "-0500": 913,
     "-0600": 137,
     "-0700": 2415,
@@ -2444,7 +2443,7 @@
     "-1000": 96
   },
   "source_lines": {
-    "added": 7808517,
-    "current": 3047114
+    "added": 7810086,
+    "current": 3048312
   }
 }

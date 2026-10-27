@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:47:49+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:31:36+00:00",
   "name": "Ollama",
   "report_path": "index.html",
   "first_commit": "2023-06-22 16:45:31",
-  "last_commit": "2026-10-24 18:03:30",
-  "age_days": 1221,
-  "active_days": 1027,
-  "total_commits": 5946,
+  "last_commit": "2026-10-27 00:31:31",
+  "age_days": 1223,
+  "active_days": 1029,
+  "total_commits": 5950,
   "total_authors": 620,
   "active_authors_12mo": 112,
-  "commits_last_12mo": 1219,
-  "total_files": 1513,
-  "total_lines": 1037180,
-  "lines_added": 2284030,
-  "lines_removed": 1246850,
-  "total_tags": 655,
+  "commits_last_12mo": 1223,
+  "total_files": 1516,
+  "total_lines": 1039025,
+  "lines_added": 2286084,
+  "lines_removed": 1247032,
+  "total_tags": 656,
   "era": "steady",
   "top_authors": [
     {
@@ -25,7 +25,7 @@
     },
     {
       "name": "Daniel Hiltgen",
-      "commits": 1046
+      "commits": 1049
     },
     {
       "name": "Jeffrey Morgan",
@@ -41,11 +41,11 @@
     }
   ],
   "author_commits": {
-    "Daniel Hiltgen": 1046,
+    "J Berg": 18,
+    "Daniel Hiltgen": 1049,
     "Jeffrey Morgan": 932,
     "SynapShift": 1,
     "Eva H": 111,
-    "J Berg": 17,
     "Patrick Devine": 222,
     "Parth Sareen": 248,
     "Devon Rifkin": 112,
@@ -666,7 +666,7 @@
     "2023": 1681,
     "2024": 2083,
     "2025": 1146,
-    "2026": 1036
+    "2026": 1040
   },
   "ai_assisted": {
     "commits": 3,
@@ -725,17 +725,17 @@
       "2026-07": 91,
       "2026-08": 105,
       "2026-09": 109,
-      "2026-10": 136
+      "2026-10": 140
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5946,
+    "commits": 5950,
     "by_kind": {
-      "organization": 972,
+      "organization": 973,
       "one_person": 645,
       "personal": 3016,
-      "hidden": 1296,
+      "hidden": 1299,
       "unknown": 17,
       "bot": 0
     },
@@ -744,11 +744,11 @@
     "top": [
       {
         "organization": "ollama.com",
-        "commits": 772,
-        "commits_last_12mo": 263,
+        "commits": 773,
+        "commits_last_12mo": 264,
         "addresses": 6,
         "first_commit": "2023-11-08",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-27"
       },
       {
         "organization": "infrahq.com",
@@ -841,10 +841,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 32,
+        "organization": 33,
         "one_person": 3,
         "personal": 18,
-        "hidden": 71,
+        "hidden": 74,
         "unknown": 12,
         "bot": 0
       }
@@ -853,20 +853,20 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1219,
+    "commits": 1223,
     "authors": 111,
     "new_authors": 87,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 5946,
+    "commits": 5950,
     "commits_by_year": {
       "2023": 1681,
       "2024": 2083,
       "2025": 1146,
-      "2026": 1036
+      "2026": 1040
     },
-    "active_days": 1027
+    "active_days": 1029
   },
   "timezones": {
     "+0000": 47,
@@ -892,12 +892,12 @@
     "-0400": 647,
     "-0500": 310,
     "-0600": 35,
-    "-0700": 3138,
+    "-0700": 3142,
     "-0800": 1137,
     "-1000": 1
   },
   "source_lines": {
-    "added": 1531362,
-    "current": 487210
+    "added": 1533416,
+    "current": 489082
   }
 }

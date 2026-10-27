@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.0.post1.dev1",
-  "generated_at": "2026-10-26T03:56:10+00:00",
+  "generated_by": "gitstats 2.12.1",
+  "generated_at": "2026-10-27T01:40:22+00:00",
   "name": "Redis",
   "report_path": "index.html",
   "first_commit": "2009-03-22 09:30:00",
-  "last_commit": "2026-10-26 02:01:33",
-  "age_days": 6427,
+  "last_commit": "2026-10-26 12:40:46",
+  "age_days": 6428,
   "active_days": 3843,
-  "total_commits": 13378,
-  "total_authors": 910,
+  "total_commits": 13380,
+  "total_authors": 908,
   "active_authors_12mo": 119,
-  "commits_last_12mo": 587,
-  "total_files": 1941,
-  "total_lines": 664215,
-  "lines_added": 1053316,
-  "lines_removed": 389101,
+  "commits_last_12mo": 589,
+  "total_files": 1944,
+  "total_lines": 665403,
+  "lines_added": 1054725,
+  "lines_removed": 389188,
   "total_tags": 28,
   "era": "steady",
   "top_authors": [
@@ -41,11 +41,11 @@
     }
   ],
   "author_commits": {
+    "hristostaykov-del": 14,
+    "Vitah Lin": 82,
     "Marcin Po\u017aniak": 2,
-    "Vitah Lin": 81,
     "Lazizbek Ergashev": 4,
     "Salvatore Sanfilippo": 7214,
-    "hristostaykov-del": 13,
     "Slavomir Kaslev": 31,
     "Shubham S Taple": 7,
     "LiranAbir": 2,
@@ -199,7 +199,7 @@
     "Yunxiao Du": 1,
     "Ofir Luzon": 3,
     "Raz Monsonego": 3,
-    "Meir Shpilraien (Spielrein)": 68,
+    "Meir Shpilraien (Spielrein)": 81,
     "Mingyi Kang": 5,
     "Mason": 1,
     "Dustin Rodrigues": 1,
@@ -328,7 +328,7 @@
     "aradz44": 2,
     "CatboxParadox": 1,
     "Huang Zhw": 66,
-    "yancz2000": 7,
+    "yancz2000": 8,
     "Hanif Ariffin": 3,
     "AntiTopQuark": 1,
     "qetu3790": 7,
@@ -418,7 +418,6 @@
     "Hongcai Ren": 1,
     "\u4e3d\u5a9b\u81ea\u5df1\u52a8": 3,
     "leishiao": 2,
-    "meir@redislabs.com": 13,
     "OfirMos": 1,
     "Pavel Melkozerov": 1,
     "RuiliF": 1,
@@ -949,8 +948,7 @@
     "Ludovico Magnocavallo": 8,
     "Bob Potter": 3,
     "Brian Hammond": 1,
-    "Luc Heinrich": 4,
-    "yjph": 1
+    "Luc Heinrich": 4
   },
   "commits_by_year": {
     "2009": 435,
@@ -970,7 +968,7 @@
     "2023": 453,
     "2024": 321,
     "2025": 549,
-    "2026": 522
+    "2026": 524
   },
   "ai_assisted": {
     "commits": 44,
@@ -1030,16 +1028,16 @@
       "2026-07": 64,
       "2026-08": 53,
       "2026-09": 45,
-      "2026-10": 59
+      "2026-10": 61
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 13378,
+    "commits": 13380,
     "by_kind": {
-      "organization": 1915,
+      "organization": 1916,
       "one_person": 633,
-      "personal": 10262,
+      "personal": 10263,
       "hidden": 546,
       "unknown": 5,
       "bot": 17
@@ -1057,11 +1055,11 @@
       },
       {
         "organization": "redis.com",
-        "commits": 449,
-        "commits_last_12mo": 133,
+        "commits": 450,
+        "commits_last_12mo": 134,
         "addresses": 30,
         "first_commit": "2021-11-28",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-10-26"
       },
       {
         "organization": "alibaba-inc.com",
@@ -1226,9 +1224,9 @@
         "bot": 1
       },
       "2026-Q4": {
-        "organization": 17,
+        "organization": 18,
         "one_person": 0,
-        "personal": 29,
+        "personal": 30,
         "hidden": 11,
         "unknown": 0,
         "bot": 2
@@ -1238,13 +1236,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 582,
+    "commits": 584,
     "authors": 118,
     "new_authors": 83,
     "half_of_commits": 9
   },
   "humans": {
-    "commits": 13361,
+    "commits": 13363,
     "commits_by_year": {
       "2009": 435,
       "2010": 1057,
@@ -1263,14 +1261,14 @@
       "2023": 450,
       "2024": 319,
       "2025": 549,
-      "2026": 517
+      "2026": 519
     },
     "active_days": 3840
   },
   "timezones": {
     "+0000": 145,
     "+0100": 3790,
-    "+0200": 5033,
+    "+0200": 5034,
     "+0300": 1159,
     "+0330": 3,
     "+0400": 9,
@@ -1279,7 +1277,7 @@
     "+0530": 75,
     "+0600": 1,
     "+0700": 17,
-    "+0800": 1863,
+    "+0800": 1864,
     "+0900": 90,
     "+1000": 6,
     "+1100": 13,
@@ -1294,7 +1292,7 @@
     "-0800": 191
   },
   "source_lines": {
-    "added": 1172376,
-    "current": 640795
+    "added": 1173785,
+    "current": 642117
   }
 }
