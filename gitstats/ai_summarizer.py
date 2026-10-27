@@ -8,10 +8,11 @@ import datetime
 import hashlib
 import json
 import logging
+import re
 from pathlib import Path
 from typing import Any
 
-from gitstats.ai_providers import AIProviderError, AIProviderFactory
+from gitstats.ai_providers import AIProviderError, AIProviderFactory, AIProviderUnavailableError
 
 logger = logging.getLogger("gitstats")
 
@@ -19,20 +20,22 @@ logger = logging.getLogger("gitstats")
 class AISummarizer:
     """Generates AI-powered summaries for GitStats reports."""
 
-    # Common bot account patterns to filter out from analysis
-    BOT_PATTERNS = [
-        "[bot]",
-        "bot@",
-        "dependabot",
-        "pre-commit-ci",
-        "renovate",
-        "github-actions",
-        "greenkeeper",
-        "snyk-bot",
-        "codecov",
-        "travis",
-        "jenkins",
-    ]
+    # Services whose accounts commit: "travis-ci" and "jenkins-deploy" are
+    # bots, "Travis Oliphant" and "Sarah Jenkins" are people
+    BOT_SERVICES = frozenset(
+        {
+            "dependabot",
+            "renovate",
+            "greenkeeper",
+            "snyk",
+            "codecov",
+            "github-actions",
+            "pre-commit-ci",
+            "travis-ci",
+            "jenkins",
+            "buildbot",
+        }
+    )
 
     # Language-specific prompt instructions
     LANGUAGE_INSTRUCTIONS = {
@@ -67,11 +70,13 @@ class AISummarizer:
                     "base_url": config.get("ollama_base_url", "http://localhost:11434"),
                     "max_retries": config.get("ai_max_retries", 3),
                     "retry_delay": config.get("ai_retry_delay", 1),
+                    "timeout": config.get("ai_timeout", 120),
                 }
                 self.provider = AIProviderFactory.create(provider_name, provider_config)
                 logger.info(f"Initialized AI provider: {provider_name}")
-            except Exception:
-                logger.exception("Failed to initialize AI provider")
+            except Exception as e:
+                # the caller says it in one line; the traceback is for --debug
+                logger.debug("Failed to initialize AI provider", exc_info=e)
                 raise
 
     def set_cache_dir(self, cache_dir: str):
@@ -117,13 +122,35 @@ class AISummarizer:
 
     def _get_language_instruction(self) -> str:
         """Get language-specific instruction for prompts."""
-        language = self.config.get("ai_language", "en")
-        return self.LANGUAGE_INSTRUCTIONS.get(language, self.LANGUAGE_INSTRUCTIONS["en"])
+        language = str(self.config.get("ai_language") or "en").strip()
+        if language in self.LANGUAGE_INSTRUCTIONS:
+            return self.LANGUAGE_INSTRUCTIONS[language]
+        # another language code: the model can write in it; the page's own
+        # headings stay in English
+        return f"Provide your analysis in the language whose code is {language!r}."
 
     def _is_bot_account(self, author_name: str) -> bool:
-        """Check if an author name is a bot account."""
-        author_lower = author_name.lower()
-        return any(pattern.lower() in author_lower for pattern in self.BOT_PATTERNS)
+        """Check if an author name is a bot account.
+
+        A bot is named ``something[bot]``, has a word "bot" in its name
+        ("snyk-bot", "Renovate Bot"), or is the account of a service that
+        commits ("dependabot", "travis-ci", "GitHub Actions"). A person's
+        name that holds such a word ("Travis Oliphant") is not a bot.
+        """
+        name = author_name.strip().lower()
+        if name.endswith("[bot]") or "bot@" in name:
+            return True
+        words = re.split(r"[\s_.-]+", name)
+        if "bot" in words:
+            return True
+        joined = "-".join(words)
+        for service in self.BOT_SERVICES:
+            if joined == service:  # "Jenkins", "GitHub Actions", "Travis CI"
+                return True
+            # an account name, one word: "jenkins-deploy", "codecov-commenter"
+            if joined.startswith(service + "-") and " " not in name:
+                return True
+        return False
 
     def _filter_human_authors(self, authors: dict[str, Any]) -> dict[str, Any]:
         """Filter out bot accounts from authors dictionary."""
@@ -337,23 +364,15 @@ Note: Bot accounts (dependabot[bot], pre-commit-ci[bot], etc.) are excluded from
         total_added = data.get("total_lines_added", 0)
         total_removed = data.get("total_lines_removed", 0)
 
-        lines_by_date = data.get("lines_by_date", {})
-
-        # Calculate growth trend
-        if lines_by_date:
-            dates = sorted(lines_by_date.keys())
-            if len(dates) >= 2:
-                start_lines = lines_by_date[dates[0]]
-                end_lines = lines_by_date[dates[-1]]
-                growth = end_lines - start_lines
-                growth_rate = (growth / start_lines * 100) if start_lines > 0 else 0
-                trend_str = (
-                    f"Growth from {start_lines:,} to {end_lines:,} lines ({growth_rate:+.1f}%)"
-                )
-            else:
-                trend_str = f"Current: {total_lines:,} lines"
-        else:
-            trend_str = f"Current: {total_lines:,} lines"
+        # what each year added and removed, as on the Lines page
+        added_by_year = data.get("lines_added_by_year") or {}
+        removed_by_year = data.get("lines_removed_by_year") or {}
+        years = sorted(set(added_by_year) | set(removed_by_year), key=int)
+        trend_lines = []
+        for year in years:
+            added, removed = added_by_year.get(year, 0), removed_by_year.get(year, 0)
+            trend_lines.append(f"  - {year}: +{added:,}/-{removed:,} (net: {added - removed:+,})")
+        trend_str = "\n".join(trend_lines + [f"Lines of code now: {total_lines:,}"])
 
         # Lines by human authors (exclude bots)
         authors = data.get("authors", {})
@@ -378,7 +397,7 @@ Total Lines Added: {total_added:,}
 Total Lines Removed: {total_removed:,}
 Net Change: {total_added - total_removed:+,}
 
-Growth Trend:
+Lines Added and Removed by Year:
 {trend_str}
 
 Top 5 Contributors by Lines:
@@ -503,7 +522,8 @@ Top 5 Contributors by Lines:
             if not force_refresh:
                 cached_summary = self._get_cached_summary(cache_key)
                 if cached_summary:
-                    result["summary"] = cached_summary
+                    # one cached before the fence was taken off loses it too
+                    result["summary"] = strip_code_fence(cached_summary)
                     return result
 
             # Construct prompt
@@ -542,18 +562,22 @@ Generate your analysis:"""
 
             # Call AI provider
             logger.info(f"Generating AI summary for {page_type} page...")
-            summary = self.provider.generate_summary(data, prompt)
+            summary = strip_code_fence(self.provider.generate_summary(data, prompt))
 
             # Cache the result
             self._save_cached_summary(cache_key, summary)
 
             result["summary"] = summary
 
+        except AIProviderUnavailableError:
+            raise  # generate_all_summaries stops asking
         except AIProviderError as e:
-            logger.exception("AI provider error")
+            logger.warning(f"AI summary for the {page_type} page failed: {e}")
+            logger.debug("AI provider error", exc_info=e)
             result["error"] = str(e)
         except Exception as e:
-            logger.exception("Unexpected error generating summary")
+            logger.warning(f"AI summary for the {page_type} page failed: {e}")
+            logger.debug("Unexpected error generating summary", exc_info=e)
             result["error"] = f"Unexpected error: {str(e)}"
 
         return result
@@ -571,10 +595,30 @@ Generate your analysis:"""
         Returns:
             Dictionary mapping page types to summary results
         """
-        summaries = {}
+        summaries: dict[str, dict[str, Any]] = {}
         page_types = ["index", "activity", "lines", "chronicle"]
 
+        unavailable = None
         for page_type in page_types:
-            summaries[page_type] = self.generate_summary(page_type, data, force_refresh)
+            if unavailable is not None:
+                summaries[page_type] = {"summary": "", "error": unavailable}
+                continue
+            try:
+                summaries[page_type] = self.generate_summary(page_type, data, force_refresh)
+            except AIProviderUnavailableError as e:
+                # asking for the next page would wait as long again
+                logger.warning(f"AI summary for the {page_type} page failed: {e}")
+                summaries[page_type] = {"summary": "", "error": str(e)}
+                unavailable = f"Not asked: the AI service did not answer for an earlier page ({e})"
 
         return summaries
+
+
+_FENCE = re.compile(r"\A\s*```[\w-]*[ \t]*\n(.*?)\n?```\s*\Z", re.S)
+
+
+def strip_code_fence(text: str) -> str:
+    """The answer without the Markdown code fence some models put around it
+    (```html ... ```), which would show on the page as it is."""
+    match = _FENCE.match(text or "")
+    return match.group(1).strip() if match else text

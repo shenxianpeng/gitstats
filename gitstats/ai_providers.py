@@ -35,6 +35,49 @@ class AIProviderError(Exception):
     pass
 
 
+class AIProviderUnavailableError(AIProviderError):
+    """The service did not answer in time, or could not be reached: asking it
+    for the next summary would most likely wait as long again."""
+
+
+def _status_of(error: Exception) -> int | None:
+    """The HTTP status of a failed call, from the SDKs' errors (``status_code``,
+    ``code``) or from requests' (``response.status_code``)."""
+    for status in (
+        getattr(error, "status_code", None),
+        getattr(error, "code", None),
+        getattr(getattr(error, "response", None), "status_code", None),
+    ):
+        if isinstance(status, int) and not isinstance(status, bool):
+            return status
+    return None
+
+
+def _is_timeout(error: Exception) -> bool:
+    return "Timeout" in type(error).__name__ or isinstance(error, TimeoutError)
+
+
+def _is_retryable(error: Exception) -> bool:
+    """Worth asking again: the service is busy (429), failed on its side (5xx)
+    or the connection failed. Not a timeout, which would only wait as long
+    again, and not a request it refused (a wrong key or model, 4xx), an
+    answer that could not be read or a mistake in the call."""
+    if isinstance(error, AIProviderError) or _is_timeout(error):
+        return False
+    status = _status_of(error)
+    if status is not None:
+        return status == 429 or status >= 500
+    return isinstance(error, ConnectionError) or "Connection" in type(error).__name__
+
+
+CLAUDE_DEFAULT_MODEL = "claude-opus-5-5"
+# the models the API can hand a declined request to another model for
+# ("server-side fallback"); with any other model the request goes as it is
+CLAUDE_MODELS_WITH_FALLBACKS = frozenset(
+    {"claude-fable-5-1", "claude-opus-5-5", "claude-opus-5", "claude-sonnet-5-5"}
+)
+
+
 class AIProvider(ABC):
     """Abstract base class for AI providers."""
 
@@ -48,6 +91,8 @@ class AIProvider(ABC):
         self.config = config
         self.max_retries = config.get("max_retries", 3)
         self.retry_delay = config.get("retry_delay", 1)
+        # seconds to wait for one answer
+        self.timeout = config.get("timeout", 120)
 
     @abstractmethod
     def generate_summary(self, data: dict[str, Any], prompt: str) -> str:
@@ -67,16 +112,34 @@ class AIProvider(ABC):
         pass
 
     def _retry_with_backoff(self, func, *args, **kwargs):
-        """Execute a function with exponential backoff retry logic."""
+        """Call ``func``, and again with exponential backoff while it fails in a
+        way worth retrying (see ``_is_retryable``), ``max_retries`` calls in
+        all. The SDKs are told not to retry on their own, so these are all
+        the calls made.
+
+        Raises AIProviderUnavailableError when the service timed out or could not
+        be reached, AIProviderError for any other failure.
+        """
         for attempt in range(self.max_retries):
             try:
                 return func(*args, **kwargs)
             except Exception as e:
-                if attempt == self.max_retries - 1:
-                    raise AIProviderError(f"Failed after {self.max_retries} attempts: {e}") from e
-                delay = self.retry_delay * (2**attempt)
-                logger.warning(f"Attempt {attempt + 1} failed, retrying in {delay}s: {e}")
-                time.sleep(delay)
+                last = attempt == self.max_retries - 1
+                if _is_retryable(e) and not last:
+                    delay = self.retry_delay * (2**attempt)
+                    logger.warning(f"Attempt {attempt + 1} failed, retrying in {delay}s: {e}")
+                    time.sleep(delay)
+                    continue
+                message = f"Failed after {attempt + 1} attempts: {e}" if attempt else str(e)
+                if _is_timeout(e):
+                    raise AIProviderUnavailableError(
+                        f"No answer within {self.timeout} seconds ({e})"
+                    ) from e
+                if isinstance(e, AIProviderError):
+                    raise
+                if _is_retryable(e) and _status_of(e) is None:
+                    raise AIProviderUnavailableError(message) from e  # could not connect
+                raise AIProviderError(message) from e
 
 
 class OpenAIProvider(AIProvider):
@@ -101,7 +164,8 @@ class OpenAIProvider(AIProvider):
             )
 
         self.model = _get_model_with_fallback(config, "gpt-4")
-        self.client = openai.OpenAI(api_key=self.api_key)
+        # gitstats retries itself (see _retry_with_backoff)
+        self.client = openai.OpenAI(api_key=self.api_key, max_retries=0, timeout=self.timeout)
 
     def generate_summary(self, data: dict[str, Any], prompt: str) -> str:
         """Generate summary using OpenAI API."""
@@ -144,20 +208,41 @@ class ClaudeProvider(AIProvider):
                 "Claude API key not found. Set ANTHROPIC_API_KEY environment variable or configure it."
             )
 
-        self.model = _get_model_with_fallback(config, "claude-3-5-sonnet-20241022")
-        self.client = self.anthropic.Anthropic(api_key=self.api_key)
+        self.model = _get_model_with_fallback(config, CLAUDE_DEFAULT_MODEL)
+        # gitstats retries itself (see _retry_with_backoff)
+        self.client = self.anthropic.Anthropic(
+            api_key=self.api_key, max_retries=0, timeout=self.timeout
+        )
 
     def generate_summary(self, data: dict[str, Any], prompt: str) -> str:
         """Generate summary using Claude API."""
 
         def _call_api():
-            response = self.client.messages.create(
-                model=self.model,
-                max_tokens=2000,
-                temperature=0.7,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            return response.content[0].text
+            # No temperature: current models and SDKs (anthropic 1.0 on) refuse it.
+            # The answer is a few paragraphs; the room above that is for thinking.
+            request = {
+                "model": self.model,
+                "max_tokens": 16000,
+                "messages": [{"role": "user", "content": prompt}],
+            }
+            if self.model in CLAUDE_MODELS_WITH_FALLBACKS:
+                # if the model declines, the API asks another one in the same call
+                response = self.client.beta.messages.create(
+                    **request, betas=["server-side-fallback-2026-07-01"], fallbacks="default"
+                )
+            else:
+                response = self.client.messages.create(**request)
+            if response.stop_reason == "refusal":
+                raise AIProviderError(f"{self.model} declined to write this summary")
+            # the answer's text, without the thinking blocks before it
+            text = "".join(
+                block.text for block in response.content if getattr(block, "type", "") == "text"
+            ).strip()
+            if not text:
+                raise AIProviderError(
+                    f"{self.model} gave no text (stop reason: {response.stop_reason})"
+                )
+            return text
 
         return self._retry_with_backoff(_call_api)
 
@@ -190,10 +275,20 @@ class GeminiProvider(AIProvider):
         """Generate summary using Gemini API."""
 
         def _call_api():
-            response = self.model.generate_content(prompt)
+            response = self.model.generate_content(
+                prompt, request_options={"timeout": self.timeout}
+            )
             return response.text
 
         return self._retry_with_backoff(_call_api)
+
+
+class _OllamaError(Exception):
+    """An HTTP error from Ollama, with the reason it gave."""
+
+    def __init__(self, message: str, status_code: int | None):
+        super().__init__(message)
+        self.status_code = status_code
 
 
 class OllamaProvider(AIProvider):
@@ -217,13 +312,29 @@ class OllamaProvider(AIProvider):
         """Generate summary using Ollama API."""
 
         def _call_api():
+            url = f"{self.base_url}/api/generate"
             response = self.requests.post(
-                f"{self.base_url}/api/generate",
+                url,
                 json={"model": self.model, "prompt": prompt, "stream": False},
-                timeout=120,
+                timeout=self.timeout,
             )
-            response.raise_for_status()
-            return response.json()["response"]
+            try:
+                answer = response.json()
+            except ValueError:
+                answer = None
+            # Ollama says what went wrong in "error", e.g. a model not pulled yet
+            error = answer.get("error") if isinstance(answer, dict) else None
+            try:
+                response.raise_for_status()
+            except Exception as e:
+                if error:
+                    raise _OllamaError(f"Ollama: {error} ({e})", _status_of(e)) from e
+                raise
+            if error:
+                raise AIProviderError(f"Ollama: {error}")
+            if not isinstance(answer, dict) or not isinstance(answer.get("response"), str):
+                raise AIProviderError(f"{url} did not answer as Ollama does")
+            return answer["response"]
 
         return self._retry_with_backoff(_call_api)
 

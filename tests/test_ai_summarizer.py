@@ -83,6 +83,10 @@ def test_init_cache_enabled_can_be_disabled():
         "codecov-commenter",
         "travis-ci",
         "jenkins-deploy",
+        "Travis CI",
+        "Jenkins",
+        "GitHub Actions",
+        "Renovate Bot",
     ],
 )
 def test_is_bot_account_matches_bot_patterns(author_name):
@@ -98,6 +102,10 @@ def test_is_bot_account_matches_bot_patterns(author_name):
         "hoxu",
         "Xianpeng Shen",
         "robert",  # contains "bot" only as a substring check false-positive guard
+        "Bob Abbot",
+        "Travis Oliphant",  # a person named like a CI service
+        "Sarah Jenkins",
+        "Travis",
     ],
 )
 def test_is_bot_account_does_not_match_humans(author_name):
@@ -393,7 +401,9 @@ def test_prepare_lines_data_basic():
         "total_lines": 1000,
         "total_lines_added": 1500,
         "total_lines_removed": 500,
-        "lines_by_date": {"2023-01-01": 100, "2023-06-01": 1000},
+        # what the collector has, years as ints; 2022 removed more than it added
+        "lines_added_by_year": {2023: 1300, 2022: 200},
+        "lines_removed_by_year": {2023: 100, 2022: 400},
         "authors": {
             "Alice": {"lines_added": 800, "lines_removed": 200},
             "Bob": {"lines_added": 700, "lines_removed": 300},
@@ -405,34 +415,41 @@ def test_prepare_lines_data_basic():
     assert "Total Lines Added: 1,500" in result
     assert "Total Lines Removed: 500" in result
     assert "Net Change: +1,000" in result
-    assert "Growth from 100 to 1,000 lines" in result
+    assert (
+        "Lines Added and Removed by Year:\n"
+        "  - 2022: +200/-400 (net: -200)\n"
+        "  - 2023: +1,300/-100 (net: +1,200)\n"
+        "Lines of code now: 1,000\n"
+    ) in result
     assert "Alice: +800/-200 (net: +600)" in result
 
 
-def test_prepare_lines_data_single_date_uses_current_total():
-    summarizer = make_summarizer()
-    data = {
-        "total_lines": 500,
-        "total_lines_added": 500,
-        "total_lines_removed": 0,
-        "lines_by_date": {"2023-01-01": 500},
-        "authors": {},
-    }
-    result = summarizer.prepare_lines_data(data)
-    assert "Current: 500 lines" in result
+@pytest.mark.parametrize(
+    "language,instruction",
+    [
+        ("zh", "请用中文提供分析。"),
+        (None, "Provide your analysis in English."),
+        ("pt", "Provide your analysis in the language whose code is 'pt'."),
+        (" it ", "Provide your analysis in the language whose code is 'it'."),
+    ],
+)
+def test_language_instruction(language, instruction):
+    """A language gitstats has no instruction for is still asked for, not
+    replaced by English."""
+    assert make_summarizer(ai_language=language)._get_language_instruction() == instruction
 
 
-def test_prepare_lines_data_no_dates():
+def test_prepare_lines_data_year_with_removals_only():
     summarizer = make_summarizer()
-    data = {
-        "total_lines": 0,
-        "total_lines_added": 0,
-        "total_lines_removed": 0,
-        "lines_by_date": {},
-        "authors": {},
-    }
+    data = {"total_lines": 5, "lines_added_by_year": {}, "lines_removed_by_year": {2024: 7}}
+    assert "  - 2024: +0/-7 (net: -7)\nLines of code now: 5" in summarizer.prepare_lines_data(data)
+
+
+def test_prepare_lines_data_no_years():
+    summarizer = make_summarizer()
+    data = {"total_lines": 0, "total_lines_added": 0, "total_lines_removed": 0, "authors": {}}
     result = summarizer.prepare_lines_data(data)
-    assert "Current: 0 lines" in result
+    assert "Lines Added and Removed by Year:\nLines of code now: 0\n" in result
 
 
 def test_prepare_lines_data_missing_keys_defaults():
@@ -591,6 +608,73 @@ def test_generate_summary_provider_error_is_captured():
     result = summarizer.generate_summary("index", {"authors": {}})
     assert result["error"] == "rate limited"
     assert result["summary"] == ""
+
+
+def test_a_failed_summary_is_one_warning_line(caplog):
+    """The reason, without a traceback; that is for --debug."""
+    from gitstats.ai_providers import AIProviderError
+
+    summarizer, mock_provider = make_summarizer_with_mock_provider()
+    mock_provider.generate_summary.side_effect = AIProviderError("Ollama: model 'x' not found")
+    with caplog.at_level(logging.INFO, logger="gitstats"):
+        summarizer.generate_summary("activity", {"authors": {}})
+    warnings = [r for r in caplog.records if r.levelno >= logging.WARNING]
+    assert [r.getMessage() for r in warnings] == [
+        "AI summary for the activity page failed: Ollama: model 'x' not found"
+    ]
+    assert all(r.exc_info is None for r in warnings)
+
+
+def test_a_service_that_does_not_answer_is_not_asked_again():
+    from gitstats.ai_providers import AIProviderUnavailableError
+
+    summarizer, mock_provider = make_summarizer_with_mock_provider()
+    mock_provider.generate_summary.side_effect = AIProviderUnavailableError(
+        "No answer within 120 seconds"
+    )
+    summaries = summarizer.generate_all_summaries({"authors": {}})
+
+    assert mock_provider.generate_summary.call_count == 1
+    assert summaries["index"] == {"summary": "", "error": "No answer within 120 seconds"}
+    for page in ("activity", "lines", "chronicle"):
+        assert summaries[page]["error"] == (
+            "Not asked: the AI service did not answer for an earlier page "
+            "(No answer within 120 seconds)"
+        )
+
+
+@pytest.mark.parametrize(
+    "answer",
+    [
+        "```html\n<p>Fine.</p>\n```",
+        "  ```\n<p>Fine.</p>```\n",
+        "```HTML \n<p>Fine.</p>\n```",
+    ],
+)
+def test_a_code_fence_around_the_answer_is_taken_off(tmp_path, answer):
+    summarizer, mock_provider = make_summarizer_with_mock_provider()
+    summarizer.set_cache_dir(str(tmp_path))
+    mock_provider.generate_summary.return_value = answer
+    assert summarizer.generate_summary("index", {"authors": {}})["summary"] == "<p>Fine.</p>"
+
+
+def test_a_fence_cached_before_is_taken_off(tmp_path):
+    summarizer, mock_provider = make_summarizer_with_mock_provider()
+    summarizer.set_cache_dir(str(tmp_path))
+    mock_provider.generate_summary.return_value = "<p>x</p>"
+    summarizer.generate_summary("index", {"authors": {}})
+    (cached,) = tmp_path.iterdir()
+    cached.write_text(json.dumps({"summary": "```html\n<p>Old.</p>\n```"}), encoding="utf-8")
+    assert summarizer.generate_summary("index", {"authors": {}})["summary"] == "<p>Old.</p>"
+
+
+@pytest.mark.parametrize(
+    "text", ["<p>```code``` in a sentence</p>", "```\nopen fence only", "plain"]
+)
+def test_text_that_is_not_wrapped_in_a_fence_is_kept(text):
+    from gitstats.ai_summarizer import strip_code_fence
+
+    assert strip_code_fence(text) == text
 
 
 def test_generate_summary_unexpected_exception_is_captured():

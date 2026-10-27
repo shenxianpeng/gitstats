@@ -1426,6 +1426,37 @@ def normalize_site_url(url: str) -> str:
     return url.rstrip("/") + "/"
 
 
+def _generate_ai_summaries(data: Any, conf: dict, outputpath: str) -> dict[str, dict[str, Any]]:
+    """The AI summaries of the report's pages, page type -> {summary, error}.
+
+    Whatever goes wrong here, the report is still written: without the
+    summaries when the provider cannot be set up or the run is interrupted
+    (Ctrl-C) while they are being written, and with the reason on the AI
+    Insights page for each one that failed.
+    """
+    logger.info("Generating AI summaries...")
+    try:
+        summarizer = AISummarizer(conf)
+        summarizer.set_cache_dir(os.path.join(outputpath, ".ai_cache"))
+        summaries = summarizer.generate_all_summaries(data.__dict__, conf.get("refresh_ai", False))
+    except KeyboardInterrupt:
+        logger.warning("AI summaries interrupted: the report is written without them")
+        return {}
+    except Exception as e:
+        logger.warning(f"No AI summaries: {e}")
+        logger.info("Report will be generated without AI insights")
+        return {}
+    failed = [page for page, result in summaries.items() if result.get("error")]
+    if failed:
+        logger.warning(
+            f"AI summaries: {len(summaries) - len(failed)} of {len(summaries)} written; "
+            f"failed: {', '.join(failed)} (the reason is on the AI Insights page)"
+        )
+    else:
+        logger.info(f"AI summaries: {len(summaries)} of {len(summaries)} written")
+    return summaries
+
+
 def _run_single_repo(
     gitpath: str,
     outputpath: str,
@@ -1482,17 +1513,7 @@ def _run_single_repo(
 
     # Generate AI summaries if enabled
     if conf.get("ai_enabled", False):
-        try:
-            logger.info("Generating AI summaries...")
-            summarizer = AISummarizer(conf)
-            summarizer.set_cache_dir(os.path.join(outputpath, ".ai_cache"))
-            force_refresh = conf.get("refresh_ai", False)
-            data.ai_summaries = summarizer.generate_all_summaries(data.__dict__, force_refresh)
-            logger.info("AI summaries generated successfully")
-        except Exception as e:
-            logger.warning(f"Failed to generate AI summaries: {str(e)}")
-            logger.info("Report will be generated without AI insights")
-            data.ai_summaries = {}
+        data.ai_summaries = _generate_ai_summaries(data, conf, outputpath)
     else:
         data.ai_summaries = {}
 
@@ -1884,12 +1905,15 @@ def get_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "--ai-model",
-        help="AI model to use (e.g., gpt-4, claude-3-5-sonnet-20241022, gemini-pro, llama2)",
+        help="AI model to use (e.g., gpt-4, claude-opus-5-5, gemini-2.5-flash, llama2)",
     )
 
     parser.add_argument(
         "--ai-language",
-        help="Language for AI-generated summaries (en, zh, ja, ko, es, fr, de, etc.)",
+        help=(
+            "Language of the AI summaries, as a language code: en, zh, ja, ko, es, fr "
+            "and de also translate the page's headings"
+        ),
     )
 
     parser.add_argument(

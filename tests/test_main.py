@@ -2448,8 +2448,68 @@ class TestRunSingleRepo:
         ):
             data = _run_single_repo(git_repo_minimal, str(tmp_path / "report"))
         assert data.ai_summaries == {}
-        assert "Failed to generate AI summaries: no API key" in caplog.text
+        assert "No AI summaries: no API key" in caplog.text
+        assert "Traceback" not in caplog.text
         assert (tmp_path / "report" / "index.html").exists()
+
+    def test_ctrl_c_during_the_summaries_still_writes_the_report(
+        self, git_repo_minimal, tmp_path, caplog, sequential_map
+    ):
+        _use_config(ai_enabled=True)
+        summarizer = MagicMock()
+        summarizer.generate_all_summaries.side_effect = KeyboardInterrupt
+        out = tmp_path / "report"
+        with (
+            patch("gitstats.main.AISummarizer", return_value=summarizer),
+            caplog.at_level(logging.INFO, logger="gitstats"),
+        ):
+            data = _run_single_repo(git_repo_minimal, str(out))
+        assert data.ai_summaries == {}
+        assert "AI summaries interrupted: the report is written without them" in caplog.text
+        assert (out / "index.html").exists()
+
+    def test_says_how_many_summaries_were_written(
+        self, git_repo_minimal, tmp_path, caplog, sequential_map
+    ):
+        _use_config(ai_enabled=True)
+        summarizer = MagicMock()
+        summarizer.generate_all_summaries.return_value = {
+            "index": {"summary": "<p>ok</p>", "error": None},
+            "activity": {"summary": "", "error": "Ollama: model 'x' not found"},
+            "lines": {"summary": "<p>ok</p>", "error": None},
+            "chronicle": {"summary": "", "error": "Not asked"},
+        }
+        with (
+            patch("gitstats.main.AISummarizer", return_value=summarizer),
+            caplog.at_level(logging.INFO, logger="gitstats"),
+        ):
+            _run_single_repo(git_repo_minimal, str(tmp_path / "report"))
+        assert (
+            "AI summaries: 2 of 4 written; failed: activity, chronicle "
+            "(the reason is on the AI Insights page)"
+        ) in caplog.text
+        assert "successfully" not in caplog.text
+
+        summarizer.generate_all_summaries.return_value = {
+            "index": {"summary": "<p>ok</p>", "error": None}
+        }
+        caplog.clear()
+        with (
+            patch("gitstats.main.AISummarizer", return_value=summarizer),
+            caplog.at_level(logging.INFO, logger="gitstats"),
+        ):
+            _run_single_repo(git_repo_minimal, str(tmp_path / "report"))
+        assert "AI summaries: 1 of 1 written" in caplog.text
+
+    def test_a_run_without_ai_removes_the_old_ai_page(
+        self, git_repo_minimal, tmp_path, sequential_map
+    ):
+        out = tmp_path / "report"
+        out.mkdir()
+        (out / "ai-insights.html").write_text("<p>last month's summaries</p>")
+        _run_single_repo(git_repo_minimal, str(out))
+        assert not (out / "ai-insights.html").exists()
+        assert (out / "index.html").exists()
 
 
 class TestWrappedCard:

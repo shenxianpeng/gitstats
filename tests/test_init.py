@@ -60,6 +60,7 @@ def test_default_config_keys():
         "ai_cache_enabled",
         "ai_max_retries",
         "ai_retry_delay",
+        "ai_timeout",
         "ollama_base_url",
     }
     assert set(DEFAULT_CONFIG.keys()) == expected_keys
