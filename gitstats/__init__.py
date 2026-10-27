@@ -213,12 +213,42 @@ def get_i18n_text(key: str, language: str = "en") -> str:
     return translations.get(key, AI_INSIGHTS_I18N["en"].get(key, key))
 
 
-def parse_config_value(value: str) -> Any:
+# what a boolean setting may be written as, like ConfigParser.getboolean()
+_TRUE_WORDS = ("true", "yes", "on", "1")
+_FALSE_WORDS = ("false", "no", "off", "0")
+
+# What load_config() could not take from the configuration file, a sentence
+# each. Those settings keep their defaults; the command line reports these
+# before it does anything else, and `gitstats --version` still works.
+config_errors: list[str] = []
+
+
+def parse_config_value(value: str, key: str | None = None) -> Any:
     """Convert a config value from the config file or ``-c key=value``.
 
-    Integers, including negative ones such as ``max_tags_authors = -1``, become
-    ``int`` and ``true``/``false`` become ``bool``; anything else stays a string.
+    A setting of DEFAULT_CONFIG takes the type of its default: an integer, a
+    boolean (true/false, yes/no, on/off, 1/0) or a string. A string stays as
+    written even when it is all digits, like a short commit hash for
+    ``commit_end``. A value that is not of its setting's type raises
+    ValueError, with a message that names the setting.
+
+    Any other key (or none) is guessed at: integers, including negative ones
+    such as ``-1``, become ``int`` and ``true``/``false`` become ``bool``;
+    anything else stays a string.
     """
+    default = DEFAULT_CONFIG.get(key) if key is not None else None
+    if isinstance(default, bool):
+        word = value.strip().lower()
+        if word in _TRUE_WORDS or word in _FALSE_WORDS:
+            return word in _TRUE_WORDS
+        raise ValueError(f"{key} must be true or false, not {value!r}")
+    if isinstance(default, int):
+        try:
+            return int(value)
+        except ValueError:
+            raise ValueError(f"{key} must be a whole number, not {value!r}") from None
+    if isinstance(default, str):
+        return value
     if re.fullmatch(r"-?\d+", value):
         return int(value)
     if value.lower() in ("true", "false"):
@@ -227,7 +257,14 @@ def parse_config_value(value: str) -> Any:
 
 
 def load_config(file_path: str = "gitstats.conf") -> dict[str, Any]:
-    """Load configuration from a file, or fall back to defaults."""
+    """Load configuration from a file, or fall back to defaults.
+
+    The file's ``[gitstats]`` section is read as it is written: a "%" is a
+    "%". A file without that section leaves every setting at its default,
+    with a warning. What cannot be read, a malformed file or a value of the
+    wrong type, is added to ``config_errors`` and leaves those settings at
+    their defaults: an import of gitstats never fails on it.
+    """
     import configparser
     import os
 
@@ -236,17 +273,33 @@ def load_config(file_path: str = "gitstats.conf") -> dict[str, Any]:
     if _config is not None:
         return _config
 
-    _config = DEFAULT_CONFIG.copy()  # Start with defaults
-    config_parser = configparser.ConfigParser()
+    config = DEFAULT_CONFIG.copy()  # Start with defaults
+    errors: list[str] = []
+    config_parser = configparser.ConfigParser(interpolation=None)
 
     if os.path.exists(file_path):
-        config_parser.read(file_path)
+        try:
+            config_parser.read(file_path, encoding="utf-8")
+        except configparser.MissingSectionHeaderError:
+            pass  # settings without a section: reported as such below
+        except (configparser.Error, UnicodeDecodeError) as error:
+            errors.append(f"{file_path}: {error}")
         ignored = []
-        for k, v in config_parser["gitstats"].items():
-            if _NOT_FROM_FILE.fullmatch(k):
-                ignored.append(k)
-                continue
-            _config[k] = parse_config_value(v)
+        if errors:
+            pass  # nothing is taken from a file that could not be read
+        elif config_parser.has_section("gitstats"):
+            for k, v in config_parser["gitstats"].items():
+                if _NOT_FROM_FILE.fullmatch(k):
+                    ignored.append(k)
+                    continue
+                try:
+                    config[k] = parse_config_value(v, k)
+                except ValueError as error:
+                    errors.append(f"{file_path}: {error}")
+        else:
+            logger.warning(
+                f"Warning: {file_path} has no [gitstats] section; using the default settings"
+            )
         if ignored:
             logger.warning(
                 "%s: ignoring %s. A gitstats.conf can come with the repository being "
@@ -256,6 +309,8 @@ def load_config(file_path: str = "gitstats.conf") -> dict[str, Any]:
                 file_path,
                 ", ".join(ignored),
             )
+    config_errors[:] = errors
+    _config = config
     return _config
 
 

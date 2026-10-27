@@ -11,7 +11,7 @@ Some settings cannot be set in it: see `What gitstats.conf may set`_.
 * ``max_authors`` - Maximum number of authors to list in "Authors". Default: ``20``.
 * ``authors_top`` - Number of top authors to highlight. Default: ``5``.
 * ``max_tags_authors`` - Maximum number of authors to display per tag in "Tags" page. Set to ``-1`` to show all authors (no limit). Default: ``50``.
-* ``commit_begin`` - Start of commit range (empty = include all commits). For example, ``10`` for last 10 commits. A git revision: it must not start with ``-`` or hold spaces, quotes, backslashes or control characters. Default: ``""`` (empty).
+* ``commit_begin`` - Start of commit range (empty = include all commits). A number ``N`` means the last ``N`` commits that lead to ``commit_end`` (all of them when the history has fewer): for example, ``10`` for the last 10 commits. A git revision: it must not start with ``-`` or hold spaces, quotes, backslashes or control characters. Default: ``""`` (empty).
 * ``commit_end`` - End of commit range. A git revision, like ``commit_begin``. Default: ``HEAD``.
 * ``linear_linestats`` - Enable linear history for line statistics (``1`` = enabled, ``0`` = disabled). Default: ``1``.
 * ``project_name`` - Project name to display (default: repository directory name). Default: ``""`` (empty).
@@ -19,7 +19,7 @@ Some settings cannot be set in it: see `What gitstats.conf may set`_.
 * ``start_date`` - Starting date for commits, passed as --since to Git (optional). Format: ``YYYY-MM-DD``. It must not start with ``-`` or hold control characters. Default: ``""`` (empty).
 * ``end_date`` - Ending date for commits, passed as --until to Git (optional). Format: ``YYYY-MM-DD``. It must not start with ``-`` or hold control characters. Default: ``""`` (empty).
 * ``authors`` - Comma-separated list of authors to filter commits. Only commits from these authors will be included (uses OR logic: commits from any of the listed authors). If empty, all authors are included. Default: ``""`` (empty).
-* ``exclude_exts`` - Comma-separated list of file extensions to exclude from line counting. If empty, no files are excluded. Files with null bytes in their content are automatically detected as binary and excluded from line counting. This detection occurs in addition to any extensions specified in exclude_exts. Default: ``""`` (empty).
+* ``exclude_exts`` - Comma-separated list of file extensions to exclude from line counting. If empty, no files are excluded. Files with null bytes in their content are automatically detected as binary and excluded from line counting. This detection occurs in addition to any extensions specified in exclude_exts. The Lines of Code of a report are those of the files at ``commit_end`` that are counted, whatever the date, author and range filters. Default: ``""`` (empty).
 * ``badge_metric`` - Badge written as the default ``badge.svg`` in the report output: ``commits``, ``last-commit``, ``authors``, ``files``, ``lines``, ``release``, ``active-days``, ``summary``, ``activity``, ``health`` or ``ai-assisted``. All of them are always pre-rendered in ``badges/<name>.svg`` regardless of this choice. Default: ``commits``.
 * ``badge_label`` - Left-side text of the generated badges. Default: ``gitstats``.
 * ``badge_color`` - Value-segment color of the generated badges: a shields.io color name (``brightgreen``, ``green``, ``yellowgreen``, ``yellow``, ``orange``, ``red``, ``blue``, ``lightgrey``), a hex value like ``#30a14e``, or any SVG color. Default: ``""`` (gitstats brand blue).
@@ -56,6 +56,8 @@ For example:
    gitstats . -c max_authors=10 -c authors_top=3
 
 This command will generate a report with a maximum of 10 authors displayed and the top 3 authors shown.
+
+A value is read as written, a ``%`` included, and takes the type of its setting: a number, ``true``/``false`` (or ``yes``/``no``, ``on``/``off``, ``1``/``0``), or text, digits and all, like a short commit hash for ``commit_end``. A value that is not of its setting's type, in ``gitstats.conf`` or after ``-c``, stops the run with an error that names it. A ``gitstats.conf`` without a ``[gitstats]`` section leaves every setting at its default, with a warning.
 
 Filtering examples:
 

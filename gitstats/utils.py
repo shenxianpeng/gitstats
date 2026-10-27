@@ -150,29 +150,60 @@ def get_pipe_output(cmds: list[str], quiet: bool = False) -> str:
 
 
 def get_commit_range(defaultrange: str = "HEAD", end_only: bool = False) -> str:
-    """The revisions the configuration asks for: ``commit_begin..commit_end``.
+    """The revisions the configured range is made of, as `git log` takes them.
+
+    ``commit_begin..commit_end``, or ``commit_end`` alone with ``end_only``
+    or without a ``commit_begin``. A ``commit_begin`` that is a number N
+    means the last N commits that lead to ``commit_end``: all of them when
+    the history has fewer (see last_commits_range()).
 
     Raises ValueError when a setting that goes on git's command line could be
     taken for something else (see check_git_settings()). Put the range after
     ``--end-of-options``, so that git never reads it as an option.
     """
     check_git_settings(load_config())
-    if len(load_config()["commit_end"]) > 0:
-        commit_begin = load_config()["commit_begin"]
+    commit_end = str(load_config()["commit_end"])
+    if not commit_end:
+        return defaultrange
+    commit_begin = str(load_config()["commit_begin"])
+    if end_only or not commit_begin:
+        return commit_end
+    if commit_begin.isascii() and commit_begin.isdigit():
+        return last_commits_range(commit_end, int(commit_begin))
+    return f"{commit_begin}..{commit_end}"
 
-        # Convert commit_begin to string for consistent handling
-        commit_begin_str = str(commit_begin)
 
-        # If end_only or no commit_begin specified, return just the end
-        if end_only or len(commit_begin_str) == 0:
-            return load_config()["commit_end"]
+# (directory, end, count) -> what last_commits_range() found there
+_last_commits: dict[tuple[str, str, int], str] = {}
 
-        # Handle numeric commit_begin as "N commits ago"
-        if commit_begin_str.isdigit():
-            commit_begin_str = f"{load_config()['commit_end']}~{commit_begin_str}"
 
-        return "{}..{}".format(commit_begin_str, load_config()["commit_end"])
-    return defaultrange
+def last_commits_range(end: str, count: int) -> str:
+    """The last ``count`` commits that lead to ``end``, as revisions for `git log`.
+
+    They are the first ``count`` of ``git rev-list --topo-order <end>``,
+    where a commit comes after all of its descendants: the range is
+    ``<end>`` less the commits the oldest of them come from, ``<end> ^<parent>
+    ...``. Every walk of it, first-parent or not, sees those commits and no
+    others, where ``<end>~N..<end>`` would take in whole branches merged in
+    the last N commits, and fail on a history shorter than N. With no more
+    than ``count`` commits in the history, it is ``<end>``: all of them.
+    The answer is kept for the run, by repository.
+    """
+    if count == 0:
+        return f"{end}..{end}"
+    key = (os.getcwd(), end, count)
+    if key not in _last_commits:
+        rows = get_pipe_output(
+            [
+                f"git rev-list --topo-order --parents --max-count={count} --end-of-options "
+                + shlex.quote(end)
+            ]
+        ).split("\n")
+        commits = {row.split(" ", 1)[0] for row in rows}
+        parents = [parent for row in rows for parent in row.split()[1:]]
+        boundary = dict.fromkeys(parent for parent in parents if parent not in commits)
+        _last_commits[key] = " ".join([end, *(f"^{parent}" for parent in boundary)])
+    return _last_commits[key]
 
 
 def get_excluded_extensions() -> set[str]:
@@ -581,11 +612,13 @@ def shortstat_logs(
 
     def counts(
         job: tuple[list[str], bool],
-    ) -> tuple[dict[str, str], dict[str, int], dict[str, str], int]:
+    ) -> tuple[dict[str, str], dict[str, int], dict[str, str], int, dict[str, list[str]]]:
         """For one process's share of the commits: commit -> the count git
         prints under it, commit -> the files it adds less those it deletes,
         where that is not nothing, and, when the names are asked for,
-        commit -> the files it changes, a line each."""
+        commit -> the files it changes, a line each. Then, when the lines of
+        the source are asked for, those its diffs add, and commit -> the
+        files it moves into the source (see _source_lines_of())."""
         commits, first_parent = job
         # the names are those of the plain diff, as `git log --name-only` shows it
         with_names = names is not None and not first_parent
@@ -594,7 +627,13 @@ def shortstat_logs(
             began = time.monotonic()
             text = _git_text(
                 [
+                    # the paths as they are: git still quotes those with a
+                    # double quote, a backslash or a control character
+                    "-c",
+                    "core.quotePath=false",
                     "log",
+                    # the diff of a commit without parents, whatever log.showRoot says
+                    "--root",
                     "--shortstat",
                     # the files created and deleted, from the same diff
                     "--summary",
@@ -628,6 +667,7 @@ def shortstat_logs(
         files: dict[str, int] = {}
         changed: dict[str, str] = {}
         source_added = 0
+        moved: dict[str, list[str]] = {}
         # [what comes before the first commit, "<commit>\n<what is under it>", ...]
         for block in text.split(_COMMIT_MARK)[1:]:
             commit, _, under = block.partition("\n")
@@ -657,15 +697,14 @@ def shortstat_logs(
                         files[commit] = change
                 raw = under[:count_at]
             if numstat:
-                # "<added>\t<removed>\t<path>", "-" for a binary file
-                for line in raw.split("\n"):
-                    if line[:1].isdigit():
-                        lines, _, rest = line.partition("\t")
-                        if source(numstat_path(rest.partition("\t")[2])):  # type: ignore[misc]
-                            source_added += int(lines)
+                lines, moved_in = _source_lines_of(raw.split("\n"), source)  # type: ignore[arg-type]
+                source_added += lines
+                if moved_in:
+                    moved[commit] = moved_in
             if with_names:
                 # the name is what follows the last tab: for a renamed file,
-                # the new name, which comes after the old one
+                # the new name, which comes after the old one. It is left
+                # quoted as `git log --name-only` would print it.
                 changed[commit] = "".join(
                     [
                         "\n" + line.rpartition("\t")[2]
@@ -673,7 +712,7 @@ def shortstat_logs(
                         if line.startswith(":")
                     ]
                 )
-        return found, files, changed, source_added
+        return found, files, changed, source_added, moved
 
     with ThreadPoolExecutor(max_workers=workers, thread_name_prefix="git-shortstat") as pool:
         walks = list(
@@ -734,11 +773,13 @@ def shortstat_logs(
         timer = threading.Thread(target=allow_more, name="git-shortstat-more", daemon=True)
         timer.start()
         source_added = 0
+        moved: dict[str, list[str]] = {}
         try:
-            for (_, first_parent), (found, files, their_names, source_count) in zip(
+            for (_, first_parent), (found, files, their_names, source_count, moved_in) in zip(
                 jobs, pool.map(counts, jobs)
             ):
                 source_added += source_count
+                moved.update(moved_in)
                 if first_parent:
                     merges.update(found)
                     added.update(files)
@@ -759,6 +800,7 @@ def shortstat_logs(
             timer.join()
 
     if with_numstat:
+        source_added += _lines_moved_into_source(moved, env)
         source_lines.append(source_added)  # type: ignore[union-attr]
     texts = []
     names_text = None
@@ -776,17 +818,156 @@ def shortstat_logs(
     return texts, added, names_text
 
 
-# a renamed file as --numstat names it: "a/{old => new}/b" or "old => new"
-_RENAMED_PART = re.compile(r"\{[^{}]* => ([^{}]*)\}")
+# a path git quoted (core.quotePath, and always one with a double quote, a
+# backslash or a control character): in double quotes, with C escapes
+_QUOTED = r'"(?:[^"\\]|\\.)*"'
+_QUOTED_PATH = re.compile(_QUOTED, re.DOTALL)
+# a C escape: an octal byte, or a character
+_C_ESCAPE = re.compile(rb"\\([0-7]{3}|.)", re.DOTALL)
+_C_ESCAPES = {
+    b"a": b"\a",
+    b"b": b"\b",
+    b"t": b"\t",
+    b"n": b"\n",
+    b"v": b"\v",
+    b"f": b"\f",
+    b"r": b"\r",
+}
+# a renamed file as --numstat names it when a name is quoted: "old" => "new",
+# either of them quoted
+_QUOTED_RENAME = re.compile(f'({_QUOTED}|[^"]*) => ({_QUOTED}|[^"]*)', re.DOTALL)
+# the part of a renamed file's path that changed: "a/{old => new}/b"
+_RENAMED_PART = re.compile(r"\{([^{}]*) => ([^{}]*)\}")
+
+
+def unquote_path(path: str) -> str:
+    """A path as git prints it, without the quotes and escapes git may have
+    put in (``"r\\303\\251sum\\303\\251.py"`` is ``résumé.py``), so that it is the
+    path ``git ls-tree -z`` gives."""
+    if not _QUOTED_PATH.fullmatch(path):
+        return path
+    data = _C_ESCAPE.sub(
+        lambda escape: (
+            bytes([int(escape[1], 8)])
+            if len(escape[1]) == 3
+            else _C_ESCAPES.get(escape[1], escape[1])
+        ),
+        path[1:-1].encode("utf-8"),
+    )
+    return data.decode("utf-8", errors="replace")
+
+
+def numstat_paths(printed: str) -> tuple[str, str]:
+    """The path a file has before and after a commit, from what --numstat
+    prints: ``"a/{old => new}/b"``, ``old => new``, ``"old" => "new"`` for a
+    renamed file, and the same path twice for any other."""
+    if '"' in printed:
+        renamed = _QUOTED_RENAME.fullmatch(printed)
+        if renamed:
+            return unquote_path(renamed[1]), unquote_path(renamed[2])
+        return unquote_path(printed), unquote_path(printed)
+    if " => " not in printed:
+        return printed, printed
+    if "{" in printed:
+        # "{ => sub}/x" or "a/{b => }/x": a folder that is on one side only
+        return (
+            _RENAMED_PART.sub(r"\1", printed).replace("//", "/").strip("/"),
+            _RENAMED_PART.sub(r"\2", printed).replace("//", "/").strip("/"),
+        )
+    old, _, new = printed.rpartition(" => ")
+    return old, new
 
 
 def numstat_path(path: str) -> str:
     """The path a file has after a commit, from what --numstat prints."""
-    if " => " not in path:
-        return path
-    if "{" in path:
-        return _RENAMED_PART.sub(r"\1", path).replace("//", "/")
-    return path.rpartition(" => ")[2]
+    return numstat_paths(path)[1]
+
+
+def _source_lines_of(
+    numstat: Iterable[str], source: Callable[[str], bool]
+) -> tuple[int, list[str]]:
+    """The lines a commit adds to the project's own source, from the lines of
+    its ``--numstat``, and the files it moves into the source.
+
+    A file counts when ``source`` takes its path after the commit for the
+    project's own. A file renamed within the source counts what was added to
+    it; one moved out of the source counts nothing. One moved into it, from
+    a vendored folder say, brings all of its lines with it, which the
+    numstat of a rename does not say: those files are returned, for
+    _lines_moved_into_source() to count.
+    """
+    added = 0
+    moved_in = []
+    for line in numstat:
+        # "<added>\t<removed>\t<path>", "-" for a binary file
+        if line[:1].isdigit():
+            lines, _, rest = line.partition("\t")
+            old, new = numstat_paths(rest.partition("\t")[2])
+            if not source(new):
+                continue
+            if old == new or source(old):
+                added += int(lines)
+            else:
+                moved_in.append(new)
+    return added, moved_in
+
+
+def _lines_moved_into_source(moved: dict[str, list[str]], env: dict[str, str] | None = None) -> int:
+    """The lines of the files commits moved into the project's own source:
+    commit -> the files it moved there. They are what the diff of each
+    commit adds to them when it is not looking for renames, in one git
+    process. Raises subprocess.CalledProcessError when git fails."""
+    if not moved:
+        return 0
+    text = _git_text(
+        [
+            "-c",
+            "core.quotePath=false",
+            "log",
+            "--no-walk",
+            "--stdin",
+            "--no-renames",
+            "--numstat",
+            "--format=%x01%H",
+        ],
+        "\n".join(moved) + "\n",
+        env,
+    )
+    total = 0
+    for block in text.split(_COMMIT_MARK)[1:]:
+        commit, _, under = block.partition("\n")
+        wanted = set(moved.get(commit, ()))
+        for line in under.split("\n"):
+            if line[:1].isdigit():
+                lines, _, rest = line.partition("\t")
+                if unquote_path(rest.partition("\t")[2]) in wanted:
+                    total += int(lines)
+    return total
+
+
+# the options of a `git log` whose output source_lines_added() reads
+SOURCE_LINES_LOG = "-c core.quotePath=false log --root --numstat --format=%x01%H"
+
+
+def source_lines_added(printed: str, source: Callable[[str], bool]) -> int:
+    """The lines ever added to the files ``source`` takes for the project's
+    own, from what ``git SOURCE_LINES_LOG <range>`` prints: every commit but
+    the merges, whose diffs that command does not show, once.
+
+    The count shortstat_logs() makes beside the others when it is asked to,
+    by the same rules (see _source_lines_of()), for a run that does not
+    have it make them. Raises subprocess.CalledProcessError when git fails
+    to count the files moved into the source.
+    """
+    added = 0
+    moved: dict[str, list[str]] = {}
+    for block in printed.split(_COMMIT_MARK)[1:]:
+        commit, _, under = block.partition("\n")
+        lines, moved_in = _source_lines_of(under.split("\n"), source)
+        added += lines
+        if moved_in:
+            moved[commit] = moved_in
+    return added + _lines_moved_into_source(moved)
 
 
 # "<commit>\t<tree>\t<parents>\t<stamp> <author>", a commit of the history
@@ -905,8 +1086,11 @@ def get_log_range(defaultrange: str = "HEAD", end_only: bool = True) -> str:
         for author in authors_list:
             options.append("--author=" + shlex.quote(author))
 
-    # whatever the configuration says, git reads the range as revisions
-    return " ".join([*options, "--end-of-options", shlex.quote(commit_range)])
+    # whatever the configuration says, git reads the range as revisions, each
+    # quoted on its own (the last commits are a tip and the commits they leave out)
+    return " ".join(
+        [*options, "--end-of-options", *(shlex.quote(part) for part in commit_range.split(" "))]
+    )
 
 
 def commit_local_time(stamp: float, utc_offset: str) -> datetime.datetime:
