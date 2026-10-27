@@ -17,7 +17,7 @@ Additional capabilities:
 * **Analyzing patterns**: Identifying trends in commit activity, team collaboration, and code growth
 * **Providing insights**: Offering actionable recommendations based on repository statistics
 * **Generating summaries**: Creating natural language explanations of complex metrics
-* **Supporting multiple languages**: Available in English, Chinese, Japanese, Korean, Spanish, French, German, and more
+* **Supporting multiple languages**: English, Chinese, Japanese, Korean, Spanish, French and German, and any other language the model writes (see `Language Support`_)
 
 Installation
 ------------
@@ -76,6 +76,10 @@ High-quality AI models known for detailed analysis.
 .. code-block:: bash
 
    gitstats --ai --ai-provider claude /path/to/repo output/
+
+The default model is ``claude-opus-5-5``; ``--ai-model`` picks another one,
+such as ``claude-sonnet-5-5``. It needs ``anthropic`` 1.0 or later, which
+``pip install gitstats[ai]`` installs.
 
 Google Gemini
 ~~~~~~~~~~~~~
@@ -196,7 +200,8 @@ plain text.
 Language Support
 ----------------
 
-AI summaries can be generated in multiple languages:
+``--ai-language`` takes a language code. For these, the summaries and the AI
+Insights page's own headings are in that language:
 
 * **en**: English
 * **zh**: Chinese
@@ -205,6 +210,10 @@ AI summaries can be generated in multiple languages:
 * **es**: Spanish
 * **fr**: French
 * **de**: German
+
+Any other code (``pt``, ``it``, ``vi``...) is passed to the model, which
+writes the summaries in that language when it can; the page's headings stay
+in English.
 
 Example:
 
@@ -242,14 +251,28 @@ AI-generated summaries are cached by default to save API costs and time. The cac
 Error Handling
 --------------
 
-GitStats handles AI errors gracefully:
+The report is always written, with all the standard statistics:
 
-* **Network issues**: Retries with exponential backoff
-* **API errors**: Shows error message in report, continues generation
-* **Missing API keys**: Provides clear error message
-* **Rate limits**: Retries after delay
+* **Busy or failing service** (HTTP 429 or 5xx) and **connection errors**: the
+  call is made again after 1, 2, 4... seconds, ``ai_max_retries`` calls in all
+  (3 unless set, ``-c ai_max_retries=1`` for one call only).
+* **No answer** within ``ai_timeout`` seconds (120 unless set): that page's
+  summary fails, and the next pages are not asked for, since they would most
+  likely wait as long.
+* **A request the service refuses** (a wrong key or model, a model not pulled
+  in Ollama): not retried; the reason the service gives is shown.
+* Each summary that fails is on the AI Insights page as "Analysis
+  Unavailable", with the reason, and the console says how many of the
+  summaries were written.
+* **No AI package or no API key**: one warning, and the report without the AI
+  Insights page.
+* **Ctrl-C** while the summaries are being written stops them; the report is
+  then written without them.
 
-If AI generation fails, the report is still generated with all standard statistics - AI insights are simply omitted.
+.. code-block:: bash
+
+   # wait up to five minutes for a slow local model
+   gitstats --ai --ai-provider ollama -c ai_timeout=300 /path/to/repo output/
 
 Best Practices
 --------------
@@ -268,7 +291,7 @@ Best Practices
 Troubleshooting
 ---------------
 
-**"AI provider not initialized" error**
+**"No AI summaries: ... package not installed" or "... API key not found"**
 
 * Check that you've installed AI dependencies: ``pip install gitstats[ai]``
 * Verify your API key is set correctly
@@ -289,13 +312,15 @@ Troubleshooting
 
 * Ensure Ollama is running: ``ollama serve``
 * Check the base URL is correct (default: ``http://localhost:11434``)
-* Verify the model is pulled: ``ollama list``
+* Verify the model is pulled: ``ollama list`` (the page then says
+  "Ollama: model '...' not found, try pulling it first")
 
 **Slow generation**
 
 * First run is slower (generates and caches summaries)
 * Subsequent runs use cache and are much faster
-* Local models (Ollama) may be slower but have no API costs
+* Local models (Ollama) may be slower but have no API costs; raise
+  ``-c ai_timeout=...`` if a model needs more than two minutes per answer
 
 Examples
 --------
@@ -319,7 +344,7 @@ Examples
 .. code-block:: bash
 
    export ANTHROPIC_API_KEY=sk-ant-...
-   gitstats --ai --ai-provider claude --ai-model claude-3-5-sonnet-20241022 --ai-language zh /path/to/repo output/
+   gitstats --ai --ai-provider claude --ai-language zh /path/to/repo output/
 
 **Same Settings for Every Run:**
 

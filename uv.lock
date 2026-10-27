@@ -449,7 +449,7 @@ wheels = [
 
 [package.optional-dependencies]
 toml = [
-    { name = "tomli" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
 ]
 
 [[package]]
@@ -752,7 +752,7 @@ test = [
 
 [package.metadata]
 requires-dist = [
-    { name = "anthropic", marker = "extra == 'ai'", specifier = ">=0.8" },
+    { name = "anthropic", marker = "extra == 'ai'", specifier = ">=1.0" },
     { name = "google-generativeai", marker = "extra == 'ai'", specifier = ">=0.3" },
     { name = "nox", marker = "extra == 'dev'" },
     { name = "openai", marker = "extra == 'ai'", specifier = ">=1.0" },

@@ -877,6 +877,9 @@ class HTMLReportCreator(ReportCreator):
         # Create AI Insights page if AI is enabled
         if hasattr(data, "ai_summaries") and data.ai_summaries:
             self.create_ai_insights_html(data, path)
+        elif os.path.isfile(os.path.join(path, "ai-insights.html")):
+            # an earlier run's page, no longer linked and with its old numbers
+            os.remove(os.path.join(path, "ai-insights.html"))
 
     def create_index_html(self, data: Any, path: str) -> None:
         f = open(path + "/index.html", "w", encoding="utf-8")
