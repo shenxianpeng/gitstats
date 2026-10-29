@@ -473,9 +473,9 @@ class TestGitDataCollectorIntegration:
         assert dc.hotspot_files["README.md"]["lines"] == 3
         # a binary file has no lines, so it scores nothing however often it changes
         assert dc.hotspot_files["logo.png"] == {"lines": 0, "churn": 1, "score": 0.0}
-        # files without an extension are not counted as lines of code, nor here
+        # a file without an extension has its lines counted, here as in the total
         assert ".gitignore" in dc.head_files
-        assert ".gitignore" not in dc.hotspot_files
+        assert dc.hotspot_files[".gitignore"]["lines"] == 2
 
     def test_collect_changes_by_date(self, git_repo):
         dc = GitDataCollector()
@@ -686,7 +686,8 @@ class TestCollectPhases:
         assert dc.activity_by_hour_of_week == {2: {5: 1}}
         # the month, week and year it is counted in are this machine's
         assert dc.activity_by_month_of_year == {12: 1}
-        assert dc.activity_by_year_week == {here.strftime("%Y-%W"): 1}
+        # (Tue 2024-12-31 is in the ISO week 1 of 2025, with Jan 1-5)
+        assert dc.activity_by_year_week == {"2025-01": 1}
         assert dc.activity_by_hour_of_week_by_year == {2024: {2: {5: 1}}}
 
     def test_record_author_commit_tracks_span_and_active_days(self):
@@ -1781,7 +1782,7 @@ class TestCollectEdgeCases:
     def test_tags_with_unreadable_dates_and_foreign_commits(self, monkeypatch):
         fake = _fake_git(
             {
-                "git rev-list --topo-order": "c2\nc1",
+                'git log --topo-order --format="%H" ': "c2\nc1",
                 "git show-ref --tags --dereference": "c2 refs/tags/v2\nc1 refs/tags/v1\n",
                 # the history that leads to the end of the range: c2 is not in
                 # it, so its tag is left out; the stamp of c1 is unreadable,
@@ -1801,7 +1802,7 @@ class TestCollectEdgeCases:
         assert dc.tags["v1"]["authors"] == {"Ann": 1}
         # one command reads the history, whatever the number of tags
         assert fake.calls == [
-            "git rev-list --topo-order --end-of-options HEAD",
+            'git log --topo-order --format="%H" --end-of-options HEAD',
             "git show-ref --tags --dereference",
             'git log --topo-order --format="%H%x09%T%x09%P%x09%at %aN" --end-of-options HEAD',
         ]
@@ -1809,7 +1810,7 @@ class TestCollectEdgeCases:
     def test_tags_outside_the_range_need_no_history(self, monkeypatch):
         fake = _fake_git(
             {
-                "git rev-list --topo-order": "c2\nc1",
+                'git log --topo-order --format="%H" ': "c2\nc1",
                 "git show-ref --tags --dereference": "c9 refs/tags/elsewhere\n",
             }
         )
@@ -1926,7 +1927,7 @@ class TestCollectEdgeCases:
     def test_commit_stats_skip_malformed_lines(self, monkeypatch):
         fake = _fake_git(
             {
-                "git rev-list --pretty": (
+                "git log --format=": (
                     "1700000000 2023-11-14 22:13:20 +0000 Ann <ann@example.com>\n"
                     "short line\n"
                     "not-a-stamp 2023-11-14 22:13:20 +0100 Bo <bo-at-nowhere>\n"
@@ -1947,7 +1948,7 @@ class TestCollectEdgeCases:
     def test_commit_stats_sort_addresses_by_organization(self, monkeypatch):
         fake = _fake_git(
             {
-                "git rev-list --pretty": (
+                "git log --format=": (
                     "1700000000 2023-11-14 22:13:20 +0000 Ann <ann@corp.google.com>\n"
                     "1700000100 2023-11-14 22:15:00 +0000 Ann <Ann@google.com>\n"
                     "1690000000 2023-07-22 04:26:40 +0000 Bo <bo@google.com>\n"
@@ -1988,7 +1989,7 @@ class TestCollectEdgeCases:
         """Not on the clock of the machine the report is generated on."""
         fake = _fake_git(
             {
-                "git rev-list --pretty": (
+                "git log --format=": (
                     # one moment, 2023-11-14 22:13:20 UTC, committed in three places
                     "1700000000 2023-11-15 07:13:20 +0900 Ann <ann@example.com>\n"
                     "1700000000 2023-11-14 14:13:20 -0800 Bo <bo@example.com>\n"
@@ -2249,7 +2250,11 @@ class TestCollectEdgeCases:
 
         assert "vendor/lib" not in dc.head_files
         assert dc.total_files == 6
-        assert dc.extensions[""] == {"files": 1, "lines": 2}
+        # no extension (.gitignore) and one too long to be one share the row
+        assert dc.extensions[""] == {"files": 2, "lines": 4}
+        # the rows add up to the tiles
+        assert sum(e["files"] for e in dc.extensions.values()) == dc.total_files
+        assert sum(e["lines"] for e in dc.extensions.values()) == dc.total_lines
         assert dc.extensions["py"] == {"files": 2, "lines": 8}
         # the six blobs of the files, .gitignore without an extension among
         # them, were read and added to the cache
@@ -3165,7 +3170,7 @@ def test_the_root_commit_counts_whatever_log_show_root_says(tmp_path, monkeypatc
 def test_run_reports_the_time_spent_in_git(git_repo, tmp_path, caplog, sequential_map):
     with caplog.at_level(logging.INFO, logger="gitstats"):
         assert run([git_repo], str(tmp_path / "report")) == 0
-    spent = re.search(r"secs, ([\d.]+) secs \(", caplog.text)
+    spent = re.search(r"secs, ([\d.]+) secs in external commands \(added up", caplog.text)
     assert spent and float(spent[1]) > 0
 
 
@@ -3212,3 +3217,257 @@ def test_what_gitstats_conf_could_not_say_stops_the_run(capsys):
     assert stopped.value.code == 2
     assert "gitstats.conf: processes must be a whole number" in capsys.readouterr().err
     ran.assert_not_called()
+
+
+# ── data the second review found wrong ───────────────────────────────────
+
+
+@pytest.mark.parametrize("processes", [8, 1])
+def test_an_author_named_like_a_shortstat_line(tmp_path, monkeypatch, processes):
+    """A commit header "<stamp> 2 files changed" is a header: it crashed the
+    run with a KeyError, and its commit lost its lines."""
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (*ANN, "2021-03-01T10:00:00", {"a.py": 10}),
+            ("2 files changed", "fc@example.com", "2021-03-02T10:00:00", {"a.py": 20}),
+            (*ANN, "2021-03-03T10:00:00", {"a.py": 25}),
+        ],
+    )
+    dc = _collected(repo, monkeypatch, processes)
+    assert dc.authors["2 files changed"]["commits"] == 1
+    assert dc.authors["2 files changed"]["lines_added"] == 10
+    assert dc.authors["Ann"]["lines_added"] == 15
+    assert dc.total_lines_added == 25
+
+
+@pytest.mark.parametrize("processes", [8, 1])
+def test_the_authors_filter_matches_the_names_after_mailmap(tmp_path, monkeypatch, processes):
+    """Every command matches the name the report shows: `git rev-list` and
+    `git shortlog` matched the name as committed, `git log` the one after
+    .mailmap, and the shares came out at 400%, or the run crashed."""
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (
+                "Other",
+                "o@example.com",
+                "2021-01-01T10:00:00",
+                {".mailmap": "New <new@x> Old <old@x>\n"},
+            ),
+            ("Old", "old@x", "2021-01-02T10:00:00", {"a": "1"}),
+            ("Old", "old@x", "2021-01-03T10:00:00", {"a": "2"}),
+            ("Old", "old@x", "2021-01-04T10:00:00", {"a": "3"}),
+            ("New", "new@x", "2021-01-05T10:00:00", {"a": "4"}),
+        ],
+    )
+    dc = _collected(repo, monkeypatch, processes, authors="New")
+    assert dc.total_commits == 4
+    assert dc.total_authors == 1
+    assert dc.authors["New"]["commits"] == 4
+    # the name as committed is not the one shown: it matches nothing
+    with pytest.raises(RuntimeError, match="No commits to analyze"):
+        _collected(repo, monkeypatch, processes, authors="Old")
+
+
+def test_the_authors_filter_keeps_the_tags_on_other_authors_commits(tmp_path, monkeypatch):
+    """A tag on Bob's commit is still a release: it keeps Ann's commits
+    before it, where they went to the next tag of hers."""
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (*ANN, "2021-01-01T10:00:00", {"a": "1"}),
+            ("Bob", "bob@example.com", "2021-01-02T10:00:00", {"a": "2"}),
+            (*ANN, "2021-01-03T10:00:00", {"a": "3"}),
+            (*ANN, "2021-01-04T10:00:00", {"a": "4"}),
+            ("Bob", "bob@example.com", "2021-01-05T10:00:00", {"a": "5"}),
+        ],
+    )
+    for tag, back in (("v1", "HEAD~3"), ("v2", "HEAD~1"), ("v3", "HEAD")):
+        _git(repo, "tag", tag, back)
+    dc = _collected(repo, monkeypatch, authors="Ann")
+    counted = {tag: (info["commits"], info["authors"]) for tag, info in dc.tags.items()}
+    assert counted == {
+        "v1": (1, {"Ann": 1}),
+        "v2": (2, {"Ann": 2}),
+        "v3": (0, {}),  # Bob's alone: a release with none of Ann's commits
+    }
+
+
+def test_a_signature_check_in_the_users_config_is_not_read_as_data():
+    """log.showSignature would print a line into each commit's output, read
+    as a file name; every git that gitstats starts has it off."""
+    keys = {
+        os.environ[f"GIT_CONFIG_KEY_{n}"]: os.environ[f"GIT_CONFIG_VALUE_{n}"]
+        for n in range(int(os.environ["GIT_CONFIG_COUNT"]))
+    }
+    assert keys["log.showSignature"] == "false"
+    assert keys["log.mailmap"] == "true"
+
+
+def test_git_settings_go_after_those_already_in_the_environment(monkeypatch):
+    from gitstats.main import _set_git_config
+
+    monkeypatch.setenv("GIT_CONFIG_COUNT", "1")
+    monkeypatch.setenv("GIT_CONFIG_KEY_0", "user.name")
+    monkeypatch.setenv("GIT_CONFIG_VALUE_0", "Someone")
+    _set_git_config({"log.showSignature": "false"})
+    assert os.environ["GIT_CONFIG_COUNT"] == "2"
+    assert os.environ["GIT_CONFIG_KEY_0"] == "user.name"
+    assert (os.environ["GIT_CONFIG_KEY_1"], os.environ["GIT_CONFIG_VALUE_1"]) == (
+        "log.showSignature",
+        "false",
+    )
+    monkeypatch.setenv("GIT_CONFIG_COUNT", "not a number")
+    _set_git_config({"a.b": "c"})
+    assert (os.environ["GIT_CONFIG_COUNT"], os.environ["GIT_CONFIG_KEY_0"]) == ("1", "a.b")
+
+
+def test_a_domain_is_one_whatever_its_case(tmp_path, monkeypatch):
+    repo = _history(
+        tmp_path / "repo",
+        [
+            ("P1", "p1@MIT.EDU", "2021-01-01T10:00:00", {"a": "1"}),
+            ("P2", "p2@mit.edu", "2021-01-02T10:00:00", {"a": "2"}),
+        ],
+    )
+    dc = _collected(repo, monkeypatch)
+    assert dc.domains == {"mit.edu": {"commits": 2}}
+
+
+def test_a_file_name_that_starts_with_a_space(tmp_path, monkeypatch):
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (*ANN, "2021-01-01T10:00:00", {" lead.py": 10}),
+            (*ANN, "2021-01-02T10:00:00", {" lead.py": 12}),
+        ],
+    )
+    dc = _collected(repo, monkeypatch)
+    assert dc.head_files == [" lead.py"]
+    # the hotspot finds its churn under the same name
+    assert dc.hotspot_files[" lead.py"]["churn"] == dc.file_churn[" lead.py"] == 2
+
+
+def test_files_without_an_extension_are_in_the_extensions(tmp_path, monkeypatch):
+    repo = _history(
+        tmp_path / "repo",
+        [(*ANN, "2021-01-01T10:00:00", {"a.py": 5, "Makefile": 3, ".gitignore": 2})],
+    )
+    dc = _collected(repo, monkeypatch)
+    assert dc.extensions == {"py": {"files": 1, "lines": 5}, "": {"files": 2, "lines": 5}}
+    assert (dc.total_files, dc.total_lines) == (3, 10)
+    assert set(dc.hotspot_files) == {"a.py", "Makefile", ".gitignore"}
+
+
+def test_files_by_stamp_counts_a_commit_with_an_unreadable_date_at_zero(monkeypatch):
+    """git prints an author date it cannot read as nothing."""
+    # the first line too, whose space the output's strip() takes off
+    fake = _fake_git({'git log --format="%at %T"': " tree1\n1700000000 tree2\n tree3\n"})
+    monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+    dc = GitDataCollector()
+    dc.cache = {"files_in_tree": {"tree1": 1, "tree2": 2, "tree3": 3}}
+    dc._collect_files_by_stamp()
+    assert dc.files_by_stamp == {0: 3, 1700000000: 2}
+    assert dc.total_commits == 3
+
+
+class TestRepositoryChecks:
+    def test_a_folder_of_a_repository_gives_the_whole_repository(
+        self, tmp_path, caplog, sequential_map
+    ):
+        repo = _history(
+            tmp_path / "repo",
+            [(*ANN, "2021-01-01T10:00:00", {"docs/a.md": 5, "src/b.py": 100})],
+        )
+        _use_config()
+        with caplog.at_level(logging.WARNING, logger="gitstats"):
+            data = _run_single_repo(str(repo / "docs"), str(tmp_path / "report"))
+        assert f"{repo / 'docs'} is a folder of the repository" in caplog.text
+        assert data.project_name == "repo"
+        assert (data.total_files, data.total_lines) == (2, 105)
+
+    def test_not_a_repository(self, tmp_path):
+        (tmp_path / "plain").mkdir()
+        _use_config()
+        with pytest.raises(RuntimeError, match="Not a git repository: "):
+            _run_single_repo(str(tmp_path / "plain"), str(tmp_path / "report"))
+
+    @pytest.mark.parametrize(
+        "config,message",
+        [
+            ({"commit_end": "nosuchref"}, "commit_end 'nosuchref' is not a commit"),
+            ({"commit_begin": "nosuchref"}, "commit_begin 'nosuchref' is not a commit"),
+        ],
+    )
+    def test_a_range_that_is_not_in_the_repository(self, git_repo, tmp_path, config, message):
+        _use_config(**config)
+        with pytest.raises(RuntimeError, match=message):
+            _run_single_repo(git_repo, str(tmp_path / "report"))
+
+    def test_an_empty_repository(self, tmp_path):
+        (tmp_path / "empty").mkdir()
+        _git(tmp_path / "empty", "init", "-q")
+        _use_config()
+        with pytest.raises(RuntimeError, match="No commits to analyze: the repository .* is empty"):
+            _run_single_repo(str(tmp_path / "empty"), str(tmp_path / "report"))
+
+    def test_a_commit_begin_that_is_a_number_needs_no_check(
+        self, git_repo, tmp_path, sequential_map
+    ):
+        _use_config(commit_begin="2")
+        assert _run_single_repo(git_repo, str(tmp_path / "report")).total_commits == 2
+
+
+class TestOutputChecks:
+    """A report that cannot be written fails before the history is read."""
+
+    @pytest.fixture
+    def read_only(self, tmp_path):
+        folder = tmp_path / "ro"
+        folder.mkdir()
+        folder.chmod(0o555)
+        yield folder
+        folder.chmod(0o755)
+
+    @pytest.mark.skipif(os.name == "nt" or os.geteuid() == 0, reason="needs POSIX permissions")
+    def test_a_folder_that_cannot_be_written(self, git_repo, read_only, caplog):
+        _use_config()
+        with (
+            patch.object(GitDataCollector, "collect") as collect,
+            caplog.at_level(logging.ERROR, logger="gitstats"),
+        ):
+            assert run([git_repo], str(read_only)) == 1
+        collect.assert_not_called()
+        assert f"FATAL: Cannot write to {read_only}: permission denied" in caplog.text
+
+    @pytest.mark.skipif(os.name == "nt" or os.geteuid() == 0, reason="needs POSIX permissions")
+    def test_a_folder_that_cannot_be_made_says_why(self, git_repo, read_only, caplog):
+        _use_config()
+        with caplog.at_level(logging.ERROR, logger="gitstats"):
+            assert run([git_repo], str(read_only / "sub")) == 1
+        assert (
+            f"FATAL: Cannot create the output directory {read_only / 'sub'}: Permission denied"
+            in caplog.text
+        )
+
+    @pytest.mark.skipif(os.name == "nt" or os.geteuid() == 0, reason="needs POSIX permissions")
+    def test_json_beside_a_folder_that_cannot_be_written(self, git_repo, read_only):
+        read_only.chmod(0o755)
+        (read_only / "out").mkdir()
+        read_only.chmod(0o555)
+        _use_config()
+        with (
+            patch.object(GitDataCollector, "collect") as collect,
+            pytest.raises(RuntimeError, match=f"Cannot write to {read_only}"),
+        ):
+            _run_single_repo(git_repo, str(read_only / "out"), "json")
+        collect.assert_not_called()
+
+    def test_a_file_in_the_way(self, git_repo, tmp_path, caplog):
+        (tmp_path / "blocker").write_text("x")
+        _use_config()
+        with caplog.at_level(logging.ERROR, logger="gitstats"):
+            assert run([git_repo], str(tmp_path / "blocker" / "x")) == 1
+        assert "FATAL: Cannot create the output directory" in caplog.text
+        assert "Not a directory" in caplog.text

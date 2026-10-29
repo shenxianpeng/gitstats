@@ -10,6 +10,7 @@ from types import SimpleNamespace
 import pytest
 
 from gitstats import load_config
+from gitstats.main import GitDataCollector
 from gitstats.report_creator import (
     BADGES_PLACEHOLDER_URL,
     HTMLReportCreator,
@@ -859,23 +860,47 @@ def test_weekly_activity_labels_weeks_by_monday(mock_data_collector, monkeypatch
             return cls(2026, 9, 25, 12, 0)  # a Friday; its week starts on Mon 21 Sep
 
     monkeypatch.setattr("gitstats.report_creator.datetime.datetime", FixedDatetime)
-    mock_data_collector.activity_by_year_week = {"2026-38": 7}  # "%Y-%W" of 2026-09-21
+    mock_data_collector.activity_by_year_week = {"2026-39": 7}  # the ISO week of 2026-09-21
     # the last commit in the same week
     mock_data_collector.last_commit_stamp = int(FixedDatetime(2026, 9, 22, 9, 0).timestamp())
     f = StringIO()
     HTMLReportCreator()._write_weekly_activity_section(f, mock_data_collector)
     html = f.getvalue()
 
-    # Labels are the weeks' Mondays, not "2026-38" (which reads like a month),
+    # Labels are the weeks' Mondays, not "2026-39" (which reads like a month),
     # without the year when all of them are in this one
     assert '"Feb 16", "Feb 23"' in html and '"Sep 21"]' in html
-    assert '"2026-38"' not in html
+    assert '"2026-39"' not in html
     assert "Last 32 weeks, from the week of Feb 16, 2026 to the week of Sep 21, 2026." in html
-    # The value for the current week is still found under its "%Y-%W" key
+    # The value for the current week is still found under its ISO week
     assert (
         '"data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7]'
         in html
     )
+
+
+def test_weekly_activity_keeps_the_week_of_new_year_whole(mock_data_collector, monkeypatch):
+    """Mon Dec 30, 2024 to Sun Jan 5, 2025 is one week, one bar: "%Y-%W"
+    split it into 2024-53 and 2025-00, and the bar showed one of the two."""
+    import datetime as real_datetime
+
+    class FixedDatetime(real_datetime.datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return cls(2026, 9, 25, 12, 0)
+
+    monkeypatch.setattr("gitstats.report_creator.datetime.datetime", FixedDatetime)
+    mock_data_collector.last_commit_stamp = int(FixedDatetime(2025, 1, 2, 10, 0).timestamp())
+    collector = GitDataCollector()
+    for day in (30, 31, 31):
+        collector._record_activity(real_datetime.datetime(2024, 12, day, 12, 0))
+    collector._record_activity(real_datetime.datetime(2025, 1, 2, 12, 0))
+    mock_data_collector.activity_by_year_week = collector.activity_by_year_week
+    f = StringIO()
+    HTMLReportCreator()._write_weekly_activity_section(f, mock_data_collector)
+    html = f.getvalue()
+    assert '"Dec 23, 2024", "Dec 30, 2024"]' in html
+    assert html.count(", 4]") == 1  # the last bar: the four commits of that week
 
 
 def test_weekly_activity_ends_at_the_last_commit(mock_data_collector, monkeypatch):

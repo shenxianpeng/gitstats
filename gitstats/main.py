@@ -38,6 +38,7 @@ from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_
 from gitstats.sources import is_source
 from gitstats.utils import (
     SOURCE_LINES_LOG,
+    WEEK_KEY,
     History,
     commit_local_time,
     commits_reached,
@@ -58,6 +59,37 @@ from gitstats.utils import (
 from gitstats.wrapped import THEMES, WrappedCardGenerator
 
 os.environ["LC_ALL"] = "C"
+
+
+def _set_git_config(settings: dict[str, str]) -> None:
+    """Have every git process gitstats starts read these settings, whatever
+    the user's git configuration says, through the environment
+    (GIT_CONFIG_COUNT, git 2.31 and later), after any already there."""
+    try:
+        count = int(os.environ.get("GIT_CONFIG_COUNT", "0"))
+    except ValueError:
+        count = 0
+    for key, value in settings.items():
+        os.environ[f"GIT_CONFIG_KEY_{count}"] = key
+        os.environ[f"GIT_CONFIG_VALUE_{count}"] = value
+        count += 1
+    os.environ["GIT_CONFIG_COUNT"] = str(count)
+
+
+_set_git_config(
+    {
+        # a signature check printed into each commit's lines would be read as
+        # data: as a file name, or as a line that cannot be parsed
+        "log.showSignature": "false",
+        # `git log --author` matches the names after .mailmap, which are the
+        # names the report shows (it is the default, and a setting can turn it off)
+        "log.mailmap": "true",
+    }
+)
+
+# the line `git log --shortstat` writes under a commit: " 2 files changed, ..."
+# (an author may be named "2 files changed", so the header is no such line)
+_SHORTSTAT = re.compile(r"\s+\d+ files? changed")
 
 logger = logging.getLogger("gitstats")
 
@@ -150,6 +182,14 @@ def _stamp(text: str) -> int:
     return min(int(text), _LATEST_STAMP)
 
 
+def _stamp_or_zero(text: str) -> int:
+    """_stamp(), or 0 for a date git cannot read, which it prints as nothing."""
+    try:
+        return _stamp(text)
+    except ValueError:
+        return 0
+
+
 class DataCollector:
     """Manages data collection from a revision control repository."""
 
@@ -166,7 +206,7 @@ class DataCollector:
         self.activity_by_hour_of_week_by_year: dict[int, dict[int, dict[int, int]]] = {}
         self.activity_by_hour_of_day_busiest: int = 0
         self.activity_by_hour_of_week_busiest: int = 0
-        self.activity_by_year_week: dict[str, int] = {}  # yy_wNN -> commits
+        self.activity_by_year_week: dict[str, int] = {}  # ISO "YYYY-WW" -> commits
         self.activity_by_year_week_peak: int = 0
 
         self.authors: dict[str, dict[str, Any]] = {}  # name -> author stats
@@ -331,9 +371,11 @@ class GitDataCollector(DataCollector):
                 "Bitbucket Pipelines 'clone: depth: full'."
             )
 
-        self.total_authors += int(
-            get_pipe_output(["git shortlog -s {}".format(get_log_range("HEAD", False)), "wc -l"])
-        )
+        # the names after .mailmap, as `git shortlog -s` gives them; git log, not
+        # shortlog or rev-list, so that the authors filter matches those names
+        # in every command (see get_log_range())
+        names = get_pipe_output(['git log --format="%aN" {}'.format(get_log_range("HEAD", False))])
+        self.total_authors += len({name for name in names.split("\n") if name})
 
         # Three phases read a `git log` of the whole history, two of them with
         # the line counts of every diff and the third with the names of the
@@ -430,13 +472,28 @@ class GitDataCollector(DataCollector):
         are included. ``history`` gives the history that leads to the end of
         the range when collect() shares one reading of it between phases.
         """
-        log_range = get_log_range("HEAD", False)
         # --topo-order: never list a commit before its descendants, so the order
-        # below follows the history even when commit dates are skewed
+        # below follows the history even when commit dates are skewed. Which
+        # tags are in the report does not depend on the authors filter: a tag
+        # on another author's commit is still a release, credited with the
+        # filtered authors' commits since the one before.
         tag_commits = (
-            get_pipe_output([f"git rev-list --topo-order {log_range}"]).strip().split("\n")
+            get_pipe_output(
+                [
+                    f'git log --topo-order --format="%H" {get_log_range("HEAD", False, authors=False)}'
+                ]
+            )
+            .strip()
+            .split("\n")
         )
         tag_commits_set = set(tag_commits) if tag_commits[0] else set()
+        if load_config()["authors"]:
+            counted = get_pipe_output(
+                [f'git log --format="%H" {get_log_range("HEAD", False)}']
+            ).split("\n")
+            counted_set = {commit for commit in counted if commit}
+        else:
+            counted_set = tag_commits_set
 
         # An annotated tag is listed with the hash of the tag object; --dereference
         # adds a "<tag>^{}" line with the commit it points to, which is the one
@@ -467,8 +524,9 @@ class GitDataCollector(DataCollector):
         # the date and author filters would leave holes in.
         graph = history() if history else history_graph(get_commit_range("HEAD", end_only=True))
         place, parents, headers = graph.place, graph.parents, graph.headers
+        # the commits counted: those of the range, by the filtered authors
         in_range = [False] * len(parents)
-        for commit in tag_commits_set:
+        for commit in counted_set:
             if commit in place:
                 in_range[place[commit]] = True
 
@@ -533,12 +591,7 @@ class GitDataCollector(DataCollector):
         """
         # Outputs "<stamp> <date> <time> <timezone> <author> '<' <mail> '>'"
         lines = get_pipe_output(
-            [
-                'git rev-list --pretty=format:"%at %ai %aN <%aE>" {}'.format(
-                    get_log_range("HEAD", False)
-                ),
-                "grep -v ^commit",
-            ]
+            ['git log --format="%at %ai %aN <%aE>" {}'.format(get_log_range("HEAD", False))]
         ).split("\n")
         # the names and addresses used together, to merge the identities of one person
         identities: dict[tuple[str, str], int] = {}  # (name, email) -> latest stamp
@@ -566,7 +619,8 @@ class GitDataCollector(DataCollector):
             mail = mail.rstrip(">")
             domain = "?"
             if mail.find("@") != -1:
-                domain = mail.rsplit("@", 1)[1]
+                # MIT.EDU and mit.edu are one domain
+                domain = mail.rsplit("@", 1)[1].strip().lower()
             date = datetime.datetime.fromtimestamp(float(stamp))
 
             # Track name<->email pairs to later resolve identity aliases
@@ -674,7 +728,9 @@ class GitDataCollector(DataCollector):
         self.activity_by_month_of_year[month] = self.activity_by_month_of_year.get(month, 0) + 1
 
         # yearly/weekly activity
-        yyw = date.strftime("%Y-%W")
+        # the ISO week, which starts on a Monday and is one week across New
+        # Year: "%Y-%W" kept Dec 30, 2024 and Jan 2, 2025 under 2024-53 and 2025-00
+        yyw = date.strftime(WEEK_KEY)
         self.activity_by_year_week[yyw] = self.activity_by_year_week.get(yyw, 0) + 1
         if self.activity_by_year_week_peak < self.activity_by_year_week[yyw]:
             self.activity_by_year_week_peak = self.activity_by_year_week[yyw]
@@ -826,12 +882,7 @@ class GitDataCollector(DataCollector):
         """
         # outputs "<stamp> <files>" for each revision
         revlines = (
-            get_pipe_output(
-                [
-                    'git rev-list --pretty=format:"%at %T" {}'.format(get_log_range("HEAD", False)),
-                    "grep -v ^commit",
-                ]
-            )
+            get_pipe_output(['git log --format="%at %T" {}'.format(get_log_range("HEAD", False))])
             .strip()
             .split("\n")
         )
@@ -848,7 +899,9 @@ class GitDataCollector(DataCollector):
         # are counted below
         files_in_tree = self.cache.setdefault("files_in_tree", {})
         for revline in revlines:
-            time, rev = revline.split(" ")
+            # a date git cannot read prints as nothing: such a commit is counted at 0
+            time, _, rev = revline.rpartition(" ")
+            time = str(_stamp_or_zero(time.strip()))
             if rev in files_in_tree:
                 lines.append("%d %d" % (int(time), files_in_tree[rev]))
             else:
@@ -906,27 +959,30 @@ class GitDataCollector(DataCollector):
             ]
         ).split("\000")
         blobs_to_read = []
-        # (path, blob id, extension) of every file whose lines are counted:
-        # None for a file without an extension, which is counted in the total only
-        counted_files: list[tuple[str, str, str | None]] = []
+        # (path, blob id, extension) of every file whose lines are counted
+        counted_files: list[tuple[str, str, str]] = []
         lines_in_blob = self.cache.setdefault("lines_in_blob", {})
         for line in lines:
             if len(line) == 0:
                 continue
-            parts = re.split(r"\s+", line, maxsplit=4)
-            if parts[0] == "160000" and parts[3] == "-":
+            # "<mode> <type> <object> <size>\t<path>": the path is all that
+            # follows the tab, spaces at its start included
+            meta, fullpath = line.split("\t", 1)
+            parts = meta.split()
+            if parts[1] == "commit":
                 # skip submodules
                 continue
             blob_id = parts[2]
             size = int(parts[3])
-            fullpath = parts[4]
 
             self.total_size += size
             self.total_files += 1
             self.head_files.append(fullpath)
 
             filename = fullpath.split("/")[-1]  # strip directories
-            ext: str | None = None
+            # "" for a file without an extension (Makefile, .gitignore), or
+            # with one too long to be one: the report's "no extension" row
+            ext = ""
             if filename.find(".") != -1 and filename.rfind(".") != 0:
                 ext = filename[(filename.rfind(".") + 1) :]
                 if len(ext) > conf["max_ext_length"]:
@@ -936,9 +992,9 @@ class GitDataCollector(DataCollector):
                 if should_exclude_file(ext):
                     continue
 
-                if ext not in self.extensions:
-                    self.extensions[ext] = {"files": 0, "lines": 0}
-                self.extensions[ext]["files"] += 1
+            if ext not in self.extensions:
+                self.extensions[ext] = {"files": 0, "lines": 0}
+            self.extensions[ext]["files"] += 1
             counted_files.append((fullpath, blob_id, ext))
             # the line count of a blob comes from the cache if it is there
             if blob_id not in lines_in_blob:
@@ -955,8 +1011,6 @@ class GitDataCollector(DataCollector):
         for fullpath, blob_id, ext in counted_files:
             lines = lines_in_blob[blob_id]
             self.total_lines += lines
-            if ext is None:
-                continue  # files without extension
             self.extensions[ext]["lines"] += lines
             self.hotspot_files[fullpath] = {"lines": lines, "churn": 0, "score": 0.0}
 
@@ -1028,7 +1082,7 @@ class GitDataCollector(DataCollector):
 
             # <stamp> <author>; only the stamp matters here, the author is
             # attributed in _collect_per_author_line_stats
-            if re.search("files? changed", line) is None:
+            if _SHORTSTAT.match(line) is None:
                 pos = line.find(" ")
                 if pos != -1:
                     try:
@@ -1102,7 +1156,7 @@ class GitDataCollector(DataCollector):
                 continue
 
             # <stamp> <author>
-            if re.search("files? changed", line) is None:
+            if _SHORTSTAT.match(line) is None:
                 pos = line.find(" ")
                 if pos != -1:
                     try:
@@ -1403,10 +1457,71 @@ def _prepare_output_dir(path: str) -> str:
     if os.path.commonpath([base, target]) != base:
         raise ValueError(f"Refusing to create output directory outside {base}")
     try:
-        os.makedirs(target)
-    except OSError:
-        pass
+        os.makedirs(target, exist_ok=True)
+    except FileExistsError:
+        pass  # a file: the caller says it is not a directory
+    except OSError as e:
+        raise RuntimeError(f"Cannot create the output directory {target}: {e.strerror}") from e
     return target
+
+
+def _check_output_dir(path: str, json_beside: bool = False) -> None:
+    """Fail before the history is read, not after, when the report cannot be
+    written: ``path`` is not a directory, or not one gitstats can write to
+    (nor, with ``json_beside``, the directory the JSON goes to beside it).
+
+    Raises:
+        RuntimeError: saying which.
+    """
+    if not os.path.isdir(path):
+        raise RuntimeError(f"Output path is not a directory: {path}")
+    for directory in [path] + ([os.path.dirname(path)] if json_beside else []):
+        if not os.access(directory, os.W_OK):
+            raise RuntimeError(f"Cannot write to {directory}: permission denied")
+
+
+def _git_answer(gitpath: str, *args: str) -> str | None:
+    """What ``git <args>`` prints in ``gitpath``, or None when it fails."""
+    result = subprocess.run(
+        ["git", *args], cwd=gitpath, capture_output=True, text=True, check=False
+    )
+    return result.stdout.strip() if result.returncode == 0 else None
+
+
+def _repository_root(gitpath: str) -> str:
+    """The repository ``gitpath`` is, or is in, checked before its history is read.
+
+    A folder inside a repository gives the repository's top folder, with a
+    warning: git reads the history of the whole repository, and a report
+    that took its files from the folder and its commits from the whole
+    would mix the two.
+
+    Raises:
+        RuntimeError: when it is not a git repository, or the configured
+            commit_end or commit_begin is not a commit there.
+    """
+    if _git_answer(gitpath, "rev-parse", "--git-dir") is None:
+        raise RuntimeError(f"Not a git repository: {gitpath}")
+    if _git_answer(gitpath, "rev-parse", "--show-prefix"):
+        top = _git_answer(gitpath, "rev-parse", "--show-toplevel") or gitpath
+        logger.warning(
+            f"{gitpath} is a folder of the repository {top}: the report is of the whole repository"
+        )
+        gitpath = top
+    for key in ("commit_end", "commit_begin"):
+        value = str(conf.get(key) or "")
+        if not value or (key == "commit_begin" and value.isascii() and value.isdigit()):
+            continue  # a commit_begin of N is the last N commits
+        if (
+            _git_answer(
+                gitpath, "rev-parse", "--verify", "--quiet", "--end-of-options", value + "^{commit}"
+            )
+            is None
+        ):
+            if not _git_answer(gitpath, "rev-list", "-n", "1", "--all"):
+                raise RuntimeError(f"No commits to analyze: the repository {gitpath} is empty")
+            raise RuntimeError(f"{key} {value!r} is not a commit of {gitpath}")
+    return gitpath
 
 
 def normalize_site_url(url: str) -> str:
@@ -1484,10 +1599,10 @@ def _run_single_repo(
     """
     if not os.path.isdir(gitpath):
         raise RuntimeError(f"Git path is not a directory: {gitpath}")
+    gitpath = _repository_root(gitpath)
 
     outputpath = _prepare_output_dir(outputpath)
-    if not os.path.isdir(outputpath):
-        raise RuntimeError(f"Output path is not a directory: {outputpath}")
+    _check_output_dir(outputpath, json_beside=extra_fmt == "json" and json_sibling)
 
     logger.info(f"Output path: {outputpath}")
     cachefile = os.path.join(outputpath, "gitstats.cache")
@@ -1617,9 +1732,11 @@ def run(gitpath, outputpath, extra_fmt=None, wrapped_config=None) -> int:
     """
     rundir = os.getcwd()
 
-    outputpath = _prepare_output_dir(outputpath)
-    if not os.path.isdir(outputpath):
-        logger.error("FATAL: Output path is not a directory or does not exist")
+    try:
+        outputpath = _prepare_output_dir(outputpath)
+        _check_output_dir(outputpath)
+    except RuntimeError as e:
+        logger.error(f"FATAL: {e}")
         return 1
 
     try:
@@ -1655,7 +1772,8 @@ def run(gitpath, outputpath, extra_fmt=None, wrapped_config=None) -> int:
     # read off the module that adds to it, not a copy made when it was 0
     exectime_external = utils.exectime_external
     logger.info(
-        f"Execution time {exectime_internal:.5f} secs, {exectime_external:.5f} secs ({(100.0 * exectime_external) / exectime_internal:.2f} %) in external commands)"
+        f"Execution time {exectime_internal:.5f} secs, {exectime_external:.5f} secs in "
+        "external commands (added up: several run at once)"
     )
     if sys.stdin.isatty():
         logger.info("To view the report, re-run with --serve (see gitstats --help)")
