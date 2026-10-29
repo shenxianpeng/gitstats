@@ -3466,8 +3466,15 @@ class TestOutputChecks:
 
     def test_a_file_in_the_way(self, git_repo, tmp_path, caplog):
         (tmp_path / "blocker").write_text("x")
+        target = tmp_path / "blocker" / "x"
+        # the reason, as this system words it ("Not a directory" on POSIX,
+        # "The system cannot find the path specified" on Windows)
+        with pytest.raises(OSError) as error:
+            os.makedirs(target)
         _use_config()
         with caplog.at_level(logging.ERROR, logger="gitstats"):
-            assert run([git_repo], str(tmp_path / "blocker" / "x")) == 1
-        assert "FATAL: Cannot create the output directory" in caplog.text
-        assert "Not a directory" in caplog.text
+            assert run([git_repo], str(target)) == 1
+        assert (
+            f"FATAL: Cannot create the output directory {target}: {error.value.strerror}"
+            in caplog.text
+        )
