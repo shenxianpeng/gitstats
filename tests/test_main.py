@@ -3416,16 +3416,38 @@ class TestRepositoryChecks:
         with pytest.raises(RuntimeError, match=message):
             _run_single_repo(git_repo, str(tmp_path / "report"))
 
-    def test_a_repository_git_will_not_read_gives_gits_reason(
-        self, git_repo, tmp_path, monkeypatch
-    ):
+    def test_a_repository_git_will_not_read_gives_gits_reason(self, git_repo, tmp_path):
         """A repository owned by someone else (CI containers, Docker mounts):
-        git's reason and its safe.directory hint, not "Not a git repository"."""
-        monkeypatch.setenv("GIT_TEST_ASSUME_DIFFERENT_OWNER", "1")
+        git's reason and its safe.directory hint, not "Not a git repository".
+
+        git's answer is given here: whether git refuses depends on the
+        machine (owners, safe.directory), not on gitstats.
+        """
+        refused = subprocess.CompletedProcess(
+            ["git", "rev-parse", "--git-dir"],
+            128,
+            stdout="",
+            stderr=(
+                f"fatal: detected dubious ownership in repository at '{git_repo}'\n"
+                f"\tgit config --global --add safe.directory {git_repo}\n"
+            ),
+        )
         _use_config()
-        with pytest.raises(RuntimeError, match="git cannot read .*dubious ownership") as error:
+        with (
+            patch("gitstats.main._git", return_value=refused),
+            pytest.raises(RuntimeError, match="git cannot read .*dubious ownership") as error,
+        ):
             _run_single_repo(git_repo, str(tmp_path / "report"))
-        assert "safe.directory" in str(error.value)
+        assert f"safe.directory {git_repo}" in str(error.value)
+
+    def test_not_a_repository_says_so_whatever_gits_wording(self, git_repo, tmp_path):
+        nothing = subprocess.CompletedProcess(["git"], 128, stdout="", stderr="")
+        _use_config()
+        with (
+            patch("gitstats.main._git", return_value=nothing),
+            pytest.raises(RuntimeError, match="Not a git repository: "),
+        ):
+            _run_single_repo(git_repo, str(tmp_path / "report"))
 
     @pytest.mark.parametrize("value", ["HEAD~1", ":/utils", "v1.0^{}"])
     def test_any_revision_git_takes(self, git_repo, tmp_path, value, sequential_map):
