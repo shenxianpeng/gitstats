@@ -3464,6 +3464,21 @@ class TestOutputChecks:
             _run_single_repo(git_repo, str(read_only / "out"), "json")
         collect.assert_not_called()
 
+    def test_a_folder_the_system_says_cannot_be_written(self, git_repo, tmp_path, caplog):
+        """The same check on every system, Windows included, whose folders
+        the tests above cannot make read-only."""
+        out = tmp_path / "report"
+        out.mkdir()
+        _use_config()
+        with (
+            patch("gitstats.main.os.access", return_value=False),
+            patch.object(GitDataCollector, "collect") as collect,
+            caplog.at_level(logging.ERROR, logger="gitstats"),
+        ):
+            assert run([git_repo], str(out)) == 1
+        collect.assert_not_called()
+        assert f"FATAL: Cannot write to {out}: permission denied" in caplog.text
+
     def test_a_file_in_the_way(self, git_repo, tmp_path, caplog):
         (tmp_path / "blocker").write_text("x")
         target = tmp_path / "blocker" / "x"
