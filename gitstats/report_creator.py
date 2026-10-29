@@ -19,6 +19,7 @@ from gitstats.employers import KIND_LABELS, KINDS, ORGANIZATION
 from gitstats.employers import summarize as summarize_organizations
 from gitstats.safe_html import sanitize_ai_html
 from gitstats.utils import (
+    WEEK_KEY,
     format_bytes,
     format_duration,
     format_int,
@@ -912,7 +913,8 @@ class HTMLReportCreator(ReportCreator):
         total_commits = data.get_total_commits()
         active_days = len(data.get_active_days())
         delta_days = data.get_commit_delta_days()
-        extensions = len(data.extensions)
+        # the "no extension" row is not an extension
+        extensions = len([ext for ext in data.extensions if ext])
         streak = data.get_longest_streak()
         f.write(
             stat_tiles_html(
@@ -1131,7 +1133,7 @@ class HTMLReportCreator(ReportCreator):
 
         Weeks are labelled by the Monday they start on ("Feb 16"), with the
         year ("Dec 26, 2022") when the weeks are not all in this one; the
-        "%Y-%W" keys the data is stored under read like months ("2026-07").
+        ISO weeks the data is stored under (WEEK_KEY) read like months ("2026-07").
         """
         weeks_count = 32
         f.write(html_header(2, "Weekly activity"))
@@ -1141,7 +1143,7 @@ class HTMLReportCreator(ReportCreator):
         last_commit = (
             datetime.datetime.fromtimestamp(stamp) if isinstance(stamp, int) and stamp else now
         )
-        week = "%Y-%W"  # the key the commits of a week are kept under
+        week = WEEK_KEY  # the key the commits of a week are kept under
         quiet = last_commit.strftime(week) < now.strftime(week)
         deltaweek = datetime.timedelta(7)
         weeks: list[str] = []
@@ -1959,7 +1961,8 @@ class HTMLReportCreator(ReportCreator):
         f.write("<h1>Files</h1>")
 
         total_files = data.get_total_files()
-        extensions = len(data.extensions)
+        # the "no extension" row is not an extension
+        extensions = len([ext for ext in data.extensions if ext])
         tiles = [
             (
                 "Files",

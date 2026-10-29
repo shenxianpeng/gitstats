@@ -31,15 +31,6 @@ def count_lines_in_text(text: str | None) -> int:
     return len(text.strip().split("\n"))
 
 
-def filter_lines_by_pattern(text: str | None, pattern: str) -> str:
-    """Filter out lines matching a pattern (cross-platform grep -v replacement)"""
-    if not text or not text.strip():
-        return ""
-    lines = text.split("\n")
-    filtered_lines = [line for line in lines if not re.match(pattern, line)]
-    return "\n".join(filtered_lines)
-
-
 def get_version() -> str:
     """Installed package version, or "dev" when running from a source checkout."""
     try:
@@ -127,14 +118,6 @@ def get_pipe_output(cmds: list[str], quiet: bool = False) -> str:
             text = output.decode("latin-1", errors="replace").rstrip("\n")
         line_count = count_lines_in_text(text)
         result = str(line_count)
-    elif len(cmds) == 2 and cmds[1].startswith("grep -v"):
-        pattern = cmds[1].split("grep -v ")[1]
-        output = _run_command(cmds[0])
-        try:
-            text = output.decode("utf-8", errors="replace").rstrip("\n")
-        except UnicodeDecodeError:  # pragma: no cover - errors="replace" never raises
-            text = output.decode("latin-1", errors="replace").rstrip("\n")
-        result = filter_lines_by_pattern(text, pattern)
     else:
         output = _run_pipe_chain(cmds)
         try:
@@ -1063,11 +1046,21 @@ def get_stat_summary_counts(line: str) -> list[str | int]:
     return numbers
 
 
-def get_log_range(defaultrange: str = "HEAD", end_only: bool = True) -> str:
-    """The options and revisions of the commits to read, for a `git log` or
-    `git rev-list` command line: the date and author filters, then
-    ``--end-of-options`` (git 2.24 and later) and the range, each quoted for
-    shlex.split(). Nothing may follow it but ``-- <paths>``."""
+# the key the commits of a week are kept under: the ISO year and week, which
+# start on a Monday and do not split the week of New Year ("2025-01")
+WEEK_KEY = "%G-%V"
+
+
+def get_log_range(defaultrange: str = "HEAD", end_only: bool = True, authors: bool = True) -> str:
+    """The options and revisions of the commits to read, for a `git log`
+    command line: the date and author filters, then ``--end-of-options``
+    (git 2.24 and later) and the range, each quoted for shlex.split().
+    Nothing may follow it but ``-- <paths>``. Without ``authors``, the
+    authors filter is left out.
+
+    For `git log` only: ``--author`` matches the names after .mailmap there,
+    and the names as committed in `git rev-list` and `git shortlog`.
+    """
     commit_range = get_commit_range(defaultrange, end_only)
     # Build git log options
     options = []
@@ -1079,7 +1072,7 @@ def get_log_range(defaultrange: str = "HEAD", end_only: bool = True) -> str:
         options.append("--until=" + shlex.quote(load_config()["end_date"]))
 
     # Author filtering
-    if len(load_config()["authors"]) > 0:
+    if authors and len(load_config()["authors"]) > 0:
         authors_list = [
             author.strip() for author in load_config()["authors"].split(",") if author.strip()
         ]

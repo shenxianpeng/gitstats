@@ -19,7 +19,6 @@ from gitstats.utils import (
     count_files_in_trees,
     count_lines_in_blobs,
     count_lines_in_text,
-    filter_lines_by_pattern,
     format_bytes,
     format_duration,
     format_int,
@@ -97,27 +96,6 @@ def test_count_lines_in_text_empty():
 
 def test_count_lines_in_text_trailing_newline():
     assert count_lines_in_text("a\nb\nc") == 3
-
-
-# ── filter_lines_by_pattern ──────────────────────────────────────────────
-
-
-def test_filter_lines_by_pattern_basic():
-    text = "line1\ncomment: foo\nline2\ncomment: bar\n"
-    result = filter_lines_by_pattern(text, r"comment.*")
-    assert "comment" not in result
-    assert "line1" in result
-    assert "line2" in result
-
-
-def test_filter_lines_by_pattern_no_match():
-    text = "a\nb\nc\n"
-    assert filter_lines_by_pattern(text, r"xyz") == text
-
-
-def test_filter_lines_by_pattern_empty():
-    assert filter_lines_by_pattern("", r".*") == ""
-    assert filter_lines_by_pattern("   \n", r".*") == ""
 
 
 # ── should_exclude_file / get_excluded_extensions ────────────────────────
