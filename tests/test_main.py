@@ -20,6 +20,7 @@ from gitstats.main import (
     _dump_json_within,
     _make_server,
     _prepare_output_dir,
+    _repository_root,
     _run_multi_repo,
     _run_single_repo,
     _serve_report,
@@ -3308,19 +3309,29 @@ def test_a_signature_check_in_the_users_config_is_not_read_as_data():
 def test_git_settings_go_after_those_already_in_the_environment(monkeypatch):
     from gitstats.main import _set_git_config
 
-    monkeypatch.setenv("GIT_CONFIG_COUNT", "1")
-    monkeypatch.setenv("GIT_CONFIG_KEY_0", "user.name")
-    monkeypatch.setenv("GIT_CONFIG_VALUE_0", "Someone")
+    # an environment of its own, which the test leaves as it found it
+    environ = {
+        "GIT_CONFIG_COUNT": "1",
+        "GIT_CONFIG_KEY_0": "user.name",
+        "GIT_CONFIG_VALUE_0": "Someone",
+    }
+    monkeypatch.setattr(os, "environ", environ)
     _set_git_config({"log.showSignature": "false"})
-    assert os.environ["GIT_CONFIG_COUNT"] == "2"
-    assert os.environ["GIT_CONFIG_KEY_0"] == "user.name"
-    assert (os.environ["GIT_CONFIG_KEY_1"], os.environ["GIT_CONFIG_VALUE_1"]) == (
-        "log.showSignature",
-        "false",
-    )
-    monkeypatch.setenv("GIT_CONFIG_COUNT", "not a number")
+    assert environ == {
+        "GIT_CONFIG_COUNT": "2",
+        "GIT_CONFIG_KEY_0": "user.name",
+        "GIT_CONFIG_VALUE_0": "Someone",
+        "GIT_CONFIG_KEY_1": "log.showSignature",
+        "GIT_CONFIG_VALUE_1": "false",
+    }
+    environ.clear()
+    environ["GIT_CONFIG_COUNT"] = "not a number"
     _set_git_config({"a.b": "c"})
-    assert (os.environ["GIT_CONFIG_COUNT"], os.environ["GIT_CONFIG_KEY_0"]) == ("1", "a.b")
+    assert environ == {
+        "GIT_CONFIG_COUNT": "1",
+        "GIT_CONFIG_KEY_0": "a.b",
+        "GIT_CONFIG_VALUE_0": "c",
+    }
 
 
 def test_a_domain_is_one_whatever_its_case(tmp_path, monkeypatch):
@@ -3405,6 +3416,57 @@ class TestRepositoryChecks:
         with pytest.raises(RuntimeError, match=message):
             _run_single_repo(git_repo, str(tmp_path / "report"))
 
+    def test_a_repository_git_will_not_read_gives_gits_reason(
+        self, git_repo, tmp_path, monkeypatch
+    ):
+        """A repository owned by someone else (CI containers, Docker mounts):
+        git's reason and its safe.directory hint, not "Not a git repository"."""
+        monkeypatch.setenv("GIT_TEST_ASSUME_DIFFERENT_OWNER", "1")
+        _use_config()
+        with pytest.raises(RuntimeError, match="git cannot read .*dubious ownership") as error:
+            _run_single_repo(git_repo, str(tmp_path / "report"))
+        assert "safe.directory" in str(error.value)
+
+    @pytest.mark.parametrize("value", ["HEAD~1", ":/utils", "v1.0^{}"])
+    def test_any_revision_git_takes(self, git_repo, tmp_path, value, sequential_map):
+        """'<rev>^{commit}' made ':/<text>' search for '<text>^{commit}'.
+
+        The repository is shared with other tests, which add commits: git
+        counts what each revision leads to.
+        """
+        _git(git_repo, "tag", "-f", "-a", "v1.0", "-m", "release", ":/utils")
+        expected = subprocess.run(
+            ["git", "rev-list", "--count", value],
+            cwd=git_repo,
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+        _use_config(commit_end=value)
+        data = _run_single_repo(git_repo, str(tmp_path / "report"))
+        assert data.total_commits == int(expected) > 0
+
+    def test_the_revision_check_runs_on_git_before_2_30(self, git_repo, tmp_path):
+        """rev-parse has --end-of-options from git 2.30 only: on 2.24 to
+        2.29 it failed every check, and with it every run."""
+        _use_config(commit_end="HEAD")
+        calls = []
+        real = subprocess.run
+
+        def run_git(args, **kwargs):
+            calls.append(args)
+            return real(args, **kwargs)
+
+        with patch("gitstats.main.subprocess.run", side_effect=run_git):
+            _repository_root(git_repo)
+        assert [args for args in calls if "--end-of-options" in args] == []
+        assert ["git", "rev-parse", "--verify", "--quiet", "HEAD"] in calls
+
+    def test_a_setting_that_reads_as_an_option_is_refused_here_too(self, git_repo):
+        _use_config(commit_end="--output=x")
+        with pytest.raises(RuntimeError, match="is not a git revision"):
+            _repository_root(git_repo)
+
     def test_an_empty_repository(self, tmp_path):
         (tmp_path / "empty").mkdir()
         _git(tmp_path / "empty", "init", "-q")
@@ -3479,6 +3541,26 @@ class TestOutputChecks:
         collect.assert_not_called()
         assert f"FATAL: Cannot write to {out}: permission denied" in caplog.text
 
+    def test_a_json_beside_that_cannot_be_written(self, git_repo, tmp_path):
+        """One left by an earlier run, read-only: the history was read, then
+        a PermissionError ended the run."""
+        out = tmp_path / "report"
+        (tmp_path / "report.json").write_text("{}")
+        real_access = os.access
+        _use_config()
+        with (
+            patch(
+                "gitstats.main.os.access",
+                side_effect=lambda target, mode: (
+                    not str(target).endswith(".json") and real_access(target, mode)
+                ),
+            ),
+            patch.object(GitDataCollector, "collect") as collect,
+            pytest.raises(RuntimeError, match=r"Cannot write to .*report\.json"),
+        ):
+            _run_single_repo(git_repo, str(out), "json")
+        collect.assert_not_called()
+
     def test_a_file_in_the_way(self, git_repo, tmp_path, caplog):
         (tmp_path / "blocker").write_text("x")
         target = tmp_path / "blocker" / "x"
@@ -3493,3 +3575,13 @@ class TestOutputChecks:
             f"FATAL: Cannot create the output directory {target}: {error.value.strerror}"
             in caplog.text
         )
+
+
+def test_a_folder_of_a_repository_in_a_portfolio_is_named_after_it(tmp_path, sequential_map):
+    repo = _history(tmp_path / "repo", [(*ANN, "2021-01-01T10:00:00", {"nested/a.py": 3})])
+    other = _history(tmp_path / "other", [(*ANN, "2021-01-01T10:00:00", {"b.py": 2})])
+    _use_config()
+    out = tmp_path / "portfolio"
+    assert run([str(repo / "nested"), str(other)], str(out)) == 0
+    reports = {p.name for p in out.iterdir() if (p / "index.html").exists()}
+    assert reports == {"other", "repo"}

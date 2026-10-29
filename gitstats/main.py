@@ -1468,24 +1468,49 @@ def _prepare_output_dir(path: str) -> str:
 def _check_output_dir(path: str, json_beside: bool = False) -> None:
     """Fail before the history is read, not after, when the report cannot be
     written: ``path`` is not a directory, or not one gitstats can write to
-    (nor, with ``json_beside``, the directory the JSON goes to beside it).
+    (nor, with ``json_beside``, the directory the JSON goes to beside it, or
+    that JSON when it is there already).
 
     Raises:
         RuntimeError: saying which.
     """
     if not os.path.isdir(path):
         raise RuntimeError(f"Output path is not a directory: {path}")
-    for directory in [path] + ([os.path.dirname(path)] if json_beside else []):
-        if not os.access(directory, os.W_OK):
-            raise RuntimeError(f"Cannot write to {directory}: permission denied")
+    targets = [path]
+    if json_beside:
+        # the folder it goes in, and the file when an earlier run left one
+        targets.append(os.path.dirname(path))
+        if os.path.exists(path + ".json"):
+            targets.append(path + ".json")
+    for target in targets:
+        if not os.access(target, os.W_OK):
+            raise RuntimeError(f"Cannot write to {target}: permission denied")
+
+
+def _git(gitpath: str, *args: str) -> subprocess.CompletedProcess[str]:
+    """``git <args>`` run in ``gitpath``, its output read as UTF-8."""
+    return subprocess.run(
+        ["git", *args],
+        cwd=gitpath,
+        capture_output=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+    )
 
 
 def _git_answer(gitpath: str, *args: str) -> str | None:
     """What ``git <args>`` prints in ``gitpath``, or None when it fails."""
-    result = subprocess.run(
-        ["git", *args], cwd=gitpath, capture_output=True, text=True, check=False
-    )
+    result = _git(gitpath, *args)
     return result.stdout.strip() if result.returncode == 0 else None
+
+
+def _top_folder(gitpath: str) -> str:
+    """The top folder of the repository ``gitpath`` is a folder of, or
+    ``gitpath`` itself (a repository's top, a bare repository, ``.git``)."""
+    if _git_answer(gitpath, "rev-parse", "--show-prefix"):
+        return _git_answer(gitpath, "rev-parse", "--show-toplevel") or gitpath
+    return gitpath
 
 
 def _repository_root(gitpath: str) -> str:
@@ -1497,13 +1522,23 @@ def _repository_root(gitpath: str) -> str:
     would mix the two.
 
     Raises:
-        RuntimeError: when it is not a git repository, or the configured
-            commit_end or commit_begin is not a commit there.
+        RuntimeError: when it is not a git repository, git will not read it
+            (with git's reason, such as a repository owned by someone else),
+            it has no commits, or the configured commit_end or commit_begin
+            is not a commit there.
     """
-    if _git_answer(gitpath, "rev-parse", "--git-dir") is None:
-        raise RuntimeError(f"Not a git repository: {gitpath}")
-    if _git_answer(gitpath, "rev-parse", "--show-prefix"):
-        top = _git_answer(gitpath, "rev-parse", "--show-toplevel") or gitpath
+    try:
+        check_git_settings(conf)
+    except ValueError as e:
+        raise RuntimeError(str(e)) from e
+    found = _git(gitpath, "rev-parse", "--git-dir")
+    if found.returncode != 0:
+        reason = found.stderr.strip()
+        if not reason or "not a git repository" in reason:
+            raise RuntimeError(f"Not a git repository: {gitpath}")
+        raise RuntimeError(f"git cannot read {gitpath}: {reason}")
+    top = _top_folder(gitpath)
+    if top != gitpath:
         logger.warning(
             f"{gitpath} is a folder of the repository {top}: the report is of the whole repository"
         )
@@ -1512,10 +1547,14 @@ def _repository_root(gitpath: str) -> str:
         value = str(conf.get(key) or "")
         if not value or (key == "commit_begin" and value.isascii() and value.isdigit()):
             continue  # a commit_begin of N is the last N commits
-        if (
-            _git_answer(
-                gitpath, "rev-parse", "--verify", "--quiet", "--end-of-options", value + "^{commit}"
-            )
+        # The value cannot be taken for an option: check_git_settings()
+        # refuses one that starts with "-". No --end-of-options, which
+        # rev-parse has only from git 2.30; and the revision is found
+        # first, then checked to be a commit, as "<rev>^{commit}" would
+        # make ":/<text>" search for "<text>^{commit}".
+        found_rev = _git_answer(gitpath, "rev-parse", "--verify", "--quiet", value)
+        if found_rev is None or (
+            _git_answer(gitpath, "rev-parse", "--verify", "--quiet", found_rev + "^{commit}")
             is None
         ):
             if not _git_answer(gitpath, "rev-list", "-n", "1", "--all"):
@@ -1862,7 +1901,8 @@ def _run_multi_repo(
     used_slugs: set[str] = set()
     for path in gitpaths:
         try:
-            slug = _slugify_repo(path)
+            # a folder of a repository is reported, and named, as the repository
+            slug = _slugify_repo(_top_folder(path) if os.path.isdir(path) else path)
         except ValueError as e:
             logger.warning(f"Skipping repository {path!r}: {e}")
             failures.append({"name": path, "path": path, "error": str(e)})

@@ -913,7 +913,8 @@ class HTMLReportCreator(ReportCreator):
         total_commits = data.get_total_commits()
         active_days = len(data.get_active_days())
         delta_days = data.get_commit_delta_days()
-        extensions = len(data.extensions)
+        # the "no extension" row is not an extension
+        extensions = len([ext for ext in data.extensions if ext])
         streak = data.get_longest_streak()
         f.write(
             stat_tiles_html(
@@ -1960,7 +1961,8 @@ class HTMLReportCreator(ReportCreator):
         f.write("<h1>Files</h1>")
 
         total_files = data.get_total_files()
-        extensions = len(data.extensions)
+        # the "no extension" row is not an extension
+        extensions = len([ext for ext in data.extensions if ext])
         tiles = [
             (
                 "Files",

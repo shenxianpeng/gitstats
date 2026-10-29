@@ -4047,3 +4047,20 @@ def test_report_nav_starts_with_its_brand(mock_data_collector):
     f = StringIO()
     creator.print_nav(f, "index.html")
     assert REPORT_BRAND in f.getvalue()
+
+
+def test_files_without_an_extension_are_not_an_extension(mock_data_collector, temp_dir):
+    """The "no extension" row is in the table, not in the count of extensions."""
+    mock_data_collector.extensions = {
+        "py": {"files": 1, "lines": 5},
+        "md": {"files": 1, "lines": 2},
+        "": {"files": 2, "lines": 5},
+    }
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    for name in ("index.html", "files.html"):
+        with open(os.path.join(temp_dir, name), encoding="utf-8") as f:
+            content = f.read()
+        assert "2 extensions" in content, name
+        assert "3 extensions" not in content, name
+    with open(os.path.join(temp_dir, "files.html"), encoding="utf-8") as f:
+        assert "<em>no extension</em>" in f.read()
