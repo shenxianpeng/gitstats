@@ -29,8 +29,8 @@ from gitstats.employers import (
         ("mails.tsinghua.edu.cn", "tsinghua.edu.cn"),
         ("redhat.com.", "redhat.com"),
         # a country's com., edu., org. ...: the organization registers under it
-        ("cse.iitb.edu.in", "iitb.edu.in"),
-        ("usp.edu.br", "usp.edu.br"),
+        ("cse.college.edu.in", "college.edu.in"),
+        ("school.edu.br", "school.edu.br"),
         ("acme.com.ar", "acme.com.ar"),
         ("lists.kpi.org.ua", "kpi.org.ua"),
         # and suffixes for people
@@ -87,13 +87,18 @@ def test_registrable_domain(host, expected):
         ("Ann", "ann@proton.me", Affiliation(PERSONAL)),
         ("Ann", "ann@mail.de", Affiliation(PERSONAL)),
         ("Ann", "ann@runbox.com", Affiliation(PERSONAL)),
+        ("Ann", "ann@fastmail.com.au", Affiliation(PERSONAL)),
+        ("Ann", "ann@abv.bg", Affiliation(PERSONAL)),
+        ("Ann", "ann@21cn.com", Affiliation(PERSONAL)),
+        # Firefox Relay forwards to an address it does not show
+        ("Ann", "abc123@mozmail.com", Affiliation(HIDDEN)),
         # the first label of the domain, not of the host: a company's own
         # "live" or "mail" host is the company's
         ("Ann", "ann@live.typo3.org", Affiliation(ORGANIZATION, "typo3.org")),
         ("Ann", "ann@mail.schwarz", Affiliation(ORGANIZATION, "mail.schwarz")),
         # a university under its country's edu.: not all of them as one
-        ("Ann", "ann@iitb.edu.in", Affiliation(ORGANIZATION, "iitb.edu.in")),
-        ("Ann", "ann@cse.iisc.edu.in", Affiliation(ORGANIZATION, "iisc.edu.in")),
+        ("Ann", "ann@college.edu.in", Affiliation(ORGANIZATION, "college.edu.in")),
+        ("Ann", "ann@cse.institute.edu.in", Affiliation(ORGANIZATION, "institute.edu.in")),
         # one company, renamed
         ("Ann", "ann@all-hands.dev", Affiliation(ORGANIZATION, "openhands.dev")),
         ("Ann", "ann@redislabs.com", Affiliation(ORGANIZATION, "redis.com")),

@@ -655,10 +655,17 @@ def snapshot_label(name: str) -> str:
     return f"{_MONTH_NAMES[first]}–{_MONTH_NAMES[first + 2]} {match.group(1)}"
 
 
-def _read_snapshot(file: str) -> dict[str, Any] | None:
-    """A snapshot written before, or None when there is none, or it cannot be
-    read as one."""
+def _read_snapshot(path: str, name: str) -> dict[str, Any] | None:
+    """The snapshot ``name`` ("ai/2026-Q3.json") written before into the output
+    root ``path``, or None when there is none, or it cannot be read as one.
+    Only a snapshot's name, resolved inside the root, is read."""
+    if not _SNAPSHOT.fullmatch(name):
+        return None
+    base = os.path.realpath(path)
+    file = os.path.realpath(os.path.join(base, name))
     try:
+        if os.path.commonpath([base, file]) != base:
+            return None
         with open(file, encoding="utf-8") as f:
             snapshot = json.load(f)
     except (OSError, ValueError):
@@ -1043,7 +1050,7 @@ class AggregateReportCreator:
             quarter = dataset["quarters"][-1]
             name = f"ai/{quarter}.json"
             target = os.path.join(path, name)
-            kept = _read_snapshot(target)
+            kept = _read_snapshot(path, name)
             if kept is None and os.path.exists(target):
                 logger.warning("Leaving %s as it is: it cannot be read as a snapshot", name)
             else:
@@ -1091,7 +1098,7 @@ class AggregateReportCreator:
             f"ai/{entry}"
             for entry in (os.listdir(folder) if os.path.isdir(folder) else [])
             if _SNAPSHOT.fullmatch(f"ai/{entry}")
-            and _same_portfolio(_read_snapshot(os.path.join(folder, entry)), dataset)
+            and _same_portfolio(_read_snapshot(path, f"ai/{entry}"), dataset)
         )
         f = self._open_portfolio_file(path, "ai.json")
         try:

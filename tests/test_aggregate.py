@@ -956,6 +956,31 @@ def test_a_kept_entry_without_the_quarter_gives_way():
     assert [entry["name"] for entry in _snapshot_additions(snapshot, dataset, "2026-Q3")] == ["b"]
 
 
+def test_a_snapshot_is_read_only_inside_the_output(tmp_path, monkeypatch):
+    from gitstats.aggregate import _read_snapshot
+
+    out, elsewhere = tmp_path / "out", tmp_path / "elsewhere.json"
+    (out / "ai").mkdir(parents=True)
+    elsewhere.write_text('{"repositories": []}', encoding="utf-8")
+    (out / "ai" / "2026-Q3.json").write_text('{"repositories": []}', encoding="utf-8")
+    assert _read_snapshot(str(out), "ai/2026-Q3.json") == {"repositories": []}
+    # not a snapshot's name
+    assert _read_snapshot(str(out), "../elsewhere.json") is None
+    # a snapshot that resolves outside (a link to another file, or another drive)
+    real_realpath = os.path.realpath
+
+    def outside(path):
+        if path.endswith("2026-Q2.json"):
+            return str(elsewhere)
+        if path.endswith("2026-Q1.json"):
+            return "D:\\other\\2026-Q1.json" if os.name == "nt" else str(elsewhere)
+        return real_realpath(path)
+
+    monkeypatch.setattr(os.path, "realpath", outside)
+    assert _read_snapshot(str(out), "ai/2026-Q2.json") is None
+    assert _read_snapshot(str(out), "ai/2026-Q1.json") is None
+
+
 def test_same_portfolio():
     from gitstats.aggregate import _same_portfolio
 

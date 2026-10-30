@@ -47,6 +47,8 @@ PERSONAL_DOMAINS: frozenset[str] = frozenset(
         "126.com",
         "139.com",
         "163.com",
+        "21cn.com",
+        "abv.bg",
         "alice.it",
         "aliyun.com",
         "alum.mit.edu",
@@ -88,6 +90,7 @@ PERSONAL_DOMAINS: frozenset[str] = frozenset(
         "interia.pl",
         "keemail.me",
         "laposte.net",
+        "lavabit.com",
         "libero.it",
         "list.ru",
         "live.co.uk",
@@ -100,6 +103,7 @@ PERSONAL_DOMAINS: frozenset[str] = frozenset(
         "mail.de",
         "mail.ru",
         "mailbox.org",
+        "mailoo.org",
         "me.com",
         "msn.com",
         "nate.com",
@@ -170,6 +174,7 @@ PERSONAL_DOMAINS: frozenset[str] = frozenset(
 # live.cn): matched on the first label of the registrable domain.
 PERSONAL_BRANDS: frozenset[str] = frozenset(
     {
+        "fastmail",
         "gmail",
         "gmx",
         "googlemail",
@@ -194,6 +199,8 @@ HIDDEN_DOMAINS: frozenset[str] = frozenset(
         "noreply.github.com",
         "users.noreply.gitlab.com",
         "noreply.codeberg.org",
+        # Firefox Relay: an address that forwards to the person's own
+        "mozmail.com",
     }
 )
 

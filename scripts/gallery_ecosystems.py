@@ -456,7 +456,8 @@ def index_page(
             f'<p class="portfolio-subtitle">{html.escape(label)} &middot; {len(groups)} '
             f'ecosystems &middot; updated {generated} &middot; <a href="index.json">data</a></p>',
             f'<p class="section-note">{html.escape(description)} Each ecosystem has its page, '
-            "its projects ranked.</p>",
+            f"its projects ranked. A median, a highest share and how many name one count the "
+            f"projects with {MIN_RANKED_COMMITS} commits or more in the quarter.</p>",
             '<div class="table-scroll"><table class="sortable" id="ecosystems">'
             '<tr><th>Ecosystem</th><th class="num">Repositories</th>'
             '<th class="num">Median share</th><th class="num">Highest share</th>'

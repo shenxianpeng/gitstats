@@ -42,7 +42,7 @@ A part of ``python.json``, from a gallery of 24 repositories:
 
    {
      "schema_version": 2,
-     "generated_by": "gitstats 2.12.0",
+     "generated_by": "gitstats 2.12.2",
      "generated_at": "2026-10-26T00:41:07+00:00",
      "ecosystem": {"id": "python", "name": "Python", "title": "Python open source projects"},
      "quarter": {"id": "2026-Q3", "label": "Jul–Sep 2026"},
@@ -112,7 +112,7 @@ day the repository's report was made. A comparison page counts the 12 months
 up to the repository's last commit instead, without bots, so its numbers can
 differ.
 
-Schema version 1 (until gitstats 2.12.1) ranked every repository with a
+Schema version 1 (gitstats 2.12.1 and earlier) ranked every repository with a
 share, whatever its commits, and had no ``summary.ranked``.
 
 Everything else may change without notice: the display names and titles,
@@ -132,7 +132,9 @@ page, month by month and quarter by quarter, for every repository of the
 gallery; ``ai/<YYYY>-Q<n>.json`` keeps each quarter as it was first
 published. A repository added to the gallery after that is added to the
 quarter's file as it was counted then, with ``added_at`` (when), and only the
-months and quarters up to that quarter; those already in it are not changed.
+months and quarters up to that quarter. Those already in it with counts for
+that quarter are not changed; one in it without them (its report was kept
+from a build made before the quarter ended) gives way to its counts.
 A repository's ``all_time`` counts are those of the day it was put in. A month counts once it is over: a repository whose report failed
 keeps the one published before, which counts only the months that were over
 when it was made.
