@@ -322,6 +322,8 @@ def test_write_ecosystems(tmp_path):
     assert '<link rel="canonical" href="https://example.com/gallery/ecosystems/">' in index_page
     assert 'class="active" aria-current="page">Ecosystems</a>' in index_page
     assert "index-card.png" in index_page
+    # "1 / 2" sorts by how many name one
+    assert '<td class="num" data-sort="1">1 / 2</td>' in index_page
 
     card = _read(folder / "python-card.html")
     assert "<b>pandas</b>" in card

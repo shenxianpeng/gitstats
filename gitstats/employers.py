@@ -177,7 +177,7 @@ PERSONAL_BRANDS: frozenset[str] = frozenset(
         "live",
         "outlook",
         "posteo",
-        "proton",
+        # not "proton": proton.ch is Proton's own staff, proton.me its mail
         "protonmail",
         "rocketmail",
         "tutanota",

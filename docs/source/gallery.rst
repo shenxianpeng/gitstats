@@ -132,7 +132,8 @@ page, month by month and quarter by quarter, for every repository of the
 gallery; ``ai/<YYYY>-Q<n>.json`` keeps each quarter as it was first
 published. A repository added to the gallery after that is added to the
 quarter's file as it was counted then, with ``added_at`` (when), and only the
-months and quarters up to that quarter; those already in it are not changed. A month counts once it is over: a repository whose report failed
+months and quarters up to that quarter; those already in it are not changed.
+A repository's ``all_time`` counts are those of the day it was put in. A month counts once it is over: a repository whose report failed
 keeps the one published before, which counts only the months that were over
 when it was made.
 

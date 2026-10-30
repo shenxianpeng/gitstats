@@ -145,10 +145,11 @@ jobs:
           python -m pip install --quiet --only-binary=:all: "pyyaml==6.0.3"
 
       - name: Fetch the Published Gallery
-        # Each quarter's snapshot of ai.json is written once, by the first build
-        # after the quarter ends; later builds find it on the site's branch and
-        # leave it as it is. A repository whose report failed this week keeps
-        # the report published before, if there is one.
+        # Each quarter's snapshot of ai.json is first written by the first build
+        # after the quarter ends; later builds find it on the site's branch,
+        # leave the repositories in it as they are and add those it lacks. A
+        # repository whose report failed this week keeps the report published
+        # before, if there is one.
         run: |
           git fetch --depth 1 origin gh-pages
           if git cat-file -e FETCH_HEAD:gallery/ai 2>/dev/null; then

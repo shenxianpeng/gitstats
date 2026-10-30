@@ -899,6 +899,63 @@ def test_snapshot_additions_hold_only_up_to_its_quarter():
     assert list(added["months"]) == ["2026-08", "2026-09"]
 
 
+def _ai_summary(name, made, months, report=None):
+    return {
+        "name": name,
+        "report_path": f"{report or name}/index.html",
+        "generated_at": made,
+        "total_commits": 100,
+        "ai_assisted": {
+            "commits": 5,
+            "by_month": dict.fromkeys(months, 1),
+            "commits_by_month": dict.fromkeys(months, 40),
+        },
+    }
+
+
+def test_a_report_kept_from_before_the_quarter_ended_gets_it_later(tmp_path):
+    # the first build of January: b's report failed, and its summary, kept from
+    # December 20, has no Oct-Dec yet
+    months = [f"2026-{m:02d}" for m in range(7, 13)]
+    creator = AggregateReportCreator()
+    week1 = [
+        _ai_summary("a", "2027-01-03T00:00:00", months),
+        _ai_summary("b", "2026-12-20T00:00:00", months),
+    ]
+    creator._write_ai_data(str(tmp_path), ai_dataset(week1, datetime.datetime(2027, 1, 4)))
+    snapshot = json.loads((tmp_path / "ai" / "2026-Q4.json").read_text(encoding="utf-8"))
+    assert [entry["name"] for entry in snapshot["repositories"]] == ["a"]
+    assert snapshot["quarters"][-1] == "2026-Q4"
+    # a week later its report is made again: it gets the quarter, and a stays
+    week2 = [
+        _ai_summary("a", "2027-01-10T00:00:00", months),
+        _ai_summary("b", "2027-01-10T00:00:00", months),
+    ]
+    creator._write_ai_data(str(tmp_path), ai_dataset(week2, datetime.datetime(2027, 1, 11)))
+    later = json.loads((tmp_path / "ai" / "2026-Q4.json").read_text(encoding="utf-8"))
+    assert later["repositories"][0] == snapshot["repositories"][0]
+    assert sorted(later["repositories"][1]["quarters"]) == ["2026-Q3", "2026-Q4"]
+    assert "added_at" in later["repositories"][1]
+    # its id renamed: the same repository, not a second one
+    week3 = [
+        _ai_summary("a", "2027-01-17T00:00:00", months),
+        _ai_summary("b", "2027-01-17T00:00:00", months, report="b2"),
+    ]
+    creator._write_ai_data(str(tmp_path), ai_dataset(week3, datetime.datetime(2027, 1, 18)))
+    assert (tmp_path / "ai" / "2026-Q4.json").read_text(encoding="utf-8") == json.dumps(
+        later, indent=2, ensure_ascii=False
+    )
+
+
+def test_a_kept_entry_without_the_quarter_gives_way():
+    from gitstats.aggregate import _snapshot_additions
+
+    snapshot = {"repositories": [{"name": "b", "report": "b/index.html", "quarters": {}}]}
+    fresh = {"name": "b", "report": "b/index.html", "quarters": {"2026-Q3": {}}, "months": {}}
+    dataset = {"generated_at": "now", "repositories": [fresh]}
+    assert [entry["name"] for entry in _snapshot_additions(snapshot, dataset, "2026-Q3")] == ["b"]
+
+
 def test_same_portfolio():
     from gitstats.aggregate import _same_portfolio
 
@@ -1414,6 +1471,8 @@ class TestOrganizationsPage:
         mix = page[page.index('id="organization-mix"') :]
         assert '<a href="crush/index.html">crush</a>' in mix
         assert "crush/authors.html" not in mix
+        # a share sorts by its value, "<0.1%" too
+        assert '<td class="num" data-sort="0.750000">75.0%</td>' in page
         assert 'href="django/authors.html#commits_by_organization"' in mix
 
     def test_no_page_without_organizations(self, temp_dir):
@@ -1461,7 +1520,7 @@ class TestOrganizationsPage:
             "organizations.html"
         ]
         assert "Largest Share" not in page
-        assert '<td class="num">0</td><td class="num">0%</td>' in page
+        assert '<td class="num">0</td><td class="num" data-sort="0">0%</td>' in page
 
 
 class TestOrganizationPages:

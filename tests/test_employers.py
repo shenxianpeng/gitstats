@@ -82,7 +82,9 @@ def test_registrable_domain(host, expected):
         ("Ann", "ann@yahoo.co.in", Affiliation(PERSONAL)),
         ("Ann", "ann@gmx.us", Affiliation(PERSONAL)),
         ("Ann", "ann@posteo.org", Affiliation(PERSONAL)),
-        ("Ann", "ann@proton.ch", Affiliation(PERSONAL)),
+        # Proton's own staff: Proton Mail's addresses are proton.me and pm.me
+        ("Ann", "ann@proton.ch", Affiliation(ORGANIZATION, "proton.ch")),
+        ("Ann", "ann@proton.me", Affiliation(PERSONAL)),
         ("Ann", "ann@mail.de", Affiliation(PERSONAL)),
         ("Ann", "ann@runbox.com", Affiliation(PERSONAL)),
         # the first label of the domain, not of the host: a company's own

@@ -550,7 +550,8 @@ AI_DATA_DESCRIPTION = (
     "a commit is not counted, and a mark does not say how much of the commit the "
     "assistant wrote. A commit counts in the month it was written (its author date)."
 )
-# A snapshot of the data of a quarter, kept as it was first written: "ai/2026-Q3.json"
+# A snapshot of the data of a quarter, each repository kept as it was first
+# written into it: "ai/2026-Q3.json"
 _SNAPSHOT = re.compile(r"ai/(\d{4})-Q([1-4])\.json")
 
 
@@ -684,24 +685,40 @@ def _same_portfolio(snapshot: dict[str, Any] | None, dataset: dict[str, Any]) ->
     return any(_repository_key(entry) in have for entry in dataset["repositories"])
 
 
+def _snapshot_entry(entry: dict[str, Any], quarter: str) -> dict[str, Any]:
+    """A repository of ``ai_dataset`` as the snapshot of ``quarter`` keeps it:
+    its months and quarters up to that one. Its all-time counts are those of
+    the day it was put in."""
+    year, number = quarter.split("-Q")
+    last_month = f"{year}-{int(number) * 3:02d}"
+    return {
+        **entry,
+        "quarters": {key: value for key, value in entry["quarters"].items() if key <= quarter},
+        "months": {key: value for key, value in entry["months"].items() if key <= last_month},
+    }
+
+
+def _has_quarter(entry: Any, quarter: str) -> bool:
+    return isinstance(entry, dict) and quarter in (entry.get("quarters") or {})
+
+
 def _snapshot_additions(
     snapshot: dict[str, Any], dataset: dict[str, Any], quarter: str
 ) -> list[dict[str, Any]]:
-    """The repositories of ``dataset`` that the snapshot of ``quarter`` does
-    not have and that have counts for that quarter, as the snapshot would
-    have had them: up to that quarter, and when they were added."""
-    have = {_repository_key(entry) for entry in snapshot["repositories"]}
-    year, number = quarter.split("-Q")
-    last_month = f"{year}-{int(number) * 3:02d}"
+    """The repositories of ``dataset`` with counts for ``quarter`` that its
+    snapshot has none for, as the snapshot keeps them, with when they were
+    added. One the snapshot has without that quarter (its report was kept
+    from a build before the quarter ended) has none; one it has under
+    another report folder (its id renamed) has them."""
+    counted = [entry for entry in snapshot["repositories"] if _has_quarter(entry, quarter)]
+    keys = {_repository_key(entry) for entry in counted}
+    names = {str(entry.get("name", "")) for entry in counted} - {""}
     return [
-        {
-            **entry,
-            "added_at": dataset["generated_at"],
-            "quarters": {key: value for key, value in entry["quarters"].items() if key <= quarter},
-            "months": {key: value for key, value in entry["months"].items() if key <= last_month},
-        }
+        {**_snapshot_entry(entry, quarter), "added_at": dataset["generated_at"]}
         for entry in dataset["repositories"]
-        if _repository_key(entry) not in have and quarter in entry["quarters"]
+        if _has_quarter(entry, quarter)
+        and _repository_key(entry) not in keys
+        and str(entry.get("name", "")) not in names
     ]
 
 
@@ -866,6 +883,11 @@ def organization_badge_message(row: dict[str, Any]) -> str:
     )
 
 
+def _fraction(part: int, whole: int) -> str:
+    """``part`` of ``whole``, for a cell to sort by: "0.000614"."""
+    return f"{part / whole:.6f}" if whole else "0"
+
+
 def _organization_share_key(entry: dict[str, Any]) -> tuple[float, str]:
     """Sorts repositories by the share of their commits from organizations, the
     largest first, then by name."""
@@ -1010,8 +1032,9 @@ class AggregateReportCreator:
         A snapshot keeps the counts of its quarter as they were first
         published: commits written in a quarter can still be merged after it
         ends, and change the counts of ai.json. So a repository already in it
-        stays as it is; one that is not (added to the portfolio since) is
-        added, as counted now, with when it was. A snapshot that has none of
+        with counts for the quarter stays as it is; one that has none there
+        (added to the portfolio since, or kept from a build before the quarter
+        ended) is added, as counted now, with when it was. A snapshot that has none of
         this portfolio's repositories is another portfolio's, written into
         the same folder before: it is written again, and an older one of them
         is not listed.
@@ -1026,6 +1049,8 @@ class AggregateReportCreator:
             else:
                 if kept is not None and _same_portfolio(kept, dataset):
                     added = _snapshot_additions(kept, dataset, quarter)
+                    # an entry without the quarter gives way to its counts
+                    replaced = {_repository_key(entry) for entry in added}
                     snapshot = {
                         **kept,
                         "quarters": sorted(
@@ -1033,12 +1058,28 @@ class AggregateReportCreator:
                             | {key for entry in added for key in entry["quarters"]}
                         ),
                         "repositories": sorted(
-                            kept["repositories"] + added,
+                            [
+                                entry
+                                for entry in kept["repositories"]
+                                if _has_quarter(entry, quarter)
+                                or _repository_key(entry) not in replaced
+                            ]
+                            + added,
                             key=lambda entry: str(entry.get("name", "")).lower(),
                         ),
                     }
                 else:
-                    added, snapshot = [dataset], dataset
+                    # the first of the quarter: the repositories with counts for it
+                    added = [
+                        _snapshot_entry(entry, quarter)
+                        for entry in dataset["repositories"]
+                        if _has_quarter(entry, quarter)
+                    ]
+                    snapshot = {
+                        **dataset,
+                        "quarters": sorted({key for entry in added for key in entry["quarters"]}),
+                        "repositories": added,
+                    }
                 if added:
                     f = self._open_portfolio_file(path, name)
                     try:
@@ -1787,7 +1828,9 @@ class AggregateReportCreator:
         if link.endswith("index.html") and link in self.organization_sections:
             link = link[: -len("index.html")] + "authors.html#commits_by_organization"
         cells = "".join(
-            f'<td class="num">{share_text(entry["by_kind"].get(kind, 0), entry["commits"])}</td>'
+            # sorted by the exact share: "<0.1%" alone would make the column text
+            f'<td class="num" data-sort="{_fraction(entry["by_kind"].get(kind, 0), entry["commits"])}">'
+            f"{share_text(entry['by_kind'].get(kind, 0), entry['commits'])}</td>"
             for kind in ORGANIZATION_KINDS
         )
         named = ", ".join(

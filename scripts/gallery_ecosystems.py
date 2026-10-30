@@ -438,7 +438,8 @@ def index_page(
         f"{_share_value_cell(summary['median_share'])}"
         f"{_share_value_cell(summary['highest']['share'] if summary['highest'] else None)}"
         f"<td>{html.escape(summary['highest']['name']) if summary['highest'] else '&ndash;'}</td>"
-        f'<td class="num">{summary["naming"]} / {summary["ranked"]}</td></tr>'
+        f'<td class="num" data-sort="{summary["naming"]}">'
+        f"{summary['naming']} / {summary['ranked']}</td></tr>"
         for group, summary in groups
     )
     return "".join(
