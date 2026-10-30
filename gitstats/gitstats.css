@@ -1099,8 +1099,12 @@ tr[hidden] {
 	text-decoration: none;
 }
 
-/* The row of links scrolls, so it clips a ring drawn outside a link: draw it inside */
-.nav li a:focus-visible {
+/* The nav row, the page's table of contents on a phone and wide tables scroll,
+   so they clip a ring drawn outside a link: draw it inside */
+.nav li a:focus-visible,
+.page-toc a:focus-visible,
+.table-scroll a:focus-visible,
+.table-scroll summary:focus-visible {
 	outline-offset: -2px;
 }
 

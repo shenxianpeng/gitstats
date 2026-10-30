@@ -9,6 +9,7 @@ import tempfile
 
 import pytest
 
+from gitstats.aggregate import GROUP_FILTER_SCRIPT
 from gitstats.report_creator import HOTSPOTS_SCRIPT
 
 NODE = shutil.which("node")
@@ -41,6 +42,7 @@ function row(...cells) { return {cells: cells.map(c => typeof c === "string" ? e
 def _run(script: str):
     """Run ``script`` in Node, from a file (a long command line is not safe on
     every system); what it prints, as JSON."""
+    assert NODE is not None
     with tempfile.TemporaryDirectory() as folder:
         path = os.path.join(folder, "script.js")
         with open(path, "w", encoding="utf-8") as f:
@@ -115,6 +117,24 @@ def test_a_cell_sorts_by_its_data_sort_value():
     assert order == ["ts_sort_numeric", ["5 mo", "1.9 yr", "7.3 yr"]]
 
 
+def test_versions_sort_as_text():
+    # "1.0.1" is not a number; and a column whose header says so sorts as
+    # text even when every name looks like one, as "0.9" and "0.10"
+    name, order = _sorted(["1.0.1", "1.0", "0.9"])
+    assert name == "ts_sort_caseinsensitive"
+    assert order == ["0.9", "1.0", "1.0.1"]
+    order = _node(
+        """
+        const header = el("th", "Name", {"data-sort-as": "text"});
+        const rows = ["0.10", "0.9", "0.1"].map(v => row(v));
+        const sortfn = ts_columnSort({rows: [{cells: [header]}]}, 0, rows);
+        SORT_COLUMN_INDEX = 0;
+        console.log(JSON.stringify([sortfn.name, rows.sort(sortfn).map(r => r.cells[0].innerText)]));
+        """
+    )
+    assert order == ["ts_sort_caseinsensitive", ["0.1", "0.9", "0.10"]]
+
+
 def test_a_header_keeps_its_own_content():
     # rebuilt from innerText, it was what CSS showed: "COMMITS (%)"
     header = _node(
@@ -142,14 +162,21 @@ def test_a_header_keeps_its_own_content():
     }
 
 
-def _hotspot_series(points, median_lines, median_churn):
+def _hotspot_series(points, median_lines, median_churn, least=None):
     """The Hotspots plot's datasets for ``points`` [lines, churn]: their
-    labels and how many files each has, and whether the medians are drawn."""
+    labels and how many files each has, and whether the medians are drawn.
+    ``least`` is the smallest size and change count of all the files, the
+    plotted ones' unless given."""
     script = HOTSPOTS_SCRIPT.split("<script>", 1)[1].rsplit("</script>", 1)[0]
+    least_lines, least_churn = least or (min(p[0] for p in points), min(p[1] for p in points))
     data = {
         "medianLines": median_lines,
         "medianChurn": median_churn,
-        "points": [[f"f{n}", lines, churn, lines * churn] for n, (lines, churn) in enumerate(points)],
+        "leastLines": least_lines,
+        "leastChurn": least_churn,
+        "points": [
+            [f"f{n}", lines, churn, lines * churn] for n, (lines, churn) in enumerate(points)
+        ],
     }
     stubs = f"""
     const document = {{getElementById: () => ({{textContent: {json.dumps(json.dumps(data))},
@@ -194,7 +221,50 @@ def test_hotspots_at_the_smallest_value_are_not_in_the_upper_half():
     ]
 
 
+def test_hotspots_take_the_smallest_values_of_all_the_files():
+    # only the top files are plotted: one changed 3 times is the least plotted,
+    # but files changed once were left out, so 3 at the median is the upper half
+    points = [(100, 3), (200, 3), (300, 5), (400, 9), (150, 4)]
+    assert _hotspot_series(points, 200, 3, least=(10, 1))["series"] == [
+        ["Large, changed often", 3],
+        ["Small, changed often", 2],
+    ]
+
+
 def test_a_few_hotspots_are_not_split():
     # one file is not "large, changed often"
     assert _hotspot_series([(1, 1)], 1, 1) == {"series": [["Files", 1]], "medians": False}
     assert _hotspot_series([(5, 1), (9, 3), (12, 2)], 9, 2)["series"] == [["Files", 3]]
+
+
+def _groups_after(hash_at_load: str, then: str) -> list:
+    """Which rows the group filter shows when the page opens at
+    ``hash_at_load`` and the address then changes to ``then``."""
+    script = GROUP_FILTER_SCRIPT.split("<script>", 1)[1].rsplit("</script>", 1)[0]
+    stubs = f"""
+    const rows = ["py", "py", "web"].map(group => ({{hidden: false, getAttribute: () => group}}));
+    const buttons = ["", "py", "web"].map(group => ({{
+      attrs: {{}}, getAttribute: name => name === "data-group" ? group : null,
+      setAttribute(name, value) {{ this.attrs[name] = value; }}, addEventListener() {{}}}}));
+    const document = {{querySelectorAll: s => s.startsWith(".group-filter") ? buttons : rows}};
+    const location = {{hash: {json.dumps(hash_at_load)}, pathname: "/", search: ""}};
+    const history = {{replaceState() {{}}}};
+    let changed = null;
+    const window = {{addEventListener: (name, fn) => {{ changed = fn; }}}};
+    """
+    body = f"""
+    location.hash = {json.dumps(then)};
+    changed({{type: "hashchange"}});
+    console.log(JSON.stringify(rows.map(r => r.hidden ? "" : r.getAttribute("data-group")).filter(Boolean)));
+    """
+    return _run(stubs + script + body)
+
+
+def test_the_skip_link_keeps_the_group():
+    # Skip to content sets #main: the rows of the group chosen stay as they are
+    assert _groups_after("#group=py", "#main") == ["py", "py"]
+    # a link to another group, or to none, still changes it
+    assert _groups_after("#group=py", "#group=web") == ["web"]
+    assert _groups_after("#group=py", "") == ["py", "py", "web"]
+    # a page opened at #main shows every group
+    assert _groups_after("#main", "#main") == ["py", "py", "web"]

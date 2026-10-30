@@ -408,6 +408,14 @@ class TestWrappedCardSvg:
         assert ">MONTHLY COMMITS</text>" in card
         assert 'fill-opacity="0.5" text-anchor' not in card
 
+    def test_bars_are_scaled_to_the_months_drawn(self):
+        # November's 100 commits (the clock of a test: today is in October)
+        # would make October's 50 a short bar
+        generator = WrappedCardGenerator(_make_data(), year=2025, today=datetime.date(2025, 10, 1))
+        chart = generator._render_mini_bar_chart([0] * 9 + [50, 100, 0])
+        assert 'width="58" height="90" rx="4"' in chart  # October is the tallest drawn
+        assert generator._render_mini_bar_chart([0] * 10 + [100, 0]) == ""
+
     def test_facts_and_chart_wait_for_their_numbers(self):
         """Without the year's authors, months and hours: no top contributor,
         busiest month or weekday, and no bars; the card still stands."""

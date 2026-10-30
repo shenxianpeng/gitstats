@@ -727,15 +727,12 @@ HOTSPOTS_SCRIPT = r"""<script>
 	// A file at the median is in the upper half, as the tiles say, unless the
 	// median is also the smallest value: then "at least the median" is every
 	// file, and only those above it are large or changed often.
-	const smallest = function(key) {
-		return Math.min.apply(null, points.map(function(p) { return p[key]; }));
-	};
+	// (the smallest values are over all the files, plotted or not, as the medians)
 	const above = function(value, median, least) {
 		return median > least ? value >= median : value > median;
 	};
-	const leastLines = smallest('x'), leastChurn = smallest('y');
-	const large = function(p) { return above(p.x, data.medianLines, leastLines); };
-	const busy = function(p) { return above(p.y, data.medianChurn, leastChurn); };
+	const large = function(p) { return above(p.x, data.medianLines, data.leastLines); };
+	const busy = function(p) { return above(p.y, data.medianChurn, data.leastChurn); };
 	// With a few files, halves say nothing: they are one series, without medians
 	const split = points.length >= 4;
 	const quadrants = split ? [
@@ -2257,7 +2254,7 @@ class HTMLReportCreator(ReportCreator):
             )
             f.write('<div class="table-scroll"><table class="tags sortable" id="tags">')
             f.write(
-                '<tr><th>Name</th><th>Date</th><th class="num">Commits</th>'
+                '<tr><th data-sort-as="text">Name</th><th>Date</th><th class="num">Commits</th>'
                 '<th class="unsortable">Authors</th></tr>'
             )
             max_tags_authors = load_config()["max_tags_authors"]
@@ -2769,6 +2766,8 @@ class HTMLReportCreator(ReportCreator):
         page_data = {
             "medianLines": median_lines,
             "medianChurn": median_churn,
+            "leastLines": min(fs["lines"] for fs in files),
+            "leastChurn": min(fs["churn"] for fs in files),
             "points": [[fs["path"], fs["lines"], fs["churn"], fs["score"]] for fs in plotted],
         }
         f.write(
@@ -3466,7 +3465,7 @@ class HTMLReportCreator(ReportCreator):
                 file: A writable file-like object opened for text output where the HTML header will be written.
                 page: The file name of the page, such as ``"authors.html"``.
         """
-        label = dict(NAV_PAGES).get(page, "")
+        label = dict(NAV_PAGES + (("ai-insights.html", "AI Insights"),)).get(page, "")
         title = self.title if page == "index.html" or not label else f"{self.title}: {label}"
         share = share_meta_html(
             title,
@@ -4240,9 +4239,9 @@ font:20px {_CARD_MONO}}}
 
 def page_title(title: str) -> str:
     """The <title> of a page whose own title is ``title``: what a browser tab
-    and a search result show. Each page has its own; "GitStats" leads it,
+    and a search result show. Each page has its own, with "GitStats" in it
     once."""
-    return title if title.startswith("GitStats") else f"GitStats - {title}"
+    return title if "GitStats" in title else f"GitStats - {title}"
 
 
 def share_meta_html(title: str, description: str, site_url: str, page: str, image: str) -> str:

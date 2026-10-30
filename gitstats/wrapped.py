@@ -403,11 +403,11 @@ class WrappedCardGenerator:
         and no baseline: a quiet end of the year is not drawn before it happens.
         """
         c = self.colors
-        peak = max(monthly, default=0)
+        # how many of the year's months have begun: only they are drawn
+        months = self.today.month if self.year == self.today.year else 12
+        peak = max(monthly[:months], default=0)
         if not peak:
             return ""
-        # how many of the year's months have begun
-        months = self.today.month if self.year == self.today.year else 12
         title = "MONTHLY COMMITS SO FAR" if months < 12 else "MONTHLY COMMITS"
 
         # twelve bars of 58 with 24 between them fill the content column

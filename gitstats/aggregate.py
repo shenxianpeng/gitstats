@@ -736,8 +736,10 @@ GROUP_FILTER_SCRIPT = """<script>
 			row.hidden = !!group && row.getAttribute('data-group') !== group;
 		});
 	}
-	function fromHash() {
+	function fromHash(event) {
 		var match = /^#group=([a-z0-9-]+)$/.exec(location.hash);
+		// a link within the page (the skip link, a heading) chooses no group
+		if (!match && location.hash && event) return;
 		show(match ? match[1] : '');
 	}
 	buttons.forEach(function (b) {
@@ -1064,12 +1066,12 @@ class AggregateReportCreator:
     ) -> None:
         """The commits that name an AI coding assistant, repository by
         repository and quarter by quarter, and where to get their data."""
-        page_title = f"{title}: AI-assisted commits"
+        heading = f"{title}: AI-assisted commits"
         self._print_header(
             f,
-            page_title,
+            heading,
             self._share_tags(
-                page_title, ai_description(rows, quarters), "ai.html", "ai-share-card.png"
+                heading, ai_description(rows, quarters), "ai.html", "ai-share-card.png"
             ),
         )
         self._print_nav(f, title, "ai.html", True)
@@ -1151,12 +1153,12 @@ class AggregateReportCreator:
         of the last four quarters divide between kinds of address."""
         organizations = dataset["organizations"]
         repositories = dataset["repositories"]
-        page_title = f"{title}: Organizations"
+        heading = f"{title}: Organizations"
         self._print_header(
             f,
-            page_title,
+            heading,
             self._share_tags(
-                page_title,
+                heading,
                 organizations_description(dataset),
                 "organizations.html",
                 "share-card.png",
@@ -1345,7 +1347,7 @@ class AggregateReportCreator:
         group_name = dict(self.groups).get(group, "")
         peers = [other for other in rows if group and other["summary"].get("group") == group]
         others = [other for other in rows if other not in peers]
-        page_title = f"How {name} compares"
+        heading = f"How {name} compares"
         description = (
             found[0]["sentence"]
             if found
@@ -1353,9 +1355,9 @@ class AggregateReportCreator:
         )
         self._print_header(
             f,
-            page_title,
+            heading,
             self._share_tags(
-                page_title, description, f"{folder}/compare.html", f"{folder}/compare-card.png"
+                heading, description, f"{folder}/compare.html", f"{folder}/compare-card.png"
             ),
             "../",
         )
@@ -1579,12 +1581,12 @@ class AggregateReportCreator:
         and its badge with the markup to show it."""
         name = row["organization"]
         page = f"orgs/{name}.html"
-        page_title = f"{name} in {title}"
+        heading = f"{name} in {title}"
         description = (
             f"{name} in {title}: {message}, counted by the domain of its commit addresses."
         )
         self._print_header(
-            f, page_title, self._share_tags(page_title, description, page, "share-card.png"), "../"
+            f, heading, self._share_tags(heading, description, page, "share-card.png"), "../"
         )
         self._print_nav(f, title, "organizations.html", ai, prefix="../")
         f.write(f"<h1>{html.escape(name)}</h1>")

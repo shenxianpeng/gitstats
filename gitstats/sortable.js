@@ -109,12 +109,20 @@ function ts_columnSort(t, column, rows) {
 	if (!t.ts_sorts) t.ts_sorts = {};
 	if (t.ts_sorts[column] !== undefined) return t.ts_sorts[column];
 	var numeric = 0, dates = 0, values = 0;
+	// gitstats: a header can say how its column sorts (data-sort-as="text"),
+	// e.g. tag names, which can all look like numbers ("0.9", "0.10")
+	var header = t.rows && t.rows[0] && t.rows[0].cells[column];
+	if (header && header.getAttribute("data-sort-as") == "text") {
+		t.ts_sorts[column] = ts_sort_caseinsensitive;
+		return ts_sort_caseinsensitive;
+	}
 	for (var row of rows) {
 		var itm = ts_cellText(row, column);
 		if (ts_isBlank(itm)) continue;
 		values++;
 		// numbers, ignoring stuff in () after them
-		if (itm.match(/^-?\d[\d,.]*(E[-+]\d+)?%?( \(.*\))?$/)) numeric++;
+		// (a number has one decimal point at most: "1.0.1" is a version, text)
+		if (itm.match(/^-?\d[\d,]*(\.\d+)?(E[-+]\d+)?%?( \(.*\))?$/)) numeric++;
 		if (itm.match(/^\d\d[/.-][a-zA-Z]{3}[/.-]\d{4}$/) || itm.match(/^\d\d[/.-]\d\d[/.-]\d\d(\d\d)?$/)) dates++;
 	}
 	var sortfn = null;

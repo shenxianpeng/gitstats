@@ -1934,6 +1934,8 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
     assert _hotspot_points(content) == {
         "medianLines": 120,
         "medianChurn": 10,
+        "leastLines": 30,
+        "leastChurn": 2,
         "points": [
             ["main.py", 400, 15, 300.0],
             ["utils.py", 120, 10, 109.5],
@@ -4091,8 +4093,9 @@ def test_files_without_an_extension_are_not_an_extension(mock_data_collector, te
 
 def test_page_title():
     assert page_title("flask: Authors") == "GitStats - flask: Authors"
-    # "GitStats" leads the title once
+    # "GitStats" is in the title once
     assert page_title("GitStats Portfolio") == "GitStats Portfolio"
+    assert page_title("amazon.com in GitStats Gallery") == "amazon.com in GitStats Gallery"
 
 
 def test_each_page_has_its_own_title(mock_data_collector, temp_dir):
@@ -4101,6 +4104,19 @@ def test_each_page_has_its_own_title(mock_data_collector, temp_dir):
         title = re.search(r"<title>([^<]*)</title>", _read_page(temp_dir, page)).group(1)
         expected = "test-project" if page == "index.html" else f"test-project: {label}"
         assert title == f"GitStats - {expected}", page
+
+
+def test_the_ai_insights_page_has_its_own_title():
+    creator = HTMLReportCreator()
+    creator.title = "flask"
+    f = StringIO()
+    creator.print_header(f, "ai-insights.html")
+    assert "<title>GitStats - flask: AI Insights</title>" in f.getvalue()
+
+
+def test_tag_names_sort_as_text(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    assert '<th data-sort-as="text">Name</th>' in _read_page(temp_dir, "tags.html")
 
 
 def test_every_page_has_its_frame(mock_data_collector, temp_dir):
