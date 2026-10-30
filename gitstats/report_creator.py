@@ -4454,12 +4454,11 @@ def percent_text(share: float) -> str:
     "100.0%"; none is "0%". Plain text: escape it for a page."""
     if share <= 0:
         return "0%"
-    value = 100.0 * share
-    if value < 0.05:
+    if share < 0.0005:
         return "<0.1%"
-    if share < 1 and value >= 99.95:
+    if 0.9995 <= share < 1:
         return "99.9%"
-    return f"{value:.1f}%"
+    return f"{100.0 * share:.1f}%"
 
 
 def share_text(part: int, whole: int) -> str:

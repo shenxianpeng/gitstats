@@ -102,6 +102,38 @@ def _quarter_json(counts: tuple[int, int] | None) -> dict[str, Any] | None:
     }
 
 
+def _rank_row(
+    repo: Repo, summary: dict[str, Any], previous: list[str], latest: list[str]
+) -> dict[str, Any]:
+    """One repository's row, before it is ranked."""
+    ai = complete_ai(summary)
+    assistants = list((ai or {}).get("assistants") or {})[:3] if isinstance(ai, dict) else []
+    return {
+        "id": repo.id,
+        "name": str(summary.get("name") or repo.name),
+        "repository": repo.url,
+        "report": f"../{repo.id}/",
+        "quarter": quarter_counts(ai, latest),
+        "previous_quarter": quarter_counts(ai, previous),
+        "commits_last_12mo": int(summary.get("commits_last_12mo", 0) or 0),
+        "active_authors_12mo": int(summary.get("active_authors_12mo", 0) or 0),
+        "health": str(summary.get("era", "") or ""),
+        "last_commit": str(summary.get("last_commit", "") or "")[:10],
+        "assistants": assistants,
+    }
+
+
+def _rank_order(row: dict[str, Any]) -> tuple[int, float, int, str]:
+    """Ranked first, then too few commits, then no share; each by the share,
+    the quarter's commits and the name."""
+    share = share_of(row["quarter"])
+    if share is None:
+        place = 2
+    else:
+        place = 0 if ranked(row["quarter"]) else 1
+    return (place, -(share or 0.0), -(row["quarter"] or (0, 0))[1], row["name"].lower())
+
+
 def rank_rows(
     repos: list[Repo], summaries: dict[str, dict[str, Any]], now: datetime.datetime
 ) -> list[dict[str, Any]]:
@@ -109,41 +141,17 @@ def rank_rows(
     complete quarter first, then by that quarter's commits, then by name.
     Repositories with fewer than MIN_RANKED_COMMITS commits in that quarter
     come after them in the same order, without a rank (``None``), and those
-    without a share last. Repositories without a report are left out. A summary's counts stop before the month it was made
-    in, which was not over: a summary kept from an earlier build does not
-    count it as a whole month."""
+    without a share last. Repositories without a report are left out. A
+    summary's counts stop before the month it was made in, which was not
+    over: a summary kept from an earlier build does not count it as a whole
+    month."""
     (_, previous), (_, latest) = last_quarters(now, 2)
-    rows = []
-    for repo in repos:
-        summary = summaries.get(repo.id)
-        if summary is None:
-            continue
-        ai = complete_ai(summary)
-        counts = quarter_counts(ai, latest)
-        rows.append(
-            {
-                "id": repo.id,
-                "name": str(summary.get("name") or repo.name),
-                "repository": repo.url,
-                "report": f"../{repo.id}/",
-                "quarter": counts,
-                "previous_quarter": quarter_counts(ai, previous),
-                "commits_last_12mo": int(summary.get("commits_last_12mo", 0) or 0),
-                "active_authors_12mo": int(summary.get("active_authors_12mo", 0) or 0),
-                "health": str(summary.get("era", "") or ""),
-                "last_commit": str(summary.get("last_commit", "") or "")[:10],
-                "assistants": list((ai or {}).get("assistants") or {})[:3]
-                if isinstance(ai, dict)
-                else [],
-            }
-        )
-
-    def order(row: dict[str, Any]) -> tuple[int, float, int, str]:
-        share = share_of(row["quarter"])
-        place = 2 if share is None else 0 if ranked(row["quarter"]) else 1
-        return (place, -(share or 0.0), -(row["quarter"] or (0, 0))[1], row["name"].lower())
-
-    rows.sort(key=order)
+    rows = [
+        _rank_row(repo, summaries[repo.id], previous, latest)
+        for repo in repos
+        if repo.id in summaries
+    ]
+    rows.sort(key=_rank_order)
     rank = 0
     for row in rows:
         if ranked(row["quarter"]):
@@ -265,7 +273,7 @@ def _header(title: str, share: str, canonical: str) -> str:
     )
 
 
-def _nav(current: str) -> str:
+def _nav() -> str:
     return (
         f'{NAV_START}<a href="../index.html" class="nav-brand">GitStats</a><ul>'
         + nav_link("../index.html", "GitStats Gallery")
@@ -295,6 +303,17 @@ def _share_cell(counts: tuple[int, int] | None) -> str:
     hint = f' title="{format_int(counts[0])} of {format_int(counts[1])} commits"' if counts else ""
     key = "" if share is None else f' data-sort="{share:.6f}"'
     return f'<td class="num"{hint}{key}>{html.escape(percent(share))}</td>'
+
+
+def _unranked_note(unranked: int, label: str) -> str:
+    """What the note under a group's table says of its repositories without a rank."""
+    if not unranked:
+        return ""
+    have = "project has" if unranked == 1 else "projects have"
+    return (
+        f"{unranked} {have} fewer than {MIN_RANKED_COMMITS} commits in {html.escape(label)}, "
+        "too few for a share to say much: listed after the others, without a rank. "
+    )
 
 
 def _share_value_cell(share: float | None) -> str:
@@ -354,7 +373,7 @@ def group_page(
             ),
             folder_url + page if folder_url else "",
         ),
-        _nav(group.id),
+        _nav(),
         f"<h1>{html.escape(group.name)}: ranked by AI-assisted commits</h1>",
         f'<p class="portfolio-subtitle">{html.escape(label)} &middot; '
         f"{summary['repositories']} repositories &middot; updated {generated} &middot; "
@@ -390,13 +409,7 @@ def group_page(
             '<p class="section-note">The share of each quarter&rsquo;s commits that name '
             f"{ASSISTANT}: as their author, as a co-author, or in the line it signs with. A lower "
             "bound: an assistant that leaves no mark is not counted. "
-            + (
-                f"{unranked} {'project has' if unranked == 1 else 'projects have'} fewer than "
-                f"{MIN_RANKED_COMMITS} commits in {html.escape(label)}, too few for a share to "
-                "say much: listed after the others, without a rank. "
-                if unranked
-                else ""
-            )
+            + _unranked_note(unranked, label)
             + "Commits (bots&rsquo; included) and active authors (people only) are those of "
             "the 12 months up to each report; a comparison page counts the 12 months up to "
             "the project&rsquo;s last commit, without bots. Health is the "
@@ -451,7 +464,7 @@ def index_page(
                 ),
                 folder_url,
             ),
-            _nav("index"),
+            _nav(),
             "<h1>Ecosystems, ranked by AI-assisted commits</h1>",
             f'<p class="portfolio-subtitle">{html.escape(label)} &middot; {len(groups)} '
             f'ecosystems &middot; updated {generated} &middot; <a href="index.json">data</a></p>',

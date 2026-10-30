@@ -503,7 +503,10 @@ def ai_rows(
         return counts[0] / counts[1] if counts and counts[1] else -1.0
 
     def place(counts: tuple[int, int] | None) -> int:
-        return 2 if counts is None else 0 if counts[1] >= MIN_RANKED_COMMITS else 1
+        """0 for enough commits to come first, 1 for too few, 2 for no counts."""
+        if counts is None:
+            return 2
+        return 0 if counts[1] >= MIN_RANKED_COMMITS else 1
 
     rows.sort(
         key=lambda row: (
@@ -727,6 +730,43 @@ def _snapshot_additions(
         and _repository_key(entry) not in keys
         and str(entry.get("name", "")) not in names
     ]
+
+
+def _snapshot_to_write(
+    kept: dict[str, Any] | None, dataset: dict[str, Any], quarter: str
+) -> dict[str, Any] | None:
+    """The snapshot of ``quarter`` to write: ``kept`` (this portfolio's, read
+    back) with the repositories it lacks, or a new one with the repositories
+    that have counts for the quarter; None when there is nothing to add."""
+    if kept is None or not _same_portfolio(kept, dataset):
+        # the first of the quarter, or another portfolio's
+        entries = [
+            _snapshot_entry(entry, quarter)
+            for entry in dataset["repositories"]
+            if _has_quarter(entry, quarter)
+        ]
+        return {
+            **dataset,
+            "quarters": sorted({key for entry in entries for key in entry["quarters"]}),
+            "repositories": entries,
+        }
+    added = _snapshot_additions(kept, dataset, quarter)
+    if not added:
+        return None
+    # an entry without the quarter gives way to its counts
+    replaced = {_repository_key(entry) for entry in added}
+    stays = [
+        entry
+        for entry in kept["repositories"]
+        if _has_quarter(entry, quarter) or _repository_key(entry) not in replaced
+    ]
+    return {
+        **kept,
+        "quarters": sorted(
+            set(kept.get("quarters") or []) | {key for entry in added for key in entry["quarters"]}
+        ),
+        "repositories": sorted(stays + added, key=lambda entry: str(entry.get("name", "")).lower()),
+    }
 
 
 def _quarter_counts(ai: dict[str, Any], months: list[str]) -> tuple[int, int] | None:
@@ -1041,10 +1081,10 @@ class AggregateReportCreator:
         ends, and change the counts of ai.json. So a repository already in it
         with counts for the quarter stays as it is; one that has none there
         (added to the portfolio since, or kept from a build before the quarter
-        ended) is added, as counted now, with when it was. A snapshot that has none of
-        this portfolio's repositories is another portfolio's, written into
-        the same folder before: it is written again, and an older one of them
-        is not listed.
+        ended) is added, as counted now, with when it was. A snapshot that
+        has none of this portfolio's repositories is another portfolio's,
+        written into the same folder before: it is written again, and an older
+        one of them is not listed.
         """
         if dataset["quarters"]:
             quarter = dataset["quarters"][-1]
@@ -1054,40 +1094,8 @@ class AggregateReportCreator:
             if kept is None and os.path.exists(target):
                 logger.warning("Leaving %s as it is: it cannot be read as a snapshot", name)
             else:
-                if kept is not None and _same_portfolio(kept, dataset):
-                    added = _snapshot_additions(kept, dataset, quarter)
-                    # an entry without the quarter gives way to its counts
-                    replaced = {_repository_key(entry) for entry in added}
-                    snapshot = {
-                        **kept,
-                        "quarters": sorted(
-                            set(kept.get("quarters") or [])
-                            | {key for entry in added for key in entry["quarters"]}
-                        ),
-                        "repositories": sorted(
-                            [
-                                entry
-                                for entry in kept["repositories"]
-                                if _has_quarter(entry, quarter)
-                                or _repository_key(entry) not in replaced
-                            ]
-                            + added,
-                            key=lambda entry: str(entry.get("name", "")).lower(),
-                        ),
-                    }
-                else:
-                    # the first of the quarter: the repositories with counts for it
-                    added = [
-                        _snapshot_entry(entry, quarter)
-                        for entry in dataset["repositories"]
-                        if _has_quarter(entry, quarter)
-                    ]
-                    snapshot = {
-                        **dataset,
-                        "quarters": sorted({key for entry in added for key in entry["quarters"]}),
-                        "repositories": added,
-                    }
-                if added:
+                snapshot = _snapshot_to_write(kept, dataset, quarter)
+                if snapshot is not None:
                     f = self._open_portfolio_file(path, name)
                     try:
                         json.dump(snapshot, f, indent=2, ensure_ascii=False)
