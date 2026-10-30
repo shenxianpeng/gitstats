@@ -18,6 +18,8 @@ sys.path.insert(0, _SCRIPTS)
 import gallery_ecosystems as eco  # noqa: E402
 from gallery_repos import Group, Repo  # noqa: E402
 
+from gitstats.report_creator import NAV_START, SKIP_LINK  # noqa: E402
+
 NOW = datetime.datetime(2026, 10, 21, 12, 0)
 Q2 = ["2026-04", "2026-05", "2026-06"]
 Q3 = ["2026-07", "2026-08", "2026-09"]
@@ -235,7 +237,15 @@ def test_write_ecosystems(tmp_path):
         '<link rel="canonical" href="https://example.com/gallery/ecosystems/python.html">' in page
     )
     assert '<link rel="stylesheet" href="../gitstats.css"' in page
-    assert '<table class="sortable" id="ecosystem">' in page
+    # the reports' frame: a skip link, the nav, the content, the footer
+    assert (
+        page.index(SKIP_LINK)
+        < page.index(NAV_START)
+        < page.index('<main id="main">')
+        < page.index('<table class="sortable" id="ecosystem">')
+        < page.index("</main>")
+        < page.index('<footer class="footer">')
+    )
     # ranked, linked to the reports, the counts on hover
     assert page.index(">pandas</a>") < page.index(">Flask</a>")
     assert '<td class="num" title="60 of 100 commits">60.0%</td>' in page

@@ -20,4 +20,6 @@ To upgrade: download the UMD build from https://www.jsdelivr.com/package/npm/cha
 - **License**: MIT
 - **Usage**: Client-side table sorting in HTML reports
 - **Modifications**: sort indicators are drawn by CSS from a `data-sort` attribute instead of
-  `arrow-*.gif` images, and the sorted header cell gets `aria-sort`
+  `arrow-*.gif` images, and the sorted header cell gets `aria-sort`; a header keeps its own
+  content inside the sort link; a cell's `data-sort` value, when it has one, is what it sorts
+  by; a number is the one a cell starts with; text sorts with the numbers in it by value

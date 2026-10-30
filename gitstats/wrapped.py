@@ -152,9 +152,17 @@ class WrappedCardGenerator:
     Every number on the card is for one year: the one it is headed with.
     """
 
-    def __init__(self, data: Any, year: int | None = None, theme: str = "midnight") -> None:
+    def __init__(
+        self,
+        data: Any,
+        year: int | None = None,
+        theme: str = "midnight",
+        today: datetime.date | None = None,
+    ) -> None:
         self.data = data
-        self.year = year or datetime.datetime.now().year
+        # the day the card is made on: the months after it have not happened yet
+        self.today = today or datetime.date.today()
+        self.year = year or self.today.year
         self.theme_name = theme
         self.colors = THEMES.get(theme, THEMES["midnight"])
 
@@ -389,11 +397,18 @@ class WrappedCardGenerator:
         )
 
     def _render_mini_bar_chart(self, monthly: list[int]) -> str:
-        """Render the year's commits per month as twelve bars across the card."""
+        """Render the year's commits per month as twelve bars across the card.
+
+        In the year the card is made in, the months still to come have no bar
+        and no baseline: a quiet end of the year is not drawn before it happens.
+        """
         c = self.colors
-        peak = max(monthly, default=0)
+        # how many of the year's months have begun: only they are drawn
+        months = self.today.month if self.year == self.today.year else 12
+        peak = max(monthly[:months], default=0)
         if not peak:
             return ""
+        title = "MONTHLY COMMITS SO FAR" if months < 12 else "MONTHLY COMMITS"
 
         # twelve bars of 58 with 24 between them fill the content column
         bar_w = 58
@@ -403,11 +418,18 @@ class WrappedCardGenerator:
 
         parts = [
             f'<text x="{LEFT}" y="826" font-size="13" font-weight="600" '
-            f'fill="{c["stat_label"]}" letter-spacing="0.5">MONTHLY COMMITS</text>'
+            f'fill="{c["stat_label"]}" letter-spacing="0.5">{title}</text>'
         ]
         for i, commits in enumerate(monthly):
             x = LEFT + i * step
             middle = x + bar_w // 2
+            if i >= months:
+                # a month to come: its name, faint, and nothing above it
+                parts.append(
+                    f'<text x="{middle}" y="{base_y + 18}" font-size="11" fill="{c["footer"]}" '
+                    f'fill-opacity="0.5" text-anchor="middle">{MONTH_NAMES[i + 1][:3]}</text>'
+                )
+                continue
             if commits:
                 h = max(4, round(commits / peak * bar_max_h))
                 parts.append(

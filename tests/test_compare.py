@@ -221,6 +221,29 @@ def test_card_rows():
     assert compare.card_rows(_rows([1])[0], "all") == []  # alone: no rank to show
 
 
+def test_card_rows_with_shared_places():
+    # a place another holds too says so
+    rows = _rows([100, 50, 50])
+    assert compare.card_rows(rows[1], "all") == [("Commits", 0.5, "2nd / 3, shared")]
+    # a value all of them have is no place: its full bar would say it leads
+    assert compare.card_rows(_rows([50, 50, 50])[0], "all") == []
+
+
+@pytest.mark.parametrize(
+    "place, same, words",
+    [
+        ((1, 5), 1, ("1st of 5", "")),
+        ((4, 5), 2, ("4th of 5", ", shared with 1 other")),
+        ((2, 7), 3, ("2nd of 7", ", shared with 2 others")),
+        ((1, 5), 5, ("Same for all", "5")),
+        # one repository alone is first, not "the same for all"
+        ((1, 1), 1, ("1st of 1", "")),
+    ],
+)
+def test_rank_words(place, same, words):
+    assert compare.rank_words(place, same) == words
+
+
 def test_a_shared_place_is_not_named():
     # all at 4 contributors: none of them has "the most"
     summaries = [

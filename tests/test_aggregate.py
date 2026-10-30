@@ -4,6 +4,7 @@ import datetime
 import html as html_module
 import json
 import os
+import re
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -32,6 +33,7 @@ from gitstats.aggregate import (
     source_lines_summary,
     write_repo_summary,
 )
+from gitstats.report_creator import NAV_START, SKIP_LINK
 
 # ── _slugify_repo ────────────────────────────────────────────────────────
 
@@ -230,6 +232,40 @@ class TestAggregateReportCreator:
         assert '<th class="num">Lines of Code</th>' in html
         # Sorted by commits: alpha row before beta row
         assert html.index('href="alpha/index.html"') < html.index('href="beta/index.html"')
+
+    def test_every_page_has_the_reports_frame(self, temp_dir):
+        """The portfolio's pages: a skip link, the nav, <main>, the footer; and
+        one "GitStats" in the title."""
+        summaries = [
+            _summary(f"r{n}", 100 - n, {"Alice": 10}, ai_assisted=_ai([(n, 10)] * 4, {}))
+            for n in range(5)
+        ]
+        AggregateReportCreator().create(summaries, [], temp_dir)
+        pages = []
+        for folder, _, names in os.walk(temp_dir):
+            pages += [os.path.join(folder, n) for n in names if n.endswith(".html")]
+        frames = 0
+        for path in pages:
+            with open(path, encoding="utf-8") as f:
+                page = f.read()
+            if "card" in os.path.basename(path):
+                continue  # a share card is a picture, not a page
+            frames += 1
+            assert page.count(SKIP_LINK) == page.count(NAV_START) == 1, path
+            assert (
+                page.index(SKIP_LINK)
+                < page.index(NAV_START)
+                < page.index('<main id="main">')
+                < page.index("</main>")
+                < page.index('<footer class="footer">')
+            ), path
+            title = re.search(r"<title>([^<]*)</title>", page).group(1)
+            assert title.count("GitStats") == 1, title
+        assert frames == 7  # the overview, the AI page and five comparisons
+        with open(os.path.join(temp_dir, "index.html"), encoding="utf-8") as f:
+            assert "<title>GitStats Portfolio</title>" in f.read()
+        with open(os.path.join(temp_dir, "r0", "compare.html"), encoding="utf-8") as f:
+            assert "<title>GitStats - How r0 compares</title>" in f.read()
 
     def test_shares_report_theme_and_nav(self, temp_dir):
         html = self._render(temp_dir, [_summary("alpha", 10, {"Alice": 10})])
@@ -1525,6 +1561,11 @@ class TestComparisonPages:
         ) in page
         assert page.count('<div class="compare-row">') == 4  # no organizations, no AI data
         assert "<b>1st of 5</b>Python projects<br>1st of 7 overall" in page
+        # half the commits by 1, as repo3 in its group, and repo3 and repo6 of all
+        assert (
+            "<b>4th of 5</b>Python projects, shared with 1 other"
+            "<br>5th of 7 overall, shared with 2 others"
+        ) in page
         assert 'class="strip-own"' in page
         assert '<span><i class="group"></i>Python</span>' in page
         assert 'href="../gitstats.css"' in page
@@ -1556,6 +1597,20 @@ class TestComparisonPages:
         assert "Compared with all 7 repositories of" in page
         assert "<b>2nd of 7</b>repositories</div>" in page
         assert "// how it compares" in read("repo1/compare-card.html")
+
+    def test_a_value_all_of_them_have_is_no_place(self, temp_dir):
+        # half the commits by one person, everywhere: not "1st of 7"
+        summaries = self._summaries()
+        for summary in summaries:
+            summary["people_last_12mo"]["half_of_commits"] = 1
+        read = self._render(temp_dir, summaries, [("python", "Python")])
+        page = read("repo0/compare.html")
+        assert "<b>Same for all</b>5 Python projects<br>the same for all 7 overall" in page
+        assert "Half the commits by" not in read("repo0/compare-card.html")
+        for summary in summaries:
+            summary["group"] = ""
+        page = self._render(temp_dir, summaries)("repo1/compare.html")
+        assert "<b>Same for all</b>7 repositories</div>" in page
 
     def test_too_few_repositories(self, temp_dir):
         self._render(temp_dir, self._summaries(count=4))

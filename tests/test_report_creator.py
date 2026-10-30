@@ -13,6 +13,9 @@ from gitstats import load_config
 from gitstats.main import GitDataCollector
 from gitstats.report_creator import (
     BADGES_PLACEHOLDER_URL,
+    NAV_PAGES,
+    NAV_START,
+    SKIP_LINK,
     HTMLReportCreator,
     ReportCreator,
     _classify_eras,
@@ -32,6 +35,7 @@ from gitstats.report_creator import (
     longest_zero_run,
     month_range,
     months_back,
+    page_title,
     parse_chronicle,
     quiet_months,
     report_share_card_html,
@@ -265,7 +269,9 @@ def test_render_chartjs_max_bar_thickness():
     assert "maxBarThickness: 40" in result
 
 
-def test_render_chartjs_no_max_bar_thickness():
+def test_render_chartjs_default_max_bar_thickness():
+    """A bar chart without its own bar width caps it: a single bar would
+    otherwise fill the whole chart as a slab. A line chart has no bars."""
     creator = HTMLReportCreator()
     result = creator._render_chartjs(
         "chart-nothick",
@@ -273,7 +279,11 @@ def test_render_chartjs_no_max_bar_thickness():
         ["X"],
         [{"label": "C", "data": [1]}],
     )
-    assert "maxBarThickness" not in result
+    assert "datasets: { bar: { maxBarThickness: 64 } }" in result
+    line = creator._render_chartjs(
+        "chart-line", "line", ["X", "Y"], [{"label": "C", "data": [1, 2]}]
+    )
+    assert "maxBarThickness" not in line
 
 
 def test_render_chartjs_xss_protection():
@@ -1007,7 +1017,11 @@ def test_activity_month_of_year_and_timezones(mock_data_collector, temp_dir):
     month = html[html.index('id="month_of_year"') : html.index('id="commits_by_timezone"')]
     assert '"Jan", "Feb", "Mar"' in month
     assert 'gsAnnotations: {"values": true}' in month
-    assert "commits (' + (100 * item.parsed.y / total).toFixed(1)" in month
+    # "1 commit", not "1 commits"
+    assert (
+        "(item.parsed.y === 1 ? ' commit (' : ' commits (') + "
+        "(100 * item.parsed.y / total).toFixed(1)"
+    ) in month
     assert "<table" not in month
 
     # Timezones west to east as bars: -0500 (15), +0000 (5), +0800 (30) of 50
@@ -1064,8 +1078,8 @@ def test_create_authors_html(mock_data_collector, temp_dir):
     assert "<tr><td>example.com</td>" in html
     assert "<th>example.com</th>" not in html
     assert (
-        '<tr><th>Domain</th><th class="num">Commits</th><th class="num">Share</th><th></th></tr>'
-        in html
+        '<tr><th>Domain</th><th class="num">Commits</th><th class="num">Share</th>'
+        '<th class="unsortable"><span class="visually-hidden">Bar</span></th></tr>' in html
     )
     assert "chart-domains" not in html
     assert "Contributor growth" in html
@@ -1535,7 +1549,7 @@ def test_create_copies_static_files(mock_data_collector, temp_dir):
     with open(f"{temp_dir}/sortable.js", "rb") as f:
         sortable = f.read()
     assert b"<img" not in sortable
-    assert b'data-sort="none"' in sortable
+    assert b'arrow.setAttribute("data-sort", "none")' in sortable
 
 
 def test_numeric_columns_are_marked(mock_data_collector, temp_dir):
@@ -1552,7 +1566,7 @@ def test_numeric_columns_are_marked(mock_data_collector, temp_dir):
     ) in authors
     assert '<span style="width: 50.0%">' in authors  # Bob: 15 of Alice's 30
     assert '<th class="num">Commits (%)</th>' in authors
-    assert '<th class="unsortable num">Age</th>' in authors
+    assert '<th class="num">Age</th>' in authors
     # Text columns stay left-aligned
     assert "<th>First commit</th>" in authors
 
@@ -1624,7 +1638,10 @@ def test_small_formatting_fixes(mock_data_collector, temp_dir):
             return f.read()
 
     # Author span is compact, with the exact day count on hover (Alice: 150 days)
-    assert '<td class="nowrap num" title="150 days">5 mo</td>' in page("authors.html")
+    # the age sorts by its days, which its tooltip gives
+    assert '<td class="nowrap num" title="150 days" data-sort="150">5 mo</td>' in page(
+        "authors.html"
+    )
     # Average file size in readable units (50000 bytes / 25 files)
     assert '<dt>Average File Size</dt><dd class="stat-value">2.0 KB</dd>' in page("files.html")
     # No cell carries a doubled "heat heat heatN" class
@@ -1917,6 +1934,8 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
     assert _hotspot_points(content) == {
         "medianLines": 120,
         "medianChurn": 10,
+        "leastLines": 30,
+        "leastChurn": 2,
         "points": [
             ["main.py", 400, 15, 300.0],
             ["utils.py", 120, 10, 109.5],
@@ -3278,7 +3297,7 @@ def test_overview_links_the_badges_page(mock_data_collector, temp_dir):
 def test_nav_orders_pages_by_importance(mock_data_collector, temp_dir):
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     with open(os.path.join(temp_dir, "index.html"), encoding="utf-8") as f:
-        nav = f.read().split('<div class="nav">', 1)[1].split("</ul>", 1)[0]
+        nav = f.read().split('<nav class="nav" aria-label="Pages">', 1)[1].split("</ul>", 1)[0]
     labels = re.findall(r'<a href="[^"]+\.html"[^>]*>([^<]+)</a></li>', nav)
     assert labels == [
         "General",
@@ -3523,12 +3542,15 @@ def test_authors_summary_says_how_many_commits_name_an_assistant(mock_data_colle
     summary = HTMLReportCreator()._authors_summary_html(_with_assistants(mock_data_collector))
     assert (
         '<dt>AI-assisted Commits</dt><dd class="stat-value">15.0%</dd>'
-        '<dd class="stat-note">at least 9 commits</dd>'
+        '<dd class="stat-note">at least 9 of all 60 commits</dd>'
     ) in summary
 
     mock_data_collector.ai_assisted_commits = 1
     summary = HTMLReportCreator()._authors_summary_html(mock_data_collector)
-    assert '<dd class="stat-value">1.7%</dd><dd class="stat-note">at least 1 commit</dd>' in summary
+    # the tile says the share is of all the commits, not of the last 12 months
+    assert (
+        '<dd class="stat-value">1.7%</dd><dd class="stat-note">at least 1 of all 60 commits</dd>'
+    ) in summary
 
 
 def test_authors_summary_when_no_commit_names_an_assistant(mock_data_collector):
@@ -4064,3 +4086,112 @@ def test_files_without_an_extension_are_not_an_extension(mock_data_collector, te
         assert "3 extensions" not in content, name
     with open(os.path.join(temp_dir, "files.html"), encoding="utf-8") as f:
         assert "<em>no extension</em>" in f.read()
+
+
+# ── each page: its title, its frame ──────────────────────────────────────
+
+
+def test_page_title():
+    assert page_title("flask: Authors") == "GitStats - flask: Authors"
+    # "GitStats" is in the title once
+    assert page_title("GitStats Portfolio") == "GitStats Portfolio"
+    assert page_title("amazon.com in GitStats Gallery") == "amazon.com in GitStats Gallery"
+
+
+def test_each_page_has_its_own_title(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    for page, label in NAV_PAGES:
+        title = re.search(r"<title>([^<]*)</title>", _read_page(temp_dir, page)).group(1)
+        expected = "test-project" if page == "index.html" else f"test-project: {label}"
+        assert title == f"GitStats - {expected}", page
+
+
+def test_the_ai_insights_page_has_its_own_title():
+    creator = HTMLReportCreator()
+    creator.title = "flask"
+    f = StringIO()
+    creator.print_header(f, "ai-insights.html")
+    assert "<title>GitStats - flask: AI Insights</title>" in f.getvalue()
+
+
+def test_tag_names_sort_as_text(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    assert '<th data-sort-as="text">Name</th>' in _read_page(temp_dir, "tags.html")
+
+
+def test_every_page_has_its_frame(mock_data_collector, temp_dir):
+    """A skip link first, then the nav, the page's content in <main>, and the
+    footer after it; no header cell without a name."""
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    pages = [name for name in os.listdir(temp_dir) if name.endswith(".html")]
+    assert len(pages) > 10
+    for name in pages:
+        page = _read_page(temp_dir, name)
+        if name == "share-card.html":
+            continue
+        assert page.count(SKIP_LINK) == 1, name
+        assert page.count(NAV_START) == page.count('<main id="main">') == 1, name
+        assert page.count("</main>") == page.count('<footer class="footer">') == 1, name
+        body = page.index("<body>")
+        assert (
+            body
+            < page.index(SKIP_LINK)
+            < page.index(NAV_START)
+            < page.index('<main id="main">')
+            < page.index("</main>")
+            < page.index('<footer class="footer">')
+            < page.index("</body>")
+        ), name
+        assert not re.search(r"<th[^>]*></th>", page), name
+
+
+def test_one_author_and_one_tag_are_not_all(mock_data_collector, temp_dir):
+    mock_data_collector.get_total_authors.return_value = 1
+    mock_data_collector.tags = {"v1": dict(mock_data_collector.tags["v1.0.0"])}
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    index = _read_page(temp_dir, "index.html")
+    assert '<a href="authors.html">The author in detail &rarr;</a>' in index
+    assert '<a href="tags.html">The tag in detail &rarr;</a>' in index
+    assert "All 1 " not in index
+
+
+def test_an_age_of_one_day(mock_data_collector, temp_dir):
+    info = mock_data_collector.get_author_info("Alice Smith")
+    info["timedelta"] = datetime.timedelta(days=1)
+    mock_data_collector.get_author_info = lambda author, info=info: info
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    assert 'title="1 day" data-sort="1"' in _read_page(temp_dir, "authors.html")
+
+
+def test_the_top_author_tables_scroll_on_a_phone(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    authors = _read_page(temp_dir, "authors.html")
+    assert '<table class="sortable period-table" id="aoy">' in authors
+    assert '<table class="sortable period-table" id="aom">' in authors
+
+
+def test_a_few_hotspots_have_no_medians_to_mark(mock_data_collector, temp_dir):
+    page = _hotspots_html(mock_data_collector, temp_dir)
+    assert "The dashed lines mark the median file size" in page
+    mock_data_collector.hotspot_files = {
+        "main.py": {"churn": 1, "lines": 1, "score": 1.0},
+    }
+    page = _hotspots_html(mock_data_collector, temp_dir)
+    assert "dashed lines" not in page
+    assert "a bigger dot is a higher score. Both axes are logarithmic." in page
+
+
+@pytest.mark.parametrize("month_axis", [False, True])
+def test_a_single_point_is_in_the_middle(month_axis):
+    creator = HTMLReportCreator()
+    labels = ["2026-10"]
+    one = creator._render_chartjs(
+        "c", "line", labels, [{"label": "C", "data": [1]}], month_axis=month_axis
+    )
+    assert "x: { offset: true, ticks:" in one
+    two = creator._render_chartjs(
+        "c", "line", labels * 2, [{"label": "C", "data": [1, 2]}], month_axis=month_axis
+    )
+    assert "offset: true" not in two
+    bar = creator._render_chartjs("c", "bar", labels, [{"label": "C", "data": [1]}])
+    assert "offset: true" not in bar

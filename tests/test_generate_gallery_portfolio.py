@@ -393,6 +393,13 @@ def test_names_in_the_note_are_escaped(gallery_script):
 @pytest.mark.parametrize(
     ("text", "added", "expected"),
     [
+        # at the end of the content, inside <main>
+        (
+            '<main id="main"><p>a</p></main>\n<footer class="footer">f</footer></body>',
+            True,
+            "<p>a</p>NOTE</main>",
+        ),
+        # a page made before there was a <main>: before its footer
         ('<p>a</p><div class="footer">f</div></body>', True, '<p>a</p>NOTE<div class="footer">'),
         ("<p>a</p></body>", True, "<p>a</p>NOTE</body>"),
         ("<p>a</p>", False, "<p>a</p>"),
