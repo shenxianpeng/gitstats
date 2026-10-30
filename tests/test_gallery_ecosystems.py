@@ -73,7 +73,10 @@ def test_quarter_counts():
     [
         ((3, 30), 0.1, "10.0%"),
         ((0, 30), 0.0, "0%"),
-        ((1, 2500), 0.0004, "0.04%"),
+        # as ai.html writes it: 1 of 1,628 commits is "0.1%" on both pages
+        ((1, 1628), 1 / 1628, "0.1%"),
+        ((1, 2500), 0.0004, "<0.1%"),
+        ((3634, 3635), 3634 / 3635, "99.9%"),
         ((0, 0), None, "–"),
         (None, None, "–"),
     ],
@@ -84,7 +87,7 @@ def test_share_and_percent(counts, share, text):
 
 
 def test_rank_rows_by_the_last_quarter():
-    repos = [_repo(r) for r in ("low", "high", "tie", "none", "missing", "quiet")]
+    repos = [_repo(r) for r in ("low", "high", "tie", "none", "missing", "quiet", "few", "two")]
     summaries = {
         "low": _summary("low", "Low", _ai((1, 100))),
         "high": _summary("high", "High", _ai((50, 100), (5, 10), {"Claude": 9, "Codex": 1})),
@@ -94,17 +97,20 @@ def test_rank_rows_by_the_last_quarter():
         "none": _summary("none", "", None),
         # no commits in the quarter: no share, so last
         "quiet": _summary("quiet", "Quiet", _ai((0, 0))),
+        # one of 3 commits: a third, from too few commits to rank
+        "few": _summary("few", "Few", _ai((1, 3))),
+        "two": _summary("two", "Two", _ai((1, 29))),
     }
     rows = eco.rank_rows(repos, summaries, NOW)
-    assert [row["id"] for row in rows] == ["high", "tie", "low", "none", "quiet"]
-    assert [row["rank"] for row in rows] == [1, 2, 3, 4, 5]
+    assert [row["id"] for row in rows] == ["high", "tie", "low", "few", "two", "none", "quiet"]
+    assert [row["rank"] for row in rows] == [1, 2, 3, None, None, None, None]
     high = rows[0]
     assert high["quarter"] == (50, 100)
     assert high["previous_quarter"] == (5, 10)
     assert high["assistants"] == ["Claude", "Codex"]
     assert high["report"] == "../high/"
     assert high["last_commit"] == "2026-10-20"
-    none = rows[3]
+    none = rows[5]
     assert none["name"] == "None"  # from the list, when the summary has none
     assert none["quarter"] is None
     assert none["assistants"] == []
@@ -113,27 +119,30 @@ def test_rank_rows_by_the_last_quarter():
 def test_rank_rows_of_a_summary_kept_from_an_earlier_build():
     # made on 2026-09-14, its report failing since: September was not over,
     # and Jul–Sep is not a quarter it can count
-    kept = _summary("kept", "Kept", _ai((5, 10)), generated_at="2026-09-14T04:00:00+00:00")
-    fresh = _summary("fresh", "Fresh", _ai((1, 10)), generated_at="2026-10-19T04:00:00+00:00")
+    kept = _summary("kept", "Kept", _ai((5, 50)), generated_at="2026-09-14T04:00:00+00:00")
+    fresh = _summary("fresh", "Fresh", _ai((1, 50)), generated_at="2026-10-19T04:00:00+00:00")
     rows = eco.rank_rows([_repo("kept"), _repo("fresh")], {"kept": kept, "fresh": fresh}, NOW)
-    assert [(row["id"], row["quarter"]) for row in rows] == [("fresh", (1, 10)), ("kept", None)]
+    assert [(row["id"], row["quarter"]) for row in rows] == [("fresh", (1, 50)), ("kept", None)]
     assert rows[1]["previous_quarter"] == (0, 10)
 
 
 def test_group_summary():
     rows = eco.rank_rows(
-        [_repo(r) for r in "abcd"],
+        [_repo(r) for r in "abcde"],
         {
-            "a": _summary("a", "A", _ai((6, 10))),
-            "b": _summary("b", "B", _ai((1, 10))),
-            "c": _summary("c", "C", _ai((0, 10))),
+            "a": _summary("a", "A", _ai((60, 100))),
+            "b": _summary("b", "B", _ai((10, 100))),
+            "c": _summary("c", "C", _ai((0, 100))),
             "d": _summary("d", "D", _ai((0, 0))),
+            # the largest share, of 3 commits: not in the median, nor the highest
+            "e": _summary("e", "E", _ai((3, 3))),
         },
         NOW,
     )
     assert eco.group_summary(rows) == {
-        "repositories": 4,
-        "with_commits": 3,
+        "repositories": 5,
+        "with_commits": 4,
+        "ranked": 3,
         "naming": 2,
         "median_share": 0.1,
         "highest": {"id": "a", "name": "A", "share": 0.6},
@@ -141,34 +150,43 @@ def test_group_summary():
 
 
 def test_group_summary_when_none_names_one_or_none_has_commits():
-    zero = eco.rank_rows([_repo("a")], {"a": _summary("a", "A", _ai((0, 10)))}, NOW)
+    zero = eco.rank_rows([_repo("a")], {"a": _summary("a", "A", _ai((0, 100)))}, NOW)
     assert eco.group_summary(zero)["highest"] is None
     assert eco.group_summary(zero)["median_share"] == 0.0
     quiet = eco.rank_rows([_repo("a")], {"a": _summary("a", "A", _ai((0, 0)))}, NOW)
     summary = eco.group_summary(quiet)
     assert summary["median_share"] is None
     assert summary["with_commits"] == 0
+    few = eco.rank_rows([_repo("a")], {"a": _summary("a", "A", _ai((2, 3)))}, NOW)
+    summary = eco.group_summary(few)
+    assert (summary["with_commits"], summary["ranked"], summary["highest"]) == (1, 0, None)
 
 
 def test_summary_sentence():
     summary = {
         "repositories": 4,
         "with_commits": 3,
+        "ranked": 3,
         "naming": 2,
         "median_share": 0.1,
         "highest": {"id": "a", "name": "pandas", "share": 0.6674},
     }
     assert eco.summary_sentence(PYTHON, summary, "Jul–Sep 2026") == (
-        "In Jul–Sep 2026, the median project among 3 Python open source projects had "
-        "10.0% of its commits name an AI coding assistant; the highest was pandas, at 66.7%. "
-        "2 of 3 named one at least once."
+        "In Jul–Sep 2026, the median project among 3 Python open source projects with 30 "
+        "commits or more had 10.0% of its commits name an AI coding assistant; the highest "
+        "was pandas, at 66.7%. 2 of 3 named one at least once."
+    )
+    few = {**summary, "ranked": 0, "naming": 0, "median_share": None, "highest": None}
+    assert eco.summary_sentence(PYTHON, few, "Q") == (
+        "None of the 4 Python open source projects in the Gallery has 30 commits or more "
+        "in Q, so none is ranked."
     )
     nobody = {**summary, "naming": 0, "median_share": 0.0, "highest": None}
     assert eco.summary_sentence(CHINA, nobody, "Q").endswith(
-        "open source projects from China had 0% of its commits name an AI coding "
-        "assistant; none of them named one."
+        "open source projects from China with 30 commits or more had 0% of its commits "
+        "name an AI coding assistant; none of them named one."
     )
-    quiet = {**nobody, "with_commits": 0, "median_share": None}
+    quiet = {**nobody, "with_commits": 0, "ranked": 0, "median_share": None}
     assert eco.summary_sentence(CHINA, quiet, "Q") == (
         "None of the 4 open source projects from China in the Gallery has commits in Q."
     )
@@ -188,12 +206,15 @@ def _gallery(tmp_path):
     repos = [
         _repo("pandas"),
         _repo("flask"),
+        _repo("tiny"),
         _repo("dubbo", "china"),
         _repo("gone", "empty"),  # in the list, without a report
     ]
     summaries = [
         _summary("pandas", "pandas", _ai((60, 100), (40, 100), {"Claude": 50})),
-        _summary("flask", "Flask", _ai((0, 20)), era=""),
+        _summary("flask", "Flask", _ai((0, 40)), era=""),
+        # a third of 3 commits: listed, not ranked
+        _summary("tiny", "Tiny", _ai((1, 3))),
         _summary("dubbo", "Apache <Dubbo>", _ai((0, 0))),
     ]
     return groups, repos, summaries
@@ -248,9 +269,20 @@ def test_write_ecosystems(tmp_path):
     )
     # ranked, linked to the reports, the counts on hover
     assert page.index(">pandas</a>") < page.index(">Flask</a>")
-    assert '<td class="num" title="60 of 100 commits">60.0%</td>' in page
+    assert '<td class="num" title="60 of 100 commits" data-sort="0.600000">60.0%</td>' in page
     assert '<span class="history-era history-era-steady">steady</span>' in page
     assert "<td>Claude</td>" in page
+    # too few commits: after the ranked ones, without a rank, and why
+    assert page.index(">Flask</a>") < page.index(">Tiny</a>")
+    assert (
+        '<td class="num" data-sort="3" title="fewer than 30 commits in Jul–Sep 2026: '
+        'not ranked">&ndash;</td><td><a href="../tiny/">Tiny</a>'
+    ) in page
+    assert "1 project has fewer than 30 commits in Jul–Sep 2026" in page
+    assert "<th>Named most (all time)</th>" in page
+    assert "the 12 months up to each report" in page
+    # every page of the ecosystems is under their tab
+    assert 'class="active" aria-current="page">Ecosystems</a>' in page
     assert '<a href="china.html">Open source from China</a>' in page  # the others
     assert 'href="empty.html"' not in page  # no page, so no link
 
@@ -260,7 +292,13 @@ def test_write_ecosystems(tmp_path):
     assert "none names one" in china
 
     data = json.loads(_read(folder / "python.json"))
-    assert data["schema_version"] == 1
+    assert data["schema_version"] == 2
+    assert [(row["id"], row["rank"]) for row in data["repositories"]] == [
+        ("pandas", 1),
+        ("flask", 2),
+        ("tiny", None),
+    ]
+    assert data["summary"]["ranked"] == 2
     assert data["generated_by"] == "gitstats 2.12.0"
     assert data["ecosystem"] == {"id": "python", "name": "Python", "title": PYTHON.title}
     assert data["quarter"] == {"id": "2026-Q3", "label": "Jul–Sep 2026"}
@@ -284,10 +322,14 @@ def test_write_ecosystems(tmp_path):
     assert '<link rel="canonical" href="https://example.com/gallery/ecosystems/">' in index_page
     assert 'class="active" aria-current="page">Ecosystems</a>' in index_page
     assert "index-card.png" in index_page
+    assert "count the projects with 30 commits or more in the quarter" in index_page
+    # "1 / 2" sorts by how many name one
+    assert '<td class="num" data-sort="1">1 / 2</td>' in index_page
 
     card = _read(folder / "python-card.html")
     assert "<b>pandas</b>" in card
     assert "<b>Flask</b>" not in card  # bars are shares above 0
+    assert "<b>Tiny</b>" not in card  # and ranked
     assert "<b>Python</b>" in _read(folder / "index-card.html")
 
     tree = ET.fromstring(_read(tmp_path / "sitemap.xml"))
@@ -302,6 +344,7 @@ def test_write_ecosystems(tmp_path):
         site + "ecosystems/china.html",
         site + "pandas/",
         site + "flask/",
+        site + "tiny/",
         site + "dubbo/",
     ]
     assert {url.find(f"{ns}lastmod").text for url in tree} == {"2026-10-21"}

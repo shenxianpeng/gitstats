@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from gitstats.compare import complete_ai, ordinal
-from gitstats.report_creator import html_header
+from gitstats.report_creator import html_header, percent_text
 
 EXTREME = 0.85  # in the top or bottom 15% of the portfolio
 MIN_VALUES = 10  # fewer projects with a value, and a place says nothing
@@ -50,7 +50,13 @@ FOUNDATION_DOMAINS = frozenset(
 
 
 def pct(value: float) -> str:
-    """0.954 -> "95%", 0.004 -> "0.4%"."""
+    """0.954 -> "95%", 0.004 -> "0.4%"; 0.9994 -> "99.9%" and 0.0002 -> "<0.1%":
+    a share short of all never reads "100%", nor one above none "0%"."""
+    if 0.995 <= value < 1:
+        # to one decimal, as the other pages write a share
+        return percent_text(value)
+    if 0 < value < 0.0005:
+        return "<0.1%"
     return f"{100 * value:.0f}%" if value >= 0.01 or value == 0 else f"{100 * value:.1f}%"
 
 

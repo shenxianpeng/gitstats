@@ -95,6 +95,12 @@ jobs:
           --window-size=1200,630 --screenshot="$PWD/report/share-card.png"
           "file://$PWD/report/share-card.html"
 
+      # the cache of the line counts makes a second run on the same output
+      # faster; the gallery's reports are made afresh each time, and it is
+      # not a page (19 MB for Rust)
+      - name: Leave Out the Cache
+        run: rm -f report/gitstats.cache
+
       - name: Upload Artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -139,10 +145,11 @@ jobs:
           python -m pip install --quiet --only-binary=:all: "pyyaml==6.0.3"
 
       - name: Fetch the Published Gallery
-        # Each quarter's snapshot of ai.json is written once, by the first build
-        # after the quarter ends; later builds find it on the site's branch and
-        # leave it as it is. A repository whose report failed this week keeps
-        # the report published before, if there is one.
+        # Each quarter's snapshot of ai.json is first written by the first build
+        # after the quarter ends; later builds find it on the site's branch,
+        # leave the repositories in it as they are and add those it lacks. A
+        # repository whose report failed this week keeps the report published
+        # before, if there is one.
         run: |
           git fetch --depth 1 origin gh-pages
           if git cat-file -e FETCH_HEAD:gallery/ai 2>/dev/null; then
@@ -160,6 +167,8 @@ jobs:
               fi
             fi
           done
+          # a report published before this was left out kept its cache
+          rm -f gallery/*/gitstats.cache
 
       - name: Generate Gallery Portfolio Page
         # The script only needs the gitstats modules from this checkout

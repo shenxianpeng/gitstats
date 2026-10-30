@@ -4448,13 +4448,25 @@ def plural(count: int, word: str, many: str = "", number: bool = True) -> str:
     return f"{format_int(count)} {noun}" if number else noun
 
 
+def percent_text(share: float) -> str:
+    """A share as the pages write it, to one decimal: "4.1%". One too small to
+    show that way is "<0.1%", not "0.0%", and one short of all "99.9%", not
+    "100.0%"; none is "0%". Plain text: escape it for a page."""
+    if share <= 0:
+        return "0%"
+    if share < 0.0005:
+        return "<0.1%"
+    if 0.9995 <= share < 1:
+        return "99.9%"
+    return f"{100.0 * share:.1f}%"
+
+
 def share_text(part: int, whole: int) -> str:
-    """``part`` as a percentage of ``whole``, to one decimal; a share too small
-    to show that way is "&lt;0.1%", not "0.0%"."""
+    """``part`` as a percentage of ``whole``, as ``percent_text`` writes it,
+    for a page: "&lt;0.1%"."""
     if not part or not whole:
         return "0%"
-    share = 100.0 * part / whole
-    return "&lt;0.1%" if share < 0.05 else f"{share:.1f}%"
+    return html.escape(percent_text(part / whole))
 
 
 def stat_tiles_html(tiles: list[tuple[str, str, str]]) -> str:

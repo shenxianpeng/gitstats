@@ -3,6 +3,7 @@
 import datetime
 import html as html_module
 import json
+import logging
 import os
 import re
 from types import SimpleNamespace
@@ -230,6 +231,8 @@ class TestAggregateReportCreator:
         assert "Age (days)" not in html
         assert "<td>2020</td>" in html
         assert '<th class="num">Lines of Code</th>' in html
+        # its authors are people: a report counts its bots too, and can say more
+        assert "Authors are people: accounts named &hellip;[bot] are left out" in html
         # Sorted by commits: alpha row before beta row
         assert html.index('href="alpha/index.html"') < html.index('href="beta/index.html"')
 
@@ -548,17 +551,19 @@ class TestAiAssistedPage:
                     "alpha",
                     100,
                     {},
-                    ai_assisted=_ai([(0, 10), (1, 10), (2, 10), (5, 10)], {"Claude": 8}),
+                    ai_assisted=_ai([(0, 10), (1, 10), (2, 10), (15, 30)], {"Claude": 8}),
                 ),
-                _summary("beta", 100, {}, ai_assisted=_ai([(0, 10)] * 4, {})),
+                _summary("beta", 100, {}, ai_assisted=_ai([(0, 10)] * 3 + [(0, 30)], {})),
                 _summary(
                     "gamma",
                     100,
                     {},
                     ai_assisted=_ai(
-                        [(3, 10), (3, 10), (6, 20), (6, 10)], {"GitHub Copilot": 10, "Claude": 8}
+                        [(3, 10), (3, 10), (6, 20), (18, 30)], {"GitHub Copilot": 10, "Claude": 8}
                     ),
                 ),
+                # two of 3 commits: too few for its share to come first
+                _summary("tiny", 100, {}, ai_assisted=_ai([(0, 0)] * 3 + [(2, 3)], {})),
                 # summarised by a gitstats that did not count them
                 _summary("old", 100, {}),
             ],
@@ -571,24 +576,28 @@ class TestAiAssistedPage:
         assert "<h1>AI-assisted commits</h1>" in page
         assert "These are lower bounds." in page
 
-        # the largest share in the last quarter first: gamma 60%, alpha 50%, beta 0, old unknown
-        order = [page.index(f">{name}</a>") for name in ("gamma", "alpha", "beta", "old")]
+        # the largest share in the last quarter first: gamma 60%, alpha 50%, beta 0; then
+        # tiny's 67% of 3 commits; then old, unknown
+        order = [page.index(f">{name}</a>") for name in ("gamma", "alpha", "beta", "tiny", "old")]
         assert order == sorted(order)
+        assert "of the repositories with 30 commits or more in it; then the others" in page
+        assert "<th>Named most (all time)</th>" in page
         # each to its Authors page, at the section when the report has one
         assert 'href="gamma/authors.html#ai-assisted_commits"' in page
         assert 'href="beta/authors.html"' in page
         # a cell: the share, shaded, over the two counts
-        assert '--share-strength: 75%">60.0%<small>6 / 10</small></td>' in page
+        assert '--share-strength: 75%">60.0%<small>18 / 30</small></td>' in page
         # no AI-assisted commit: a share like the others, "0%"
         assert '--share-strength: 0%">0%<small>0 / 10</small></td>' in page
         assert page.count('<td class="share">&ndash;</td>') == 4
+        assert page.count('<td class="share"><small>no commits</small></td>') == 3
         # the assistants named most in each repository
         assert "<td>GitHub Copilot, Claude</td>" in page
         assert "<td>&ndash;</td>" in page
 
         last_quarter = last_quarters(datetime.datetime.now())[-1][0]
         assert (
-            '<dt>Repositories</dt><dd class="stat-value">2 of 4</dd>'
+            '<dt>Repositories</dt><dd class="stat-value">3 of 5</dd>'
             '<dd class="stat-note">name an assistant in the last four quarters</dd>'
         ) in page
         assert (
@@ -597,7 +606,7 @@ class TestAiAssistedPage:
         ) in page
         assert (
             '<dt>Named Most Widely</dt><dd class="stat-value">Claude</dd>'
-            '<dd class="stat-note">in 2 of 4 repositories</dd>'
+            '<dd class="stat-note">in 2 of 5 repositories</dd>'
         ) in page
         assert "<summary>What is counted</summary>" in page
         # on a narrow screen the table starts at its last quarter
@@ -672,14 +681,14 @@ class TestShareCards:
                 "alpha",
                 300,
                 {"Alice": 3},
-                ai_assisted=_ai([(0, 10), (1, 10), (2, 10), (5, 10)], {"Claude": 8}),
+                ai_assisted=_ai([(0, 10), (1, 10), (2, 10), (15, 30)], {"Claude": 8}),
             ),
-            _summary("beta", 200, {"Bob": 2}, ai_assisted=_ai([(0, 10)] * 4, {})),
+            _summary("beta", 200, {"Bob": 2}, ai_assisted=_ai([(0, 10)] * 3 + [(0, 30)], {})),
             _summary(
                 "<b>gamma</b>",
                 100,
                 {"Alice": 1},
-                ai_assisted=_ai([(1, 10)] * 3 + [(6, 10)], {"Aider": 9}),
+                ai_assisted=_ai([(1, 10)] * 3 + [(18, 30)], {"Aider": 9}),
             ),
         ]
         pages = self._render(temp_dir, summaries, "https://example.com/g/", True, monkeypatch)
@@ -707,6 +716,23 @@ class TestShareCards:
         assert '<i style="width:100.0%"></i><span>60.0%</span>' in ai_card
         assert "<b>beta</b>" not in ai_card
         assert "of 3 repositories. A lower bound." in ai_card
+
+    def test_too_few_commits_lead_no_page_nor_card(self, temp_dir, monkeypatch):
+        # all of 3 commits: listed, but neither the largest share nor on the card
+        summaries = [
+            _summary("alpha", 300, {"Alice": 3}, ai_assisted=_ai([(0, 0)] * 3 + [(3, 3)], {})),
+            _summary("beta", 200, {"Bob": 2}, ai_assisted=_ai([(0, 0)] * 3 + [(3, 30)], {})),
+        ]
+        pages = self._render(temp_dir, summaries, "https://example.com/g/", True, monkeypatch)
+        ai, card = pages["ai.html"], pages["ai-share-card.html"]
+        quarter = last_quarters(datetime.datetime.now())[-1][0]
+        assert ai.index(">beta</a>") < ai.index(">alpha</a>")
+        assert f"{quarter}: beta, 10.0%." in ai
+        assert f'<dd class="stat-note">beta, {quarter}</dd>' in ai
+        assert "<b>alpha</b>" not in card
+        alone = self._render(temp_dir, summaries[:1], "https://example.com/g/", True, monkeypatch)
+        assert "Largest Share" not in alone["ai.html"]
+        assert f"{quarter}:" not in alone["ai.html"].split("</head>")[0]
 
     def test_no_address_no_image(self, temp_dir, monkeypatch):
         pages = self._render(temp_dir, [_summary("alpha", 10, {})], "", True, monkeypatch)
@@ -851,6 +877,121 @@ class TestAiDataset:
         assert len(lines) == 1 + 23
 
 
+def test_snapshot_additions_hold_only_up_to_its_quarter():
+    from gitstats.aggregate import _snapshot_additions
+
+    snapshot = {"repositories": [{"name": "alpha", "report": "alpha/index.html"}]}
+    beta = {
+        "name": "beta",
+        "report": "beta/index.html",
+        "quarters": {"2026-Q2": {"commits": 1}, "2026-Q3": {"commits": 2}, "2026-Q4": {}},
+        "months": {"2026-08": {}, "2026-09": {}, "2026-10": {}},
+    }
+    # a report too short for the quarter adds nothing to it
+    short = {"name": "c", "report": "c/index.html", "quarters": {}, "months": {}}
+    dataset = {
+        "generated_at": "2027-01-04T00:00:00+00:00",
+        "repositories": [{"name": "alpha", "report": "alpha/index.html"}, beta, short],
+    }
+    [added] = _snapshot_additions(snapshot, dataset, "2026-Q3")
+    assert added["added_at"] == "2027-01-04T00:00:00+00:00"
+    assert list(added["quarters"]) == ["2026-Q2", "2026-Q3"]
+    assert list(added["months"]) == ["2026-08", "2026-09"]
+
+
+def _ai_summary(name, made, months, report=None):
+    return {
+        "name": name,
+        "report_path": f"{report or name}/index.html",
+        "generated_at": made,
+        "total_commits": 100,
+        "ai_assisted": {
+            "commits": 5,
+            "by_month": dict.fromkeys(months, 1),
+            "commits_by_month": dict.fromkeys(months, 40),
+        },
+    }
+
+
+def test_a_report_kept_from_before_the_quarter_ended_gets_it_later(tmp_path):
+    # the first build of January: b's report failed, and its summary, kept from
+    # December 20, has no Oct-Dec yet
+    months = [f"2026-{m:02d}" for m in range(7, 13)]
+    creator = AggregateReportCreator()
+    week1 = [
+        _ai_summary("a", "2027-01-03T00:00:00", months),
+        _ai_summary("b", "2026-12-20T00:00:00", months),
+    ]
+    creator._write_ai_data(str(tmp_path), ai_dataset(week1, datetime.datetime(2027, 1, 4)))
+    snapshot = json.loads((tmp_path / "ai" / "2026-Q4.json").read_text(encoding="utf-8"))
+    assert [entry["name"] for entry in snapshot["repositories"]] == ["a"]
+    assert snapshot["quarters"][-1] == "2026-Q4"
+    # a week later its report is made again: it gets the quarter, and a stays
+    week2 = [
+        _ai_summary("a", "2027-01-10T00:00:00", months),
+        _ai_summary("b", "2027-01-10T00:00:00", months),
+    ]
+    creator._write_ai_data(str(tmp_path), ai_dataset(week2, datetime.datetime(2027, 1, 11)))
+    later = json.loads((tmp_path / "ai" / "2026-Q4.json").read_text(encoding="utf-8"))
+    assert later["repositories"][0] == snapshot["repositories"][0]
+    assert sorted(later["repositories"][1]["quarters"]) == ["2026-Q3", "2026-Q4"]
+    assert "added_at" in later["repositories"][1]
+    # its id renamed: the same repository, not a second one
+    week3 = [
+        _ai_summary("a", "2027-01-17T00:00:00", months),
+        _ai_summary("b", "2027-01-17T00:00:00", months, report="b2"),
+    ]
+    creator._write_ai_data(str(tmp_path), ai_dataset(week3, datetime.datetime(2027, 1, 18)))
+    assert (tmp_path / "ai" / "2026-Q4.json").read_text(encoding="utf-8") == json.dumps(
+        later, indent=2, ensure_ascii=False
+    )
+
+
+def test_a_kept_entry_without_the_quarter_gives_way():
+    from gitstats.aggregate import _snapshot_additions
+
+    snapshot = {"repositories": [{"name": "b", "report": "b/index.html", "quarters": {}}]}
+    fresh = {"name": "b", "report": "b/index.html", "quarters": {"2026-Q3": {}}, "months": {}}
+    dataset = {"generated_at": "now", "repositories": [fresh]}
+    assert [entry["name"] for entry in _snapshot_additions(snapshot, dataset, "2026-Q3")] == ["b"]
+
+
+def test_a_snapshot_is_read_only_inside_the_output(tmp_path, monkeypatch):
+    from gitstats.aggregate import _read_snapshot
+
+    out, elsewhere = tmp_path / "out", tmp_path / "elsewhere.json"
+    (out / "ai").mkdir(parents=True)
+    elsewhere.write_text('{"repositories": []}', encoding="utf-8")
+    (out / "ai" / "2026-Q3.json").write_text('{"repositories": []}', encoding="utf-8")
+    assert _read_snapshot(str(out), "ai/2026-Q3.json") == {"repositories": []}
+    # not a snapshot's name
+    assert _read_snapshot(str(out), "../elsewhere.json") is None
+    # a snapshot that resolves outside (a link to another file, or another drive)
+    real_realpath = os.path.realpath
+
+    def outside(path):
+        if path.endswith("2026-Q2.json"):
+            return str(elsewhere)
+        if path.endswith("2026-Q1.json"):
+            return "D:\\other\\2026-Q1.json" if os.name == "nt" else str(elsewhere)
+        return real_realpath(path)
+
+    monkeypatch.setattr(os.path, "realpath", outside)
+    assert _read_snapshot(str(out), "ai/2026-Q2.json") is None
+    assert _read_snapshot(str(out), "ai/2026-Q1.json") is None
+
+
+def test_same_portfolio():
+    from gitstats.aggregate import _same_portfolio
+
+    dataset = {"repositories": [{"name": "Alpha", "report": "alpha/index.html"}]}
+    # by the report, which stays where it is when a name changes
+    assert _same_portfolio({"repositories": [{"name": "A", "report": "alpha/index.html"}]}, dataset)
+    # an entry that is not one, or names nothing, matches nothing
+    assert not _same_portfolio({"repositories": ["alpha/index.html", {}]}, dataset)
+    assert not _same_portfolio(None, dataset)
+
+
 @pytest.mark.parametrize(
     ("months", "expected"),
     [
@@ -908,9 +1049,19 @@ class TestAiData:
         data = json.loads(self._read(tmp_path, "ai.json"))
         assert data["repositories"][0]["quarters"][last]["ai_assisted"] == 2
 
+    @staticmethod
+    def _snapshot(path, name, reports):
+        (path / "ai").mkdir(exist_ok=True)
+        repositories = [{"name": report, "report": f"{report}/index.html"} for report in reports]
+        (path / "ai" / name).write_text(
+            json.dumps({"quarters": [], "repositories": repositories}), encoding="utf-8"
+        )
+
     def test_the_snapshots_already_there_are_listed(self, tmp_path):
-        (tmp_path / "ai").mkdir()
-        (tmp_path / "ai" / "2001-Q1.json").write_text("{}", encoding="utf-8")
+        self._snapshot(tmp_path, "2001-Q1.json", ["alpha"])
+        # another portfolio's, written into the same folder before
+        self._snapshot(tmp_path, "2001-Q2.json", ["other"])
+        (tmp_path / "ai" / "2001-Q3.json").write_text("{}", encoding="utf-8")
         (tmp_path / "ai" / "notes.json").write_text("{}", encoding="utf-8")
         self._create(tmp_path, [_summary("alpha", 40, {}, ai_assisted=_ai([(1, 10)] * 4, {}))])
         last = quarter_id(last_quarters(datetime.datetime.now())[-1][1])
@@ -918,7 +1069,56 @@ class TestAiData:
         assert data["snapshots"] == ["ai/2001-Q1.json", f"ai/{last}.json"]
         page = self._read(tmp_path, "ai.html")
         assert '<a href="ai/2001-Q1.json">Jan\u2013Mar 2001</a>, ' in page
+        assert "2001-Q2" not in page
+        assert "2001-Q3" not in page  # not a snapshot
         assert "notes.json" not in page
+
+    def test_a_repository_added_since_is_added_to_the_snapshot(self, tmp_path):
+        now = datetime.datetime.now()
+        last = quarter_id(last_quarters(now)[-1][1])
+        self._create(tmp_path, [_summary("alpha", 40, {}, ai_assisted=_ai([(1, 10)] * 4, {}))])
+        first = json.loads(self._read(tmp_path, f"ai/{last}.json"))
+        # a week later: alpha has a commit more in the quarter, beta joins
+        alpha = _summary("alpha", 41, {}, ai_assisted=_ai([(1, 10)] * 3 + [(2, 11)], {}))
+        beta = _ai([(0, 10)] * 3 + [(3, 30)], {"Claude": 3})
+        # a month after the quarter, which the snapshot does not hold
+        after = f"{now.year:04d}-{now.month:02d}"
+        beta["by_month"][after] = beta["commits_by_month"][after] = 5
+        self._create(tmp_path, [alpha, _summary("beta", 60, {}, ai_assisted=beta)])
+        snapshot = json.loads(self._read(tmp_path, f"ai/{last}.json"))
+        # alpha as it was first published; beta as it is now, and when it was added
+        assert snapshot["repositories"][0] == first["repositories"][0]
+        assert snapshot["generated_at"] == first["generated_at"]
+        added = snapshot["repositories"][1]
+        assert added["name"] == "beta"
+        assert added["quarters"][last] == {"commits": 30, "ai_assisted": 3, "share": 0.1}
+        assert added["added_at"] == json.loads(self._read(tmp_path, "ai.json"))["generated_at"]
+        assert max(added["quarters"]) == last
+        assert after not in added["months"]
+        # the next week: nothing more to add, and nothing written
+        before = self._read(tmp_path, f"ai/{last}.json")
+        self._create(tmp_path, [alpha, _summary("beta", 61, {}, ai_assisted=beta)])
+        assert self._read(tmp_path, f"ai/{last}.json") == before
+
+    def test_another_portfolios_snapshot_is_written_again(self, tmp_path):
+        # gitstats alpha beta port, then gitstats gamma port: the snapshot was
+        # alpha and beta's
+        last = quarter_id(last_quarters(datetime.datetime.now())[-1][1])
+        self._snapshot(tmp_path, f"{last}.json", ["alpha", "beta"])
+        self._create(tmp_path, [_summary("gamma", 40, {}, ai_assisted=_ai([(1, 10)] * 4, {}))])
+        snapshot = json.loads(self._read(tmp_path, f"ai/{last}.json"))
+        assert [entry["name"] for entry in snapshot["repositories"]] == ["gamma"]
+        assert json.loads(self._read(tmp_path, "ai.json"))["snapshots"] == [f"ai/{last}.json"]
+
+    def test_a_snapshot_that_cannot_be_read_is_left_as_it_is(self, tmp_path, caplog):
+        last = quarter_id(last_quarters(datetime.datetime.now())[-1][1])
+        (tmp_path / "ai").mkdir()
+        (tmp_path / "ai" / f"{last}.json").write_text("{not json", encoding="utf-8")
+        with caplog.at_level(logging.WARNING, logger="gitstats"):
+            self._create(tmp_path, [_summary("a", 40, {}, ai_assisted=_ai([(1, 10)] * 4, {}))])
+        assert self._read(tmp_path, f"ai/{last}.json") == "{not json"
+        assert f"Leaving ai/{last}.json as it is" in caplog.text
+        assert json.loads(self._read(tmp_path, "ai.json"))["snapshots"] == []
 
     def test_no_snapshot_without_a_complete_quarter(self, tmp_path):
         old = _ai([(1, 10)] * 4, {})
@@ -1203,8 +1403,16 @@ class TestOrganizationsDataset:
         data = organizations_dataset(self._summaries(), self.NOW)
         assert organizations_description(data) == (
             "The organizations whose addresses commit to 2 repositories, by the domain of "
-            "the address. Most commits in the last 12 months: redhat.com, 60 in 2 "
-            "repositories."
+            "the address. Most commits in the last 12 months: redhat.com, 60 in 1 "
+            "repository."
+        )
+        # its commits of the last 12 months are in one of the two it committed to
+        assert data["organizations"][0]["repositories"] == ["django", "kubernetes"]
+        # none in the last 12 months: the most of all
+        for row in data["organizations"][0]["by_repository"]:
+            row["commits_last_12mo"] = 0
+        assert organizations_description(data).endswith(
+            "Most commits: redhat.com, 305 in 2 repositories."
         )
         data["organizations"] = []
         assert organizations_description(data).endswith("by the domain of the address.")
@@ -1279,6 +1487,19 @@ class TestOrganizationsPage:
         assert '<a href="organizations.html">Organizations, by the' in pages["index.html"]
         assert 'href="organizations.html"' in pages["index.html"].split("</div>")[0] + page
 
+    def test_a_repository_without_organizations_links_to_its_report(self, temp_dir):
+        # its Authors page has no "Commits by organization" section to land on
+        summaries = self._summaries() + [
+            _summary("crush", 50, {}, organizations=_orgs([], [{"personal": 5}] * 4))
+        ]
+        page = self._render(temp_dir, summaries)["organizations.html"]
+        mix = page[page.index('id="organization-mix"') :]
+        assert '<a href="crush/index.html">crush</a>' in mix
+        assert "crush/authors.html" not in mix
+        # a share sorts by its value, "<0.1%" too
+        assert '<td class="num" data-sort="0.750000">75.0%</td>' in page
+        assert 'href="django/authors.html#commits_by_organization"' in mix
+
     def test_no_page_without_organizations(self, temp_dir):
         summaries = [_summary("a", 1, {}), _summary("b", 1, {}, organizations=_orgs([]))]
         pages = self._render(temp_dir, summaries)
@@ -1324,7 +1545,7 @@ class TestOrganizationsPage:
             "organizations.html"
         ]
         assert "Largest Share" not in page
-        assert '<td class="num">0</td><td class="num">0%</td>' in page
+        assert '<td class="num">0</td><td class="num" data-sort="0">0%</td>' in page
 
 
 class TestOrganizationPages:
@@ -1560,10 +1781,11 @@ class TestComparisonPages:
             "any other of the 5 Python open source projects."
         ) in page
         assert page.count('<div class="compare-row">') == 4  # no organizations, no AI data
-        assert "<b>1st of 5</b>Python projects<br>1st of 7 overall" in page
+        # the group's projects as a sentence names them, not "Python projects"
+        assert "<b>1st of 5</b>Python open source projects<br>1st of 7 overall" in page
         # half the commits by 1, as repo3 in its group, and repo3 and repo6 of all
         assert (
-            "<b>4th of 5</b>Python projects, shared with 1 other"
+            "<b>4th of 5</b>Python open source projects, shared with 1 other"
             "<br>5th of 7 overall, shared with 2 others"
         ) in page
         assert 'class="strip-own"' in page
@@ -1572,7 +1794,7 @@ class TestComparisonPages:
         assert '<a href="index.html">The full report of repo0' in page
         assert 'content="https://example.org/g/repo0/compare.html"' in page
         card = read("repo0/compare-card.html")
-        assert "// Python projects compared" in card
+        assert "// Python open source projects compared" in card
         assert "1st / 5" in card
 
     def test_data(self, temp_dir):

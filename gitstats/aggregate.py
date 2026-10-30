@@ -42,6 +42,7 @@ from gitstats.report_creator import (
     html_header,
     nav_link,
     page_title,
+    plural,
     share_card_page,
     share_meta_html,
     share_text,
@@ -470,6 +471,11 @@ def last_quarters(now: datetime.datetime, count: int = 4) -> list[tuple[str, lis
     return quarters[::-1]
 
 
+# A quarter's share is ranked when the quarter has this many commits or more:
+# one of 3 commits is a third of them, and says little
+MIN_RANKED_COMMITS = 30
+
+
 # a repository's summary, its AI-assisted commits, and (commits that name an
 # assistant, all commits) in each quarter, None where the summary has no counts
 AiRow = tuple[dict[str, Any], dict[str, Any] | None, list[tuple[int, int] | None]]
@@ -479,7 +485,9 @@ def ai_rows(
     summaries: list[dict[str, Any]], now: datetime.datetime
 ) -> tuple[list[AiRow], list[tuple[str, list[str]]]]:
     """The rows of the AI-assisted commits page, the largest share in the last
-    quarter first, then in the quarter before it; and those quarters."""
+    quarter first, then in the quarter before it; and those quarters. A
+    repository with fewer than MIN_RANKED_COMMITS commits in the last quarter
+    comes after those with more, one without counts for it last."""
     quarters = last_quarters(now)
     rows: list[AiRow] = []
     for summary in summaries:
@@ -494,7 +502,20 @@ def ai_rows(
     def share(counts: tuple[int, int] | None) -> float:
         return counts[0] / counts[1] if counts and counts[1] else -1.0
 
-    rows.sort(key=lambda row: (-share(row[2][-1]), -share(row[2][-2]), row[0].get("name", "")))
+    def place(counts: tuple[int, int] | None) -> int:
+        """0 for enough commits to come first, 1 for too few, 2 for no counts."""
+        if counts is None:
+            return 2
+        return 0 if counts[1] >= MIN_RANKED_COMMITS else 1
+
+    rows.sort(
+        key=lambda row: (
+            place(row[2][-1]),
+            -share(row[2][-1]),
+            -share(row[2][-2]),
+            row[0].get("name", ""),
+        )
+    )
     return rows, quarters
 
 
@@ -520,7 +541,7 @@ def ai_description(rows: list[AiRow], quarters: list[tuple[str, list[str]]]) -> 
     )
     summary, _, counts = rows[0] if rows else ({}, None, [None])
     latest = counts[-1]
-    if latest and latest[0]:
+    if latest and latest[0] and latest[1] >= MIN_RANKED_COMMITS:
         largest = share_text(*latest).replace("&lt;", "<")
         text += f" {quarters[-1][0]}: {summary.get('name', '')}, {largest}."
     return text
@@ -532,7 +553,8 @@ AI_DATA_DESCRIPTION = (
     "a commit is not counted, and a mark does not say how much of the commit the "
     "assistant wrote. A commit counts in the month it was written (its author date)."
 )
-# A snapshot of the data of a quarter, kept as it was first written: "ai/2026-Q3.json"
+# A snapshot of the data of a quarter, each repository kept as it was first
+# written into it: "ai/2026-Q3.json"
 _SNAPSHOT = re.compile(r"ai/(\d{4})-Q([1-4])\.json")
 
 
@@ -634,6 +656,117 @@ def snapshot_label(name: str) -> str:
         return name
     first = (int(match.group(2)) - 1) * 3
     return f"{_MONTH_NAMES[first]}–{_MONTH_NAMES[first + 2]} {match.group(1)}"
+
+
+def _read_snapshot(path: str, name: str) -> dict[str, Any] | None:
+    """The snapshot ``name`` ("ai/2026-Q3.json") written before into the output
+    root ``path``, or None when there is none, or it cannot be read as one.
+    Only a snapshot's name, resolved inside the root, is read."""
+    if not _SNAPSHOT.fullmatch(name):
+        return None
+    base = os.path.realpath(path)
+    file = os.path.realpath(os.path.join(base, name))
+    try:
+        if os.path.commonpath([base, file]) != base:
+            return None
+        with open(file, encoding="utf-8") as f:
+            snapshot = json.load(f)
+    except (OSError, ValueError):
+        return None
+    if not isinstance(snapshot, dict) or not isinstance(snapshot.get("repositories"), list):
+        return None
+    return snapshot
+
+
+def _repository_key(entry: Any) -> str:
+    """Which repository an entry of ``ai_dataset`` is: its report, which a
+    portfolio keeps in the same place, or its name."""
+    if not isinstance(entry, dict):
+        return ""
+    return str(entry.get("report") or entry.get("name") or "")
+
+
+def _same_portfolio(snapshot: dict[str, Any] | None, dataset: dict[str, Any]) -> bool:
+    """Whether ``snapshot`` was written by this portfolio: it has one of its
+    repositories."""
+    if snapshot is None:
+        return False
+    have = {_repository_key(entry) for entry in snapshot["repositories"]} - {""}
+    return any(_repository_key(entry) in have for entry in dataset["repositories"])
+
+
+def _snapshot_entry(entry: dict[str, Any], quarter: str) -> dict[str, Any]:
+    """A repository of ``ai_dataset`` as the snapshot of ``quarter`` keeps it:
+    its months and quarters up to that one. Its all-time counts are those of
+    the day it was put in."""
+    year, number = quarter.split("-Q")
+    last_month = f"{year}-{int(number) * 3:02d}"
+    return {
+        **entry,
+        "quarters": {key: value for key, value in entry["quarters"].items() if key <= quarter},
+        "months": {key: value for key, value in entry["months"].items() if key <= last_month},
+    }
+
+
+def _has_quarter(entry: Any, quarter: str) -> bool:
+    return isinstance(entry, dict) and quarter in (entry.get("quarters") or {})
+
+
+def _snapshot_additions(
+    snapshot: dict[str, Any], dataset: dict[str, Any], quarter: str
+) -> list[dict[str, Any]]:
+    """The repositories of ``dataset`` with counts for ``quarter`` that its
+    snapshot has none for, as the snapshot keeps them, with when they were
+    added. One the snapshot has without that quarter (its report was kept
+    from a build before the quarter ended) has none; one it has under
+    another report folder (its id renamed) has them."""
+    counted = [entry for entry in snapshot["repositories"] if _has_quarter(entry, quarter)]
+    keys = {_repository_key(entry) for entry in counted}
+    names = {str(entry.get("name", "")) for entry in counted} - {""}
+    return [
+        {**_snapshot_entry(entry, quarter), "added_at": dataset["generated_at"]}
+        for entry in dataset["repositories"]
+        if _has_quarter(entry, quarter)
+        and _repository_key(entry) not in keys
+        and str(entry.get("name", "")) not in names
+    ]
+
+
+def _snapshot_to_write(
+    kept: dict[str, Any] | None, dataset: dict[str, Any], quarter: str
+) -> dict[str, Any] | None:
+    """The snapshot of ``quarter`` to write: ``kept`` (this portfolio's, read
+    back) with the repositories it lacks, or a new one with the repositories
+    that have counts for the quarter; None when there is nothing to add."""
+    if kept is None or not _same_portfolio(kept, dataset):
+        # the first of the quarter, or another portfolio's
+        entries = [
+            _snapshot_entry(entry, quarter)
+            for entry in dataset["repositories"]
+            if _has_quarter(entry, quarter)
+        ]
+        return {
+            **dataset,
+            "quarters": sorted({key for entry in entries for key in entry["quarters"]}),
+            "repositories": entries,
+        }
+    added = _snapshot_additions(kept, dataset, quarter)
+    if not added:
+        return None
+    # an entry without the quarter gives way to its counts
+    replaced = {_repository_key(entry) for entry in added}
+    stays = [
+        entry
+        for entry in kept["repositories"]
+        if _has_quarter(entry, quarter) or _repository_key(entry) not in replaced
+    ]
+    return {
+        **kept,
+        "quarters": sorted(
+            set(kept.get("quarters") or []) | {key for entry in added for key in entry["quarters"]}
+        ),
+        "repositories": sorted(stays + added, key=lambda entry: str(entry.get("name", "")).lower()),
+    }
 
 
 def _quarter_counts(ai: dict[str, Any], months: list[str]) -> tuple[int, int] | None:
@@ -797,6 +930,11 @@ def organization_badge_message(row: dict[str, Any]) -> str:
     )
 
 
+def _fraction(part: int, whole: int) -> str:
+    """``part`` of ``whole``, for a cell to sort by: "0.000614"."""
+    return f"{part / whole:.6f}" if whole else "0"
+
+
 def _organization_share_key(entry: dict[str, Any]) -> tuple[float, str]:
     """Sorts repositories by the share of their commits from organizations, the
     largest first, then by name."""
@@ -813,11 +951,19 @@ def organizations_description(dataset: dict[str, Any]) -> str:
     )
     if dataset["organizations"]:
         top = dataset["organizations"][0]
-        text += (
-            f" Most commits in the last 12 months: {top['organization']}, "
-            f"{format_int(top['commits_last_12mo'])} in {len(top['repositories'])} "
-            "repositories."
-        )
+        # the repositories of those commits, as its own page counts them
+        recent = sum(1 for repo in top["by_repository"] if repo["commits_last_12mo"])
+        if recent:
+            text += (
+                f" Most commits in the last 12 months: {top['organization']}, "
+                f"{format_int(top['commits_last_12mo'])} in {plural(recent, 'repository', 'repositories')}."
+            )
+        else:
+            # none in the last 12 months: the most of all
+            text += (
+                f" Most commits: {top['organization']}, {format_int(top['commits'])} in "
+                f"{plural(len(top['repositories']), 'repository', 'repositories')}."
+            )
     return text
 
 
@@ -920,32 +1066,47 @@ class AggregateReportCreator:
     nav: list[tuple[str, str]] = []
     organizations = False
     organization_page_names: set[str] = set()
+    organization_sections: set[str] = set()
     group_titles: dict[str, str] = {}
     version = ""
     groups: list[tuple[str, str]] = []
 
     def _write_ai_data(self, path: str, dataset: dict[str, Any]) -> list[str]:
         """Write the data of the AI-assisted commits page, as ai.json and
-        ai.csv, and the snapshot of its last quarter unless there is one;
-        return the snapshots in the output root, oldest first.
+        ai.csv, and the snapshot of its last quarter; return the snapshots in
+        the output root that are this portfolio's, oldest first.
 
-        A snapshot is written once, so it keeps the counts of its quarter as
-        they were first published: commits written in a quarter can still be
-        merged after it ends, and change the counts of ai.json.
+        A snapshot keeps the counts of its quarter as they were first
+        published: commits written in a quarter can still be merged after it
+        ends, and change the counts of ai.json. So a repository already in it
+        with counts for the quarter stays as it is; one that has none there
+        (added to the portfolio since, or kept from a build before the quarter
+        ended) is added, as counted now, with when it was. A snapshot that
+        has none of this portfolio's repositories is another portfolio's,
+        written into the same folder before: it is written again, and an older
+        one of them is not listed.
         """
         if dataset["quarters"]:
-            name = f"ai/{dataset['quarters'][-1]}.json"
-            if not os.path.exists(os.path.join(path, name)):
-                f = self._open_portfolio_file(path, name)
-                try:
-                    json.dump(dataset, f, indent=2, ensure_ascii=False)
-                finally:
-                    f.close()
+            quarter = dataset["quarters"][-1]
+            name = f"ai/{quarter}.json"
+            target = os.path.join(path, name)
+            kept = _read_snapshot(path, name)
+            if kept is None and os.path.exists(target):
+                logger.warning("Leaving %s as it is: it cannot be read as a snapshot", name)
+            else:
+                snapshot = _snapshot_to_write(kept, dataset, quarter)
+                if snapshot is not None:
+                    f = self._open_portfolio_file(path, name)
+                    try:
+                        json.dump(snapshot, f, indent=2, ensure_ascii=False)
+                    finally:
+                        f.close()
         folder = os.path.join(path, "ai")
         snapshots = sorted(
             f"ai/{entry}"
             for entry in (os.listdir(folder) if os.path.isdir(folder) else [])
             if _SNAPSHOT.fullmatch(f"ai/{entry}")
+            and _same_portfolio(_read_snapshot(path, f"ai/{entry}"), dataset)
         )
         f = self._open_portfolio_file(path, "ai.json")
         try:
@@ -1096,7 +1257,9 @@ class AggregateReportCreator:
         f.write(
             '<p class="section-note">The share of each quarter&rsquo;s commits that name an '
             "assistant, and under it those commits and all of them. The darker, the larger "
-            "the share.</p>"
+            "the share. The largest share in the last quarter comes first, of the "
+            f"repositories with {MIN_RANKED_COMMITS} commits or more in it; then the others. "
+            "The assistants named most are those of all the history.</p>"
         )
         if self.groups:
             f.write(group_filter_html(summaries, self.groups))
@@ -1104,7 +1267,7 @@ class AggregateReportCreator:
         f.write(
             "<tr><th>Repository</th>"
             + "".join(f'<th class="num">{label}</th>' for label, _ in quarters)
-            + "<th>Named most</th></tr>"
+            + "<th>Named most (all time)</th></tr>"
         )
         for row in rows:
             f.write(self._ai_row(*row))
@@ -1135,7 +1298,8 @@ class AggregateReportCreator:
             )
             note += (
                 " Each quarter is also kept as it was first published, since commits written "
-                f"in a quarter can still be merged after it ends: {links}."
+                "in a quarter can still be merged after it ends; a repository added to the "
+                f"portfolio later is kept as it was when it was added: {links}."
             )
         f.write(f'<p class="section-note">{note}</p>')
         self._print_footer(f)
@@ -1153,6 +1317,13 @@ class AggregateReportCreator:
         of the last four quarters divide between kinds of address."""
         organizations = dataset["organizations"]
         repositories = dataset["repositories"]
+        # the reports whose Authors page has the "Commits by organization"
+        # section: those with a commit from an organization
+        self.organization_sections = {
+            str(summary.get("report_path", "") or "")
+            for summary in summaries
+            if (summary.get("organizations") or {}).get("top")
+        }
         heading = f"{title}: Organizations"
         self._print_header(
             f,
@@ -1254,7 +1425,6 @@ class AggregateReportCreator:
         quarters = [months for _, months in last_quarters(now)]
         rows = compare.comparisons(summaries, quarters)
         stand_out = insights.facts(summaries, f"{title} projects")
-        names = dict(self.groups)
         data = []
         for row, found in zip(rows, stand_out):
             summary = row["summary"]
@@ -1295,7 +1465,11 @@ class AggregateReportCreator:
                 f.close()
             f = self._open_portfolio_file(path, f"{folder}/compare-card.html")
             try:
-                f.write(self._comparison_card(row, names.get(group, ""), entry["headline"], found))
+                f.write(
+                    self._comparison_card(
+                        row, self._group_projects(group), entry["headline"], found
+                    )
+                )
             finally:
                 f.close()
             self._fill_overview(
@@ -1405,7 +1579,8 @@ class AggregateReportCreator:
             # a measure with a value has a rank among all, and among its peers;
             # a place others share says so, and one all of them share is none
             place = ranks["group"] if peers else ranks["all"]
-            where = f"{html.escape(group_name)} projects" if peers else "repositories"
+            # "12th of 12 open source AI coding assistants", as a sentence names them
+            where = html.escape(self._group_projects(group)) if peers else "repositories"
             same = sum(1 for other in (peers or rows) if other["values"][measure.id] == own)
             words, more = compare.rank_words(place, same)
             if words == "Same for all":
@@ -1444,13 +1619,14 @@ class AggregateReportCreator:
     @staticmethod
     def _comparison_card(
         row: dict[str, Any],
-        group_name: str,
+        group_projects: str,
         headline: str,
         found: list[dict[str, Any]] | None = None,
     ) -> str:
         """The comparison's share card: what stands out, each fact's number
         large; or, with nothing that does, the sentence, and each measure's
-        rank as a bar, longer the nearer the top."""
+        rank as a bar, longer the nearer the top. ``group_projects`` names the
+        projects of its group, as a sentence does; "" without one."""
         name = str(row["summary"].get("name", "") or "")
         if found:
             facts = "".join(
@@ -1463,7 +1639,7 @@ class AggregateReportCreator:
                 f'<div class="brand">// what stands out</div><h1>{html.escape(name)}</h1>'
                 f'<div class="facts n{len(found)}">{facts}</div>',
             )
-        scope = "group" if group_name else "all"
+        scope = "group" if group_projects else "all"
         bars = "".join(
             f"<div><b>{html.escape(label)}</b>"
             f'<i style="width:{max(2.0, 100 * position):.1f}%"></i>'
@@ -1471,9 +1647,7 @@ class AggregateReportCreator:
             for label, position, rank_text in compare.card_rows(row, scope)
         )
         brand = (
-            f"// {html.escape(group_name)} projects compared"
-            if group_name
-            else "// how it compares"
+            f"// {html.escape(group_projects)} compared" if group_projects else "// how it compares"
         )
         return share_card_page(
             f"How {name} compares",
@@ -1663,12 +1837,15 @@ class AggregateReportCreator:
         self._print_footer(f)
 
     def _organization_mix_row(self, entry: dict[str, Any]) -> str:
-        """One repository's row of the By repository table."""
+        """One repository's row of the By repository table: its name links to
+        the organizations of its report, or to the report when it has none."""
         link = entry["report"]
-        if link.endswith("index.html"):
+        if link.endswith("index.html") and link in self.organization_sections:
             link = link[: -len("index.html")] + "authors.html#commits_by_organization"
         cells = "".join(
-            f'<td class="num">{share_text(entry["by_kind"].get(kind, 0), entry["commits"])}</td>'
+            # sorted by the exact share: "<0.1%" alone would make the column text
+            f'<td class="num" data-sort="{_fraction(entry["by_kind"].get(kind, 0), entry["commits"])}">'
+            f"{share_text(entry['by_kind'].get(kind, 0), entry['commits'])}</td>"
             for kind in ORGANIZATION_KINDS
         )
         named = ", ".join(
@@ -1774,7 +1951,7 @@ class AggregateReportCreator:
         latest = [
             (summary.get("name", ""), counts[-1])
             for summary, _, counts in rows
-            if counts[-1] and counts[-1][0] and counts[-1][1]
+            if counts[-1] and counts[-1][0] and counts[-1][1] >= MIN_RANKED_COMMITS
         ][:6]
         top = max((part / whole for _, (part, whole) in latest), default=1.0) or 1.0
         bars = "".join(
@@ -1830,7 +2007,7 @@ class AggregateReportCreator:
         ]
         summary, _, counts = rows[0]
         latest = counts[-1]
-        if latest and latest[0]:
+        if latest and latest[0] and latest[1] >= MIN_RANKED_COMMITS:
             tiles.append(
                 (
                     "Largest Share",
@@ -2011,6 +2188,11 @@ class AggregateReportCreator:
                 f"<td>{since}</td></tr>"
             )
         f.write("</table></div>")
+        f.write(
+            '<p class="section-note">Authors are people: accounts named &hellip;[bot] are '
+            "left out, so a report, which counts them, can say more. Active: those whose last "
+            "commit is in the 12 months up to the report.</p>"
+        )
         if names:
             f.write(GROUP_FILTER_SCRIPT)
 

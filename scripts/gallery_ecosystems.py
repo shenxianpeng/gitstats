@@ -28,7 +28,7 @@ from typing import Any
 
 from gallery_repos import Group, Repo
 
-from gitstats.aggregate import last_quarters, quarter_id
+from gitstats.aggregate import MIN_RANKED_COMMITS, last_quarters, quarter_id
 from gitstats.compare import complete_ai
 from gitstats.report_creator import (
     AI_ASSISTED_COUNTED,
@@ -40,6 +40,7 @@ from gitstats.report_creator import (
     THEME_SCRIPT,
     THEME_TOGGLE_BUTTON,
     nav_link,
+    percent_text,
     share_card_page,
     share_meta_html,
     stat_tiles_html,
@@ -48,7 +49,9 @@ from gitstats.utils import format_int
 
 FOLDER = "ecosystems"
 INDEX = "index.html"
-SCHEMA_VERSION = 1
+# 2: a repository with too few commits in the quarter has no rank, and the
+# summary's median, highest and naming count only the ranked ones
+SCHEMA_VERSION = 2
 ASSISTANT = "an AI coding assistant"
 
 
@@ -77,14 +80,15 @@ def share_of(counts: tuple[int, int] | None) -> float | None:
 
 
 def percent(share: float | None) -> str:
-    """A share as the pages write it, a plain number so that a table sorts
-    by it: "4.1%", "0.04%" (two decimals under 0.1%), "0%"; "–" for none."""
-    if share is None:
-        return "–"
-    if not share:
-        return "0%"
-    value = 100 * share
-    return f"{value:.2f}%" if value < 0.1 else f"{value:.1f}%"
+    """A share as every page of the gallery writes it: "4.1%", "<0.1%", "0%"
+    (see percent_text); "–" for none. Plain text: escape it for a page."""
+    return "–" if share is None else percent_text(share)
+
+
+def ranked(counts: Any) -> bool:
+    """Whether a quarter's (named, all) commits are enough for its share to
+    be ranked: one of 3 commits is a third of them, and says little."""
+    return counts is not None and counts[1] >= MIN_RANKED_COMMITS
 
 
 def _quarter_json(counts: tuple[int, int] | None) -> dict[str, Any] | None:
@@ -98,59 +102,77 @@ def _quarter_json(counts: tuple[int, int] | None) -> dict[str, Any] | None:
     }
 
 
+def _rank_row(
+    repo: Repo, summary: dict[str, Any], previous: list[str], latest: list[str]
+) -> dict[str, Any]:
+    """One repository's row, before it is ranked."""
+    ai = complete_ai(summary)
+    assistants = list((ai or {}).get("assistants") or {})[:3] if isinstance(ai, dict) else []
+    return {
+        "id": repo.id,
+        "name": str(summary.get("name") or repo.name),
+        "repository": repo.url,
+        "report": f"../{repo.id}/",
+        "quarter": quarter_counts(ai, latest),
+        "previous_quarter": quarter_counts(ai, previous),
+        "commits_last_12mo": int(summary.get("commits_last_12mo", 0) or 0),
+        "active_authors_12mo": int(summary.get("active_authors_12mo", 0) or 0),
+        "health": str(summary.get("era", "") or ""),
+        "last_commit": str(summary.get("last_commit", "") or "")[:10],
+        "assistants": assistants,
+    }
+
+
+def _rank_order(row: dict[str, Any]) -> tuple[int, float, int, str]:
+    """Ranked first, then too few commits, then no share; each by the share,
+    the quarter's commits and the name."""
+    share = share_of(row["quarter"])
+    if share is None:
+        place = 2
+    else:
+        place = 0 if ranked(row["quarter"]) else 1
+    return (place, -(share or 0.0), -(row["quarter"] or (0, 0))[1], row["name"].lower())
+
+
 def rank_rows(
     repos: list[Repo], summaries: dict[str, dict[str, Any]], now: datetime.datetime
 ) -> list[dict[str, Any]]:
     """The rows of one group's table, ranked: the largest share in the last
-    complete quarter first, then by that quarter's commits, then by name;
-    repositories without a share in that quarter last. Repositories without a
-    report are left out. A summary's counts stop before the month it was made
-    in, which was not over: a summary kept from an earlier build does not
-    count it as a whole month."""
+    complete quarter first, then by that quarter's commits, then by name.
+    Repositories with fewer than MIN_RANKED_COMMITS commits in that quarter
+    come after them in the same order, without a rank (``None``), and those
+    without a share last. Repositories without a report are left out. A
+    summary's counts stop before the month it was made in, which was not
+    over: a summary kept from an earlier build does not count it as a whole
+    month."""
     (_, previous), (_, latest) = last_quarters(now, 2)
-    rows = []
-    for repo in repos:
-        summary = summaries.get(repo.id)
-        if summary is None:
-            continue
-        ai = complete_ai(summary)
-        counts = quarter_counts(ai, latest)
-        rows.append(
-            {
-                "id": repo.id,
-                "name": str(summary.get("name") or repo.name),
-                "repository": repo.url,
-                "report": f"../{repo.id}/",
-                "quarter": counts,
-                "previous_quarter": quarter_counts(ai, previous),
-                "commits_last_12mo": int(summary.get("commits_last_12mo", 0) or 0),
-                "active_authors_12mo": int(summary.get("active_authors_12mo", 0) or 0),
-                "health": str(summary.get("era", "") or ""),
-                "last_commit": str(summary.get("last_commit", "") or "")[:10],
-                "assistants": list((ai or {}).get("assistants") or {})[:3]
-                if isinstance(ai, dict)
-                else [],
-            }
-        )
-
-    def order(row: dict[str, Any]) -> tuple[bool, float, int, str]:
-        share = share_of(row["quarter"])
-        return (share is None, -(share or 0.0), -(row["quarter"] or (0, 0))[1], row["name"].lower())
-
-    rows.sort(key=order)
-    for rank, row in enumerate(rows, 1):
-        row["rank"] = rank
+    rows = [
+        _rank_row(repo, summaries[repo.id], previous, latest)
+        for repo in repos
+        if repo.id in summaries
+    ]
+    rows.sort(key=_rank_order)
+    rank = 0
+    for row in rows:
+        if ranked(row["quarter"]):
+            rank += 1
+            row["rank"] = rank
+        else:
+            row["rank"] = None
     return rows
 
 
 def group_summary(rows: list[dict[str, Any]]) -> dict[str, Any]:
-    """The numbers the sentence at the top of a page says."""
-    ranked = [row for row in rows if share_of(row["quarter"]) is not None]
-    shares = [share_of(row["quarter"]) or 0.0 for row in ranked]
-    top = ranked[0] if ranked and shares[0] > 0 else None
+    """The numbers the sentence at the top of a page says: the median, the
+    highest and how many name an assistant, of the ranked repositories."""
+    with_commits = [row for row in rows if share_of(row["quarter"]) is not None]
+    ranked_rows = [row for row in rows if row["rank"] is not None]
+    shares = [share_of(row["quarter"]) or 0.0 for row in ranked_rows]
+    top = ranked_rows[0] if ranked_rows and shares[0] > 0 else None
     return {
         "repositories": len(rows),
-        "with_commits": len(ranked),
+        "with_commits": len(with_commits),
+        "ranked": len(ranked_rows),
         "naming": sum(1 for share in shares if share > 0),
         "median_share": round(statistics.median(shares), 4) if shares else None,
         "highest": None
@@ -171,16 +193,22 @@ def summary_sentence(group: Group, summary: dict[str, Any], label: str) -> str:
     projects = in_a_sentence(group.title)
     if not summary["with_commits"]:
         return f"None of the {summary['repositories']} {projects} in the Gallery has commits in {label}."
+    if not summary["ranked"]:
+        return (
+            f"None of the {summary['repositories']} {projects} in the Gallery has "
+            f"{MIN_RANKED_COMMITS} commits or more in {label}, so none is ranked."
+        )
     text = (
-        f"In {label}, the median project among {summary['with_commits']} {projects} had "
-        f"{percent(summary['median_share'])} of its commits name {ASSISTANT}"
+        f"In {label}, the median project among {summary['ranked']} {projects} with "
+        f"{MIN_RANKED_COMMITS} commits or more had {percent(summary['median_share'])} of its "
+        f"commits name {ASSISTANT}"
     )
     highest = summary["highest"]
     if highest is None:
         return text + "; none of them named one."
     return (
         f"{text}; the highest was {highest['name']}, at {percent(highest['share'])}. "
-        f"{summary['naming']} of {summary['with_commits']} named one at least once."
+        f"{summary['naming']} of {summary['ranked']} named one at least once."
     )
 
 
@@ -245,13 +273,15 @@ def _header(title: str, share: str, canonical: str) -> str:
     )
 
 
-def _nav(current: str) -> str:
+def _nav() -> str:
     return (
         f'{NAV_START}<a href="../index.html" class="nav-brand">GitStats</a><ul>'
         + nav_link("../index.html", "GitStats Gallery")
         + nav_link("../ai.html", "AI-assisted commits")
         + nav_link("../organizations.html", "Organizations")
-        + nav_link(INDEX, "Ecosystems", current=INDEX if current == "index" else "")
+        # every page of the ecosystems is under this tab, as an organization's
+        # page is under Organizations
+        + nav_link(INDEX, "Ecosystems", current=INDEX)
         + f'</ul><div class="nav-right">{THEME_TOGGLE_BUTTON}</div>{NAV_END}'
     )
 
@@ -267,17 +297,49 @@ def _health(era: str) -> str:
 
 
 def _share_cell(counts: tuple[int, int] | None) -> str:
-    """A share, alone in its cell so that the column sorts by it; the counts
-    it is made of show on hover."""
+    """A share, alone in its cell so that the column sorts by it, by its exact
+    value; the counts it is made of show on hover."""
+    share = share_of(counts)
     hint = f' title="{format_int(counts[0])} of {format_int(counts[1])} commits"' if counts else ""
-    return f'<td class="num"{hint}>{percent(share_of(counts))}</td>'
+    key = "" if share is None else f' data-sort="{share:.6f}"'
+    return f'<td class="num"{hint}{key}>{html.escape(percent(share))}</td>'
 
 
-def _row_html(row: dict[str, Any]) -> str:
+def _unranked_note(unranked: int, label: str) -> str:
+    """What the note under a group's table says of its repositories without a rank."""
+    if not unranked:
+        return ""
+    have = "project has" if unranked == 1 else "projects have"
+    return (
+        f"{unranked} {have} fewer than {MIN_RANKED_COMMITS} commits in {html.escape(label)}, "
+        "too few for a share to say much: listed after the others, without a rank. "
+    )
+
+
+def _share_value_cell(share: float | None) -> str:
+    """A share alone in its cell, sorting by its exact value."""
+    key = "" if share is None else f' data-sort="{share:.6f}"'
+    return f'<td class="num"{key}>{html.escape(percent(share))}</td>'
+
+
+def _rank_cell(row: dict[str, Any], position: int, label: str) -> str:
+    """The rank, or "–" with the reason for one too few commits rank; the
+    column sorts in the order of the list."""
+    if row["rank"] is not None:
+        return f'<td class="num" data-sort="{position}">{row["rank"]}</td>'
+    reason = (
+        f"no commits in {label}"
+        if share_of(row["quarter"]) is None
+        else f"fewer than {MIN_RANKED_COMMITS} commits in {label}: not ranked"
+    )
+    return f'<td class="num" data-sort="{position}" title="{html.escape(reason)}">&ndash;</td>'
+
+
+def _row_html(row: dict[str, Any], position: int = 0, label: str = "the quarter") -> str:
     named = ", ".join(html.escape(name) for name in row["assistants"][:2])
     link = html.escape(row["report"], quote=True)
     return (
-        f'<tr><td class="num">{row["rank"]}</td>'
+        f"<tr>{_rank_cell(row, position, label)}"
         f'<td><a href="{link}">{html.escape(row["name"])}</a></td>'
         f"{_share_cell(row['quarter'])}{_share_cell(row['previous_quarter'])}"
         f'<td class="num">{format_int(row["commits_last_12mo"])}</td>'
@@ -311,7 +373,7 @@ def group_page(
             ),
             folder_url + page if folder_url else "",
         ),
-        _nav(group.id),
+        _nav(),
         f"<h1>{html.escape(group.name)}: ranked by AI-assisted commits</h1>",
         f'<p class="portfolio-subtitle">{html.escape(label)} &middot; '
         f"{summary['repositories']} repositories &middot; updated {generated} &middot; "
@@ -320,18 +382,19 @@ def group_page(
     ]
     highest = summary["highest"]
     tiles = [
-        ("Median Share", percent(summary["median_share"]), f"{ASSISTANT}, {label}"),
+        ("Median Share", html.escape(percent(summary["median_share"])), f"{ASSISTANT}, {label}"),
         (
             "Highest Share",
-            percent(highest["share"]) if highest else "–",
+            html.escape(percent(highest["share"])) if highest else "–",
             html.escape(highest["name"]) if highest else "none names one",
         ),
         (
             "Naming One",
-            f"{summary['naming']} of {summary['with_commits']}",
-            "projects with commits that quarter",
+            f"{summary['naming']} of {summary['ranked']}",
+            f"projects with {MIN_RANKED_COMMITS} commits or more that quarter",
         ),
     ]
+    unranked = summary["with_commits"] - summary["ranked"]
     parts.extend(
         [
             stat_tiles_html(tiles),
@@ -339,13 +402,19 @@ def group_page(
             '<tr><th class="num">#</th><th>Repository</th>'
             f'<th class="num">{html.escape(label)}</th>'
             f'<th class="num">{html.escape(previous_label)}</th><th class="num">Commits (12 mo)</th>'
-            '<th class="num">Active authors (12 mo)</th><th>Health</th><th>Named most</th></tr>'
-            + "".join(_row_html(row) for row in rows)
+            '<th class="num">Active authors (12 mo)</th><th>Health</th>'
+            "<th>Named most (all time)</th></tr>"
+            + "".join(_row_html(row, position, label) for position, row in enumerate(rows, 1))
             + "</table></div>",
             '<p class="section-note">The share of each quarter&rsquo;s commits that name '
             f"{ASSISTANT}: as their author, as a co-author, or in the line it signs with. A lower "
-            "bound: an assistant that leaves no mark is not counted. Commits and active authors "
-            "are those of the last 12 months; health is the project's pace of the last year.</p>",
+            "bound: an assistant that leaves no mark is not counted. "
+            + _unranked_note(unranked, label)
+            + "Commits (bots&rsquo; included) and active authors (people only) are those of "
+            "the 12 months up to each report; a comparison page counts the 12 months up to "
+            "the project&rsquo;s last commit, without bots. Health is the "
+            "project&rsquo;s pace of the last year; the assistants named most are those of "
+            "all its history.</p>",
             AI_ASSISTED_COUNTED,
         ]
     )
@@ -379,10 +448,11 @@ def index_page(
     rows = "".join(
         f'<tr><td><a href="{group.id}.html">{html.escape(group.name)}</a></td>'
         f'<td class="num">{summary["repositories"]}</td>'
-        f'<td class="num">{percent(summary["median_share"])}</td>'
-        f'<td class="num">{percent(summary["highest"]["share"]) if summary["highest"] else "&ndash;"}</td>'
+        f"{_share_value_cell(summary['median_share'])}"
+        f"{_share_value_cell(summary['highest']['share'] if summary['highest'] else None)}"
         f"<td>{html.escape(summary['highest']['name']) if summary['highest'] else '&ndash;'}</td>"
-        f'<td class="num">{summary["naming"]} / {summary["with_commits"]}</td></tr>'
+        f'<td class="num" data-sort="{summary["naming"]}">'
+        f"{summary['naming']} / {summary['ranked']}</td></tr>"
         for group, summary in groups
     )
     return "".join(
@@ -394,12 +464,13 @@ def index_page(
                 ),
                 folder_url,
             ),
-            _nav("index"),
+            _nav(),
             "<h1>Ecosystems, ranked by AI-assisted commits</h1>",
             f'<p class="portfolio-subtitle">{html.escape(label)} &middot; {len(groups)} '
             f'ecosystems &middot; updated {generated} &middot; <a href="index.json">data</a></p>',
             f'<p class="section-note">{html.escape(description)} Each ecosystem has its page, '
-            "its projects ranked.</p>",
+            f"its projects ranked. A median, a highest share and how many name one count the "
+            f"projects with {MIN_RANKED_COMMITS} commits or more in the quarter.</p>",
             '<div class="table-scroll"><table class="sortable" id="ecosystems">'
             '<tr><th>Ecosystem</th><th class="num">Repositories</th>'
             '<th class="num">Median share</th><th class="num">Highest share</th>'
@@ -416,13 +487,14 @@ def group_card(
     group: Group, rows: list[dict[str, Any]], summary: dict[str, Any], label: str
 ) -> str:
     """A group's share card: its largest shares of the quarter, as bars."""
-    top = [row for row in rows if share_of(row["quarter"])][:6]
+    top = [row for row in rows if row["rank"] is not None and share_of(row["quarter"])][:6]
     return _bars_card(
         f"{group.name}: AI-assisted commits",
         f"// {group.name}",
         label,
         f"The median project&rsquo;s share of commits that name {ASSISTANT}: "
-        f"{percent(summary['median_share'])}, of {summary['with_commits']} projects. A lower bound.",
+        f"{html.escape(percent(summary['median_share']))}, of {summary['ranked']} projects. "
+        "A lower bound.",
         [(row["name"], share_of(row["quarter"]) or 0.0) for row in top],
     )
 
@@ -449,7 +521,7 @@ def _bars_card(title: str, brand: str, label: str, sub: str, bars: list[tuple[st
     top = max((share for _, share in bars), default=1.0) or 1.0
     body = "".join(
         f"<div><b>{html.escape(name)}</b>"
-        f'<i style="width:{100 * share / top:.1f}%"></i><span>{percent(share)}</span></div>'
+        f'<i style="width:{100 * share / top:.1f}%"></i><span>{html.escape(percent(share))}</span></div>'
         for name, share in bars
     )
     return share_card_page(

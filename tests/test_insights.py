@@ -67,7 +67,21 @@ def _portfolio(count=12):
 
 
 @pytest.mark.parametrize(
-    ("value", "text"), [(0.954, "95%"), (0.004, "0.4%"), (0, "0%"), (1, "100%")]
+    ("value", "text"),
+    [
+        (0.954, "95%"),
+        (0.004, "0.4%"),
+        (0, "0%"),
+        (1, "100%"),
+        # 3,633 of 3,635 commits is not all of them
+        (3633 / 3635, "99.9%"),
+        (0.99999, "99.9%"),
+        # to one decimal, as percent_text: not 99.6% here and 99.7% there
+        (0.9967, "99.7%"),
+        (0.995, "99.5%"),
+        (0.9949, "99%"),
+        (0.0002, "<0.1%"),
+    ],
 )
 def test_pct(value, text):
     assert insights.pct(value) == text
