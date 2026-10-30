@@ -46,9 +46,20 @@ function ts_makeSortable(t) {
 	// We have a first row: assume it's the header, and make its contents clickable links
 	for (var i=0;i<firstRow.cells.length;i++) {
 		var cell = firstRow.cells[i];
-		var txt = ts_getInnerText(cell);
 		if (cell.className != "unsortable" && cell.className.indexOf("unsortable") == -1) {
-			cell.innerHTML = '<a href="#" class="sortheader" onclick="ts_resortTable(this, '+i+');return false;">'+txt+'<span class="sortarrow" data-sort="none" aria-hidden="true"></span></a>';
+			// gitstats: the header's own content goes into the link as it is;
+			// its innerText would be what CSS shows, e.g. upper-cased
+			var link = document.createElement("a");
+			link.href = "#";
+			link.className = "sortheader";
+			link.setAttribute("onclick", "ts_resortTable(this, " + i + ");return false;");
+			while (cell.firstChild) link.appendChild(cell.firstChild);
+			var arrow = document.createElement("span");
+			arrow.className = "sortarrow";
+			arrow.setAttribute("data-sort", "none");
+			arrow.setAttribute("aria-hidden", "true");
+			link.appendChild(arrow);
+			cell.appendChild(link);
 		}
 	}
 	if (alternate_row_colors) {
@@ -83,9 +94,13 @@ function ts_isBlank(text) {
 	return text == "" || text == "\u2014" || text == "\u2013" || text == "-" || text.substr(0,4) == "<!--";
 }
 
+// What a cell is sorted by: its data-sort value when it has one (e.g. the
+// number of days behind "1.9 yr"), else its text.
 function ts_cellText(row, column) {
 	var cell = row.cells[column];
-	return cell ? trim(ts_getInnerText(cell)) : "";
+	if (!cell) return "";
+	var key = cell.getAttribute("data-sort");
+	return key !== null ? key : trim(ts_getInnerText(cell));
 }
 
 // The sort a column takes, worked out once, from all its values: a later
@@ -235,8 +250,8 @@ function sort_date(date) {
 }
 
 function ts_sort_date(a,b) {
-	dt1 = sort_date(ts_getInnerText(a.cells[SORT_COLUMN_INDEX]));
-	dt2 = sort_date(ts_getInnerText(b.cells[SORT_COLUMN_INDEX]));
+	dt1 = sort_date(ts_cellText(a, SORT_COLUMN_INDEX));
+	dt2 = sort_date(ts_cellText(b, SORT_COLUMN_INDEX));
 
 	if (dt1==dt2) {
 		return 0;
@@ -247,10 +262,8 @@ function ts_sort_date(a,b) {
 	return 1;
 }
 function ts_sort_numeric(a,b) {
-	var aa = ts_getInnerText(a.cells[SORT_COLUMN_INDEX]);
-	aa = clean_num(aa);
-	var bb = ts_getInnerText(b.cells[SORT_COLUMN_INDEX]);
-	bb = clean_num(bb);
+	var aa = clean_num(ts_cellText(a, SORT_COLUMN_INDEX));
+	var bb = clean_num(ts_cellText(b, SORT_COLUMN_INDEX));
 	return compare_numeric(aa,bb);
 }
 function compare_numeric(a,b) {
@@ -260,16 +273,11 @@ function compare_numeric(a,b) {
 	b = (isNaN(b) ? 0 : b);
 	return a - b;
 }
+// gitstats: text is compared the way people read it: case aside, and the
+// numbers in it by value, so that v0.9 comes before v0.10
+var ts_collator = new Intl.Collator(undefined, {numeric: true, sensitivity: "base"});
 function ts_sort_caseinsensitive(a,b) {
-	aa = ts_getInnerText(a.cells[SORT_COLUMN_INDEX]).toLowerCase();
-	bb = ts_getInnerText(b.cells[SORT_COLUMN_INDEX]).toLowerCase();
-	if (aa==bb) {
-		return 0;
-	}
-	if (aa<bb) {
-		return -1;
-	}
-	return 1;
+	return ts_collator.compare(ts_cellText(a, SORT_COLUMN_INDEX), ts_cellText(b, SORT_COLUMN_INDEX));
 }
 function ts_sort_default(a,b) {
 	aa = ts_getInnerText(a.cells[SORT_COLUMN_INDEX]);
@@ -297,9 +305,11 @@ function addEvent(elm, evType, fn, useCapture)
 		alert("Handler could not be removed");
 	}
 }
+// gitstats: the number a cell starts with, without its thousands separators:
+// "127 (78.4% of 162)" is 127, not 12778.4162
 function clean_num(str) {
-	str = str.replace(new RegExp(/[^-?0-9.]/g),"");
-	return str;
+	var match = str.replace(/,/g, "").match(/^-?\d*\.?\d+(E[-+]\d+)?/i);
+	return match ? match[0] : "";
 }
 function trim(s) {
 	return s.replace(/^\s+|\s+$/g, "");

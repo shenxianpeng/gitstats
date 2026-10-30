@@ -235,8 +235,8 @@ def _cta_html(gallery_link: str) -> str:
 
 
 def add_note(base: str, page: str, note: str) -> bool:
-    """Put ``note`` before the footer of the HTML file ``page`` (or before
-    ``</body>``), unless it has it already. Whether it was added.
+    """Put ``note`` at the end of the content of the HTML file ``page`` (or
+    before its footer, or ``</body>``), unless it has it already. Whether it was added.
 
     ``page`` must resolve to an .html file under the directory ``base``:
     nothing else is read or written."""
@@ -255,7 +255,8 @@ def add_note(base: str, page: str, note: str) -> bool:
         return False
     if NOTE_MARK in text:
         return False
-    for anchor in ('<div class="footer">', "</body>"):
+    # the end of the page's content; pages made before it had a <main>, the footer
+    for anchor in ("</main>", '<div class="footer">', "</body>"):
         at = text.rfind(anchor)
         if at >= 0:
             break

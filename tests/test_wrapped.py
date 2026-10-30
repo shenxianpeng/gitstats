@@ -119,6 +119,10 @@ class TestWrappedCardStats:
         assert gen.theme_name == "midnight"
         assert gen.colors is THEMES["midnight"]
 
+    def test_init_year_is_todays(self):
+        gen = WrappedCardGenerator(_make_data(), today=datetime.date(2030, 3, 1))
+        assert (gen.year, gen.today) == (2030, datetime.date(2030, 3, 1))
+
     def test_init_custom_year_and_theme(self):
         gen = WrappedCardGenerator(_make_data(), year=2024, theme="sunset")
         assert gen.year == 2024
@@ -382,6 +386,27 @@ class TestWrappedCardSvg:
         # the nine months without commits keep their place
         assert len(re.findall(r'width="58" height="2"', card)) == 9
         assert ">30</text>" not in card
+
+    def test_the_months_to_come_are_not_drawn(self):
+        """A card of the current year, made in mid-August: September to
+        December have not happened, so they have no bar and no baseline."""
+        generator = WrappedCardGenerator(_make_data(), year=2025, today=datetime.date(2025, 8, 15))
+        card = generator._render_card(generator._collect_stats())
+        ET.fromstring(card)
+        assert ">MONTHLY COMMITS SO FAR</text>" in card
+        bars = re.findall(r'<rect x="(\d+)" y="\d+" width="58" height="(\d+)" rx="4"', card)
+        assert [int(x) for x, _ in bars] == [60, 224, 634]  # January, March, August
+        # February and April to July had no commits: a baseline each
+        assert len(re.findall(r'width="58" height="2"', card)) == 5
+        # the months to come: their names, faint, and nothing more
+        for month in ("Sep", "Oct", "Nov", "Dec"):
+            assert f'fill-opacity="0.5" text-anchor="middle">{month}</text>' in card
+        assert 'fill-opacity="0.5" text-anchor="middle">Aug</text>' not in card
+        # a past year is whole
+        generator = WrappedCardGenerator(_make_data(), year=2025, today=datetime.date(2026, 1, 2))
+        card = generator._render_card(generator._collect_stats())
+        assert ">MONTHLY COMMITS</text>" in card
+        assert 'fill-opacity="0.5" text-anchor' not in card
 
     def test_facts_and_chart_wait_for_their_numbers(self):
         """Without the year's authors, months and hours: no top contributor,

@@ -49,7 +49,7 @@ MEASURES: tuple[Measure, ...] = (
         "commits",
         "the most commits",
         "fewer commits in the last 12 months",
-        "Commits in the 12 months up to the last one; bots' are left out.",
+        "Commits in the 12 months up to the last one; bots' commits are left out.",
     ),
     Measure(
         "authors",
@@ -401,18 +401,33 @@ def strip_svg(
     )
 
 
+def rank_words(place: tuple[int, int], same: int) -> tuple[str, str]:
+    """A rank as the comparison page shows it: the place, and what to add to
+    it, given how many of the repositories ranked (``place[1]``) have the
+    same value (``same``, the repository itself among them). A place every
+    one of them shares is no place: "the same for all"."""
+    number, of = place
+    if of > 1 and same >= of:
+        return "Same for all", f"{of}"
+    others = same - 1
+    shared = f", shared with {others} other{'' if others == 1 else 's'}" if others > 0 else ""
+    return f"{ordinal(number)} of {of}", shared
+
+
 def card_rows(row: dict[str, Any], scope: str) -> list[tuple[str, float, str]]:
     """The share card's rows: each measure, how far up its peers it is (1 for
-    the first, 0 for the last), and its rank."""
+    the first, 0 for the last), and its rank. A measure on which they all have
+    the same value is left out: its full bar would say it leads."""
     rows = []
     for measure in MEASURES:
         place = row["ranks"][measure.id][scope]
-        if place and place[1] > 1:
+        ties = row["shared"][measure.id]
+        if place and place[1] > 1 and ties < place[1] - 1:
             rows.append(
                 (
                     measure.label,
                     1 - (place[0] - 1) / (place[1] - 1),
-                    f"{ordinal(place[0])} / {place[1]}",
+                    f"{ordinal(place[0])} / {place[1]}{', shared' if ties else ''}",
                 )
             )
     return rows

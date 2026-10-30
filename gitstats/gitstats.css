@@ -77,7 +77,7 @@
 	--heat2-bg: #40c463;
 	--heat2-color: #1f2328;
 	--heat3-bg: #30a14e;
-	--heat3-color: #ffffff;
+	--heat3-color: #1f2328; /* 4.8:1; white was 3.3:1 */
 	--heat4-bg: #216e39;
 	--heat4-color: #ffffff;
 }
@@ -398,6 +398,21 @@ table {
 .table-scroll > table {
 	width: 100%;
 	margin-bottom: 0;
+}
+
+/* The top author of each year or month: five columns that, squeezed into a
+   phone's width, made rows of five lines. They scroll sideways instead, with
+   the commits on one line and room for the runners-up. */
+.table-scroll > table.period-table {
+	min-width: 640px;
+}
+
+.period-table td:nth-child(3) {
+	white-space: nowrap;
+}
+
+.period-table td:nth-child(4) {
+	min-width: 16rem;
 }
 
 /* ===== Contributor timeline (Authors page) ===== */
@@ -1084,11 +1099,21 @@ tr[hidden] {
 	text-decoration: none;
 }
 
+/* The row of links scrolls, so it clips a ring drawn outside a link: draw it inside */
+.nav li a:focus-visible {
+	outline-offset: -2px;
+}
+
 /* Current page — inverted block */
 .nav li a.active,
 .nav li a.active:hover {
 	color: var(--bg-color);
 	background-color: var(--text-color);
+}
+
+/* on the inverted block, the ring takes the block's text color */
+.nav li a.active:focus-visible {
+	outline-color: var(--bg-color);
 }
 
 /* ===== Nav Brand ===== */
@@ -1457,6 +1482,39 @@ a {
 
 a:hover {
 	text-decoration: underline;
+}
+
+/* A link inside a sentence is underlined: its color alone is too close to
+   the text around it. A link on a line of its own (.more-link) is not. */
+p:not(.more-link) a {
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 0.15em;
+}
+
+/* Keyboard focus: a ring in the link color */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible {
+	outline: 2px solid var(--link-color);
+	outline-offset: 2px;
+}
+
+/* Skip link: off screen until the keyboard reaches it, first on the page */
+.skip-link {
+	position: absolute;
+	left: var(--space-3);
+	top: -100px;
+	z-index: 200;
+	padding: var(--space-2) var(--space-3);
+	background-color: var(--bg-color);
+	border: 1px solid var(--border-strong);
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+}
+
+.skip-link:focus {
+	top: var(--space-2);
 }
 
 /* ===== Bar Charts ===== */
