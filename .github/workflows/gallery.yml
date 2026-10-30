@@ -95,6 +95,12 @@ jobs:
           --window-size=1200,630 --screenshot="$PWD/report/share-card.png"
           "file://$PWD/report/share-card.html"
 
+      # the cache of the line counts makes a second run on the same output
+      # faster; the gallery's reports are made afresh each time, and it is
+      # not a page (19 MB for Rust)
+      - name: Leave Out the Cache
+        run: rm -f report/gitstats.cache
+
       - name: Upload Artifact
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -160,6 +166,8 @@ jobs:
               fi
             fi
           done
+          # a report published before this was left out kept its cache
+          rm -f gallery/*/gitstats.cache
 
       - name: Generate Gallery Portfolio Page
         # The script only needs the gitstats modules from this checkout

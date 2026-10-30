@@ -13,7 +13,9 @@ Ecosystem rankings
 Each group of ``gallery/repos.yml`` (an *ecosystem*: Python, CNCF graduated,
 Apache, …) has a page that ranks its repositories by the share of the last
 complete quarter's commits that name an AI coding assistant, and the same
-ranking as JSON at the same address:
+ranking as JSON at the same address. A repository with fewer than 30 commits
+in that quarter is listed after the ranked ones, without a rank: one of 3
+commits is a third of them, and says little.
 
 * ``/gitstats/gallery/ecosystems/<id>.html`` and ``<id>.json``, for example
   `python.html <https://shenxianpeng.dev/gitstats/gallery/ecosystems/python.html>`_
@@ -39,7 +41,7 @@ A part of ``python.json``, from a gallery of 24 repositories:
 .. code-block:: json
 
    {
-     "schema_version": 1,
+     "schema_version": 2,
      "generated_by": "gitstats 2.12.0",
      "generated_at": "2026-10-26T00:41:07+00:00",
      "ecosystem": {"id": "python", "name": "Python", "title": "Python open source projects"},
@@ -48,6 +50,7 @@ A part of ``python.json``, from a gallery of 24 repositories:
      "summary": {
        "repositories": 6,
        "with_commits": 6,
+       "ranked": 6,
        "naming": 4,
        "median_share": 0.0115,
        "highest": {"id": "pandas", "name": "pandas", "share": 0.6674}
@@ -78,15 +81,18 @@ as above.
 Stable fields
 ~~~~~~~~~~~~~
 
-While ``schema_version`` is ``1``, these fields keep their names, types and
+While ``schema_version`` is ``2``, these fields keep their names, types and
 meaning; a change to any of them comes with a new ``schema_version``:
 
 * ``schema_version``;
 * ``ecosystem.id``; ``quarter.id`` and ``previous_quarter.id`` (``YYYY-Qn``);
-* ``summary.repositories``, ``summary.with_commits``, ``summary.naming``,
-  ``summary.median_share``, ``summary.highest`` (``id``, ``name``, ``share``,
-  or ``null`` when no repository names an assistant);
-* for each of ``repositories``, sorted by ``rank``: ``rank``, ``id``,
+* ``summary.repositories``, ``summary.with_commits`` (those with commits in
+  the quarter), ``summary.ranked`` (those with 30 or more), and, of the ranked
+  ones, ``summary.naming``, ``summary.median_share`` and ``summary.highest``
+  (``id``, ``name``, ``share``, or ``null`` when none of them names an
+  assistant);
+* for each of ``repositories``, in the order of the page: ``rank`` (``null``
+  for one with fewer than 30 commits in the quarter, or none), ``id``,
   ``repository`` (``owner/name`` on GitHub), ``quarter`` and
   ``previous_quarter`` (``commits``, ``ai_assisted``, ``share``),
   ``commits_last_12mo`` and ``active_authors_12mo``;
@@ -96,8 +102,18 @@ meaning; a change to any of them comes with a new ``schema_version``:
 A share is a fraction from 0 to 1, rounded to four decimals, or ``null`` when
 there are no commits to make one of. ``quarter`` (in a repository) is ``null``
 when its report does not reach back to that quarter. The ranking: the largest
-``quarter.share`` first, then the most commits in the quarter, then the name;
-repositories without a share last.
+``quarter.share`` first, then the most commits in the quarter, then the name.
+The repositories with fewer than 30 commits in the quarter follow in the same
+order, and those without a share come last.
+
+``commits_last_12mo`` (all commits, bots' too) and ``active_authors_12mo``
+(people whose last commit is in that time) are of the 12 months up to the
+day the repository's report was made. A comparison page counts the 12 months
+up to the repository's last commit instead, without bots, so its numbers can
+differ.
+
+Schema version 1 (until gitstats 2.12.1) ranked every repository with a
+share, whatever its commits, and had no ``summary.ranked``.
 
 Everything else may change without notice: the display names and titles,
 ``quarter.label``, ``generated_by``, ``generated_at``, ``report`` (where the
@@ -114,7 +130,9 @@ AI-assisted commits
 of the `AI-assisted commits <https://shenxianpeng.dev/gitstats/gallery/ai.html>`_
 page, month by month and quarter by quarter, for every repository of the
 gallery; ``ai/<YYYY>-Q<n>.json`` keeps each quarter as it was first
-published. A month counts once it is over: a repository whose report failed
+published. A repository added to the gallery after that is added to the
+quarter's file as it was counted then, with ``added_at`` (when), and only the
+months and quarters up to that quarter; those already in it are not changed. A month counts once it is over: a repository whose report failed
 keeps the one published before, which counts only the months that were over
 when it was made.
 

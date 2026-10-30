@@ -86,6 +86,7 @@ PERSONAL_DOMAINS: frozenset[str] = frozenset(
         "iki.fi",
         "inbox.ru",
         "interia.pl",
+        "keemail.me",
         "laposte.net",
         "libero.it",
         "list.ru",
@@ -96,6 +97,7 @@ PERSONAL_DOMAINS: frozenset[str] = frozenset(
         "m4x.org",
         "mac.com",
         "mail.com",
+        "mail.de",
         "mail.ru",
         "mailbox.org",
         "me.com",
@@ -124,6 +126,7 @@ PERSONAL_DOMAINS: frozenset[str] = frozenset(
         "rediffmail.com",
         "riseup.net",
         "rogers.com",
+        "runbox.com",
         "sbcglobal.net",
         "seznam.cz",
         "sfr.fr",
@@ -132,12 +135,17 @@ PERSONAL_DOMAINS: frozenset[str] = frozenset(
         "sina.com",
         "skynet.be",
         "sohu.com",
+        "startmail.com",
         "t-online.de",
         "telenet.be",
         "tiscali.it",
+        "tuta.com",
+        "tuta.io",
+        "tutamail.com",
         "tutanota.com",
-        "users.sourceforge.net",
+        "tutanota.de",
         "ukr.net",
+        "users.sourceforge.net",
         "verizon.net",
         "virgilio.it",
         "virginmedia.com",
@@ -158,6 +166,27 @@ PERSONAL_DOMAINS: frozenset[str] = frozenset(
     }
 )
 
+# Mail providers whose domain differs by country (hotmail.ca, yahoo.com.au,
+# live.cn): matched on the first label of the registrable domain.
+PERSONAL_BRANDS: frozenset[str] = frozenset(
+    {
+        "gmail",
+        "gmx",
+        "googlemail",
+        "hotmail",
+        "live",
+        "outlook",
+        "posteo",
+        "proton",
+        "protonmail",
+        "rocketmail",
+        "tutanota",
+        "yahoo",
+        "yandex",
+        "ymail",
+    }
+)
+
 # Addresses that hide the person's own: a code host's private address.
 HIDDEN_DOMAINS: frozenset[str] = frozenset(
     {
@@ -169,7 +198,8 @@ HIDDEN_DOMAINS: frozenset[str] = frozenset(
 )
 
 # Suffixes under which an organization registers the third label from the
-# right: "ox.ac.uk", not "ac.uk".
+# right: "ox.ac.uk", not "ac.uk". Besides these, any of _SECOND_LEVEL under a
+# country's two letters is one: "edu.in", "com.ar", "org.ua".
 TWO_LABEL_SUFFIXES: frozenset[str] = frozenset(
     {
         "ac.at",
@@ -202,14 +232,16 @@ TWO_LABEL_SUFFIXES: frozenset[str] = frozenset(
         "edu.hk",
         "edu.sg",
         "edu.tw",
+        "eu.org",
         "gov.cn",
         "gov.uk",
+        "id.au",
         "ltd.uk",
         "me.uk",
-        "net.nz",
         "ne.jp",
         "net.au",
         "net.cn",
+        "net.nz",
         "or.jp",
         "org.au",
         "org.cn",
@@ -219,6 +251,8 @@ TWO_LABEL_SUFFIXES: frozenset[str] = frozenset(
     }
 )
 
+_SECOND_LEVEL: frozenset[str] = frozenset({"ac", "co", "com", "edu", "gov", "net", "org"})
+
 # Domains of one organization, under the one a report names it by. Kept short
 # on purpose: only merges that are not in doubt.
 ORGANIZATION_ALIASES: dict[str, str] = {
@@ -226,12 +260,17 @@ ORGANIZATION_ALIASES: dict[str, str] = {
     "amazon.de": "amazon.com",
     "amazon.co.uk": "amazon.com",
     "amazon.co.jp": "amazon.com",
+    # All Hands AI, which makes OpenHands, before it took the project's name
+    "all-hands.dev": "openhands.dev",
+    # Redis Labs, renamed Redis in 2021
+    "redislabs.com": "redis.com",
 }
 
 # Host names that machines make up when git is not told an address.
 _LOCAL_SUFFIXES: tuple[str, ...] = (".local", ".localdomain", ".lan", ".home", ".internal")
 _LOCAL_HOSTS: frozenset[str] = frozenset(
-    {"localhost", "localhost.com", "(none)", "none", "example.com"}
+    # fritz.box: the name a FRITZ!Box router gives the machines behind it
+    {"localhost", "localhost.com", "(none)", "none", "example.com", "fritz.box"}
 )
 _NOREPLY_USERS: frozenset[str] = frozenset({"noreply", "no-reply", "donotreply", "do-not-reply"})
 # Addresses that CI services commit under, whatever name they give.
@@ -265,7 +304,9 @@ def registrable_domain(domain: str) -> str:
     labels = [label for label in domain.strip().strip(".").lower().split(".") if label]
     if len(labels) <= 2:
         return ".".join(labels)
-    keep = 3 if ".".join(labels[-2:]) in TWO_LABEL_SUFFIXES else 2
+    suffix = ".".join(labels[-2:])
+    country = len(labels[-1]) == 2 and labels[-2] in _SECOND_LEVEL
+    keep = 3 if suffix in TWO_LABEL_SUFFIXES or country else 2
     return ".".join(labels[-keep:])
 
 
@@ -293,7 +334,11 @@ def classify(author: str, email: str) -> Affiliation:
     if "." not in host or host in _LOCAL_HOSTS or host.endswith(_LOCAL_SUFFIXES):
         return Affiliation(UNKNOWN)
     domain = registrable_domain(host)
-    if domain in PERSONAL_DOMAINS or host in PERSONAL_DOMAINS:
+    if (
+        domain in PERSONAL_DOMAINS
+        or host in PERSONAL_DOMAINS
+        or domain.split(".", 1)[0] in PERSONAL_BRANDS
+    ):
         return Affiliation(PERSONAL)
     if domain in _LOCAL_HOSTS:
         return Affiliation(UNKNOWN)

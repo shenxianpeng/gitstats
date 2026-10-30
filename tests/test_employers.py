@@ -28,6 +28,17 @@ from gitstats.employers import (
         ("cs.ox.ac.uk", "ox.ac.uk"),
         ("mails.tsinghua.edu.cn", "tsinghua.edu.cn"),
         ("redhat.com.", "redhat.com"),
+        # a country's com., edu., org. ...: the organization registers under it
+        ("cse.iitb.edu.in", "iitb.edu.in"),
+        ("usp.edu.br", "usp.edu.br"),
+        ("acme.com.ar", "acme.com.ar"),
+        ("lists.kpi.org.ua", "kpi.org.ua"),
+        # and suffixes for people
+        ("ann.id.au", "ann.id.au"),
+        ("ann.eu.org", "ann.eu.org"),
+        # a two-letter top-level domain alone is not one of them
+        ("mail.huggingface.co", "huggingface.co"),
+        ("git.cs.lab.io", "lab.io"),
         ("localhost", "localhost"),
         ("", ""),
     ],
@@ -60,6 +71,30 @@ def test_registrable_domain(host, expected):
         # me.uk is a suffix for people: the domain is the name under it
         ("Ann", "ann@ann.me.uk", Affiliation(ORGANIZATION, "ann.me.uk")),
         ("Ann", "ann@eu.mail.yahoo.com", Affiliation(PERSONAL)),
+        # Tuta (Tutanota), and providers with a domain in each country
+        ("Ann", "ann@tuta.io", Affiliation(PERSONAL)),
+        ("Ann", "ann@tutanota.de", Affiliation(PERSONAL)),
+        ("Ann", "ann@ymail.com", Affiliation(PERSONAL)),
+        ("Ann", "ann@live.cn", Affiliation(PERSONAL)),
+        ("Ann", "ann@hotmail.ca", Affiliation(PERSONAL)),
+        ("Ann", "ann@outlook.jp", Affiliation(PERSONAL)),
+        ("Ann", "ann@yahoo.com.au", Affiliation(PERSONAL)),
+        ("Ann", "ann@yahoo.co.in", Affiliation(PERSONAL)),
+        ("Ann", "ann@gmx.us", Affiliation(PERSONAL)),
+        ("Ann", "ann@posteo.org", Affiliation(PERSONAL)),
+        ("Ann", "ann@proton.ch", Affiliation(PERSONAL)),
+        ("Ann", "ann@mail.de", Affiliation(PERSONAL)),
+        ("Ann", "ann@runbox.com", Affiliation(PERSONAL)),
+        # the first label of the domain, not of the host: a company's own
+        # "live" or "mail" host is the company's
+        ("Ann", "ann@live.typo3.org", Affiliation(ORGANIZATION, "typo3.org")),
+        ("Ann", "ann@mail.schwarz", Affiliation(ORGANIZATION, "mail.schwarz")),
+        # a university under its country's edu.: not all of them as one
+        ("Ann", "ann@iitb.edu.in", Affiliation(ORGANIZATION, "iitb.edu.in")),
+        ("Ann", "ann@cse.iisc.edu.in", Affiliation(ORGANIZATION, "iisc.edu.in")),
+        # one company, renamed
+        ("Ann", "ann@all-hands.dev", Affiliation(ORGANIZATION, "openhands.dev")),
+        ("Ann", "ann@redislabs.com", Affiliation(ORGANIZATION, "redis.com")),
         # a code host's private address, and no-reply senders
         ("Ann", "123+ann@users.noreply.github.com", Affiliation(HIDDEN)),
         ("Ann", "ann@users.noreply.gitlab.com", Affiliation(HIDDEN)),
@@ -81,6 +116,8 @@ def test_registrable_domain(host, expected):
         ("Ann", "ann@localhost.com", Affiliation(UNKNOWN)),
         ("Ann", "ann@example.com", Affiliation(UNKNOWN)),
         ("Ann", "ann@build.example.com", Affiliation(UNKNOWN)),
+        # the name a FRITZ!Box router gives the machines behind it
+        ("Ann", "ann@laptop.fritz.box", Affiliation(UNKNOWN)),
         # an account named [bot] is a bot, whatever its address
         ("dependabot[bot]", "49699333+dependabot[bot]@users.noreply.github.com", Affiliation(BOT)),
         ("renovate[bot] ", "bot@renovateapp.com", Affiliation(BOT)),
