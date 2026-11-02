@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:44:47+00:00",
+  "schema_version": 2,
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:12:17+00:00",
   "quarter": {
     "id": "2026-Q3",
     "label": "Jul–Sep 2026"
@@ -16,8 +16,9 @@
       "summary": {
         "repositories": 17,
         "with_commits": 17,
+        "ranked": 15,
         "naming": 13,
-        "median_share": 0.0064,
+        "median_share": 0.0096,
         "highest": {
           "id": "pandas",
           "name": "pandas",
@@ -34,8 +35,9 @@
       "summary": {
         "repositories": 12,
         "with_commits": 11,
-        "naming": 10,
-        "median_share": 0.0529,
+        "ranked": 10,
+        "naming": 9,
+        "median_share": 0.049,
         "highest": {
           "id": "openhands",
           "name": "OpenHands",
@@ -52,6 +54,7 @@
       "summary": {
         "repositories": 12,
         "with_commits": 12,
+        "ranked": 12,
         "naming": 10,
         "median_share": 0.1029,
         "highest": {
@@ -70,6 +73,7 @@
       "summary": {
         "repositories": 15,
         "with_commits": 15,
+        "ranked": 15,
         "naming": 13,
         "median_share": 0.0243,
         "highest": {
@@ -88,6 +92,7 @@
       "summary": {
         "repositories": 10,
         "with_commits": 10,
+        "ranked": 10,
         "naming": 10,
         "median_share": 0.0568,
         "highest": {
@@ -106,6 +111,7 @@
       "summary": {
         "repositories": 11,
         "with_commits": 11,
+        "ranked": 11,
         "naming": 9,
         "median_share": 0.0167,
         "highest": {
@@ -124,8 +130,9 @@
       "summary": {
         "repositories": 16,
         "with_commits": 16,
+        "ranked": 13,
         "naming": 10,
-        "median_share": 0.0031,
+        "median_share": 0.0139,
         "highest": {
           "id": "nacos",
           "name": "Nacos",
@@ -142,12 +149,13 @@
       "summary": {
         "repositories": 14,
         "with_commits": 14,
+        "ranked": 14,
         "naming": 12,
         "median_share": 0.0246,
         "highest": {
           "id": "vscode",
           "name": "VS Code",
-          "share": 0.5708
+          "share": 0.5758
         }
       }
     }

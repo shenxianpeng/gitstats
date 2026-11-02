@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:32:48+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:00:53+00:00",
   "name": "Helm",
   "report_path": "index.html",
   "first_commit": "2015-11-02 23:52:56",
-  "last_commit": "2026-10-26 22:29:20",
-  "age_days": 4011,
-  "active_days": 2442,
-  "total_commits": 10024,
-  "total_authors": 947,
+  "last_commit": "2026-11-01 19:43:10",
+  "age_days": 4017,
+  "active_days": 2445,
+  "total_commits": 10028,
+  "total_authors": 949,
   "active_authors_12mo": 89,
-  "commits_last_12mo": 972,
+  "commits_last_12mo": 860,
   "total_files": 2048,
-  "total_lines": 133911,
-  "lines_added": 345068,
-  "lines_removed": 211072,
+  "total_lines": 133989,
+  "lines_added": 345166,
+  "lines_removed": 211092,
   "total_tags": 43,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Sam Darwin": 1,
+    "Piotr \u0141\u0105czykowski": 1,
     "Terry Howe": 255,
     "ump45nose": 1,
     "Zain Qureshi": 1,
@@ -1001,7 +1003,7 @@
     "2023": 439,
     "2024": 618,
     "2025": 1342,
-    "2026": 764
+    "2026": 768
   },
   "ai_assisted": {
     "commits": 30,
@@ -1013,7 +1015,6 @@
       "Cursor": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1036,10 +1037,10 @@
       "2026-07": 8,
       "2026-08": 2,
       "2026-09": 0,
-      "2026-10": 2
+      "2026-10": 2,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 55,
       "2024-12": 118,
       "2025-01": 110,
       "2025-02": 158,
@@ -1062,22 +1063,23 @@
       "2026-07": 180,
       "2026-08": 36,
       "2026-09": 37,
-      "2026-10": 23
+      "2026-10": 26,
+      "2026-11": 1
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 10024,
+    "commits": 10028,
     "by_kind": {
-      "organization": 3711,
-      "one_person": 2190,
-      "personal": 2777,
-      "hidden": 858,
+      "organization": 3709,
+      "one_person": 2184,
+      "personal": 2786,
+      "hidden": 859,
       "unknown": 10,
-      "bot": 478
+      "bot": 480
     },
-    "organization_count": 33,
-    "last_12mo_from": "2025-11",
+    "organization_count": 32,
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "microsoft.com",
@@ -1098,7 +1100,7 @@
       {
         "organization": "suse.com",
         "commits": 460,
-        "commits_last_12mo": 46,
+        "commits_last_12mo": 34,
         "addresses": 10,
         "first_commit": "2017-03-21",
         "last_commit": "2026-08-28"
@@ -1320,14 +1322,6 @@
         "last_commit": "2022-12-16"
       },
       {
-        "organization": "edu.in",
-        "commits": 2,
-        "commits_last_12mo": 1,
-        "addresses": 2,
-        "first_commit": "2021-09-24",
-        "last_commit": "2026-06-16"
-      },
-      {
         "organization": "newrelic.com",
         "commits": 2,
         "commits_last_12mo": 0,
@@ -1363,16 +1357,16 @@
       },
       "2025-Q3": {
         "organization": 69,
-        "one_person": 69,
-        "personal": 191,
+        "one_person": 68,
+        "personal": 192,
         "hidden": 0,
         "unknown": 0,
         "bot": 31
       },
       "2025-Q4": {
         "organization": 53,
-        "one_person": 54,
-        "personal": 175,
+        "one_person": 53,
+        "personal": 176,
         "hidden": 18,
         "unknown": 0,
         "bot": 35
@@ -1386,8 +1380,8 @@
         "bot": 28
       },
       "2026-Q2": {
-        "organization": 7,
-        "one_person": 13,
+        "organization": 6,
+        "one_person": 14,
         "personal": 158,
         "hidden": 20,
         "unknown": 0,
@@ -1404,23 +1398,23 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 1,
-        "personal": 9,
-        "hidden": 2,
+        "personal": 10,
+        "hidden": 3,
         "unknown": 0,
-        "bot": 11
+        "bot": 13
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 803,
-    "authors": 88,
-    "new_authors": 68,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 703,
+    "authors": 81,
+    "new_authors": 59,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 9546,
+    "commits": 9548,
     "commits_by_year": {
       "2015": 237,
       "2016": 2248,
@@ -1433,13 +1427,13 @@
       "2023": 383,
       "2024": 529,
       "2025": 1218,
-      "2026": 623
+      "2026": 625
     },
-    "active_days": 2370
+    "active_days": 2372
   },
   "timezones": {
-    "+0000": 793,
-    "+0100": 752,
+    "+0000": 794,
+    "+0100": 753,
     "+0200": 549,
     "+0300": 113,
     "+0330": 4,
@@ -1459,13 +1453,13 @@
     "-0300": 20,
     "-0400": 1133,
     "-0500": 768,
-    "-0600": 1671,
+    "-0600": 1673,
     "-0700": 2351,
     "-0800": 1176,
     "-1000": 1
   },
   "source_lines": {
-    "added": 319037,
-    "current": 112590
+    "added": 319131,
+    "current": 115198
   }
 }

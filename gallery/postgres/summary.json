@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:41:39+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:09:29+00:00",
   "name": "PostgreSQL",
   "report_path": "index.html",
   "first_commit": "1996-07-09 06:22:35",
-  "last_commit": "2026-10-26 22:11:21",
-  "age_days": 11067,
-  "active_days": 10257,
-  "total_commits": 65753,
+  "last_commit": "2026-11-02 01:45:35",
+  "age_days": 11073,
+  "active_days": 10264,
+  "total_commits": 65812,
   "total_authors": 58,
   "active_authors_12mo": 30,
-  "commits_last_12mo": 3294,
-  "total_files": 7723,
-  "total_lines": 4389979,
-  "lines_added": 13932283,
-  "lines_removed": 9541508,
+  "commits_last_12mo": 3093,
+  "total_files": 7726,
+  "total_lines": 4392684,
+  "lines_added": 13935521,
+  "lines_removed": 9542040,
   "total_tags": 103,
   "era": "steady",
   "top_authors": [
     {
       "name": "Tom Lane",
-      "commits": 16931
+      "commits": 16939
     },
     {
       "name": "Bruce Momjian",
@@ -33,40 +33,40 @@
     },
     {
       "name": "Michael Paquier",
-      "commits": 2658
+      "commits": 2668
     },
     {
       "name": "Robert Haas",
-      "commits": 2634
+      "commits": 2639
     }
   ],
   "author_commits": {
+    "Tom Lane": 16939,
+    "Richard Guo": 180,
+    "Michael Paquier": 2668,
+    "Andrew Dunstan": 1013,
+    "Daniel Gustafsson": 545,
+    "Fujii Masao": 869,
+    "Heikki Linnakangas": 1951,
+    "Andres Freund": 1553,
+    "Nathan Bossart": 504,
+    "Robert Haas": 2639,
+    "John Naylor": 206,
+    "David Rowley": 628,
+    "Amit Langote": 159,
+    "Masahiko Sawada": 203,
     "Jeff Davis": 441,
-    "Tom Lane": 16931,
-    "Daniel Gustafsson": 544,
     "Peter Geoghegan": 541,
     "Peter Eisentraut": 6617,
-    "Michael Paquier": 2658,
-    "Richard Guo": 174,
     "\u00c1lvaro Herrera": 2233,
-    "Amit Langote": 156,
-    "Fujii Masao": 861,
     "Amit Kapila": 728,
-    "Masahiko Sawada": 202,
-    "David Rowley": 620,
     "Noah Misch": 559,
-    "John Naylor": 205,
-    "Robert Haas": 2634,
-    "Heikki Linnakangas": 1948,
     "Bruce Momjian": 14115,
     "Jacob Champion": 72,
-    "Andrew Dunstan": 1011,
-    "Nathan Bossart": 502,
     "Etsuro Fujita": 147,
     "Alexander Korotkov": 536,
     "Melanie Plageman": 142,
     "Dean Rasheed": 173,
-    "Andres Freund": 1552,
     "Tomas Vondra": 367,
     "Tatsuo Ishii": 453,
     "Thomas Munro": 642,
@@ -131,14 +131,13 @@
     "2023": 2209,
     "2024": 2722,
     "2025": 2816,
-    "2026": 2774
+    "2026": 2833
   },
   "ai_assisted": {
     "commits": 0,
     "authored": 0,
     "assistants": {},
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -161,10 +160,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 203,
       "2024-12": 195,
       "2025-01": 215,
       "2025-02": 248,
@@ -184,33 +183,34 @@
       "2026-04": 355,
       "2026-05": 202,
       "2026-06": 209,
-      "2026-07": 307,
+      "2026-07": 308,
       "2026-08": 317,
       "2026-09": 282,
-      "2026-10": 244
+      "2026-10": 293,
+      "2026-11": 9
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 65753,
+    "commits": 65812,
     "by_kind": {
-      "organization": 10282,
-      "one_person": 48266,
-      "personal": 7205,
+      "organization": 10317,
+      "one_person": 48287,
+      "personal": 7208,
       "hidden": 0,
       "unknown": 0,
       "bot": 0
     },
     "organization_count": 1,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "postgresql.org",
-        "commits": 10282,
-        "commits_last_12mo": 1408,
+        "commits": 10317,
+        "commits_last_12mo": 1330,
         "addresses": 21,
         "first_commit": "1998-01-15",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-11-02"
       }
     ],
     "quarters": {
@@ -264,16 +264,16 @@
       },
       "2026-Q3": {
         "organization": 470,
-        "one_person": 376,
+        "one_person": 377,
         "personal": 60,
         "hidden": 0,
         "unknown": 0,
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 119,
-        "one_person": 112,
-        "personal": 13,
+        "organization": 154,
+        "one_person": 132,
+        "personal": 16,
         "hidden": 0,
         "unknown": 0,
         "bot": 0
@@ -281,15 +281,15 @@
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 3294,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 3093,
     "authors": 30,
     "new_authors": 0,
     "half_of_commits": 6
   },
   "humans": {
-    "commits": 65753,
+    "commits": 65812,
     "commits_by_year": {
       "1996": 876,
       "1997": 1698,
@@ -321,35 +321,35 @@
       "2023": 2209,
       "2024": 2722,
       "2025": 2816,
-      "2026": 2774
+      "2026": 2833
     },
-    "active_days": 10257
+    "active_days": 10264
   },
   "timezones": {
     "+0000": 30856,
-    "+0100": 2414,
-    "+0200": 3854,
+    "+0100": 2415,
+    "+0200": 3857,
     "+0300": 1797,
     "+0400": 3,
     "+0530": 709,
-    "+0700": 177,
+    "+0700": 178,
     "+0800": 6,
-    "+0900": 4143,
+    "+0900": 4170,
     "+0930": 2,
     "+1030": 10,
     "+1100": 8,
     "+1200": 625,
-    "+1300": 634,
+    "+1300": 642,
     "-0200": 2,
     "-0300": 937,
-    "-0400": 10913,
-    "-0500": 5832,
+    "-0400": 10926,
+    "-0500": 5837,
     "-0600": 158,
-    "-0700": 1885,
+    "-0700": 1886,
     "-0800": 788
   },
   "source_lines": {
-    "added": 13082968,
-    "current": 4187921
+    "added": 13086206,
+    "current": 4245417
   }
 }

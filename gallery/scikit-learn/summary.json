@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:29:00+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:57:16+00:00",
   "name": "scikit-learn",
   "report_path": "index.html",
   "first_commit": "2010-01-05 13:26:32",
-  "last_commit": "2026-10-26 14:13:29",
-  "age_days": 6139,
-  "active_days": 5129,
-  "total_commits": 34093,
-  "total_authors": 3369,
-  "active_authors_12mo": 193,
-  "commits_last_12mo": 996,
-  "total_files": 1860,
-  "total_lines": 577161,
-  "lines_added": 2934367,
-  "lines_removed": 2357456,
+  "last_commit": "2026-11-01 15:58:02",
+  "age_days": 6145,
+  "active_days": 5134,
+  "total_commits": 34105,
+  "total_authors": 3371,
+  "active_authors_12mo": 192,
+  "commits_last_12mo": 909,
+  "total_files": 1865,
+  "total_lines": 577515,
+  "lines_added": 2935809,
+  "lines_removed": 2358544,
   "total_tags": 25,
   "era": "steady",
   "top_authors": [
@@ -41,20 +41,23 @@
     }
   ],
   "author_commits": {
+    "Loic Esteve": 655,
+    "Dylan Perdig\u00e3o": 1,
+    "Ayush": 3,
+    "Christian Lorentzen": 286,
+    "Arthur Lacote": 58,
+    "Venkata Naveen": 1,
+    "Stefanie Senger": 133,
+    "scikit-learn-bot": 534,
     "Michelle": 1,
-    "Arthur Lacote": 56,
-    "scikit-learn-bot": 533,
-    "Loic Esteve": 654,
     "Yuvraj Chirag": 1,
     "Mohd Maaz Khan": 2,
     "Virgil Chan": 24,
     "Fran\u00e7ois Paugam": 45,
     "Erwan Le Pennec": 1,
-    "Christian Lorentzen": 284,
     "Copilot": 3,
     "Sanjay": 1,
     "Adam Li": 35,
-    "Stefanie Senger": 130,
     "jax": 1,
     "Nandan Vallamdasu": 1,
     "Vinc3ntCyb3rpunk": 1,
@@ -240,7 +243,6 @@
     "Andr\u00e9s H. Zapke": 2,
     "Kenneth Enevoldsen": 1,
     "J\u00e9r\u00f4me Dock\u00e8s": 14,
-    "Ayush": 2,
     "Yaswanth Kumar": 1,
     "BRYANT MUSI BABILA": 5,
     "Steven Hur": 2,
@@ -3428,18 +3430,17 @@
     "2023": 1349,
     "2024": 1268,
     "2025": 1237,
-    "2026": 828
+    "2026": 840
   },
   "ai_assisted": {
-    "commits": 9,
+    "commits": 11,
     "authored": 3,
     "assistants": {
       "GitHub Copilot": 5,
       "Cursor": 4,
-      "Claude": 1
+      "Claude": 3
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -3462,10 +3463,10 @@
       "2026-07": 1,
       "2026-08": 1,
       "2026-09": 1,
-      "2026-10": 3
+      "2026-10": 5,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 86,
       "2024-12": 72,
       "2025-01": 100,
       "2025-02": 77,
@@ -3488,22 +3489,23 @@
       "2026-07": 96,
       "2026-08": 77,
       "2026-09": 62,
-      "2026-10": 61
+      "2026-10": 70,
+      "2026-11": 3
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 34093,
+    "commits": 34105,
     "by_kind": {
-      "organization": 9443,
-      "one_person": 8391,
-      "personal": 12812,
-      "hidden": 3390,
+      "organization": 8785,
+      "one_person": 8375,
+      "personal": 13494,
+      "hidden": 3394,
       "unknown": 38,
       "bot": 19
     },
-    "organization_count": 57,
-    "last_12mo_from": "2025-11",
+    "organization_count": 55,
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "inria.fr",
@@ -3522,14 +3524,6 @@
         "last_commit": "2022-04-09"
       },
       {
-        "organization": "ymail.com",
-        "commits": 656,
-        "commits_last_12mo": 41,
-        "addresses": 3,
-        "first_commit": "2014-07-16",
-        "last_commit": "2026-10-26"
-      },
-      {
         "organization": "nyu.edu",
         "commits": 315,
         "commits_last_12mo": 0,
@@ -3540,7 +3534,7 @@
       {
         "organization": "probabl.ai",
         "commits": 285,
-        "commits_last_12mo": 61,
+        "commits_last_12mo": 57,
         "addresses": 8,
         "first_commit": "2024-02-10",
         "last_commit": "2026-09-21"
@@ -3794,14 +3788,6 @@
         "last_commit": "2026-05-10"
       },
       {
-        "organization": "edu.co",
-        "commits": 4,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2021-07-13",
-        "last_commit": "2022-04-06"
-      },
-      {
         "organization": "google.com",
         "commits": 4,
         "commits_last_12mo": 2,
@@ -3840,6 +3826,14 @@
         "addresses": 4,
         "first_commit": "2017-07-20",
         "last_commit": "2020-06-28"
+      },
+      {
+        "organization": "unal.edu.co",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2021-07-13",
+        "last_commit": "2022-04-06"
       },
       {
         "organization": "utexas.edu",
@@ -3952,53 +3946,45 @@
         "addresses": 2,
         "first_commit": "2019-08-25",
         "last_commit": "2025-04-23"
-      },
-      {
-        "organization": "yahoo.com.br",
-        "commits": 2,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2013-12-09",
-        "last_commit": "2021-07-20"
       }
     ],
     "quarters": {
       "2025-Q1": {
-        "organization": 53,
+        "organization": 13,
         "one_person": 17,
-        "personal": 124,
+        "personal": 164,
         "hidden": 77,
         "unknown": 0,
         "bot": 3
       },
       "2025-Q2": {
-        "organization": 52,
+        "organization": 25,
         "one_person": 17,
-        "personal": 136,
+        "personal": 163,
         "hidden": 81,
         "unknown": 0,
         "bot": 2
       },
       "2025-Q3": {
-        "organization": 48,
+        "organization": 19,
         "one_person": 14,
-        "personal": 163,
+        "personal": 192,
         "hidden": 83,
         "unknown": 0,
         "bot": 1
       },
       "2025-Q4": {
-        "organization": 47,
+        "organization": 10,
         "one_person": 34,
-        "personal": 183,
+        "personal": 220,
         "hidden": 101,
         "unknown": 0,
         "bot": 1
       },
       "2026-Q1": {
-        "organization": 16,
+        "organization": 7,
         "one_person": 22,
-        "personal": 145,
+        "personal": 154,
         "hidden": 46,
         "unknown": 0,
         "bot": 3
@@ -4012,33 +3998,33 @@
         "bot": 1
       },
       "2026-Q3": {
-        "organization": 26,
+        "organization": 20,
         "one_person": 25,
-        "personal": 145,
+        "personal": 151,
         "hidden": 39,
         "unknown": 0,
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 4,
+        "organization": 0,
         "one_person": 6,
-        "personal": 41,
-        "hidden": 10,
+        "personal": 53,
+        "hidden": 14,
         "unknown": 0,
         "bot": 0
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 991,
-    "authors": 189,
-    "new_authors": 131,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 905,
+    "authors": 176,
+    "new_authors": 124,
     "half_of_commits": 7
   },
   "humans": {
-    "commits": 34074,
+    "commits": 34086,
     "commits_by_year": {
       "2010": 2604,
       "2011": 4913,
@@ -4056,20 +4042,20 @@
       "2023": 1349,
       "2024": 1262,
       "2025": 1230,
-      "2026": 824
+      "2026": 836
     },
-    "active_days": 5129
+    "active_days": 5134
   },
   "timezones": {
-    "+0000": 1118,
-    "+0100": 8401,
+    "+0000": 1119,
+    "+0100": 8410,
     "+0200": 11673,
     "+0300": 940,
     "+0330": 24,
     "+0400": 28,
     "+0430": 13,
     "+0500": 139,
-    "+0530": 1173,
+    "+0530": 1175,
     "+0545": 2,
     "+0600": 35,
     "+0700": 16,
@@ -4090,7 +4076,7 @@
     "-1000": 21
   },
   "source_lines": {
-    "added": 3715254,
-    "current": 574074
+    "added": 3716519,
+    "current": 575054
   }
 }

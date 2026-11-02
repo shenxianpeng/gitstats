@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:36:28+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:03:42+00:00",
   "name": "Nuxt",
   "report_path": "index.html",
   "first_commit": "2016-10-26 11:18:47",
-  "last_commit": "2026-10-27 01:15:48",
-  "age_days": 3653,
-  "active_days": 2627,
-  "total_commits": 15891,
+  "last_commit": "2026-11-01 02:34:38",
+  "age_days": 3658,
+  "active_days": 2631,
+  "total_commits": 15937,
   "total_authors": 1300,
-  "active_authors_12mo": 182,
-  "commits_last_12mo": 1637,
-  "total_files": 2497,
-  "total_lines": 219221,
-  "lines_added": 1016381,
-  "lines_removed": 796650,
+  "active_authors_12mo": 181,
+  "commits_last_12mo": 1625,
+  "total_files": 2600,
+  "total_lines": 227608,
+  "lines_added": 1025904,
+  "lines_removed": 797786,
   "total_tags": 269,
   "era": "steady",
   "top_authors": [
     {
       "name": "Daniel Roe",
-      "commits": 3743
+      "commits": 3783
     },
     {
       "name": "Pooya Parsa",
@@ -29,7 +29,7 @@
     },
     {
       "name": "S\u00e9bastien Chopin",
-      "commits": 1588
+      "commits": 1590
     },
     {
       "name": "Xin Du (Clark)",
@@ -41,14 +41,16 @@
     }
   ],
   "author_commits": {
-    "Daniel Roe": 3743,
+    "Daniel Roe": 3783,
+    "Max": 43,
+    "Benjamin Canac": 5,
+    "S\u00e9bastien Chopin": 1590,
+    "saini-25": 2,
     "Felix Fang": 2,
-    "Max": 41,
     "Volkan Akyel": 1,
     "Bochkarev Ivan": 21,
     "Maksim Zhukau": 1,
     "Gareth": 4,
-    "S\u00e9bastien Chopin": 1588,
     "Baptiste Leproux": 4,
     "Hugo": 8,
     "Eduardo San Martin Morote": 15,
@@ -78,12 +80,10 @@
     "Issayah": 2,
     "Matej \u010cern\u00fd": 54,
     "Ori": 36,
-    "saini-25": 1,
     "Daniel West": 4,
     "Marc Gschwend": 1,
     "Hamed": 1,
     "Aubakirov Asker": 3,
-    "Benjamin Canac": 4,
     "Damian G\u0142owala": 83,
     "Yoshihiro Yamaguchi": 8,
     "Khaled Waleed": 2,
@@ -1353,7 +1353,7 @@
     "2023": 2123,
     "2024": 1825,
     "2025": 1398,
-    "2026": 1479
+    "2026": 1525
   },
   "ai_assisted": {
     "commits": 21,
@@ -1364,7 +1364,6 @@
       "GitHub Copilot": 3
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1387,10 +1386,10 @@
       "2026-07": 4,
       "2026-08": 2,
       "2026-09": 2,
-      "2026-10": 7
+      "2026-10": 7,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 110,
       "2024-12": 129,
       "2025-01": 155,
       "2025-02": 131,
@@ -1413,22 +1412,23 @@
       "2026-07": 284,
       "2026-08": 182,
       "2026-09": 215,
-      "2026-10": 167
+      "2026-10": 211,
+      "2026-11": 2
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15891,
+    "commits": 15937,
     "by_kind": {
-      "organization": 243,
-      "one_person": 6840,
-      "personal": 4793,
+      "organization": 220,
+      "one_person": 6872,
+      "personal": 4830,
       "hidden": 951,
       "unknown": 0,
       "bot": 3064
     },
-    "organization_count": 5,
-    "last_12mo_from": "2025-11",
+    "organization_count": 3,
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "nuxtjs.com",
@@ -1447,35 +1447,19 @@
         "last_commit": "2019-06-11"
       },
       {
-        "organization": "yahoo.com.br",
-        "commits": 21,
-        "commits_last_12mo": 0,
-        "addresses": 3,
-        "first_commit": "2018-02-03",
-        "last_commit": "2024-11-17"
-      },
-      {
         "organization": "epitech.eu",
         "commits": 4,
         "commits_last_12mo": 0,
         "addresses": 2,
         "first_commit": "2024-03-06",
         "last_commit": "2025-06-02"
-      },
-      {
-        "organization": "live.nl",
-        "commits": 2,
-        "commits_last_12mo": 1,
-        "addresses": 2,
-        "first_commit": "2023-09-19",
-        "last_commit": "2026-08-08"
       }
     ],
     "quarters": {
       "2025-Q1": {
         "organization": 2,
-        "one_person": 196,
-        "personal": 92,
+        "one_person": 195,
+        "personal": 93,
         "hidden": 35,
         "unknown": 0,
         "bot": 148
@@ -1521,17 +1505,17 @@
         "bot": 62
       },
       "2026-Q3": {
-        "organization": 1,
+        "organization": 0,
         "one_person": 480,
-        "personal": 58,
+        "personal": 59,
         "hidden": 67,
         "unknown": 0,
         "bot": 75
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 108,
-        "personal": 32,
+        "one_person": 148,
+        "personal": 38,
         "hidden": 15,
         "unknown": 0,
         "bot": 12
@@ -1539,15 +1523,15 @@
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 1409,
-    "authors": 181,
-    "new_authors": 122,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 1411,
+    "authors": 177,
+    "new_authors": 117,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 12827,
+    "commits": 12873,
     "commits_by_year": {
       "2016": 353,
       "2017": 1647,
@@ -1559,13 +1543,13 @@
       "2023": 1558,
       "2024": 1218,
       "2025": 1062,
-      "2026": 1281
+      "2026": 1327
     },
-    "active_days": 2454
+    "active_days": 2458
   },
   "timezones": {
-    "+0000": 2702,
-    "+0100": 5771,
+    "+0000": 2746,
+    "+0100": 5772,
     "+0200": 3315,
     "+0300": 301,
     "+0330": 676,
@@ -1585,14 +1569,14 @@
     "+1300": 3,
     "-0200": 40,
     "-0300": 81,
-    "-0400": 101,
+    "-0400": 102,
     "-0500": 159,
     "-0600": 46,
     "-0700": 189,
     "-0800": 133
   },
   "source_lines": {
-    "added": 655234,
-    "current": 175638
+    "added": 663568,
+    "current": 183144
   }
 }

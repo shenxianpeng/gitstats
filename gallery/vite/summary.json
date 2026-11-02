@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:36:11+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:03:41+00:00",
   "name": "Vite",
   "report_path": "index.html",
   "first_commit": "2020-04-20 08:00:10",
-  "last_commit": "2026-10-26 04:05:48",
-  "age_days": 2380,
-  "active_days": 1763,
-  "total_commits": 9836,
-  "total_authors": 1329,
-  "active_authors_12mo": 221,
-  "commits_last_12mo": 1216,
-  "total_files": 2909,
-  "total_lines": 166481,
-  "lines_added": 588476,
-  "lines_removed": 421801,
-  "total_tags": 904,
+  "last_commit": "2026-10-30 10:47:43",
+  "age_days": 2385,
+  "active_days": 1765,
+  "total_commits": 9852,
+  "total_authors": 1333,
+  "active_authors_12mo": 225,
+  "commits_last_12mo": 1142,
+  "total_files": 2916,
+  "total_lines": 166909,
+  "lines_added": 589541,
+  "lines_removed": 422438,
+  "total_tags": 906,
   "era": "steady",
   "top_authors": [
     {
       "name": "\u7fe0",
-      "commits": 1963
+      "commits": 1970
     },
     {
       "name": "Evan You",
@@ -37,13 +37,17 @@
     },
     {
       "name": "btea",
-      "commits": 213
+      "commits": 215
     }
   ],
   "author_commits": {
+    "\u7fe0": 1970,
+    "\uc774\uc7ac\uc724": 1,
+    "btea": 215,
+    "bpuns": 1,
+    "L-zeus": 1,
+    "Max": 1,
     "Alperen": 1,
-    "btea": 213,
-    "\u7fe0": 1963,
     "smeng9": 11,
     "Simon Knott": 1,
     "Jiahan Chen": 1,
@@ -1378,7 +1382,7 @@
     "2023": 1231,
     "2024": 1045,
     "2025": 1388,
-    "2026": 1032
+    "2026": 1048
   },
   "ai_assisted": {
     "commits": 66,
@@ -1391,7 +1395,6 @@
       "Warp": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1414,10 +1417,10 @@
       "2026-07": 1,
       "2026-08": 1,
       "2026-09": 2,
-      "2026-10": 1
+      "2026-10": 1,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 136,
       "2024-12": 85,
       "2025-01": 70,
       "2025-02": 89,
@@ -1440,19 +1443,20 @@
       "2026-07": 119,
       "2026-08": 120,
       "2026-09": 80,
-      "2026-10": 112
+      "2026-10": 128,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9836,
+    "commits": 9852,
     "by_kind": {
       "organization": 55,
-      "one_person": 1964,
-      "personal": 5700,
+      "one_person": 1968,
+      "personal": 5709,
       "hidden": 1613,
       "unknown": 1,
-      "bot": 503
+      "bot": 506
     },
     "organization_count": 4,
     "last_12mo_from": "2025-11",
@@ -1549,24 +1553,24 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 32,
-        "personal": 53,
+        "one_person": 39,
+        "personal": 59,
         "hidden": 11,
         "unknown": 0,
-        "bot": 16
+        "bot": 19
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1061,
-    "authors": 221,
-    "new_authors": 175,
+    "commits": 1074,
+    "authors": 225,
+    "new_authors": 179,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 9333,
+    "commits": 9346,
     "commits_by_year": {
       "2020": 1289,
       "2021": 2163,
@@ -1574,13 +1578,13 @@
       "2023": 1165,
       "2024": 963,
       "2025": 1275,
-      "2026": 900
+      "2026": 913
     },
-    "active_days": 1746
+    "active_days": 1748
   },
   "timezones": {
     "+0000": 81,
-    "+0100": 896,
+    "+0100": 897,
     "+0200": 1122,
     "+0300": 96,
     "+0330": 9,
@@ -1592,8 +1596,8 @@
     "+0600": 32,
     "+0630": 30,
     "+0700": 34,
-    "+0800": 2490,
-    "+0900": 2454,
+    "+0800": 2494,
+    "+0900": 2465,
     "+0930": 1,
     "+1000": 21,
     "+1030": 1,
@@ -1609,7 +1613,7 @@
     "-1000": 2
   },
   "source_lines": {
-    "added": 389325,
-    "current": 149649
+    "added": 389874,
+    "current": 150933
   }
 }

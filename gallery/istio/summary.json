@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:33:25+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:01:20+00:00",
   "name": "Istio",
   "report_path": "index.html",
   "first_commit": "2016-11-18 23:57:24",
-  "last_commit": "2026-10-26 20:22:55",
-  "age_days": 3629,
-  "active_days": 3352,
-  "total_commits": 26805,
-  "total_authors": 1280,
-  "active_authors_12mo": 165,
-  "commits_last_12mo": 1237,
-  "total_files": 6781,
-  "total_lines": 985824,
-  "lines_added": 8129589,
-  "lines_removed": 7138647,
+  "last_commit": "2026-11-01 22:07:19",
+  "age_days": 3635,
+  "active_days": 3358,
+  "total_commits": 26834,
+  "total_authors": 1282,
+  "active_authors_12mo": 166,
+  "commits_last_12mo": 1168,
+  "total_files": 6760,
+  "total_lines": 986878,
+  "lines_added": 8131578,
+  "lines_removed": 7139581,
   "total_tags": 54,
   "era": "steady",
   "top_authors": [
     {
       "name": "Istio Automation",
-      "commits": 4187
+      "commits": 4197
     },
     {
       "name": "John Howard",
@@ -41,16 +41,24 @@
     }
   ],
   "author_commits": {
-    "Jack Kawell": 8,
+    "Istio Automation": 4197,
+    "David Jumani": 2,
+    "Petr McAllister": 93,
+    "Jack Kawell": 10,
+    "Michael Fraenkel": 25,
+    "Tanuj Dwivedi": 4,
+    "Omar Hammami": 1,
+    "Steven Jin": 76,
+    "Jackson Greer": 21,
+    "Prabhjot Singh": 5,
+    "Ahmad Al-Masry": 1,
+    "Zhewei Hu": 6,
+    "Junho Baek": 5,
     "Aditya Menon": 3,
     "John Howard": 3642,
     "Maxim Babushkin": 30,
     "Sebastian Schepens": 87,
-    "Istio Automation": 4187,
     "Max Xu": 1,
-    "Michael Fraenkel": 24,
-    "Petr McAllister": 89,
-    "Junho Baek": 4,
     "Srinivas Chippagiri": 1,
     "Jacek Ewertowski": 89,
     "Eric Bishop": 20,
@@ -60,7 +68,6 @@
     "Yuri Shcherbakov": 2,
     "Nick Fox": 5,
     "Matej Kralik": 9,
-    "Jackson Greer": 19,
     "Rama Chavali": 872,
     "zirain": 324,
     "darren": 9,
@@ -80,13 +87,11 @@
     "Gustavo Meira": 8,
     "Sandeep Varma": 3,
     "Rajat Vig": 1,
-    "Steven Jin": 73,
     "Kuromesi": 10,
     "Immanuel Tikhonov": 3,
     "Bartosz Majsak": 2,
     "dongjiang": 1,
     "code": 8,
-    "Prabhjot Singh": 4,
     "Krinkin, Mike": 33,
     "Jeremy Schoemaker": 1,
     "Yap Sok Ann": 3,
@@ -142,7 +147,6 @@
     "Martyn Cross": 1,
     "German Robayo": 8,
     "Brian Mangoenpawiro": 5,
-    "Tanuj Dwivedi": 3,
     "Frederik Kold Knudsen": 1,
     "Oleg Atamanenko": 1,
     "Christian Rohmann": 6,
@@ -160,7 +164,6 @@
     "stringsbuilder": 1,
     "jmcguire98": 1,
     "Liam Byrne": 4,
-    "Zhewei Hu": 5,
     "Yevhen Kyriukha": 1,
     "Maksym Dolgykh": 2,
     "Nagendra Reddy": 3,
@@ -172,7 +175,6 @@
     "kt": 1,
     "Prashanth Josyula": 5,
     "Huynh Duc Tran": 1,
-    "David Jumani": 1,
     "Varun Chawla": 2,
     "aarnaud": 1,
     "Kai Burjack": 1,
@@ -1333,18 +1335,17 @@
     "2023": 2538,
     "2024": 2341,
     "2025": 1459,
-    "2026": 1078
+    "2026": 1107
   },
   "ai_assisted": {
-    "commits": 22,
+    "commits": 23,
     "authored": 0,
     "assistants": {
-      "Claude": 15,
+      "Claude": 16,
       "GitHub Copilot": 6,
       "Cursor": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1367,10 +1368,10 @@
       "2026-07": 4,
       "2026-08": 2,
       "2026-09": 0,
-      "2026-10": 4
+      "2026-10": 5,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 128,
       "2024-12": 151,
       "2025-01": 184,
       "2025-02": 152,
@@ -1393,27 +1394,28 @@
       "2026-07": 95,
       "2026-08": 122,
       "2026-09": 137,
-      "2026-10": 119
+      "2026-10": 145,
+      "2026-11": 3
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 26805,
+    "commits": 26834,
     "by_kind": {
-      "organization": 12981,
-      "one_person": 920,
-      "personal": 4499,
-      "hidden": 4462,
+      "organization": 12989,
+      "one_person": 913,
+      "personal": 4513,
+      "hidden": 4466,
       "unknown": 0,
-      "bot": 3943
+      "bot": 3953
     },
     "organization_count": 30,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "google.com",
         "commits": 6881,
-        "commits_last_12mo": 43,
+        "commits_last_12mo": 38,
         "addresses": 85,
         "first_commit": "2016-11-18",
         "last_commit": "2026-10-26"
@@ -1437,7 +1439,7 @@
       {
         "organization": "salesforce.com",
         "commits": 880,
-        "commits_last_12mo": 41,
+        "commits_last_12mo": 38,
         "addresses": 4,
         "first_commit": "2019-05-03",
         "last_commit": "2026-10-09"
@@ -1445,7 +1447,7 @@
       {
         "organization": "redhat.com",
         "commits": 658,
-        "commits_last_12mo": 55,
+        "commits_last_12mo": 44,
         "addresses": 37,
         "first_commit": "2017-08-15",
         "last_commit": "2026-10-26"
@@ -1453,26 +1455,26 @@
       {
         "organization": "daocloud.io",
         "commits": 305,
-        "commits_last_12mo": 22,
+        "commits_last_12mo": 17,
         "addresses": 19,
         "first_commit": "2017-12-27",
         "last_commit": "2026-10-08"
       },
       {
         "organization": "solo.io",
-        "commits": 270,
-        "commits_last_12mo": 81,
-        "addresses": 22,
+        "commits": 276,
+        "commits_last_12mo": 83,
+        "addresses": 23,
         "first_commit": "2021-02-24",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-10-30"
       },
       {
         "organization": "microsoft.com",
-        "commits": 227,
-        "commits_last_12mo": 100,
+        "commits": 229,
+        "commits_last_12mo": 91,
         "addresses": 10,
         "first_commit": "2018-07-17",
-        "last_commit": "2026-10-09"
+        "last_commit": "2026-10-29"
       },
       {
         "organization": "cisco.com",
@@ -1509,7 +1511,7 @@
       {
         "organization": "mercadolibre.com",
         "commits": 88,
-        "commits_last_12mo": 58,
+        "commits_last_12mo": 56,
         "addresses": 2,
         "first_commit": "2022-06-13",
         "last_commit": "2026-10-26"
@@ -1621,7 +1623,7 @@
       {
         "organization": "ebay.com",
         "commits": 5,
-        "commits_last_12mo": 1,
+        "commits_last_12mo": 0,
         "addresses": 3,
         "first_commit": "2021-04-21",
         "last_commit": "2025-11-06"
@@ -1678,8 +1680,8 @@
       },
       "2025-Q4": {
         "organization": 112,
-        "one_person": 12,
-        "personal": 30,
+        "one_person": 11,
+        "personal": 31,
         "hidden": 12,
         "unknown": 0,
         "bot": 99
@@ -1709,25 +1711,25 @@
         "bot": 86
       },
       "2026-Q4": {
-        "organization": 35,
-        "one_person": 9,
-        "personal": 26,
-        "hidden": 6,
+        "organization": 43,
+        "one_person": 8,
+        "personal": 34,
+        "hidden": 10,
         "unknown": 0,
-        "bot": 43
+        "bot": 53
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 1233,
-    "authors": 164,
-    "new_authors": 101,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 1164,
+    "authors": 157,
+    "new_authors": 95,
     "half_of_commits": 6
   },
   "humans": {
-    "commits": 22862,
+    "commits": 22881,
     "commits_by_year": {
       "2016": 134,
       "2017": 2811,
@@ -1739,39 +1741,39 @@
       "2023": 1702,
       "2024": 1497,
       "2025": 849,
-      "2026": 747
+      "2026": 766
     },
-    "active_days": 3112
+    "active_days": 3117
   },
   "timezones": {
     "+0000": 254,
-    "+0100": 497,
-    "+0200": 758,
+    "+0100": 498,
+    "+0200": 759,
     "+0300": 275,
     "+0330": 1,
     "+0400": 6,
     "+0500": 3,
-    "+0530": 1241,
+    "+0530": 1242,
     "+0600": 1,
     "+0700": 23,
     "+0800": 3700,
-    "+0900": 105,
+    "+0900": 106,
     "+1000": 17,
     "+1100": 6,
     "+1200": 8,
     "+1300": 11,
     "-0200": 7,
     "-0300": 143,
-    "-0400": 2274,
-    "-0500": 1509,
-    "-0600": 326,
-    "-0700": 10361,
+    "-0400": 2280,
+    "-0500": 1520,
+    "-0600": 329,
+    "-0700": 10366,
     "-0800": 5265,
     "-0900": 1,
     "-1000": 13
   },
   "source_lines": {
-    "added": 3422660,
-    "current": 728757
+    "added": 3424376,
+    "current": 758422
   }
 }

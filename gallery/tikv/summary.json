@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:34:31+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:01:49+00:00",
   "name": "TiKV",
   "report_path": "index.html",
   "first_commit": "2016-01-07 05:02:04",
-  "last_commit": "2026-10-26 13:10:02",
-  "age_days": 3946,
-  "active_days": 2601,
-  "total_commits": 8538,
-  "total_authors": 473,
-  "active_authors_12mo": 67,
-  "commits_last_12mo": 219,
+  "last_commit": "2026-11-02 03:16:44",
+  "age_days": 3952,
+  "active_days": 2604,
+  "total_commits": 8546,
+  "total_authors": 476,
+  "active_authors_12mo": 70,
+  "commits_last_12mo": 215,
   "total_files": 1552,
-  "total_lines": 850740,
-  "lines_added": 1601782,
-  "lines_removed": 751036,
+  "total_lines": 851467,
+  "lines_added": 1602586,
+  "lines_removed": 751113,
   "total_tags": 47,
   "era": "quiet",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "Neil Shen",
-      "commits": 503
+      "commits": 504
     },
     {
       "name": "disksing",
@@ -41,8 +41,13 @@
     }
   ],
   "author_commits": {
+    "Bisheng Huang": 35,
+    "Madhav Ramesh": 2,
+    "Pujitha Paladugu": 1,
+    "Ray Yan": 1,
+    "lucasliang": 121,
+    "Neil Shen": 504,
     "YangKeao": 28,
-    "lucasliang": 120,
     "mittalrishabh": 13,
     "Vlad Dmitriev": 5,
     "Sanket Kedia": 2,
@@ -52,7 +57,6 @@
     "Wenxuan": 236,
     "Ziqian Qin": 47,
     "Chen YiBo": 1,
-    "Bisheng Huang": 33,
     "mayjiang0203": 4,
     "D3Hunter": 1,
     "timzxz": 1,
@@ -68,7 +72,6 @@
     "Ping Yu": 29,
     "Liqi Geng": 77,
     "hhwyt": 17,
-    "Neil Shen": 503,
     "Jianjun Liao": 39,
     "Sky": 1,
     "glorv": 140,
@@ -526,7 +529,7 @@
     "2023": 642,
     "2024": 509,
     "2025": 253,
-    "2026": 187
+    "2026": 195
   },
   "ai_assisted": {
     "commits": 4,
@@ -536,7 +539,6 @@
       "Claude": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -559,10 +561,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 33,
       "2024-12": 32,
       "2025-01": 27,
       "2025-02": 28,
@@ -585,27 +587,28 @@
       "2026-07": 21,
       "2026-08": 35,
       "2026-09": 12,
-      "2026-10": 12
+      "2026-10": 19,
+      "2026-11": 1
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8538,
+    "commits": 8546,
     "by_kind": {
       "organization": 1003,
-      "one_person": 748,
-      "personal": 5327,
+      "one_person": 743,
+      "personal": 5340,
       "hidden": 1408,
       "unknown": 4,
       "bot": 48
     },
     "organization_count": 4,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "pingcap.com",
         "commits": 944,
-        "commits_last_12mo": 15,
+        "commits_last_12mo": 14,
         "addresses": 38,
         "first_commit": "2016-05-24",
         "last_commit": "2026-08-14"
@@ -695,7 +698,7 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 1,
-        "personal": 10,
+        "personal": 18,
         "hidden": 1,
         "unknown": 0,
         "bot": 0
@@ -703,15 +706,15 @@
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 219,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 215,
     "authors": 67,
-    "new_authors": 29,
+    "new_authors": 30,
     "half_of_commits": 11
   },
   "humans": {
-    "commits": 8490,
+    "commits": 8498,
     "commits_by_year": {
       "2016": 1887,
       "2017": 703,
@@ -723,9 +726,9 @@
       "2023": 642,
       "2024": 501,
       "2025": 247,
-      "2026": 180
+      "2026": 188
     },
-    "active_days": 2592
+    "active_days": 2595
   },
   "timezones": {
     "+0000": 9,
@@ -734,7 +737,7 @@
     "+0300": 5,
     "+0530": 26,
     "+0700": 4,
-    "+0800": 7678,
+    "+0800": 7683,
     "+0900": 26,
     "+1000": 1,
     "+1200": 27,
@@ -743,11 +746,11 @@
     "-0400": 33,
     "-0500": 173,
     "-0600": 58,
-    "-0700": 292,
+    "-0700": 295,
     "-0800": 102
   },
   "source_lines": {
-    "added": 1585921,
-    "current": 838879
+    "added": 1586691,
+    "current": 841245
   }
 }

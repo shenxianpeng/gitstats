@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:29:02+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:57:15+00:00",
   "name": "Django",
   "report_path": "index.html",
   "first_commit": "2005-07-13 01:25:57",
-  "last_commit": "2026-10-25 19:19:24",
-  "age_days": 7775,
-  "active_days": 6666,
-  "total_commits": 35056,
-  "total_authors": 3172,
-  "active_authors_12mo": 218,
-  "commits_last_12mo": 1004,
-  "total_files": 7089,
-  "total_lines": 1119673,
-  "lines_added": 3418571,
-  "lines_removed": 2296741,
+  "last_commit": "2026-10-31 01:55:53",
+  "age_days": 7781,
+  "active_days": 6673,
+  "total_commits": 35078,
+  "total_authors": 3173,
+  "active_authors_12mo": 219,
+  "commits_last_12mo": 923,
+  "total_files": 7085,
+  "total_lines": 1120156,
+  "lines_added": 3419912,
+  "lines_removed": 2297595,
   "total_tags": 8,
   "era": "steady",
   "top_authors": [
@@ -41,20 +41,23 @@
     }
   ],
   "author_commits": {
+    "Natalia": 292,
+    "Mike Edmunds": 98,
+    "Jacob Walls": 435,
+    "HelmiDev03": 3,
+    "=?UTF-8?q?Anders=20Hovm=C3=B6ller?=": 5,
+    "Alex Henman": 1,
+    "Pravin Kamble": 8,
     "Aslan Osmanov": 3,
     "Michiel W. Beijen": 6,
     "Yarchik": 1,
     "\u041b\u0435\u0432 \u0417\u043b\u043e\u0431\u0438\u043d": 3,
-    "Jacob Walls": 431,
-    "Mike Edmunds": 91,
     "Carlton Gibson": 330,
     "Jacob Rief": 8,
     "Gerry Mcbride": 1,
-    "Natalia": 288,
     "Sanskar Kharya": 1,
     "Sarah Boyce": 216,
     "Adam Johnson": 355,
-    "HelmiDev03": 1,
     "Clifford Gama": 79,
     "Aman Kumar Jain": 1,
     "Mariusz Felisiak": 1695,
@@ -70,7 +73,7 @@
     "Vishy": 6,
     "Yassin Bahri": 7,
     "Md. Saikat Islam": 3,
-    "SnippyCodes": 10,
+    "SnippyCodes": 11,
     "David Smith": 206,
     "VIZZARD-X": 18,
     "Becky Smith": 2,
@@ -98,7 +101,6 @@
     "viralpraxis": 1,
     "Nguy\u1ec5n Anh B\u00ecnh": 1,
     "Karan Suthar": 1,
-    "Pravin Kamble": 7,
     "Jens Spanier": 1,
     "Jakob Friedrich": 1,
     "Jonathan Biemond": 3,
@@ -412,7 +414,6 @@
     "Juan Pablo Mallarino": 1,
     "Gabriel Nick Pivovarov": 1,
     "Oleg Sverdlov": 1,
-    "Anders Hovm\u00f6ller": 3,
     "jburns6789": 1,
     "Ayush khatri": 1,
     "Tainara Palmeira": 3,
@@ -3236,14 +3237,13 @@
     "2023": 952,
     "2024": 939,
     "2025": 954,
-    "2026": 833
+    "2026": 855
   },
   "ai_assisted": {
     "commits": 0,
     "authored": 0,
     "assistants": {},
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -3266,10 +3266,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 87,
       "2024-12": 102,
       "2025-01": 109,
       "2025-02": 66,
@@ -3289,24 +3289,25 @@
       "2026-04": 103,
       "2026-05": 102,
       "2026-06": 98,
-      "2026-07": 80,
-      "2026-08": 58,
-      "2026-09": 58,
-      "2026-10": 68
+      "2026-07": 81,
+      "2026-08": 59,
+      "2026-09": 61,
+      "2026-10": 85,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 35056,
+    "commits": 35078,
     "by_kind": {
-      "organization": 943,
-      "one_person": 13547,
-      "personal": 19356,
-      "hidden": 1171,
+      "organization": 926,
+      "one_person": 13553,
+      "personal": 19385,
+      "hidden": 1175,
       "unknown": 39,
       "bot": 0
     },
-    "organization_count": 68,
+    "organization_count": 66,
     "last_12mo_from": "2025-11",
     "top": [
       {
@@ -3404,14 +3405,6 @@
         "addresses": 7,
         "first_commit": "2012-06-20",
         "last_commit": "2024-12-05"
-      },
-      {
-        "organization": "id.au",
-        "commits": 14,
-        "commits_last_12mo": 0,
-        "addresses": 3,
-        "first_commit": "2013-01-10",
-        "last_commit": "2016-06-07"
       },
       {
         "organization": "maykinmedia.nl",
@@ -3558,14 +3551,6 @@
         "last_commit": "2017-08-13"
       },
       {
-        "organization": "edu.pl",
-        "commits": 5,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2014-11-27",
-        "last_commit": "2015-05-14"
-      },
-      {
         "organization": "enix.org",
         "commits": 5,
         "commits_last_12mo": 0,
@@ -3588,6 +3573,14 @@
         "addresses": 3,
         "first_commit": "2013-02-23",
         "last_commit": "2017-06-23"
+      },
+      {
+        "organization": "mimuw.edu.pl",
+        "commits": 5,
+        "commits_last_12mo": 0,
+        "addresses": 2,
+        "first_commit": "2014-11-27",
+        "last_commit": "2015-05-14"
       },
       {
         "organization": "arbisoft.com",
@@ -3684,14 +3677,6 @@
         "addresses": 2,
         "first_commit": "2014-09-12",
         "last_commit": "2016-04-03"
-      },
-      {
-        "organization": "runbox.com",
-        "commits": 3,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2015-04-09",
-        "last_commit": "2024-05-09"
       },
       {
         "organization": "thermondo.de",
@@ -3905,17 +3890,17 @@
       },
       "2026-Q3": {
         "organization": 8,
-        "one_person": 19,
-        "personal": 118,
+        "one_person": 21,
+        "personal": 121,
         "hidden": 50,
         "unknown": 1,
         "bot": 0
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 3,
-        "personal": 42,
-        "hidden": 23,
+        "one_person": 4,
+        "personal": 54,
+        "hidden": 27,
         "unknown": 0,
         "bot": 0
       }
@@ -3924,13 +3909,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1004,
-    "authors": 217,
-    "new_authors": 149,
+    "commits": 1026,
+    "authors": 219,
+    "new_authors": 150,
     "half_of_commits": 6
   },
   "humans": {
-    "commits": 35056,
+    "commits": 35078,
     "commits_by_year": {
       "2005": 1277,
       "2006": 1320,
@@ -3953,20 +3938,20 @@
       "2023": 952,
       "2024": 939,
       "2025": 954,
-      "2026": 833
+      "2026": 855
     },
-    "active_days": 6666
+    "active_days": 6673
   },
   "timezones": {
     "+0000": 12856,
-    "+0100": 5124,
-    "+0200": 5236,
+    "+0100": 5127,
+    "+0200": 5238,
     "+0300": 719,
     "+0330": 27,
     "+0400": 31,
     "+0430": 29,
     "+0500": 419,
-    "+0530": 592,
+    "+0530": 594,
     "+0545": 4,
     "+0600": 56,
     "+0700": 246,
@@ -3980,17 +3965,17 @@
     "+1300": 17,
     "-0100": 1,
     "-0200": 11,
-    "-0300": 693,
-    "-0400": 3567,
+    "-0300": 697,
+    "-0400": 3571,
     "-0430": 4,
     "-0500": 2271,
     "-0600": 274,
-    "-0700": 1528,
+    "-0700": 1535,
     "-0800": 520,
     "-1000": 3
   },
   "source_lines": {
-    "added": 3384891,
-    "current": 1089572
+    "added": 3386232,
+    "current": 1092393
   }
 }

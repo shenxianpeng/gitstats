@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:33:10+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:00:53+00:00",
   "name": "containerd",
   "report_path": "index.html",
   "first_commit": "2015-11-05 23:29:53",
-  "last_commit": "2026-10-26 22:58:40",
-  "age_days": 4008,
-  "active_days": 3147,
-  "total_commits": 17526,
-  "total_authors": 807,
-  "active_authors_12mo": 128,
-  "commits_last_12mo": 1694,
-  "total_files": 6750,
-  "total_lines": 1782947,
-  "lines_added": 4030110,
-  "lines_removed": 2247054,
+  "last_commit": "2026-11-01 22:08:58",
+  "age_days": 4014,
+  "active_days": 3153,
+  "total_commits": 17554,
+  "total_authors": 809,
+  "active_authors_12mo": 129,
+  "commits_last_12mo": 1614,
+  "total_files": 6759,
+  "total_lines": 1784915,
+  "lines_added": 4032503,
+  "lines_removed": 2247479,
   "total_tags": 132,
   "era": "steady",
   "top_authors": [
     {
       "name": "Derek McGowan",
-      "commits": 2144
+      "commits": 2145
     },
     {
       "name": "Michael Crosby",
@@ -37,27 +37,29 @@
     },
     {
       "name": "Maksym Pavlenko",
-      "commits": 1219
+      "commits": 1231
     }
   ],
   "author_commits": {
-    "Derek McGowan": 2144,
-    "Maksym Pavlenko": 1219,
+    "Maksym Pavlenko": 1231,
+    "Akihiro Suda": 1048,
+    "Derek McGowan": 2145,
+    "Wei Fu": 789,
+    "Samuel Karp": 443,
+    "Mike Brown": 454,
+    "Pawe\u0142 Gronowski": 49,
+    "Sebastiaan van Stijn": 772,
     "Phil Estes": 1594,
     "Michael Zappa": 9,
     "Davanum Srinivas": 101,
-    "Sebastiaan van Stijn": 770,
-    "Samuel Karp": 442,
-    "Pawe\u0142 Gronowski": 48,
+    "Eric Curtin": 2,
     "Justin Terry": 110,
-    "Wei Fu": 787,
-    "Akihiro Suda": 1046,
     "Vincent": 1,
-    "Mike Brown": 453,
+    "Md Tahsin Rahman": 1,
     "Mykhaylo Sul": 2,
     "T\u00f5nis Tiigi": 47,
+    "Chengyu Zhu": 8,
     "Jacob Gabrielson": 1,
-    "Chengyu Zhu": 6,
     "syed abdul khaliq": 1,
     "LEI WANG": 2,
     "Nahum Litvin": 2,
@@ -861,20 +863,20 @@
     "2023": 1659,
     "2024": 1433,
     "2025": 1366,
-    "2026": 1465
+    "2026": 1493
   },
   "ai_assisted": {
-    "commits": 26,
+    "commits": 29,
     "authored": 0,
     "assistants": {
-      "Claude": 19,
+      "Claude": 22,
       "Gemini": 5,
+      "OpenCode": 2,
       "Codex": 1,
       "Cursor": 1,
       "GitHub Copilot": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -897,10 +899,10 @@
       "2026-07": 7,
       "2026-08": 4,
       "2026-09": 1,
-      "2026-10": 2
+      "2026-10": 5,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 121,
       "2024-12": 86,
       "2025-01": 95,
       "2025-02": 91,
@@ -922,23 +924,24 @@
       "2026-06": 120,
       "2026-07": 144,
       "2026-08": 184,
-      "2026-09": 165,
-      "2026-10": 91
+      "2026-09": 166,
+      "2026-10": 116,
+      "2026-11": 2
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17526,
+    "commits": 17554,
     "by_kind": {
-      "organization": 4734,
-      "one_person": 3835,
-      "personal": 8385,
+      "organization": 4742,
+      "one_person": 3831,
+      "personal": 8408,
       "hidden": 46,
       "unknown": 2,
-      "bot": 524
+      "bot": 525
     },
     "organization_count": 46,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "google.com",
@@ -950,40 +953,40 @@
       },
       {
         "organization": "ntt.co.jp",
-        "commits": 1071,
-        "commits_last_12mo": 76,
+        "commits": 1073,
+        "commits_last_12mo": 68,
         "addresses": 2,
         "first_commit": "2015-12-25",
-        "last_commit": "2026-10-18"
+        "last_commit": "2026-11-01"
       },
       {
         "organization": "ibm.com",
-        "commits": 523,
+        "commits": 524,
         "commits_last_12mo": 41,
         "addresses": 31,
         "first_commit": "2016-05-11",
-        "last_commit": "2026-10-16"
+        "last_commit": "2026-10-28"
       },
       {
         "organization": "microsoft.com",
         "commits": 390,
-        "commits_last_12mo": 20,
+        "commits_last_12mo": 17,
         "addresses": 31,
         "first_commit": "2017-05-23",
         "last_commit": "2026-10-15"
       },
       {
         "organization": "docker.com",
-        "commits": 202,
-        "commits_last_12mo": 45,
-        "addresses": 28,
+        "commits": 205,
+        "commits_last_12mo": 48,
+        "addresses": 29,
         "first_commit": "2015-12-18",
-        "last_commit": "2026-10-20"
+        "last_commit": "2026-10-27"
       },
       {
         "organization": "zte.com.cn",
         "commits": 137,
-        "commits_last_12mo": 12,
+        "commits_last_12mo": 10,
         "addresses": 9,
         "first_commit": "2016-12-21",
         "last_commit": "2026-08-20"
@@ -1031,7 +1034,7 @@
       {
         "organization": "kernel.org",
         "commits": 35,
-        "commits_last_12mo": 16,
+        "commits_last_12mo": 12,
         "addresses": 2,
         "first_commit": "2021-09-08",
         "last_commit": "2026-06-23"
@@ -1063,7 +1066,7 @@
       {
         "organization": "nvidia.com",
         "commits": 15,
-        "commits_last_12mo": 5,
+        "commits_last_12mo": 4,
         "addresses": 7,
         "first_commit": "2018-06-21",
         "last_commit": "2026-06-01"
@@ -1101,6 +1104,14 @@
         "last_commit": "2017-12-08"
       },
       {
+        "organization": "tencent.com",
+        "commits": 12,
+        "commits_last_12mo": 6,
+        "addresses": 4,
+        "first_commit": "2016-04-06",
+        "last_commit": "2026-10-09"
+      },
+      {
         "organization": "vmware.com",
         "commits": 12,
         "commits_last_12mo": 0,
@@ -1131,14 +1142,6 @@
         "addresses": 3,
         "first_commit": "2016-04-26",
         "last_commit": "2023-05-03"
-      },
-      {
-        "organization": "tencent.com",
-        "commits": 10,
-        "commits_last_12mo": 6,
-        "addresses": 4,
-        "first_commit": "2016-04-06",
-        "last_commit": "2026-10-07"
       },
       {
         "organization": "hyper.sh",
@@ -1328,8 +1331,8 @@
       },
       "2025-Q3": {
         "organization": 75,
-        "one_person": 49,
-        "personal": 113,
+        "one_person": 48,
+        "personal": 114,
         "hidden": 0,
         "unknown": 0,
         "bot": 50
@@ -1361,31 +1364,31 @@
       "2026-Q3": {
         "organization": 59,
         "one_person": 196,
-        "personal": 193,
+        "personal": 194,
         "hidden": 4,
         "unknown": 0,
         "bot": 41
       },
       "2026-Q4": {
-        "organization": 11,
-        "one_person": 31,
-        "personal": 37,
+        "organization": 19,
+        "one_person": 35,
+        "personal": 51,
         "hidden": 0,
         "unknown": 0,
-        "bot": 12
+        "bot": 13
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 1517,
-    "authors": 127,
-    "new_authors": 81,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 1451,
+    "authors": 122,
+    "new_authors": 76,
     "half_of_commits": 4
   },
   "humans": {
-    "commits": 17002,
+    "commits": 17029,
     "commits_by_year": {
       "2015": 151,
       "2016": 589,
@@ -1398,34 +1401,34 @@
       "2023": 1629,
       "2024": 1279,
       "2025": 1165,
-      "2026": 1326
+      "2026": 1353
     },
-    "active_days": 3127
+    "active_days": 3134
   },
   "timezones": {
-    "+0000": 3618,
-    "+0100": 571,
+    "+0000": 3629,
+    "+0100": 576,
     "+0200": 899,
     "+0300": 155,
     "+0330": 2,
     "+0400": 3,
     "+0530": 164,
     "+0700": 4,
-    "+0800": 1485,
-    "+0900": 798,
+    "+0800": 1488,
+    "+0900": 799,
     "+1000": 27,
     "+1100": 45,
     "+1200": 2,
     "-0300": 30,
-    "-0400": 1724,
-    "-0500": 1223,
+    "-0400": 1725,
+    "-0500": 1224,
     "-0600": 159,
-    "-0700": 4356,
+    "-0700": 4362,
     "-0800": 2258,
     "-0900": 3
   },
   "source_lines": {
-    "added": 711295,
-    "current": 339776
+    "added": 713367,
+    "current": 343787
   }
 }

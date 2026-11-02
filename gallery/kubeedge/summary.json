@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:38:07+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:05:31+00:00",
   "name": "KubeEdge",
   "report_path": "index.html",
   "first_commit": "2018-09-28 08:57:50",
-  "last_commit": "2026-10-20 09:18:06",
-  "age_days": 2945,
-  "active_days": 1765,
-  "total_commits": 6491,
-  "total_authors": 400,
-  "active_authors_12mo": 42,
-  "commits_last_12mo": 294,
-  "total_files": 14110,
-  "total_lines": 3803808,
-  "lines_added": 8084281,
-  "lines_removed": 4284640,
+  "last_commit": "2026-10-29 02:22:09",
+  "age_days": 2953,
+  "active_days": 1770,
+  "total_commits": 6497,
+  "total_authors": 402,
+  "active_authors_12mo": 43,
+  "commits_last_12mo": 274,
+  "total_files": 14112,
+  "total_lines": 3804223,
+  "lines_added": 8084705,
+  "lines_removed": 4284649,
   "total_tags": 35,
   "era": "steady",
   "top_authors": [
     {
       "name": "KubeEdge Bot",
-      "commits": 2317
+      "commits": 2320
     },
     {
       "name": "fisherxu",
@@ -41,8 +41,10 @@
     }
   ],
   "author_commits": {
-    "KubeEdge Bot": 2317,
-    "Aditya Raut": 6,
+    "KubeEdge Bot": 2320,
+    "tarone-saloni": 1,
+    "D.Leap": 1,
+    "Aditya Raut": 7,
     "Vidhi Singh": 1,
     "ryoheimorimoto": 4,
     "Shelley-BaoYue": 278,
@@ -451,7 +453,7 @@
     "2023": 569,
     "2024": 624,
     "2025": 453,
-    "2026": 228
+    "2026": 234
   },
   "ai_assisted": {
     "commits": 5,
@@ -461,7 +463,6 @@
       "Claude": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -484,10 +485,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 5,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 55,
       "2024-12": 41,
       "2025-01": 38,
       "2025-02": 40,
@@ -510,19 +511,20 @@
       "2026-07": 35,
       "2026-08": 20,
       "2026-09": 30,
-      "2026-10": 9
+      "2026-10": 15,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 6491,
+    "commits": 6497,
     "by_kind": {
       "organization": 2230,
-      "one_person": 231,
-      "personal": 1644,
+      "one_person": 225,
+      "personal": 1653,
       "hidden": 66,
       "unknown": 2,
-      "bot": 2318
+      "bot": 2321
     },
     "organization_count": 14,
     "last_12mo_from": "2025-11",
@@ -700,23 +702,23 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 0,
-        "personal": 2,
+        "personal": 5,
         "hidden": 0,
         "unknown": 0,
-        "bot": 6
+        "bot": 9
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 294,
-    "authors": 41,
-    "new_authors": 31,
+    "commits": 300,
+    "authors": 43,
+    "new_authors": 33,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 4173,
+    "commits": 4176,
     "commits_by_year": {
       "2018": 79,
       "2019": 1157,
@@ -726,17 +728,17 @@
       "2023": 348,
       "2024": 383,
       "2025": 266,
-      "2026": 124
+      "2026": 127
     },
-    "active_days": 1513
+    "active_days": 1516
   },
   "timezones": {
     "+0000": 96,
     "+0100": 38,
     "+0200": 75,
     "+0300": 2,
-    "+0530": 736,
-    "+0800": 5417,
+    "+0530": 739,
+    "+0800": 5420,
     "+0900": 27,
     "-0300": 2,
     "-0400": 13,
@@ -747,7 +749,7 @@
     "-1000": 2
   },
   "source_lines": {
-    "added": 536762,
-    "current": 281124
+    "added": 537186,
+    "current": 283750
   }
 }

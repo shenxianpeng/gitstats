@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:30:38+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:58:44+00:00",
   "name": "Continue",
   "report_path": "index.html",
   "first_commit": "2023-05-24 03:45:12",
@@ -10,8 +10,8 @@
   "active_days": 1005,
   "total_commits": 21569,
   "total_authors": 504,
-  "active_authors_12mo": 74,
-  "commits_last_12mo": 1663,
+  "active_authors_12mo": 73,
+  "commits_last_12mo": 1233,
   "total_files": 3058,
   "total_lines": 700691,
   "lines_added": 1802945,
@@ -564,7 +564,6 @@
       "OpenHands": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -587,10 +586,10 @@
       "2026-07": 1,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 972,
       "2024-12": 841,
       "2025-01": 605,
       "2025-02": 831,
@@ -613,7 +612,8 @@
       "2026-07": 3,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     }
   },
   "organizations": {
@@ -621,8 +621,8 @@
     "commits": 21569,
     "by_kind": {
       "organization": 829,
-      "one_person": 1130,
-      "personal": 15238,
+      "one_person": 1124,
+      "personal": 15244,
       "hidden": 3432,
       "unknown": 64,
       "bot": 876
@@ -674,8 +674,8 @@
     "quarters": {
       "2024-Q4": {
         "organization": 22,
-        "one_person": 78,
-        "personal": 1942,
+        "one_person": 76,
+        "personal": 1944,
         "hidden": 402,
         "unknown": 2,
         "bot": 11
@@ -698,8 +698,8 @@
       },
       "2025-Q3": {
         "organization": 515,
-        "one_person": 183,
-        "personal": 2976,
+        "one_person": 181,
+        "personal": 2978,
         "hidden": 946,
         "unknown": 0,
         "bot": 61
@@ -779,6 +779,6 @@
   },
   "source_lines": {
     "added": 1377071,
-    "current": 497051
+    "current": 498683
   }
 }

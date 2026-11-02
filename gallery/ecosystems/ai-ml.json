@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:44:47+00:00",
+  "schema_version": 2,
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:12:17+00:00",
   "ecosystem": {
     "id": "ai-ml",
     "name": "AI and machine learning",
@@ -18,6 +18,7 @@
   "summary": {
     "repositories": 12,
     "with_commits": 12,
+    "ranked": 12,
     "naming": 10,
     "median_share": 0.1029,
     "highest": {
@@ -43,10 +44,10 @@
         "ai_assisted": 281,
         "share": 0.2522
       },
-      "commits_last_12mo": 4429,
-      "active_authors_12mo": 484,
+      "commits_last_12mo": 4159,
+      "active_authors_12mo": 481,
       "health": "steady",
-      "last_commit": "2026-10-27",
+      "last_commit": "2026-11-02",
       "assistants": [
         "Claude",
         "Gemini",
@@ -69,10 +70,10 @@
         "ai_assisted": 346,
         "share": 0.1211
       },
-      "commits_last_12mo": 12978,
-      "active_authors_12mo": 2327,
+      "commits_last_12mo": 12522,
+      "active_authors_12mo": 2374,
       "health": "peak",
-      "last_commit": "2026-10-27",
+      "last_commit": "2026-11-02",
       "assistants": [
         "Claude",
         "Codex",
@@ -95,10 +96,10 @@
         "ai_assisted": 31,
         "share": 0.1148
       },
-      "commits_last_12mo": 1061,
-      "active_authors_12mo": 221,
+      "commits_last_12mo": 998,
+      "active_authors_12mo": 218,
       "health": "steady",
-      "last_commit": "2026-10-27",
+      "last_commit": "2026-10-31",
       "assistants": [
         "Claude",
         "GitHub Copilot"
@@ -120,10 +121,10 @@
         "ai_assisted": 37,
         "share": 0.048
       },
-      "commits_last_12mo": 3493,
-      "active_authors_12mo": 664,
+      "commits_last_12mo": 3300,
+      "active_authors_12mo": 673,
       "health": "steady",
-      "last_commit": "2026-10-27",
+      "last_commit": "2026-11-02",
       "assistants": [
         "Claude",
         "GitHub Copilot",
@@ -146,10 +147,10 @@
         "ai_assisted": 425,
         "share": 0.1196
       },
-      "commits_last_12mo": 14565,
-      "active_authors_12mo": 1470,
+      "commits_last_12mo": 14177,
+      "active_authors_12mo": 1498,
       "health": "peak",
-      "last_commit": "2026-10-27",
+      "last_commit": "2026-11-02",
       "assistants": [
         "Claude",
         "Gemini",
@@ -172,13 +173,13 @@
         "ai_assisted": 18,
         "share": 0.0145
       },
-      "commits_last_12mo": 5006,
-      "active_authors_12mo": 949,
+      "commits_last_12mo": 4821,
+      "active_authors_12mo": 953,
       "health": "peak",
-      "last_commit": "2026-10-26",
+      "last_commit": "2026-11-01",
       "assistants": [
-        "Pi",
         "Claude",
+        "Pi",
         "Codex"
       ]
     },
@@ -189,7 +190,7 @@
       "repository": "pytorch/pytorch",
       "report": "../pytorch/",
       "quarter": {
-        "commits": 4908,
+        "commits": 4909,
         "ai_assisted": 476,
         "share": 0.097
       },
@@ -198,10 +199,10 @@
         "ai_assisted": 118,
         "share": 0.0238
       },
-      "commits_last_12mo": 17754,
-      "active_authors_12mo": 1521,
+      "commits_last_12mo": 17069,
+      "active_authors_12mo": 1538,
       "health": "peak",
-      "last_commit": "2026-10-27",
+      "last_commit": "2026-11-02",
       "assistants": [
         "Claude",
         "Cursor",
@@ -224,8 +225,8 @@
         "ai_assisted": 4,
         "share": 0.0303
       },
-      "commits_last_12mo": 718,
-      "active_authors_12mo": 295,
+      "commits_last_12mo": 655,
+      "active_authors_12mo": 289,
       "health": "steady",
       "last_commit": "2026-10-14",
       "assistants": [
@@ -250,10 +251,10 @@
         "ai_assisted": 5,
         "share": 0.0069
       },
-      "commits_last_12mo": 2403,
-      "active_authors_12mo": 239,
+      "commits_last_12mo": 2290,
+      "active_authors_12mo": 237,
       "health": "steady",
-      "last_commit": "2026-10-26",
+      "last_commit": "2026-11-02",
       "assistants": [
         "GitHub Copilot",
         "Claude"
@@ -266,7 +267,7 @@
       "repository": "tensorflow/tensorflow",
       "report": "../tensorflow/",
       "quarter": {
-        "commits": 4105,
+        "commits": 4119,
         "ai_assisted": 16,
         "share": 0.0039
       },
@@ -275,10 +276,10 @@
         "ai_assisted": 22,
         "share": 0.0056
       },
-      "commits_last_12mo": 15642,
-      "active_authors_12mo": 685,
+      "commits_last_12mo": 14908,
+      "active_authors_12mo": 700,
       "health": "steady",
-      "last_commit": "2026-10-27",
+      "last_commit": "2026-11-02",
       "assistants": [
         "Gemini",
         "Claude",
@@ -301,10 +302,10 @@
         "ai_assisted": 2,
         "share": 0.001
       },
-      "commits_last_12mo": 7820,
-      "active_authors_12mo": 315,
+      "commits_last_12mo": 7475,
+      "active_authors_12mo": 316,
       "health": "surge",
-      "last_commit": "2026-10-27",
+      "last_commit": "2026-11-01",
       "assistants": [
         "Gemini"
       ]
@@ -325,10 +326,10 @@
         "ai_assisted": 2,
         "share": 0.0078
       },
-      "commits_last_12mo": 1223,
-      "active_authors_12mo": 112,
+      "commits_last_12mo": 1128,
+      "active_authors_12mo": 111,
       "health": "steady",
-      "last_commit": "2026-10-27",
+      "last_commit": "2026-10-31",
       "assistants": [
         "Claude",
         "GitHub Copilot"

@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:28:44+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:56:56+00:00",
   "name": "SQLAlchemy",
   "report_path": "index.html",
   "first_commit": "2005-07-01 02:25:16",
-  "last_commit": "2026-10-26 21:19:29",
-  "age_days": 7788,
-  "active_days": 5258,
-  "total_commits": 18444,
-  "total_authors": 853,
-  "active_authors_12mo": 91,
-  "commits_last_12mo": 662,
-  "total_files": 927,
-  "total_lines": 801139,
-  "lines_added": 1760750,
-  "lines_removed": 959448,
+  "last_commit": "2026-11-01 15:19:27",
+  "age_days": 7794,
+  "active_days": 5261,
+  "total_commits": 18453,
+  "total_authors": 855,
+  "active_authors_12mo": 92,
+  "commits_last_12mo": 620,
+  "total_files": 931,
+  "total_lines": 801494,
+  "lines_added": 1761161,
+  "lines_removed": 959504,
   "total_tags": 199,
   "era": "steady",
   "top_authors": [
     {
       "name": "Michael Bayer",
-      "commits": 14607
+      "commits": 14612
     },
     {
       "name": "Federico Caselli",
-      "commits": 705
+      "commits": 707
     },
     {
       "name": "Jason Kirtland",
@@ -41,12 +41,14 @@
     }
   ],
   "author_commits": {
-    "Michael Bayer": 14607,
+    "Michael Bayer": 14612,
+    "Federico Caselli": 707,
+    "basavaraj-sm05": 1,
+    "Prince Jain": 1,
     "Javid Khan": 7,
     "L\u00e9o Gallot": 5,
     "Albert T. Wong": 1,
     "Dhruva Kumar": 1,
-    "Federico Caselli": 705,
     "TomasCaruso10": 1,
     "Jay": 1,
     "pctablet505": 1,
@@ -917,14 +919,13 @@
     "2023": 956,
     "2024": 533,
     "2025": 604,
-    "2026": 555
+    "2026": 564
   },
   "ai_assisted": {
     "commits": 0,
     "authored": 0,
     "assistants": {},
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -947,10 +948,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 30,
       "2024-12": 36,
       "2025-01": 29,
       "2025-02": 47,
@@ -973,38 +974,31 @@
       "2026-07": 48,
       "2026-08": 79,
       "2026-09": 79,
-      "2026-10": 93
+      "2026-10": 101,
+      "2026-11": 1
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 18444,
+    "commits": 18453,
     "by_kind": {
-      "organization": 14666,
-      "one_person": 1576,
-      "personal": 1984,
+      "organization": 14665,
+      "one_person": 1575,
+      "personal": 1995,
       "hidden": 154,
       "unknown": 22,
       "bot": 42
     },
-    "organization_count": 20,
-    "last_12mo_from": "2025-11",
+    "organization_count": 19,
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "zzzcomputing.com",
-        "commits": 14607,
-        "commits_last_12mo": 464,
+        "commits": 14612,
+        "commits_last_12mo": 431,
         "addresses": 2,
         "first_commit": "2005-07-01",
-        "last_commit": "2026-10-26"
-      },
-      {
-        "organization": "gmail.org",
-        "commits": 6,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2011-03-09",
-        "last_commit": "2016-04-12"
+        "last_commit": "2026-11-01"
       },
       {
         "organization": "google.com",
@@ -1154,8 +1148,8 @@
     "quarters": {
       "2025-Q1": {
         "organization": 82,
-        "one_person": 15,
-        "personal": 40,
+        "one_person": 14,
+        "personal": 41,
         "hidden": 3,
         "unknown": 0,
         "bot": 0
@@ -1209,9 +1203,9 @@
         "bot": 3
       },
       "2026-Q4": {
-        "organization": 78,
-        "one_person": 2,
-        "personal": 8,
+        "organization": 83,
+        "one_person": 3,
+        "personal": 11,
         "hidden": 4,
         "unknown": 0,
         "bot": 1
@@ -1219,15 +1213,15 @@
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 651,
-    "authors": 90,
-    "new_authors": 73,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 609,
+    "authors": 87,
+    "new_authors": 72,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 18402,
+    "commits": 18411,
     "commits_by_year": {
       "2005": 742,
       "2006": 1115,
@@ -1250,19 +1244,19 @@
       "2023": 942,
       "2024": 523,
       "2025": 604,
-      "2026": 544
+      "2026": 553
     },
-    "active_days": 5255
+    "active_days": 5258
   },
   "timezones": {
-    "+0000": 6986,
-    "+0100": 432,
+    "+0000": 6990,
+    "+0100": 433,
     "+0200": 536,
     "+0300": 63,
     "+0330": 3,
     "+0400": 14,
     "+0500": 5,
-    "+0530": 13,
+    "+0530": 14,
     "+0600": 2,
     "+0800": 24,
     "+0900": 54,
@@ -1271,14 +1265,14 @@
     "+1300": 15,
     "-0200": 1,
     "-0300": 10,
-    "-0400": 6456,
+    "-0400": 6459,
     "-0500": 3379,
     "-0600": 187,
     "-0700": 189,
     "-0800": 57
   },
   "source_lines": {
-    "added": 1787159,
-    "current": 799338
+    "added": 1787570,
+    "current": 800026
   }
 }

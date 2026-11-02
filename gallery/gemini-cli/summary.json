@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:30:13+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:58:02+00:00",
   "name": "Gemini CLI",
   "report_path": "index.html",
   "first_commit": "2025-04-16 04:41:08",
-  "last_commit": "2026-10-26 20:12:43",
-  "age_days": 559,
-  "active_days": 482,
-  "total_commits": 6538,
-  "total_authors": 687,
-  "active_authors_12mo": 418,
-  "commits_last_12mo": 3386,
-  "total_files": 3036,
-  "total_lines": 1666657,
-  "lines_added": 2140552,
-  "lines_removed": 473874,
+  "last_commit": "2026-10-30 21:38:47",
+  "age_days": 563,
+  "active_days": 486,
+  "total_commits": 6569,
+  "total_authors": 688,
+  "active_authors_12mo": 409,
+  "commits_last_12mo": 3099,
+  "total_files": 3043,
+  "total_lines": 1674637,
+  "lines_added": 2149148,
+  "lines_removed": 474490,
   "total_tags": 13,
   "era": "steady",
   "top_authors": [
@@ -41,18 +41,20 @@
     }
   ],
   "author_commits": {
-    "Diego Godinez": 17,
-    "urielefrenvirtusa": 15,
-    "duvanka-prasad": 1,
-    "jesussamuel-byte": 23,
-    "villahernandez-coder": 14,
-    "elberthc-byte": 10,
-    "amelidev": 20,
-    "jvargassanchez-dot": 17,
+    "villahernandez-coder": 17,
+    "ugorla-dev": 8,
+    "Diego Godinez": 20,
+    "jvargassanchez-dot": 20,
+    "tadipavan": 4,
+    "urielefrenvirtusa": 18,
+    "jesussamuel-byte": 26,
+    "duvanka-prasad": 5,
+    "Dmitry Lyalin": 17,
+    "gemini-cli-robot": 183,
+    "elberthc-byte": 11,
+    "amelidev": 21,
     "luisfelipe-alt": 26,
-    "gemini-cli-robot": 181,
     "gurusai-voleti": 1,
-    "ugorla-dev": 5,
     "Srinath Padmanabhan": 17,
     "David Pierce": 43,
     "Sandy Tao": 230,
@@ -250,7 +252,6 @@
     "Muhammad Usman": 1,
     "Vroot": 1,
     "aworki": 1,
-    "Dmitry Lyalin": 16,
     "Jeffrey Ying": 2,
     "Arnav Raj": 1,
     "S\u00e9bastien Prud'homme": 1,
@@ -731,18 +732,17 @@
   },
   "commits_by_year": {
     "2025": 3744,
-    "2026": 2794
+    "2026": 2825
   },
   "ai_assisted": {
-    "commits": 272,
+    "commits": 273,
     "authored": 0,
     "assistants": {
-      "Gemini": 261,
+      "Gemini": 262,
       "Jules": 11,
       "GitHub Copilot": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -765,10 +765,10 @@
       "2026-07": 3,
       "2026-08": 3,
       "2026-09": 3,
-      "2026-10": 2
+      "2026-10": 3,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -791,17 +791,18 @@
       "2026-07": 48,
       "2026-08": 60,
       "2026-09": 62,
-      "2026-10": 85
+      "2026-10": 116,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 6538,
+    "commits": 6569,
     "by_kind": {
-      "organization": 2473,
-      "one_person": 302,
-      "personal": 2234,
-      "hidden": 1511,
+      "organization": 2500,
+      "one_person": 300,
+      "personal": 2237,
+      "hidden": 1514,
       "unknown": 0,
       "bot": 18
     },
@@ -810,11 +811,11 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 2464,
-        "commits_last_12mo": 1393,
-        "addresses": 113,
+        "commits": 2491,
+        "commits_last_12mo": 1420,
+        "addresses": 114,
         "first_commit": "2025-04-16",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-10-30"
       },
       {
         "organization": "github.com",
@@ -836,16 +837,16 @@
       },
       "2025-Q3": {
         "organization": 345,
-        "one_person": 130,
-        "personal": 664,
+        "one_person": 128,
+        "personal": 666,
         "hidden": 349,
         "unknown": 0,
         "bot": 12
       },
       "2025-Q4": {
         "organization": 351,
-        "one_person": 45,
-        "personal": 456,
+        "one_person": 44,
+        "personal": 457,
         "hidden": 285,
         "unknown": 0,
         "bot": 1
@@ -875,10 +876,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 74,
-        "one_person": 0,
+        "organization": 101,
+        "one_person": 1,
         "personal": 0,
-        "hidden": 11,
+        "hidden": 14,
         "unknown": 0,
         "bot": 0
       }
@@ -887,21 +888,21 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3381,
-    "authors": 408,
-    "new_authors": 343,
+    "commits": 3412,
+    "authors": 409,
+    "new_authors": 344,
     "half_of_commits": 15
   },
   "humans": {
-    "commits": 6520,
+    "commits": 6551,
     "commits_by_year": {
       "2025": 3730,
-      "2026": 2790
+      "2026": 2821
     },
-    "active_days": 482
+    "active_days": 486
   },
   "timezones": {
-    "+0000": 639,
+    "+0000": 670,
     "+0100": 105,
     "+0200": 134,
     "+0300": 17,
@@ -924,7 +925,7 @@
     "-1000": 4
   },
   "source_lines": {
-    "added": 2049637,
-    "current": 1615535
+    "added": 2058233,
+    "current": 1624540
   }
 }

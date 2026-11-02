@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:29:45+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:57:10+00:00",
   "name": "Pydantic",
   "report_path": "index.html",
   "first_commit": "2017-05-03 21:23:41",
-  "last_commit": "2026-10-26 20:45:15",
-  "age_days": 3463,
-  "active_days": 1417,
-  "total_commits": 5851,
-  "total_authors": 803,
-  "active_authors_12mo": 128,
-  "commits_last_12mo": 617,
-  "total_files": 852,
-  "total_lines": 259705,
-  "lines_added": 451848,
-  "lines_removed": 192141,
+  "last_commit": "2026-11-01 19:43:04",
+  "age_days": 3469,
+  "active_days": 1423,
+  "total_commits": 5896,
+  "total_authors": 805,
+  "active_authors_12mo": 127,
+  "commits_last_12mo": 584,
+  "total_files": 3572,
+  "total_lines": 323246,
+  "lines_added": 542889,
+  "lines_removed": 218289,
   "total_tags": 143,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Victorien",
-      "commits": 751
+      "commits": 777
     },
     {
       "name": "Sydney Runkle",
@@ -37,13 +37,20 @@
     },
     {
       "name": "David Hewitt",
-      "commits": 321
+      "commits": 322
     }
   ],
   "author_commits": {
-    "Victorien": 751,
-    "adarrevah": 1,
-    "David Hewitt": 321,
+    "Victorien": 777,
+    "Dylan Pulver": 2,
+    "Michael \u0160im\u00e1\u010dek": 4,
+    "Alex Hall": 30,
+    "Nenad Mitrovic": 1,
+    "Kropiunig": 7,
+    "Owen Taylor": 1,
+    "Bill Easton": 7,
+    "adarrevah": 2,
+    "David Hewitt": 322,
     "Wentao Tong": 1,
     "Chirag Patankar": 1,
     "Sofia Bergstr\u00f6m": 1,
@@ -56,9 +63,7 @@
     "Lichao Chen": 3,
     "Ayush Singh": 2,
     "Fares Rafat": 1,
-    "Dylan Pulver": 1,
     "Hsn": 1,
-    "Bill Easton": 6,
     "agustin18": 1,
     "David Peter": 1,
     "\u9648\u5fd7\u8c26": 4,
@@ -68,7 +73,6 @@
     "Jaideep Pyne": 1,
     "Tamir Duberstein": 2,
     "Pham Manh Luc": 3,
-    "Kropiunig": 6,
     "Lakshay Gahlawat": 1,
     "Rafli Surya Wijaya": 1,
     "wse114": 1,
@@ -149,7 +153,6 @@
     "JUNG SEUNGHOON": 1,
     "Antoine Dechaume": 1,
     "Louis Maddox": 2,
-    "Michael \u0160im\u00e1\u010dek": 3,
     "Vedant Madane": 1,
     "Yassin Nouh": 4,
     "tokihiko-tsurumoto": 1,
@@ -286,7 +289,6 @@
     "Aditya Tewary": 2,
     "swelborn": 2,
     "Sumanth": 1,
-    "Alex Hall": 20,
     "dAIsySHEng1": 3,
     "Ryu": 1,
     "Boxy": 5,
@@ -855,7 +857,7 @@
     "2023": 1775,
     "2024": 1029,
     "2025": 644,
-    "2026": 524
+    "2026": 569
   },
   "ai_assisted": {
     "commits": 4,
@@ -865,7 +867,6 @@
       "GitHub Copilot": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -888,10 +889,10 @@
       "2026-07": 2,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 101,
       "2024-12": 80,
       "2025-01": 62,
       "2025-02": 80,
@@ -914,30 +915,31 @@
       "2026-07": 63,
       "2026-08": 82,
       "2026-09": 64,
-      "2026-10": 78
+      "2026-10": 114,
+      "2026-11": 9
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5851,
+    "commits": 5896,
     "by_kind": {
-      "organization": 261,
-      "one_person": 1402,
-      "personal": 1161,
-      "hidden": 2422,
+      "organization": 263,
+      "one_person": 1401,
+      "personal": 1175,
+      "hidden": 2451,
       "unknown": 0,
-      "bot": 605
+      "bot": 606
     },
     "organization_count": 2,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "pydantic.dev",
-        "commits": 259,
-        "commits_last_12mo": 65,
+        "commits": 261,
+        "commits_last_12mo": 36,
         "addresses": 5,
         "first_commit": "2023-05-17",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-10-29"
       },
       {
         "organization": "berkeley.edu",
@@ -983,8 +985,8 @@
       },
       "2026-Q1": {
         "organization": 13,
-        "one_person": 7,
-        "personal": 16,
+        "one_person": 6,
+        "personal": 17,
         "hidden": 67,
         "unknown": 0,
         "bot": 23
@@ -1006,25 +1008,25 @@
         "bot": 29
       },
       "2026-Q4": {
-        "organization": 2,
-        "one_person": 3,
-        "personal": 3,
-        "hidden": 60,
+        "organization": 4,
+        "one_person": 5,
+        "personal": 14,
+        "hidden": 89,
         "unknown": 0,
-        "bot": 10
+        "bot": 11
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 509,
-    "authors": 124,
-    "new_authors": 111,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 487,
+    "authors": 121,
+    "new_authors": 108,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 5246,
+    "commits": 5290,
     "commits_by_year": {
       "2017": 116,
       "2018": 131,
@@ -1035,14 +1037,14 @@
       "2023": 1663,
       "2024": 927,
       "2025": 577,
-      "2026": 431
+      "2026": 475
     },
-    "active_days": 1361
+    "active_days": 1367
   },
   "timezones": {
-    "+0000": 726,
-    "+0100": 1714,
-    "+0200": 1260,
+    "+0000": 727,
+    "+0100": 1744,
+    "+0200": 1271,
     "+0300": 162,
     "+0330": 111,
     "+0400": 23,
@@ -1060,14 +1062,14 @@
     "+1200": 2,
     "+1300": 3,
     "-0300": 14,
-    "-0400": 223,
-    "-0500": 686,
+    "-0400": 224,
+    "-0500": 688,
     "-0600": 476,
     "-0700": 171,
     "-0800": 35
   },
   "source_lines": {
-    "added": 495169,
-    "current": 253056
+    "added": 585168,
+    "current": 316997
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:32:50+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:00:41+00:00",
   "name": "etcd",
   "report_path": "index.html",
   "first_commit": "2013-06-07 00:43:32",
-  "last_commit": "2026-10-23 20:28:27",
-  "age_days": 4887,
-  "active_days": 4011,
-  "total_commits": 25334,
+  "last_commit": "2026-10-28 18:53:56",
+  "age_days": 4892,
+  "active_days": 4014,
+  "total_commits": 25342,
   "total_authors": 1138,
-  "active_authors_12mo": 89,
-  "commits_last_12mo": 1317,
+  "active_authors_12mo": 88,
+  "commits_last_12mo": 1229,
   "total_files": 1505,
-  "total_lines": 258878,
-  "lines_added": 2398111,
-  "lines_removed": 2139181,
+  "total_lines": 258880,
+  "lines_added": 2398145,
+  "lines_removed": 2139213,
   "total_tags": 101,
   "era": "steady",
   "top_authors": [
@@ -41,8 +41,9 @@
     }
   ],
   "author_commits": {
+    "Iv\u00e1n Vald\u00e9s Castillo": 376,
+    "vivekpatani": 64,
     "Benjamin Wang": 2316,
-    "Iv\u00e1n Vald\u00e9s Castillo": 373,
     "Tobi Abidoye": 6,
     "Fu Wei": 248,
     "Batianxieshen1": 1,
@@ -70,7 +71,6 @@
     "Sharath P J": 5,
     "v-zhuravlev": 10,
     "Pablo Garcia Caceres": 1,
-    "vivekpatani": 63,
     "Ribhav Jain": 3,
     "Hrishi Baskaran": 1,
     "Ganesh Biradar": 1,
@@ -1194,7 +1194,7 @@
     "2023": 1621,
     "2024": 1553,
     "2025": 1899,
-    "2026": 1151
+    "2026": 1159
   },
   "ai_assisted": {
     "commits": 3,
@@ -1204,7 +1204,6 @@
       "Claude": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1227,10 +1226,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 1,
-      "2026-10": 2
+      "2026-10": 2,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 143,
       "2024-12": 128,
       "2025-01": 202,
       "2025-02": 178,
@@ -1253,19 +1252,20 @@
       "2026-07": 137,
       "2026-08": 76,
       "2026-09": 60,
-      "2026-10": 75
+      "2026-10": 83,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 25334,
+    "commits": 25342,
     "by_kind": {
       "organization": 9897,
       "one_person": 2386,
-      "personal": 12503,
-      "hidden": 222,
+      "personal": 12506,
+      "hidden": 223,
       "unknown": 7,
-      "bot": 319
+      "bot": 323
     },
     "organization_count": 39,
     "last_12mo_from": "2025-11",
@@ -1642,24 +1642,24 @@
       },
       "2026-Q4": {
         "organization": 4,
-        "one_person": 23,
+        "one_person": 26,
         "personal": 40,
-        "hidden": 4,
+        "hidden": 5,
         "unknown": 0,
-        "bot": 4
+        "bot": 8
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1230,
+    "commits": 1234,
     "authors": 88,
     "new_authors": 62,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 25015,
+    "commits": 25019,
     "commits_by_year": {
       "2013": 1220,
       "2014": 2950,
@@ -1674,12 +1674,12 @@
       "2023": 1545,
       "2024": 1464,
       "2025": 1828,
-      "2026": 1079
+      "2026": 1083
     },
-    "active_days": 3998
+    "active_days": 4000
   },
   "timezones": {
-    "+0000": 1372,
+    "+0000": 1376,
     "+0100": 2147,
     "+0200": 2265,
     "+0300": 87,
@@ -1701,12 +1701,12 @@
     "-0400": 827,
     "-0500": 635,
     "-0600": 126,
-    "-0700": 10229,
+    "-0700": 10233,
     "-0800": 4482,
     "-1000": 2
   },
   "source_lines": {
-    "added": 941262,
-    "current": 239466
+    "added": 941277,
+    "current": 242795
   }
 }

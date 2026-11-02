@@ -1,7 +1,7 @@
 {
-  "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:44:47+00:00",
+  "schema_version": 2,
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:12:17+00:00",
   "ecosystem": {
     "id": "cncf",
     "name": "CNCF graduated",
@@ -18,6 +18,7 @@
   "summary": {
     "repositories": 15,
     "with_commits": 15,
+    "ranked": 15,
     "naming": 13,
     "median_share": 0.0243,
     "highest": {
@@ -43,10 +44,10 @@
         "ai_assisted": 84,
         "share": 0.2927
       },
-      "commits_last_12mo": 1064,
+      "commits_last_12mo": 1066,
       "active_authors_12mo": 118,
       "health": "peak",
-      "last_commit": "2026-10-25",
+      "last_commit": "2026-11-02",
       "assistants": [
         "Claude",
         "GitHub Copilot",
@@ -69,7 +70,7 @@
         "ai_assisted": 12,
         "share": 0.0923
       },
-      "commits_last_12mo": 393,
+      "commits_last_12mo": 377,
       "active_authors_12mo": 49,
       "health": "steady",
       "last_commit": "2026-10-26",
@@ -95,10 +96,10 @@
         "ai_assisted": 1,
         "share": 0.0104
       },
-      "commits_last_12mo": 423,
-      "active_authors_12mo": 93,
+      "commits_last_12mo": 422,
+      "active_authors_12mo": 92,
       "health": "steady",
-      "last_commit": "2026-10-26",
+      "last_commit": "2026-11-02",
       "assistants": [
         "Cursor",
         "GitHub Copilot",
@@ -121,10 +122,10 @@
         "ai_assisted": 41,
         "share": 0.0499
       },
-      "commits_last_12mo": 3843,
-      "active_authors_12mo": 352,
+      "commits_last_12mo": 3647,
+      "active_authors_12mo": 351,
       "health": "steady",
-      "last_commit": "2026-10-26",
+      "last_commit": "2026-11-02",
       "assistants": [
         "Claude",
         "GitHub Copilot",
@@ -147,10 +148,10 @@
         "ai_assisted": 21,
         "share": 0.0333
       },
-      "commits_last_12mo": 2303,
-      "active_authors_12mo": 386,
+      "commits_last_12mo": 2248,
+      "active_authors_12mo": 405,
       "health": "peak",
-      "last_commit": "2026-10-26",
+      "last_commit": "2026-11-02",
       "assistants": [
         "Claude",
         "Cursor",
@@ -164,19 +165,19 @@
       "repository": "prometheus/prometheus",
       "report": "../prometheus/",
       "quarter": {
-        "commits": 796,
+        "commits": 798,
         "ai_assisted": 35,
-        "share": 0.044
+        "share": 0.0439
       },
       "previous_quarter": {
         "commits": 668,
         "ai_assisted": 20,
         "share": 0.0299
       },
-      "commits_last_12mo": 2717,
-      "active_authors_12mo": 274,
+      "commits_last_12mo": 2616,
+      "active_authors_12mo": 276,
       "health": "surge",
-      "last_commit": "2026-10-26",
+      "last_commit": "2026-10-31",
       "assistants": [
         "Claude",
         "GitHub Copilot",
@@ -199,10 +200,10 @@
         "ai_assisted": 8,
         "share": 0.0335
       },
-      "commits_last_12mo": 972,
+      "commits_last_12mo": 860,
       "active_authors_12mo": 89,
       "health": "steady",
-      "last_commit": "2026-10-26",
+      "last_commit": "2026-11-01",
       "assistants": [
         "GitHub Copilot",
         "Claude",
@@ -216,7 +217,7 @@
       "repository": "containerd/containerd",
       "report": "../containerd/",
       "quarter": {
-        "commits": 493,
+        "commits": 494,
         "ai_assisted": 12,
         "share": 0.0243
       },
@@ -225,14 +226,14 @@
         "ai_assisted": 8,
         "share": 0.0198
       },
-      "commits_last_12mo": 1694,
-      "active_authors_12mo": 128,
+      "commits_last_12mo": 1614,
+      "active_authors_12mo": 129,
       "health": "steady",
-      "last_commit": "2026-10-26",
+      "last_commit": "2026-11-01",
       "assistants": [
         "Claude",
         "Gemini",
-        "Codex"
+        "OpenCode"
       ]
     },
     {
@@ -251,10 +252,10 @@
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 777,
-      "active_authors_12mo": 93,
+      "commits_last_12mo": 739,
+      "active_authors_12mo": 95,
       "health": "peak",
-      "last_commit": "2026-10-26",
+      "last_commit": "2026-11-02",
       "assistants": [
         "Claude",
         "GitHub Copilot"
@@ -276,10 +277,10 @@
         "ai_assisted": 8,
         "share": 0.0265
       },
-      "commits_last_12mo": 1237,
-      "active_authors_12mo": 165,
+      "commits_last_12mo": 1168,
+      "active_authors_12mo": 166,
       "health": "steady",
-      "last_commit": "2026-10-26",
+      "last_commit": "2026-11-01",
       "assistants": [
         "Claude",
         "GitHub Copilot",
@@ -302,10 +303,10 @@
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 777,
+      "commits_last_12mo": 718,
       "active_authors_12mo": 33,
       "health": "steady",
-      "last_commit": "2026-10-26",
+      "last_commit": "2026-10-30",
       "assistants": [
         "Claude"
       ]
@@ -326,10 +327,10 @@
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 1317,
-      "active_authors_12mo": 89,
+      "commits_last_12mo": 1229,
+      "active_authors_12mo": 88,
       "health": "steady",
-      "last_commit": "2026-10-23",
+      "last_commit": "2026-10-28",
       "assistants": [
         "GitHub Copilot",
         "Claude"
@@ -342,19 +343,19 @@
       "repository": "cilium/cilium",
       "report": "../cilium/",
       "quarter": {
-        "commits": 1628,
+        "commits": 1649,
         "ai_assisted": 1,
         "share": 0.0006
       },
       "previous_quarter": {
-        "commits": 1214,
+        "commits": 1215,
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 5257,
-      "active_authors_12mo": 347,
+      "commits_last_12mo": 4937,
+      "active_authors_12mo": 353,
       "health": "steady",
-      "last_commit": "2026-10-26",
+      "last_commit": "2026-11-01",
       "assistants": [
         "Claude",
         "Cursor"
@@ -367,19 +368,19 @@
       "repository": "kubernetes/kubernetes",
       "report": "../kubernetes/",
       "quarter": {
-        "commits": 2369,
+        "commits": 2398,
         "ai_assisted": 0,
         "share": 0.0
       },
       "previous_quarter": {
-        "commits": 2193,
+        "commits": 2198,
         "ai_assisted": 1,
         "share": 0.0005
       },
-      "commits_last_12mo": 8574,
-      "active_authors_12mo": 613,
+      "commits_last_12mo": 8419,
+      "active_authors_12mo": 621,
       "health": "steady",
-      "last_commit": "2026-10-27",
+      "last_commit": "2026-11-01",
       "assistants": [
         "Claude",
         "Codex",
@@ -402,10 +403,10 @@
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 219,
-      "active_authors_12mo": 67,
+      "commits_last_12mo": 215,
+      "active_authors_12mo": 70,
       "health": "quiet",
-      "last_commit": "2026-10-26",
+      "last_commit": "2026-11-02",
       "assistants": [
         "GitHub Copilot",
         "Claude"

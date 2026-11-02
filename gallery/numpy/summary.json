@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:28:55+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:57:13+00:00",
   "name": "NumPy",
   "report_path": "index.html",
   "first_commit": "2001-12-18 15:45:10",
-  "last_commit": "2026-10-26 08:18:16",
-  "age_days": 9078,
-  "active_days": 6830,
-  "total_commits": 42443,
-  "total_authors": 2108,
-  "active_authors_12mo": 237,
-  "commits_last_12mo": 2480,
-  "total_files": 2423,
-  "total_lines": 1007472,
-  "lines_added": 2791718,
-  "lines_removed": 1783944,
+  "last_commit": "2026-11-01 00:28:47",
+  "age_days": 9084,
+  "active_days": 6836,
+  "total_commits": 42470,
+  "total_authors": 2112,
+  "active_authors_12mo": 239,
+  "commits_last_12mo": 2312,
+  "total_files": 2433,
+  "total_lines": 1008807,
+  "lines_added": 2793773,
+  "lines_removed": 1784664,
   "total_tags": 16,
   "era": "steady",
   "top_authors": [
@@ -41,8 +41,21 @@
     }
   ],
   "author_commits": {
-    "Andrew Nelson": 95,
-    "Ganesh Kathiresan": 161,
+    "Rohit Goswami": 333,
+    "Riaz1729": 1,
+    "Matthew Digman": 2,
+    "Joren Hammudoglu": 1437,
+    "bymasha": 2,
+    "Pieter Eendebak": 169,
+    "Pratham Hole": 61,
+    "Nathan Goldbaum": 876,
+    "Iason Krommydas": 36,
+    "Andrew Nelson": 96,
+    "Ganesh Kathiresan": 162,
+    "David King": 2,
+    "Dante": 1,
+    "dhrub chatterjee": 1,
+    "Travis Fortney": 1,
     "Tyler Reddy": 199,
     "Charles Harris": 7292,
     "Fun-Projects-Learn": 2,
@@ -54,36 +67,28 @@
     "gregwb": 3,
     "Sebastian Berg": 2984,
     "Abhinay Reddy Keesara": 3,
-    "David King": 1,
     "pereradrian": 1,
-    "Nathan Goldbaum": 872,
     "HughStanway": 4,
-    "Iason Krommydas": 33,
-    "Joren Hammudoglu": 1436,
     "Inessa Pawson": 51,
     "aryangorde6": 1,
     "Matti Picus": 3035,
     "Michael Zhan": 4,
     "sukeyzhou": 2,
-    "bymasha": 1,
     "ssmore": 1,
     "Mohd Maaz Khan": 14,
     "Yuka Sadaoka": 1,
     "Likhitha J": 1,
     "Raghuveer Devulapalli": 330,
     "Lakshay Garg": 5,
-    "Pratham Hole": 58,
     "Eugenio \"Jay\" Zuccarelli": 1,
     "Rayson Yeap": 1,
     "Gustav Lantz": 1,
     "stanley": 1,
     "Syed Labeeq Sajid Bukhari": 1,
     "Michael Niklas": 1,
-    "Pieter Eendebak": 168,
     "Sacha Jungerman": 1,
     "Nikita Berezyuk": 1,
     "Johnny Kao": 1,
-    "Matthew Digman": 1,
     "Eero Vaher": 4,
     "Shubham Bansal": 7,
     "Matt Haberland": 54,
@@ -140,7 +145,6 @@
     "Geonho": 1,
     "Michael Cogan": 1,
     "Ijtihed Kilani": 4,
-    "Rohit Goswami": 328,
     "VectorPeak": 10,
     "Jelle Zijlstra": 1,
     "Charalampos Stratakis": 4,
@@ -2176,7 +2180,7 @@
     "2023": 3422,
     "2024": 3054,
     "2025": 2543,
-    "2026": 2079
+    "2026": 2106
   },
   "ai_assisted": {
     "commits": 38,
@@ -2187,7 +2191,6 @@
       "GitHub Copilot": 7
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -2210,10 +2213,10 @@
       "2026-07": 4,
       "2026-08": 0,
       "2026-09": 12,
-      "2026-10": 5
+      "2026-10": 5,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 207,
       "2024-12": 191,
       "2025-01": 203,
       "2025-02": 137,
@@ -2233,25 +2236,26 @@
       "2026-04": 199,
       "2026-05": 100,
       "2026-06": 166,
-      "2026-07": 241,
+      "2026-07": 242,
       "2026-08": 229,
       "2026-09": 333,
-      "2026-10": 207
+      "2026-10": 232,
+      "2026-11": 1
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 42443,
+    "commits": 42470,
     "by_kind": {
-      "organization": 2800,
-      "one_person": 6066,
-      "personal": 31207,
-      "hidden": 1270,
+      "organization": 2794,
+      "one_person": 6050,
+      "personal": 31252,
+      "hidden": 1273,
       "unknown": 486,
-      "bot": 614
+      "bot": 615
     },
-    "organization_count": 70,
-    "last_12mo_from": "2025-11",
+    "organization_count": 68,
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "berkeley.edu",
@@ -2272,7 +2276,7 @@
       {
         "organization": "utoronto.ca",
         "commits": 365,
-        "commits_last_12mo": 15,
+        "commits_last_12mo": 13,
         "addresses": 2,
         "first_commit": "2013-10-12",
         "last_commit": "2026-07-17"
@@ -2312,7 +2316,7 @@
       {
         "organization": "python.org",
         "commits": 56,
-        "commits_last_12mo": 37,
+        "commits_last_12mo": 33,
         "addresses": 3,
         "first_commit": "2014-12-03",
         "last_commit": "2026-09-17"
@@ -2320,7 +2324,7 @@
       {
         "organization": "quansight.com",
         "commits": 50,
-        "commits_last_12mo": 3,
+        "commits_last_12mo": 0,
         "addresses": 4,
         "first_commit": "2021-06-07",
         "last_commit": "2025-11-18"
@@ -2328,7 +2332,7 @@
       {
         "organization": "ibm.com",
         "commits": 47,
-        "commits_last_12mo": 4,
+        "commits_last_12mo": 3,
         "addresses": 13,
         "first_commit": "2018-07-02",
         "last_commit": "2026-07-03"
@@ -2606,14 +2610,6 @@
         "last_commit": "2022-01-22"
       },
       {
-        "organization": "edu.tr",
-        "commits": 4,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2021-06-07",
-        "last_commit": "2023-03-16"
-      },
-      {
         "organization": "normalesup.org",
         "commits": 4,
         "commits_last_12mo": 0,
@@ -2742,14 +2738,6 @@
         "last_commit": "2016-11-13"
       },
       {
-        "organization": "edu.br",
-        "commits": 2,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2020-06-26",
-        "last_commit": "2022-06-08"
-      },
-      {
         "organization": "imperial.ac.uk",
         "commits": 2,
         "commits_last_12mo": 0,
@@ -2833,8 +2821,8 @@
       },
       "2025-Q3": {
         "organization": 17,
-        "one_person": 22,
-        "personal": 352,
+        "one_person": 21,
+        "personal": 353,
         "hidden": 33,
         "unknown": 1,
         "bot": 35
@@ -2857,15 +2845,15 @@
       },
       "2026-Q2": {
         "organization": 17,
-        "one_person": 56,
-        "personal": 302,
+        "one_person": 55,
+        "personal": 303,
         "hidden": 28,
         "unknown": 0,
         "bot": 62
       },
       "2026-Q3": {
         "organization": 17,
-        "one_person": 21,
+        "one_person": 22,
         "personal": 680,
         "hidden": 36,
         "unknown": 0,
@@ -2873,24 +2861,24 @@
       },
       "2026-Q4": {
         "organization": 6,
-        "one_person": 2,
-        "personal": 168,
-        "hidden": 21,
+        "one_person": 6,
+        "personal": 186,
+        "hidden": 24,
         "unknown": 0,
-        "bot": 10
+        "bot": 11
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 2299,
-    "authors": 235,
-    "new_authors": 172,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 2141,
+    "authors": 224,
+    "new_authors": 160,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 41829,
+    "commits": 41855,
     "commits_by_year": {
       "2001": 8,
       "2002": 408,
@@ -2917,20 +2905,20 @@
       "2023": 3343,
       "2024": 2947,
       "2025": 2423,
-      "2026": 1923
+      "2026": 1949
     },
-    "active_days": 6827
+    "active_days": 6833
   },
   "timezones": {
-    "+0000": 9547,
-    "+0100": 4306,
+    "+0000": 9552,
+    "+0100": 4313,
     "+0200": 6945,
     "+0300": 1943,
     "+0330": 7,
     "+0400": 45,
     "+0430": 2,
     "+0500": 50,
-    "+0530": 1105,
+    "+0530": 1110,
     "+0545": 1,
     "+0600": 15,
     "+0700": 15,
@@ -2938,22 +2926,22 @@
     "+0900": 289,
     "+1000": 104,
     "+1030": 2,
-    "+1100": 145,
+    "+1100": 146,
     "+1200": 45,
     "+1300": 58,
     "-0100": 1,
     "-0200": 3,
     "-0300": 284,
-    "-0400": 1898,
+    "-0400": 1900,
     "-0430": 1,
-    "-0500": 2745,
-    "-0600": 4905,
+    "-0500": 2748,
+    "-0600": 4909,
     "-0700": 5667,
     "-0800": 1762,
     "-1000": 14
   },
   "source_lines": {
-    "added": 3219332,
-    "current": 1005282
+    "added": 3221411,
+    "current": 1008807
   }
 }

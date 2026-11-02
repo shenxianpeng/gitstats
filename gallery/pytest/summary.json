@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:28:41+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:56:52+00:00",
   "name": "pytest",
   "report_path": "index.html",
   "first_commit": "2007-01-24 14:24:01",
-  "last_commit": "2026-10-26 09:36:08",
-  "age_days": 7215,
-  "active_days": 4063,
-  "total_commits": 17860,
-  "total_authors": 1116,
-  "active_authors_12mo": 126,
-  "commits_last_12mo": 912,
-  "total_files": 735,
-  "total_lines": 183628,
-  "lines_added": 615155,
-  "lines_removed": 431504,
-  "total_tags": 153,
+  "last_commit": "2026-11-01 19:11:28",
+  "age_days": 7222,
+  "active_days": 4068,
+  "total_commits": 17878,
+  "total_authors": 1117,
+  "active_authors_12mo": 124,
+  "commits_last_12mo": 799,
+  "total_files": 639,
+  "total_lines": 184197,
+  "lines_added": 616034,
+  "lines_removed": 431814,
+  "total_tags": 154,
   "era": "steady",
   "top_authors": [
     {
@@ -29,11 +29,11 @@
     },
     {
       "name": "Ran Benita",
-      "commits": 1907
+      "commits": 1912
     },
     {
       "name": "Ronny Pfannschmidt",
-      "commits": 1294
+      "commits": 1297
     },
     {
       "name": "Daniel Hahler",
@@ -41,12 +41,14 @@
     }
   ],
   "author_commits": {
+    "Michael Seifert": 4,
+    "Ronny Pfannschmidt": 1297,
+    "Ran Benita": 1912,
+    "Gabriel Gerlero": 5,
     "Philipp Stahlberg": 1,
-    "Ran Benita": 1907,
     "Zhang Xiaomin": 1,
-    "Ronny Pfannschmidt": 1294,
+    "Claude": 14,
     "Toluwalase Akinyemi": 1,
-    "Claude": 11,
     "simukappu": 1,
     "Paneendra Kumar": 5,
     "Pierre Sassoulas": 188,
@@ -84,7 +86,6 @@
     "eternalrights": 3,
     "Syncrain": 2,
     "Zac Hatfield-Dodds": 100,
-    "Michael Seifert": 3,
     "Freya Bruhin": 308,
     "Joosboy": 2,
     "Alex Chen": 1,
@@ -1178,19 +1179,18 @@
     "2023": 640,
     "2024": 935,
     "2025": 680,
-    "2026": 742
+    "2026": 760
   },
   "ai_assisted": {
-    "commits": 116,
-    "authored": 12,
+    "commits": 120,
+    "authored": 15,
     "assistants": {
-      "Claude": 108,
+      "Claude": 112,
       "Codex": 5,
       "Cursor": 2,
       "Factory Droid": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1213,10 +1213,10 @@
       "2026-07": 36,
       "2026-08": 33,
       "2026-09": 13,
-      "2026-10": 20
+      "2026-10": 24,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 96,
       "2024-12": 49,
       "2025-01": 52,
       "2025-02": 50,
@@ -1239,22 +1239,23 @@
       "2026-07": 108,
       "2026-08": 101,
       "2026-09": 64,
-      "2026-10": 67
+      "2026-10": 84,
+      "2026-11": 1
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17860,
+    "commits": 17878,
     "by_kind": {
       "organization": 1026,
-      "one_person": 8319,
-      "personal": 6030,
-      "hidden": 622,
+      "one_person": 8317,
+      "personal": 6041,
+      "hidden": 630,
       "unknown": 1084,
-      "bot": 779
+      "bot": 780
     },
     "organization_count": 21,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "umich.edu",
@@ -1267,7 +1268,7 @@
       {
         "organization": "redhat.com",
         "commits": 241,
-        "commits_last_12mo": 14,
+        "commits_last_12mo": 6,
         "addresses": 10,
         "first_commit": "2015-08-04",
         "last_commit": "2026-05-26"
@@ -1281,9 +1282,9 @@
         "last_commit": "2022-12-21"
       },
       {
-        "organization": "org.ua",
+        "organization": "sydorenko.org.ua",
         "commits": 55,
-        "commits_last_12mo": 2,
+        "commits_last_12mo": 0,
         "addresses": 2,
         "first_commit": "2022-08-13",
         "last_commit": "2025-11-11"
@@ -1476,32 +1477,32 @@
       },
       "2026-Q3": {
         "organization": 2,
-        "one_person": 130,
-        "personal": 77,
+        "one_person": 129,
+        "personal": 78,
         "hidden": 21,
         "unknown": 0,
         "bot": 43
       },
       "2026-Q4": {
         "organization": 1,
-        "one_person": 21,
+        "one_person": 30,
         "personal": 18,
-        "hidden": 15,
+        "hidden": 23,
         "unknown": 0,
-        "bot": 12
+        "bot": 13
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 749,
-    "authors": 123,
-    "new_authors": 104,
-    "half_of_commits": 2
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 646,
+    "authors": 118,
+    "new_authors": 97,
+    "half_of_commits": 3
   },
   "humans": {
-    "commits": 17081,
+    "commits": 17098,
     "commits_by_year": {
       "2007": 580,
       "2008": 175,
@@ -1522,14 +1523,14 @@
       "2023": 522,
       "2024": 770,
       "2025": 523,
-      "2026": 609
+      "2026": 626
     },
-    "active_days": 3892
+    "active_days": 3897
   },
   "timezones": {
-    "+0000": 949,
-    "+0100": 3865,
-    "+0200": 5339,
+    "+0000": 953,
+    "+0100": 3867,
+    "+0200": 5344,
     "+0300": 1362,
     "+0330": 19,
     "+0400": 3,
@@ -1546,8 +1547,8 @@
     "+1200": 1,
     "+1300": 2,
     "-0200": 748,
-    "-0300": 3258,
-    "-0400": 434,
+    "-0300": 3263,
+    "-0400": 436,
     "-0500": 429,
     "-0600": 86,
     "-0700": 736,
@@ -1555,7 +1556,7 @@
     "-1000": 7
   },
   "source_lines": {
-    "added": 647362,
-    "current": 180694
+    "added": 648258,
+    "current": 182057
   }
 }

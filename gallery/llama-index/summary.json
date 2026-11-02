@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:32:33+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:00:18+00:00",
   "name": "LlamaIndex",
   "report_path": "index.html",
   "first_commit": "2022-11-02 04:25:10",
@@ -10,8 +10,8 @@
   "active_days": 1176,
   "total_commits": 7962,
   "total_authors": 1918,
-  "active_authors_12mo": 295,
-  "commits_last_12mo": 718,
+  "active_authors_12mo": 289,
+  "commits_last_12mo": 655,
   "total_files": 9798,
   "total_lines": 4775455,
   "lines_added": 13524442,
@@ -1976,7 +1976,6 @@
       "GitHub Copilot": 2
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1999,10 +1998,10 @@
       "2026-07": 1,
       "2026-08": 0,
       "2026-09": 1,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 152,
       "2024-12": 143,
       "2025-01": 126,
       "2025-02": 140,
@@ -2025,7 +2024,8 @@
       "2026-07": 36,
       "2026-08": 46,
       "2026-09": 33,
-      "2026-10": 11
+      "2026-10": 11,
+      "2026-11": 0
     }
   },
   "organizations": {
@@ -2033,8 +2033,8 @@
     "commits": 7962,
     "by_kind": {
       "organization": 211,
-      "one_person": 488,
-      "personal": 4680,
+      "one_person": 475,
+      "personal": 4693,
       "hidden": 2058,
       "unknown": 0,
       "bot": 525
@@ -2230,16 +2230,16 @@
     "quarters": {
       "2025-Q1": {
         "organization": 17,
-        "one_person": 31,
-        "personal": 250,
+        "one_person": 28,
+        "personal": 253,
         "hidden": 126,
         "unknown": 0,
         "bot": 3
       },
       "2025-Q2": {
         "organization": 11,
-        "one_person": 29,
-        "personal": 307,
+        "one_person": 28,
+        "personal": 308,
         "hidden": 155,
         "unknown": 0,
         "bot": 8
@@ -2343,6 +2343,6 @@
   },
   "source_lines": {
     "added": 3179271,
-    "current": 1696334
+    "current": 1810375
   }
 }

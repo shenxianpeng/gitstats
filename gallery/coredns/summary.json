@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:33:26+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:01:11+00:00",
   "name": "CoreDNS",
   "report_path": "index.html",
   "first_commit": "2016-03-18 20:57:35",
-  "last_commit": "2026-10-26 08:22:35",
-  "age_days": 3874,
-  "active_days": 1679,
-  "total_commits": 5199,
-  "total_authors": 513,
-  "active_authors_12mo": 93,
-  "commits_last_12mo": 777,
-  "total_files": 1060,
-  "total_lines": 148287,
-  "lines_added": 15102455,
-  "lines_removed": 14954095,
+  "last_commit": "2026-11-02 00:22:53",
+  "age_days": 3881,
+  "active_days": 1684,
+  "total_commits": 5223,
+  "total_authors": 515,
+  "active_authors_12mo": 95,
+  "commits_last_12mo": 739,
+  "total_files": 1071,
+  "total_lines": 149903,
+  "lines_added": 15104227,
+  "lines_removed": 14954251,
   "total_tags": 85,
   "era": "peak",
   "top_authors": [
@@ -33,7 +33,7 @@
     },
     {
       "name": "Ville Vesilehto",
-      "commits": 157
+      "commits": 160
     },
     {
       "name": "John Belamaric",
@@ -41,24 +41,26 @@
     }
   ],
   "author_commits": {
-    "Ville Vesilehto": 157,
-    "ump45nose": 10,
-    "houyuwushang": 38,
+    "Ville Vesilehto": 160,
+    "ump45nose": 16,
+    "mrchatam": 1,
+    "houyuwushang": 42,
+    "Qingyuan Wang": 1,
+    "Ilya Kulakov": 14,
+    "Aradhya Jain": 5,
+    "baltasarblanco": 9,
     "Yong Tang": 359,
     "Pujitha Paladugu": 3,
-    "Baltasar Blanco": 8,
     "Ahmad Mehrabi": 1,
     "myohannes": 2,
     "Christian Menges": 1,
     "jxj": 6,
     "MohibShaikh": 1,
-    "Aradhya Jain": 4,
     "Ben Kochie": 32,
     "Choudhry Shehryar": 1,
     "llucas": 2,
     "Arunesh Dwivedi": 1,
     "Amila Senadheera": 4,
-    "Ilya Kulakov": 13,
     "Saleh": 5,
     "Sak\u0131p Han Dursun": 1,
     "Paco Cartones": 4,
@@ -566,7 +568,7 @@
     "2023": 299,
     "2024": 234,
     "2025": 493,
-    "2026": 661
+    "2026": 685
   },
   "ai_assisted": {
     "commits": 8,
@@ -576,7 +578,6 @@
       "GitHub Copilot": 2
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -599,10 +600,10 @@
       "2026-07": 4,
       "2026-08": 2,
       "2026-09": 0,
-      "2026-10": 1
+      "2026-10": 1,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 33,
       "2024-12": 1,
       "2025-01": 1,
       "2025-02": 24,
@@ -625,22 +626,23 @@
       "2026-07": 134,
       "2026-08": 81,
       "2026-09": 82,
-      "2026-10": 59
+      "2026-10": 75,
+      "2026-11": 8
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5199,
+    "commits": 5223,
     "by_kind": {
       "organization": 594,
-      "one_person": 1695,
-      "personal": 751,
-      "hidden": 338,
+      "one_person": 1697,
+      "personal": 755,
+      "hidden": 350,
       "unknown": 0,
-      "bot": 1821
+      "bot": 1827
     },
     "organization_count": 12,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "infoblox.com",
@@ -798,24 +800,24 @@
       },
       "2026-Q4": {
         "organization": 5,
-        "one_person": 7,
-        "personal": 13,
-        "hidden": 14,
+        "one_person": 10,
+        "personal": 16,
+        "hidden": 26,
         "unknown": 0,
-        "bot": 20
+        "bot": 26
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 392,
-    "authors": 93,
-    "new_authors": 77,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 390,
+    "authors": 85,
+    "new_authors": 70,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 3378,
+    "commits": 3396,
     "commits_by_year": {
       "2016": 480,
       "2017": 509,
@@ -827,23 +829,23 @@
       "2023": 91,
       "2024": 68,
       "2025": 184,
-      "2026": 351
+      "2026": 369
     },
-    "active_days": 1461
+    "active_days": 1466
   },
   "timezones": {
     "+0000": 744,
     "+0100": 872,
-    "+0200": 516,
+    "+0200": 520,
     "+0300": 300,
-    "+0330": 6,
+    "+0330": 7,
     "+0400": 16,
     "+0430": 3,
     "+0500": 2,
-    "+0530": 49,
+    "+0530": 50,
     "+0600": 1,
     "+0700": 20,
-    "+0800": 280,
+    "+0800": 291,
     "+0900": 24,
     "+0930": 1,
     "+1000": 5,
@@ -851,15 +853,15 @@
     "+1100": 2,
     "+1200": 1,
     "+1300": 3,
-    "-0300": 24,
+    "-0300": 25,
     "-0400": 513,
     "-0500": 289,
     "-0600": 29,
-    "-0700": 1092,
-    "-0800": 405
+    "-0700": 1097,
+    "-0800": 406
   },
   "source_lines": {
-    "added": 260925,
-    "current": 146828
+    "added": 262681,
+    "current": 148825
   }
 }

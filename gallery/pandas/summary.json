@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:29:13+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:57:25+00:00",
   "name": "pandas",
   "report_path": "index.html",
   "first_commit": "2009-07-31 15:07:16",
-  "last_commit": "2026-10-26 22:41:18",
-  "age_days": 6297,
-  "active_days": 5309,
-  "total_commits": 39635,
-  "total_authors": 4044,
-  "active_authors_12mo": 403,
-  "commits_last_12mo": 2968,
-  "total_files": 2687,
-  "total_lines": 1073284,
-  "lines_added": 3318086,
-  "lines_removed": 2244792,
+  "last_commit": "2026-11-01 20:52:44",
+  "age_days": 6303,
+  "active_days": 5315,
+  "total_commits": 39687,
+  "total_authors": 4050,
+  "active_authors_12mo": 395,
+  "commits_last_12mo": 2900,
+  "total_files": 2689,
+  "total_lines": 1076810,
+  "lines_added": 3322110,
+  "lines_removed": 2245290,
   "total_tags": 102,
   "era": "steady",
   "top_authors": [
     {
       "name": "jbrockmendel",
-      "commits": 6475
+      "commits": 6511
     },
     {
       "name": "Jeff Reback",
@@ -37,12 +37,24 @@
     },
     {
       "name": "Matthew Roeschke",
-      "commits": 1555
+      "commits": 1556
     }
   ],
   "author_commits": {
-    "jbrockmendel": 6475,
-    "Matthew Roeschke": 1555,
+    "jbrockmendel": 6511,
+    "Fangchen Li": 183,
+    "Abhishek kr. Chauhan": 1,
+    "Shriraj Jadhav": 1,
+    "Tharoboiz": 1,
+    "ramchaser": 3,
+    "Mohd Maaz Khan": 3,
+    "Noah": 4,
+    "matiaslindgren": 10,
+    "Enrico Lockner": 1,
+    "Matthew Roeschke": 1556,
+    "Abhishek Kumar": 10,
+    "Chetan Sahney": 1,
+    "Igor Souza Lima": 1,
     "Davin Khotob": 1,
     "Junpei Zhang": 1,
     "Ge Li": 1,
@@ -59,11 +71,9 @@
     "Chaimaa Abi": 2,
     "Ayush Kumar": 1,
     "Sugandh Garg": 1,
-    "Fangchen Li": 182,
     "Mannava Daasaradhi": 1,
     "\u00c1lvaro Kothe": 65,
     "Juan Miguel Contreras": 1,
-    "Mohd Maaz Khan": 2,
     "britz": 1,
     "Atik": 1,
     "Saihritesh": 2,
@@ -71,7 +81,6 @@
     "Aidan Feldman": 21,
     "Leo Camus": 1,
     "yuchen-xu": 1,
-    "Abhishek Kumar": 8,
     "Trinh Quoc Anh": 41,
     "Natalia Mokeeva": 179,
     "GON": 1,
@@ -115,7 +124,6 @@
     "Abel Wondimu": 1,
     "Eastern": 1,
     "Kyubum Hwang": 1,
-    "ramchaser": 2,
     "Joshua Swanson": 1,
     "Sanjay": 1,
     "Apoorv Darshan": 1,
@@ -428,7 +436,6 @@
     "Sreeja Govardhana": 1,
     "AustinOregonState": 1,
     "justmhie": 1,
-    "matiaslindgren": 9,
     "Jayalakshmi M": 1,
     "Tyson Cung": 1,
     "Sanjana Moudgalya": 1,
@@ -1813,7 +1820,6 @@
     "juliansmidek": 1,
     "vladu": 1,
     "Daniel Saxton": 168,
-    "Noah": 3,
     "Alexandre Prince-Levasseur": 5,
     "Julia Signell": 3,
     "Andrew Wieteska": 74,
@@ -4104,18 +4110,17 @@
     "2023": 3017,
     "2024": 1769,
     "2025": 1097,
-    "2026": 2713
+    "2026": 2765
   },
   "ai_assisted": {
-    "commits": 1463,
+    "commits": 1502,
     "authored": 1,
     "assistants": {
-      "Claude": 1461,
+      "Claude": 1500,
       "Devin": 1,
       "GitHub Copilot": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -4138,10 +4143,10 @@
       "2026-07": 176,
       "2026-08": 167,
       "2026-09": 289,
-      "2026-10": 319
+      "2026-10": 349,
+      "2026-11": 9
     },
     "commits_by_month": {
-      "2024-11": 115,
       "2024-12": 62,
       "2025-01": 78,
       "2025-02": 100,
@@ -4164,22 +4169,23 @@
       "2026-07": 250,
       "2026-08": 275,
       "2026-09": 422,
-      "2026-10": 435
+      "2026-10": 477,
+      "2026-11": 10
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39635,
+    "commits": 39687,
     "by_kind": {
-      "organization": 987,
-      "one_person": 6674,
-      "personal": 23605,
-      "hidden": 8123,
+      "organization": 968,
+      "one_person": 6644,
+      "personal": 23696,
+      "hidden": 8131,
       "unknown": 25,
-      "bot": 221
+      "bot": 223
     },
-    "organization_count": 59,
-    "last_12mo_from": "2025-11",
+    "organization_count": 56,
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "lambdafoundry.com",
@@ -4294,14 +4300,6 @@
         "last_commit": "2017-07-07"
       },
       {
-        "organization": "yahoo.in",
-        "commits": 10,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2017-02-03",
-        "last_commit": "2020-12-07"
-      },
-      {
         "organization": "berkeley.edu",
         "commits": 9,
         "commits_last_12mo": 0,
@@ -4364,14 +4362,6 @@
         "addresses": 6,
         "first_commit": "2012-11-16",
         "last_commit": "2023-03-26"
-      },
-      {
-        "organization": "edu.in",
-        "commits": 6,
-        "commits_last_12mo": 1,
-        "addresses": 3,
-        "first_commit": "2018-11-05",
-        "last_commit": "2026-07-20"
       },
       {
         "organization": "gentoo.org",
@@ -4470,20 +4460,20 @@
         "last_commit": "2026-03-06"
       },
       {
-        "organization": "edu.br",
-        "commits": 4,
-        "commits_last_12mo": 0,
-        "addresses": 4,
-        "first_commit": "2018-09-18",
-        "last_commit": "2023-11-24"
-      },
-      {
         "organization": "iiitd.ac.in",
         "commits": 4,
         "commits_last_12mo": 0,
         "addresses": 3,
         "first_commit": "2014-05-14",
         "last_commit": "2023-01-03"
+      },
+      {
+        "organization": "insper.edu.br",
+        "commits": 4,
+        "commits_last_12mo": 0,
+        "addresses": 4,
+        "first_commit": "2018-09-18",
+        "last_commit": "2023-11-24"
       },
       {
         "organization": "microsoft.com",
@@ -4574,14 +4564,6 @@
         "last_commit": "2017-11-11"
       },
       {
-        "organization": "yahoo.com.br",
-        "commits": 3,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2020-03-12",
-        "last_commit": "2021-10-16"
-      },
-      {
         "organization": "counsyl.com",
         "commits": 2,
         "commits_last_12mo": 0,
@@ -4665,8 +4647,8 @@
       },
       "2025-Q2": {
         "organization": 4,
-        "one_person": 5,
-        "personal": 65,
+        "one_person": 4,
+        "personal": 66,
         "hidden": 83,
         "unknown": 0,
         "bot": 3
@@ -4704,8 +4686,8 @@
         "bot": 37
       },
       "2026-Q3": {
-        "organization": 1,
-        "one_person": 10,
+        "organization": 0,
+        "one_person": 11,
         "personal": 749,
         "hidden": 137,
         "unknown": 0,
@@ -4714,23 +4696,23 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 2,
-        "personal": 372,
-        "hidden": 46,
+        "personal": 414,
+        "hidden": 54,
         "unknown": 0,
-        "bot": 14
+        "bot": 16
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 2849,
-    "authors": 389,
-    "new_authors": 322,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 2781,
+    "authors": 365,
+    "new_authors": 301,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 39414,
+    "commits": 39464,
     "commits_by_year": {
       "2009": 100,
       "2010": 147,
@@ -4749,20 +4731,20 @@
       "2023": 2991,
       "2024": 1747,
       "2025": 1064,
-      "2026": 2599
+      "2026": 2649
     },
-    "active_days": 5301
+    "active_days": 5307
   },
   "timezones": {
     "+0000": 1633,
-    "+0100": 4023,
+    "+0100": 4025,
     "+0200": 3782,
     "+0300": 700,
     "+0330": 10,
     "+0400": 60,
     "+0430": 3,
     "+0500": 13,
-    "+0530": 1252,
+    "+0530": 1258,
     "+0545": 7,
     "+0600": 11,
     "+0700": 209,
@@ -4770,22 +4752,22 @@
     "+0900": 522,
     "+0930": 2,
     "+1000": 94,
-    "+1100": 67,
+    "+1100": 68,
     "+1200": 6,
     "+1300": 4,
     "+1400": 1,
     "-0200": 11,
-    "-0300": 219,
-    "-0400": 8230,
+    "-0300": 220,
+    "-0400": 8232,
     "-0500": 5869,
     "-0600": 709,
-    "-0700": 7283,
-    "-0800": 3943,
+    "-0700": 7314,
+    "-0800": 3952,
     "-0900": 1,
     "-1000": 361
   },
   "source_lines": {
-    "added": 3115355,
-    "current": 996701
+    "added": 3118342,
+    "current": 1000603
   }
 }

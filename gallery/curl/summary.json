@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:40:28+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:07:45+00:00",
   "name": "curl",
   "report_path": "index.html",
   "first_commit": "1999-12-29 14:20:26",
-  "last_commit": "2026-10-26 20:11:53",
-  "age_days": 9799,
-  "active_days": 7815,
-  "total_commits": 40272,
-  "total_authors": 1542,
-  "active_authors_12mo": 190,
-  "commits_last_12mo": 3564,
-  "total_files": 4610,
-  "total_lines": 634150,
-  "lines_added": 1950287,
-  "lines_removed": 1317453,
+  "last_commit": "2026-11-01 14:55:56",
+  "age_days": 9805,
+  "active_days": 7821,
+  "total_commits": 40323,
+  "total_authors": 1548,
+  "active_authors_12mo": 196,
+  "commits_last_12mo": 3206,
+  "total_files": 4547,
+  "total_lines": 625484,
+  "lines_added": 1952421,
+  "lines_removed": 1328253,
   "total_tags": 217,
   "era": "surge",
   "top_authors": [
     {
       "name": "Daniel Stenberg",
-      "commits": 20754
+      "commits": 20766
     },
     {
       "name": "Viktor Szakats",
-      "commits": 3573
+      "commits": 3590
     },
     {
       "name": "Yang Tse",
@@ -37,29 +37,36 @@
     },
     {
       "name": "Dan Fandrich",
-      "commits": 1471
+      "commits": 1472
     }
   ],
   "author_commits": {
+    "Viktor Szakats": 3590,
+    "Victor Hugo": 1,
+    "Max Dymond": 72,
+    "heppycat": 1,
+    "Dan Fandrich": 1472,
+    "Daniel Stenberg": 20766,
+    "Mohammadreza Khellat": 1,
+    "Vishnu Srivatsava": 1,
+    "akasakariko": 1,
+    "Jay Satiro": 795,
+    "Stefan Eissing": 1281,
+    "Martin Vlach": 3,
+    "Bob Swanson": 1,
+    "Treston Cuzzort": 3,
+    "Michiel van Slobbe": 7,
     "Daniel McCarney": 35,
-    "Viktor Szakats": 3573,
-    "Max Dymond": 69,
-    "Michiel van Slobbe": 4,
-    "Daniel Stenberg": 20754,
     "Sai Harsha": 1,
-    "Treston Cuzzort": 2,
     "akashdeshmukh-git": 3,
     "Martin Mirchev": 9,
     "Armaan Sandhu": 3,
-    "Stefan Eissing": 1279,
-    "Dan Fandrich": 1471,
     "Derek Martin": 1,
     "matty69v": 3,
     "11soda11": 4,
     "Stephen Augustus": 1,
     "AP": 1,
     "Khaled": 1,
-    "Martin Vlach": 2,
     "Jon DeVree": 4,
     "Rhino": 6,
     "Daniel Wade": 2,
@@ -72,7 +79,6 @@
     "Vasiliy-Kkk": 3,
     "pszemus": 1,
     "David Bures": 1,
-    "Jay Satiro": 794,
     "Samuel Henrique": 25,
     "jdymitarai": 1,
     "ns-ylambert": 2,
@@ -1612,7 +1618,7 @@
     "2023": 1905,
     "2024": 2436,
     "2025": 3477,
-    "2026": 2823
+    "2026": 2874
   },
   "ai_assisted": {
     "commits": 2,
@@ -1622,7 +1628,6 @@
       "GitHub Copilot": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1645,10 +1650,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 2
+      "2026-10": 2,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 117,
       "2024-12": 155,
       "2025-01": 232,
       "2025-02": 303,
@@ -1671,35 +1676,36 @@
       "2026-07": 173,
       "2026-08": 259,
       "2026-09": 355,
-      "2026-10": 308
+      "2026-10": 357,
+      "2026-11": 2
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 40272,
+    "commits": 40323,
     "by_kind": {
-      "organization": 22031,
-      "one_person": 10654,
-      "personal": 6899,
-      "hidden": 314,
+      "organization": 22035,
+      "one_person": 10170,
+      "personal": 7425,
+      "hidden": 315,
       "unknown": 60,
-      "bot": 314
+      "bot": 318
     },
-    "organization_count": 57,
-    "last_12mo_from": "2025-11",
+    "organization_count": 55,
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "haxx.se",
-        "commits": 20786,
-        "commits_last_12mo": 1045,
+        "commits": 20798,
+        "commits_last_12mo": 931,
         "addresses": 3,
         "first_commit": "1999-12-29",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-10-29"
       },
       {
         "organization": "teamviewer.com",
         "commits": 420,
-        "commits_last_12mo": 3,
+        "commits_last_12mo": 2,
         "addresses": 3,
         "first_commit": "2011-08-06",
         "last_commit": "2026-09-30"
@@ -1715,7 +1721,7 @@
       {
         "organization": "aisle.com",
         "commits": 62,
-        "commits_last_12mo": 42,
+        "commits_last_12mo": 40,
         "addresses": 2,
         "first_commit": "2025-09-16",
         "last_commit": "2026-10-09"
@@ -1731,7 +1737,7 @@
       {
         "organization": "ibm.com",
         "commits": 34,
-        "commits_last_12mo": 4,
+        "commits_last_12mo": 3,
         "addresses": 5,
         "first_commit": "2020-01-27",
         "last_commit": "2026-01-06"
@@ -1739,7 +1745,7 @@
       {
         "organization": "debian.org",
         "commits": 28,
-        "commits_last_12mo": 10,
+        "commits_last_12mo": 8,
         "addresses": 3,
         "first_commit": "2017-03-06",
         "last_commit": "2026-10-13"
@@ -1811,7 +1817,7 @@
       {
         "organization": "wolfssl.com",
         "commits": 15,
-        "commits_last_12mo": 3,
+        "commits_last_12mo": 2,
         "addresses": 9,
         "first_commit": "2018-04-11",
         "last_commit": "2026-07-24"
@@ -1887,14 +1893,6 @@
         "addresses": 4,
         "first_commit": "2010-11-18",
         "last_commit": "2024-02-29"
-      },
-      {
-        "organization": "yahoo.ca",
-        "commits": 6,
-        "commits_last_12mo": 0,
-        "addresses": 3,
-        "first_commit": "2012-08-07",
-        "last_commit": "2024-06-11"
       },
       {
         "organization": "infor.com",
@@ -2057,14 +2055,6 @@
         "last_commit": "2018-12-28"
       },
       {
-        "organization": "id.au",
-        "commits": 2,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2011-03-07",
-        "last_commit": "2022-07-06"
-      },
-      {
         "organization": "kde.org",
         "commits": 2,
         "commits_last_12mo": 0,
@@ -2203,25 +2193,25 @@
         "bot": 34
       },
       "2026-Q4": {
-        "organization": 59,
-        "one_person": 188,
-        "personal": 33,
-        "hidden": 16,
+        "organization": 71,
+        "one_person": 208,
+        "personal": 47,
+        "hidden": 17,
         "unknown": 0,
-        "bot": 12
+        "bot": 16
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 3435,
-    "authors": 190,
-    "new_authors": 147,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 3086,
+    "authors": 187,
+    "new_authors": 146,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 39958,
+    "commits": 40005,
     "commits_by_year": {
       "1999": 1,
       "2000": 710,
@@ -2250,25 +2240,25 @@
       "2023": 1905,
       "2024": 2354,
       "2025": 3348,
-      "2026": 2720
+      "2026": 2767
     },
-    "active_days": 7811
+    "active_days": 7817
   },
   "timezones": {
-    "+0000": 14830,
-    "+0100": 9181,
-    "+0200": 13005,
+    "+0000": 14837,
+    "+0100": 9215,
+    "+0200": 13007,
     "+0300": 311,
-    "+0330": 8,
+    "+0330": 9,
     "+0400": 25,
     "+0430": 1,
     "+0500": 19,
-    "+0530": 61,
+    "+0530": 62,
     "+0545": 1,
     "+0600": 2,
     "+0700": 17,
     "+0800": 186,
-    "+0900": 170,
+    "+0900": 171,
     "+0930": 1,
     "+1000": 43,
     "+1030": 2,
@@ -2277,17 +2267,17 @@
     "+1300": 9,
     "-0200": 3,
     "-0230": 4,
-    "-0300": 35,
+    "-0300": 36,
     "-0330": 1,
-    "-0400": 744,
-    "-0500": 503,
+    "-0400": 746,
+    "-0500": 504,
     "-0600": 108,
-    "-0700": 741,
+    "-0700": 742,
     "-0800": 243,
     "-1000": 1
   },
   "source_lines": {
-    "added": 1950301,
-    "current": 496126
+    "added": 1952435,
+    "current": 625484
   }
 }

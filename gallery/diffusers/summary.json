@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:32:03+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:59:43+00:00",
   "name": "Diffusers",
   "report_path": "index.html",
   "first_commit": "2022-05-30 16:07:33",
-  "last_commit": "2026-10-27 00:31:26",
-  "age_days": 1611,
-  "active_days": 1315,
-  "total_commits": 7014,
-  "total_authors": 1148,
-  "active_authors_12mo": 221,
-  "commits_last_12mo": 1061,
-  "total_files": 2989,
-  "total_lines": 1187172,
-  "lines_added": 1637910,
-  "lines_removed": 450691,
+  "last_commit": "2026-10-31 05:12:14",
+  "age_days": 1615,
+  "active_days": 1318,
+  "total_commits": 7025,
+  "total_authors": 1151,
+  "active_authors_12mo": 218,
+  "commits_last_12mo": 998,
+  "total_files": 3013,
+  "total_lines": 1194403,
+  "lines_added": 1647229,
+  "lines_removed": 452779,
   "total_tags": 26,
   "era": "steady",
   "top_authors": [
     {
       "name": "Sayak Paul",
-      "commits": 1078
+      "commits": 1079
     },
     {
       "name": "Patrick von Platen",
@@ -29,7 +29,7 @@
     },
     {
       "name": "Dhruv Nair",
-      "commits": 362
+      "commits": 363
     },
     {
       "name": "Suraj Patil",
@@ -37,16 +37,22 @@
     },
     {
       "name": "YiYi Xu",
-      "commits": 286
+      "commits": 289
     }
   ],
   "author_commits": {
-    "YiYi Xu": 286,
+    "kahlun": 1,
+    "YiYi Xu": 289,
+    "Aloys Jehwin": 2,
+    "Sylvan Liu": 1,
+    "Jingya HUANG": 11,
+    "Dhruv Nair": 363,
+    "Sayak Paul": 1079,
+    "Wang, Yi": 23,
+    "Ziyu Lin": 1,
     "Gorka Dab\u00f3": 1,
-    "Wang, Yi": 22,
     "A-Raphie": 1,
     "Linoy Tsaban": 75,
-    "Sayak Paul": 1078,
     "Aayush D C Dangi": 1,
     "Eliott C.": 1,
     "Christopher": 5,
@@ -56,8 +62,6 @@
     "Alexander Ivanov": 2,
     "Akshan Krithick": 63,
     "Stephen Batifol": 1,
-    "Jingya HUANG": 10,
-    "Dhruv Nair": 362,
     "Pauline Bailly-Masson": 12,
     "Vinh H. Pham": 25,
     "Javier De Jesus": 1,
@@ -102,7 +106,6 @@
     "Benjamin Bossan": 8,
     "BADAOUI Abdennacer": 1,
     "Funtowicz Morgan": 1,
-    "Aloys Jehwin": 1,
     "sashakunitsyn": 1,
     "Henos D": 1,
     "David El Malih": 44,
@@ -1195,17 +1198,16 @@
     "2023": 1890,
     "2024": 1466,
     "2025": 1151,
-    "2026": 926
+    "2026": 937
   },
   "ai_assisted": {
-    "commits": 106,
+    "commits": 108,
     "authored": 0,
     "assistants": {
-      "Claude": 101,
+      "Claude": 103,
       "GitHub Copilot": 5
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1228,10 +1230,10 @@
       "2026-07": 14,
       "2026-08": 25,
       "2026-09": 15,
-      "2026-10": 17
+      "2026-10": 19,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 65,
       "2024-12": 184,
       "2025-01": 138,
       "2025-02": 91,
@@ -1254,17 +1256,18 @@
       "2026-07": 111,
       "2026-08": 132,
       "2026-09": 64,
-      "2026-10": 67
+      "2026-10": 78,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7014,
+    "commits": 7025,
     "by_kind": {
-      "organization": 813,
-      "one_person": 336,
-      "personal": 4263,
-      "hidden": 1581,
+      "organization": 816,
+      "one_person": 334,
+      "personal": 4270,
+      "hidden": 1584,
       "unknown": 1,
       "bot": 20
     },
@@ -1281,11 +1284,11 @@
       },
       {
         "organization": "intel.com",
-        "commits": 132,
-        "commits_last_12mo": 49,
-        "addresses": 17,
+        "commits": 134,
+        "commits_last_12mo": 51,
+        "addresses": 18,
         "first_commit": "2022-12-15",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-10-31"
       },
       {
         "organization": "nvidia.com",
@@ -1321,11 +1324,11 @@
       },
       {
         "organization": "amd.com",
-        "commits": 4,
-        "commits_last_12mo": 2,
-        "addresses": 3,
+        "commits": 5,
+        "commits_last_12mo": 3,
+        "addresses": 4,
         "first_commit": "2025-04-05",
-        "last_commit": "2026-07-18"
+        "last_commit": "2026-10-29"
       },
       {
         "organization": "canva.com",
@@ -1450,10 +1453,10 @@
         "bot": 6
       },
       "2026-Q4": {
-        "organization": 7,
+        "organization": 10,
         "one_person": 0,
-        "personal": 41,
-        "hidden": 19,
+        "personal": 46,
+        "hidden": 22,
         "unknown": 0,
         "bot": 0
       }
@@ -1462,34 +1465,34 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1051,
-    "authors": 215,
-    "new_authors": 162,
+    "commits": 1062,
+    "authors": 218,
+    "new_authors": 165,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 6994,
+    "commits": 7005,
     "commits_by_year": {
       "2022": 1581,
       "2023": 1889,
       "2024": 1462,
       "2025": 1146,
-      "2026": 916
+      "2026": 927
     },
-    "active_days": 1315
+    "active_days": 1318
   },
   "timezones": {
     "+0000": 394,
-    "+0100": 733,
+    "+0100": 734,
     "+0200": 1551,
     "+0300": 253,
     "+0330": 1,
     "+0400": 24,
     "+0500": 6,
-    "+0530": 1726,
+    "+0530": 1729,
     "+0545": 2,
     "+0700": 74,
-    "+0800": 624,
+    "+0800": 627,
     "+0900": 181,
     "+1000": 12,
     "+1100": 6,
@@ -1499,12 +1502,12 @@
     "-0400": 150,
     "-0500": 94,
     "-0600": 65,
-    "-0700": 543,
+    "-0700": 544,
     "-0800": 237,
-    "-1000": 286
+    "-1000": 289
   },
   "source_lines": {
-    "added": 1642705,
-    "current": 1186113
+    "added": 1652024,
+    "current": 1194202
   }
 }

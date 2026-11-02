@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:28:25+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:56:54+00:00",
   "name": "Flask",
   "report_path": "index.html",
   "first_commit": "2010-04-06 11:12:57",
-  "last_commit": "2026-10-07 14:02:54",
-  "age_days": 6029,
-  "active_days": 1716,
-  "total_commits": 5562,
+  "last_commit": "2026-10-30 15:05:20",
+  "age_days": 6052,
+  "active_days": 1717,
+  "total_commits": 5566,
   "total_authors": 832,
   "active_authors_12mo": 6,
-  "commits_last_12mo": 94,
+  "commits_last_12mo": 89,
   "total_files": 236,
-  "total_lines": 36279,
-  "lines_added": 109314,
-  "lines_removed": 73035,
+  "total_lines": 36338,
+  "lines_added": 109397,
+  "lines_removed": 73059,
   "total_tags": 63,
   "era": "quiet",
   "top_authors": [
     {
       "name": "David Lord",
-      "commits": 1861
+      "commits": 1865
     },
     {
       "name": "Armin Ronacher",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "David Lord": 1861,
+    "David Lord": 1865,
     "lkk7": 2,
     "Micha\u0142 G\u00f3rny": 1,
     "Markus Heidelberg": 2,
@@ -891,14 +891,13 @@
     "2023": 325,
     "2024": 172,
     "2025": 90,
-    "2026": 84
+    "2026": 88
   },
   "ai_assisted": {
     "commits": 0,
     "authored": 0,
     "assistants": {},
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -921,10 +920,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 38,
       "2024-12": 0,
       "2025-01": 7,
       "2025-02": 0,
@@ -947,16 +946,17 @@
       "2026-07": 7,
       "2026-08": 9,
       "2026-09": 1,
-      "2026-10": 5
+      "2026-10": 9,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5562,
+    "commits": 5566,
     "by_kind": {
       "organization": 18,
-      "one_person": 2174,
-      "personal": 3038,
+      "one_person": 2173,
+      "personal": 3043,
       "hidden": 135,
       "unknown": 6,
       "bot": 191
@@ -1057,7 +1057,7 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 0,
-        "personal": 5,
+        "personal": 9,
         "hidden": 0,
         "unknown": 0,
         "bot": 0
@@ -1067,13 +1067,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 94,
+    "commits": 98,
     "authors": 6,
     "new_authors": 4,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 5371,
+    "commits": 5375,
     "commits_by_year": {
       "2010": 556,
       "2011": 463,
@@ -1091,9 +1091,9 @@
       "2023": 292,
       "2024": 152,
       "2025": 90,
-      "2026": 84
+      "2026": 88
     },
-    "active_days": 1676
+    "active_days": 1677
   },
   "timezones": {
     "+0000": 320,
@@ -1118,12 +1118,12 @@
     "-0400": 329,
     "-0500": 168,
     "-0600": 61,
-    "-0700": 1717,
+    "-0700": 1721,
     "-0800": 593,
     "-0900": 6
   },
   "source_lines": {
-    "added": 111701,
-    "current": 34559
+    "added": 111784,
+    "current": 34694
   }
 }

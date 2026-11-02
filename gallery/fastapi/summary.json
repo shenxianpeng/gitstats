@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:28:44+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:56:47+00:00",
   "name": "FastAPI",
   "report_path": "index.html",
   "first_commit": "2018-12-05 06:56:50",
-  "last_commit": "2026-10-26 10:29:12",
-  "age_days": 2883,
-  "active_days": 912,
-  "total_commits": 7953,
+  "last_commit": "2026-10-31 11:17:33",
+  "age_days": 2888,
+  "active_days": 913,
+  "total_commits": 7957,
   "total_authors": 887,
   "active_authors_12mo": 68,
-  "commits_last_12mo": 1761,
-  "total_files": 3233,
-  "total_lines": 408710,
-  "lines_added": 824540,
-  "lines_removed": 415830,
+  "commits_last_12mo": 1686,
+  "total_files": 3235,
+  "total_lines": 408726,
+  "lines_added": 824559,
+  "lines_removed": 415833,
   "total_tags": 344,
   "era": "surge",
   "top_authors": [
     {
       "name": "Sebasti\u00e1n Ram\u00edrez",
-      "commits": 2309
+      "commits": 2311
     },
     {
       "name": "github-actions",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Sebasti\u00e1n Ram\u00edrez": 2309,
+    "Sebasti\u00e1n Ram\u00edrez": 2311,
     "Yurii Motov": 124,
     "Mix": 1,
     "Victorien": 3,
@@ -938,7 +938,7 @@
     "2023": 780,
     "2024": 1999,
     "2025": 1150,
-    "2026": 1450
+    "2026": 1454
   },
   "ai_assisted": {
     "commits": 3,
@@ -949,7 +949,6 @@
       "GitHub Copilot": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -972,10 +971,10 @@
       "2026-07": 1,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 219,
       "2024-12": 124,
       "2025-01": 151,
       "2025-02": 121,
@@ -998,19 +997,20 @@
       "2026-07": 209,
       "2026-08": 88,
       "2026-09": 35,
-      "2026-10": 223
+      "2026-10": 227,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7953,
+    "commits": 7957,
     "by_kind": {
       "organization": 7,
-      "one_person": 155,
-      "personal": 3329,
+      "one_person": 152,
+      "personal": 3334,
       "hidden": 875,
       "unknown": 0,
-      "bot": 3587
+      "bot": 3589
     },
     "organization_count": 3,
     "last_12mo_from": "2025-11",
@@ -1100,23 +1100,23 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 0,
-        "personal": 46,
+        "personal": 48,
         "hidden": 6,
         "unknown": 0,
-        "bot": 171
+        "bot": 173
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 731,
+    "commits": 733,
     "authors": 68,
     "new_authors": 54,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 4366,
+    "commits": 4368,
     "commits_by_year": {
       "2018": 190,
       "2019": 510,
@@ -1126,13 +1126,13 @@
       "2023": 395,
       "2024": 974,
       "2025": 535,
-      "2026": 565
+      "2026": 567
     },
-    "active_days": 852
+    "active_days": 853
   },
   "timezones": {
-    "+0000": 3341,
-    "+0100": 898,
+    "+0000": 3343,
+    "+0100": 900,
     "+0200": 1515,
     "+0300": 218,
     "+0330": 17,
@@ -1157,7 +1157,7 @@
     "-0800": 202
   },
   "source_lines": {
-    "added": 810531,
-    "current": 403634
+    "added": 810548,
+    "current": 403705
   }
 }

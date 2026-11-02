@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:33:56+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:02:00+00:00",
   "name": "Harbor",
   "report_path": "index.html",
   "first_commit": "2016-02-01 11:59:10",
-  "last_commit": "2026-10-26 13:58:11",
-  "age_days": 3921,
-  "active_days": 2436,
-  "total_commits": 12937,
+  "last_commit": "2026-11-02 04:02:08",
+  "age_days": 3927,
+  "active_days": 2439,
+  "total_commits": 12942,
   "total_authors": 469,
-  "active_authors_12mo": 93,
-  "commits_last_12mo": 423,
-  "total_files": 3310,
-  "total_lines": 483491,
-  "lines_added": 4985699,
-  "lines_removed": 4502106,
+  "active_authors_12mo": 92,
+  "commits_last_12mo": 422,
+  "total_files": 3312,
+  "total_lines": 483733,
+  "lines_added": 4985959,
+  "lines_removed": 4502124,
   "total_tags": 41,
   "era": "steady",
   "top_authors": [
@@ -41,22 +41,22 @@
     }
   ],
   "author_commits": {
+    "Max": 3,
+    "Norway-02": 10,
+    "stonezdj(Daojun Zhang)": 556,
+    "Nikita Kodkany": 2,
     "Orlix": 24,
     "Vadim Bauer": 39,
-    "stonezdj(Daojun Zhang)": 554,
     "Prasanth Baskar": 53,
     "Wang Yan": 1095,
     "jUDASmILE": 14,
     "Chlins Zhang": 237,
     "Youngju KIM": 1,
     "Qingyuan Wang": 1,
-    "Nikita Kodkany": 1,
     "Viktor Erpylev": 3,
-    "Max": 2,
     "Lewis Bertin": 1,
     "warisshaikh1": 1,
     "Yannick M\u00fcller": 9,
-    "Norway-02": 9,
     "Hanabi": 1,
     "Vaibhav Srivastava": 1,
     "Maksym Trofimenko": 8,
@@ -522,18 +522,17 @@
     "2023": 434,
     "2024": 323,
     "2025": 269,
-    "2026": 402
+    "2026": 407
   },
   "ai_assisted": {
-    "commits": 16,
+    "commits": 18,
     "authored": 0,
     "assistants": {
       "Cursor": 7,
       "GitHub Copilot": 7,
-      "Claude": 3
+      "Claude": 5
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -556,10 +555,10 @@
       "2026-07": 3,
       "2026-08": 2,
       "2026-09": 5,
-      "2026-10": 2
+      "2026-10": 3,
+      "2026-11": 1
     },
     "commits_by_month": {
-      "2024-11": 24,
       "2024-12": 7,
       "2025-01": 33,
       "2025-02": 21,
@@ -582,27 +581,28 @@
       "2026-07": 39,
       "2026-08": 58,
       "2026-09": 46,
-      "2026-10": 77
+      "2026-10": 81,
+      "2026-11": 1
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 12937,
+    "commits": 12942,
     "by_kind": {
       "organization": 9000,
-      "one_person": 303,
-      "personal": 2293,
-      "hidden": 1073,
+      "one_person": 302,
+      "personal": 2298,
+      "hidden": 1074,
       "unknown": 8,
       "bot": 260
     },
     "organization_count": 10,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "vmware.com",
         "commits": 8814,
-        "commits_last_12mo": 12,
+        "commits_last_12mo": 11,
         "addresses": 51,
         "first_commit": "2016-02-01",
         "last_commit": "2026-03-16"
@@ -707,8 +707,8 @@
       },
       "2025-Q4": {
         "organization": 6,
-        "one_person": 3,
-        "personal": 14,
+        "one_person": 2,
+        "personal": 15,
         "hidden": 7,
         "unknown": 0,
         "bot": 9
@@ -740,23 +740,23 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 21,
-        "personal": 22,
-        "hidden": 7,
+        "personal": 26,
+        "hidden": 8,
         "unknown": 0,
         "bot": 27
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 344,
-    "authors": 92,
-    "new_authors": 75,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 343,
+    "authors": 90,
+    "new_authors": 73,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 12677,
+    "commits": 12682,
     "commits_by_year": {
       "2016": 2176,
       "2017": 1824,
@@ -768,21 +768,21 @@
       "2023": 407,
       "2024": 237,
       "2025": 204,
-      "2026": 329
+      "2026": 334
     },
-    "active_days": 2386
+    "active_days": 2389
   },
   "timezones": {
     "+0000": 334,
-    "+0100": 187,
+    "+0100": 188,
     "+0200": 235,
     "+0300": 56,
     "+0400": 1,
     "+0500": 3,
-    "+0530": 121,
+    "+0530": 122,
     "+0600": 11,
     "+0700": 4,
-    "+0800": 11289,
+    "+0800": 11291,
     "+0900": 19,
     "+1100": 11,
     "+1200": 1,
@@ -792,11 +792,11 @@
     "-0400": 145,
     "-0500": 94,
     "-0600": 44,
-    "-0700": 299,
+    "-0700": 300,
     "-0800": 72
   },
   "source_lines": {
-    "added": 1506360,
-    "current": 439728
+    "added": 1506620,
+    "current": 442621
   }
 }

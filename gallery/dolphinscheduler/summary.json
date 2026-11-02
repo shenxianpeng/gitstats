@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:37:26+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:04:38+00:00",
   "name": "Apache DolphinScheduler",
   "report_path": "index.html",
   "first_commit": "2019-03-01 16:39:25",
-  "last_commit": "2026-10-24 06:03:45",
-  "age_days": 2794,
-  "active_days": 1901,
-  "total_commits": 9111,
-  "total_authors": 668,
-  "active_authors_12mo": 69,
-  "commits_last_12mo": 354,
-  "total_files": 4874,
-  "total_lines": 450368,
-  "lines_added": 1680174,
-  "lines_removed": 1229588,
+  "last_commit": "2026-11-02 04:30:54",
+  "age_days": 2803,
+  "active_days": 1904,
+  "total_commits": 9116,
+  "total_authors": 672,
+  "active_authors_12mo": 72,
+  "commits_last_12mo": 327,
+  "total_files": 4875,
+  "total_lines": 450741,
+  "lines_added": 1680631,
+  "lines_removed": 1229672,
   "total_tags": 8,
   "era": "quiet",
   "top_authors": [
@@ -41,6 +41,10 @@
     }
   ],
   "author_commits": {
+    "Jay Choukikar": 1,
+    "Sharang Gupta": 1,
+    "Moouna": 2,
+    "Itachi_194109": 1,
     "silvermissile": 1,
     "Kerwin": 208,
     "mengzhe gan": 5,
@@ -718,7 +722,7 @@
     "2023": 571,
     "2024": 429,
     "2025": 224,
-    "2026": 302
+    "2026": 307
   },
   "ai_assisted": {
     "commits": 1,
@@ -727,7 +731,6 @@
       "GitHub Copilot": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -750,10 +753,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 28,
       "2024-12": 25,
       "2025-01": 10,
       "2025-02": 13,
@@ -776,27 +779,28 @@
       "2026-07": 11,
       "2026-08": 23,
       "2026-09": 26,
-      "2026-10": 27
+      "2026-10": 31,
+      "2026-11": 1
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9111,
+    "commits": 9116,
     "by_kind": {
       "organization": 1582,
-      "one_person": 417,
-      "personal": 5329,
+      "one_person": 412,
+      "personal": 5339,
       "hidden": 1780,
       "unknown": 1,
       "bot": 2
     },
     "organization_count": 4,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "apache.org",
         "commits": 799,
-        "commits_last_12mo": 96,
+        "commits_last_12mo": 90,
         "addresses": 18,
         "first_commit": "2020-03-08",
         "last_commit": "2026-09-08"
@@ -885,8 +889,8 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 1,
-        "personal": 17,
+        "one_person": 2,
+        "personal": 21,
         "hidden": 9,
         "unknown": 0,
         "bot": 0
@@ -894,15 +898,15 @@
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 354,
-    "authors": 68,
-    "new_authors": 53,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 327,
+    "authors": 65,
+    "new_authors": 50,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 9109,
+    "commits": 9114,
     "commits_by_year": {
       "2019": 1889,
       "2020": 2359,
@@ -911,20 +915,20 @@
       "2023": 571,
       "2024": 429,
       "2025": 224,
-      "2026": 302
+      "2026": 307
     },
-    "active_days": 1901
+    "active_days": 1904
   },
   "timezones": {
-    "+0000": 1,
+    "+0000": 2,
     "+0100": 17,
     "+0200": 10,
     "+0300": 2,
     "+0500": 3,
-    "+0530": 31,
+    "+0530": 32,
     "+0545": 1,
     "+0700": 3,
-    "+0800": 8982,
+    "+0800": 8985,
     "+0900": 3,
     "+1000": 10,
     "+1100": 1,
@@ -936,7 +940,7 @@
     "-0800": 2
   },
   "source_lines": {
-    "added": 1829484,
-    "current": 442207
+    "added": 1829941,
+    "current": 446848
   }
 }

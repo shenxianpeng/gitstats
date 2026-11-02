@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:36:37+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:04:24+00:00",
   "name": "webpack",
   "report_path": "index.html",
   "first_commit": "2012-03-10 12:11:23",
-  "last_commit": "2026-10-26 12:53:12",
-  "age_days": 5344,
-  "active_days": 3258,
-  "total_commits": 20187,
+  "last_commit": "2026-11-02 01:28:07",
+  "age_days": 5350,
+  "active_days": 3265,
+  "total_commits": 20303,
   "total_authors": 933,
   "active_authors_12mo": 46,
-  "commits_last_12mo": 2039,
-  "total_files": 21849,
-  "total_lines": 1132471,
-  "lines_added": 2108932,
-  "lines_removed": 976267,
+  "commits_last_12mo": 2077,
+  "total_files": 22979,
+  "total_lines": 1093918,
+  "lines_added": 2176738,
+  "lines_removed": 1082624,
   "total_tags": 654,
   "era": "surge",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Alexander Akait",
-      "commits": 3069
+      "commits": 3164
     },
     {
       "name": "Sean Larkin",
@@ -41,12 +41,13 @@
     }
   ],
   "author_commits": {
-    "Alexander Akait": 3069,
-    "Raj Aryan": 95,
+    "Alexander Akait": 3164,
+    "hai-x": 222,
+    "Raj Aryan": 102,
+    "Xiao": 170,
+    "Fy": 15,
     "Lazizbek Ergashev": 3,
-    "Xiao": 169,
     "Siddharth S": 1,
-    "hai-x": 218,
     "Eshiv": 6,
     "Qingyuan Wang": 1,
     "Manit Roy": 1,
@@ -74,7 +75,6 @@
     "Siddhi Gupta": 1,
     "Gengkun": 109,
     "Rohan Santhosh": 1,
-    "Fy": 14,
     "Kartikey Gupta": 1,
     "shayanna": 1,
     "STEFAN BINOJ": 4,
@@ -990,18 +990,17 @@
     "2023": 1153,
     "2024": 1152,
     "2025": 681,
-    "2026": 1908
+    "2026": 2024
   },
   "ai_assisted": {
-    "commits": 246,
+    "commits": 296,
     "authored": 2,
     "assistants": {
-      "Claude": 235,
+      "Claude": 285,
       "CodeRabbit": 8,
       "GitHub Copilot": 4
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1024,10 +1023,10 @@
       "2026-07": 7,
       "2026-08": 2,
       "2026-09": 30,
-      "2026-10": 181
+      "2026-10": 219,
+      "2026-11": 12
     },
     "commits_by_month": {
-      "2024-11": 130,
       "2024-12": 25,
       "2025-01": 1,
       "2025-02": 34,
@@ -1050,22 +1049,23 @@
       "2026-07": 203,
       "2026-08": 238,
       "2026-09": 383,
-      "2026-10": 462
+      "2026-10": 554,
+      "2026-11": 24
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20187,
+    "commits": 20303,
     "by_kind": {
       "organization": 331,
-      "one_person": 1503,
-      "personal": 14235,
-      "hidden": 2495,
+      "one_person": 1488,
+      "personal": 14256,
+      "hidden": 2597,
       "unknown": 6,
-      "bot": 1617
+      "bot": 1625
     },
     "organization_count": 15,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "microsoft.com",
@@ -1248,23 +1248,23 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 1,
-        "personal": 60,
-        "hidden": 367,
+        "personal": 66,
+        "hidden": 469,
         "unknown": 0,
-        "bot": 34
+        "bot": 42
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 1795,
-    "authors": 46,
-    "new_authors": 35,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 1841,
+    "authors": 45,
+    "new_authors": 34,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 18570,
+    "commits": 18678,
     "commits_by_year": {
       "2012": 274,
       "2013": 306,
@@ -1280,22 +1280,22 @@
       "2023": 1088,
       "2024": 1053,
       "2025": 587,
-      "2026": 1693
+      "2026": 1801
     },
-    "active_days": 3126
+    "active_days": 3133
   },
   "timezones": {
-    "+0000": 1402,
+    "+0000": 1407,
     "+0100": 4713,
     "+0200": 6308,
-    "+0300": 3849,
+    "+0300": 3943,
     "+0330": 1,
     "+0400": 38,
     "+0500": 7,
-    "+0530": 685,
+    "+0530": 692,
     "+0600": 1,
     "+0700": 56,
-    "+0800": 907,
+    "+0800": 913,
     "+0900": 100,
     "+1000": 81,
     "+1100": 334,
@@ -1303,13 +1303,13 @@
     "-0200": 5,
     "-0300": 20,
     "-0400": 224,
-    "-0500": 399,
+    "-0500": 403,
     "-0600": 221,
     "-0700": 628,
     "-0800": 206
   },
   "source_lines": {
-    "added": 1760760,
-    "current": 911061
+    "added": 1825084,
+    "current": 877025
   }
 }

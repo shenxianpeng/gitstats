@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:36:43+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:04:27+00:00",
   "name": "Tailwind CSS",
   "report_path": "index.html",
   "first_commit": "2017-07-20 12:38:55",
-  "last_commit": "2026-10-19 15:50:54",
-  "age_days": 3379,
-  "active_days": 1561,
-  "total_commits": 6877,
-  "total_authors": 377,
-  "active_authors_12mo": 66,
-  "commits_last_12mo": 379,
-  "total_files": 558,
-  "total_lines": 199730,
-  "lines_added": 5231526,
-  "lines_removed": 5031796,
+  "last_commit": "2026-11-01 23:58:26",
+  "age_days": 3392,
+  "active_days": 1562,
+  "total_commits": 6882,
+  "total_authors": 378,
+  "active_authors_12mo": 67,
+  "commits_last_12mo": 353,
+  "total_files": 562,
+  "total_lines": 200781,
+  "lines_added": 5232591,
+  "lines_removed": 5031810,
   "total_tags": 263,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Robin Malfait",
-      "commits": 1014
+      "commits": 1017
     },
     {
       "name": "Jordan Pittman",
@@ -41,7 +41,8 @@
     }
   ],
   "author_commits": {
-    "Robin Malfait": 1014,
+    "Wei-Lun Li": 1,
+    "Robin Malfait": 1017,
     "\uc591\uc9c0\uc6b0": 1,
     "i098": 1,
     "OllieinCanada": 1,
@@ -429,18 +430,17 @@
     "2023": 258,
     "2024": 643,
     "2025": 712,
-    "2026": 303
+    "2026": 308
   },
   "ai_assisted": {
-    "commits": 13,
+    "commits": 14,
     "authored": 0,
     "assistants": {
-      "Claude": 12,
+      "Claude": 13,
       "CodeRabbit": 2,
       "Codex": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -463,10 +463,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 1,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 1
     },
     "commits_by_month": {
-      "2024-11": 142,
       "2024-12": 36,
       "2025-01": 98,
       "2025-02": 87,
@@ -489,22 +489,23 @@
       "2026-07": 31,
       "2026-08": 24,
       "2026-09": 5,
-      "2026-10": 25
+      "2026-10": 25,
+      "2026-11": 5
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 6877,
+    "commits": 6882,
     "by_kind": {
       "organization": 11,
-      "one_person": 1374,
-      "personal": 4304,
+      "one_person": 1372,
+      "personal": 4310,
       "hidden": 165,
       "unknown": 5,
-      "bot": 1018
+      "bot": 1019
     },
     "organization_count": 1,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "tighten.co",
@@ -575,23 +576,23 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 1,
-        "personal": 22,
+        "personal": 26,
         "hidden": 2,
         "unknown": 0,
-        "bot": 0
+        "bot": 1
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 321,
-    "authors": 66,
-    "new_authors": 58,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 307,
+    "authors": 64,
+    "new_authors": 57,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 5859,
+    "commits": 5863,
     "commits_by_year": {
       "2017": 1392,
       "2018": 263,
@@ -602,13 +603,13 @@
       "2023": 213,
       "2024": 609,
       "2025": 504,
-      "2026": 280
+      "2026": 284
     },
-    "active_days": 1323
+    "active_days": 1324
   },
   "timezones": {
-    "+0000": 823,
-    "+0100": 903,
+    "+0000": 824,
+    "+0100": 906,
     "+0200": 889,
     "+0300": 30,
     "+0500": 7,
@@ -616,7 +617,7 @@
     "+0600": 2,
     "+0700": 6,
     "+0800": 38,
-    "+0900": 17,
+    "+0900": 18,
     "+0930": 27,
     "+1000": 18,
     "+1030": 1,
@@ -631,7 +632,7 @@
     "-0800": 8
   },
   "source_lines": {
-    "added": 589502,
-    "current": 174785
+    "added": 590567,
+    "current": 176222
   }
 }

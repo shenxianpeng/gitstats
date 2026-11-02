@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:33:48+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:01:35+00:00",
   "name": "Flux",
   "report_path": "index.html",
   "first_commit": "2020-04-24 09:38:22",
@@ -11,7 +11,7 @@
   "total_commits": 4123,
   "total_authors": 224,
   "active_authors_12mo": 49,
-  "commits_last_12mo": 393,
+  "commits_last_12mo": 377,
   "total_files": 835,
   "total_lines": 72485,
   "lines_added": 154859,
@@ -287,7 +287,6 @@
       "Unnamed assistant": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -310,10 +309,10 @@
       "2026-07": 0,
       "2026-08": 1,
       "2026-09": 7,
-      "2026-10": 5
+      "2026-10": 5,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 8,
       "2024-12": 21,
       "2025-01": 20,
       "2025-02": 34,
@@ -336,7 +335,8 @@
       "2026-07": 36,
       "2026-08": 11,
       "2026-09": 17,
-      "2026-10": 111
+      "2026-10": 111,
+      "2026-11": 0
     }
   },
   "organizations": {
@@ -344,8 +344,8 @@
     "commits": 4123,
     "by_kind": {
       "organization": 243,
-      "one_person": 517,
-      "personal": 2560,
+      "one_person": 516,
+      "personal": 2561,
       "hidden": 660,
       "unknown": 0,
       "bot": 143
@@ -514,6 +514,6 @@
   },
   "source_lines": {
     "added": 137157,
-    "current": 63823
+    "current": 64292
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:38:10+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:06:10+00:00",
   "name": "Ant Design",
   "report_path": "index.html",
   "first_commit": "2015-05-07 10:50:36",
-  "last_commit": "2026-10-26 09:48:13",
-  "age_days": 4190,
-  "active_days": 3838,
-  "total_commits": 33136,
-  "total_authors": 2612,
+  "last_commit": "2026-11-01 13:33:04",
+  "age_days": 4197,
+  "active_days": 3843,
+  "total_commits": 33155,
+  "total_authors": 2613,
   "active_authors_12mo": 195,
-  "commits_last_12mo": 2359,
+  "commits_last_12mo": 2138,
   "total_files": 5042,
-  "total_lines": 1751648,
-  "lines_added": 6293956,
-  "lines_removed": 4542307,
+  "total_lines": 1753125,
+  "lines_added": 6295533,
+  "lines_removed": 4542407,
   "total_tags": 758,
   "era": "steady",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "lijianan",
-      "commits": 1526
+      "commits": 1530
     },
     {
       "name": "Benjy Cui",
@@ -41,15 +41,17 @@
     }
   ],
   "author_commits": {
+    "lijianan": 1530,
+    "\u591a\u683c": 58,
+    "Nicol\u00f2 Zandarin": 12,
+    "\u9ad8\u8273\u5175": 331,
+    "Dominique Roduit": 1,
+    "JANSON": 3,
     "WH-bin": 1,
     "AMin": 1,
-    "\u591a\u683c": 57,
-    "\u9ad8\u8273\u5175": 330,
-    "lijianan": 1526,
     "afc163": 10854,
     "zoomdong": 54,
     "Enes Uygur": 1,
-    "JANSON": 2,
     "Otto": 1,
     "YeYiChen": 3,
     "Amumu": 221,
@@ -92,7 +94,6 @@
     "NoiseFan": 5,
     "darkingtail": 1,
     "lee": 3,
-    "Nicol\u00f2 Zandarin": 6,
     "water": 2,
     "QdabuliuQ": 16,
     "\ub099\ud0c0/\uc1a1\uc7ac\uc11d": 1,
@@ -2666,20 +2667,19 @@
     "2023": 2676,
     "2024": 2021,
     "2025": 2248,
-    "2026": 1933
+    "2026": 1952
   },
   "ai_assisted": {
-    "commits": 334,
+    "commits": 336,
     "authored": 21,
     "assistants": {
       "Gemini": 152,
-      "Claude": 138,
-      "GitHub Copilot": 62,
+      "Claude": 139,
+      "GitHub Copilot": 63,
       "Cursor": 9,
       "CodeRabbit": 5
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -2702,10 +2702,10 @@
       "2026-07": 15,
       "2026-08": 15,
       "2026-09": 2,
-      "2026-10": 2
+      "2026-10": 3,
+      "2026-11": 1
     },
     "commits_by_month": {
-      "2024-11": 138,
       "2024-12": 149,
       "2025-01": 221,
       "2025-02": 173,
@@ -2728,22 +2728,23 @@
       "2026-07": 219,
       "2026-08": 175,
       "2026-09": 133,
-      "2026-10": 96
+      "2026-10": 108,
+      "2026-11": 7
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 33136,
+    "commits": 33155,
     "by_kind": {
-      "organization": 911,
-      "one_person": 683,
-      "personal": 27069,
-      "hidden": 2534,
+      "organization": 903,
+      "one_person": 675,
+      "personal": 27091,
+      "hidden": 2542,
       "unknown": 5,
-      "bot": 1934
+      "bot": 1939
     },
-    "organization_count": 16,
-    "last_12mo_from": "2025-11",
+    "organization_count": 13,
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "alipay.com",
@@ -2756,7 +2757,7 @@
       {
         "organization": "alibaba-inc.com",
         "commits": 329,
-        "commits_last_12mo": 43,
+        "commits_last_12mo": 40,
         "addresses": 25,
         "first_commit": "2015-06-09",
         "last_commit": "2026-06-27"
@@ -2810,14 +2811,6 @@
         "last_commit": "2019-04-22"
       },
       {
-        "organization": "live.cn",
-        "commits": 4,
-        "commits_last_12mo": 0,
-        "addresses": 3,
-        "first_commit": "2021-09-13",
-        "last_commit": "2024-02-02"
-      },
-      {
         "organization": "activeviam.com",
         "commits": 3,
         "commits_last_12mo": 0,
@@ -2840,22 +2833,6 @@
         "addresses": 3,
         "first_commit": "2018-07-16",
         "last_commit": "2018-12-21"
-      },
-      {
-        "organization": "21cn.com",
-        "commits": 2,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2016-11-03",
-        "last_commit": "2018-03-11"
-      },
-      {
-        "organization": "com.ar",
-        "commits": 2,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2019-01-23",
-        "last_commit": "2020-07-16"
       },
       {
         "organization": "netease.com",
@@ -2885,8 +2862,8 @@
       },
       "2025-Q2": {
         "organization": 2,
-        "one_person": 9,
-        "personal": 284,
+        "one_person": 8,
+        "personal": 285,
         "hidden": 58,
         "unknown": 0,
         "bot": 90
@@ -2909,8 +2886,8 @@
       },
       "2026-Q1": {
         "organization": 18,
-        "one_person": 12,
-        "personal": 305,
+        "one_person": 10,
+        "personal": 307,
         "hidden": 126,
         "unknown": 0,
         "bot": 164
@@ -2933,24 +2910,24 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 1,
-        "personal": 50,
-        "hidden": 35,
+        "one_person": 2,
+        "personal": 55,
+        "hidden": 43,
         "unknown": 0,
-        "bot": 10
+        "bot": 15
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 1794,
-    "authors": 194,
-    "new_authors": 145,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 1615,
+    "authors": 177,
+    "new_authors": 132,
     "half_of_commits": 4
   },
   "humans": {
-    "commits": 31202,
+    "commits": 31216,
     "commits_by_year": {
       "2015": 3342,
       "2016": 3938,
@@ -2963,13 +2940,13 @@
       "2023": 2426,
       "2024": 1693,
       "2025": 1828,
-      "2026": 1463
+      "2026": 1477
     },
-    "active_days": 3799
+    "active_days": 3804
   },
   "timezones": {
     "+0000": 980,
-    "+0100": 298,
+    "+0100": 305,
     "+0200": 393,
     "+0300": 226,
     "+0330": 39,
@@ -2980,7 +2957,7 @@
     "+0545": 12,
     "+0600": 9,
     "+0700": 143,
-    "+0800": 30012,
+    "+0800": 30024,
     "+0900": 116,
     "+0930": 7,
     "+1000": 40,
@@ -2998,7 +2975,7 @@
     "-1000": 1
   },
   "source_lines": {
-    "added": 1190639,
-    "current": 360348
+    "added": 1190995,
+    "current": 360895
   }
 }

@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:31:27+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:59:41+00:00",
   "name": "LangChain",
   "report_path": "index.html",
   "first_commit": "2022-10-24 21:51:15",
-  "last_commit": "2026-10-26 23:00:03",
-  "age_days": 1464,
-  "active_days": 1313,
-  "total_commits": 17083,
-  "total_authors": 3594,
-  "active_authors_12mo": 239,
-  "commits_last_12mo": 2403,
-  "total_files": 3275,
-  "total_lines": 575809,
-  "lines_added": 3868638,
-  "lines_removed": 3292828,
-  "total_tags": 1310,
+  "last_commit": "2026-11-02 00:44:54",
+  "age_days": 1470,
+  "active_days": 1320,
+  "total_commits": 17111,
+  "total_authors": 3597,
+  "active_authors_12mo": 237,
+  "commits_last_12mo": 2290,
+  "total_files": 3277,
+  "total_lines": 581257,
+  "lines_added": 3876197,
+  "lines_removed": 3294939,
+  "total_tags": 1314,
   "era": "steady",
   "top_authors": [
     {
@@ -29,20 +29,25 @@
     },
     {
       "name": "ccurme",
-      "commits": 1175
+      "commits": 1179
+    },
+    {
+      "name": "Mason Daugherty",
+      "commits": 972
     },
     {
       "name": "Erick Friis",
       "commits": 971
-    },
-    {
-      "name": "Mason Daugherty",
-      "commits": 971
     }
   ],
   "author_commits": {
-    "ccurme": 1175,
-    "Mason Daugherty": 971,
+    "Mason Daugherty": 972,
+    "ccurme": 1179,
+    "Thushanth Bengre": 1,
+    "Elior Nataf Lackritz": 1,
+    "Eugene Yurtsev": 764,
+    "Hunter Lovell": 27,
+    "Sera": 1,
     "John Kennedy": 23,
     "Richard Scarrott": 11,
     "Vladislav Nechakhin": 1,
@@ -52,7 +57,6 @@
     "Baihao Wang": 2,
     "gethin-langchain": 1,
     "nm-fireworks": 1,
-    "Hunter Lovell": 25,
     "Emil F": 2,
     "Juan Ezquerro LLanes": 1,
     "xuan": 1,
@@ -70,7 +74,6 @@
     "Huzaifa Iftikhar": 1,
     "Luk\u00e1\u0161 Ko\u017eu\u0161n\u00edk": 1,
     "Kodurd": 2,
-    "Eugene Yurtsev": 762,
     "andrewmadson-pplx": 2,
     "DO999www": 1,
     "Noah Dylan": 1,
@@ -3641,17 +3644,16 @@
     "2023": 6342,
     "2024": 5701,
     "2025": 2693,
-    "2026": 2063
+    "2026": 2091
   },
   "ai_assisted": {
-    "commits": 46,
+    "commits": 47,
     "authored": 9,
     "assistants": {
       "GitHub Copilot": 27,
-      "Claude": 19
+      "Claude": 20
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -3674,10 +3676,10 @@
       "2026-07": 2,
       "2026-08": 3,
       "2026-09": 1,
-      "2026-10": 0
+      "2026-10": 1,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 251,
       "2024-12": 313,
       "2025-01": 225,
       "2025-02": 217,
@@ -3700,30 +3702,31 @@
       "2026-07": 145,
       "2026-08": 193,
       "2026-09": 187,
-      "2026-10": 209
+      "2026-10": 229,
+      "2026-11": 8
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17083,
+    "commits": 17111,
     "by_kind": {
-      "organization": 2499,
-      "one_person": 830,
-      "personal": 7441,
-      "hidden": 5432,
+      "organization": 2497,
+      "one_person": 824,
+      "personal": 7459,
+      "hidden": 5434,
       "unknown": 0,
-      "bot": 881
+      "bot": 897
     },
-    "organization_count": 35,
-    "last_12mo_from": "2025-11",
+    "organization_count": 34,
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "langchain.dev",
-        "commits": 2194,
-        "commits_last_12mo": 595,
-        "addresses": 18,
+        "commits": 2196,
+        "commits_last_12mo": 552,
+        "addresses": 19,
         "first_commit": "2023-07-25",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-10-29"
       },
       {
         "organization": "unstructuredai.io",
@@ -3910,14 +3913,6 @@
         "last_commit": "2024-03-15"
       },
       {
-        "organization": "yahoo.in",
-        "commits": 4,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2024-06-18",
-        "last_commit": "2025-03-14"
-      },
-      {
         "organization": "alibaba-inc.com",
         "commits": 3,
         "commits_last_12mo": 0,
@@ -4000,9 +3995,9 @@
     ],
     "quarters": {
       "2025-Q1": {
-        "organization": 87,
-        "one_person": 45,
-        "personal": 411,
+        "organization": 84,
+        "one_person": 44,
+        "personal": 415,
         "hidden": 168,
         "unknown": 0,
         "bot": 0
@@ -4056,36 +4051,36 @@
         "bot": 214
       },
       "2026-Q4": {
-        "organization": 15,
+        "organization": 17,
         "one_person": 2,
-        "personal": 34,
-        "hidden": 5,
+        "personal": 42,
+        "hidden": 7,
         "unknown": 0,
-        "bot": 153
+        "bot": 169
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 1542,
-    "authors": 234,
-    "new_authors": 192,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 1415,
+    "authors": 214,
+    "new_authors": 178,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 16202,
+    "commits": 16214,
     "commits_by_year": {
       "2022": 284,
       "2023": 6340,
       "2024": 5700,
       "2025": 2672,
-      "2026": 1206
+      "2026": 1218
     },
-    "active_days": 1283
+    "active_days": 1286
   },
   "timezones": {
-    "+0000": 254,
+    "+0000": 257,
     "+0100": 1149,
     "+0200": 1206,
     "+0300": 258,
@@ -4098,7 +4093,7 @@
     "+0600": 32,
     "+0700": 55,
     "+0800": 1068,
-    "+0900": 484,
+    "+0900": 486,
     "+1000": 118,
     "+1030": 2,
     "+1100": 17,
@@ -4106,15 +4101,15 @@
     "+1300": 8,
     "-0100": 1,
     "-0300": 147,
-    "-0400": 3609,
-    "-0500": 1440,
+    "-0400": 3623,
+    "-0500": 1442,
     "-0600": 209,
-    "-0700": 4137,
-    "-0800": 2004,
+    "-0700": 4140,
+    "-0800": 2008,
     "-1000": 3
   },
   "source_lines": {
-    "added": 2761275,
-    "current": 480799
+    "added": 2768593,
+    "current": 489591
   }
 }

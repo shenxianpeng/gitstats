@@ -1,72 +1,82 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:32:02+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:00:03+00:00",
   "name": "JAX",
   "report_path": "index.html",
   "first_commit": "2018-11-18 02:03:33",
-  "last_commit": "2026-10-27 01:07:50",
-  "age_days": 2900,
-  "active_days": 2749,
-  "total_commits": 39431,
-  "total_authors": 1065,
-  "active_authors_12mo": 315,
-  "commits_last_12mo": 7820,
-  "total_files": 2034,
-  "total_lines": 899250,
-  "lines_added": 2004696,
-  "lines_removed": 1105413,
+  "last_commit": "2026-11-01 08:07:08",
+  "age_days": 2906,
+  "active_days": 2754,
+  "total_commits": 39583,
+  "total_authors": 1068,
+  "active_authors_12mo": 316,
+  "commits_last_12mo": 7475,
+  "total_files": 2062,
+  "total_lines": 914332,
+  "lines_added": 2025021,
+  "lines_removed": 1110656,
   "total_tags": 263,
   "era": "surge",
   "top_authors": [
     {
       "name": "jax authors",
-      "commits": 11085
+      "commits": 11120
     },
     {
       "name": "Peter Hawkins",
-      "commits": 3902
+      "commits": 3920
     },
     {
-      "name": "Jake VanderPlas CA",
-      "commits": 3142
+      "name": "Jake VanderPlas",
+      "commits": 3156
     },
     {
       "name": "Matthew Johnson",
-      "commits": 3044
+      "commits": 3049
     },
     {
       "name": "Yash Katariya",
-      "commits": 2365
+      "commits": 2391
     }
   ],
   "author_commits": {
-    "jax authors": 11085,
-    "Naums Mogers": 56,
-    "Yue Sheng": 102,
-    "Benjamin Chetioui": 671,
-    "Peter Hawkins": 3902,
-    "Yash Katariya": 2365,
+    "jax authors": 11120,
+    "Yash Katariya": 2391,
+    "Anxhelo Xhebraj": 6,
+    "Robert Dyro": 128,
+    "Jake VanderPlas": 3156,
+    "Sergei Lebedev": 1181,
+    "Naums Mogers": 59,
+    "Peter Hawkins": 3920,
+    "Sohaib Iftikhar": 8,
+    "Matthew Johnson": 3049,
+    "Yue Sheng": 105,
+    "Ivy Zheng": 70,
+    "Sharad Vikram": 478,
+    "Zviki Nozadze": 5,
+    "Greg Olechwierowicz": 127,
+    "Alexandros Theodoridis": 45,
+    "Jerry Hsu": 1,
+    "Yurii Topin": 17,
+    "Will Froom": 20,
+    "Vladimir Belitskiy": 133,
+    "Benjamin Chetioui": 675,
+    "Sam Ginzburg": 10,
+    "Alex Y. Chan": 15,
+    "Allan Renucci": 399,
+    "Adrian Kuegel": 20,
+    "George Necula": 1318,
+    "Taha Kotil": 1,
+    "Yusuf Malik Durmus": 1,
     "Patrick C. Toulme": 8,
-    "Vladimir Belitskiy": 132,
-    "Jake VanderPlas CA": 3142,
     "Mahimn Patel": 1,
     "Pakize Sanal": 9,
-    "George Necula": 1317,
-    "Robert Dyro": 120,
-    "Sergei Lebedev": 1176,
-    "Ivy Zheng": 68,
-    "Allan Renucci": 397,
     "Iris": 1,
     "Vlad Sytchenko": 17,
     "Yifan jin": 3,
-    "Matthew Johnson": 3044,
+    "Ashish Kumar Singh": 2,
     "Ilya Biryukov": 1,
-    "Adrian Kuegel": 19,
-    "Zviki Nozadze": 3,
-    "Sharad Vikram": 477,
-    "Anxhelo Xhebraj": 2,
-    "Sam Ginzburg": 9,
     "Anselm Levskaya": 82,
     "guptaishaan": 1,
     "Ayaka Mikazuki": 91,
@@ -80,8 +90,6 @@
     "Eugenio \"Jay\" Zuccarelli": 1,
     "ahlag": 3,
     "Vladimir Suvorov": 1,
-    "Will Froom": 19,
-    "Sohaib Iftikhar": 7,
     "Paul Biberstein": 21,
     "Gabriel Gerlero": 1,
     "carlosgmartin": 67,
@@ -92,7 +100,6 @@
     "Dimitar (Mitko) Asenov": 171,
     "Omer Mor": 1,
     "scxfjiang": 3,
-    "Alex Y. Chan": 13,
     "Hyeontaek Lim": 91,
     "magaonka-amd": 47,
     "Hridey Marwah": 7,
@@ -108,7 +115,6 @@
     "Arati": 26,
     "Pavel Emeliyanenko": 1,
     "Kuldeeep18": 1,
-    "Alexandros Theodoridis": 44,
     "Cjkkkk": 62,
     "mayuriphad": 1,
     "Gulsum Gudukbay Akbulut": 8,
@@ -140,7 +146,6 @@
     "Ilya Tikhonovskiy": 9,
     "Henning Becker": 15,
     "Pratik Gandhi": 1,
-    "Ashish Kumar Singh": 1,
     "Cristian Garcia": 47,
     "Brian Patton": 64,
     "TJ Xu": 6,
@@ -173,12 +178,10 @@
     "Austin Liu": 1,
     "Dirk Hornung": 8,
     "Vaggelis": 3,
-    "Yurii Topin": 16,
     "Rohan Jain": 1,
     "gulsumgudukbay": 18,
     "Skye Wanderman-Milne": 507,
     "Eugene Zhulenev": 41,
-    "Greg Olechwierowicz": 121,
     "Yuan Lu": 3,
     "hbahk": 1,
     "Xiongfei Wei": 1,
@@ -1116,7 +1119,7 @@
     "2023": 4502,
     "2024": 6118,
     "2025": 7667,
-    "2026": 6853
+    "2026": 7005
   },
   "ai_assisted": {
     "commits": 8,
@@ -1125,7 +1128,6 @@
       "Gemini": 8
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1148,10 +1150,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 480,
       "2024-12": 499,
       "2025-01": 514,
       "2025-02": 585,
@@ -1174,38 +1176,39 @@
       "2026-07": 696,
       "2026-08": 625,
       "2026-09": 692,
-      "2026-10": 687
+      "2026-10": 838,
+      "2026-11": 1
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39431,
+    "commits": 39583,
     "by_kind": {
-      "organization": 29777,
-      "one_person": 269,
-      "personal": 2556,
+      "organization": 29924,
+      "one_person": 265,
+      "personal": 2565,
       "hidden": 6746,
       "unknown": 0,
       "bot": 83
     },
-    "organization_count": 19,
-    "last_12mo_from": "2025-11",
+    "organization_count": 18,
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "google.com",
-        "commits": 28363,
-        "commits_last_12mo": 7083,
-        "addresses": 465,
+        "commits": 28509,
+        "commits_last_12mo": 6778,
+        "addresses": 466,
         "first_commit": "2018-11-18",
-        "last_commit": "2026-10-27"
+        "last_commit": "2026-11-01"
       },
       {
         "organization": "nvidia.com",
-        "commits": 393,
-        "commits_last_12mo": 62,
+        "commits": 395,
+        "commits_last_12mo": 61,
         "addresses": 33,
         "first_commit": "2022-08-04",
-        "last_commit": "2026-10-14"
+        "last_commit": "2026-10-28"
       },
       {
         "organization": "mit.edu",
@@ -1217,11 +1220,11 @@
       },
       {
         "organization": "amd.com",
-        "commits": 327,
-        "commits_last_12mo": 197,
+        "commits": 328,
+        "commits_last_12mo": 189,
         "addresses": 25,
         "first_commit": "2022-03-31",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-10-28"
       },
       {
         "organization": "stanford.edu",
@@ -1234,7 +1237,7 @@
       {
         "organization": "cmu.edu",
         "commits": 77,
-        "commits_last_12mo": 10,
+        "commits_last_12mo": 9,
         "addresses": 2,
         "first_commit": "2020-05-27",
         "last_commit": "2026-10-16"
@@ -1334,21 +1337,13 @@
         "addresses": 2,
         "first_commit": "2023-06-01",
         "last_commit": "2024-10-29"
-      },
-      {
-        "organization": "ymail.com",
-        "commits": 2,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2021-06-21",
-        "last_commit": "2022-10-03"
       }
     ],
     "quarters": {
       "2025-Q1": {
         "organization": 1661,
-        "one_person": 6,
-        "personal": 85,
+        "one_person": 5,
+        "personal": 86,
         "hidden": 6,
         "unknown": 0,
         "bot": 3
@@ -1402,9 +1397,9 @@
         "bot": 7
       },
       "2026-Q4": {
-        "organization": 652,
+        "organization": 801,
         "one_person": 1,
-        "personal": 28,
+        "personal": 31,
         "hidden": 6,
         "unknown": 0,
         "bot": 0
@@ -1412,15 +1407,15 @@
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 7794,
-    "authors": 313,
-    "new_authors": 157,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 7450,
+    "authors": 304,
+    "new_authors": 150,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 39348,
+    "commits": 39500,
     "commits_by_year": {
       "2018": 469,
       "2019": 2953,
@@ -1430,15 +1425,15 @@
       "2023": 4499,
       "2024": 6085,
       "2025": 7654,
-      "2026": 6829
+      "2026": 6981
     },
-    "active_days": 2749
+    "active_days": 2754
   },
   "timezones": {
-    "+0000": 1784,
+    "+0000": 1787,
     "+0100": 895,
     "+0200": 653,
-    "+0300": 404,
+    "+0300": 406,
     "+0400": 7,
     "+0500": 17,
     "+0530": 191,
@@ -1451,13 +1446,13 @@
     "-0100": 1,
     "-0300": 28,
     "-0400": 1624,
-    "-0500": 1099,
+    "-0500": 1100,
     "-0600": 110,
-    "-0700": 22628,
+    "-0700": 22774,
     "-0800": 9785
   },
   "source_lines": {
-    "added": 2029913,
-    "current": 880466
+    "added": 2050192,
+    "current": 912196
   }
 }

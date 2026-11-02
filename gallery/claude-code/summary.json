@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:30:02+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:58:01+00:00",
   "name": "Claude Code",
   "report_path": "index.html",
   "first_commit": "2025-02-22 17:23:42",
-  "last_commit": "2026-10-26 21:51:04",
-  "age_days": 612,
-  "active_days": 372,
-  "total_commits": 948,
+  "last_commit": "2026-10-31 01:01:10",
+  "age_days": 616,
+  "active_days": 376,
+  "total_commits": 957,
   "total_authors": 60,
-  "active_authors_12mo": 39,
-  "commits_last_12mo": 637,
-  "total_files": 1601,
-  "total_lines": 93204,
-  "lines_added": 114493,
-  "lines_removed": 21284,
-  "total_tags": 258,
+  "active_authors_12mo": 37,
+  "commits_last_12mo": 590,
+  "total_files": 1473,
+  "total_lines": 65511,
+  "lines_added": 116210,
+  "lines_removed": 50697,
+  "total_tags": 261,
   "era": "steady",
   "top_authors": [
     {
       "name": "GitHub Actions",
-      "commits": 494
+      "commits": 500
     },
     {
       "name": "Alice T'Poteat",
@@ -41,12 +41,12 @@
     }
   ],
   "author_commits": {
-    "GitHub Actions": 494,
-    "Mohamed Hegazy": 5,
+    "GitHub Actions": 500,
+    "Mohamed Hegazy": 6,
+    "Claude": 14,
     "Sarah Deaton": 5,
     "Alice T'Poteat": 113,
     "Qing Wang": 1,
-    "Claude": 12,
     "7487": 2,
     "timgu0": 1,
     "Dickson Tsai": 8,
@@ -104,16 +104,15 @@
   },
   "commits_by_year": {
     "2025": 405,
-    "2026": 543
+    "2026": 552
   },
   "ai_assisted": {
-    "commits": 80,
-    "authored": 13,
+    "commits": 82,
+    "authored": 15,
     "assistants": {
-      "Claude": 80
+      "Claude": 82
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -136,10 +135,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 7,
-      "2026-10": 0
+      "2026-10": 2,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 1,
@@ -162,19 +161,20 @@
       "2026-07": 27,
       "2026-08": 30,
       "2026-09": 155,
-      "2026-10": 49
+      "2026-10": 58,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 948,
+    "commits": 957,
     "by_kind": {
       "organization": 245,
       "one_person": 10,
       "personal": 31,
-      "hidden": 167,
+      "hidden": 170,
       "unknown": 0,
-      "bot": 495
+      "bot": 501
     },
     "organization_count": 1,
     "last_12mo_from": "2025-11",
@@ -249,30 +249,30 @@
         "organization": 3,
         "one_person": 0,
         "personal": 0,
-        "hidden": 3,
+        "hidden": 6,
         "unknown": 0,
-        "bot": 43
+        "bot": 49
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 636,
+    "commits": 645,
     "authors": 37,
     "new_authors": 24,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 453,
+    "commits": 456,
     "commits_by_year": {
       "2025": 234,
-      "2026": 219
+      "2026": 222
     },
-    "active_days": 150
+    "active_days": 151
   },
   "timezones": {
-    "+0000": 525,
+    "+0000": 533,
     "+0100": 7,
     "+0200": 5,
     "+0300": 3,
@@ -283,11 +283,11 @@
     "-0400": 2,
     "-0500": 17,
     "-0600": 1,
-    "-0700": 303,
+    "-0700": 304,
     "-0800": 70
   },
   "source_lines": {
-    "added": 111319,
-    "current": 87294
+    "added": 113041,
+    "current": 59921
   }
 }

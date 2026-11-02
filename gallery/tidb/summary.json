@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:40:13+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:06:15+00:00",
   "name": "TiDB",
   "report_path": "index.html",
   "first_commit": "2015-09-06 04:04:42",
-  "last_commit": "2026-10-26 19:27:20",
-  "age_days": 4069,
-  "active_days": 3411,
-  "total_commits": 28789,
+  "last_commit": "2026-11-02 03:57:29",
+  "age_days": 4075,
+  "active_days": 3416,
+  "total_commits": 28827,
   "total_authors": 993,
   "active_authors_12mo": 138,
-  "commits_last_12mo": 1719,
-  "total_files": 7848,
-  "total_lines": 2581413,
-  "lines_added": 9981930,
-  "lines_removed": 7399745,
+  "commits_last_12mo": 1635,
+  "total_files": 7890,
+  "total_lines": 2603833,
+  "lines_added": 10018619,
+  "lines_removed": 7414014,
   "total_tags": 54,
   "era": "steady",
   "top_authors": [
@@ -37,21 +37,29 @@
     },
     {
       "name": "Yuanjia Zhang",
-      "commits": 961
+      "commits": 964
     }
   ],
   "author_commits": {
+    "Jianyuan Jiang": 8,
+    "Jiong": 12,
+    "tpp": 128,
+    "ris": 41,
+    "xufei": 181,
+    "Artem Danilov": 7,
+    "lhy1024": 16,
+    "D3Hunter": 714,
+    "Ruihao Chen": 127,
+    "Yuanjia Zhang": 964,
+    "wjHuang": 480,
+    "Dongpo Liu": 369,
+    "GMHDBJD": 105,
+    "Juncen Yu": 12,
+    "Yiding Cui": 482,
+    "flaky-claw": 96,
     "YangKeao": 301,
-    "Dongpo Liu": 368,
-    "Yiding Cui": 481,
-    "D3Hunter": 708,
-    "ris": 40,
     "Sanket Kedia": 2,
-    "Jiong": 10,
-    "xufei": 171,
-    "flaky-claw": 95,
     "Chao Wang": 495,
-    "Ruihao Chen": 124,
     "Vlad Dmitriev": 4,
     "dillon": 6,
     "expxiaoli": 24,
@@ -61,14 +69,10 @@
     "lucasliang": 2,
     "Mattias Jonsson": 209,
     "Jianjun Liao": 214,
-    "lhy1024": 15,
     "Jinlong Liu": 39,
     "xzhangxian1008": 113,
-    "Juncen Yu": 11,
-    "tpp": 126,
     "zeminzhou": 20,
     "bb7133": 130,
-    "Yuanjia Zhang": 961,
     "JmPotato": 93,
     "sary": 2,
     "Hitachi": 3,
@@ -79,13 +83,10 @@
     "Wenxuan": 92,
     "Zhigao TONG": 37,
     "Debra-He": 5,
-    "GMHDBJD": 104,
     "YiBo Chen": 3,
     "ystaticy": 26,
-    "wjHuang": 477,
     "JaySon": 23,
     "Chunzhu Li": 51,
-    "Jianyuan Jiang": 7,
     "Liqi Geng": 40,
     "Ahmad Bilal": 1,
     "xhe": 207,
@@ -127,7 +128,6 @@
     "panmuyun": 1,
     "Paul Tyng": 1,
     "haiboumich": 1,
-    "Artem Danilov": 6,
     "JoyC-dev": 5,
     "guo-shaoge": 154,
     "okJiang": 50,
@@ -1047,7 +1047,7 @@
     "2023": 3184,
     "2024": 2840,
     "2025": 1979,
-    "2026": 1428
+    "2026": 1466
   },
   "ai_assisted": {
     "commits": 4,
@@ -1056,7 +1056,6 @@
       "GitHub Copilot": 4
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1079,10 +1078,10 @@
       "2026-07": 1,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 230,
       "2024-12": 222,
       "2025-01": 165,
       "2025-02": 147,
@@ -1105,30 +1104,31 @@
       "2026-07": 123,
       "2026-08": 118,
       "2026-09": 157,
-      "2026-10": 98
+      "2026-10": 134,
+      "2026-11": 2
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 28789,
+    "commits": 28827,
     "by_kind": {
-      "organization": 4091,
-      "one_person": 1536,
-      "personal": 19679,
-      "hidden": 3215,
+      "organization": 4096,
+      "one_person": 1543,
+      "personal": 19701,
+      "hidden": 3219,
       "unknown": 2,
       "bot": 266
     },
     "organization_count": 12,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "pingcap.com",
-        "commits": 3876,
-        "commits_last_12mo": 370,
+        "commits": 3881,
+        "commits_last_12mo": 358,
         "addresses": 55,
         "first_commit": "2016-10-11",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-10-29"
       },
       {
         "organization": "breeswish.org",
@@ -1141,7 +1141,7 @@
       {
         "organization": "pingcap.cn",
         "commits": 54,
-        "commits_last_12mo": 1,
+        "commits_last_12mo": 0,
         "addresses": 2,
         "first_commit": "2024-07-16",
         "last_commit": "2025-11-13"
@@ -1277,25 +1277,25 @@
         "bot": 2
       },
       "2026-Q4": {
-        "organization": 13,
-        "one_person": 17,
-        "personal": 45,
-        "hidden": 23,
+        "organization": 18,
+        "one_person": 28,
+        "personal": 63,
+        "hidden": 27,
         "unknown": 0,
         "bot": 0
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 1701,
-    "authors": 138,
-    "new_authors": 55,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 1618,
+    "authors": 133,
+    "new_authors": 53,
     "half_of_commits": 9
   },
   "humans": {
-    "commits": 28523,
+    "commits": 28561,
     "commits_by_year": {
       "2015": 2528,
       "2016": 1541,
@@ -1308,20 +1308,20 @@
       "2023": 3099,
       "2024": 2767,
       "2025": 1904,
-      "2026": 1405
+      "2026": 1443
     },
-    "active_days": 3390
+    "active_days": 3395
   },
   "timezones": {
     "+0000": 206,
-    "+0100": 231,
+    "+0100": 235,
     "+0200": 390,
     "+0300": 39,
     "+0330": 1,
     "+0500": 1,
     "+0530": 40,
     "+0700": 11,
-    "+0800": 26212,
+    "+0800": 26243,
     "+0900": 165,
     "+1000": 9,
     "+1100": 8,
@@ -1331,12 +1331,12 @@
     "-0400": 117,
     "-0500": 384,
     "-0600": 384,
-    "-0700": 433,
+    "-0700": 436,
     "-0800": 130,
     "-0900": 1
   },
   "source_lines": {
-    "added": 8519409,
-    "current": 2427760
+    "added": 8556098,
+    "current": 2454782
   }
 }

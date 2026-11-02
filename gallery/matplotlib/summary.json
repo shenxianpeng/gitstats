@@ -1,35 +1,35 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:29:21+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:57:19+00:00",
   "name": "Matplotlib",
   "report_path": "index.html",
   "first_commit": "2003-05-12 15:20:38",
-  "last_commit": "2026-10-23 18:59:49",
-  "age_days": 8566,
-  "active_days": 7021,
-  "total_commits": 55584,
-  "total_authors": 1836,
-  "active_authors_12mo": 165,
-  "commits_last_12mo": 2055,
+  "last_commit": "2026-11-01 17:01:01",
+  "age_days": 8575,
+  "active_days": 7027,
+  "total_commits": 55606,
+  "total_authors": 1839,
+  "active_authors_12mo": 164,
+  "commits_last_12mo": 2009,
   "total_files": 4606,
-  "total_lines": 804251,
-  "lines_added": 1902541,
-  "lines_removed": 1333290,
+  "total_lines": 804057,
+  "lines_added": 1902721,
+  "lines_removed": 1333664,
   "total_tags": 142,
   "era": "steady",
   "top_authors": [
     {
       "name": "Thomas A Caswell",
-      "commits": 6979
+      "commits": 6986
     },
     {
       "name": "Elliott Sales de Andrade",
-      "commits": 6027
+      "commits": 6028
     },
     {
       "name": "Tim Hoffmann",
-      "commits": 4727
+      "commits": 4728
     },
     {
       "name": "Antony Lee",
@@ -41,37 +41,40 @@
     }
   ],
   "author_commits": {
-    "Thomas A Caswell": 6979,
+    "Ricci Adams": 71,
+    "Anu jangir": 2,
+    "Jody Klymak": 2599,
+    "Melissa Weber Mendon\u00e7a": 51,
+    "Thomas A Caswell": 6986,
+    "Gabriel Luca": 4,
+    "msaimanish": 2,
+    "Tim Hoffmann": 4728,
+    "rahulgupta": 1,
     "Kyle Sunden": 1084,
-    "Tim Hoffmann": 4727,
-    "Ricci Adams": 67,
-    "Elliott Sales de Andrade": 6027,
+    "Elliott Sales de Andrade": 6028,
     "Christian Aurich Zanettini Martins": 2,
     "Omar Zagonel El Laden": 1,
     "Mohd Maaz Khan": 19,
     "Greg Lucas": 344,
     "Ruth Comer": 620,
-    "Anu Jangir": 1,
     "Sebastian Torres": 3,
     "DavidVadnais": 1,
     "hannah": 660,
     "Shamik Basu": 2,
     "Carlos Ramos Carre\u00f1o": 3,
-    "Gabriel Luca": 3,
     "Albert Y. Shih": 74,
     "RYAN AKMAL PASYA": 1,
     "Qianye Su": 3,
     "Ahmed Mohamed": 5,
+    "Leon White": 1,
     "Daniel Liu": 2,
     "Eric Larson": 50,
-    "Melissa Weber Mendon\u00e7a": 50,
     "Scott Shambaugh": 226,
     "Antony Lee": 4514,
     "Roberto Moura": 9,
     "carlosgmartin": 1,
     "Syamjith NK": 3,
     "Zeke Barger": 2,
-    "Jody Klymak": 2598,
     "rokokol": 1,
     "Christopher Holmes": 1,
     "Gleb Popov": 1,
@@ -1900,9 +1903,9 @@
     "2021": 4320,
     "2022": 3824,
     "2023": 3663,
-    "2024": 2332,
+    "2024": 2333,
     "2025": 1843,
-    "2026": 1888
+    "2026": 1909
   },
   "ai_assisted": {
     "commits": 9,
@@ -1914,7 +1917,6 @@
       "OpenCode": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1937,10 +1939,10 @@
       "2026-07": 1,
       "2026-08": 0,
       "2026-09": 2,
-      "2026-10": 1
+      "2026-10": 1,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 193,
       "2024-12": 239,
       "2025-01": 218,
       "2025-02": 173,
@@ -1962,23 +1964,24 @@
       "2026-06": 248,
       "2026-07": 199,
       "2026-08": 135,
-      "2026-09": 176,
-      "2026-10": 139
+      "2026-09": 177,
+      "2026-10": 158,
+      "2026-11": 1
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 55584,
+    "commits": 55606,
     "by_kind": {
-      "organization": 3522,
-      "one_person": 3479,
-      "personal": 42357,
-      "hidden": 6009,
+      "organization": 3510,
+      "one_person": 3209,
+      "personal": 42657,
+      "hidden": 6012,
       "unknown": 78,
-      "bot": 139
+      "bot": 140
     },
-    "organization_count": 63,
-    "last_12mo_from": "2025-11",
+    "organization_count": 61,
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "hawaii.edu",
@@ -1991,7 +1994,7 @@
       {
         "organization": "metoffice.gov.uk",
         "commits": 621,
-        "commits_last_12mo": 155,
+        "commits_last_12mo": 146,
         "addresses": 2,
         "first_commit": "2014-12-03",
         "last_commit": "2026-10-17"
@@ -2293,14 +2296,6 @@
         "last_commit": "2017-07-11"
       },
       {
-        "organization": "fastmail.com.au",
-        "commits": 6,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2016-03-18",
-        "last_commit": "2016-08-31"
-      },
-      {
         "organization": "ibm.com",
         "commits": 6,
         "commits_last_12mo": 0,
@@ -2323,14 +2318,6 @@
         "addresses": 3,
         "first_commit": "2011-05-19",
         "last_commit": "2015-10-26"
-      },
-      {
-        "organization": "ymail.com",
-        "commits": 6,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2013-08-26",
-        "last_commit": "2015-02-13"
       },
       {
         "organization": "bristol.ac.uk",
@@ -2496,8 +2483,8 @@
       },
       "2025-Q2": {
         "organization": 39,
-        "one_person": 22,
-        "personal": 315,
+        "one_person": 21,
+        "personal": 316,
         "hidden": 120,
         "unknown": 0,
         "bot": 9
@@ -2536,7 +2523,7 @@
       },
       "2026-Q3": {
         "organization": 32,
-        "one_person": 57,
+        "one_person": 58,
         "personal": 281,
         "hidden": 127,
         "unknown": 0,
@@ -2544,24 +2531,24 @@
       },
       "2026-Q4": {
         "organization": 3,
-        "one_person": 9,
-        "personal": 58,
-        "hidden": 66,
+        "one_person": 11,
+        "personal": 72,
+        "hidden": 69,
         "unknown": 0,
-        "bot": 3
+        "bot": 4
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 2013,
-    "authors": 162,
-    "new_authors": 121,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 1967,
+    "authors": 158,
+    "new_authors": 119,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 55445,
+    "commits": 55466,
     "commits_by_year": {
       "2003": 88,
       "2004": 673,
@@ -2584,22 +2571,22 @@
       "2021": 4319,
       "2022": 3806,
       "2023": 3641,
-      "2024": 2301,
+      "2024": 2302,
       "2025": 1818,
-      "2026": 1848
+      "2026": 1868
     },
-    "active_days": 7018
+    "active_days": 7024
   },
   "timezones": {
-    "+0000": 8717,
-    "+0100": 7824,
-    "+0200": 7427,
+    "+0000": 8719,
+    "+0100": 7825,
+    "+0200": 7428,
     "+0300": 561,
     "+0330": 3,
     "+0400": 13,
     "+0430": 4,
     "+0500": 12,
-    "+0530": 673,
+    "+0530": 677,
     "+0545": 7,
     "+0600": 9,
     "+0700": 5,
@@ -2612,18 +2599,18 @@
     "+1200": 2,
     "+1300": 5,
     "-0200": 1,
-    "-0300": 110,
-    "-0400": 12180,
+    "-0300": 111,
+    "-0400": 12188,
     "-0500": 7307,
     "-0600": 1536,
-    "-0700": 4971,
-    "-0800": 2506,
+    "-0700": 4975,
+    "-0800": 2507,
     "-0900": 1,
     "-1000": 954,
     "-1100": 2
   },
   "source_lines": {
-    "added": 2186133,
-    "current": 801238
+    "added": 2186317,
+    "current": 804018
   }
 }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:38:08+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:05:46+00:00",
   "name": "Milvus",
   "report_path": "index.html",
   "first_commit": "2019-03-18 11:33:09",
-  "last_commit": "2026-10-26 17:41:55",
-  "age_days": 2780,
-  "active_days": 2301,
-  "total_commits": 25888,
-  "total_authors": 383,
-  "active_authors_12mo": 105,
-  "commits_last_12mo": 2518,
-  "total_files": 7420,
-  "total_lines": 3554713,
-  "lines_added": 8057292,
-  "lines_removed": 4502474,
+  "last_commit": "2026-11-02 03:13:57",
+  "age_days": 2786,
+  "active_days": 2308,
+  "total_commits": 25951,
+  "total_authors": 385,
+  "active_authors_12mo": 106,
+  "commits_last_12mo": 2393,
+  "total_files": 7718,
+  "total_lines": 3645876,
+  "lines_added": 8171105,
+  "lines_removed": 4525125,
   "total_tags": 35,
   "era": "steady",
   "top_authors": [
     {
       "name": "congqixia",
-      "commits": 1802
+      "commits": 1804
     },
     {
       "name": "jinhai",
@@ -29,51 +29,56 @@
     },
     {
       "name": "yihao.dai",
-      "commits": 1092
+      "commits": 1093
     },
     {
       "name": "zhuwenxing",
-      "commits": 861
+      "commits": 866
     },
     {
       "name": "cai.zhang",
-      "commits": 834
+      "commits": 838
     }
   ],
   "author_commits": {
-    "Zhen Ye": 486,
+    "Zhen Ye": 492,
+    "Bingyi Sun": 690,
+    "PerryLink": 1,
+    "Buqian Zheng": 197,
+    "Chun Han": 217,
+    "zhikunyao": 59,
+    "zhenshan.cao": 485,
+    "marcelo-cjl": 37,
+    "yihao.dai": 1093,
+    "sre-ci-robot": 567,
+    "wei liu": 605,
+    "James": 482,
+    "fudongying": 4,
+    "sijie-ni-0214": 78,
+    "cai.zhang": 838,
+    "jiaqizho": 40,
+    "Feilong Hou": 46,
+    "aleks-s10": 1,
+    "Li Liu": 114,
+    "zhuwenxing": 866,
+    "congqixia": 1804,
+    "aoiasd": 321,
+    "somfornot": 9,
+    "Clint": 2,
+    "tinswzy": 66,
+    "XuanYang-cn": 779,
     "Simon Hearne": 2,
-    "XuanYang-cn": 778,
-    "Clint": 1,
-    "somfornot": 8,
-    "Li Liu": 113,
-    "zhuwenxing": 861,
     "\u5b59\u8fbe\u660e": 1,
     "yanliang567": 473,
     "WuXingying": 2,
-    "congqixia": 1802,
     "Jeng.Gwan": 12,
-    "James": 475,
-    "sre-ci-robot": 566,
-    "cai.zhang": 834,
-    "sijie-ni-0214": 75,
     "Wangshu": 2,
-    "Chun Han": 216,
-    "Buqian Zheng": 191,
     "Gao": 96,
-    "zhenshan.cao": 484,
-    "Bingyi Sun": 683,
     "sparknack": 90,
     "zhagnlu": 246,
-    "yihao.dai": 1092,
-    "wei liu": 604,
-    "aoiasd": 319,
     "foxspy": 76,
     "Ted Xu": 99,
     "Pardeep Singh": 1,
-    "marcelo-cjl": 35,
-    "fudongying": 3,
-    "jiaqizho": 38,
     "Douglas": 1,
     "aadigolchha": 1,
     "WAR10CK": 2,
@@ -82,13 +87,10 @@
     "junjiejiangjjj": 64,
     "pymilvus-bot": 11,
     "Kuroda Kayn": 2,
-    "tinswzy": 65,
     "Alexander Guzhva": 18,
     "2sumtech": 7,
     "ChenLiqing": 6,
-    "zhikunyao": 57,
     "santiago-wjq": 1,
-    "Feilong Hou": 44,
     "huanghaoyuanhhy": 5,
     "AbNoZ&v02": 1,
     "YHW": 1,
@@ -433,19 +435,18 @@
     "2023": 2450,
     "2024": 2810,
     "2025": 2228,
-    "2026": 2104
+    "2026": 2167
   },
   "ai_assisted": {
-    "commits": 701,
+    "commits": 717,
     "authored": 0,
     "assistants": {
-      "Claude": 697,
-      "Cursor": 4,
+      "Claude": 713,
+      "Cursor": 5,
       "OpenCode": 1,
       "Warp": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -468,10 +469,10 @@
       "2026-07": 105,
       "2026-08": 80,
       "2026-09": 79,
-      "2026-10": 41
+      "2026-10": 57,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 260,
       "2024-12": 219,
       "2025-01": 173,
       "2025-02": 170,
@@ -494,30 +495,31 @@
       "2026-07": 270,
       "2026-08": 219,
       "2026-09": 217,
-      "2026-10": 202
+      "2026-10": 261,
+      "2026-11": 4
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 25888,
+    "commits": 25951,
     "by_kind": {
-      "organization": 18944,
+      "organization": 18969,
       "one_person": 164,
-      "personal": 2673,
-      "hidden": 4070,
+      "personal": 2693,
+      "hidden": 4088,
       "unknown": 7,
       "bot": 30
     },
     "organization_count": 6,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "zilliz.com",
-        "commits": 18930,
-        "commits_last_12mo": 1312,
+        "commits": 18955,
+        "commits_last_12mo": 1226,
         "addresses": 103,
         "first_commit": "2019-03-18",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-10-31"
       },
       {
         "organization": "apache.org",
@@ -618,25 +620,25 @@
         "bot": 1
       },
       "2026-Q4": {
-        "organization": 87,
+        "organization": 112,
         "one_person": 0,
-        "personal": 59,
-        "hidden": 56,
+        "personal": 79,
+        "hidden": 74,
         "unknown": 0,
         "bot": 0
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 2516,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 2391,
     "authors": 104,
-    "new_authors": 58,
+    "new_authors": 55,
     "half_of_commits": 10
   },
   "humans": {
-    "commits": 25858,
+    "commits": 25921,
     "commits_by_year": {
       "2019": 4644,
       "2020": 1360,
@@ -645,9 +647,9 @@
       "2023": 2443,
       "2024": 2810,
       "2025": 2226,
-      "2026": 2102
+      "2026": 2165
     },
-    "active_days": 2301
+    "active_days": 2308
   },
   "timezones": {
     "+0000": 296,
@@ -657,18 +659,18 @@
     "+0400": 6,
     "+0530": 46,
     "+0700": 1,
-    "+0800": 25109,
+    "+0800": 25163,
     "+0900": 16,
     "+1000": 2,
     "-0300": 2,
-    "-0400": 31,
+    "-0400": 32,
     "-0500": 72,
     "-0600": 11,
-    "-0700": 241,
+    "-0700": 249,
     "-0800": 15
   },
   "source_lines": {
-    "added": 6258365,
-    "current": 2786711
+    "added": 6355567,
+    "current": 2880768
   }
 }

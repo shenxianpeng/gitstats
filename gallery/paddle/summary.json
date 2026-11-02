@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:38:16+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:06:21+00:00",
   "name": "PaddlePaddle",
   "report_path": "index.html",
   "first_commit": "2016-08-29 14:32:53",
-  "last_commit": "2026-10-26 12:36:41",
-  "age_days": 3710,
-  "active_days": 3308,
-  "total_commits": 58205,
-  "total_authors": 1235,
-  "active_authors_12mo": 187,
-  "commits_last_12mo": 2086,
-  "total_files": 15604,
-  "total_lines": 3604396,
-  "lines_added": 7838961,
-  "lines_removed": 4234488,
+  "last_commit": "2026-10-30 09:00:21",
+  "age_days": 3714,
+  "active_days": 3311,
+  "total_commits": 58211,
+  "total_authors": 1236,
+  "active_authors_12mo": 186,
+  "commits_last_12mo": 1741,
+  "total_files": 15608,
+  "total_lines": 3606138,
+  "lines_added": 7841030,
+  "lines_removed": 4234815,
   "total_tags": 12,
   "era": "quiet",
   "top_authors": [
@@ -41,18 +41,19 @@
     }
   ],
   "author_commits": {
+    "ZhenxingLi": 75,
+    "yuweivvv": 1,
+    "zhengshengning": 105,
+    "Wang Shigure": 5,
     "Ray961123": 7,
     "LxG_01": 1,
     "liuruyan": 157,
     "feixi": 44,
-    "ZhenxingLi": 72,
     "omoYang": 31,
-    "zhengshengning": 104,
     "Gu Shiwei": 184,
     "Xiangrui Yu": 17,
     "Difer": 53,
     "SUN Dong": 139,
-    "Wang Shigure": 4,
     "Paddle-bot": 1,
     "YUNSHEN XIE": 147,
     "LiYuRio": 144,
@@ -1288,7 +1289,7 @@
     "2023": 6440,
     "2024": 6646,
     "2025": 4381,
-    "2026": 1404
+    "2026": 1410
   },
   "ai_assisted": {
     "commits": 146,
@@ -1300,7 +1301,6 @@
       "Cursor": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 3,
       "2025-01": 0,
       "2025-02": 1,
@@ -1323,10 +1323,10 @@
       "2026-07": 5,
       "2026-08": 2,
       "2026-09": 2,
-      "2026-10": 4
+      "2026-10": 4,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 457,
       "2024-12": 518,
       "2025-01": 314,
       "2025-02": 248,
@@ -1349,17 +1349,18 @@
       "2026-07": 84,
       "2026-08": 54,
       "2026-09": 47,
-      "2026-10": 41
+      "2026-10": 47,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 58205,
+    "commits": 58211,
     "by_kind": {
-      "organization": 23067,
-      "one_person": 576,
-      "personal": 18118,
-      "hidden": 16307,
+      "organization": 23071,
+      "one_person": 532,
+      "personal": 18163,
+      "hidden": 16308,
       "unknown": 135,
       "bot": 2
     },
@@ -1368,11 +1369,11 @@
     "top": [
       {
         "organization": "baidu.com",
-        "commits": 21168,
-        "commits_last_12mo": 287,
+        "commits": 21172,
+        "commits_last_12mo": 291,
         "addresses": 186,
         "first_commit": "2016-08-31",
-        "last_commit": "2026-10-20"
+        "last_commit": "2026-10-30"
       },
       {
         "organization": "intel.com",
@@ -1513,10 +1514,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 8,
+        "organization": 12,
         "one_person": 0,
-        "personal": 3,
-        "hidden": 29,
+        "personal": 4,
+        "hidden": 30,
         "unknown": 0,
         "bot": 1
       }
@@ -1525,13 +1526,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 2086,
-    "authors": 185,
-    "new_authors": 75,
+    "commits": 2092,
+    "authors": 186,
+    "new_authors": 76,
     "half_of_commits": 10
   },
   "humans": {
-    "commits": 58203,
+    "commits": 58209,
     "commits_by_year": {
       "2016": 1423,
       "2017": 9090,
@@ -1543,9 +1544,9 @@
       "2023": 6440,
       "2024": 6646,
       "2025": 4381,
-      "2026": 1403
+      "2026": 1409
     },
-    "active_days": 3308
+    "active_days": 3311
   },
   "timezones": {
     "+0000": 2308,
@@ -1557,7 +1558,7 @@
     "+0530": 21,
     "+0600": 1,
     "+0700": 1,
-    "+0800": 50387,
+    "+0800": 50393,
     "+0900": 6,
     "+1400": 9,
     "-0400": 100,
@@ -1567,7 +1568,7 @@
     "-0800": 937
   },
   "source_lines": {
-    "added": 8052600,
-    "current": 3602116
+    "added": 8054669,
+    "current": 3605767
   }
 }

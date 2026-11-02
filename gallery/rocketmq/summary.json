@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:37:21+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:04:51+00:00",
   "name": "Apache RocketMQ",
   "report_path": "index.html",
   "first_commit": "2013-05-15 05:45:27",
-  "last_commit": "2026-10-26 06:52:26",
-  "age_days": 4913,
-  "active_days": 2248,
-  "total_commits": 9246,
+  "last_commit": "2026-10-27 09:01:03",
+  "age_days": 4914,
+  "active_days": 2249,
+  "total_commits": 9250,
   "total_authors": 688,
   "active_authors_12mo": 64,
-  "commits_last_12mo": 323,
+  "commits_last_12mo": 292,
   "total_files": 2780,
-  "total_lines": 430244,
-  "lines_added": 578953,
-  "lines_removed": 148608,
+  "total_lines": 430422,
+  "lines_added": 579141,
+  "lines_removed": 148618,
   "total_tags": 32,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,10 @@
     }
   ],
   "author_commits": {
+    "qianye": 64,
+    "Quan": 27,
+    "\u70e4\u5316\u306e\u521d\u96ea": 2,
+    "Xiao Yang": 106,
     "bai mengxuan": 5,
     "Felix-Gong": 1,
     "zhang hongyuan": 2,
@@ -49,13 +53,10 @@
     "leaveWhite9088": 1,
     "majialong": 20,
     "imzs": 20,
-    "Quan": 26,
-    "Xiao Yang": 105,
     "\u5065\u5eb7\u5b9d": 1,
     "Rui Yin": 1,
     "beautyarbutin": 1,
     "hqbfz": 21,
-    "qianye": 63,
     "lizhimins": 137,
     "rongtong": 355,
     "Jiahua Wang": 15,
@@ -63,7 +64,6 @@
     "zhaohai": 8,
     "dingshuangxi888": 41,
     "ymwneu": 16,
-    "\u70e4\u5316\u306e\u521d\u96ea": 1,
     "Gerard": 1,
     "fuyou001": 71,
     "Rui": 1,
@@ -744,7 +744,7 @@
     "2023": 635,
     "2024": 380,
     "2025": 270,
-    "2026": 257
+    "2026": 261
   },
   "ai_assisted": {
     "commits": 8,
@@ -754,7 +754,6 @@
       "Cursor": 3
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -777,10 +776,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 1,
-      "2026-10": 1
+      "2026-10": 1,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 36,
       "2024-12": 28,
       "2025-01": 18,
       "2025-02": 18,
@@ -803,21 +802,22 @@
       "2026-07": 15,
       "2026-08": 21,
       "2026-09": 36,
-      "2026-10": 21
+      "2026-10": 25,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9246,
+    "commits": 9250,
     "by_kind": {
-      "organization": 5660,
-      "one_person": 612,
-      "personal": 2440,
+      "organization": 5657,
+      "one_person": 611,
+      "personal": 2448,
       "hidden": 519,
       "unknown": 8,
       "bot": 7
     },
-    "organization_count": 10,
+    "organization_count": 9,
     "last_12mo_from": "2025-11",
     "top": [
       {
@@ -830,11 +830,11 @@
       },
       {
         "organization": "alibaba-inc.com",
-        "commits": 1236,
-        "commits_last_12mo": 30,
+        "commits": 1237,
+        "commits_last_12mo": 31,
         "addresses": 41,
         "first_commit": "2013-07-01",
-        "last_commit": "2026-09-21"
+        "last_commit": "2026-10-27"
       },
       {
         "organization": "apache.org",
@@ -883,14 +883,6 @@
         "addresses": 3,
         "first_commit": "2019-10-10",
         "last_commit": "2022-03-14"
-      },
-      {
-        "organization": "live.cn",
-        "commits": 4,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2021-03-14",
-        "last_commit": "2022-05-19"
       },
       {
         "organization": "kuaishou.com",
@@ -959,9 +951,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 0,
+        "organization": 1,
         "one_person": 1,
-        "personal": 13,
+        "personal": 16,
         "hidden": 7,
         "unknown": 0,
         "bot": 0
@@ -971,13 +963,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 323,
+    "commits": 327,
     "authors": 64,
     "new_authors": 37,
     "half_of_commits": 6
   },
   "humans": {
-    "commits": 9239,
+    "commits": 9243,
     "commits_by_year": {
       "2013": 2273,
       "2014": 1341,
@@ -992,16 +984,16 @@
       "2023": 632,
       "2024": 379,
       "2025": 270,
-      "2026": 257
+      "2026": 261
     },
-    "active_days": 2248
+    "active_days": 2249
   },
   "timezones": {
     "+0000": 6,
     "+0100": 8,
     "+0200": 4,
     "+0530": 20,
-    "+0800": 9140,
+    "+0800": 9144,
     "+0900": 23,
     "+1100": 6,
     "-0400": 10,
@@ -1011,7 +1003,7 @@
     "-0800": 2
   },
   "source_lines": {
-    "added": 1362527,
-    "current": 428845
+    "added": 1362715,
+    "current": 430422
   }
 }

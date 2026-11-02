@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:30:26+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:58:35+00:00",
   "name": "Cline",
   "report_path": "index.html",
   "first_commit": "2024-07-06 00:51:41",
-  "last_commit": "2026-10-26 15:02:16",
-  "age_days": 843,
-  "active_days": 745,
-  "total_commits": 7705,
-  "total_authors": 345,
-  "active_authors_12mo": 149,
-  "commits_last_12mo": 3790,
-  "total_files": 4399,
-  "total_lines": 1211831,
-  "lines_added": 2749114,
-  "lines_removed": 1537278,
-  "total_tags": 775,
+  "last_commit": "2026-10-30 21:21:13",
+  "age_days": 847,
+  "active_days": 749,
+  "total_commits": 7727,
+  "total_authors": 347,
+  "active_authors_12mo": 146,
+  "commits_last_12mo": 3602,
+  "total_files": 4444,
+  "total_lines": 1225985,
+  "lines_added": 2763932,
+  "lines_removed": 1537942,
+  "total_tags": 776,
   "era": "steady",
   "top_authors": [
     {
-      "name": "Saoud Rizwan",
-      "commits": 3615
+      "name": "Bee",
+      "commits": 3622
     },
     {
       "name": "celestial-vault",
@@ -41,12 +41,16 @@
     }
   ],
   "author_commits": {
+    "Bee": 3622,
+    "John Choi": 86,
+    "Tom\u00e1s Barreiro": 253,
+    "Etisha Garg": 6,
+    "coby-mckinney": 1,
+    "Hugo": 1,
+    "James Arlen": 4,
     "Dante": 3,
-    "Saoud Rizwan": 3615,
     "Max": 102,
-    "Tom\u00e1s Barreiro": 252,
     "Miko\u0142aj Kondratek": 220,
-    "John Choi": 76,
     "zurrll": 1,
     "Lucien": 2,
     "TheRealSpencer": 11,
@@ -66,13 +70,11 @@
     "lihongyuan99": 1,
     "Harsha Varma": 1,
     "Xx": 1,
-    "James Arlen": 3,
     "Renee Huang": 29,
     "Asem ahmed": 1,
     "Timothy Franceschi": 1,
     "charles": 1,
     "alex-lum": 14,
-    "Etisha Garg": 5,
     "Emmanuel Acheampong": 1,
     "avianion": 1,
     "Harrison": 1,
@@ -390,18 +392,17 @@
   "commits_by_year": {
     "2024": 1067,
     "2025": 3336,
-    "2026": 3302
+    "2026": 3324
   },
   "ai_assisted": {
-    "commits": 167,
+    "commits": 168,
     "authored": 0,
     "assistants": {
       "Claude": 72,
-      "Cursor": 49,
+      "Cursor": 50,
       "GitHub Copilot": 47
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -424,10 +425,10 @@
       "2026-07": 26,
       "2026-08": 14,
       "2026-09": 26,
-      "2026-10": 8
+      "2026-10": 9,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 21,
       "2024-12": 134,
       "2025-01": 288,
       "2025-02": 255,
@@ -450,17 +451,18 @@
       "2026-07": 355,
       "2026-08": 392,
       "2026-09": 323,
-      "2026-10": 205
+      "2026-10": 227,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7705,
+    "commits": 7727,
     "by_kind": {
-      "organization": 911,
-      "one_person": 256,
-      "personal": 1216,
-      "hidden": 5134,
+      "organization": 913,
+      "one_person": 257,
+      "personal": 1217,
+      "hidden": 5152,
       "unknown": 0,
       "bot": 188
     },
@@ -469,11 +471,11 @@
     "top": [
       {
         "organization": "cline.bot",
-        "commits": 856,
-        "commits_last_12mo": 677,
+        "commits": 858,
+        "commits_last_12mo": 679,
         "addresses": 16,
         "first_commit": "2025-04-15",
-        "last_commit": "2026-10-20"
+        "last_commit": "2026-10-29"
       },
       {
         "organization": "sap.com",
@@ -519,8 +521,8 @@
     "quarters": {
       "2025-Q1": {
         "organization": 0,
-        "one_person": 170,
-        "personal": 149,
+        "one_person": 169,
+        "personal": 150,
         "hidden": 498,
         "unknown": 0,
         "bot": 10
@@ -574,10 +576,10 @@
         "bot": 9
       },
       "2026-Q4": {
-        "organization": 13,
-        "one_person": 2,
+        "organization": 15,
+        "one_person": 4,
         "personal": 16,
-        "hidden": 173,
+        "hidden": 191,
         "unknown": 0,
         "bot": 1
       }
@@ -586,44 +588,44 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 3729,
-    "authors": 145,
-    "new_authors": 115,
+    "commits": 3751,
+    "authors": 147,
+    "new_authors": 117,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 7517,
+    "commits": 7539,
     "commits_by_year": {
       "2024": 1067,
       "2025": 3188,
-      "2026": 3262
+      "2026": 3284
     },
-    "active_days": 744
+    "active_days": 748
   },
   "timezones": {
     "+0000": 81,
     "+0100": 107,
     "+0200": 231,
-    "+0300": 34,
+    "+0300": 35,
     "+0400": 37,
     "+0500": 4,
-    "+0530": 59,
+    "+0530": 60,
     "+0700": 18,
     "+0800": 212,
     "+0900": 161,
     "+1000": 5,
     "+1100": 1,
     "+1200": 3,
-    "-0300": 231,
-    "-0400": 968,
+    "-0300": 232,
+    "-0400": 969,
     "-0500": 111,
     "-0600": 66,
-    "-0700": 3822,
+    "-0700": 3840,
     "-0800": 1494,
     "-1000": 60
   },
   "source_lines": {
-    "added": 2635556,
-    "current": 1169531
+    "added": 2650370,
+    "current": 1184710
   }
 }

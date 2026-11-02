@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:36:21+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:04:17+00:00",
   "name": "Apache Dubbo",
   "report_path": "index.html",
   "first_commit": "2011-10-20 15:04:29",
-  "last_commit": "2026-10-21 02:25:11",
-  "age_days": 5480,
-  "active_days": 2076,
-  "total_commits": 8916,
-  "total_authors": 681,
-  "active_authors_12mo": 47,
-  "commits_last_12mo": 334,
-  "total_files": 4846,
-  "total_lines": 521669,
-  "lines_added": 1333733,
-  "lines_removed": 812033,
+  "last_commit": "2026-10-30 07:54:57",
+  "age_days": 5489,
+  "active_days": 2078,
+  "total_commits": 8926,
+  "total_authors": 688,
+  "active_authors_12mo": 53,
+  "commits_last_12mo": 315,
+  "total_files": 4852,
+  "total_lines": 522372,
+  "lines_added": 1334507,
+  "lines_removed": 812104,
   "total_tags": 74,
   "era": "steady",
   "top_authors": [
@@ -41,10 +41,17 @@
     }
   ],
   "author_commits": {
+    "CCCLL": 3,
+    "xiaobaicai66695": 2,
+    "Kayokoi": 1,
+    "binbin.zhang": 1,
+    "Junpei Zhang": 1,
+    "SiriusTL666": 1,
+    "\u7535\u5927\u8001baby": 1,
+    "Elias\u4e0d\u5403\u7cd6": 1,
     "Sharang Gupta": 1,
     "zzk": 2,
     "hickey-ai": 1,
-    "CCCLL": 1,
     "Ken Liu": 1135,
     "ZhijieZheng": 1,
     "Yukina": 18,
@@ -739,17 +746,16 @@
     "2023": 1468,
     "2024": 720,
     "2025": 456,
-    "2026": 224
+    "2026": 234
   },
   "ai_assisted": {
-    "commits": 8,
+    "commits": 9,
     "authored": 0,
     "assistants": {
       "GitHub Copilot": 7,
-      "Claude": 1
+      "Claude": 2
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -772,10 +778,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 1,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 54,
       "2024-12": 15,
       "2025-01": 59,
       "2025-02": 51,
@@ -798,17 +804,18 @@
       "2026-07": 6,
       "2026-08": 6,
       "2026-09": 10,
-      "2026-10": 7
+      "2026-10": 17,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8916,
+    "commits": 8926,
     "by_kind": {
       "organization": 235,
-      "one_person": 174,
-      "personal": 5239,
-      "hidden": 740,
+      "one_person": 160,
+      "personal": 5262,
+      "hidden": 741,
       "unknown": 1424,
       "bot": 1104
     },
@@ -908,8 +915,8 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 1,
-        "personal": 4,
-        "hidden": 2,
+        "personal": 13,
+        "hidden": 3,
         "unknown": 0,
         "bot": 0
       }
@@ -918,13 +925,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 115,
-    "authors": 46,
-    "new_authors": 38,
-    "half_of_commits": 4
+    "commits": 125,
+    "authors": 53,
+    "new_authors": 45,
+    "half_of_commits": 6
   },
   "humans": {
-    "commits": 7812,
+    "commits": 7822,
     "commits_by_year": {
       "2011": 565,
       "2012": 1200,
@@ -941,9 +948,9 @@
       "2023": 1047,
       "2024": 415,
       "2025": 233,
-      "2026": 76
+      "2026": 86
     },
-    "active_days": 2012
+    "active_days": 2014
   },
   "timezones": {
     "+0000": 1423,
@@ -953,7 +960,7 @@
     "+0400": 1,
     "+0530": 22,
     "+0600": 1,
-    "+0800": 7276,
+    "+0800": 7286,
     "+0900": 5,
     "-0300": 11,
     "-0400": 6,
@@ -963,7 +970,7 @@
     "-0800": 8
   },
   "source_lines": {
-    "added": 1526192,
-    "current": 520386
+    "added": 1526966,
+    "current": 522372
   }
 }

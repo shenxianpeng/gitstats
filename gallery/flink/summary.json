@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:35:20+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:02:49+00:00",
   "name": "Apache Flink",
   "report_path": "index.html",
   "first_commit": "2010-12-15 16:02:01",
-  "last_commit": "2026-10-26 13:16:44",
-  "age_days": 5794,
-  "active_days": 4887,
-  "total_commits": 38725,
-  "total_authors": 1741,
-  "active_authors_12mo": 172,
-  "commits_last_12mo": 1470,
-  "total_files": 27299,
-  "total_lines": 4049403,
-  "lines_added": 10668105,
-  "lines_removed": 6617944,
+  "last_commit": "2026-10-31 19:15:38",
+  "age_days": 5800,
+  "active_days": 4892,
+  "total_commits": 38776,
+  "total_authors": 1747,
+  "active_authors_12mo": 176,
+  "commits_last_12mo": 1435,
+  "total_files": 27354,
+  "total_lines": 4059437,
+  "lines_added": 10679679,
+  "lines_removed": 6619484,
   "total_tags": 2,
   "era": "steady",
   "top_authors": [
@@ -41,47 +41,56 @@
     }
   ],
   "author_commits": {
+    "Sergey Nuyanzin": 618,
+    "Ramin Gharib": 104,
+    "Martijn Visser": 277,
+    "Rakesh Kumar": 1,
+    "bvarghese1": 56,
+    "Purushottam Sinha": 41,
+    "Robin Varghese": 1,
+    "Jim Hughes": 48,
+    "Rion Williams": 9,
+    "Abhijeet Sharma": 1,
+    "Piotr Nowojski": 778,
+    "Timo Theusner": 9,
+    "Sangkyoon Nam": 4,
+    "Matt Belle": 2,
+    "Hanyu (Peter) Zheng": 4,
+    "Timo Walther": 1029,
+    "Dale Lane": 7,
+    "Vasudev Kelappassery": 8,
+    "Utkarsh Vashishtha": 1,
+    "SEPURI-SAI-KRISHNA": 6,
+    "Biao Geng": 13,
+    "Luo Zhengjie": 1,
     "Rui Fan": 285,
-    "Ramin Gharib": 98,
-    "Rion Williams": 6,
     "Gustavo de Morais": 89,
-    "Martijn Visser": 274,
-    "Timo Walther": 1028,
     "wuyifan": 1,
     "Roc Marshal": 180,
     "Yahya Kisana": 1,
-    "Sergey Nuyanzin": 607,
     "Piotr Przybylski": 5,
     "bowenli86": 233,
     "Efrat Levitan": 22,
-    "Purushottam Sinha": 40,
     "beetle0915": 8,
-    "Timo Theusner": 8,
     "Sankalp Thakur": 1,
     "Muhammad Junaid Muzammil": 1,
     "florianvazelle": 7,
     "Isaac Montenegro Jimenez": 1,
     "Gabor Somogyi": 103,
     "Liu Liu": 19,
-    "Sangkyoon Nam": 1,
     "Mohsen Rezaei": 3,
     "Victor Wang": 1,
     "Weiqing Yang": 16,
-    "Dale Lane": 5,
     "Moritz Manner": 10,
     "Mate Czagany": 24,
-    "Biao Geng": 11,
     "danzhewuju": 1,
     "bladedragon": 1,
     "Fabian Hueske": 829,
-    "Vasudev Kelappassery": 7,
     "Shihuan Liu": 1,
     "Bharath Reddy Gunapati": 1,
     "niliushall": 1,
-    "Bonnie Varghese": 55,
     "YordanPavlov": 2,
     "Zakelly": 220,
-    "Matt Belle": 1,
     "Mika Naylor": 47,
     "Federico Dolce": 5,
     "Arvid Heise": 374,
@@ -94,7 +103,6 @@
     "Han You": 1,
     "Aleksandr Savonin": 19,
     "SulphurFH": 2,
-    "SEPURI-SAI-KRISHNA": 5,
     "Gyula Fora": 440,
     "yongfu.gao": 4,
     "Talat Uyarer": 1,
@@ -133,7 +141,6 @@
     "Au-Miner": 6,
     "luogen.lg": 2,
     "David Anderson": 63,
-    "Piotr Nowojski": 774,
     "lincoln lee": 125,
     "Xuyang": 135,
     "Matthias Pohl": 438,
@@ -155,7 +162,6 @@
     "Jubin Soni": 2,
     "reswqa": 324,
     "sumin": 1,
-    "Jim Hughes": 47,
     "nattilabalint": 1,
     "Dennis-Mircea Ciupitu": 7,
     "Arvind Kandpal": 2,
@@ -1800,22 +1806,21 @@
     "2023": 2085,
     "2024": 1658,
     "2025": 1064,
-    "2026": 1337
+    "2026": 1388
   },
   "ai_assisted": {
-    "commits": 201,
+    "commits": 223,
     "authored": 0,
     "assistants": {
-      "Claude": 181,
-      "ChatGPT": 18,
-      "Codex": 15,
+      "Claude": 202,
+      "ChatGPT": 19,
+      "Codex": 16,
       "GitHub Copilot": 3,
       "Cursor": 2,
       "Gemini": 1,
       "Grok": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1836,12 +1841,12 @@
       "2026-05": 4,
       "2026-06": 27,
       "2026-07": 51,
-      "2026-08": 14,
+      "2026-08": 15,
       "2026-09": 46,
-      "2026-10": 49
+      "2026-10": 70,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 77,
       "2024-12": 126,
       "2025-01": 201,
       "2025-02": 108,
@@ -1862,32 +1867,33 @@
       "2026-05": 125,
       "2026-06": 141,
       "2026-07": 205,
-      "2026-08": 120,
+      "2026-08": 121,
       "2026-09": 161,
-      "2026-10": 139
+      "2026-10": 189,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38725,
+    "commits": 38776,
     "by_kind": {
-      "organization": 20800,
-      "one_person": 1245,
-      "personal": 15432,
-      "hidden": 1123,
-      "unknown": 109,
+      "organization": 20785,
+      "one_person": 1250,
+      "personal": 15482,
+      "hidden": 1130,
+      "unknown": 113,
       "bot": 16
     },
-    "organization_count": 69,
+    "organization_count": 66,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "apache.org",
-        "commits": 12616,
-        "commits_last_12mo": 129,
+        "commits": 12617,
+        "commits_last_12mo": 130,
         "addresses": 85,
         "first_commit": "2012-05-11",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-10-29"
       },
       {
         "organization": "tu-berlin.de",
@@ -1931,11 +1937,11 @@
       },
       {
         "organization": "confluent.io",
-        "commits": 472,
-        "commits_last_12mo": 197,
-        "addresses": 27,
+        "commits": 483,
+        "commits_last_12mo": 208,
+        "addresses": 29,
         "first_commit": "2023-01-11",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-10-30"
       },
       {
         "organization": "aiven.io",
@@ -2066,14 +2072,6 @@
         "last_commit": "2017-10-04"
       },
       {
-        "organization": "live.cn",
-        "commits": 20,
-        "commits_last_12mo": 18,
-        "addresses": 2,
-        "first_commit": "2021-11-04",
-        "last_commit": "2026-10-19"
-      },
-      {
         "organization": "cloudera.com",
         "commits": 19,
         "commits_last_12mo": 2,
@@ -2154,6 +2152,14 @@
         "last_commit": "2022-05-22"
       },
       {
+        "organization": "ibm.com",
+        "commits": 10,
+        "commits_last_12mo": 5,
+        "addresses": 6,
+        "first_commit": "2016-07-13",
+        "last_commit": "2026-10-20"
+      },
+      {
         "organization": "netease.com",
         "commits": 10,
         "commits_last_12mo": 0,
@@ -2218,14 +2224,6 @@
         "last_commit": "2019-04-18"
       },
       {
-        "organization": "ibm.com",
-        "commits": 8,
-        "commits_last_12mo": 3,
-        "addresses": 6,
-        "first_commit": "2016-07-13",
-        "last_commit": "2026-10-15"
-      },
-      {
         "organization": "kth.se",
         "commits": 7,
         "commits_last_12mo": 0,
@@ -2280,22 +2278,6 @@
         "addresses": 2,
         "first_commit": "2020-10-11",
         "last_commit": "2021-07-01"
-      },
-      {
-        "organization": "ymail.com",
-        "commits": 5,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2016-01-06",
-        "last_commit": "2020-02-09"
-      },
-      {
-        "organization": "fritz.box",
-        "commits": 4,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2014-09-09",
-        "last_commit": "2017-08-28"
       },
       {
         "organization": "asiainfo.com",
@@ -2453,8 +2435,8 @@
       },
       "2025-Q3": {
         "organization": 81,
-        "one_person": 2,
-        "personal": 113,
+        "one_person": 1,
+        "personal": 114,
         "hidden": 20,
         "unknown": 0,
         "bot": 0
@@ -2476,26 +2458,26 @@
         "bot": 0
       },
       "2026-Q2": {
-        "organization": 110,
+        "organization": 109,
         "one_person": 10,
-        "personal": 189,
+        "personal": 190,
         "hidden": 69,
         "unknown": 0,
         "bot": 0
       },
       "2026-Q3": {
-        "organization": 136,
+        "organization": 125,
         "one_person": 9,
-        "personal": 260,
-        "hidden": 79,
+        "personal": 271,
+        "hidden": 80,
         "unknown": 0,
         "bot": 2
       },
       "2026-Q4": {
-        "organization": 37,
-        "one_person": 4,
-        "personal": 62,
-        "hidden": 35,
+        "organization": 45,
+        "one_person": 10,
+        "personal": 92,
+        "hidden": 41,
         "unknown": 0,
         "bot": 1
       }
@@ -2504,13 +2486,13 @@
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1467,
-    "authors": 170,
-    "new_authors": 91,
+    "commits": 1518,
+    "authors": 176,
+    "new_authors": 97,
     "half_of_commits": 8
   },
   "humans": {
-    "commits": 38709,
+    "commits": 38760,
     "commits_by_year": {
       "2010": 37,
       "2011": 1880,
@@ -2528,38 +2510,38 @@
       "2023": 2080,
       "2024": 1658,
       "2025": 1064,
-      "2026": 1334
+      "2026": 1385
     },
-    "active_days": 4886
+    "active_days": 4891
   },
   "timezones": {
-    "+0000": 301,
-    "+0100": 10185,
-    "+0200": 13541,
+    "+0000": 302,
+    "+0100": 10212,
+    "+0200": 13542,
     "+0300": 210,
     "+0400": 28,
     "+0430": 1,
-    "+0530": 249,
+    "+0530": 253,
     "+0545": 1,
     "+0600": 1,
     "+0700": 31,
-    "+0800": 12089,
-    "+0900": 90,
+    "+0800": 12092,
+    "+0900": 93,
     "+1000": 3,
     "+1100": 2,
     "+1200": 2,
     "+1300": 1,
     "-0200": 1,
     "-0300": 3,
-    "-0400": 332,
-    "-0500": 295,
+    "-0400": 334,
+    "-0500": 302,
     "-0600": 128,
-    "-0700": 837,
+    "-0700": 840,
     "-0800": 393,
     "-1000": 1
   },
   "source_lines": {
-    "added": 11368467,
-    "current": 3867655
+    "added": 11380041,
+    "current": 4039684
   }
 }

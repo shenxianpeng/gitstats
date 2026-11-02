@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:28:35+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:56:59+00:00",
   "name": "pip",
   "report_path": "index.html",
   "first_commit": "2008-10-15 22:02:57",
-  "last_commit": "2026-10-26 04:22:54",
-  "age_days": 6585,
-  "active_days": 3540,
-  "total_commits": 16348,
+  "last_commit": "2026-11-01 20:17:58",
+  "age_days": 6591,
+  "active_days": 3553,
+  "total_commits": 16449,
   "total_authors": 848,
   "active_authors_12mo": 67,
-  "commits_last_12mo": 749,
-  "total_files": 1087,
-  "total_lines": 217268,
-  "lines_added": 1052952,
-  "lines_removed": 835669,
+  "commits_last_12mo": 790,
+  "total_files": 1134,
+  "total_lines": 231653,
+  "lines_added": 1069253,
+  "lines_removed": 837585,
   "total_tags": 162,
   "era": "steady",
   "top_authors": [
@@ -33,7 +33,7 @@
     },
     {
       "name": "St\u00e9phane Bidoul",
-      "commits": 953
+      "commits": 956
     },
     {
       "name": "Paul Moore",
@@ -41,7 +41,8 @@
     }
   ],
   "author_commits": {
-    "Damian Shaw": 660,
+    "Damian Shaw": 696,
+    "Sepehr Rasouli": 106,
     "Seth Michael Larson": 24,
     "Gregory P. Smith": 1,
     "Kevin Turcios": 14,
@@ -49,14 +50,13 @@
     "Edgar Ram\u00edrez Mondrag\u00f3n": 4,
     "Paul Moore": 823,
     "Miro Hron\u010dok": 24,
+    "Youngkwang Yang": 22,
     "T.Yamada": 1,
     "Keto D. Zhang": 2,
     "Islam Asabaev": 1,
-    "Youngkwang Yang": 13,
+    "St\u00e9phane Bidoul": 956,
     "Abdul Rawoof Khan": 6,
     "Hugo": 2,
-    "St\u00e9phane Bidoul": 953,
-    "Sepehr Rasouli": 53,
     "Sebastian H\u00f6ffner": 1,
     "RAHUL KUMAR": 1,
     "Andrea Corna": 1,
@@ -908,8 +908,8 @@
     "2022": 857,
     "2023": 764,
     "2024": 627,
-    "2025": 765,
-    "2026": 658
+    "2025": 781,
+    "2026": 743
   },
   "ai_assisted": {
     "commits": 4,
@@ -920,7 +920,6 @@
       "OpenCode": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -943,10 +942,10 @@
       "2026-07": 1,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 18,
       "2024-12": 29,
       "2025-01": 82,
       "2025-02": 58,
@@ -955,36 +954,37 @@
       "2025-05": 64,
       "2025-06": 40,
       "2025-07": 59,
-      "2025-08": 71,
-      "2025-09": 74,
-      "2025-10": 76,
-      "2025-11": 45,
-      "2025-12": 46,
+      "2025-08": 76,
+      "2025-09": 75,
+      "2025-10": 78,
+      "2025-11": 52,
+      "2025-12": 47,
       "2026-01": 96,
-      "2026-02": 26,
+      "2026-02": 35,
       "2026-03": 53,
-      "2026-04": 119,
-      "2026-05": 31,
-      "2026-06": 86,
-      "2026-07": 117,
-      "2026-08": 52,
+      "2026-04": 130,
+      "2026-05": 37,
+      "2026-06": 93,
+      "2026-07": 125,
+      "2026-08": 55,
       "2026-09": 18,
-      "2026-10": 60
+      "2026-10": 94,
+      "2026-11": 7
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 16348,
+    "commits": 16449,
     "by_kind": {
       "organization": 348,
-      "one_person": 4273,
-      "personal": 10858,
+      "one_person": 4274,
+      "personal": 10958,
       "hidden": 777,
       "unknown": 24,
       "bot": 68
     },
     "organization_count": 17,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "bloomberg.net",
@@ -1003,7 +1003,7 @@
         "last_commit": "2023-03-30"
       },
       {
-        "organization": "org.ua",
+        "organization": "sydorenko.org.ua",
         "commits": 46,
         "commits_last_12mo": 0,
         "addresses": 2,
@@ -1021,7 +1021,7 @@
       {
         "organization": "cern.ch",
         "commits": 23,
-        "commits_last_12mo": 5,
+        "commits_last_12mo": 4,
         "addresses": 2,
         "first_commit": "2020-04-16",
         "last_commit": "2026-01-16"
@@ -1143,7 +1143,7 @@
       "2025-Q3": {
         "organization": 5,
         "one_person": 5,
-        "personal": 172,
+        "personal": 178,
         "hidden": 16,
         "unknown": 0,
         "bot": 6
@@ -1151,7 +1151,7 @@
       "2025-Q4": {
         "organization": 3,
         "one_person": 11,
-        "personal": 143,
+        "personal": 153,
         "hidden": 1,
         "unknown": 0,
         "bot": 9
@@ -1159,23 +1159,23 @@
       "2026-Q1": {
         "organization": 5,
         "one_person": 5,
-        "personal": 154,
+        "personal": 163,
         "hidden": 6,
         "unknown": 0,
         "bot": 5
       },
       "2026-Q2": {
         "organization": 0,
-        "one_person": 19,
-        "personal": 196,
+        "one_person": 20,
+        "personal": 219,
         "hidden": 14,
         "unknown": 0,
         "bot": 7
       },
       "2026-Q3": {
         "organization": 1,
-        "one_person": 18,
-        "personal": 151,
+        "one_person": 23,
+        "personal": 157,
         "hidden": 6,
         "unknown": 0,
         "bot": 11
@@ -1183,7 +1183,7 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 1,
-        "personal": 55,
+        "personal": 96,
         "hidden": 1,
         "unknown": 0,
         "bot": 2
@@ -1191,15 +1191,15 @@
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 718,
-    "authors": 67,
-    "new_authors": 45,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 761,
+    "authors": 58,
+    "new_authors": 38,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 16280,
+    "commits": 16381,
     "commits_by_year": {
       "2008": 39,
       "2009": 357,
@@ -1218,39 +1218,39 @@
       "2022": 857,
       "2023": 761,
       "2024": 624,
-      "2025": 728,
-      "2026": 633
+      "2025": 744,
+      "2026": 718
     },
-    "active_days": 3528
+    "active_days": 3542
   },
   "timezones": {
     "+0000": 992,
     "+0100": 2378,
-    "+0200": 1626,
+    "+0200": 1629,
     "+0300": 410,
-    "+0330": 56,
+    "+0330": 109,
     "+0400": 16,
     "+0500": 2,
     "+0530": 2390,
     "+0600": 1,
     "+0700": 90,
     "+0800": 1189,
-    "+0900": 80,
+    "+0900": 89,
     "+1000": 88,
     "+1100": 56,
     "+1200": 31,
     "+1300": 43,
     "-0200": 21,
     "-0300": 183,
-    "-0400": 2740,
-    "-0500": 1632,
+    "-0400": 2769,
+    "-0500": 1639,
     "-0600": 261,
     "-0700": 1428,
     "-0800": 634,
     "-1000": 1
   },
   "source_lines": {
-    "added": 1148145,
-    "current": 216524
+    "added": 1164519,
+    "current": 231653
   }
 }

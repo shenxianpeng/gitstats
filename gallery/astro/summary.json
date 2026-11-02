@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:36:19+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:04:08+00:00",
   "name": "Astro",
   "report_path": "index.html",
   "first_commit": "2021-03-15 17:22:05",
-  "last_commit": "2026-10-26 20:21:54",
-  "age_days": 2052,
-  "active_days": 1627,
-  "total_commits": 15333,
-  "total_authors": 969,
-  "active_authors_12mo": 165,
-  "commits_last_12mo": 2320,
-  "total_files": 7052,
-  "total_lines": 419404,
-  "lines_added": 1860630,
-  "lines_removed": 1441128,
-  "total_tags": 3405,
+  "last_commit": "2026-10-30 13:25:29",
+  "age_days": 2055,
+  "active_days": 1631,
+  "total_commits": 15355,
+  "total_authors": 972,
+  "active_authors_12mo": 168,
+  "commits_last_12mo": 2220,
+  "total_files": 7071,
+  "total_lines": 420511,
+  "lines_added": 1862208,
+  "lines_removed": 1441599,
+  "total_tags": 3418,
   "era": "steady",
   "top_authors": [
     {
@@ -41,6 +41,10 @@
     }
   ],
   "author_commits": {
+    "skezo": 1,
+    "Edmund Hung": 2,
+    "Waleed Rostom \ud83d\udc26\u200d\u2b1b": 1,
+    "Nikolas Sapalidis": 1,
     "okxint": 2,
     "Denis Scarabelli": 1,
     "Abhirup Pal": 1,
@@ -51,7 +55,6 @@
     "KTrain": 1,
     "Austen Stone": 1,
     "Harjot Singh": 1,
-    "Edmund Hung": 1,
     "joel hansson": 2,
     "Dan Barclay": 1,
     "breken": 1,
@@ -1017,7 +1020,7 @@
     "2023": 3622,
     "2024": 2797,
     "2025": 1373,
-    "2026": 2089
+    "2026": 2111
   },
   "ai_assisted": {
     "commits": 30,
@@ -1027,7 +1030,6 @@
       "GitHub Copilot": 8
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -1050,10 +1052,10 @@
       "2026-07": 1,
       "2026-08": 1,
       "2026-09": 2,
-      "2026-10": 5
+      "2026-10": 5,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 137,
       "2024-12": 161,
       "2025-01": 184,
       "2025-02": 121,
@@ -1076,19 +1078,20 @@
       "2026-07": 138,
       "2026-08": 171,
       "2026-09": 178,
-      "2026-10": 180
+      "2026-10": 202,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15333,
+    "commits": 15355,
     "by_kind": {
-      "organization": 1377,
-      "one_person": 2278,
-      "personal": 3305,
-      "hidden": 7278,
+      "organization": 1378,
+      "one_person": 2275,
+      "personal": 3314,
+      "hidden": 7281,
       "unknown": 0,
-      "bot": 1095
+      "bot": 1107
     },
     "organization_count": 6,
     "last_12mo_from": "2025-11",
@@ -1103,11 +1106,11 @@
       },
       {
         "organization": "cloudflare.com",
-        "commits": 497,
-        "commits_last_12mo": 494,
+        "commits": 498,
+        "commits_last_12mo": 495,
         "addresses": 5,
         "first_commit": "2022-08-10",
-        "last_commit": "2026-10-26"
+        "last_commit": "2026-10-30"
       },
       {
         "organization": "astro.build",
@@ -1153,8 +1156,8 @@
       },
       "2025-Q2": {
         "organization": 0,
-        "one_person": 77,
-        "personal": 47,
+        "one_person": 76,
+        "personal": 48,
         "hidden": 144,
         "unknown": 0,
         "bot": 13
@@ -1177,8 +1180,8 @@
       },
       "2026-Q1": {
         "organization": 195,
-        "one_person": 122,
-        "personal": 81,
+        "one_person": 120,
+        "personal": 83,
         "hidden": 249,
         "unknown": 0,
         "bot": 74
@@ -1200,39 +1203,39 @@
         "bot": 105
       },
       "2026-Q4": {
-        "organization": 14,
-        "one_person": 15,
-        "personal": 3,
-        "hidden": 35,
+        "organization": 15,
+        "one_person": 20,
+        "personal": 4,
+        "hidden": 38,
         "unknown": 0,
-        "bot": 113
+        "bot": 125
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 229,
-    "authors": 165,
-    "new_authors": 156,
-    "half_of_commits": 51
+    "commits": 233,
+    "authors": 168,
+    "new_authors": 159,
+    "half_of_commits": 52
   },
   "humans": {
-    "commits": 14238,
+    "commits": 14248,
     "commits_by_year": {
       "2021": 1837,
       "2022": 3220,
       "2023": 3558,
       "2024": 2566,
       "2025": 1269,
-      "2026": 1788
+      "2026": 1798
     },
-    "active_days": 1614
+    "active_days": 1618
   },
   "timezones": {
-    "+0000": 3635,
-    "+0100": 1710,
-    "+0200": 1630,
+    "+0000": 3637,
+    "+0100": 1713,
+    "+0200": 1631,
     "+0300": 96,
     "+0330": 4,
     "+0400": 7,
@@ -1242,23 +1245,23 @@
     "+0600": 20,
     "+0630": 4,
     "+0700": 62,
-    "+0800": 995,
-    "+0900": 178,
+    "+0800": 996,
+    "+0900": 180,
     "+1000": 140,
     "+1030": 1,
     "+1100": 18,
     "+1200": 8,
     "+1300": 12,
     "-0300": 437,
-    "-0400": 1911,
+    "-0400": 1922,
     "-0500": 1271,
     "-0600": 400,
-    "-0700": 1919,
+    "-0700": 1921,
     "-0800": 696,
     "-1000": 1
   },
   "source_lines": {
-    "added": 1299958,
-    "current": 338802
+    "added": 1301189,
+    "current": 340614
   }
 }

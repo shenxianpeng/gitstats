@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:37:13+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:04:57+00:00",
   "name": "Apache ECharts",
   "report_path": "index.html",
   "first_commit": "2013-05-31 09:45:54",
@@ -11,7 +11,7 @@
   "total_commits": 10403,
   "total_authors": 330,
   "active_authors_12mo": 22,
-  "commits_last_12mo": 240,
+  "commits_last_12mo": 217,
   "total_files": 2182,
   "total_lines": 929274,
   "lines_added": 4162894,
@@ -393,7 +393,6 @@
     "authored": 0,
     "assistants": {},
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -416,10 +415,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 42,
       "2024-12": 51,
       "2025-01": 28,
       "2025-02": 22,
@@ -442,7 +441,8 @@
       "2026-07": 8,
       "2026-08": 2,
       "2026-09": 11,
-      "2026-10": 2
+      "2026-10": 2,
+      "2026-11": 0
     }
   },
   "organizations": {
@@ -450,8 +450,8 @@
     "commits": 10403,
     "by_kind": {
       "organization": 112,
-      "one_person": 832,
-      "personal": 9313,
+      "one_person": 816,
+      "personal": 9329,
       "hidden": 85,
       "unknown": 16,
       "bot": 45
@@ -617,6 +617,6 @@
   },
   "source_lines": {
     "added": 4856071,
-    "current": 900554
+    "current": 901863
   }
 }

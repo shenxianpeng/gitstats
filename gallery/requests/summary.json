@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:28:25+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T04:56:40+00:00",
   "name": "Requests",
   "report_path": "index.html",
   "first_commit": "2011-02-13 18:41:18",
@@ -836,7 +836,6 @@
       "Claude": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 0,
@@ -859,10 +858,10 @@
       "2026-07": 0,
       "2026-08": 0,
       "2026-09": 0,
-      "2026-10": 0
+      "2026-10": 0,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 3,
       "2024-12": 1,
       "2025-01": 2,
       "2025-02": 14,
@@ -885,21 +884,22 @@
       "2026-07": 7,
       "2026-08": 5,
       "2026-09": 2,
-      "2026-10": 1
+      "2026-10": 1,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
     "commits": 6496,
     "by_kind": {
-      "organization": 66,
-      "one_person": 3904,
-      "personal": 2232,
+      "organization": 61,
+      "one_person": 3907,
+      "personal": 2234,
       "hidden": 212,
       "unknown": 16,
       "bot": 66
     },
-    "organization_count": 15,
+    "organization_count": 14,
     "last_12mo_from": "2025-11",
     "top": [
       {
@@ -909,14 +909,6 @@
         "addresses": 2,
         "first_commit": "2014-07-02",
         "last_commit": "2015-08-24"
-      },
-      {
-        "organization": "id.au",
-        "commits": 5,
-        "commits_last_12mo": 0,
-        "addresses": 2,
-        "first_commit": "2011-11-17",
-        "last_commit": "2012-08-23"
       },
       {
         "organization": "redhat.com",
@@ -1149,6 +1141,6 @@
   },
   "source_lines": {
     "added": 158656,
-    "current": 27581
+    "current": 28184
   }
 }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.1",
-  "generated_at": "2026-10-27T01:40:14+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev2",
+  "generated_at": "2026-11-02T05:08:54+00:00",
   "name": "TypeScript",
   "report_path": "index.html",
   "first_commit": "2014-07-08 00:08:16",
-  "last_commit": "2026-10-26 16:08:24",
-  "age_days": 4494,
-  "active_days": 3926,
-  "total_commits": 39594,
-  "total_authors": 989,
-  "active_authors_12mo": 137,
-  "commits_last_12mo": 1798,
-  "total_files": 67957,
-  "total_lines": 6395069,
-  "lines_added": 25812217,
-  "lines_removed": 19391716,
+  "last_commit": "2026-10-30 22:12:03",
+  "age_days": 4498,
+  "active_days": 3930,
+  "total_commits": 39635,
+  "total_authors": 995,
+  "active_authors_12mo": 143,
+  "commits_last_12mo": 1739,
+  "total_files": 68201,
+  "total_lines": 6421801,
+  "lines_added": 25841460,
+  "lines_removed": 19394108,
   "total_tags": 16,
   "era": "steady",
   "top_authors": [
     {
       "name": "Anders Hejlsberg",
-      "commits": 4128
+      "commits": 4129
     },
     {
       "name": "Sheetal Nandi",
@@ -41,16 +41,23 @@
     }
   ],
   "author_commits": {
-    "Mateusz Burzy\u0144ski": 586,
-    "Jake Bailey": 1436,
-    "Anders Hejlsberg": 4128,
+    "Jake Bailey": 1452,
+    "Mateusz Burzy\u0144ski": 592,
+    "Ryan Cavanaugh": 1016,
+    "Oleksandr Tarasiuk": 592,
+    "Tom S": 1,
+    "GOVARDHAN CHINTA": 1,
+    "Timon G\u00e4rtner": 1,
+    "MaheshDesu": 1,
+    "Andrew Branch": 870,
+    "Wesley Wigham": 1782,
+    "Kirk Ouimet": 1,
+    "magic-akari": 10,
+    "Anders Hejlsberg": 4129,
+    "Harsh Vardhan Chauhan": 1,
     "John Favret": 43,
-    "Wesley Wigham": 1780,
-    "Oleksandr Tarasiuk": 590,
-    "Andrew Branch": 869,
     "Joaquin Jares": 2,
     "Max Schwenk": 6,
-    "Ryan Cavanaugh": 1013,
     "Titian Cernicova-Dragomir": 56,
     "HazyLab": 1,
     "Christopher Plieger": 5,
@@ -97,7 +104,6 @@
     "Marius Schulz": 13,
     "Zhiyao Wen": 1,
     "Akshay Madavalappil Ramesh": 1,
-    "magic-akari": 9,
     "Ijtihed Kilani": 1,
     "udit": 2,
     "Kenny Daniel": 1,
@@ -1044,18 +1050,17 @@
     "2023": 1305,
     "2024": 1085,
     "2025": 1465,
-    "2026": 1570
+    "2026": 1611
   },
   "ai_assisted": {
-    "commits": 445,
+    "commits": 447,
     "authored": 342,
     "assistants": {
-      "GitHub Copilot": 439,
+      "GitHub Copilot": 441,
       "Claude": 5,
       "Codex": 1
     },
     "by_month": {
-      "2024-11": 0,
       "2024-12": 0,
       "2025-01": 0,
       "2025-02": 1,
@@ -1078,10 +1083,10 @@
       "2026-07": 21,
       "2026-08": 27,
       "2026-09": 22,
-      "2026-10": 15
+      "2026-10": 17,
+      "2026-11": 0
     },
     "commits_by_month": {
-      "2024-11": 80,
       "2024-12": 93,
       "2025-01": 104,
       "2025-02": 125,
@@ -1104,30 +1109,31 @@
       "2026-07": 118,
       "2026-08": 137,
       "2026-09": 153,
-      "2026-10": 112
+      "2026-10": 153,
+      "2026-11": 0
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39594,
+    "commits": 39635,
     "by_kind": {
-      "organization": 25463,
-      "one_person": 1221,
-      "personal": 5824,
-      "hidden": 6939,
+      "organization": 25466,
+      "one_person": 1167,
+      "personal": 5889,
+      "hidden": 6963,
       "unknown": 10,
-      "bot": 137
+      "bot": 140
     },
     "organization_count": 8,
     "last_12mo_from": "2025-11",
     "top": [
       {
         "organization": "microsoft.com",
-        "commits": 25147,
-        "commits_last_12mo": 193,
+        "commits": 25150,
+        "commits_last_12mo": 196,
         "addresses": 70,
         "first_commit": "2014-07-08",
-        "last_commit": "2026-10-23"
+        "last_commit": "2026-10-28"
       },
       {
         "organization": "umich.edu",
@@ -1213,8 +1219,8 @@
       },
       "2025-Q4": {
         "organization": 53,
-        "one_person": 4,
-        "personal": 102,
+        "one_person": 3,
+        "personal": 103,
         "hidden": 201,
         "unknown": 0,
         "bot": 14
@@ -1244,25 +1250,25 @@
         "bot": 11
       },
       "2026-Q4": {
-        "organization": 16,
-        "one_person": 0,
-        "personal": 29,
-        "hidden": 62,
+        "organization": 19,
+        "one_person": 1,
+        "personal": 39,
+        "hidden": 86,
         "unknown": 0,
-        "bot": 5
+        "bot": 8
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-11",
     "to": "2026-10",
-    "commits": 1747,
-    "authors": 137,
-    "new_authors": 98,
+    "commits": 1785,
+    "authors": 143,
+    "new_authors": 104,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 39457,
+    "commits": 39495,
     "commits_by_year": {
       "2014": 3328,
       "2015": 6550,
@@ -1276,12 +1282,12 @@
       "2023": 1301,
       "2024": 1053,
       "2025": 1409,
-      "2026": 1527
+      "2026": 1565
     },
-    "active_days": 3924
+    "active_days": 3928
   },
   "timezones": {
-    "+0000": 2022,
+    "+0000": 2063,
     "+0100": 848,
     "+0200": 1171,
     "+0300": 803,
@@ -1308,7 +1314,7 @@
     "-1000": 238
   },
   "source_lines": {
-    "added": 27232856,
-    "current": 1417564
+    "added": 27244609,
+    "current": 1427421
   }
 }
