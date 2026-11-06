@@ -5,6 +5,10 @@ on:
     paths:
       - '**/*.py'
       - 'pyproject.toml'
+      # the jobs below install from the lock file, so a change to it is a
+      # change to what they test: Dependabot's weekly uv group touches
+      # nothing else, and without this those updates merge untested
+      - 'uv.lock'
       - 'gitstats/*'
       - 'tests/*'
       - '.github/workflows/test.yml'
@@ -60,6 +64,21 @@ jobs:
       run: >-
         uv run python -m pytest tests/ -v --tb=short --cov --cov-report=term-missing
         ${{ matrix.python-version == '3.15' && '--cov-fail-under=0' || '' }}
+
+    # No other job installs the ai extra, so the four providers are otherwise
+    # only ever exercised against the stand-in modules of
+    # tests/test_ai_providers.py, which pass whatever the installed SDKs look
+    # like: that is how the Claude provider came to be broken against current
+    # ones (#357), and Dependabot moves these pins in uv.lock every week. One
+    # leg of the matrix is enough, as the lock file pins one version of each.
+    # No --cov: this is a subset, which could not reach the 100% the gate in
+    # pyproject.toml asks of the whole suite. --no-sync and --no-build keep
+    # the run from installing or building anything of its own.
+    - name: Check the AI SDK surface the providers use
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12' }}
+      run: |
+        uv sync --frozen --no-build --no-install-project --extra ai --extra test
+        uv run --no-sync --no-build python -m pytest tests/test_ai_sdk_contract.py -v --tb=short
 
     - name: Generate GitStats Report (smoke test)
       if: ${{ matrix.python-version == '3.10' }}
