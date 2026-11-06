@@ -65,6 +65,20 @@ jobs:
         uv run python -m pytest tests/ -v --tb=short --cov --cov-report=term-missing
         ${{ matrix.python-version == '3.15' && '--cov-fail-under=0' || '' }}
 
+    # No other job installs the ai extra, so the four providers are otherwise
+    # only ever exercised against the stand-in modules of
+    # tests/test_ai_providers.py, which pass whatever the installed SDKs look
+    # like: that is how the Claude provider came to be broken against current
+    # ones (#357), and Dependabot moves these pins in uv.lock every week. One
+    # leg of the matrix is enough, as the lock file pins one version of each.
+    # No --cov: this is a subset, which could not reach the 100% the gate in
+    # pyproject.toml asks of the whole suite.
+    - name: Check the AI SDK surface the providers use
+      if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12' }}
+      run: |
+        uv sync --frozen --no-build --no-install-project --extra ai --extra test
+        uv run --no-sync python -m pytest tests/test_ai_sdk_contract.py -v --tb=short
+
     - name: Generate GitStats Report (smoke test)
       if: ${{ matrix.python-version == '3.10' }}
       env:
@@ -78,41 +92,6 @@ jobs:
       with:
         name: test-report-${{ matrix.os }}
         path: test-report
-
-  ai-sdk-contract:
-    # The ai extra is optional, so no other job installs it: the providers are
-    # otherwise only ever exercised against the stand-in modules of
-    # tests/test_ai_providers.py, and a renamed SDK surface reaches users
-    # instead of CI, as it did in #357. Dependabot moves these pins in
-    # uv.lock every week.
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        persist-credentials: false
-
-    - name: Set up Python 3.12
-      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
-      with:
-        python-version: 3.12
-        cache: 'pip'
-        cache-dependency-path: 'pyproject.toml'
-
-    - name: Install uv
-      run: 'pip install --only-binary :all: uv'
-
-    - name: Install dependencies, with the ai extra
-      run: |
-        uv sync --frozen --no-build --no-install-project --extra ai --extra test
-        uv pip install --editable .
-
-    - name: Check the SDK surface the providers use
-      # No --cov: these two files are a subset, which could not reach the
-      # 100% the gate in pyproject.toml asks of the whole suite.
-      run: >-
-        uv run python -m pytest
-        tests/test_ai_sdk_contract.py tests/test_ai_providers.py -v --tb=short
 
   test-docs:
     runs-on: ubuntu-latest
