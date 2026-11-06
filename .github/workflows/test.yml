@@ -72,12 +72,13 @@ jobs:
     # ones (#357), and Dependabot moves these pins in uv.lock every week. One
     # leg of the matrix is enough, as the lock file pins one version of each.
     # No --cov: this is a subset, which could not reach the 100% the gate in
-    # pyproject.toml asks of the whole suite.
+    # pyproject.toml asks of the whole suite. --no-sync and --no-build keep
+    # the run from installing or building anything of its own.
     - name: Check the AI SDK surface the providers use
       if: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.12' }}
       run: |
         uv sync --frozen --no-build --no-install-project --extra ai --extra test
-        uv run --no-sync python -m pytest tests/test_ai_sdk_contract.py -v --tb=short
+        uv run --no-sync --no-build python -m pytest tests/test_ai_sdk_contract.py -v --tb=short
 
     - name: Generate GitStats Report (smoke test)
       if: ${{ matrix.python-version == '3.10' }}
