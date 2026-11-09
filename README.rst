@@ -62,6 +62,20 @@
 
 📊 Generate insightful visual reports from Git.
 
+``gitstats`` reads a repository's Git history and writes a static report about
+it: commits, authors, activity, files, lines of code, tags, code ownership and
+more, as HTML to open or publish and as JSON to query. It runs ``git`` on a
+clone you already have. There is no server, no database, no account and no API
+token.
+
+This is the maintained continuation of the original ``gitstats``, written by
+`Heikki Hokkanen <https://github.com/hoxu>`_ and released from 2007 to 2014.
+It keeps the name, the GPL licence and the idea, and has been rebuilt for
+Python 3.10 and newer: charts drawn in the browser instead of by Gnuplot, JSON
+output, a dark theme, and pages the original never had. See `lineage and
+comparison <https://gitstats.readthedocs.io/en/latest/comparison.html>`_ for
+what changed and how it sits next to other tools.
+
 📘 Documentation: `gitstats.readthedocs.io <https://gitstats.readthedocs.io/>`_
 📊 GitStats Gallery: `shenxianpeng.dev/gitstats/gallery/ <https://shenxianpeng.dev/gitstats/gallery/>`_
 
@@ -357,21 +371,6 @@ With several repositories, each one gets its card in its own report
 directory; ``--wrapped-output`` names a single file, so it only works with one
 repository.
 
-
-What's New in v2.0.0
---------------------
-
-v2.0.0 is a major release focused on modernizing the report UI and removing the Gnuplot dependency.
-
-**Terminal-inspired UI redesign**
-   The entire report interface has been redesigned with a terminal / OpenCode-inspired aesthetic:
-   zero border-radius (sharp, angular corners), monospace fonts in headings and navigation,
-   border-heavy layout, and a GitHub-style green heatmap. Both light and dark modes are supported
-   with a one-click toggle — no flash of unstyled content when switching pages.
-
-**Chart.js replaces Gnuplot**
-   All charts are now rendered interactively in the browser using `Chart.js <https://www.chartjs.org/>`_.
-   Gnuplot is no longer required. Reports are fully self-contained HTML files.
 
 Features
 --------

@@ -19,6 +19,7 @@ Welcome to GitStats documentation!
    integration
    ai-integration
    gallery
+   comparison
    faq
 
 .. toctree::
