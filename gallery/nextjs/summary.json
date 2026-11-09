@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:06:25+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:18:13+00:00",
   "name": "Next.js",
   "report_path": "index.html",
   "first_commit": "2016-10-05 23:35:00",
-  "last_commit": "2026-11-02 03:30:37",
-  "age_days": 3680,
-  "active_days": 3336,
-  "total_commits": 36564,
-  "total_authors": 3965,
-  "active_authors_12mo": 242,
-  "commits_last_12mo": 4689,
-  "total_files": 34914,
-  "total_lines": 3166049,
-  "lines_added": 13104565,
-  "lines_removed": 9938450,
-  "total_tags": 3916,
-  "era": "steady",
+  "last_commit": "2026-11-08 23:17:14",
+  "age_days": 3686,
+  "active_days": 3342,
+  "total_commits": 36703,
+  "total_authors": 3972,
+  "active_authors_12mo": 243,
+  "commits_last_12mo": 4828,
+  "total_files": 35411,
+  "total_lines": 3209271,
+  "lines_added": 13164006,
+  "lines_removed": 9954668,
+  "total_tags": 3925,
+  "era": "surge",
   "top_authors": [
     {
-      "name": "Hendrik Liebau",
-      "commits": 3961
+      "name": "David Alexandru Ilie",
+      "commits": 3980
     },
     {
       "name": "JJ Kasper",
@@ -29,7 +29,7 @@
     },
     {
       "name": "Tobias Koppers",
-      "commits": 2717
+      "commits": 2722
     },
     {
       "name": "nextjs-bot",
@@ -41,27 +41,37 @@
     }
   ],
   "author_commits": {
+    "Luke Sandberg": 500,
+    "Aurora Scharff": 360,
+    "Code and core": 1,
+    "Reza Karimzadeh": 1,
+    "Robert J. Simmons": 1,
+    "SK Uncle Kim": 2,
+    "Aditya Reddy": 1,
+    "Steven": 576,
+    "Niklas Mischkulnig": 876,
+    "Lawrence Lin": 1,
+    "Joseph": 325,
+    "Jan Kassens": 24,
+    "Sebastian \"Sebbie\" Silbermann": 896,
+    "Benjamin Woodruff \u202e": 656,
+    "David Alexandru Ilie": 3980,
+    "Will Binns-Smith": 609,
+    "Jamiboy Mohammad": 54,
+    "Andrew Clark": 313,
+    "Tobias Koppers": 2722,
+    "Jimmy Miller": 38,
+    "Darpan Kakadia": 3,
+    "Shotaro Tsubouchi": 1,
+    "zoomdong": 19,
+    "Thu Vo": 1,
     "Andrew Imm": 13,
-    "Luke Sandberg": 477,
-    "Aurora Scharff": 349,
-    "Joseph": 318,
-    "Hendrik Liebau": 3961,
-    "Will Binns-Smith": 607,
-    "Niklas Mischkulnig": 858,
     "Shohei Maeda": 7,
-    "Tobias Koppers": 2717,
-    "Sebastian \"Sebbie\" Silbermann": 884,
-    "Andrew Clark": 310,
-    "Jimmy Miller": 37,
     "Sam Selikoff": 17,
-    "Benjamin Woodruff \u202e": 649,
     "Jiwon Choi": 570,
     "Chad Hietala": 1,
-    "Jan Kassens": 21,
-    "Steven": 573,
     "nt": 1,
     "Batri\u0107 Perovi\u0107": 1,
-    "Jamiboy Mohammad": 49,
     "Arnaud": 1,
     "dan": 329,
     "Jiachi Liu": 1347,
@@ -73,7 +83,6 @@
     "Tobias Lins": 1,
     "Yousef Dawood": 2,
     "kxrn_gupta": 1,
-    "Darpan Kakadia": 2,
     "HiiTea": 1,
     "Eddy (Frontend Engineer)": 3,
     "mugi-uno": 2,
@@ -113,7 +122,6 @@
     "Lazizbek Ergashev": 2,
     "Hamidreza Hanafi": 3,
     "MB": 1,
-    "zoomdong": 18,
     "WangTao": 1,
     "niketchandivade": 8,
     "KAM": 1,
@@ -1947,7 +1955,6 @@
     "X7Becka": 1,
     "M. Zakiyuddin Munziri": 2,
     "Jono Hewitt": 1,
-    "fediev": 1,
     "pekarja5": 1,
     "Julien Deniau": 1,
     "Everton Nunes": 1,
@@ -4018,13 +4025,13 @@
     "2023": 5710,
     "2024": 5744,
     "2025": 5619,
-    "2026": 4436
+    "2026": 4575
   },
   "ai_assisted": {
-    "commits": 280,
+    "commits": 297,
     "authored": 5,
     "assistants": {
-      "Claude": 218,
+      "Claude": 235,
       "Cursor": 53,
       "GitHub Copilot": 7,
       "Devin": 3
@@ -4053,7 +4060,7 @@
       "2026-08": 28,
       "2026-09": 27,
       "2026-10": 36,
-      "2026-11": 0
+      "2026-11": 17
     },
     "commits_by_month": {
       "2024-12": 387,
@@ -4079,30 +4086,30 @@
       "2026-08": 490,
       "2026-09": 478,
       "2026-10": 584,
-      "2026-11": 1
+      "2026-11": 140
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 36564,
+    "commits": 36703,
     "by_kind": {
-      "organization": 5486,
-      "one_person": 12440,
-      "personal": 11813,
-      "hidden": 5125,
+      "organization": 5516,
+      "one_person": 12460,
+      "personal": 11837,
+      "hidden": 5180,
       "unknown": 0,
-      "bot": 1700
+      "bot": 1710
     },
     "organization_count": 18,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "vercel.com",
-        "commits": 4208,
-        "commits_last_12mo": 816,
+        "commits": 4238,
+        "commits_last_12mo": 846,
         "addresses": 42,
         "first_commit": "2020-05-08",
-        "last_commit": "2026-11-02"
+        "last_commit": "2026-11-06"
       },
       {
         "organization": "zeit.co",
@@ -4299,25 +4306,25 @@
         "bot": 163
       },
       "2026-Q4": {
-        "organization": 94,
-        "one_person": 58,
-        "personal": 207,
-        "hidden": 163,
+        "organization": 124,
+        "one_person": 78,
+        "personal": 231,
+        "hidden": 218,
         "unknown": 0,
-        "bot": 63
+        "bot": 73
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 4407,
-    "authors": 218,
-    "new_authors": 160,
+    "commits": 4536,
+    "authors": 226,
+    "new_authors": 167,
     "half_of_commits": 6
   },
   "humans": {
-    "commits": 34864,
+    "commits": 34993,
     "commits_by_year": {
       "2016": 446,
       "2017": 1137,
@@ -4329,26 +4336,26 @@
       "2023": 5677,
       "2024": 5609,
       "2025": 4834,
-      "2026": 3850
+      "2026": 3979
     },
-    "active_days": 3323
+    "active_days": 3329
   },
   "timezones": {
-    "+0000": 2391,
-    "+0100": 6162,
+    "+0000": 2409,
+    "+0100": 6216,
     "+0200": 8909,
     "+0300": 397,
-    "+0330": 35,
+    "+0330": 36,
     "+0400": 34,
     "+0430": 14,
     "+0500": 78,
-    "+0530": 866,
+    "+0530": 867,
     "+0545": 8,
     "+0600": 36,
     "+0630": 2,
-    "+0700": 172,
-    "+0800": 838,
-    "+0900": 1883,
+    "+0700": 173,
+    "+0800": 839,
+    "+0900": 1885,
     "+0930": 1,
     "+1000": 59,
     "+1030": 1,
@@ -4360,14 +4367,14 @@
     "-0300": 256,
     "-0330": 1,
     "-0400": 2432,
-    "-0500": 3194,
-    "-0600": 1178,
-    "-0700": 5343,
-    "-0800": 2181,
+    "-0500": 3204,
+    "-0600": 1191,
+    "-0700": 5344,
+    "-0800": 2218,
     "-1000": 4
   },
   "source_lines": {
-    "added": 13806775,
-    "current": 3040839
+    "added": 13865140,
+    "current": 3083664
   }
 }

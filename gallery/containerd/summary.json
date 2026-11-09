@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:00:53+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:12:26+00:00",
   "name": "containerd",
   "report_path": "index.html",
   "first_commit": "2015-11-05 23:29:53",
-  "last_commit": "2026-11-01 22:08:58",
-  "age_days": 4014,
-  "active_days": 3153,
-  "total_commits": 17554,
-  "total_authors": 809,
-  "active_authors_12mo": 129,
-  "commits_last_12mo": 1614,
-  "total_files": 6759,
-  "total_lines": 1784915,
-  "lines_added": 4032503,
-  "lines_removed": 2247479,
+  "last_commit": "2026-11-07 19:25:17",
+  "age_days": 4020,
+  "active_days": 3158,
+  "total_commits": 17590,
+  "total_authors": 810,
+  "active_authors_12mo": 128,
+  "commits_last_12mo": 1650,
+  "total_files": 6794,
+  "total_lines": 1791228,
+  "lines_added": 4039334,
+  "lines_removed": 2247997,
   "total_tags": 132,
   "era": "steady",
   "top_authors": [
     {
       "name": "Derek McGowan",
-      "commits": 2145
+      "commits": 2147
     },
     {
       "name": "Michael Crosby",
@@ -29,7 +29,7 @@
     },
     {
       "name": "Phil Estes",
-      "commits": 1594
+      "commits": 1596
     },
     {
       "name": "Lantao Liu",
@@ -37,19 +37,21 @@
     },
     {
       "name": "Maksym Pavlenko",
-      "commits": 1231
+      "commits": 1249
     }
   ],
   "author_commits": {
-    "Maksym Pavlenko": 1231,
+    "Maksym Pavlenko": 1249,
+    "Wei Fu": 791,
+    "Samuel Karp": 447,
+    "Derek McGowan": 2147,
+    "Phil Estes": 1596,
+    "David Scott": 1,
+    "Craig Gumbley": 2,
     "Akihiro Suda": 1048,
-    "Derek McGowan": 2145,
-    "Wei Fu": 789,
-    "Samuel Karp": 443,
     "Mike Brown": 454,
     "Pawe\u0142 Gronowski": 49,
     "Sebastiaan van Stijn": 772,
-    "Phil Estes": 1594,
     "Michael Zappa": 9,
     "Davanum Srinivas": 101,
     "Eric Curtin": 2,
@@ -123,7 +125,6 @@
     "Sreeram Venkitesh": 1,
     "Chris Chang": 1,
     "William Myers": 1,
-    "Craig Gumbley": 1,
     "Sanil Khurana": 1,
     "Yuanliang Zhang": 1,
     "Arjun Yogidas": 1,
@@ -863,15 +864,15 @@
     "2023": 1659,
     "2024": 1433,
     "2025": 1366,
-    "2026": 1493
+    "2026": 1529
   },
   "ai_assisted": {
-    "commits": 29,
+    "commits": 31,
     "authored": 0,
     "assistants": {
-      "Claude": 22,
+      "Claude": 24,
       "Gemini": 5,
-      "OpenCode": 2,
+      "OpenCode": 4,
       "Codex": 1,
       "Cursor": 1,
       "GitHub Copilot": 1
@@ -891,7 +892,7 @@
       "2025-11": 0,
       "2025-12": 0,
       "2026-01": 1,
-      "2026-02": 3,
+      "2026-02": 5,
       "2026-03": 0,
       "2026-04": 2,
       "2026-05": 3,
@@ -917,28 +918,28 @@
       "2025-11": 108,
       "2025-12": 121,
       "2026-01": 123,
-      "2026-02": 124,
+      "2026-02": 126,
       "2026-03": 230,
       "2026-04": 187,
       "2026-05": 97,
       "2026-06": 120,
       "2026-07": 144,
       "2026-08": 184,
-      "2026-09": 166,
-      "2026-10": 116,
-      "2026-11": 2
+      "2026-09": 173,
+      "2026-10": 127,
+      "2026-11": 18
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17554,
+    "commits": 17590,
     "by_kind": {
       "organization": 4742,
-      "one_person": 3831,
-      "personal": 8408,
+      "one_person": 3838,
+      "personal": 8431,
       "hidden": 46,
       "unknown": 2,
-      "bot": 525
+      "bot": 531
     },
     "organization_count": 46,
     "last_12mo_from": "2025-12",
@@ -1347,8 +1348,8 @@
       },
       "2026-Q1": {
         "organization": 60,
-        "one_person": 158,
-        "personal": 211,
+        "one_person": 159,
+        "personal": 212,
         "hidden": 1,
         "unknown": 0,
         "bot": 47
@@ -1364,31 +1365,31 @@
       "2026-Q3": {
         "organization": 59,
         "one_person": 196,
-        "personal": 194,
+        "personal": 201,
         "hidden": 4,
         "unknown": 0,
         "bot": 41
       },
       "2026-Q4": {
         "organization": 19,
-        "one_person": 35,
-        "personal": 51,
+        "one_person": 41,
+        "personal": 66,
         "hidden": 0,
         "unknown": 0,
-        "bot": 13
+        "bot": 19
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1451,
-    "authors": 122,
-    "new_authors": 76,
-    "half_of_commits": 4
+    "commits": 1481,
+    "authors": 123,
+    "new_authors": 77,
+    "half_of_commits": 3
   },
   "humans": {
-    "commits": 17029,
+    "commits": 17059,
     "commits_by_year": {
       "2015": 151,
       "2016": 589,
@@ -1401,12 +1402,12 @@
       "2023": 1629,
       "2024": 1279,
       "2025": 1165,
-      "2026": 1353
+      "2026": 1383
     },
-    "active_days": 3134
+    "active_days": 3139
   },
   "timezones": {
-    "+0000": 3629,
+    "+0000": 3651,
     "+0100": 576,
     "+0200": 899,
     "+0300": 155,
@@ -1421,14 +1422,14 @@
     "+1200": 2,
     "-0300": 30,
     "-0400": 1725,
-    "-0500": 1224,
+    "-0500": 1225,
     "-0600": 159,
-    "-0700": 4362,
-    "-0800": 2258,
+    "-0700": 4373,
+    "-0800": 2260,
     "-0900": 3
   },
   "source_lines": {
-    "added": 713367,
-    "current": 343787
+    "added": 719457,
+    "current": 349639
   }
 }

@@ -2,8 +2,8 @@
   "schema_version": 1,
   "title": "AI-assisted commits",
   "description": "Commits that name an AI coding assistant: as their author, as a co-author, or in the line it signs with. These are lower bounds: an assistant that leaves no mark in a commit is not counted, and a mark does not say how much of the commit the assistant wrote. A commit counts in the month it was written (its author date).",
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:12:16+00:00",
+  "generated_by": "gitstats dev",
+  "generated_at": "2026-11-09T05:23:52+00:00",
   "quarters": [
     "2025-Q1",
     "2025-Q2",
@@ -17,7 +17,7 @@
     {
       "name": "Aider",
       "report": "aider/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
         "commits": 13138,
         "ai_assisted": 4389,
@@ -162,9 +162,9 @@
     {
       "name": "Angular",
       "report": "angular/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 39184,
+        "commits": 39249,
         "ai_assisted": 3,
         "authored": 0,
         "assistants": {
@@ -198,12 +198,12 @@
           "share": 0.0
         },
         "2026-Q2": {
-          "commits": 902,
+          "commits": 903,
           "ai_assisted": 0,
           "share": 0.0
         },
         "2026-Q3": {
-          "commits": 832,
+          "commits": 835,
           "ai_assisted": 0,
           "share": 0.0
         }
@@ -278,7 +278,7 @@
           "ai_assisted": 0
         },
         "2026-05": {
-          "commits": 307,
+          "commits": 308,
           "ai_assisted": 0
         },
         "2026-06": {
@@ -286,7 +286,7 @@
           "ai_assisted": 0
         },
         "2026-07": {
-          "commits": 233,
+          "commits": 234,
           "ai_assisted": 0
         },
         "2026-08": {
@@ -294,11 +294,11 @@
           "ai_assisted": 0
         },
         "2026-09": {
-          "commits": 363,
+          "commits": 365,
           "ai_assisted": 0
         },
         "2026-10": {
-          "commits": 458,
+          "commits": 476,
           "ai_assisted": 3
         }
       }
@@ -306,15 +306,15 @@
     {
       "name": "Ant Design",
       "report": "ant-design/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 33155,
-        "ai_assisted": 336,
+        "commits": 33320,
+        "ai_assisted": 342,
         "authored": 21,
         "assistants": {
           "Gemini": 152,
-          "Claude": 139,
-          "GitHub Copilot": 63,
+          "Claude": 144,
+          "GitHub Copilot": 64,
           "Cursor": 9,
           "CodeRabbit": 5
         }
@@ -351,9 +351,9 @@
           "share": 0.1343
         },
         "2026-Q3": {
-          "commits": 527,
-          "ai_assisted": 32,
-          "share": 0.0607
+          "commits": 605,
+          "ai_assisted": 33,
+          "share": 0.0545
         }
       },
       "months": {
@@ -438,33 +438,33 @@
           "ai_assisted": 15
         },
         "2026-08": {
-          "commits": 175,
-          "ai_assisted": 15
+          "commits": 200,
+          "ai_assisted": 16
         },
         "2026-09": {
-          "commits": 133,
+          "commits": 186,
           "ai_assisted": 2
         },
         "2026-10": {
-          "commits": 108,
-          "ai_assisted": 3
+          "commits": 159,
+          "ai_assisted": 5
         }
       }
     },
     {
       "name": "Apache Airflow",
       "report": "airflow/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 42780,
-        "ai_assisted": 561,
+        "commits": 43017,
+        "ai_assisted": 607,
         "authored": 0,
         "assistants": {
-          "Claude": 486,
-          "GitHub Copilot": 56,
-          "Cursor": 23,
-          "ChatGPT": 3,
-          "Codex": 3,
+          "Claude": 527,
+          "GitHub Copilot": 57,
+          "Cursor": 27,
+          "ChatGPT": 4,
+          "Codex": 4,
           "Devin": 1
         }
       },
@@ -603,9 +603,9 @@
     {
       "name": "Apache APISIX",
       "report": "apisix/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 5254,
+        "commits": 5271,
         "ai_assisted": 1,
         "authored": 0,
         "assistants": {
@@ -747,13 +747,13 @@
     {
       "name": "Apache Arrow",
       "report": "arrow/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 19482,
-        "ai_assisted": 39,
+        "commits": 19519,
+        "ai_assisted": 40,
         "authored": 0,
         "assistants": {
-          "GitHub Copilot": 26,
+          "GitHub Copilot": 27,
           "Claude": 12,
           "Jules": 1
         }
@@ -893,14 +893,14 @@
     {
       "name": "Apache Beam",
       "report": "beam/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 48739,
-        "ai_assisted": 79,
+        "commits": 48826,
+        "ai_assisted": 86,
         "authored": 0,
         "assistants": {
           "Gemini": 51,
-          "Claude": 23,
+          "Claude": 30,
           "Cursor": 3,
           "ChatGPT": 2,
           "Codex": 2,
@@ -1034,7 +1034,7 @@
           "ai_assisted": 5
         },
         "2026-10": {
-          "commits": 390,
+          "commits": 394,
           "ai_assisted": 7
         }
       }
@@ -1042,9 +1042,9 @@
     {
       "name": "Apache Cassandra",
       "report": "cassandra/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 32538,
+        "commits": 32584,
         "ai_assisted": 24,
         "authored": 0,
         "assistants": {
@@ -1086,9 +1086,9 @@
           "share": 0.0106
         },
         "2026-Q3": {
-          "commits": 374,
+          "commits": 375,
           "ai_assisted": 19,
-          "share": 0.0508
+          "share": 0.0507
         }
       },
       "months": {
@@ -1177,11 +1177,11 @@
           "ai_assisted": 9
         },
         "2026-09": {
-          "commits": 123,
+          "commits": 124,
           "ai_assisted": 9
         },
         "2026-10": {
-          "commits": 134,
+          "commits": 141,
           "ai_assisted": 2
         }
       }
@@ -1189,9 +1189,9 @@
     {
       "name": "Apache DolphinScheduler",
       "report": "dolphinscheduler/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 9116,
+        "commits": 9121,
         "ai_assisted": 1,
         "authored": 0,
         "assistants": {
@@ -1333,13 +1333,13 @@
     {
       "name": "Apache Doris",
       "report": "doris/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 32938,
-        "ai_assisted": 233,
+        "commits": 33067,
+        "ai_assisted": 238,
         "authored": 1,
         "assistants": {
-          "Claude": 168,
+          "Claude": 173,
           "GitHub Copilot": 65,
           "Cursor": 1
         }
@@ -1479,9 +1479,9 @@
     {
       "name": "Apache Dubbo",
       "report": "dubbo/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 8926,
+        "commits": 8929,
         "ai_assisted": 9,
         "authored": 0,
         "assistants": {
@@ -1766,13 +1766,13 @@
     {
       "name": "Apache Flink",
       "report": "flink/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 38776,
-        "ai_assisted": 223,
+        "commits": 38812,
+        "ai_assisted": 242,
         "authored": 0,
         "assistants": {
-          "Claude": 202,
+          "Claude": 221,
           "ChatGPT": 19,
           "Codex": 16,
           "GitHub Copilot": 3,
@@ -1908,22 +1908,22 @@
           "ai_assisted": 46
         },
         "2026-10": {
-          "commits": 189,
-          "ai_assisted": 70
+          "commits": 192,
+          "ai_assisted": 71
         }
       }
     },
     {
       "name": "Apache Iceberg",
       "report": "iceberg/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 9546,
-        "ai_assisted": 116,
+        "commits": 9600,
+        "ai_assisted": 123,
         "authored": 0,
         "assistants": {
-          "Claude": 57,
-          "Codex": 34,
+          "Claude": 64,
+          "Codex": 35,
           "Cursor": 14,
           "GitHub Copilot": 12,
           "ChatGPT": 7,
@@ -2067,13 +2067,13 @@
     {
       "name": "Apache Kafka",
       "report": "kafka/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 18580,
-        "ai_assisted": 100,
+        "commits": 18632,
+        "ai_assisted": 108,
         "authored": 0,
         "assistants": {
-          "Claude": 84,
+          "Claude": 92,
           "GitHub Copilot": 16,
           "ChatGPT": 1,
           "Codex": 1,
@@ -2207,21 +2207,21 @@
           "ai_assisted": 14
         },
         "2026-10": {
-          "commits": 210,
-          "ai_assisted": 43
+          "commits": 211,
+          "ai_assisted": 44
         }
       }
     },
     {
       "name": "Apache Pulsar",
       "report": "pulsar/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 15368,
-        "ai_assisted": 34,
+        "commits": 15537,
+        "ai_assisted": 36,
         "authored": 0,
         "assistants": {
-          "Claude": 25,
+          "Claude": 27,
           "GitHub Copilot": 8,
           "Cursor": 1
         }
@@ -2361,9 +2361,9 @@
     {
       "name": "Apache RocketMQ",
       "report": "rocketmq/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 9250,
+        "commits": 9252,
         "ai_assisted": 8,
         "authored": 0,
         "assistants": {
@@ -2506,13 +2506,15 @@
     {
       "name": "Apache ShardingSphere",
       "report": "shardingsphere/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 50111,
-        "ai_assisted": 62,
+        "commits": 50148,
+        "ai_assisted": 63,
         "authored": 0,
         "assistants": {
           "Claude": 61,
+          "ChatGPT": 1,
+          "Codex": 1,
           "GitHub Copilot": 1
         }
       },
@@ -2651,13 +2653,13 @@
     {
       "name": "Apache SkyWalking",
       "report": "skywalking/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 8661,
-        "ai_assisted": 2,
+        "commits": 8672,
+        "ai_assisted": 3,
         "authored": 0,
         "assistants": {
-          "Claude": 2
+          "Claude": 3
         }
       },
       "quarters": {
@@ -2795,20 +2797,20 @@
     {
       "name": "Apache Spark",
       "report": "spark/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 50821,
-        "ai_assisted": 2380,
+        "commits": 50972,
+        "ai_assisted": 2515,
         "authored": 0,
         "assistants": {
-          "Claude": 1785,
-          "ChatGPT": 390,
-          "Codex": 390,
-          "Cursor": 218,
+          "Claude": 1890,
+          "ChatGPT": 416,
+          "Codex": 412,
+          "Cursor": 220,
           "Gemini": 51,
-          "GitHub Copilot": 40,
-          "Grok": 34,
-          "Kiro": 13,
+          "GitHub Copilot": 42,
+          "Grok": 35,
+          "Kiro": 16,
           "OpenCode": 6,
           "Unnamed assistant": 4,
           "Pi": 2
@@ -2949,13 +2951,13 @@
     {
       "name": "Apache Superset",
       "report": "superset/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 24161,
-        "ai_assisted": 2180,
+        "commits": 24255,
+        "ai_assisted": 2213,
         "authored": 0,
         "assistants": {
-          "Claude": 2148,
+          "Claude": 2181,
           "GitHub Copilot": 35,
           "Cursor": 13,
           "Devin": 7
@@ -3096,15 +3098,15 @@
     {
       "name": "Argo CD",
       "report": "argo-cd/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 11880,
-        "ai_assisted": 91,
+        "commits": 11933,
+        "ai_assisted": 107,
         "authored": 0,
         "assistants": {
-          "Claude": 47,
-          "Cursor": 28,
-          "GitHub Copilot": 16
+          "Claude": 62,
+          "Cursor": 29,
+          "GitHub Copilot": 17
         }
       },
       "quarters": {
@@ -3242,13 +3244,13 @@
     {
       "name": "Astro",
       "report": "astro/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 15355,
-        "ai_assisted": 30,
+        "commits": 15390,
+        "ai_assisted": 32,
         "authored": 1,
         "assistants": {
-          "Claude": 23,
+          "Claude": 25,
           "GitHub Copilot": 8
         }
       },
@@ -3387,13 +3389,13 @@
     {
       "name": "Bun",
       "report": "bun/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 18620,
-        "ai_assisted": 764,
+        "commits": 18643,
+        "ai_assisted": 776,
         "authored": 0,
         "assistants": {
-          "Claude": 746,
+          "Claude": 758,
           "CodeRabbit": 15,
           "Cursor": 6,
           "Devin": 1
@@ -3534,9 +3536,9 @@
     {
       "name": "Cilium",
       "report": "cilium/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 45442,
+        "commits": 45592,
         "ai_assisted": 2,
         "authored": 0,
         "assistants": {
@@ -3571,12 +3573,12 @@
           "share": 0.0
         },
         "2026-Q2": {
-          "commits": 1215,
+          "commits": 1217,
           "ai_assisted": 0,
           "share": 0.0
         },
         "2026-Q3": {
-          "commits": 1649,
+          "commits": 1668,
           "ai_assisted": 1,
           "share": 0.0006
         }
@@ -3651,7 +3653,7 @@
           "ai_assisted": 0
         },
         "2026-05": {
-          "commits": 435,
+          "commits": 437,
           "ai_assisted": 0
         },
         "2026-06": {
@@ -3663,15 +3665,15 @@
           "ai_assisted": 0
         },
         "2026-08": {
-          "commits": 544,
+          "commits": 545,
           "ai_assisted": 1
         },
         "2026-09": {
-          "commits": 552,
+          "commits": 570,
           "ai_assisted": 0
         },
         "2026-10": {
-          "commits": 416,
+          "commits": 487,
           "ai_assisted": 0
         }
       }
@@ -3679,13 +3681,13 @@
     {
       "name": "Claude Code",
       "report": "claude-code/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 957,
-        "ai_assisted": 82,
-        "authored": 15,
+        "commits": 966,
+        "ai_assisted": 85,
+        "authored": 17,
         "assistants": {
-          "Claude": 82
+          "Claude": 85
         }
       },
       "quarters": {
@@ -3823,9 +3825,9 @@
     {
       "name": "Cline",
       "report": "cline/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 7727,
+        "commits": 7751,
         "ai_assisted": 168,
         "authored": 0,
         "assistants": {
@@ -3969,9 +3971,9 @@
     {
       "name": "Codex CLI",
       "report": "codex/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 12953,
+        "commits": 13318,
         "ai_assisted": 102,
         "authored": 0,
         "assistants": {
@@ -4115,15 +4117,15 @@
     {
       "name": "containerd",
       "report": "containerd/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 17554,
-        "ai_assisted": 29,
+        "commits": 17590,
+        "ai_assisted": 31,
         "authored": 0,
         "assistants": {
-          "Claude": 22,
+          "Claude": 24,
           "Gemini": 5,
-          "OpenCode": 2,
+          "OpenCode": 4,
           "Codex": 1,
           "Cursor": 1,
           "GitHub Copilot": 1
@@ -4151,9 +4153,9 @@
           "share": 0.0
         },
         "2026-Q1": {
-          "commits": 477,
-          "ai_assisted": 4,
-          "share": 0.0084
+          "commits": 479,
+          "ai_assisted": 6,
+          "share": 0.0125
         },
         "2026-Q2": {
           "commits": 404,
@@ -4161,9 +4163,9 @@
           "share": 0.0198
         },
         "2026-Q3": {
-          "commits": 494,
+          "commits": 501,
           "ai_assisted": 12,
-          "share": 0.0243
+          "share": 0.024
         }
       },
       "months": {
@@ -4224,8 +4226,8 @@
           "ai_assisted": 1
         },
         "2026-02": {
-          "commits": 124,
-          "ai_assisted": 3
+          "commits": 126,
+          "ai_assisted": 5
         },
         "2026-03": {
           "commits": 230,
@@ -4252,11 +4254,11 @@
           "ai_assisted": 4
         },
         "2026-09": {
-          "commits": 166,
+          "commits": 173,
           "ai_assisted": 1
         },
         "2026-10": {
-          "commits": 116,
+          "commits": 127,
           "ai_assisted": 5
         }
       }
@@ -4264,7 +4266,7 @@
     {
       "name": "Continue",
       "report": "continue/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
         "commits": 21569,
         "ai_assisted": 245,
@@ -4413,9 +4415,9 @@
     {
       "name": "CoreDNS",
       "report": "coredns/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 5223,
+        "commits": 5237,
         "ai_assisted": 8,
         "authored": 0,
         "assistants": {
@@ -4558,14 +4560,15 @@
     {
       "name": "CPython",
       "report": "cpython/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 134121,
-        "ai_assisted": 400,
+        "commits": 134257,
+        "ai_assisted": 417,
         "authored": 0,
         "assistants": {
-          "Claude": 398,
-          "GitHub Copilot": 2
+          "Claude": 414,
+          "GitHub Copilot": 2,
+          "Codex": 1
         }
       },
       "quarters": {
@@ -4703,13 +4706,13 @@
     {
       "name": "Crush",
       "report": "crush/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 4419,
-        "ai_assisted": 58,
+        "commits": 4497,
+        "ai_assisted": 61,
         "authored": 3,
         "assistants": {
-          "Claude": 45,
+          "Claude": 48,
           "GitHub Copilot": 10,
           "ChatGPT": 2,
           "OpenCode": 1
@@ -4747,9 +4750,9 @@
           "share": 0.0045
         },
         "2026-Q3": {
-          "commits": 622,
+          "commits": 627,
           "ai_assisted": 28,
-          "share": 0.045
+          "share": 0.0447
         }
       },
       "months": {
@@ -4838,25 +4841,26 @@
           "ai_assisted": 10
         },
         "2026-09": {
-          "commits": 202,
+          "commits": 207,
           "ai_assisted": 2
         },
         "2026-10": {
-          "commits": 126,
-          "ai_assisted": 10
+          "commits": 162,
+          "ai_assisted": 12
         }
       }
     },
     {
       "name": "curl",
       "report": "curl/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 40323,
-        "ai_assisted": 2,
-        "authored": 0,
+        "commits": 40379,
+        "ai_assisted": 3,
+        "authored": 1,
         "assistants": {
           "ChatGPT": 1,
+          "Claude": 1,
           "GitHub Copilot": 1
         }
       },
@@ -4892,7 +4896,7 @@
           "share": 0.0
         },
         "2026-Q3": {
-          "commits": 787,
+          "commits": 788,
           "ai_assisted": 0,
           "share": 0.0
         }
@@ -4983,11 +4987,11 @@
           "ai_assisted": 0
         },
         "2026-09": {
-          "commits": 355,
+          "commits": 356,
           "ai_assisted": 0
         },
         "2026-10": {
-          "commits": 357,
+          "commits": 368,
           "ai_assisted": 2
         }
       }
@@ -4995,7 +4999,7 @@
     {
       "name": "Deno",
       "report": "deno/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
         "commits": 17398,
         "ai_assisted": 431,
@@ -5142,14 +5146,14 @@
     {
       "name": "Diffusers",
       "report": "diffusers/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 7025,
-        "ai_assisted": 108,
+        "commits": 7044,
+        "ai_assisted": 117,
         "authored": 0,
         "assistants": {
-          "Claude": 103,
-          "GitHub Copilot": 5
+          "Claude": 111,
+          "GitHub Copilot": 6
         }
       },
       "quarters": {
@@ -5287,16 +5291,16 @@
     {
       "name": "Django",
       "report": "django/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 35078,
+        "commits": 35105,
         "ai_assisted": 0,
         "authored": 0,
         "assistants": {}
       },
       "quarters": {
         "2025-Q1": {
-          "commits": 255,
+          "commits": 256,
           "ai_assisted": 0,
           "share": 0.0
         },
@@ -5326,7 +5330,7 @@
           "share": 0.0
         },
         "2026-Q3": {
-          "commits": 201,
+          "commits": 203,
           "ai_assisted": 0,
           "share": 0.0
         }
@@ -5337,7 +5341,7 @@
           "ai_assisted": 0
         },
         "2025-01": {
-          "commits": 109,
+          "commits": 110,
           "ai_assisted": 0
         },
         "2025-02": {
@@ -5413,15 +5417,15 @@
           "ai_assisted": 0
         },
         "2026-08": {
-          "commits": 59,
+          "commits": 60,
           "ai_assisted": 0
         },
         "2026-09": {
-          "commits": 61,
+          "commits": 62,
           "ai_assisted": 0
         },
         "2026-10": {
-          "commits": 85,
+          "commits": 95,
           "ai_assisted": 0
         }
       }
@@ -5429,14 +5433,14 @@
     {
       "name": "Envoy",
       "report": "envoy/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 29484,
-        "ai_assisted": 153,
+        "commits": 29610,
+        "ai_assisted": 160,
         "authored": 23,
         "assistants": {
-          "Claude": 77,
-          "GitHub Copilot": 67,
+          "Claude": 82,
+          "GitHub Copilot": 69,
           "Gemini": 10,
           "Jules": 1
         }
@@ -5576,9 +5580,9 @@
     {
       "name": "etcd",
       "report": "etcd/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 25342,
+        "commits": 25365,
         "ai_assisted": 3,
         "authored": 0,
         "assistants": {
@@ -5713,7 +5717,7 @@
           "ai_assisted": 1
         },
         "2026-10": {
-          "commits": 83,
+          "commits": 87,
           "ai_assisted": 2
         }
       }
@@ -5721,9 +5725,9 @@
     {
       "name": "FastAPI",
       "report": "fastapi/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 7957,
+        "commits": 8041,
         "ai_assisted": 3,
         "authored": 0,
         "assistants": {
@@ -5867,7 +5871,7 @@
     {
       "name": "Flask",
       "report": "flask/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
         "commits": 5566,
         "ai_assisted": 0,
@@ -6009,9 +6013,9 @@
     {
       "name": "Flux",
       "report": "flux/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 4123,
+        "commits": 4125,
         "ai_assisted": 25,
         "authored": 0,
         "assistants": {
@@ -6158,13 +6162,13 @@
     {
       "name": "Gemini CLI",
       "report": "gemini-cli/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 6569,
-        "ai_assisted": 273,
+        "commits": 6600,
+        "ai_assisted": 274,
         "authored": 0,
         "assistants": {
-          "Gemini": 262,
+          "Gemini": 263,
           "Jules": 11,
           "GitHub Copilot": 1
         }
@@ -6304,14 +6308,15 @@
     {
       "name": "Git",
       "report": "git/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 82668,
-        "ai_assisted": 100,
+        "commits": 82725,
+        "ai_assisted": 103,
         "authored": 0,
         "assistants": {
-          "Claude": 85,
+          "Claude": 88,
           "ChatGPT": 15,
+          "Gemini": 2,
           "Unnamed assistant": 2
         }
       },
@@ -6347,7 +6352,7 @@
           "share": 0.0252
         },
         "2026-Q3": {
-          "commits": 961,
+          "commits": 962,
           "ai_assisted": 70,
           "share": 0.0728
         }
@@ -6438,25 +6443,26 @@
           "ai_assisted": 26
         },
         "2026-09": {
-          "commits": 272,
+          "commits": 273,
           "ai_assisted": 19
         },
         "2026-10": {
-          "commits": 216,
-          "ai_assisted": 5
+          "commits": 250,
+          "ai_assisted": 8
         }
       }
     },
     {
       "name": "Go",
       "report": "go/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 68315,
-        "ai_assisted": 15,
+        "commits": 68487,
+        "ai_assisted": 21,
         "authored": 0,
         "assistants": {
           "Claude": 11,
+          "Unnamed assistant": 6,
           "GitHub Copilot": 4
         }
       },
@@ -6492,9 +6498,9 @@
           "share": 0.0
         },
         "2026-Q3": {
-          "commits": 1018,
+          "commits": 1044,
           "ai_assisted": 11,
-          "share": 0.0108
+          "share": 0.0105
         }
       },
       "months": {
@@ -6575,19 +6581,19 @@
           "ai_assisted": 0
         },
         "2026-07": {
-          "commits": 270,
+          "commits": 272,
           "ai_assisted": 0
         },
         "2026-08": {
-          "commits": 319,
+          "commits": 330,
           "ai_assisted": 5
         },
         "2026-09": {
-          "commits": 429,
+          "commits": 442,
           "ai_assisted": 6
         },
         "2026-10": {
-          "commits": 317,
+          "commits": 375,
           "ai_assisted": 1
         }
       }
@@ -6595,13 +6601,13 @@
     {
       "name": "goose",
       "report": "goose/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 5914,
-        "ai_assisted": 290,
+        "commits": 5932,
+        "ai_assisted": 292,
         "authored": 0,
         "assistants": {
-          "Claude": 208,
+          "Claude": 210,
           "GitHub Copilot": 69,
           "Cursor": 8,
           "Amp": 6,
@@ -6744,9 +6750,9 @@
     {
       "name": "Harbor",
       "report": "harbor/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 12942,
+        "commits": 12952,
         "ai_assisted": 18,
         "authored": 0,
         "assistants": {
@@ -6890,9 +6896,9 @@
     {
       "name": "Helm",
       "report": "helm/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 10028,
+        "commits": 10030,
         "ai_assisted": 30,
         "authored": 2,
         "assistants": {
@@ -7037,15 +7043,15 @@
     {
       "name": "Home Assistant",
       "report": "home-assistant/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 122760,
-        "ai_assisted": 4240,
+        "commits": 123658,
+        "ai_assisted": 4487,
         "authored": 13,
         "assistants": {
-          "Claude": 2994,
-          "GitHub Copilot": 1338,
-          "Cursor": 33,
+          "Claude": 3225,
+          "GitHub Copilot": 1355,
+          "Cursor": 34,
           "Jules": 1
         }
       },
@@ -7184,14 +7190,15 @@
     {
       "name": "Homebrew",
       "report": "homebrew/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 53495,
-        "ai_assisted": 218,
+        "commits": 53716,
+        "ai_assisted": 220,
         "authored": 39,
         "assistants": {
           "GitHub Copilot": 131,
           "Claude": 85,
+          "CodeRabbit": 2,
           "Codex": 1,
           "Cursor": 1
         }
@@ -7323,7 +7330,7 @@
           "ai_assisted": 7
         },
         "2026-10": {
-          "commits": 475,
+          "commits": 481,
           "ai_assisted": 1
         }
       }
@@ -7331,9 +7338,9 @@
     {
       "name": "Istio",
       "report": "istio/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 26834,
+        "commits": 26872,
         "ai_assisted": 23,
         "authored": 0,
         "assistants": {
@@ -7477,14 +7484,14 @@
     {
       "name": "Jaeger",
       "report": "jaeger/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 4961,
-        "ai_assisted": 372,
+        "commits": 4995,
+        "ai_assisted": 397,
         "authored": 66,
         "assistants": {
-          "Claude": 274,
-          "GitHub Copilot": 97,
+          "Claude": 298,
+          "GitHub Copilot": 98,
           "Cursor": 14,
           "Codex": 1
         }
@@ -7624,9 +7631,9 @@
     {
       "name": "JAX",
       "report": "jax/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 39583,
+        "commits": 39792,
         "ai_assisted": 8,
         "authored": 0,
         "assistants": {
@@ -7760,7 +7767,7 @@
           "ai_assisted": 0
         },
         "2026-10": {
-          "commits": 838,
+          "commits": 847,
           "ai_assisted": 0
         }
       }
@@ -7768,14 +7775,14 @@
     {
       "name": "Kilo Code",
       "report": "kilocode/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 33984,
-        "ai_assisted": 171,
+        "commits": 34199,
+        "ai_assisted": 175,
         "authored": 2,
         "assistants": {
           "OpenCode": 77,
-          "Claude": 65,
+          "Claude": 69,
           "GitHub Copilot": 18,
           "Amp": 6,
           "Cursor": 5,
@@ -7815,7 +7822,7 @@
           "share": 0.0018
         },
         "2026-Q3": {
-          "commits": 7041,
+          "commits": 7043,
           "ai_assisted": 12,
           "share": 0.0017
         }
@@ -7906,19 +7913,19 @@
           "ai_assisted": 6
         },
         "2026-09": {
-          "commits": 2285,
+          "commits": 2287,
           "ai_assisted": 2
         },
         "2026-10": {
-          "commits": 1103,
-          "ai_assisted": 6
+          "commits": 1140,
+          "ai_assisted": 10
         }
       }
     },
     {
       "name": "KubeEdge",
       "report": "kubeedge/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
         "commits": 6497,
         "ai_assisted": 5,
@@ -8063,9 +8070,9 @@
     {
       "name": "Kubernetes",
       "report": "kubernetes/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 142893,
+        "commits": 143375,
         "ai_assisted": 10,
         "authored": 1,
         "assistants": {
@@ -8097,17 +8104,17 @@
           "share": 0.0
         },
         "2026-Q1": {
-          "commits": 2395,
+          "commits": 2396,
           "ai_assisted": 8,
           "share": 0.0033
         },
         "2026-Q2": {
-          "commits": 2198,
+          "commits": 2200,
           "ai_assisted": 1,
           "share": 0.0005
         },
         "2026-Q3": {
-          "commits": 2398,
+          "commits": 2429,
           "ai_assisted": 0,
           "share": 0.0
         }
@@ -8174,7 +8181,7 @@
           "ai_assisted": 3
         },
         "2026-03": {
-          "commits": 956,
+          "commits": 957,
           "ai_assisted": 1
         },
         "2026-04": {
@@ -8182,7 +8189,7 @@
           "ai_assisted": 1
         },
         "2026-05": {
-          "commits": 769,
+          "commits": 771,
           "ai_assisted": 0
         },
         "2026-06": {
@@ -8194,15 +8201,15 @@
           "ai_assisted": 0
         },
         "2026-08": {
-          "commits": 401,
+          "commits": 411,
           "ai_assisted": 0
         },
         "2026-09": {
-          "commits": 872,
+          "commits": 893,
           "ai_assisted": 0
         },
         "2026-10": {
-          "commits": 1019,
+          "commits": 1130,
           "ai_assisted": 0
         }
       }
@@ -8210,14 +8217,14 @@
     {
       "name": "LangChain",
       "report": "langchain/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 17111,
-        "ai_assisted": 47,
+        "commits": 17154,
+        "ai_assisted": 48,
         "authored": 9,
         "assistants": {
           "GitHub Copilot": 27,
-          "Claude": 20
+          "Claude": 21
         }
       },
       "quarters": {
@@ -8355,9 +8362,9 @@
     {
       "name": "Linkerd",
       "report": "linkerd/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 9202,
+        "commits": 9211,
         "ai_assisted": 2,
         "authored": 0,
         "assistants": {
@@ -8499,18 +8506,18 @@
     {
       "name": "llama.cpp",
       "report": "llama-cpp/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 12033,
-        "ai_assisted": 337,
+        "commits": 12211,
+        "ai_assisted": 375,
         "authored": 2,
         "assistants": {
-          "Claude": 139,
+          "Claude": 165,
           "Pi": 119,
-          "Codex": 49,
+          "Codex": 63,
           "OpenCode": 20,
-          "GitHub Copilot": 12,
-          "ChatGPT": 8,
+          "GitHub Copilot": 13,
+          "ChatGPT": 9,
           "Unnamed assistant": 2,
           "Grok": 1,
           "Kiro": 1,
@@ -8652,13 +8659,13 @@
     {
       "name": "LlamaIndex",
       "report": "llama-index/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 7962,
-        "ai_assisted": 14,
+        "commits": 7964,
+        "ai_assisted": 15,
         "authored": 0,
         "assistants": {
-          "Claude": 12,
+          "Claude": 13,
           "Cursor": 2,
           "GitHub Copilot": 2
         }
@@ -8798,9 +8805,9 @@
     {
       "name": "Matplotlib",
       "report": "matplotlib/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 55606,
+        "commits": 55630,
         "ai_assisted": 9,
         "authored": 0,
         "assistants": {
@@ -8937,7 +8944,7 @@
           "ai_assisted": 2
         },
         "2026-10": {
-          "commits": 158,
+          "commits": 165,
           "ai_assisted": 1
         }
       }
@@ -9092,14 +9099,14 @@
     {
       "name": "Nacos",
       "report": "nacos/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 6358,
-        "ai_assisted": 299,
+        "commits": 6366,
+        "ai_assisted": 307,
         "authored": 0,
         "assistants": {
-          "Claude": 254,
-          "Codex": 48,
+          "Claude": 255,
+          "Codex": 56,
           "ChatGPT": 8,
           "Kiro": 5,
           "Cursor": 3,
@@ -9241,9 +9248,9 @@
     {
       "name": "Neovim",
       "report": "neovim/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 38631,
+        "commits": 38698,
         "ai_assisted": 57,
         "authored": 0,
         "assistants": {
@@ -9278,12 +9285,12 @@
           "share": 0.0054
         },
         "2026-Q2": {
-          "commits": 1089,
+          "commits": 1090,
           "ai_assisted": 19,
           "share": 0.0174
         },
         "2026-Q3": {
-          "commits": 1255,
+          "commits": 1256,
           "ai_assisted": 31,
           "share": 0.0247
         }
@@ -9358,7 +9365,7 @@
           "ai_assisted": 3
         },
         "2026-05": {
-          "commits": 323,
+          "commits": 324,
           "ai_assisted": 4
         },
         "2026-06": {
@@ -9374,7 +9381,7 @@
           "ai_assisted": 20
         },
         "2026-09": {
-          "commits": 407,
+          "commits": 408,
           "ai_assisted": 0
         },
         "2026-10": {
@@ -9386,13 +9393,13 @@
     {
       "name": "Next.js",
       "report": "nextjs/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 36564,
-        "ai_assisted": 280,
+        "commits": 36703,
+        "ai_assisted": 297,
         "authored": 5,
         "assistants": {
-          "Claude": 218,
+          "Claude": 235,
           "Cursor": 53,
           "GitHub Copilot": 7,
           "Devin": 3
@@ -9533,9 +9540,9 @@
     {
       "name": "nginx",
       "report": "nginx/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 8776,
+        "commits": 8787,
         "ai_assisted": 6,
         "authored": 0,
         "assistants": {
@@ -9574,9 +9581,9 @@
           "share": 0.0
         },
         "2026-Q3": {
-          "commits": 92,
+          "commits": 99,
           "ai_assisted": 6,
-          "share": 0.0652
+          "share": 0.0606
         }
       },
       "months": {
@@ -9657,19 +9664,19 @@
           "ai_assisted": 0
         },
         "2026-07": {
-          "commits": 29,
+          "commits": 30,
           "ai_assisted": 0
         },
         "2026-08": {
-          "commits": 27,
+          "commits": 28,
           "ai_assisted": 0
         },
         "2026-09": {
-          "commits": 36,
+          "commits": 41,
           "ai_assisted": 6
         },
         "2026-10": {
-          "commits": 18,
+          "commits": 20,
           "ai_assisted": 0
         }
       }
@@ -9677,20 +9684,20 @@
     {
       "name": "Node.js",
       "report": "nodejs/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 49325,
-        "ai_assisted": 658,
+        "commits": 49408,
+        "ai_assisted": 690,
         "authored": 0,
         "assistants": {
-          "Codex": 242,
-          "OpenCode": 181,
-          "Claude": 111,
+          "Codex": 258,
+          "OpenCode": 182,
+          "Claude": 120,
           "ChatGPT": 81,
-          "Unnamed assistant": 17,
+          "Unnamed assistant": 18,
           "Pi": 16,
-          "GitHub Copilot": 9,
-          "Grok": 8,
+          "Grok": 12,
+          "GitHub Copilot": 10,
           "Cursor": 6,
           "Amp": 1,
           "Gemini": 1,
@@ -9824,21 +9831,21 @@
           "ai_assisted": 217
         },
         "2026-10": {
-          "commits": 405,
-          "ai_assisted": 154
+          "commits": 416,
+          "ai_assisted": 162
         }
       }
     },
     {
       "name": "NumPy",
       "report": "numpy/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 42470,
-        "ai_assisted": 38,
+        "commits": 42495,
+        "ai_assisted": 39,
         "authored": 2,
         "assistants": {
-          "Claude": 24,
+          "Claude": 25,
           "Codex": 7,
           "GitHub Copilot": 7
         }
@@ -9970,7 +9977,7 @@
           "ai_assisted": 12
         },
         "2026-10": {
-          "commits": 232,
+          "commits": 233,
           "ai_assisted": 5
         }
       }
@@ -9978,13 +9985,13 @@
     {
       "name": "Nuxt",
       "report": "nuxt/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 15937,
-        "ai_assisted": 21,
+        "commits": 16028,
+        "ai_assisted": 24,
         "authored": 0,
         "assistants": {
-          "Claude": 15,
+          "Claude": 18,
           "CodeRabbit": 3,
           "GitHub Copilot": 3
         }
@@ -10116,7 +10123,7 @@
           "ai_assisted": 2
         },
         "2026-10": {
-          "commits": 211,
+          "commits": 220,
           "ai_assisted": 7
         }
       }
@@ -10124,9 +10131,9 @@
     {
       "name": "Ollama",
       "report": "ollama/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 5962,
+        "commits": 5984,
         "ai_assisted": 3,
         "authored": 0,
         "assistants": {
@@ -10269,14 +10276,14 @@
     {
       "name": "OpenCode",
       "report": "opencode/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 21887,
-        "ai_assisted": 136,
+        "commits": 22393,
+        "ai_assisted": 137,
         "authored": 1,
         "assistants": {
           "OpenCode": 81,
-          "Claude": 39,
+          "Claude": 40,
           "GitHub Copilot": 13,
           "Cursor": 3,
           "Jules": 1
@@ -10417,14 +10424,14 @@
     {
       "name": "OpenHands",
       "report": "openhands/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 8841,
-        "ai_assisted": 2565,
+        "commits": 8990,
+        "ai_assisted": 2608,
         "authored": 17,
         "assistants": {
-          "OpenHands": 2356,
-          "Claude": 195,
+          "OpenHands": 2388,
+          "Claude": 206,
           "Cursor": 38,
           "GitHub Copilot": 5,
           "Codex": 3,
@@ -10568,7 +10575,7 @@
     {
       "name": "OpenHarmony ArkUI",
       "report": "openharmony-arkui/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
         "commits": 111193,
         "ai_assisted": 26,
@@ -10713,7 +10720,7 @@
     {
       "name": "OpenHarmony LiteOS-A",
       "report": "openharmony-liteos-a/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
         "commits": 1516,
         "ai_assisted": 0,
@@ -10855,14 +10862,14 @@
     {
       "name": "PaddlePaddle",
       "report": "paddle/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 58211,
-        "ai_assisted": 146,
+        "commits": 58220,
+        "ai_assisted": 147,
         "authored": 0,
         "assistants": {
+          "Claude": 67,
           "GitHub Copilot": 67,
-          "Claude": 66,
           "Codex": 17,
           "Cursor": 1
         }
@@ -11002,13 +11009,13 @@
     {
       "name": "pandas",
       "report": "pandas/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 39687,
-        "ai_assisted": 1502,
+        "commits": 39778,
+        "ai_assisted": 1558,
         "authored": 1,
         "assistants": {
-          "Claude": 1500,
+          "Claude": 1556,
           "Devin": 1,
           "GitHub Copilot": 1
         }
@@ -11148,9 +11155,9 @@
     {
       "name": "pip",
       "report": "pip/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 16449,
+        "commits": 16501,
         "ai_assisted": 4,
         "authored": 0,
         "assistants": {
@@ -11191,9 +11198,9 @@
           "share": 0.0115
         },
         "2026-Q3": {
-          "commits": 198,
+          "commits": 205,
           "ai_assisted": 1,
-          "share": 0.0051
+          "share": 0.0049
         }
       },
       "months": {
@@ -11278,15 +11285,15 @@
           "ai_assisted": 1
         },
         "2026-08": {
-          "commits": 55,
+          "commits": 60,
           "ai_assisted": 0
         },
         "2026-09": {
-          "commits": 18,
+          "commits": 20,
           "ai_assisted": 0
         },
         "2026-10": {
-          "commits": 94,
+          "commits": 109,
           "ai_assisted": 0
         }
       }
@@ -11294,9 +11301,9 @@
     {
       "name": "PostgreSQL",
       "report": "postgres/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 65812,
+        "commits": 65888,
         "ai_assisted": 0,
         "authored": 0,
         "assistants": {}
@@ -11436,13 +11443,13 @@
     {
       "name": "Prometheus",
       "report": "prometheus/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 19174,
-        "ai_assisted": 70,
+        "commits": 19224,
+        "ai_assisted": 73,
         "authored": 3,
         "assistants": {
-          "Claude": 45,
+          "Claude": 48,
           "GitHub Copilot": 14,
           "Cursor": 12,
           "OpenCode": 2,
@@ -11584,9 +11591,9 @@
     {
       "name": "Pydantic",
       "report": "pydantic/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 5896,
+        "commits": 5934,
         "ai_assisted": 4,
         "authored": 0,
         "assistants": {
@@ -11729,13 +11736,13 @@
     {
       "name": "pytest",
       "report": "pytest/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 17878,
-        "ai_assisted": 120,
-        "authored": 15,
+        "commits": 17891,
+        "ai_assisted": 123,
+        "authored": 18,
         "assistants": {
-          "Claude": 112,
+          "Claude": 115,
           "Codex": 5,
           "Cursor": 2,
           "Factory Droid": 1
@@ -11868,23 +11875,23 @@
           "ai_assisted": 13
         },
         "2026-10": {
-          "commits": 84,
-          "ai_assisted": 24
+          "commits": 89,
+          "ai_assisted": 27
         }
       }
     },
     {
       "name": "PyTorch",
       "report": "pytorch/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 113465,
-        "ai_assisted": 908,
+        "commits": 113872,
+        "ai_assisted": 955,
         "authored": 5,
         "assistants": {
-          "Claude": 749,
-          "Cursor": 70,
-          "GitHub Copilot": 63,
+          "Claude": 793,
+          "Cursor": 72,
+          "GitHub Copilot": 65,
           "Codex": 19,
           "ChatGPT": 16
         }
@@ -12016,21 +12023,21 @@
           "ai_assisted": 269
         },
         "2026-10": {
-          "commits": 1761,
-          "ai_assisted": 231
+          "commits": 1778,
+          "ai_assisted": 232
         }
       }
     },
     {
       "name": "Qwen Code",
       "report": "qwen-code/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 11822,
-        "ai_assisted": 633,
+        "commits": 12207,
+        "ai_assisted": 655,
         "authored": 6,
         "assistants": {
-          "Claude": 495,
+          "Claude": 517,
           "Gemini": 67,
           "Cursor": 34,
           "GitHub Copilot": 25,
@@ -12175,15 +12182,15 @@
     {
       "name": "Ray",
       "report": "ray/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 32358,
-        "ai_assisted": 1109,
+        "commits": 32506,
+        "ai_assisted": 1209,
         "authored": 0,
         "assistants": {
-          "Claude": 811,
-          "Gemini": 272,
-          "GitHub Copilot": 38,
+          "Claude": 905,
+          "Gemini": 275,
+          "GitHub Copilot": 43,
           "Cursor": 30
         }
       },
@@ -12322,9 +12329,9 @@
     {
       "name": "React",
       "report": "react/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 21757,
+        "commits": 21761,
         "ai_assisted": 39,
         "authored": 0,
         "assistants": {
@@ -12468,14 +12475,14 @@
     {
       "name": "Redis",
       "report": "redis/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 13394,
-        "ai_assisted": 49,
+        "commits": 13419,
+        "ai_assisted": 57,
         "authored": 0,
         "assistants": {
-          "Claude": 40,
-          "GitHub Copilot": 9,
+          "Claude": 48,
+          "GitHub Copilot": 10,
           "Cursor": 1
         }
       },
@@ -12614,7 +12621,7 @@
     {
       "name": "Requests",
       "report": "requests/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
         "commits": 6496,
         "ai_assisted": 1,
@@ -12758,13 +12765,14 @@
     {
       "name": "Ruff",
       "report": "ruff/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 17878,
-        "ai_assisted": 70,
+        "commits": 18032,
+        "ai_assisted": 71,
         "authored": 0,
         "assistants": {
           "Claude": 70,
+          "Codex": 1,
           "GitHub Copilot": 1
         }
       },
@@ -12903,9 +12911,9 @@
     {
       "name": "Rust",
       "report": "rust/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 345516,
+        "commits": 346476,
         "ai_assisted": 16,
         "authored": 0,
         "assistants": {
@@ -12928,27 +12936,27 @@
           "share": 0.0
         },
         "2025-Q3": {
-          "commits": 8562,
+          "commits": 8563,
           "ai_assisted": 0,
           "share": 0.0
         },
         "2025-Q4": {
-          "commits": 6727,
+          "commits": 6728,
           "ai_assisted": 0,
           "share": 0.0
         },
         "2026-Q1": {
-          "commits": 7971,
+          "commits": 7972,
           "ai_assisted": 2,
           "share": 0.0003
         },
         "2026-Q2": {
-          "commits": 8641,
+          "commits": 8643,
           "ai_assisted": 7,
           "share": 0.0008
         },
         "2026-Q3": {
-          "commits": 10420,
+          "commits": 10478,
           "ai_assisted": 5,
           "share": 0.0005
         }
@@ -12991,11 +12999,11 @@
           "ai_assisted": 0
         },
         "2025-09": {
-          "commits": 2371,
+          "commits": 2372,
           "ai_assisted": 0
         },
         "2025-10": {
-          "commits": 2237,
+          "commits": 2238,
           "ai_assisted": 0
         },
         "2025-11": {
@@ -13015,7 +13023,7 @@
           "ai_assisted": 0
         },
         "2026-03": {
-          "commits": 2660,
+          "commits": 2661,
           "ai_assisted": 2
         },
         "2026-04": {
@@ -13027,23 +13035,23 @@
           "ai_assisted": 3
         },
         "2026-06": {
-          "commits": 2842,
+          "commits": 2844,
           "ai_assisted": 3
         },
         "2026-07": {
-          "commits": 3631,
+          "commits": 3638,
           "ai_assisted": 2
         },
         "2026-08": {
-          "commits": 3764,
+          "commits": 3778,
           "ai_assisted": 2
         },
         "2026-09": {
-          "commits": 3025,
+          "commits": 3062,
           "ai_assisted": 1
         },
         "2026-10": {
-          "commits": 2800,
+          "commits": 3121,
           "ai_assisted": 2
         }
       }
@@ -13051,15 +13059,15 @@
     {
       "name": "scikit-learn",
       "report": "scikit-learn/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 34105,
-        "ai_assisted": 11,
+        "commits": 34133,
+        "ai_assisted": 12,
         "authored": 3,
         "assistants": {
           "GitHub Copilot": 5,
-          "Cursor": 4,
-          "Claude": 3
+          "Claude": 4,
+          "Cursor": 4
         }
       },
       "quarters": {
@@ -13197,13 +13205,13 @@
     {
       "name": "SciPy",
       "report": "scipy/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 38533,
-        "ai_assisted": 57,
+        "commits": 38575,
+        "ai_assisted": 62,
         "authored": 1,
         "assistants": {
-          "Claude": 47,
+          "Claude": 52,
           "Warp": 5,
           "GitHub Copilot": 4,
           "Devin": 1
@@ -13336,7 +13344,7 @@
           "ai_assisted": 3
         },
         "2026-10": {
-          "commits": 129,
+          "commits": 130,
           "ai_assisted": 7
         }
       }
@@ -13344,18 +13352,18 @@
     {
       "name": "SGLang",
       "report": "sglang/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 21498,
-        "ai_assisted": 1794,
+        "commits": 22020,
+        "ai_assisted": 1936,
         "authored": 0,
         "assistants": {
-          "Claude": 1476,
+          "Claude": 1610,
           "Gemini": 177,
-          "Cursor": 148,
-          "GitHub Copilot": 18,
+          "Cursor": 151,
+          "GitHub Copilot": 23,
+          "Devin": 6,
           "Codex": 4,
-          "Devin": 4,
           "CodeRabbit": 1,
           "OpenHands": 1
         }
@@ -13495,9 +13503,9 @@
     {
       "name": "SQLAlchemy",
       "report": "sqlalchemy/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 18453,
+        "commits": 18492,
         "ai_assisted": 0,
         "authored": 0,
         "assistants": {}
@@ -13629,7 +13637,7 @@
           "ai_assisted": 0
         },
         "2026-10": {
-          "commits": 101,
+          "commits": 103,
           "ai_assisted": 0
         }
       }
@@ -13637,9 +13645,9 @@
     {
       "name": "Svelte",
       "report": "svelte/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 11459,
+        "commits": 11465,
         "ai_assisted": 23,
         "authored": 1,
         "assistants": {
@@ -13783,13 +13791,13 @@
     {
       "name": "Tailwind CSS",
       "report": "tailwindcss/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 6882,
-        "ai_assisted": 14,
+        "commits": 6905,
+        "ai_assisted": 17,
         "authored": 0,
         "assistants": {
-          "Claude": 13,
+          "Claude": 16,
           "CodeRabbit": 2,
           "Codex": 1
         }
@@ -13929,13 +13937,13 @@
     {
       "name": "TensorFlow",
       "report": "tensorflow/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 202529,
-        "ai_assisted": 51,
+        "commits": 203095,
+        "ai_assisted": 52,
         "authored": 0,
         "assistants": {
-          "Gemini": 40,
+          "Gemini": 41,
           "Claude": 10,
           "Cursor": 1
         }
@@ -13967,12 +13975,12 @@
           "share": 0.0003
         },
         "2026-Q2": {
-          "commits": 3913,
+          "commits": 3915,
           "ai_assisted": 22,
           "share": 0.0056
         },
         "2026-Q3": {
-          "commits": 4119,
+          "commits": 4149,
           "ai_assisted": 16,
           "share": 0.0039
         }
@@ -14043,7 +14051,7 @@
           "ai_assisted": 1
         },
         "2026-04": {
-          "commits": 1399,
+          "commits": 1400,
           "ai_assisted": 0
         },
         "2026-05": {
@@ -14051,11 +14059,11 @@
           "ai_assisted": 1
         },
         "2026-06": {
-          "commits": 1265,
+          "commits": 1266,
           "ai_assisted": 21
         },
         "2026-07": {
-          "commits": 1301,
+          "commits": 1302,
           "ai_assisted": 3
         },
         "2026-08": {
@@ -14063,12 +14071,12 @@
           "ai_assisted": 10
         },
         "2026-09": {
-          "commits": 1389,
+          "commits": 1418,
           "ai_assisted": 3
         },
         "2026-10": {
-          "commits": 2468,
-          "ai_assisted": 12
+          "commits": 2564,
+          "ai_assisted": 13
         }
       }
     },
@@ -14219,9 +14227,9 @@
     {
       "name": "TiKV",
       "report": "tikv/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 8546,
+        "commits": 8551,
         "ai_assisted": 4,
         "authored": 0,
         "assistants": {
@@ -14364,13 +14372,13 @@
     {
       "name": "Transformers",
       "report": "transformers/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 24592,
-        "ai_assisted": 305,
+        "commits": 24700,
+        "ai_assisted": 327,
         "authored": 0,
         "assistants": {
-          "Claude": 287,
+          "Claude": 309,
           "GitHub Copilot": 9,
           "Cursor": 7,
           "OpenHands": 3,
@@ -14513,15 +14521,16 @@
     {
       "name": "TypeScript",
       "report": "typescript/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 39635,
-        "ai_assisted": 447,
-        "authored": 342,
+        "commits": 39688,
+        "ai_assisted": 461,
+        "authored": 351,
         "assistants": {
-          "GitHub Copilot": 441,
-          "Claude": 5,
-          "Codex": 1
+          "GitHub Copilot": 453,
+          "Claude": 6,
+          "Codex": 1,
+          "Cursor": 1
         }
       },
       "quarters": {
@@ -14659,9 +14668,9 @@
     {
       "name": "uv",
       "report": "uv/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 11301,
+        "commits": 11345,
         "ai_assisted": 155,
         "authored": 2,
         "assistants": {
@@ -14806,14 +14815,14 @@
     {
       "name": "Vite",
       "report": "vite/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 9852,
-        "ai_assisted": 66,
+        "commits": 9871,
+        "ai_assisted": 67,
         "authored": 37,
         "assistants": {
           "GitHub Copilot": 43,
-          "Claude": 18,
+          "Claude": 19,
           "Codex": 3,
           "Cursor": 1,
           "Warp": 1
@@ -14954,19 +14963,19 @@
     {
       "name": "vLLM",
       "report": "vllm/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 24325,
-        "ai_assisted": 2631,
+        "commits": 24909,
+        "ai_assisted": 2940,
         "authored": 6,
         "assistants": {
-          "Claude": 1781,
-          "Codex": 380,
+          "Claude": 2077,
+          "Codex": 383,
           "Gemini": 309,
-          "Cursor": 174,
-          "GitHub Copilot": 51,
+          "Cursor": 187,
+          "GitHub Copilot": 54,
           "OpenCode": 5,
-          "Devin": 3,
+          "Devin": 4,
           "CodeRabbit": 2,
           "Factory Droid": 1
         }
@@ -15254,9 +15263,9 @@
     {
       "name": "Vue",
       "report": "vue/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 7238,
+        "commits": 7281,
         "ai_assisted": 0,
         "authored": 0,
         "assistants": {}
@@ -15396,13 +15405,13 @@
     {
       "name": "webpack",
       "report": "webpack/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 20303,
-        "ai_assisted": 296,
+        "commits": 20425,
+        "ai_assisted": 346,
         "authored": 2,
         "assistants": {
-          "Claude": 285,
+          "Claude": 335,
           "CodeRabbit": 8,
           "GitHub Copilot": 4
         }
@@ -15542,18 +15551,19 @@
     {
       "name": "Zed",
       "report": "zed/index.html",
-      "counted_by": "gitstats 2.12.2.post1.dev2",
+      "counted_by": "gitstats 2.12.2.post1.dev3",
       "all_time": {
-        "commits": 40677,
-        "ai_assisted": 173,
+        "commits": 40749,
+        "ai_assisted": 179,
         "authored": 1,
         "assistants": {
-          "Claude": 128,
-          "Amp": 22,
+          "Claude": 131,
+          "Amp": 25,
           "Factory Droid": 11,
           "GitHub Copilot": 9,
           "Cursor": 3,
-          "Unnamed assistant": 2
+          "Unnamed assistant": 2,
+          "Codex": 1
         }
       },
       "quarters": {

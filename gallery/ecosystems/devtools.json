@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:12:17+00:00",
+  "generated_by": "gitstats dev",
+  "generated_at": "2026-11-09T05:23:53+00:00",
   "ecosystem": {
     "id": "devtools",
     "name": "Languages and developer tools",
@@ -70,10 +70,10 @@
         "ai_assisted": 99,
         "share": 0.1115
       },
-      "commits_last_12mo": 3698,
-      "active_authors_12mo": 430,
+      "commits_last_12mo": 3781,
+      "active_authors_12mo": 426,
       "health": "steady",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-08",
       "assistants": [
         "Codex",
         "OpenCode",
@@ -96,10 +96,10 @@
         "ai_assisted": 7,
         "share": 0.0486
       },
-      "commits_last_12mo": 568,
-      "active_authors_12mo": 120,
+      "commits_last_12mo": 593,
+      "active_authors_12mo": 121,
       "health": "steady",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-08",
       "assistants": [
         "Claude",
         "GitHub Copilot",
@@ -113,7 +113,7 @@
       "repository": "git/git",
       "report": "../git/",
       "quarter": {
-        "commits": 961,
+        "commits": 962,
         "ai_assisted": 70,
         "share": 0.0728
       },
@@ -122,14 +122,14 @@
         "ai_assisted": 24,
         "share": 0.0252
       },
-      "commits_last_12mo": 3479,
-      "active_authors_12mo": 230,
+      "commits_last_12mo": 3536,
+      "active_authors_12mo": 232,
       "health": "steady",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-06",
       "assistants": [
         "Claude",
         "ChatGPT",
-        "Unnamed assistant"
+        "Gemini"
       ]
     },
     {
@@ -139,19 +139,19 @@
       "repository": "nginx/nginx",
       "report": "../nginx/",
       "quarter": {
-        "commits": 92,
+        "commits": 99,
         "ai_assisted": 6,
-        "share": 0.0652
+        "share": 0.0606
       },
       "previous_quarter": {
         "commits": 89,
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 276,
-      "active_authors_12mo": 46,
+      "commits_last_12mo": 287,
+      "active_authors_12mo": 48,
       "health": "steady",
-      "last_commit": "2026-10-28",
+      "last_commit": "2026-11-06",
       "assistants": [
         "OpenCode"
       ]
@@ -172,10 +172,10 @@
         "ai_assisted": 29,
         "share": 0.0134
       },
-      "commits_last_12mo": 7533,
+      "commits_last_12mo": 7605,
       "active_authors_12mo": 1183,
       "health": "steady",
-      "last_commit": "2026-11-02",
+      "last_commit": "2026-11-09",
       "assistants": [
         "Claude",
         "Amp",
@@ -189,19 +189,19 @@
       "repository": "neovim/neovim",
       "report": "../neovim/",
       "quarter": {
-        "commits": 1255,
+        "commits": 1256,
         "ai_assisted": 31,
         "share": 0.0247
       },
       "previous_quarter": {
-        "commits": 1089,
+        "commits": 1090,
         "ai_assisted": 19,
         "share": 0.0174
       },
-      "commits_last_12mo": 4057,
-      "active_authors_12mo": 290,
+      "commits_last_12mo": 4124,
+      "active_authors_12mo": 293,
       "health": "steady",
-      "last_commit": "2026-11-02",
+      "last_commit": "2026-11-09",
       "assistants": [
         "Claude",
         "Unnamed assistant"
@@ -223,14 +223,14 @@
         "ai_assisted": 49,
         "share": 0.0264
       },
-      "commits_last_12mo": 6131,
+      "commits_last_12mo": 6352,
       "active_authors_12mo": 199,
       "health": "peak",
-      "last_commit": "2026-11-02",
+      "last_commit": "2026-11-08",
       "assistants": [
         "GitHub Copilot",
         "Claude",
-        "Codex"
+        "CodeRabbit"
       ]
     },
     {
@@ -250,7 +250,7 @@
         "share": 0.0841
       },
       "commits_last_12mo": 2818,
-      "active_authors_12mo": 195,
+      "active_authors_12mo": 194,
       "health": "peak",
       "last_commit": "2026-10-26",
       "assistants": [
@@ -266,21 +266,22 @@
       "repository": "golang/go",
       "report": "../go/",
       "quarter": {
-        "commits": 1018,
+        "commits": 1044,
         "ai_assisted": 11,
-        "share": 0.0108
+        "share": 0.0105
       },
       "previous_quarter": {
         "commits": 949,
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 3241,
-      "active_authors_12mo": 337,
+      "commits_last_12mo": 3411,
+      "active_authors_12mo": 343,
       "health": "steady",
-      "last_commit": "2026-10-30",
+      "last_commit": "2026-11-09",
       "assistants": [
         "Claude",
+        "Unnamed assistant",
         "GitHub Copilot"
       ]
     },
@@ -300,10 +301,10 @@
         "ai_assisted": 10,
         "share": 0.0088
       },
-      "commits_last_12mo": 4454,
-      "active_authors_12mo": 85,
+      "commits_last_12mo": 4477,
+      "active_authors_12mo": 84,
       "health": "peak",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-07",
       "assistants": [
         "Claude",
         "CodeRabbit",
@@ -317,19 +318,19 @@
       "repository": "rust-lang/rust",
       "report": "../rust/",
       "quarter": {
-        "commits": 10420,
+        "commits": 10478,
         "ai_assisted": 5,
         "share": 0.0005
       },
       "previous_quarter": {
-        "commits": 8641,
+        "commits": 8643,
         "ai_assisted": 7,
         "share": 0.0008
       },
-      "commits_last_12mo": 32056,
-      "active_authors_12mo": 1327,
+      "commits_last_12mo": 33014,
+      "active_authors_12mo": 1335,
       "health": "steady",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-09",
       "assistants": [
         "Claude",
         "GitHub Copilot",
@@ -352,10 +353,10 @@
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 3093,
+      "commits_last_12mo": 3169,
       "active_authors_12mo": 30,
       "health": "steady",
-      "last_commit": "2026-11-02",
+      "last_commit": "2026-11-08",
       "assistants": []
     },
     {
@@ -365,7 +366,7 @@
       "repository": "curl/curl",
       "report": "../curl/",
       "quarter": {
-        "commits": 787,
+        "commits": 788,
         "ai_assisted": 0,
         "share": 0.0
       },
@@ -374,12 +375,13 @@
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 3206,
-      "active_authors_12mo": 196,
+      "commits_last_12mo": 3262,
+      "active_authors_12mo": 199,
       "health": "surge",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-08",
       "assistants": [
         "ChatGPT",
+        "Claude",
         "GitHub Copilot"
       ]
     }

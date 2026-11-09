@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:02:00+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:13:25+00:00",
   "name": "Harbor",
   "report_path": "index.html",
   "first_commit": "2016-02-01 11:59:10",
-  "last_commit": "2026-11-02 04:02:08",
-  "age_days": 3927,
-  "active_days": 2439,
-  "total_commits": 12942,
+  "last_commit": "2026-11-06 08:32:02",
+  "age_days": 3931,
+  "active_days": 2443,
+  "total_commits": 12952,
   "total_authors": 469,
-  "active_authors_12mo": 92,
-  "commits_last_12mo": 422,
-  "total_files": 3312,
-  "total_lines": 483733,
-  "lines_added": 4985959,
-  "lines_removed": 4502124,
+  "active_authors_12mo": 91,
+  "commits_last_12mo": 432,
+  "total_files": 3313,
+  "total_lines": 484483,
+  "lines_added": 4986878,
+  "lines_removed": 4502293,
   "total_tags": 41,
   "era": "steady",
   "top_authors": [
@@ -41,13 +41,13 @@
     }
   ],
   "author_commits": {
+    "Prasanth Baskar": 56,
+    "stonezdj(Daojun Zhang)": 559,
     "Max": 3,
     "Norway-02": 10,
-    "stonezdj(Daojun Zhang)": 556,
     "Nikita Kodkany": 2,
     "Orlix": 24,
     "Vadim Bauer": 39,
-    "Prasanth Baskar": 53,
     "Wang Yan": 1095,
     "jUDASmILE": 14,
     "Chlins Zhang": 237,
@@ -522,7 +522,7 @@
     "2023": 434,
     "2024": 323,
     "2025": 269,
-    "2026": 407
+    "2026": 417
   },
   "ai_assisted": {
     "commits": 18,
@@ -582,19 +582,19 @@
       "2026-08": 58,
       "2026-09": 46,
       "2026-10": 81,
-      "2026-11": 1
+      "2026-11": 11
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 12942,
+    "commits": 12952,
     "by_kind": {
       "organization": 9000,
-      "one_person": 302,
-      "personal": 2298,
+      "one_person": 305,
+      "personal": 2301,
       "hidden": 1074,
       "unknown": 8,
-      "bot": 260
+      "bot": 264
     },
     "organization_count": 10,
     "last_12mo_from": "2025-12",
@@ -739,24 +739,24 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 21,
-        "personal": 26,
+        "one_person": 24,
+        "personal": 29,
         "hidden": 8,
         "unknown": 0,
-        "bot": 27
+        "bot": 31
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 343,
+    "commits": 349,
     "authors": 90,
     "new_authors": 73,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 12682,
+    "commits": 12688,
     "commits_by_year": {
       "2016": 2176,
       "2017": 1824,
@@ -768,21 +768,21 @@
       "2023": 407,
       "2024": 237,
       "2025": 204,
-      "2026": 334
+      "2026": 340
     },
-    "active_days": 2389
+    "active_days": 2393
   },
   "timezones": {
-    "+0000": 334,
+    "+0000": 337,
     "+0100": 188,
-    "+0200": 235,
+    "+0200": 236,
     "+0300": 56,
     "+0400": 1,
     "+0500": 3,
-    "+0530": 122,
+    "+0530": 125,
     "+0600": 11,
     "+0700": 4,
-    "+0800": 11291,
+    "+0800": 11294,
     "+0900": 19,
     "+1100": 11,
     "+1200": 1,
@@ -796,7 +796,7 @@
     "-0800": 72
   },
   "source_lines": {
-    "added": 1506620,
-    "current": 442621
+    "added": 1507536,
+    "current": 443377
   }
 }

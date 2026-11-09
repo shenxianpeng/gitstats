@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:58:35+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:10:03+00:00",
   "name": "Cline",
   "report_path": "index.html",
   "first_commit": "2024-07-06 00:51:41",
-  "last_commit": "2026-10-30 21:21:13",
-  "age_days": 847,
-  "active_days": 749,
-  "total_commits": 7727,
-  "total_authors": 347,
-  "active_authors_12mo": 146,
-  "commits_last_12mo": 3602,
-  "total_files": 4444,
-  "total_lines": 1225985,
-  "lines_added": 2763932,
-  "lines_removed": 1537942,
-  "total_tags": 776,
-  "era": "steady",
+  "last_commit": "2026-11-06 18:48:41",
+  "age_days": 854,
+  "active_days": 754,
+  "total_commits": 7751,
+  "total_authors": 349,
+  "active_authors_12mo": 145,
+  "commits_last_12mo": 3626,
+  "total_files": 4464,
+  "total_lines": 1231852,
+  "lines_added": 2772876,
+  "lines_removed": 1541019,
+  "total_tags": 777,
+  "era": "peak",
   "top_authors": [
     {
-      "name": "Bee",
-      "commits": 3622
+      "name": "Haley Park",
+      "commits": 3626
     },
     {
       "name": "celestial-vault",
@@ -41,16 +41,18 @@
     }
   ],
   "author_commits": {
-    "Bee": 3622,
-    "John Choi": 86,
+    "Haley Park": 3626,
+    "John Choi": 96,
+    "Aditya Batra": 1,
+    "Miko\u0142aj Kondratek": 224,
+    "zhengqiuyang": 1,
+    "Max": 106,
     "Tom\u00e1s Barreiro": 253,
     "Etisha Garg": 6,
     "coby-mckinney": 1,
     "Hugo": 1,
     "James Arlen": 4,
     "Dante": 3,
-    "Max": 102,
-    "Miko\u0142aj Kondratek": 220,
     "zurrll": 1,
     "Lucien": 2,
     "TheRealSpencer": 11,
@@ -392,7 +394,7 @@
   "commits_by_year": {
     "2024": 1067,
     "2025": 3336,
-    "2026": 3324
+    "2026": 3348
   },
   "ai_assisted": {
     "commits": 168,
@@ -452,27 +454,27 @@
       "2026-08": 392,
       "2026-09": 323,
       "2026-10": 227,
-      "2026-11": 0
+      "2026-11": 24
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7727,
+    "commits": 7751,
     "by_kind": {
       "organization": 913,
       "one_person": 257,
-      "personal": 1217,
-      "hidden": 5152,
+      "personal": 1223,
+      "hidden": 5170,
       "unknown": 0,
       "bot": 188
     },
     "organization_count": 6,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "cline.bot",
         "commits": 858,
-        "commits_last_12mo": 679,
+        "commits_last_12mo": 673,
         "addresses": 16,
         "first_commit": "2025-04-15",
         "last_commit": "2026-10-29"
@@ -480,7 +482,7 @@
       {
         "organization": "sap.com",
         "commits": 19,
-        "commits_last_12mo": 8,
+        "commits_last_12mo": 7,
         "addresses": 5,
         "first_commit": "2025-08-15",
         "last_commit": "2026-07-23"
@@ -488,7 +490,7 @@
       {
         "organization": "oracle.com",
         "commits": 14,
-        "commits_last_12mo": 6,
+        "commits_last_12mo": 5,
         "addresses": 3,
         "first_commit": "2025-09-19",
         "last_commit": "2026-03-17"
@@ -496,7 +498,7 @@
       {
         "organization": "cerebras.net",
         "commits": 13,
-        "commits_last_12mo": 6,
+        "commits_last_12mo": 5,
         "addresses": 2,
         "first_commit": "2025-05-27",
         "last_commit": "2026-02-18"
@@ -512,7 +514,7 @@
       {
         "organization": "amazon.com",
         "commits": 4,
-        "commits_last_12mo": 2,
+        "commits_last_12mo": 1,
         "addresses": 4,
         "first_commit": "2025-05-05",
         "last_commit": "2026-01-20"
@@ -578,40 +580,40 @@
       "2026-Q4": {
         "organization": 15,
         "one_person": 4,
-        "personal": 16,
-        "hidden": 191,
+        "personal": 22,
+        "hidden": 209,
         "unknown": 0,
         "bot": 1
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 3751,
-    "authors": 147,
-    "new_authors": 117,
-    "half_of_commits": 2
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 3571,
+    "authors": 134,
+    "new_authors": 107,
+    "half_of_commits": 1
   },
   "humans": {
-    "commits": 7539,
+    "commits": 7563,
     "commits_by_year": {
       "2024": 1067,
       "2025": 3188,
-      "2026": 3284
+      "2026": 3308
     },
-    "active_days": 748
+    "active_days": 753
   },
   "timezones": {
     "+0000": 81,
-    "+0100": 107,
+    "+0100": 111,
     "+0200": 231,
     "+0300": 35,
     "+0400": 37,
     "+0500": 4,
-    "+0530": 60,
+    "+0530": 61,
     "+0700": 18,
-    "+0800": 212,
+    "+0800": 213,
     "+0900": 161,
     "+1000": 5,
     "+1100": 1,
@@ -621,11 +623,11 @@
     "-0500": 111,
     "-0600": 66,
     "-0700": 3840,
-    "-0800": 1494,
+    "-0800": 1512,
     "-1000": 60
   },
   "source_lines": {
-    "added": 2650370,
-    "current": 1184710
+    "added": 2659309,
+    "current": 1190581
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:00:41+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:12:24+00:00",
   "name": "etcd",
   "report_path": "index.html",
   "first_commit": "2013-06-07 00:43:32",
-  "last_commit": "2026-10-28 18:53:56",
-  "age_days": 4892,
-  "active_days": 4014,
-  "total_commits": 25342,
-  "total_authors": 1138,
-  "active_authors_12mo": 88,
-  "commits_last_12mo": 1229,
+  "last_commit": "2026-11-06 12:29:27",
+  "age_days": 4901,
+  "active_days": 4022,
+  "total_commits": 25365,
+  "total_authors": 1140,
+  "active_authors_12mo": 86,
+  "commits_last_12mo": 1252,
   "total_files": 1505,
-  "total_lines": 258880,
-  "lines_added": 2398145,
-  "lines_removed": 2139213,
+  "total_lines": 259316,
+  "lines_added": 2398850,
+  "lines_removed": 2139482,
   "total_tags": 101,
   "era": "steady",
   "top_authors": [
@@ -29,11 +29,11 @@
     },
     {
       "name": "Benjamin Wang",
-      "commits": 2316
+      "commits": 2323
     },
     {
       "name": "Marek Siarkowicz",
-      "commits": 1907
+      "commits": 1908
     },
     {
       "name": "Anthony Romano",
@@ -41,11 +41,14 @@
     }
   ],
   "author_commits": {
-    "Iv\u00e1n Vald\u00e9s Castillo": 376,
+    "Fu Wei": 253,
+    "Benjamin Wang": 2323,
+    "Marek Siarkowicz": 1908,
+    "Ivan Valdes": 382,
+    "AliasJeff": 2,
+    "Franciszek": 1,
     "vivekpatani": 64,
-    "Benjamin Wang": 2316,
     "Tobi Abidoye": 6,
-    "Fu Wei": 248,
     "Batianxieshen1": 1,
     "AngstyDuck": 2,
     "Ri\u010dardas \u010cubukinas": 3,
@@ -54,7 +57,6 @@
     "Parman Mohammadalizadeh": 1,
     "Venkat Kooram": 2,
     "Stephen Kitt": 5,
-    "Marek Siarkowicz": 1907,
     "Davanum Srinivas": 22,
     "Aadeen Rashid": 4,
     "Nont": 71,
@@ -1194,7 +1196,7 @@
     "2023": 1621,
     "2024": 1553,
     "2025": 1899,
-    "2026": 1159
+    "2026": 1182
   },
   "ai_assisted": {
     "commits": 3,
@@ -1252,23 +1254,23 @@
       "2026-07": 137,
       "2026-08": 76,
       "2026-09": 60,
-      "2026-10": 83,
-      "2026-11": 0
+      "2026-10": 87,
+      "2026-11": 19
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 25342,
+    "commits": 25365,
     "by_kind": {
-      "organization": 9897,
-      "one_person": 2386,
-      "personal": 12506,
+      "organization": 9899,
+      "one_person": 2392,
+      "personal": 12520,
       "hidden": 223,
       "unknown": 7,
-      "bot": 323
+      "bot": 324
     },
     "organization_count": 39,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "coreos.com",
@@ -1280,11 +1282,11 @@
       },
       {
         "organization": "google.com",
-        "commits": 3242,
-        "commits_last_12mo": 331,
-        "addresses": 32,
+        "commits": 3244,
+        "commits_last_12mo": 308,
+        "addresses": 33,
         "first_commit": "2014-10-30",
-        "last_commit": "2026-10-07"
+        "last_commit": "2026-11-05"
       },
       {
         "organization": "vmware.com",
@@ -1305,7 +1307,7 @@
       {
         "organization": "ibm.com",
         "commits": 309,
-        "commits_last_12mo": 2,
+        "commits_last_12mo": 1,
         "addresses": 13,
         "first_commit": "2015-11-20",
         "last_commit": "2026-03-18"
@@ -1641,25 +1643,25 @@
         "bot": 29
       },
       "2026-Q4": {
-        "organization": 4,
-        "one_person": 26,
-        "personal": 40,
+        "organization": 6,
+        "one_person": 32,
+        "personal": 54,
         "hidden": 5,
         "unknown": 0,
-        "bot": 8
+        "bot": 9
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 1234,
-    "authors": 88,
-    "new_authors": 62,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 1166,
+    "authors": 86,
+    "new_authors": 61,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 25019,
+    "commits": 25041,
     "commits_by_year": {
       "2013": 1220,
       "2014": 2950,
@@ -1674,12 +1676,12 @@
       "2023": 1545,
       "2024": 1464,
       "2025": 1828,
-      "2026": 1083
+      "2026": 1105
     },
-    "active_days": 4000
+    "active_days": 4008
   },
   "timezones": {
-    "+0000": 1376,
+    "+0000": 1388,
     "+0100": 2147,
     "+0200": 2265,
     "+0300": 87,
@@ -1690,7 +1692,7 @@
     "+0530": 355,
     "+0600": 1,
     "+0700": 20,
-    "+0800": 1952,
+    "+0800": 1954,
     "+0900": 414,
     "+0930": 1,
     "+1000": 22,
@@ -1699,14 +1701,14 @@
     "+1300": 127,
     "-0300": 26,
     "-0400": 827,
-    "-0500": 635,
+    "-0500": 638,
     "-0600": 126,
     "-0700": 10233,
-    "-0800": 4482,
+    "-0800": 4488,
     "-1000": 2
   },
   "source_lines": {
-    "added": 941277,
-    "current": 242795
+    "added": 941846,
+    "current": 243215
   }
 }

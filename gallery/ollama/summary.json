@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:59:37+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:11:13+00:00",
   "name": "Ollama",
   "report_path": "index.html",
   "first_commit": "2023-06-22 16:45:31",
-  "last_commit": "2026-10-31 22:46:17",
-  "age_days": 1228,
-  "active_days": 1033,
-  "total_commits": 5962,
-  "total_authors": 620,
-  "active_authors_12mo": 111,
-  "commits_last_12mo": 1128,
-  "total_files": 1585,
-  "total_lines": 1052517,
-  "lines_added": 2300506,
-  "lines_removed": 1247962,
-  "total_tags": 661,
+  "last_commit": "2026-11-08 00:36:53",
+  "age_days": 1235,
+  "active_days": 1040,
+  "total_commits": 5984,
+  "total_authors": 622,
+  "active_authors_12mo": 100,
+  "commits_last_12mo": 1150,
+  "total_files": 1631,
+  "total_lines": 1065520,
+  "lines_added": 2315095,
+  "lines_removed": 1249548,
+  "total_tags": 667,
   "era": "steady",
   "top_authors": [
     {
@@ -25,7 +25,7 @@
     },
     {
       "name": "Daniel Hiltgen",
-      "commits": 1056
+      "commits": 1065
     },
     {
       "name": "Jeffrey Morgan",
@@ -41,13 +41,16 @@
     }
   ],
   "author_commits": {
-    "Daniel Hiltgen": 1056,
-    "Parth Sareen": 249,
-    "Eva H": 115,
-    "J Berg": 18,
+    "Patrick Devine": 225,
+    "Eva H": 118,
+    "Daniel Hiltgen": 1065,
+    "Matteo Celani": 4,
+    "liangliang205": 1,
+    "Marlon Ferreira": 1,
+    "J Berg": 19,
+    "Parth Sareen": 252,
     "Jeffrey Morgan": 932,
     "SynapShift": 1,
-    "Patrick Devine": 222,
     "Devon Rifkin": 112,
     "Willie Tran": 2,
     "Anna Rahn": 21,
@@ -80,7 +83,6 @@
     "Anto jones": 1,
     "Pratham Agarwal": 1,
     "madflow": 1,
-    "Matteo Celani": 3,
     "Michael Verrilli": 1,
     "Mike Wallio": 1,
     "saman-amd": 2,
@@ -666,7 +668,7 @@
     "2023": 1681,
     "2024": 2083,
     "2025": 1146,
-    "2026": 1052
+    "2026": 1074
   },
   "ai_assisted": {
     "commits": 3,
@@ -725,35 +727,35 @@
       "2026-08": 105,
       "2026-09": 109,
       "2026-10": 152,
-      "2026-11": 0
+      "2026-11": 22
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5962,
+    "commits": 5984,
     "by_kind": {
-      "organization": 974,
+      "organization": 981,
       "one_person": 644,
-      "personal": 3017,
-      "hidden": 1310,
+      "personal": 3019,
+      "hidden": 1323,
       "unknown": 17,
       "bot": 0
     },
     "organization_count": 5,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "ollama.com",
-        "commits": 774,
-        "commits_last_12mo": 265,
+        "commits": 781,
+        "commits_last_12mo": 262,
         "addresses": 6,
         "first_commit": "2023-11-08",
-        "last_commit": "2026-10-30"
+        "last_commit": "2026-11-08"
       },
       {
         "organization": "infrahq.com",
         "commits": 153,
-        "commits_last_12mo": 35,
+        "commits_last_12mo": 31,
         "addresses": 4,
         "first_commit": "2023-06-27",
         "last_commit": "2026-03-28"
@@ -841,36 +843,36 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 34,
+        "organization": 41,
         "one_person": 3,
-        "personal": 18,
-        "hidden": 85,
+        "personal": 20,
+        "hidden": 98,
         "unknown": 12,
         "bot": 0
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 1235,
-    "authors": 111,
-    "new_authors": 87,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 1150,
+    "authors": 86,
+    "new_authors": 67,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 5962,
+    "commits": 5984,
     "commits_by_year": {
       "2023": 1681,
       "2024": 2083,
       "2025": 1146,
-      "2026": 1052
+      "2026": 1074
     },
-    "active_days": 1033
+    "active_days": 1040
   },
   "timezones": {
     "+0000": 47,
-    "+0100": 159,
+    "+0100": 160,
     "+0200": 128,
     "+0300": 29,
     "+0330": 3,
@@ -881,23 +883,23 @@
     "+0600": 2,
     "+0630": 1,
     "+0700": 25,
-    "+0800": 129,
+    "+0800": 130,
     "+0900": 24,
     "+1000": 16,
     "+1100": 9,
     "+1200": 3,
     "+1300": 1,
-    "-0300": 34,
+    "-0300": 35,
     "-0330": 1,
     "-0400": 650,
-    "-0500": 310,
+    "-0500": 313,
     "-0600": 35,
     "-0700": 3151,
-    "-0800": 1137,
+    "-0800": 1153,
     "-1000": 1
   },
   "source_lines": {
-    "added": 1547044,
-    "current": 502299
+    "added": 1560278,
+    "current": 514141
   }
 }

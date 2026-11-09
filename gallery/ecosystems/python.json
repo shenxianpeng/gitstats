@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:12:17+00:00",
+  "generated_by": "gitstats dev",
+  "generated_at": "2026-11-09T05:23:53+00:00",
   "ecosystem": {
     "id": "python",
     "name": "Python",
@@ -44,10 +44,10 @@
         "ai_assisted": 356,
         "share": 0.5651
       },
-      "commits_last_12mo": 2900,
-      "active_authors_12mo": 395,
+      "commits_last_12mo": 2991,
+      "active_authors_12mo": 394,
       "health": "steady",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-09",
       "assistants": [
         "Claude",
         "Devin",
@@ -70,10 +70,10 @@
         "ai_assisted": 12,
         "share": 0.0502
       },
-      "commits_last_12mo": 799,
-      "active_authors_12mo": 124,
+      "commits_last_12mo": 812,
+      "active_authors_12mo": 122,
       "health": "steady",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-08",
       "assistants": [
         "Claude",
         "Codex",
@@ -96,10 +96,10 @@
         "ai_assisted": 850,
         "share": 0.1691
       },
-      "commits_last_12mo": 20756,
-      "active_authors_12mo": 1470,
+      "commits_last_12mo": 21654,
+      "active_authors_12mo": 1498,
       "health": "peak",
-      "last_commit": "2026-11-02",
+      "last_commit": "2026-11-09",
       "assistants": [
         "Claude",
         "GitHub Copilot",
@@ -122,13 +122,14 @@
         "ai_assisted": 111,
         "share": 0.0853
       },
-      "commits_last_12mo": 4782,
-      "active_authors_12mo": 794,
+      "commits_last_12mo": 4918,
+      "active_authors_12mo": 809,
       "health": "steady",
-      "last_commit": "2026-11-02",
+      "last_commit": "2026-11-09",
       "assistants": [
         "Claude",
-        "GitHub Copilot"
+        "GitHub Copilot",
+        "Codex"
       ]
     },
     {
@@ -147,10 +148,10 @@
         "ai_assisted": 10,
         "share": 0.0215
       },
-      "commits_last_12mo": 2312,
+      "commits_last_12mo": 2337,
       "active_authors_12mo": 239,
       "health": "steady",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-07",
       "assistants": [
         "Claude",
         "Codex",
@@ -173,10 +174,10 @@
         "ai_assisted": 12,
         "share": 0.0236
       },
-      "commits_last_12mo": 2046,
-      "active_authors_12mo": 231,
+      "commits_last_12mo": 2088,
+      "active_authors_12mo": 235,
       "health": "steady",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-08",
       "assistants": [
         "Claude",
         "Warp",
@@ -199,14 +200,14 @@
         "ai_assisted": 2,
         "share": 0.0067
       },
-      "commits_last_12mo": 909,
-      "active_authors_12mo": 192,
+      "commits_last_12mo": 937,
+      "active_authors_12mo": 194,
       "health": "steady",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-06",
       "assistants": [
         "GitHub Copilot",
-        "Cursor",
-        "Claude"
+        "Claude",
+        "Cursor"
       ]
     },
     {
@@ -225,10 +226,10 @@
         "ai_assisted": 1,
         "share": 0.009
       },
-      "commits_last_12mo": 584,
-      "active_authors_12mo": 127,
+      "commits_last_12mo": 622,
+      "active_authors_12mo": 131,
       "health": "steady",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-08",
       "assistants": [
         "Claude",
         "GitHub Copilot"
@@ -250,10 +251,10 @@
         "ai_assisted": 33,
         "share": 0.0507
       },
-      "commits_last_12mo": 3402,
-      "active_authors_12mo": 179,
+      "commits_last_12mo": 3446,
+      "active_authors_12mo": 175,
       "health": "steady",
-      "last_commit": "2026-11-02",
+      "last_commit": "2026-11-08",
       "assistants": [
         "Claude",
         "ChatGPT",
@@ -276,12 +277,13 @@
         "ai_assisted": 10,
         "share": 0.0083
       },
-      "commits_last_12mo": 4885,
-      "active_authors_12mo": 310,
-      "health": "steady",
-      "last_commit": "2026-11-02",
+      "commits_last_12mo": 5039,
+      "active_authors_12mo": 317,
+      "health": "peak",
+      "last_commit": "2026-11-08",
       "assistants": [
         "Claude",
+        "Codex",
         "GitHub Copilot"
       ]
     },
@@ -301,10 +303,10 @@
         "ai_assisted": 2,
         "share": 0.0028
       },
-      "commits_last_12mo": 2009,
-      "active_authors_12mo": 164,
+      "commits_last_12mo": 2033,
+      "active_authors_12mo": 166,
       "health": "steady",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-09",
       "assistants": [
         "Claude",
         "Cursor",
@@ -318,19 +320,19 @@
       "repository": "pypa/pip",
       "report": "../pip/",
       "quarter": {
-        "commits": 198,
+        "commits": 205,
         "ai_assisted": 1,
-        "share": 0.0051
+        "share": 0.0049
       },
       "previous_quarter": {
         "commits": 260,
         "ai_assisted": 3,
         "share": 0.0115
       },
-      "commits_last_12mo": 790,
-      "active_authors_12mo": 67,
+      "commits_last_12mo": 842,
+      "active_authors_12mo": 68,
       "health": "steady",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-07",
       "assistants": [
         "Codex",
         "Claude",
@@ -353,10 +355,10 @@
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 1686,
-      "active_authors_12mo": 68,
+      "commits_last_12mo": 1770,
+      "active_authors_12mo": 67,
       "health": "surge",
-      "last_commit": "2026-10-31",
+      "last_commit": "2026-11-08",
       "assistants": [
         "Claude",
         "Cursor",
@@ -379,10 +381,10 @@
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 620,
-      "active_authors_12mo": 92,
+      "commits_last_12mo": 659,
+      "active_authors_12mo": 93,
       "health": "steady",
-      "last_commit": "2026-11-01",
+      "last_commit": "2026-11-08",
       "assistants": []
     },
     {
@@ -392,7 +394,7 @@
       "repository": "django/django",
       "report": "../django/",
       "quarter": {
-        "commits": 201,
+        "commits": 203,
         "ai_assisted": 0,
         "share": 0.0
       },
@@ -401,10 +403,10 @@
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 923,
-      "active_authors_12mo": 219,
+      "commits_last_12mo": 949,
+      "active_authors_12mo": 223,
       "health": "steady",
-      "last_commit": "2026-10-31",
+      "last_commit": "2026-11-06",
       "assistants": []
     },
     {
@@ -424,7 +426,7 @@
         "share": 0.0
       },
       "commits_last_12mo": 89,
-      "active_authors_12mo": 6,
+      "active_authors_12mo": 5,
       "health": "quiet",
       "last_commit": "2026-10-30",
       "assistants": []

@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:07:37+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:20:49+00:00",
   "name": "Neovim",
   "report_path": "index.html",
   "first_commit": "2014-01-31 13:39:15",
-  "last_commit": "2026-11-02 02:13:25",
-  "age_days": 4658,
-  "active_days": 4509,
-  "total_commits": 38631,
-  "total_authors": 1509,
-  "active_authors_12mo": 290,
-  "commits_last_12mo": 4057,
-  "total_files": 3944,
-  "total_lines": 1744645,
-  "lines_added": 3716660,
-  "lines_removed": 1971878,
+  "last_commit": "2026-11-09 02:19:13",
+  "age_days": 4665,
+  "active_days": 4515,
+  "total_commits": 38698,
+  "total_authors": 1512,
+  "active_authors_12mo": 293,
+  "commits_last_12mo": 4124,
+  "total_files": 3950,
+  "total_lines": 1748599,
+  "lines_added": 3722774,
+  "lines_removed": 1974038,
   "total_tags": 26,
   "era": "steady",
   "top_authors": [
     {
       "name": "zeertzjq",
-      "commits": 7174
+      "commits": 7189
     },
     {
       "name": "Justin M. Keyes",
-      "commits": 5079
+      "commits": 5113
     },
     {
       "name": "Jan Edmund Lazo",
@@ -33,29 +33,36 @@
     },
     {
       "name": "bfredl",
-      "commits": 2470
+      "commits": 2471
     },
     {
       "name": "Christian Clason",
-      "commits": 1635
+      "commits": 1639
     }
   ],
   "author_commits": {
-    "Justin M. Keyes": 5079,
-    "zeertzjq": 7174,
+    "zeertzjq": 7189,
+    "Justin M. Keyes": 5113,
+    "Christian Clason": 1639,
+    "Wei-Lun Li": 4,
+    "glepnir": 348,
+    "coot": 2,
+    "bfredl": 2471,
+    "Manoj Panda": 3,
+    "Ayush Yadav": 1,
+    "Szymon Wilczek": 4,
+    "tao": 23,
+    "Nazem": 1,
     "Konstantin Glukhov": 1,
     "Emre": 1,
     "Dylan Djian": 1,
     "Evgeni Chasnovski": 191,
-    "Christian Clason": 1635,
     "Lazizbek Ergashev": 1,
     "Lewis Russell": 772,
     "Freddie Haddad": 8,
-    "glepnir": 347,
     "Mike J McGuirk": 8,
     "Jan Edmund Lazo": 2768,
     "EKo": 1,
-    "bfredl": 2470,
     "Vishnu Srivatsava": 3,
     "Douglas Camata": 1,
     "Andrea Covelli": 1,
@@ -131,7 +138,6 @@
     "Kyle": 11,
     "HX L": 1,
     "Torben Leth": 1,
-    "tao": 21,
     "Erdiansyah": 4,
     "Oleh Kostiuk": 1,
     "Tanishq": 1,
@@ -165,7 +171,6 @@
     "Oleh Volynets": 4,
     "Caleb White": 2,
     "prwang": 1,
-    "Manoj Panda": 2,
     "STG": 2,
     "nikolightsaber": 5,
     "Rawan Khalid": 4,
@@ -212,7 +217,6 @@
     "Will Lillis": 2,
     "Luis Calle": 15,
     "Alexej Kowalew": 2,
-    "Szymon Wilczek": 3,
     "Quentin": 1,
     "Eisuke Kawashima": 23,
     "Ellison": 3,
@@ -559,7 +563,6 @@
     "Ivan Georgiev": 1,
     "Joey Gouly": 4,
     "Sam": 1,
-    "Marcin Szamotulski": 1,
     "Mayrom": 1,
     "Razvan-Adrian Ciochina": 1,
     "Calvin Bochulak": 1,
@@ -1564,7 +1567,7 @@
     "2023": 3985,
     "2024": 3283,
     "2025": 3384,
-    "2026": 3752
+    "2026": 3819
   },
   "ai_assisted": {
     "commits": 57,
@@ -1617,25 +1620,25 @@
       "2026-02": 362,
       "2026-03": 406,
       "2026-04": 423,
-      "2026-05": 323,
+      "2026-05": 324,
       "2026-06": 343,
       "2026-07": 420,
       "2026-08": 428,
-      "2026-09": 407,
+      "2026-09": 408,
       "2026-10": 272,
-      "2026-11": 19
+      "2026-11": 84
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38631,
+    "commits": 38698,
     "by_kind": {
       "organization": 31,
-      "one_person": 6584,
-      "personal": 29979,
-      "hidden": 1860,
+      "one_person": 6589,
+      "personal": 30038,
+      "hidden": 1862,
       "unknown": 17,
-      "bot": 160
+      "bot": 161
     },
     "organization_count": 7,
     "last_12mo_from": "2025-12",
@@ -1741,14 +1744,14 @@
       "2026-Q2": {
         "organization": 0,
         "one_person": 89,
-        "personal": 870,
+        "personal": 871,
         "hidden": 94,
         "unknown": 0,
         "bot": 36
       },
       "2026-Q3": {
         "organization": 1,
-        "one_person": 159,
+        "one_person": 160,
         "personal": 930,
         "hidden": 126,
         "unknown": 0,
@@ -1756,24 +1759,24 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 38,
-        "personal": 231,
-        "hidden": 14,
+        "one_person": 42,
+        "personal": 289,
+        "hidden": 16,
         "unknown": 0,
-        "bot": 8
+        "bot": 9
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 3948,
-    "authors": 270,
-    "new_authors": 188,
+    "commits": 4014,
+    "authors": 274,
+    "new_authors": 191,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 38471,
+    "commits": 38537,
     "commits_by_year": {
       "2014": 2640,
       "2015": 2124,
@@ -1787,25 +1790,25 @@
       "2023": 3971,
       "2024": 3279,
       "2025": 3354,
-      "2026": 3652
+      "2026": 3718
     },
-    "active_days": 4509
+    "active_days": 4515
   },
   "timezones": {
-    "+0000": 1125,
-    "+0100": 6154,
-    "+0200": 7783,
+    "+0000": 1128,
+    "+0100": 6165,
+    "+0200": 7785,
     "+0300": 1874,
     "+0330": 2,
     "+0400": 50,
     "+0430": 2,
     "+0500": 21,
-    "+0530": 173,
+    "+0530": 174,
     "+0545": 2,
     "+0600": 231,
     "+0700": 109,
-    "+0800": 8324,
-    "+0900": 974,
+    "+0800": 8342,
+    "+0900": 975,
     "+1000": 82,
     "+1100": 23,
     "+1200": 4,
@@ -1814,13 +1817,13 @@
     "-0230": 1,
     "-0300": 1183,
     "-0400": 4945,
-    "-0500": 3131,
+    "-0500": 3162,
     "-0600": 472,
     "-0700": 1286,
     "-0800": 616
   },
   "source_lines": {
-    "added": 3687000,
-    "current": 1710443
+    "added": 3693514,
+    "current": 1714274
   }
 }

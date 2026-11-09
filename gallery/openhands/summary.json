@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:58:35+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:10:21+00:00",
   "name": "OpenHands",
   "report_path": "index.html",
   "first_commit": "2024-03-13 03:36:30",
-  "last_commit": "2026-11-01 21:37:23",
-  "age_days": 964,
-  "active_days": 914,
-  "total_commits": 8841,
-  "total_authors": 580,
-  "active_authors_12mo": 211,
-  "commits_last_12mo": 3242,
-  "total_files": 2894,
-  "total_lines": 572708,
-  "lines_added": 2203554,
-  "lines_removed": 1630845,
-  "total_tags": 105,
+  "last_commit": "2026-11-09 00:12:46",
+  "age_days": 971,
+  "active_days": 922,
+  "total_commits": 8990,
+  "total_authors": 584,
+  "active_authors_12mo": 210,
+  "commits_last_12mo": 3391,
+  "total_files": 2935,
+  "total_lines": 593470,
+  "lines_added": 2260511,
+  "lines_removed": 1667040,
+  "total_tags": 109,
   "era": "peak",
   "top_authors": [
     {
-      "name": "Hiep Le",
-      "commits": 712
+      "name": "Hiep",
+      "commits": 719
     },
     {
       "name": "Tim O'Farrell",
-      "commits": 663
+      "commits": 664
     },
     {
       "name": "Xingyao Wang",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Engel Nyst",
-      "commits": 575
+      "commits": 611
     },
     {
       "name": "Robert Brennan",
@@ -41,36 +41,42 @@
     }
   ],
   "author_commits": {
-    "Alona": 115,
-    "Engel Nyst": 575,
-    "Rohit Malhotra": 521,
-    "Juan Pedro Michelini Jorge": 42,
+    "Juan Pedro Michelini Jorge": 43,
+    "phatloi0010": 1,
+    "Rajiv Shah": 2,
+    "Engel Nyst": 611,
+    "OpenHands Bot": 76,
+    "Alona": 144,
+    "simonrosenberg": 94,
+    "jpelletier1": 17,
+    "kuse": 1,
+    "Hiep": 719,
+    "Vasco Schiavo": 129,
+    "Graham Neubig": 498,
+    "John-Mason P. Shackelford": 23,
+    "Devin": 16,
+    "Sneha Pawar": 1,
+    "Henrique Hirako": 5,
+    "Harsh Kashyap": 9,
+    "\ud83d\udc3e smolpaws": 35,
+    "MindOfqc": 1,
+    "Rohit Malhotra": 523,
+    "Tim O'Farrell": 664,
     "Tanishq": 1,
-    "Vasco Schiavo": 120,
-    "OpenHands Bot": 66,
-    "simonrosenberg": 92,
     "Baruch Jacob Niebloom": 1,
-    "Graham Neubig": 495,
-    "Hiep Le": 712,
     "Brock Smickley": 1,
-    "Tim O'Farrell": 663,
     "Stochastic": 1,
     "Leizhen Zhang": 1,
-    "Harsh Kashyap": 8,
     "Liang Xu": 8,
     "Abhay Mishra": 8,
-    "Devin": 15,
     "Onat \u00d6zmen": 1,
     "OrangerXu": 1,
     "Nelson Spence": 4,
     "Irhas Abdul Rosyid": 2,
     "dymux": 1,
-    "John-Mason P. Shackelford": 22,
-    "\ud83d\udc3e smolpaws": 32,
     "FraterCCCLXIII": 35,
     "Artem Altukhov": 2,
     "Zihan Xu": 1,
-    "Henrique Hirako": 4,
     "Admin Cipansor": 1,
     "sk09-dev": 1,
     "amandhaw": 1,
@@ -117,7 +123,6 @@
     "lzhan011": 2,
     "LosAveRoad": 1,
     "Pranshul Soni": 1,
-    "jpelletier1": 16,
     "Prakhar Saini": 1,
     "aashikantkumar": 1,
     "Shashwat Pratap Singh": 3,
@@ -172,7 +177,6 @@
     "\u51af\u57fa\u9b41": 1,
     "Yufeng He": 1,
     "Calvin Smith": 43,
-    "Rajiv Shah": 1,
     "Ismail Zalim": 1,
     "Xingyao Wang": 642,
     "Jamie Chicago": 22,
@@ -625,14 +629,14 @@
   "commits_by_year": {
     "2024": 2995,
     "2025": 2790,
-    "2026": 3056
+    "2026": 3205
   },
   "ai_assisted": {
-    "commits": 2565,
+    "commits": 2608,
     "authored": 17,
     "assistants": {
-      "OpenHands": 2356,
-      "Claude": 195,
+      "OpenHands": 2388,
+      "Claude": 206,
       "Cursor": 38,
       "GitHub Copilot": 5,
       "Codex": 3,
@@ -664,7 +668,7 @@
       "2026-08": 63,
       "2026-09": 161,
       "2026-10": 161,
-      "2026-11": 1
+      "2026-11": 44
     },
     "commits_by_month": {
       "2024-12": 275,
@@ -690,30 +694,30 @@
       "2026-08": 179,
       "2026-09": 250,
       "2026-10": 454,
-      "2026-11": 14
+      "2026-11": 163
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8841,
+    "commits": 8990,
     "by_kind": {
-      "organization": 994,
-      "one_person": 1172,
-      "personal": 3290,
-      "hidden": 2262,
+      "organization": 1033,
+      "one_person": 1176,
+      "personal": 3339,
+      "hidden": 2283,
       "unknown": 0,
-      "bot": 1123
+      "bot": 1159
     },
     "organization_count": 1,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "openhands.dev",
-        "commits": 994,
-        "commits_last_12mo": 479,
+        "commits": 1033,
+        "commits_last_12mo": 518,
         "addresses": 11,
         "first_commit": "2024-08-28",
-        "last_commit": "2026-11-01"
+        "last_commit": "2026-11-07"
       }
     ],
     "quarters": {
@@ -774,58 +778,58 @@
         "bot": 88
       },
       "2026-Q4": {
-        "organization": 62,
-        "one_person": 30,
-        "personal": 274,
-        "hidden": 89,
+        "organization": 101,
+        "one_person": 34,
+        "personal": 323,
+        "hidden": 110,
         "unknown": 0,
-        "bot": 13
+        "bot": 49
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 3022,
-    "authors": 198,
-    "new_authors": 175,
+    "commits": 3135,
+    "authors": 202,
+    "new_authors": 179,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 7718,
+    "commits": 7831,
     "commits_by_year": {
       "2024": 2270,
       "2025": 2591,
-      "2026": 2857
+      "2026": 2970
     },
-    "active_days": 914
+    "active_days": 922
   },
   "timezones": {
-    "+0000": 424,
-    "+0100": 319,
+    "+0000": 429,
+    "+0100": 381,
     "+0200": 1100,
     "+0300": 104,
     "+0330": 4,
     "+0400": 388,
     "+0500": 3,
-    "+0530": 250,
+    "+0530": 252,
     "+0545": 5,
     "+0600": 1,
-    "+0700": 792,
-    "+0800": 765,
+    "+0700": 801,
+    "+0800": 767,
     "+0900": 54,
     "+1000": 2,
     "+1100": 2,
     "+1300": 1,
-    "-0300": 63,
+    "-0300": 64,
     "-0400": 2094,
-    "-0500": 1064,
-    "-0600": 545,
+    "-0500": 1129,
+    "-0600": 546,
     "-0700": 771,
-    "-0800": 90
+    "-0800": 92
   },
   "source_lines": {
-    "added": 1886525,
-    "current": 549188
+    "added": 1937249,
+    "current": 568294
   }
 }

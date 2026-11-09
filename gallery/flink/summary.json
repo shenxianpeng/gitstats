@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:02:49+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:14:26+00:00",
   "name": "Apache Flink",
   "report_path": "index.html",
   "first_commit": "2010-12-15 16:02:01",
-  "last_commit": "2026-10-31 19:15:38",
-  "age_days": 5800,
-  "active_days": 4892,
-  "total_commits": 38776,
-  "total_authors": 1747,
+  "last_commit": "2026-11-06 16:13:13",
+  "age_days": 5806,
+  "active_days": 4898,
+  "total_commits": 38812,
+  "total_authors": 1749,
   "active_authors_12mo": 176,
-  "commits_last_12mo": 1435,
-  "total_files": 27354,
-  "total_lines": 4059437,
-  "lines_added": 10679679,
-  "lines_removed": 6619484,
+  "commits_last_12mo": 1471,
+  "total_files": 27398,
+  "total_lines": 4071099,
+  "lines_added": 10692834,
+  "lines_removed": 6620977,
   "total_tags": 2,
   "era": "steady",
   "top_authors": [
@@ -41,19 +41,25 @@
     }
   ],
   "author_commits": {
-    "Sergey Nuyanzin": 618,
-    "Ramin Gharib": 104,
+    "Garvit Sharma": 1,
+    "Ramin Gharib": 114,
+    "Purushottam Sinha": 43,
+    "Anton Borisov": 1,
+    "Bonnie Varghese": 57,
+    "Yahya Kisana": 2,
+    "Sergey Nuyanzin": 632,
+    "Timo Theusner": 10,
+    "Arvind Kandpal": 4,
+    "Gabor Somogyi": 104,
+    "Joao Boto": 11,
+    "Sangkyoon Nam": 5,
     "Martijn Visser": 277,
     "Rakesh Kumar": 1,
-    "bvarghese1": 56,
-    "Purushottam Sinha": 41,
     "Robin Varghese": 1,
     "Jim Hughes": 48,
     "Rion Williams": 9,
     "Abhijeet Sharma": 1,
     "Piotr Nowojski": 778,
-    "Timo Theusner": 9,
-    "Sangkyoon Nam": 4,
     "Matt Belle": 2,
     "Hanyu (Peter) Zheng": 4,
     "Timo Walther": 1029,
@@ -67,7 +73,6 @@
     "Gustavo de Morais": 89,
     "wuyifan": 1,
     "Roc Marshal": 180,
-    "Yahya Kisana": 1,
     "Piotr Przybylski": 5,
     "bowenli86": 233,
     "Efrat Levitan": 22,
@@ -76,7 +81,6 @@
     "Muhammad Junaid Muzammil": 1,
     "florianvazelle": 7,
     "Isaac Montenegro Jimenez": 1,
-    "Gabor Somogyi": 103,
     "Liu Liu": 19,
     "Mohsen Rezaei": 3,
     "Victor Wang": 1,
@@ -164,7 +168,6 @@
     "sumin": 1,
     "nattilabalint": 1,
     "Dennis-Mircea Ciupitu": 7,
-    "Arvind Kandpal": 2,
     "SameerDevgon": 1,
     "jhanishant260": 1,
     "Dawid Wysakowicz": 783,
@@ -483,7 +486,6 @@
     "Akinfolami Akin-Alamu": 1,
     "baiwuchang": 1,
     "xuyu": 2,
-    "Joao Boto": 10,
     "cailiuyang": 2,
     "Bangui Dunn": 1,
     "Jia Liu": 2,
@@ -1806,13 +1808,13 @@
     "2023": 2085,
     "2024": 1658,
     "2025": 1064,
-    "2026": 1388
+    "2026": 1424
   },
   "ai_assisted": {
-    "commits": 223,
+    "commits": 242,
     "authored": 0,
     "assistants": {
-      "Claude": 202,
+      "Claude": 221,
       "ChatGPT": 19,
       "Codex": 16,
       "GitHub Copilot": 3,
@@ -1843,8 +1845,8 @@
       "2026-07": 51,
       "2026-08": 15,
       "2026-09": 46,
-      "2026-10": 70,
-      "2026-11": 0
+      "2026-10": 71,
+      "2026-11": 18
     },
     "commits_by_month": {
       "2024-12": 126,
@@ -1869,28 +1871,28 @@
       "2026-07": 205,
       "2026-08": 121,
       "2026-09": 161,
-      "2026-10": 189,
-      "2026-11": 0
+      "2026-10": 192,
+      "2026-11": 33
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38776,
+    "commits": 38812,
     "by_kind": {
-      "organization": 20785,
-      "one_person": 1250,
-      "personal": 15482,
-      "hidden": 1130,
+      "organization": 20789,
+      "one_person": 1254,
+      "personal": 15507,
+      "hidden": 1133,
       "unknown": 113,
       "bot": 16
     },
     "organization_count": 66,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "apache.org",
         "commits": 12617,
-        "commits_last_12mo": 130,
+        "commits_last_12mo": 107,
         "addresses": 85,
         "first_commit": "2012-05-11",
         "last_commit": "2026-10-29"
@@ -1906,7 +1908,7 @@
       {
         "organization": "alibaba-inc.com",
         "commits": 927,
-        "commits_last_12mo": 4,
+        "commits_last_12mo": 3,
         "addresses": 55,
         "first_commit": "2016-02-28",
         "last_commit": "2026-09-18"
@@ -1937,11 +1939,11 @@
       },
       {
         "organization": "confluent.io",
-        "commits": 483,
-        "commits_last_12mo": 208,
+        "commits": 486,
+        "commits_last_12mo": 206,
         "addresses": 29,
         "first_commit": "2023-01-11",
-        "last_commit": "2026-10-30"
+        "last_commit": "2026-11-06"
       },
       {
         "organization": "aiven.io",
@@ -1977,11 +1979,11 @@
       },
       {
         "organization": "apple.com",
-        "commits": 128,
-        "commits_last_12mo": 32,
+        "commits": 129,
+        "commits_last_12mo": 33,
         "addresses": 11,
         "first_commit": "2022-04-04",
-        "last_commit": "2026-10-20"
+        "last_commit": "2026-11-03"
       },
       {
         "organization": "amazon.com",
@@ -1994,7 +1996,7 @@
       {
         "organization": "uber.com",
         "commits": 74,
-        "commits_last_12mo": 1,
+        "commits_last_12mo": 0,
         "addresses": 11,
         "first_commit": "2017-04-21",
         "last_commit": "2025-11-18"
@@ -2474,25 +2476,25 @@
         "bot": 2
       },
       "2026-Q4": {
-        "organization": 45,
-        "one_person": 10,
-        "personal": 92,
-        "hidden": 41,
+        "organization": 49,
+        "one_person": 14,
+        "personal": 117,
+        "hidden": 44,
         "unknown": 0,
         "bot": 1
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 1518,
-    "authors": 176,
-    "new_authors": 97,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 1468,
+    "authors": 170,
+    "new_authors": 96,
     "half_of_commits": 8
   },
   "humans": {
-    "commits": 38760,
+    "commits": 38796,
     "commits_by_year": {
       "2010": 37,
       "2011": 1880,
@@ -2510,23 +2512,23 @@
       "2023": 2080,
       "2024": 1658,
       "2025": 1064,
-      "2026": 1385
+      "2026": 1421
     },
-    "active_days": 4891
+    "active_days": 4897
   },
   "timezones": {
-    "+0000": 302,
-    "+0100": 10212,
+    "+0000": 304,
+    "+0100": 10238,
     "+0200": 13542,
     "+0300": 210,
     "+0400": 28,
     "+0430": 1,
-    "+0530": 253,
+    "+0530": 258,
     "+0545": 1,
     "+0600": 1,
     "+0700": 31,
     "+0800": 12092,
-    "+0900": 93,
+    "+0900": 94,
     "+1000": 3,
     "+1100": 2,
     "+1200": 2,
@@ -2535,13 +2537,13 @@
     "-0300": 3,
     "-0400": 334,
     "-0500": 302,
-    "-0600": 128,
+    "-0600": 129,
     "-0700": 840,
-    "-0800": 393,
+    "-0800": 394,
     "-1000": 1
   },
   "source_lines": {
-    "added": 11380041,
-    "current": 4039684
+    "added": 11393196,
+    "current": 4051346
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:04:16+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:16:02+00:00",
   "name": "React",
   "report_path": "index.html",
   "first_commit": "2013-05-28 17:04:45",
-  "last_commit": "2026-10-31 13:54:20",
-  "age_days": 4904,
-  "active_days": 3817,
-  "total_commits": 21757,
+  "last_commit": "2026-11-06 19:43:46",
+  "age_days": 4911,
+  "active_days": 3819,
+  "total_commits": 21761,
   "total_authors": 1938,
-  "active_authors_12mo": 102,
-  "commits_last_12mo": 545,
+  "active_authors_12mo": 99,
+  "commits_last_12mo": 549,
   "total_files": 7300,
-  "total_lines": 1174823,
-  "lines_added": 3049076,
-  "lines_removed": 1871330,
+  "total_lines": 1175233,
+  "lines_added": 3049566,
+  "lines_removed": 1871410,
   "total_tags": 73,
   "era": "quiet",
   "top_authors": [
@@ -37,16 +37,17 @@
     },
     {
       "name": "Andrew Clark",
-      "commits": 1439
+      "commits": 1440
     }
   ],
   "author_commits": {
+    "Andrew Clark": 1440,
+    "Hendrik Liebau": 70,
+    "Jan Kassens": 349,
     "Ruslan Lesiutin": 293,
     "Sebastian \"Sebbie\" Silbermann": 480,
     "Xinzi Zhou": 2,
-    "Jan Kassens": 347,
     "Jack Pope": 147,
-    "Andrew Clark": 1439,
     "magic-akari": 1,
     "Sophie Alpert": 1303,
     "Lazizbek Ergashev": 4,
@@ -54,7 +55,6 @@
     "Cheng": 3,
     "The number one sword cultivator in the south of the sky": 4,
     "Gourav Kumar Dhiman": 2,
-    "Hendrik Liebau": 69,
     "Josh Story": 260,
     "Minho Yoo": 2,
     "\u8d64\u5742\u7406\u5b50": 1,
@@ -1994,7 +1994,7 @@
     "2023": 1955,
     "2024": 2173,
     "2025": 1434,
-    "2026": 506
+    "2026": 510
   },
   "ai_assisted": {
     "commits": 39,
@@ -2054,35 +2054,35 @@
       "2026-08": 45,
       "2026-09": 48,
       "2026-10": 48,
-      "2026-11": 0
+      "2026-11": 4
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 21757,
+    "commits": 21761,
     "by_kind": {
-      "organization": 4454,
-      "one_person": 7598,
+      "organization": 4456,
+      "one_person": 7600,
       "personal": 7357,
       "hidden": 2243,
       "unknown": 7,
       "bot": 98
     },
     "organization_count": 13,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "meta.com",
-        "commits": 4092,
-        "commits_last_12mo": 12,
+        "commits": 4094,
+        "commits_last_12mo": 13,
         "addresses": 75,
         "first_commit": "2013-06-03",
-        "last_commit": "2026-10-30"
+        "last_commit": "2026-11-05"
       },
       {
         "organization": "vercel.com",
         "commits": 295,
-        "commits_last_12mo": 137,
+        "commits_last_12mo": 123,
         "addresses": 5,
         "first_commit": "2023-05-03",
         "last_commit": "2026-10-31"
@@ -2234,8 +2234,8 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 7,
-        "one_person": 13,
+        "organization": 9,
+        "one_person": 15,
         "personal": 24,
         "hidden": 4,
         "unknown": 0,
@@ -2244,15 +2244,15 @@
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 622,
-    "authors": 102,
-    "new_authors": 67,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 545,
+    "authors": 97,
+    "new_authors": 64,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 21659,
+    "commits": 21663,
     "commits_by_year": {
       "2013": 1412,
       "2014": 1946,
@@ -2267,13 +2267,13 @@
       "2023": 1938,
       "2024": 2146,
       "2025": 1432,
-      "2026": 502
+      "2026": 506
     },
-    "active_days": 3817
+    "active_days": 3819
   },
   "timezones": {
     "+0000": 1290,
-    "+0100": 2410,
+    "+0100": 2411,
     "+0200": 912,
     "+0300": 233,
     "+0330": 8,
@@ -2294,7 +2294,7 @@
     "-0200": 34,
     "-0300": 71,
     "-0400": 3451,
-    "-0500": 1691,
+    "-0500": 1694,
     "-0600": 265,
     "-0700": 6967,
     "-0800": 3326,
@@ -2302,7 +2302,7 @@
     "-1100": 1
   },
   "source_lines": {
-    "added": 2293566,
-    "current": 801552
+    "added": 2294037,
+    "current": 801959
   }
 }

@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:12:17+00:00",
+  "generated_by": "gitstats dev",
+  "generated_at": "2026-11-09T05:23:53+00:00",
   "ecosystem": {
     "id": "china",
     "name": "Open source from China",
@@ -44,10 +44,10 @@
         "ai_assisted": 138,
         "share": 0.4525
       },
-      "commits_last_12mo": 762,
+      "commits_last_12mo": 770,
       "active_authors_12mo": 86,
       "health": "steady",
-      "last_commit": "2026-10-29",
+      "last_commit": "2026-11-05",
       "assistants": [
         "Claude",
         "Codex",
@@ -82,32 +82,6 @@
     },
     {
       "rank": 3,
-      "id": "ant-design",
-      "name": "Ant Design",
-      "repository": "ant-design/ant-design",
-      "report": "../ant-design/",
-      "quarter": {
-        "commits": 527,
-        "ai_assisted": 32,
-        "share": 0.0607
-      },
-      "previous_quarter": {
-        "commits": 685,
-        "ai_assisted": 92,
-        "share": 0.1343
-      },
-      "commits_last_12mo": 2138,
-      "active_authors_12mo": 195,
-      "health": "steady",
-      "last_commit": "2026-11-01",
-      "assistants": [
-        "Gemini",
-        "Claude",
-        "GitHub Copilot"
-      ]
-    },
-    {
-      "rank": 4,
       "id": "kubeedge",
       "name": "KubeEdge",
       "repository": "kubeedge/kubeedge",
@@ -123,12 +97,38 @@
         "share": 0.0
       },
       "commits_last_12mo": 274,
-      "active_authors_12mo": 43,
+      "active_authors_12mo": 42,
       "health": "steady",
       "last_commit": "2026-10-29",
       "assistants": [
         "GitHub Copilot",
         "Claude"
+      ]
+    },
+    {
+      "rank": 4,
+      "id": "ant-design",
+      "name": "Ant Design",
+      "repository": "ant-design/ant-design",
+      "report": "../ant-design/",
+      "quarter": {
+        "commits": 605,
+        "ai_assisted": 33,
+        "share": 0.0545
+      },
+      "previous_quarter": {
+        "commits": 685,
+        "ai_assisted": 92,
+        "share": 0.1343
+      },
+      "commits_last_12mo": 2303,
+      "active_authors_12mo": 194,
+      "health": "steady",
+      "last_commit": "2026-11-09",
+      "assistants": [
+        "Gemini",
+        "Claude",
+        "GitHub Copilot"
       ]
     },
     {
@@ -147,10 +147,10 @@
         "ai_assisted": 100,
         "share": 0.0962
       },
-      "commits_last_12mo": 4244,
+      "commits_last_12mo": 4373,
       "active_authors_12mo": 167,
       "health": "steady",
-      "last_commit": "2026-11-02",
+      "last_commit": "2026-11-07",
       "assistants": [
         "Claude",
         "GitHub Copilot",
@@ -173,13 +173,13 @@
         "ai_assisted": 47,
         "share": 0.1227
       },
-      "commits_last_12mo": 1741,
-      "active_authors_12mo": 186,
+      "commits_last_12mo": 1750,
+      "active_authors_12mo": 180,
       "health": "quiet",
-      "last_commit": "2026-10-30",
+      "last_commit": "2026-11-05",
       "assistants": [
-        "GitHub Copilot",
         "Claude",
+        "GitHub Copilot",
         "Codex"
       ]
     },
@@ -199,10 +199,10 @@
         "ai_assisted": 6,
         "share": 0.069
       },
-      "commits_last_12mo": 292,
+      "commits_last_12mo": 294,
       "active_authors_12mo": 64,
       "health": "steady",
-      "last_commit": "2026-10-27",
+      "last_commit": "2026-11-09",
       "assistants": [
         "Claude",
         "Cursor"
@@ -225,7 +225,7 @@
         "share": 0.0027
       },
       "commits_last_12mo": 15145,
-      "active_authors_12mo": 497,
+      "active_authors_12mo": 490,
       "health": "steady",
       "last_commit": "2026-10-07",
       "assistants": [
@@ -273,13 +273,14 @@
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 2705,
-      "active_authors_12mo": 67,
+      "commits_last_12mo": 2742,
+      "active_authors_12mo": 68,
       "health": "steady",
-      "last_commit": "2026-11-02",
+      "last_commit": "2026-11-08",
       "assistants": [
         "Claude",
-        "GitHub Copilot"
+        "ChatGPT",
+        "Codex"
       ]
     },
     {
@@ -298,10 +299,10 @@
         "ai_assisted": 1,
         "share": 0.0036
       },
-      "commits_last_12mo": 630,
-      "active_authors_12mo": 60,
+      "commits_last_12mo": 647,
+      "active_authors_12mo": 59,
       "health": "steady",
-      "last_commit": "2026-11-02",
+      "last_commit": "2026-11-09",
       "assistants": [
         "Claude"
       ]
@@ -322,10 +323,10 @@
         "ai_assisted": 0,
         "share": 0.0
       },
-      "commits_last_12mo": 327,
-      "active_authors_12mo": 72,
+      "commits_last_12mo": 332,
+      "active_authors_12mo": 73,
       "health": "quiet",
-      "last_commit": "2026-11-02",
+      "last_commit": "2026-11-07",
       "assistants": [
         "GitHub Copilot"
       ]
@@ -346,10 +347,10 @@
         "ai_assisted": 1,
         "share": 0.0104
       },
-      "commits_last_12mo": 274,
-      "active_authors_12mo": 26,
+      "commits_last_12mo": 285,
+      "active_authors_12mo": 27,
       "health": "steady",
-      "last_commit": "2026-11-02",
+      "last_commit": "2026-11-07",
       "assistants": [
         "Claude"
       ]
@@ -370,10 +371,10 @@
         "ai_assisted": 1,
         "share": 0.0127
       },
-      "commits_last_12mo": 315,
+      "commits_last_12mo": 318,
       "active_authors_12mo": 53,
       "health": "steady",
-      "last_commit": "2026-10-30",
+      "last_commit": "2026-11-09",
       "assistants": [
         "GitHub Copilot",
         "Claude"

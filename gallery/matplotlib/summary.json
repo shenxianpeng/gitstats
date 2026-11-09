@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:57:19+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:09:01+00:00",
   "name": "Matplotlib",
   "report_path": "index.html",
   "first_commit": "2003-05-12 15:20:38",
-  "last_commit": "2026-11-01 17:01:01",
-  "age_days": 8575,
-  "active_days": 7027,
-  "total_commits": 55606,
-  "total_authors": 1839,
-  "active_authors_12mo": 164,
-  "commits_last_12mo": 2009,
+  "last_commit": "2026-11-09 05:07:36",
+  "age_days": 8582,
+  "active_days": 7036,
+  "total_commits": 55630,
+  "total_authors": 1841,
+  "active_authors_12mo": 166,
+  "commits_last_12mo": 2033,
   "total_files": 4606,
-  "total_lines": 804057,
-  "lines_added": 1902721,
-  "lines_removed": 1333664,
+  "total_lines": 804120,
+  "lines_added": 1902940,
+  "lines_removed": 1333820,
   "total_tags": 142,
   "era": "steady",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "Tim Hoffmann",
-      "commits": 4728
+      "commits": 4736
     },
     {
       "name": "Antony Lee",
@@ -41,15 +41,18 @@
     }
   ],
   "author_commits": {
-    "Ricci Adams": 71,
+    "Tim Hoffmann": 4736,
+    "Gabriel Luca": 5,
+    "Ricci Adams": 74,
+    "Monika Dvorackova": 1,
+    "Daniel Liu": 3,
+    "Jody Klymak": 2604,
     "Anu jangir": 2,
-    "Jody Klymak": 2599,
     "Melissa Weber Mendon\u00e7a": 51,
     "Thomas A Caswell": 6986,
-    "Gabriel Luca": 4,
     "msaimanish": 2,
-    "Tim Hoffmann": 4728,
     "rahulgupta": 1,
+    "mansi tomar": 2,
     "Kyle Sunden": 1084,
     "Elliott Sales de Andrade": 6028,
     "Christian Aurich Zanettini Martins": 2,
@@ -67,7 +70,6 @@
     "Qianye Su": 3,
     "Ahmed Mohamed": 5,
     "Leon White": 1,
-    "Daniel Liu": 2,
     "Eric Larson": 50,
     "Scott Shambaugh": 226,
     "Antony Lee": 4514,
@@ -1905,7 +1907,7 @@
     "2023": 3663,
     "2024": 2333,
     "2025": 1843,
-    "2026": 1909
+    "2026": 1933
   },
   "ai_assisted": {
     "commits": 9,
@@ -1965,20 +1967,20 @@
       "2026-07": 199,
       "2026-08": 135,
       "2026-09": 177,
-      "2026-10": 158,
-      "2026-11": 1
+      "2026-10": 165,
+      "2026-11": 18
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 55606,
+    "commits": 55630,
     "by_kind": {
       "organization": 3510,
-      "one_person": 3209,
-      "personal": 42657,
-      "hidden": 6012,
+      "one_person": 3210,
+      "personal": 42666,
+      "hidden": 6023,
       "unknown": 78,
-      "bot": 140
+      "bot": 143
     },
     "organization_count": 61,
     "last_12mo_from": "2025-12",
@@ -2531,24 +2533,24 @@
       },
       "2026-Q4": {
         "organization": 3,
-        "one_person": 11,
-        "personal": 72,
-        "hidden": 69,
+        "one_person": 12,
+        "personal": 81,
+        "hidden": 80,
         "unknown": 0,
-        "bot": 4
+        "bot": 7
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1967,
-    "authors": 158,
-    "new_authors": 119,
+    "commits": 1988,
+    "authors": 160,
+    "new_authors": 121,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 55466,
+    "commits": 55487,
     "commits_by_year": {
       "2003": 88,
       "2004": 673,
@@ -2573,20 +2575,20 @@
       "2023": 3641,
       "2024": 2302,
       "2025": 1818,
-      "2026": 1868
+      "2026": 1889
     },
-    "active_days": 7024
+    "active_days": 7032
   },
   "timezones": {
-    "+0000": 8719,
-    "+0100": 7825,
+    "+0000": 8723,
+    "+0100": 7834,
     "+0200": 7428,
     "+0300": 561,
     "+0330": 3,
     "+0400": 13,
     "+0430": 4,
     "+0500": 12,
-    "+0530": 677,
+    "+0530": 679,
     "+0545": 7,
     "+0600": 9,
     "+0700": 5,
@@ -2601,16 +2603,16 @@
     "-0200": 1,
     "-0300": 111,
     "-0400": 12188,
-    "-0500": 7307,
+    "-0500": 7308,
     "-0600": 1536,
-    "-0700": 4975,
-    "-0800": 2507,
+    "-0700": 4980,
+    "-0800": 2510,
     "-0900": 1,
     "-1000": 954,
     "-1100": 2
   },
   "source_lines": {
-    "added": 2186317,
-    "current": 804018
+    "added": 2186567,
+    "current": 804081
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:00:18+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:12:04+00:00",
   "name": "LlamaIndex",
   "report_path": "index.html",
   "first_commit": "2022-11-02 04:25:10",
-  "last_commit": "2026-10-14 15:29:28",
-  "age_days": 1443,
-  "active_days": 1176,
-  "total_commits": 7962,
-  "total_authors": 1918,
-  "active_authors_12mo": 289,
-  "commits_last_12mo": 655,
+  "last_commit": "2026-11-08 21:41:55",
+  "age_days": 1468,
+  "active_days": 1178,
+  "total_commits": 7964,
+  "total_authors": 1919,
+  "active_authors_12mo": 285,
+  "commits_last_12mo": 657,
   "total_files": 9798,
   "total_lines": 4775455,
-  "lines_added": 13524442,
-  "lines_removed": 8748982,
+  "lines_added": 13524444,
+  "lines_removed": 8748984,
   "total_tags": 276,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,8 @@
     }
   ],
   "author_commits": {
+    "Dat Daryl Ngo": 2,
+    "Kevin Meyer": 1,
     "Gabby Ong": 1,
     "Matt": 32,
     "Ran Shemtov": 3,
@@ -71,7 +73,6 @@
     "LancyZhao": 1,
     "Ujjwal Rana": 1,
     "\u53f2\u542f\u660e\uff08QimingShi\uff09": 1,
-    "Dat Daryl Ngo": 1,
     "Mark McDonald": 8,
     "Ostap": 1,
     "Fernn": 1,
@@ -1965,13 +1966,13 @@
     "2023": 2382,
     "2024": 3281,
     "2025": 1564,
-    "2026": 600
+    "2026": 602
   },
   "ai_assisted": {
-    "commits": 14,
+    "commits": 15,
     "authored": 0,
     "assistants": {
-      "Claude": 12,
+      "Claude": 13,
       "Cursor": 2,
       "GitHub Copilot": 2
     },
@@ -1999,7 +2000,7 @@
       "2026-08": 0,
       "2026-09": 1,
       "2026-10": 0,
-      "2026-11": 0
+      "2026-11": 1
     },
     "commits_by_month": {
       "2024-12": 143,
@@ -2025,22 +2026,22 @@
       "2026-08": 46,
       "2026-09": 33,
       "2026-10": 11,
-      "2026-11": 0
+      "2026-11": 2
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7962,
+    "commits": 7964,
     "by_kind": {
       "organization": 211,
-      "one_person": 475,
+      "one_person": 476,
       "personal": 4693,
-      "hidden": 2058,
+      "hidden": 2059,
       "unknown": 0,
       "bot": 525
     },
     "organization_count": 23,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "intel.com",
@@ -2061,7 +2062,7 @@
       {
         "organization": "microsoft.com",
         "commits": 24,
-        "commits_last_12mo": 1,
+        "commits_last_12mo": 0,
         "addresses": 7,
         "first_commit": "2023-05-04",
         "last_commit": "2025-11-13"
@@ -2093,7 +2094,7 @@
       {
         "organization": "alibaba-inc.com",
         "commits": 9,
-        "commits_last_12mo": 1,
+        "commits_last_12mo": 0,
         "addresses": 5,
         "first_commit": "2024-06-26",
         "last_commit": "2025-11-27"
@@ -2286,36 +2287,36 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 1,
+        "one_person": 2,
         "personal": 5,
-        "hidden": 5,
+        "hidden": 6,
         "unknown": 0,
         "bot": 0
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 614,
-    "authors": 290,
-    "new_authors": 241,
-    "half_of_commits": 39
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 555,
+    "authors": 270,
+    "new_authors": 221,
+    "half_of_commits": 37
   },
   "humans": {
-    "commits": 7437,
+    "commits": 7439,
     "commits_by_year": {
       "2022": 135,
       "2023": 2378,
       "2024": 2890,
       "2025": 1529,
-      "2026": 505
+      "2026": 507
     },
-    "active_days": 1174
+    "active_days": 1176
   },
   "timezones": {
     "+0000": 98,
-    "+0100": 504,
+    "+0100": 505,
     "+0200": 579,
     "+0300": 181,
     "+0330": 7,
@@ -2335,14 +2336,14 @@
     "-0200": 1,
     "-0300": 104,
     "-0400": 588,
-    "-0500": 540,
+    "-0500": 541,
     "-0600": 1872,
     "-0700": 1193,
     "-0800": 814,
     "-1000": 1
   },
   "source_lines": {
-    "added": 3179271,
+    "added": 3179273,
     "current": 1810375
   }
 }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:05:14+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:17:38+00:00",
   "name": "Apache ShardingSphere",
   "report_path": "index.html",
   "first_commit": "2016-01-18 12:49:26",
-  "last_commit": "2026-11-02 03:03:34",
-  "age_days": 3941,
-  "active_days": 3433,
-  "total_commits": 50111,
-  "total_authors": 738,
-  "active_authors_12mo": 67,
-  "commits_last_12mo": 2705,
-  "total_files": 17872,
-  "total_lines": 1519307,
-  "lines_added": 4827383,
-  "lines_removed": 3308300,
+  "last_commit": "2026-11-08 14:55:54",
+  "age_days": 3948,
+  "active_days": 3439,
+  "total_commits": 50148,
+  "total_authors": 740,
+  "active_authors_12mo": 68,
+  "commits_last_12mo": 2742,
+  "total_files": 17446,
+  "total_lines": 1491760,
+  "lines_added": 4836598,
+  "lines_removed": 3344577,
   "total_tags": 37,
   "era": "steady",
   "top_authors": [
     {
       "name": "Liang Zhang",
-      "commits": 18897
+      "commits": 18924
     },
     {
       "name": "Juan Pan(Trista)",
@@ -37,17 +37,20 @@
     },
     {
       "name": "Zhengqiang Duan",
-      "commits": 1572
+      "commits": 1573
     }
   ],
   "author_commits": {
-    "Hongsheng Zhong": 731,
-    "Liang Zhang": 18897,
+    "Liang Zhang": 18924,
+    "ZIHAN DAI": 13,
+    "Hongsheng Zhong": 735,
+    "Raigor": 505,
+    "Mohd Irshad": 1,
+    "Reassoonn": 1,
+    "Zhengqiang Duan": 1573,
     "Eunbin Son": 58,
     "jingouzhui": 1,
     "ZhangCheng": 542,
-    "Zhengqiang Duan": 1572,
-    "Raigor": 503,
     "Claire": 73,
     "Divyansh Yadav": 3,
     "LiuYC3213687107": 1,
@@ -59,7 +62,6 @@
     "Zhicheng Lin": 1,
     "cangen185-sudo": 1,
     "Gimin Kim": 6,
-    "ZIHAN DAI": 12,
     "Arvin": 1,
     "Hariom Lokhande": 4,
     "Haoran Meng": 1117,
@@ -791,13 +793,15 @@
     "2023": 4028,
     "2024": 3620,
     "2025": 2956,
-    "2026": 2399
+    "2026": 2436
   },
   "ai_assisted": {
-    "commits": 62,
+    "commits": 63,
     "authored": 0,
     "assistants": {
       "Claude": 61,
+      "ChatGPT": 1,
+      "Codex": 1,
       "GitHub Copilot": 1
     },
     "by_month": {
@@ -824,7 +828,7 @@
       "2026-08": 0,
       "2026-09": 1,
       "2026-10": 4,
-      "2026-11": 0
+      "2026-11": 1
     },
     "commits_by_month": {
       "2024-12": 299,
@@ -850,17 +854,17 @@
       "2026-08": 339,
       "2026-09": 298,
       "2026-10": 295,
-      "2026-11": 8
+      "2026-11": 45
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 50111,
+    "commits": 50148,
     "by_kind": {
-      "organization": 15848,
+      "organization": 15880,
       "one_person": 526,
-      "personal": 30563,
-      "hidden": 3082,
+      "personal": 30566,
+      "hidden": 3084,
       "unknown": 71,
       "bot": 21
     },
@@ -869,11 +873,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 15383,
-        "commits_last_12mo": 2056,
+        "commits": 15415,
+        "commits_last_12mo": 2088,
         "addresses": 21,
         "first_commit": "2018-03-02",
-        "last_commit": "2026-11-02"
+        "last_commit": "2026-11-08"
       },
       {
         "organization": "huobi.com",
@@ -974,10 +978,10 @@
         "bot": 4
       },
       "2026-Q4": {
-        "organization": 241,
+        "organization": 273,
         "one_person": 0,
-        "personal": 14,
-        "hidden": 48,
+        "personal": 17,
+        "hidden": 50,
         "unknown": 0,
         "bot": 0
       }
@@ -986,13 +990,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2699,
-    "authors": 62,
-    "new_authors": 43,
+    "commits": 2736,
+    "authors": 64,
+    "new_authors": 45,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 50090,
+    "commits": 50127,
     "commits_by_year": {
       "2016": 399,
       "2017": 2025,
@@ -1004,9 +1008,9 @@
       "2023": 4025,
       "2024": 3617,
       "2025": 2953,
-      "2026": 2393
+      "2026": 2430
     },
-    "active_days": 3433
+    "active_days": 3439
   },
   "timezones": {
     "+0000": 14,
@@ -1014,13 +1018,13 @@
     "+0200": 65,
     "+0300": 72,
     "+0400": 2,
-    "+0530": 481,
+    "+0530": 482,
     "+0600": 1,
     "+0700": 49,
-    "+0800": 48785,
+    "+0800": 48820,
     "+0900": 106,
     "+1000": 8,
-    "+1100": 5,
+    "+1100": 6,
     "+1200": 32,
     "+1300": 190,
     "-0300": 7,
@@ -1031,7 +1035,7 @@
     "-0800": 10
   },
   "source_lines": {
-    "added": 6605214,
-    "current": 1518826
+    "added": 6614429,
+    "current": 1491365
   }
 }

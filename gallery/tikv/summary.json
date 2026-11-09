@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:01:49+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:13:50+00:00",
   "name": "TiKV",
   "report_path": "index.html",
   "first_commit": "2016-01-07 05:02:04",
-  "last_commit": "2026-11-02 03:16:44",
-  "age_days": 3952,
-  "active_days": 2604,
-  "total_commits": 8546,
+  "last_commit": "2026-11-06 08:33:00",
+  "age_days": 3957,
+  "active_days": 2608,
+  "total_commits": 8551,
   "total_authors": 476,
-  "active_authors_12mo": 70,
-  "commits_last_12mo": 215,
+  "active_authors_12mo": 68,
+  "commits_last_12mo": 220,
   "total_files": 1552,
-  "total_lines": 851467,
-  "lines_added": 1602586,
-  "lines_removed": 751113,
+  "total_lines": 853186,
+  "lines_added": 1604365,
+  "lines_removed": 751173,
   "total_tags": 47,
   "era": "quiet",
   "top_authors": [
@@ -41,14 +41,16 @@
     }
   ],
   "author_commits": {
+    "Juncen Yu": 5,
+    "lucasliang": 122,
+    "lhy1024": 45,
+    "mittalrishabh": 14,
+    "Madhav Ramesh": 3,
     "Bisheng Huang": 35,
-    "Madhav Ramesh": 2,
     "Pujitha Paladugu": 1,
     "Ray Yan": 1,
-    "lucasliang": 121,
     "Neil Shen": 504,
     "YangKeao": 28,
-    "mittalrishabh": 13,
     "Vlad Dmitriev": 5,
     "Sanket Kedia": 2,
     "ris": 7,
@@ -64,7 +66,6 @@
     "Otto Westerlund": 2,
     "Ti Chi Robot": 21,
     "Jiong": 1,
-    "lhy1024": 44,
     "Paulo Cabral Sanz": 4,
     "disksing": 286,
     "nhsmw": 3,
@@ -82,7 +83,6 @@
     "hujiatao": 6,
     "xufei": 3,
     "JmPotato": 57,
-    "Juncen Yu": 4,
     "Yishuai Li": 1,
     "Debin": 4,
     "Zier": 1,
@@ -529,7 +529,7 @@
     "2023": 642,
     "2024": 509,
     "2025": 253,
-    "2026": 195
+    "2026": 200
   },
   "ai_assisted": {
     "commits": 4,
@@ -588,16 +588,16 @@
       "2026-08": 35,
       "2026-09": 12,
       "2026-10": 19,
-      "2026-11": 1
+      "2026-11": 6
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8546,
+    "commits": 8551,
     "by_kind": {
-      "organization": 1003,
+      "organization": 1004,
       "one_person": 743,
-      "personal": 5340,
+      "personal": 5344,
       "hidden": 1408,
       "unknown": 4,
       "bot": 48
@@ -607,11 +607,11 @@
     "top": [
       {
         "organization": "pingcap.com",
-        "commits": 944,
-        "commits_last_12mo": 14,
+        "commits": 945,
+        "commits_last_12mo": 15,
         "addresses": 38,
         "first_commit": "2016-05-24",
-        "last_commit": "2026-08-14"
+        "last_commit": "2026-11-06"
       },
       {
         "organization": "hoverbear.org",
@@ -696,9 +696,9 @@
         "bot": 2
       },
       "2026-Q4": {
-        "organization": 0,
+        "organization": 1,
         "one_person": 1,
-        "personal": 18,
+        "personal": 22,
         "hidden": 1,
         "unknown": 0,
         "bot": 0
@@ -708,13 +708,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 215,
+    "commits": 220,
     "authors": 67,
     "new_authors": 30,
     "half_of_commits": 11
   },
   "humans": {
-    "commits": 8498,
+    "commits": 8503,
     "commits_by_year": {
       "2016": 1887,
       "2017": 703,
@@ -726,9 +726,9 @@
       "2023": 642,
       "2024": 501,
       "2025": 247,
-      "2026": 188
+      "2026": 193
     },
-    "active_days": 2595
+    "active_days": 2599
   },
   "timezones": {
     "+0000": 9,
@@ -737,7 +737,7 @@
     "+0300": 5,
     "+0530": 26,
     "+0700": 4,
-    "+0800": 7683,
+    "+0800": 7686,
     "+0900": 26,
     "+1000": 1,
     "+1200": 27,
@@ -747,10 +747,10 @@
     "-0500": 173,
     "-0600": 58,
     "-0700": 295,
-    "-0800": 102
+    "-0800": 104
   },
   "source_lines": {
-    "added": 1586691,
-    "current": 841245
+    "added": 1588470,
+    "current": 842964
   }
 }

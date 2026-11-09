@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:04:24+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:16:35+00:00",
   "name": "webpack",
   "report_path": "index.html",
   "first_commit": "2012-03-10 12:11:23",
-  "last_commit": "2026-11-02 01:28:07",
-  "age_days": 5350,
-  "active_days": 3265,
-  "total_commits": 20303,
-  "total_authors": 933,
-  "active_authors_12mo": 46,
-  "commits_last_12mo": 2077,
-  "total_files": 22979,
-  "total_lines": 1093918,
-  "lines_added": 2176738,
-  "lines_removed": 1082624,
+  "last_commit": "2026-11-08 22:11:16",
+  "age_days": 5357,
+  "active_days": 3271,
+  "total_commits": 20425,
+  "total_authors": 935,
+  "active_authors_12mo": 48,
+  "commits_last_12mo": 2199,
+  "total_files": 45181,
+  "total_lines": 1369265,
+  "lines_added": 2584218,
+  "lines_removed": 1214578,
   "total_tags": 654,
   "era": "surge",
   "top_authors": [
@@ -24,8 +24,8 @@
       "commits": 9452
     },
     {
-      "name": "Alexander Akait",
-      "commits": 3164
+      "name": "Sebastian Beltran",
+      "commits": 3261
     },
     {
       "name": "Sean Larkin",
@@ -41,19 +41,21 @@
     }
   ],
   "author_commits": {
-    "Alexander Akait": 3164,
-    "hai-x": 222,
-    "Raj Aryan": 102,
-    "Xiao": 170,
+    "Sebastian Beltran": 3261,
+    "Raj Aryan": 108,
+    "faizan": 2,
+    "Xiao": 174,
+    "Aviv Keller": 31,
+    "hai-x": 223,
+    "bob": 2,
+    "Eshiv": 8,
+    "Victor Hugo Macedo Paes Leme": 1,
     "Fy": 15,
     "Lazizbek Ergashev": 3,
     "Siddharth S": 1,
-    "Eshiv": 6,
-    "Qingyuan Wang": 1,
     "Manit Roy": 1,
     "Even Stensberg": 41,
     "Avanti Konde": 1,
-    "Aviv Keller": 27,
     "Sean Larkin": 533,
     "Craigory Coppola": 1,
     "James Addison": 1,
@@ -990,13 +992,13 @@
     "2023": 1153,
     "2024": 1152,
     "2025": 681,
-    "2026": 2024
+    "2026": 2146
   },
   "ai_assisted": {
-    "commits": 296,
+    "commits": 346,
     "authored": 2,
     "assistants": {
-      "Claude": 285,
+      "Claude": 335,
       "CodeRabbit": 8,
       "GitHub Copilot": 4
     },
@@ -1024,7 +1026,7 @@
       "2026-08": 2,
       "2026-09": 30,
       "2026-10": 219,
-      "2026-11": 12
+      "2026-11": 62
     },
     "commits_by_month": {
       "2024-12": 25,
@@ -1050,19 +1052,19 @@
       "2026-08": 238,
       "2026-09": 383,
       "2026-10": 554,
-      "2026-11": 24
+      "2026-11": 146
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20303,
+    "commits": 20425,
     "by_kind": {
       "organization": 331,
-      "one_person": 1488,
-      "personal": 14256,
-      "hidden": 2597,
+      "one_person": 1492,
+      "personal": 14270,
+      "hidden": 2697,
       "unknown": 6,
-      "bot": 1625
+      "bot": 1629
     },
     "organization_count": 15,
     "last_12mo_from": "2025-12",
@@ -1247,24 +1249,24 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 1,
-        "personal": 66,
-        "hidden": 469,
+        "one_person": 5,
+        "personal": 80,
+        "hidden": 569,
         "unknown": 0,
-        "bot": 42
+        "bot": 46
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1841,
-    "authors": 45,
-    "new_authors": 34,
+    "commits": 1959,
+    "authors": 47,
+    "new_authors": 36,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 18678,
+    "commits": 18796,
     "commits_by_year": {
       "2012": 274,
       "2013": 306,
@@ -1280,36 +1282,36 @@
       "2023": 1088,
       "2024": 1053,
       "2025": 587,
-      "2026": 1801
+      "2026": 1919
     },
-    "active_days": 3133
+    "active_days": 3139
   },
   "timezones": {
     "+0000": 1407,
     "+0100": 4713,
     "+0200": 6308,
-    "+0300": 3943,
+    "+0300": 4036,
     "+0330": 1,
     "+0400": 38,
     "+0500": 7,
-    "+0530": 692,
+    "+0530": 702,
     "+0600": 1,
     "+0700": 56,
-    "+0800": 913,
+    "+0800": 919,
     "+0900": 100,
     "+1000": 81,
     "+1100": 334,
     "+1300": 2,
     "-0200": 5,
-    "-0300": 20,
+    "-0300": 21,
     "-0400": 224,
-    "-0500": 403,
+    "-0500": 415,
     "-0600": 221,
     "-0700": 628,
     "-0800": 206
   },
   "source_lines": {
-    "added": 1825084,
-    "current": 877025
+    "added": 1900744,
+    "current": 887431
   }
 }

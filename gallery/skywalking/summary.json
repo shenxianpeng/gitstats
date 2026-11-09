@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:04:39+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:16:52+00:00",
   "name": "Apache SkyWalking",
   "report_path": "index.html",
   "first_commit": "2015-11-07 03:30:37",
-  "last_commit": "2026-11-02 02:43:55",
-  "age_days": 4013,
-  "active_days": 2708,
-  "total_commits": 8661,
-  "total_authors": 516,
-  "active_authors_12mo": 26,
-  "commits_last_12mo": 274,
-  "total_files": 5637,
-  "total_lines": 612272,
-  "lines_added": 2379812,
-  "lines_removed": 1767382,
+  "last_commit": "2026-11-07 10:38:39",
+  "age_days": 4019,
+  "active_days": 2713,
+  "total_commits": 8672,
+  "total_authors": 517,
+  "active_authors_12mo": 27,
+  "commits_last_12mo": 285,
+  "total_files": 5646,
+  "total_lines": 615726,
+  "lines_added": 2383704,
+  "lines_removed": 1767820,
   "total_tags": 18,
   "era": "steady",
   "top_authors": [
     {
       "name": "\u5434\u665f Wu Sheng",
-      "commits": 3192
+      "commits": 3198
     },
     {
       "name": "\u5f6d\u52c7\u5347 pengys",
@@ -37,14 +37,15 @@
     },
     {
       "name": "Wan Kai",
-      "commits": 386
+      "commits": 388
     }
   ],
   "author_commits": {
-    "\u5434\u665f Wu Sheng": 3192,
+    "\u5434\u665f Wu Sheng": 3198,
+    "Wan Kai": 388,
+    "songzhendong": 25,
+    "Mohd Irshad": 1,
     "S1Jackson-cmd": 1,
-    "Wan Kai": 386,
-    "songzhendong": 23,
     "dennis zhuang": 1,
     "Leo Camus": 3,
     "kezhenxu94": 537,
@@ -570,13 +571,13 @@
     "2023": 409,
     "2024": 312,
     "2025": 232,
-    "2026": 263
+    "2026": 274
   },
   "ai_assisted": {
-    "commits": 2,
+    "commits": 3,
     "authored": 0,
     "assistants": {
-      "Claude": 2
+      "Claude": 3
     },
     "by_month": {
       "2024-12": 0,
@@ -602,7 +603,7 @@
       "2026-08": 0,
       "2026-09": 0,
       "2026-10": 0,
-      "2026-11": 1
+      "2026-11": 2
     },
     "commits_by_month": {
       "2024-12": 31,
@@ -628,17 +629,17 @@
       "2026-08": 18,
       "2026-09": 25,
       "2026-10": 36,
-      "2026-11": 3
+      "2026-11": 14
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8661,
+    "commits": 8672,
     "by_kind": {
       "organization": 778,
       "one_person": 262,
-      "personal": 7299,
-      "hidden": 314,
+      "personal": 7309,
+      "hidden": 315,
       "unknown": 8,
       "bot": 0
     },
@@ -722,8 +723,8 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 0,
-        "personal": 38,
-        "hidden": 1,
+        "personal": 48,
+        "hidden": 2,
         "unknown": 0,
         "bot": 0
       }
@@ -732,13 +733,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 274,
-    "authors": 25,
-    "new_authors": 15,
+    "commits": 285,
+    "authors": 26,
+    "new_authors": 16,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 8661,
+    "commits": 8672,
     "commits_by_year": {
       "2015": 301,
       "2016": 985,
@@ -751,9 +752,9 @@
       "2023": 409,
       "2024": 312,
       "2025": 232,
-      "2026": 263
+      "2026": 274
     },
-    "active_days": 2708
+    "active_days": 2713
   },
   "timezones": {
     "+0000": 23,
@@ -761,9 +762,9 @@
     "+0200": 21,
     "+0300": 12,
     "+0400": 16,
-    "+0530": 9,
+    "+0530": 10,
     "+0700": 11,
-    "+0800": 8290,
+    "+0800": 8300,
     "+0900": 23,
     "+1000": 1,
     "+1100": 3,
@@ -775,7 +776,7 @@
     "-0800": 10
   },
   "source_lines": {
-    "added": 2104806,
-    "current": 600526
+    "added": 2108698,
+    "current": 603980
   }
 }

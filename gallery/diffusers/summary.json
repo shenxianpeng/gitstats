@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:59:43+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:11:18+00:00",
   "name": "Diffusers",
   "report_path": "index.html",
   "first_commit": "2022-05-30 16:07:33",
-  "last_commit": "2026-10-31 05:12:14",
-  "age_days": 1615,
-  "active_days": 1318,
-  "total_commits": 7025,
-  "total_authors": 1151,
-  "active_authors_12mo": 218,
-  "commits_last_12mo": 998,
-  "total_files": 3013,
-  "total_lines": 1194403,
-  "lines_added": 1647229,
-  "lines_removed": 452779,
+  "last_commit": "2026-11-09 01:25:41",
+  "age_days": 1624,
+  "active_days": 1325,
+  "total_commits": 7044,
+  "total_authors": 1158,
+  "active_authors_12mo": 223,
+  "commits_last_12mo": 1017,
+  "total_files": 3043,
+  "total_lines": 1202681,
+  "lines_added": 1655809,
+  "lines_removed": 453081,
   "total_tags": 26,
   "era": "steady",
   "top_authors": [
     {
       "name": "Sayak Paul",
-      "commits": 1079
+      "commits": 1082
     },
     {
       "name": "Patrick von Platen",
@@ -37,20 +37,29 @@
     },
     {
       "name": "YiYi Xu",
-      "commits": 289
+      "commits": 294
     }
   ],
   "author_commits": {
+    "YiYi Xu": 294,
+    "Sayak Paul": 1082,
+    "sarankumar": 1,
+    "Jingya HUANG": 12,
+    "G\u00f6rkem G\u00fcl": 1,
+    "yzhautouskay": 10,
+    "Gorka Dab\u00f3": 2,
+    "mlzerotoheroyoutube": 1,
+    "Parth Vadera": 1,
+    "Mishig": 19,
+    "Raghul chandramouli": 1,
+    "Nils": 1,
+    "nvsm": 1,
     "kahlun": 1,
-    "YiYi Xu": 289,
     "Aloys Jehwin": 2,
     "Sylvan Liu": 1,
-    "Jingya HUANG": 11,
     "Dhruv Nair": 363,
-    "Sayak Paul": 1079,
     "Wang, Yi": 23,
     "Ziyu Lin": 1,
-    "Gorka Dab\u00f3": 1,
     "A-Raphie": 1,
     "Linoy Tsaban": 75,
     "Aayush D C Dangi": 1,
@@ -74,7 +83,6 @@
     "Steven Liu": 216,
     "naykun": 10,
     "Aritra Roy Gosthipaty": 9,
-    "yzhautouskay": 9,
     "TB": 1,
     "BeyondBirthday07": 1,
     "Pranav Negi": 1,
@@ -121,7 +129,6 @@
     "Cheung Ka Wai": 7,
     "tangyanf": 1,
     "TheLovesOfLadyPurple": 1,
-    "Mishig": 18,
     "GiGi Koneti": 2,
     "Zaid": 1,
     "Prakshaale Jain": 1,
@@ -1198,14 +1205,14 @@
     "2023": 1890,
     "2024": 1466,
     "2025": 1151,
-    "2026": 937
+    "2026": 956
   },
   "ai_assisted": {
-    "commits": 108,
+    "commits": 117,
     "authored": 0,
     "assistants": {
-      "Claude": 103,
-      "GitHub Copilot": 5
+      "Claude": 111,
+      "GitHub Copilot": 6
     },
     "by_month": {
       "2024-12": 0,
@@ -1231,7 +1238,7 @@
       "2026-08": 25,
       "2026-09": 15,
       "2026-10": 19,
-      "2026-11": 0
+      "2026-11": 9
     },
     "commits_by_month": {
       "2024-12": 184,
@@ -1257,22 +1264,22 @@
       "2026-08": 132,
       "2026-09": 64,
       "2026-10": 78,
-      "2026-11": 0
+      "2026-11": 19
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7025,
+    "commits": 7044,
     "by_kind": {
-      "organization": 816,
-      "one_person": 334,
-      "personal": 4270,
-      "hidden": 1584,
+      "organization": 817,
+      "one_person": 335,
+      "personal": 4282,
+      "hidden": 1589,
       "unknown": 1,
       "bot": 20
     },
     "organization_count": 15,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "huggingface.co",
@@ -1285,18 +1292,18 @@
       {
         "organization": "intel.com",
         "commits": 134,
-        "commits_last_12mo": 51,
+        "commits_last_12mo": 48,
         "addresses": 18,
         "first_commit": "2022-12-15",
         "last_commit": "2026-10-31"
       },
       {
         "organization": "nvidia.com",
-        "commits": 22,
-        "commits_last_12mo": 22,
+        "commits": 23,
+        "commits_last_12mo": 23,
         "addresses": 6,
         "first_commit": "2025-12-22",
-        "last_commit": "2026-10-02"
+        "last_commit": "2026-11-04"
       },
       {
         "organization": "berkeley.edu",
@@ -1453,43 +1460,43 @@
         "bot": 6
       },
       "2026-Q4": {
-        "organization": 10,
-        "one_person": 0,
-        "personal": 46,
-        "hidden": 22,
+        "organization": 11,
+        "one_person": 1,
+        "personal": 58,
+        "hidden": 27,
         "unknown": 0,
         "bot": 0
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 1062,
-    "authors": 218,
-    "new_authors": 165,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 1007,
+    "authors": 213,
+    "new_authors": 160,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 7005,
+    "commits": 7024,
     "commits_by_year": {
       "2022": 1581,
       "2023": 1889,
       "2024": 1462,
       "2025": 1146,
-      "2026": 927
+      "2026": 946
     },
-    "active_days": 1318
+    "active_days": 1325
   },
   "timezones": {
     "+0000": 394,
-    "+0100": 734,
+    "+0100": 739,
     "+0200": 1551,
-    "+0300": 253,
+    "+0300": 258,
     "+0330": 1,
     "+0400": 24,
     "+0500": 6,
-    "+0530": 1729,
+    "+0530": 1731,
     "+0545": 2,
     "+0700": 74,
     "+0800": 627,
@@ -1503,11 +1510,11 @@
     "-0500": 94,
     "-0600": 65,
     "-0700": 544,
-    "-0800": 237,
-    "-1000": 289
+    "-0800": 239,
+    "-1000": 294
   },
   "source_lines": {
-    "added": 1652024,
-    "current": 1194202
+    "added": 1660604,
+    "current": 1202480
   }
 }

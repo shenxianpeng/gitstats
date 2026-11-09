@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:59:12+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:11:05+00:00",
   "name": "Kilo Code",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-10-31 14:22:06",
-  "age_days": 589,
-  "active_days": 573,
-  "total_commits": 33984,
-  "total_authors": 1204,
-  "active_authors_12mo": 1001,
-  "commits_last_12mo": 29011,
-  "total_files": 11095,
-  "total_lines": 1931010,
-  "lines_added": 4278475,
-  "lines_removed": 2347471,
-  "total_tags": 254,
+  "last_commit": "2026-11-07 21:51:09",
+  "age_days": 597,
+  "active_days": 580,
+  "total_commits": 34199,
+  "total_authors": 1208,
+  "active_authors_12mo": 978,
+  "commits_last_12mo": 29226,
+  "total_files": 11253,
+  "total_lines": 1958227,
+  "lines_added": 4309909,
+  "lines_removed": 2351689,
+  "total_tags": 256,
   "era": "steady",
   "top_authors": [
     {
-      "name": "marius-kilocode",
-      "commits": 4375
+      "name": "Marius",
+      "commits": 4382
     },
     {
       "name": "Kirill Kalishev",
-      "commits": 2853
+      "commits": 2923
     },
     {
       "name": "Adam",
@@ -41,19 +41,23 @@
     }
   ],
   "author_commits": {
+    "Kirill Kalishev": 2923,
+    "Zeke Fralish": 50,
+    "Andrea Giammarchi": 272,
+    "Jeremy Odell": 2,
+    "gil-kilo": 3,
+    "Gil Sharon": 2,
+    "Marius": 4382,
+    "Evgeny Shurakov": 98,
     "Emilie Lima Schario": 85,
     "Mihaela Stoica": 5,
-    "Kirill Kalishev": 2853,
+    "Denis Dupeyron": 1,
     "Joshua Lambert": 298,
     "Josh Lambert": 396,
-    "Andrea Giammarchi": 203,
-    "Evgeny Shurakov": 92,
-    "Zeke Fralish": 48,
     "Igor \u0160\u0107eki\u0107": 531,
     "matt wilkie": 134,
     "Emilie Schario": 38,
-    "marius-kilocode": 4375,
-    "Christiaan Arnoldus": 480,
+    "Christiaan Arnoldus": 481,
     "arrrkady": 24,
     "Bruno Agat\u00e3o": 290,
     "Uddoo": 1,
@@ -65,6 +69,7 @@
     "Cathryn Lavery": 1,
     "default": 1,
     "Abdul Kanchwala": 4,
+    "Sylwester Liljegren": 68,
     "Suwanwa": 1,
     "Malykh Valentin": 2,
     "Maureen Murphy": 6,
@@ -72,7 +77,6 @@
     "Yash2017": 3,
     "Krishna": 3,
     "Iv\u00e1n Uruchurtu": 40,
-    "Sylwester Liljegren": 63,
     "Rakshith N": 58,
     "L4XB": 2,
     "Emmanuel Borja": 12,
@@ -1248,14 +1252,14 @@
   },
   "commits_by_year": {
     "2025": 6919,
-    "2026": 27065
+    "2026": 27280
   },
   "ai_assisted": {
-    "commits": 171,
+    "commits": 175,
     "authored": 2,
     "assistants": {
       "OpenCode": 77,
-      "Claude": 65,
+      "Claude": 69,
       "GitHub Copilot": 18,
       "Amp": 6,
       "Cursor": 5,
@@ -1285,7 +1289,7 @@
       "2026-07": 4,
       "2026-08": 6,
       "2026-09": 2,
-      "2026-10": 6,
+      "2026-10": 10,
       "2026-11": 0
     },
     "commits_by_month": {
@@ -1310,48 +1314,48 @@
       "2026-06": 3189,
       "2026-07": 2275,
       "2026-08": 2481,
-      "2026-09": 2285,
-      "2026-10": 1103,
-      "2026-11": 0
+      "2026-09": 2287,
+      "2026-10": 1140,
+      "2026-11": 176
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 33984,
+    "commits": 34199,
     "by_kind": {
-      "organization": 11882,
-      "one_person": 3075,
-      "personal": 9035,
-      "hidden": 5536,
+      "organization": 11963,
+      "one_person": 3082,
+      "personal": 9109,
+      "hidden": 5542,
       "unknown": 53,
-      "bot": 4403
+      "bot": 4450
     },
     "organization_count": 11,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "kilocode.ai",
-        "commits": 9496,
-        "commits_last_12mo": 9466,
+        "commits": 9558,
+        "commits_last_12mo": 9513,
         "addresses": 15,
         "first_commit": "2025-08-27",
-        "last_commit": "2026-10-29"
+        "last_commit": "2026-11-07"
       },
       {
         "organization": "sst.dev",
         "commits": 1027,
-        "commits_last_12mo": 543,
+        "commits_last_12mo": 381,
         "addresses": 2,
         "first_commit": "2025-05-23",
         "last_commit": "2026-09-01"
       },
       {
         "organization": "anaconda.com",
-        "commits": 653,
-        "commits_last_12mo": 653,
-        "addresses": 9,
+        "commits": 672,
+        "commits_last_12mo": 672,
+        "addresses": 11,
         "first_commit": "2026-07-21",
-        "last_commit": "2026-10-31"
+        "last_commit": "2026-11-07"
       },
       {
         "organization": "anoma.ly",
@@ -1396,7 +1400,7 @@
       {
         "organization": "neonronin.sh",
         "commits": 5,
-        "commits_last_12mo": 5,
+        "commits_last_12mo": 2,
         "addresses": 2,
         "first_commit": "2025-11-13",
         "last_commit": "2026-02-20"
@@ -1473,38 +1477,38 @@
         "personal": 739,
         "hidden": 766,
         "unknown": 5,
-        "bot": 761
+        "bot": 763
       },
       "2026-Q4": {
-        "organization": 488,
-        "one_person": 11,
-        "personal": 292,
-        "hidden": 195,
+        "organization": 569,
+        "one_person": 18,
+        "personal": 366,
+        "hidden": 201,
         "unknown": 15,
-        "bot": 102
+        "bot": 147
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 26792,
-    "authors": 1004,
-    "new_authors": 932,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 25792,
+    "authors": 919,
+    "new_authors": 834,
     "half_of_commits": 7
   },
   "humans": {
-    "commits": 29581,
+    "commits": 29749,
     "commits_by_year": {
       "2025": 6174,
-      "2026": 23407
+      "2026": 23575
     },
-    "active_days": 572
+    "active_days": 579
   },
   "timezones": {
-    "+0000": 5794,
-    "+0100": 3261,
-    "+0200": 7565,
+    "+0000": 5839,
+    "+0100": 3352,
+    "+0200": 7571,
     "+0300": 669,
     "+0330": 26,
     "+0400": 10,
@@ -1521,14 +1525,14 @@
     "+1300": 2,
     "-0300": 1066,
     "-0400": 7413,
-    "-0500": 3392,
-    "-0600": 2285,
+    "-0500": 3462,
+    "-0600": 2288,
     "-0700": 421,
     "-0800": 160,
     "-1000": 4
   },
   "source_lines": {
-    "added": 6649759,
-    "current": 1710693
+    "added": 6680745,
+    "current": 1737309
   }
 }

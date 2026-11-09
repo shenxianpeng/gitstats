@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:04:17+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:16:18+00:00",
   "name": "Apache Dubbo",
   "report_path": "index.html",
   "first_commit": "2011-10-20 15:04:29",
-  "last_commit": "2026-10-30 07:54:57",
-  "age_days": 5489,
-  "active_days": 2078,
-  "total_commits": 8926,
+  "last_commit": "2026-11-09 03:08:17",
+  "age_days": 5499,
+  "active_days": 2080,
+  "total_commits": 8929,
   "total_authors": 688,
   "active_authors_12mo": 53,
-  "commits_last_12mo": 315,
+  "commits_last_12mo": 318,
   "total_files": 4852,
   "total_lines": 522372,
-  "lines_added": 1334507,
-  "lines_removed": 812104,
+  "lines_added": 1334513,
+  "lines_removed": 812110,
   "total_tags": 74,
   "era": "steady",
   "top_authors": [
@@ -41,11 +41,12 @@
     }
   ],
   "author_commits": {
+    "Yukina": 20,
+    "Junpei Zhang": 2,
     "CCCLL": 3,
     "xiaobaicai66695": 2,
     "Kayokoi": 1,
     "binbin.zhang": 1,
-    "Junpei Zhang": 1,
     "SiriusTL666": 1,
     "\u7535\u5927\u8001baby": 1,
     "Elias\u4e0d\u5403\u7cd6": 1,
@@ -54,7 +55,6 @@
     "hickey-ai": 1,
     "Ken Liu": 1135,
     "ZhijieZheng": 1,
-    "Yukina": 18,
     "spud": 2,
     "Anon2Tokyo": 1,
     "\u6797\u6849": 1,
@@ -746,7 +746,7 @@
     "2023": 1468,
     "2024": 720,
     "2025": 456,
-    "2026": 234
+    "2026": 237
   },
   "ai_assisted": {
     "commits": 9,
@@ -805,22 +805,22 @@
       "2026-08": 6,
       "2026-09": 10,
       "2026-10": 17,
-      "2026-11": 0
+      "2026-11": 3
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8926,
+    "commits": 8929,
     "by_kind": {
-      "organization": 235,
+      "organization": 237,
       "one_person": 160,
-      "personal": 5262,
+      "personal": 5263,
       "hidden": 741,
       "unknown": 1424,
       "bot": 1104
     },
     "organization_count": 4,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "alibaba-inc.com",
@@ -832,11 +832,11 @@
       },
       {
         "organization": "apache.org",
-        "commits": 90,
-        "commits_last_12mo": 14,
+        "commits": 92,
+        "commits_last_12mo": 13,
         "addresses": 13,
         "first_commit": "2018-06-29",
-        "last_commit": "2026-09-15"
+        "last_commit": "2026-11-09"
       },
       {
         "organization": "xiaomi.com",
@@ -913,9 +913,9 @@
         "bot": 12
       },
       "2026-Q4": {
-        "organization": 0,
+        "organization": 2,
         "one_person": 1,
-        "personal": 13,
+        "personal": 14,
         "hidden": 3,
         "unknown": 0,
         "bot": 0
@@ -923,15 +923,15 @@
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 125,
-    "authors": 53,
-    "new_authors": 45,
-    "half_of_commits": 6
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 102,
+    "authors": 49,
+    "new_authors": 41,
+    "half_of_commits": 8
   },
   "humans": {
-    "commits": 7822,
+    "commits": 7825,
     "commits_by_year": {
       "2011": 565,
       "2012": 1200,
@@ -948,9 +948,9 @@
       "2023": 1047,
       "2024": 415,
       "2025": 233,
-      "2026": 86
+      "2026": 89
     },
-    "active_days": 2014
+    "active_days": 2016
   },
   "timezones": {
     "+0000": 1423,
@@ -960,7 +960,7 @@
     "+0400": 1,
     "+0530": 22,
     "+0600": 1,
-    "+0800": 7286,
+    "+0800": 7289,
     "+0900": 5,
     "-0300": 11,
     "-0400": 6,
@@ -970,7 +970,7 @@
     "-0800": 8
   },
   "source_lines": {
-    "added": 1526966,
+    "added": 1526972,
     "current": 522372
   }
 }

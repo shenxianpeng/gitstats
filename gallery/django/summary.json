@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:57:15+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:08:40+00:00",
   "name": "Django",
   "report_path": "index.html",
   "first_commit": "2005-07-13 01:25:57",
-  "last_commit": "2026-10-31 01:55:53",
-  "age_days": 7781,
-  "active_days": 6673,
-  "total_commits": 35078,
-  "total_authors": 3173,
-  "active_authors_12mo": 219,
-  "commits_last_12mo": 923,
-  "total_files": 7085,
-  "total_lines": 1120156,
-  "lines_added": 3419912,
-  "lines_removed": 2297595,
+  "last_commit": "2026-11-06 14:16:07",
+  "age_days": 7787,
+  "active_days": 6680,
+  "total_commits": 35105,
+  "total_authors": 3182,
+  "active_authors_12mo": 223,
+  "commits_last_12mo": 949,
+  "total_files": 7097,
+  "total_lines": 1121663,
+  "lines_added": 3422485,
+  "lines_removed": 2298661,
   "total_tags": 8,
   "era": "steady",
   "top_authors": [
@@ -41,9 +41,24 @@
     }
   ],
   "author_commits": {
-    "Natalia": 292,
-    "Mike Edmunds": 98,
-    "Jacob Walls": 435,
+    "Hossein": 1,
+    "kihuni": 3,
+    "Ines Besrour": 1,
+    "Kunal Kumar": 2,
+    "Ryan Hiebert": 4,
+    "Dmitri Leiko": 1,
+    "Jacob Walls": 441,
+    "Sahil Advani": 1,
+    "Mike Edmunds": 100,
+    "ShabirAhmadLinux": 1,
+    "Fran\u00e7ois Freitag": 75,
+    "Jake Howard": 31,
+    "Natalia": 294,
+    "Andrew James Gonzalez": 1,
+    "David Smith": 207,
+    "Sarah Boyce": 217,
+    "Namraa Patel": 1,
+    "himanshu": 1,
     "HelmiDev03": 3,
     "=?UTF-8?q?Anders=20Hovm=C3=B6ller?=": 5,
     "Alex Henman": 1,
@@ -56,7 +71,6 @@
     "Jacob Rief": 8,
     "Gerry Mcbride": 1,
     "Sanskar Kharya": 1,
-    "Sarah Boyce": 216,
     "Adam Johnson": 355,
     "Clifford Gama": 79,
     "Aman Kumar Jain": 1,
@@ -74,7 +88,6 @@
     "Yassin Bahri": 7,
     "Md. Saikat Islam": 3,
     "SnippyCodes": 11,
-    "David Smith": 206,
     "VIZZARD-X": 18,
     "Becky Smith": 2,
     "Juliana Nicacio": 1,
@@ -148,7 +161,6 @@
     "Karolis Ryselis": 1,
     "jodizzle": 1,
     "wesley": 1,
-    "Jake Howard": 30,
     "Paul McMillan": 56,
     "Lier0102": 1,
     "Chris Rose": 2,
@@ -262,7 +274,6 @@
     "Bruno Alla": 9,
     "Cha Hwa Young": 1,
     "Chris Wesseling": 1,
-    "kihuni": 1,
     "Storm B. Heg": 1,
     "farthestmage": 1,
     "Georgi Yanchev": 6,
@@ -499,7 +510,6 @@
     "\u3044\u3002": 1,
     "Willem Van Onsem": 4,
     "Berker Peksag": 71,
-    "Ryan Hiebert": 3,
     "Jonny Park": 4,
     "Joachim Jablon": 8,
     "ZeyadMoustafaKamal": 1,
@@ -634,7 +644,6 @@
     "Oguzhan Akan": 1,
     "Maxime Toussaint": 1,
     "Jeremy Nauta": 1,
-    "Fran\u00e7ois Freitag": 74,
     "tell-k": 2,
     "willzhao": 1,
     "John Whitman": 1,
@@ -3236,8 +3245,8 @@
     "2022": 963,
     "2023": 952,
     "2024": 939,
-    "2025": 954,
-    "2026": 855
+    "2025": 955,
+    "2026": 881
   },
   "ai_assisted": {
     "commits": 0,
@@ -3271,7 +3280,7 @@
     },
     "commits_by_month": {
       "2024-12": 102,
-      "2025-01": 109,
+      "2025-01": 110,
       "2025-02": 66,
       "2025-03": 80,
       "2025-04": 71,
@@ -3290,30 +3299,30 @@
       "2026-05": 102,
       "2026-06": 98,
       "2026-07": 81,
-      "2026-08": 59,
-      "2026-09": 61,
-      "2026-10": 85,
-      "2026-11": 0
+      "2026-08": 60,
+      "2026-09": 62,
+      "2026-10": 95,
+      "2026-11": 14
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 35078,
+    "commits": 35105,
     "by_kind": {
       "organization": 926,
-      "one_person": 13553,
-      "personal": 19385,
-      "hidden": 1175,
+      "one_person": 13557,
+      "personal": 19405,
+      "hidden": 1178,
       "unknown": 39,
       "bot": 0
     },
     "organization_count": 66,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "adamj.eu",
         "commits": 355,
-        "commits_last_12mo": 21,
+        "commits_last_12mo": 20,
         "addresses": 2,
         "first_commit": "2015-02-17",
         "last_commit": "2026-08-08"
@@ -3409,7 +3418,7 @@
       {
         "organization": "maykinmedia.nl",
         "commits": 13,
-        "commits_last_12mo": 1,
+        "commits_last_12mo": 0,
         "addresses": 5,
         "first_commit": "2013-02-24",
         "last_commit": "2025-11-20"
@@ -3842,7 +3851,7 @@
     "quarters": {
       "2025-Q1": {
         "organization": 7,
-        "one_person": 19,
+        "one_person": 20,
         "personal": 160,
         "hidden": 66,
         "unknown": 3,
@@ -3891,31 +3900,31 @@
       "2026-Q3": {
         "organization": 8,
         "one_person": 21,
-        "personal": 121,
+        "personal": 123,
         "hidden": 50,
         "unknown": 1,
         "bot": 0
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 4,
-        "personal": 54,
-        "hidden": 27,
+        "one_person": 7,
+        "personal": 72,
+        "hidden": 30,
         "unknown": 0,
         "bot": 0
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 1026,
-    "authors": 219,
-    "new_authors": 150,
-    "half_of_commits": 6
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 949,
+    "authors": 209,
+    "new_authors": 142,
+    "half_of_commits": 5
   },
   "humans": {
-    "commits": 35078,
+    "commits": 35105,
     "commits_by_year": {
       "2005": 1277,
       "2006": 1320,
@@ -3937,21 +3946,21 @@
       "2022": 963,
       "2023": 952,
       "2024": 939,
-      "2025": 954,
-      "2026": 855
+      "2025": 955,
+      "2026": 881
     },
-    "active_days": 6673
+    "active_days": 6680
   },
   "timezones": {
-    "+0000": 12856,
-    "+0100": 5127,
-    "+0200": 5238,
-    "+0300": 719,
-    "+0330": 27,
+    "+0000": 12858,
+    "+0100": 5130,
+    "+0200": 5239,
+    "+0300": 720,
+    "+0330": 28,
     "+0400": 31,
     "+0430": 29,
     "+0500": 419,
-    "+0530": 594,
+    "+0530": 599,
     "+0545": 4,
     "+0600": 56,
     "+0700": 246,
@@ -3965,17 +3974,17 @@
     "+1300": 17,
     "-0100": 1,
     "-0200": 11,
-    "-0300": 697,
-    "-0400": 3571,
+    "-0300": 699,
+    "-0400": 3573,
     "-0430": 4,
-    "-0500": 2271,
-    "-0600": 274,
-    "-0700": 1535,
-    "-0800": 520,
+    "-0500": 2277,
+    "-0600": 275,
+    "-0700": 1536,
+    "-0800": 522,
     "-1000": 3
   },
   "source_lines": {
-    "added": 3386232,
-    "current": 1092393
+    "added": 3388805,
+    "current": 1093900
   }
 }

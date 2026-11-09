@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:57:14+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:08:43+00:00",
   "name": "SciPy",
   "report_path": "index.html",
   "first_commit": "2001-02-01 08:32:30",
-  "last_commit": "2026-11-01 19:39:56",
-  "age_days": 9405,
-  "active_days": 6837,
-  "total_commits": 38533,
-  "total_authors": 1953,
-  "active_authors_12mo": 231,
-  "commits_last_12mo": 2046,
-  "total_files": 2929,
-  "total_lines": 1239691,
-  "lines_added": 5272437,
-  "lines_removed": 4131546,
+  "last_commit": "2026-11-08 22:38:02",
+  "age_days": 9412,
+  "active_days": 6844,
+  "total_commits": 38575,
+  "total_authors": 1956,
+  "active_authors_12mo": 235,
+  "commits_last_12mo": 2088,
+  "total_files": 2928,
+  "total_lines": 1240644,
+  "lines_added": 5274506,
+  "lines_removed": 4132662,
   "total_tags": 5,
   "era": "steady",
   "top_authors": [
@@ -37,34 +37,39 @@
     },
     {
       "name": "Tyler Reddy",
-      "commits": 1420
+      "commits": 1423
     }
   ],
   "author_commits": {
-    "Ilhan Polat": 712,
-    "Ayush Yadav": 1,
+    "Tyler Reddy": 1423,
+    "Martin Schuck": 68,
+    "Florian Bourgey": 174,
+    "Ayush Yadav": 2,
+    "Sagar Kurada": 1,
+    "Daniel Schmitz": 198,
+    "Christoph Baumgarten": 115,
+    "Albert Steppi": 381,
+    "Andrew Nelson": 1033,
+    "Jake Bowhay": 465,
+    "Yash Raghubanshi": 2,
+    "Enrico Lockner": 8,
+    "Ilhan Polat": 713,
+    "VeeraBabu Jakkula": 2,
     "Aadya Chinubhai": 17,
     "pratik9751": 3,
-    "Enrico Lockner": 4,
     "Samuel Hills": 1,
-    "Andrew Nelson": 1032,
-    "Florian Bourgey": 173,
-    "Jake Bowhay": 463,
     "Matt Haberland": 2366,
     "Kaushik Gunasekaren": 2,
     "Eugenio \"Jay\" Zuccarelli": 1,
     "Yichao Yu": 1,
     "Ralf Gommers": 4281,
     "Albert Yau": 3,
-    "Martin Schuck": 49,
     "krishneetRAJ": 2,
     "Mohith GR": 1,
-    "Tyler Reddy": 1420,
     "Christian Lorentzen": 41,
     "Agriya Khetarpal": 19,
     "Will": 2,
     "berce": 1,
-    "Daniel Schmitz": 197,
     "Evgeni Burovski": 2180,
     "Lucas Colley": 628,
     "Hannah Rittich": 1,
@@ -94,7 +99,6 @@
     "Mohd Maaz Khan": 2,
     "Sylvanus Chinedu Egbosiuba": 1,
     "Pamphile Roy": 583,
-    "Albert Steppi": 378,
     "Thomas Schmelzer": 5,
     "Nicholas Riley": 1,
     "Swapnil-J20": 1,
@@ -420,7 +424,6 @@
     "a-drenaline": 1,
     "Gideon Genadi Kogan": 1,
     "Clemens Brunner": 2,
-    "Christoph Baumgarten": 114,
     "Sergey Fedorov": 1,
     "Martin Spi\u0161\u00e1k": 1,
     "Romain Simon": 1,
@@ -2021,13 +2024,13 @@
     "2023": 2061,
     "2024": 2957,
     "2025": 2335,
-    "2026": 1847
+    "2026": 1889
   },
   "ai_assisted": {
-    "commits": 57,
+    "commits": 62,
     "authored": 1,
     "assistants": {
-      "Claude": 47,
+      "Claude": 52,
       "Warp": 5,
       "GitHub Copilot": 4,
       "Devin": 1
@@ -2056,7 +2059,7 @@
       "2026-08": 2,
       "2026-09": 3,
       "2026-10": 7,
-      "2026-11": 1
+      "2026-11": 6
     },
     "commits_by_month": {
       "2024-12": 286,
@@ -2081,18 +2084,18 @@
       "2026-07": 171,
       "2026-08": 228,
       "2026-09": 171,
-      "2026-10": 129,
-      "2026-11": 7
+      "2026-10": 130,
+      "2026-11": 48
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38533,
+    "commits": 38575,
     "by_kind": {
-      "organization": 3808,
-      "one_person": 3080,
-      "personal": 27122,
-      "hidden": 2703,
+      "organization": 3823,
+      "one_person": 3082,
+      "personal": 27131,
+      "hidden": 2719,
       "unknown": 1820,
       "bot": 0
     },
@@ -2196,6 +2199,14 @@
         "last_commit": "2026-09-26"
       },
       {
+        "organization": "tum.de",
+        "commits": 30,
+        "commits_last_12mo": 17,
+        "addresses": 4,
+        "first_commit": "2016-08-22",
+        "last_commit": "2026-11-07"
+      },
+      {
         "organization": "amazon.com",
         "commits": 22,
         "commits_last_12mo": 0,
@@ -2234,14 +2245,6 @@
         "addresses": 2,
         "first_commit": "2015-10-19",
         "last_commit": "2019-09-12"
-      },
-      {
-        "organization": "tum.de",
-        "commits": 15,
-        "commits_last_12mo": 2,
-        "addresses": 4,
-        "first_commit": "2016-08-22",
-        "last_commit": "2026-08-03"
       },
       {
         "organization": "uw.edu",
@@ -2622,10 +2625,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 1,
-        "one_person": 5,
-        "personal": 69,
-        "hidden": 61,
+        "organization": 16,
+        "one_person": 7,
+        "personal": 78,
+        "hidden": 77,
         "unknown": 0,
         "bot": 0
       }
@@ -2634,13 +2637,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2046,
-    "authors": 222,
-    "new_authors": 161,
-    "half_of_commits": 6
+    "commits": 2088,
+    "authors": 226,
+    "new_authors": 164,
+    "half_of_commits": 7
   },
   "humans": {
-    "commits": 38533,
+    "commits": 38575,
     "commits_by_year": {
       "2001": 286,
       "2002": 357,
@@ -2667,20 +2670,20 @@
       "2023": 2061,
       "2024": 2957,
       "2025": 2335,
-      "2026": 1847
+      "2026": 1889
     },
-    "active_days": 6837
+    "active_days": 6844
   },
   "timezones": {
-    "+0000": 7839,
-    "+0100": 5435,
+    "+0000": 7841,
+    "+0100": 5461,
     "+0200": 6560,
     "+0300": 2007,
     "+0330": 6,
     "+0400": 20,
     "+0430": 4,
     "+0500": 261,
-    "+0530": 731,
+    "+0530": 735,
     "+0600": 28,
     "+0700": 16,
     "+0800": 477,
@@ -2688,22 +2691,22 @@
     "+0930": 1,
     "+1000": 463,
     "+1030": 7,
-    "+1100": 804,
+    "+1100": 805,
     "+1200": 207,
     "+1300": 203,
     "-0100": 10,
     "-0200": 14,
     "-0300": 175,
     "-0400": 3386,
-    "-0500": 2453,
-    "-0600": 1329,
-    "-0700": 3720,
-    "-0800": 1894,
+    "-0500": 2455,
+    "-0600": 1332,
+    "-0700": 3723,
+    "-0800": 1895,
     "-0900": 1,
     "-1000": 24
   },
   "source_lines": {
-    "added": 5665710,
-    "current": 1183783
+    "added": 5667791,
+    "current": 1184736
   }
 }

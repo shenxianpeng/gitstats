@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:00:53+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:12:30+00:00",
   "name": "Helm",
   "report_path": "index.html",
   "first_commit": "2015-11-02 23:52:56",
-  "last_commit": "2026-11-01 19:43:10",
-  "age_days": 4017,
-  "active_days": 2445,
-  "total_commits": 10028,
+  "last_commit": "2026-11-07 10:35:14",
+  "age_days": 4023,
+  "active_days": 2447,
+  "total_commits": 10030,
   "total_authors": 949,
-  "active_authors_12mo": 89,
-  "commits_last_12mo": 860,
+  "active_authors_12mo": 87,
+  "commits_last_12mo": 862,
   "total_files": 2048,
   "total_lines": 133989,
-  "lines_added": 345166,
-  "lines_removed": 211092,
+  "lines_added": 345173,
+  "lines_removed": 211099,
   "total_tags": 43,
   "era": "steady",
   "top_authors": [
@@ -1003,7 +1003,7 @@
     "2023": 439,
     "2024": 618,
     "2025": 1342,
-    "2026": 768
+    "2026": 770
   },
   "ai_assisted": {
     "commits": 30,
@@ -1064,19 +1064,19 @@
       "2026-08": 36,
       "2026-09": 37,
       "2026-10": 26,
-      "2026-11": 1
+      "2026-11": 3
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 10028,
+    "commits": 10030,
     "by_kind": {
       "organization": 3709,
       "one_person": 2184,
       "personal": 2786,
       "hidden": 859,
       "unknown": 10,
-      "bot": 480
+      "bot": 482
     },
     "organization_count": 32,
     "last_12mo_from": "2025-12",
@@ -1401,7 +1401,7 @@
         "personal": 10,
         "hidden": 3,
         "unknown": 0,
-        "bot": 13
+        "bot": 15
       }
     }
   },
@@ -1454,12 +1454,12 @@
     "-0400": 1133,
     "-0500": 768,
     "-0600": 1673,
-    "-0700": 2351,
+    "-0700": 2353,
     "-0800": 1176,
     "-1000": 1
   },
   "source_lines": {
-    "added": 319131,
+    "added": 319136,
     "current": 115198
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:57:16+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:08:47+00:00",
   "name": "scikit-learn",
   "report_path": "index.html",
   "first_commit": "2010-01-05 13:26:32",
-  "last_commit": "2026-11-01 15:58:02",
-  "age_days": 6145,
-  "active_days": 5134,
-  "total_commits": 34105,
-  "total_authors": 3371,
-  "active_authors_12mo": 192,
-  "commits_last_12mo": 909,
-  "total_files": 1865,
-  "total_lines": 577515,
-  "lines_added": 2935809,
-  "lines_removed": 2358544,
+  "last_commit": "2026-11-06 12:37:21",
+  "age_days": 6149,
+  "active_days": 5139,
+  "total_commits": 34133,
+  "total_authors": 3375,
+  "active_authors_12mo": 194,
+  "commits_last_12mo": 937,
+  "total_files": 1868,
+  "total_lines": 576698,
+  "lines_added": 2937107,
+  "lines_removed": 2360659,
   "total_tags": 25,
   "era": "steady",
   "top_authors": [
@@ -41,19 +41,26 @@
     }
   ],
   "author_commits": {
-    "Loic Esteve": 655,
+    "Arthur Lacote": 63,
+    "scikit-learn-bot": 536,
+    "Loic Esteve": 657,
+    "Hayden Barolette": 2,
+    "antoinebaker": 21,
+    "Virgil Chan": 26,
+    "Christian Lorentzen": 289,
+    "Fran\u00e7ois Paugam": 47,
+    "Anne Beyer": 62,
+    "Rugved Bane": 2,
+    "Soledad Galli": 2,
+    "blank-0007": 1,
+    "Stefanie Senger": 134,
+    "jasperjonkhans": 1,
     "Dylan Perdig\u00e3o": 1,
     "Ayush": 3,
-    "Christian Lorentzen": 286,
-    "Arthur Lacote": 58,
     "Venkata Naveen": 1,
-    "Stefanie Senger": 133,
-    "scikit-learn-bot": 534,
     "Michelle": 1,
     "Yuvraj Chirag": 1,
     "Mohd Maaz Khan": 2,
-    "Virgil Chan": 24,
-    "Fran\u00e7ois Paugam": 45,
     "Erwan Le Pennec": 1,
     "Copilot": 3,
     "Sanjay": 1,
@@ -64,7 +71,6 @@
     "Punyak": 2,
     "Arya Topale": 1,
     "Tony Bagnall": 1,
-    "antoinebaker": 20,
     "Tim Head": 123,
     "Olivier Grisel": 2584,
     "Pranav Negi": 1,
@@ -76,7 +82,6 @@
     "Eric Larson": 9,
     "J\u00e9r\u00e9mie du Boisberranger": 525,
     "Abhimanyu Singh Shekhawat": 1,
-    "Anne Beyer": 60,
     "Shruti Nath": 12,
     "Christopher Boseak": 1,
     "Cheryl Gabba": 1,
@@ -1644,7 +1649,6 @@
     "xun-tang": 2,
     "bmaisonn": 5,
     "Felix Wick": 1,
-    "Soledad Galli": 1,
     "Kevin Markham": 12,
     "tijanajovanovic": 1,
     "Jin Li": 1,
@@ -3430,15 +3434,15 @@
     "2023": 1349,
     "2024": 1268,
     "2025": 1237,
-    "2026": 840
+    "2026": 868
   },
   "ai_assisted": {
-    "commits": 11,
+    "commits": 12,
     "authored": 3,
     "assistants": {
       "GitHub Copilot": 5,
-      "Cursor": 4,
-      "Claude": 3
+      "Claude": 4,
+      "Cursor": 4
     },
     "by_month": {
       "2024-12": 0,
@@ -3464,7 +3468,7 @@
       "2026-08": 1,
       "2026-09": 1,
       "2026-10": 5,
-      "2026-11": 0
+      "2026-11": 1
     },
     "commits_by_month": {
       "2024-12": 72,
@@ -3490,19 +3494,19 @@
       "2026-08": 77,
       "2026-09": 62,
       "2026-10": 70,
-      "2026-11": 3
+      "2026-11": 31
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 34105,
+    "commits": 34133,
     "by_kind": {
       "organization": 8785,
       "one_person": 8375,
-      "personal": 13494,
-      "hidden": 3394,
+      "personal": 13515,
+      "hidden": 3400,
       "unknown": 38,
-      "bot": 19
+      "bot": 20
     },
     "organization_count": 55,
     "last_12mo_from": "2025-12",
@@ -4008,23 +4012,23 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 6,
-        "personal": 53,
-        "hidden": 14,
+        "personal": 74,
+        "hidden": 20,
         "unknown": 0,
-        "bot": 0
+        "bot": 1
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 905,
-    "authors": 176,
-    "new_authors": 124,
+    "commits": 932,
+    "authors": 181,
+    "new_authors": 128,
     "half_of_commits": 7
   },
   "humans": {
-    "commits": 34086,
+    "commits": 34113,
     "commits_by_year": {
       "2010": 2604,
       "2011": 4913,
@@ -4042,20 +4046,20 @@
       "2023": 1349,
       "2024": 1262,
       "2025": 1230,
-      "2026": 836
+      "2026": 863
     },
-    "active_days": 5134
+    "active_days": 5139
   },
   "timezones": {
     "+0000": 1119,
-    "+0100": 8410,
+    "+0100": 8431,
     "+0200": 11673,
     "+0300": 940,
     "+0330": 24,
     "+0400": 28,
     "+0430": 13,
     "+0500": 139,
-    "+0530": 1175,
+    "+0530": 1178,
     "+0545": 2,
     "+0600": 35,
     "+0700": 16,
@@ -4072,11 +4076,11 @@
     "-0500": 1747,
     "-0600": 189,
     "-0700": 1630,
-    "-0800": 815,
+    "-0800": 819,
     "-1000": 21
   },
   "source_lines": {
-    "added": 3716519,
-    "current": 575054
+    "added": 3717809,
+    "current": 574237
   }
 }

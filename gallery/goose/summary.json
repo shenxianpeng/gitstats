@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:58:43+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:10:09+00:00",
   "name": "goose",
   "report_path": "index.html",
   "first_commit": "2024-08-23 23:39:04",
-  "last_commit": "2026-11-02 04:27:38",
-  "age_days": 801,
-  "active_days": 653,
-  "total_commits": 5914,
-  "total_authors": 659,
-  "active_authors_12mo": 427,
-  "commits_last_12mo": 3035,
-  "total_files": 2565,
-  "total_lines": 1093401,
-  "lines_added": 2364181,
-  "lines_removed": 1270728,
+  "last_commit": "2026-11-09 03:53:38",
+  "age_days": 808,
+  "active_days": 659,
+  "total_commits": 5932,
+  "total_authors": 660,
+  "active_authors_12mo": 419,
+  "commits_last_12mo": 3053,
+  "total_files": 2581,
+  "total_lines": 1098456,
+  "lines_added": 2376381,
+  "lines_removed": 1277873,
   "total_tags": 93,
   "era": "peak",
   "top_authors": [
@@ -24,16 +24,16 @@
       "commits": 325
     },
     {
+      "name": "Lifei Zhou",
+      "commits": 312
+    },
+    {
       "name": "Alex Hancock",
       "commits": 311
     },
     {
-      "name": "Lifei Zhou",
-      "commits": 308
-    },
-    {
       "name": "Jack Amadeo",
-      "commits": 287
+      "commits": 288
     },
     {
       "name": "Michael Neale",
@@ -41,9 +41,19 @@
     }
   ],
   "author_commits": {
-    "Seydi Charyyev": 22,
+    "Tyler": 66,
+    "NoX1De": 1,
+    "filip": 41,
+    "Jasper": 233,
+    "Jack Amadeo": 288,
+    "Atish Patel": 4,
+    "Salman Mohammed": 83,
+    "Lifei Zhou": 312,
+    "Tim Mellor": 2,
+    "David Hamilton": 1,
+    "Seydi Charyyev": 23,
+    "Yixuan Zhong": 4,
     "Douwe Osinga": 325,
-    "filip": 40,
     "Quan Kaiyi": 1,
     "IToSSc": 1,
     "Abdelrehman Fouad": 1,
@@ -57,11 +67,8 @@
     "Lacesse": 1,
     "Dan Wuensch": 2,
     "William Pembleton": 1,
-    "Jack Amadeo": 287,
-    "Lifei Zhou": 308,
     "KetchupZ": 1,
     "Thymeed": 1,
-    "Jasper": 232,
     "Abhijay Jain": 98,
     "Will Pfleger": 29,
     "James Dumay": 5,
@@ -69,7 +76,6 @@
     "Diem Nguyen": 1,
     "GokayAI": 2,
     "Alex Hancock": 311,
-    "Salman Mohammed": 82,
     "Jeffrey Aven": 1,
     "Michael Neale": 258,
     "\uc774\ub300\ud76c": 7,
@@ -82,7 +88,6 @@
     "Adam": 1,
     "Vishal Veera Reddy": 2,
     "BestCodes": 39,
-    "Atish Patel": 2,
     "Lucien": 1,
     "Tiago Vilas Boas": 1,
     "Godefroid Chapelle": 1,
@@ -100,7 +105,6 @@
     "SynthLuvr": 5,
     "Lucas Alvares Gomes": 6,
     "elgeom": 1,
-    "Tim Mellor": 1,
     "dorien-koelemeijer": 33,
     "Mo": 1,
     "charles": 1,
@@ -119,7 +123,6 @@
     "Teddy Tennant": 3,
     "jlmalone": 4,
     "Konstantin": 1,
-    "Yixuan Zhong": 3,
     "Faried Nawaz T": 1,
     "Omid Amraei": 1,
     "Fnine59": 1,
@@ -365,7 +368,6 @@
     "Peter Siska": 1,
     "Songlin Yang": 7,
     "Plag": 1,
-    "Tyler": 2,
     "Yuki Watanabe": 1,
     "Emma Youndtsmith": 46,
     "avianion": 1,
@@ -375,7 +377,6 @@
     "Dan Prince": 2,
     "WhiskerSage": 1,
     "God-damnit-all": 1,
-    "tlongwell-block": 62,
     "u35tpus": 1,
     "Zane Staggs": 8,
     "Marlon Barreto": 1,
@@ -704,13 +705,13 @@
   "commits_by_year": {
     "2024": 187,
     "2025": 2859,
-    "2026": 2868
+    "2026": 2886
   },
   "ai_assisted": {
-    "commits": 290,
+    "commits": 292,
     "authored": 0,
     "assistants": {
-      "Claude": 208,
+      "Claude": 210,
       "GitHub Copilot": 69,
       "Cursor": 8,
       "Amp": 6,
@@ -741,7 +742,7 @@
       "2026-08": 20,
       "2026-09": 12,
       "2026-10": 19,
-      "2026-11": 0
+      "2026-11": 2
     },
     "commits_by_month": {
       "2024-12": 19,
@@ -767,38 +768,38 @@
       "2026-08": 348,
       "2026-09": 199,
       "2026-10": 152,
-      "2026-11": 1
+      "2026-11": 19
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5914,
+    "commits": 5932,
     "by_kind": {
-      "organization": 2188,
-      "one_person": 413,
-      "personal": 1292,
-      "hidden": 1661,
+      "organization": 2195,
+      "one_person": 414,
+      "personal": 1296,
+      "hidden": 1666,
       "unknown": 0,
-      "bot": 360
+      "bot": 361
     },
     "organization_count": 5,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "squareup.com",
-        "commits": 1081,
-        "commits_last_12mo": 439,
-        "addresses": 36,
+        "commits": 1087,
+        "commits_last_12mo": 445,
+        "addresses": 37,
         "first_commit": "2024-08-24",
-        "last_commit": "2026-10-27"
+        "last_commit": "2026-11-05"
       },
       {
         "organization": "block.xyz",
-        "commits": 1014,
-        "commits_last_12mo": 626,
+        "commits": 1015,
+        "commits_last_12mo": 627,
         "addresses": 10,
         "first_commit": "2025-01-26",
-        "last_commit": "2026-10-31"
+        "last_commit": "2026-11-05"
       },
       {
         "organization": "redhat.com",
@@ -883,34 +884,34 @@
         "bot": 138
       },
       "2026-Q4": {
-        "organization": 77,
-        "one_person": 8,
-        "personal": 38,
-        "hidden": 23,
+        "organization": 84,
+        "one_person": 9,
+        "personal": 42,
+        "hidden": 28,
         "unknown": 0,
-        "bot": 7
+        "bot": 8
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2707,
-    "authors": 409,
-    "new_authors": 356,
+    "commits": 2724,
+    "authors": 410,
+    "new_authors": 358,
     "half_of_commits": 10
   },
   "humans": {
-    "commits": 5554,
+    "commits": 5571,
     "commits_by_year": {
       "2024": 187,
       "2025": 2821,
-      "2026": 2546
+      "2026": 2563
     },
-    "active_days": 651
+    "active_days": 657
   },
   "timezones": {
-    "+0000": 710,
+    "+0000": 728,
     "+0100": 202,
     "+0200": 241,
     "+0300": 35,
@@ -935,7 +936,7 @@
     "-1000": 8
   },
   "source_lines": {
-    "added": 2149837,
-    "current": 1041080
+    "added": 2162028,
+    "current": 1046135
   }
 }

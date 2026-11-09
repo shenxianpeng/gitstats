@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:58:36+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:10:21+00:00",
   "name": "OpenCode",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-11-02 04:16:40",
-  "age_days": 591,
-  "active_days": 578,
-  "total_commits": 21887,
-  "total_authors": 1034,
-  "active_authors_12mo": 840,
-  "commits_last_12mo": 17233,
-  "total_files": 9275,
-  "total_lines": 1495876,
-  "lines_added": 4629754,
-  "lines_removed": 3133877,
-  "total_tags": 921,
+  "last_commit": "2026-11-09 05:07:03",
+  "age_days": 598,
+  "active_days": 585,
+  "total_commits": 22393,
+  "total_authors": 1046,
+  "active_authors_12mo": 829,
+  "commits_last_12mo": 17739,
+  "total_files": 11319,
+  "total_lines": 1840746,
+  "lines_added": 5091492,
+  "lines_removed": 3250742,
+  "total_tags": 922,
   "era": "steady",
   "top_authors": [
     {
       "name": "Aiden Cline",
-      "commits": 2620
+      "commits": 2658
     },
     {
       "name": "Dax Raad",
@@ -29,11 +29,11 @@
     },
     {
       "name": "Kit Langton",
-      "commits": 2427
+      "commits": 2440
     },
     {
       "name": "Adam",
-      "commits": 2087
+      "commits": 2145
     },
     {
       "name": "Github Action",
@@ -41,24 +41,42 @@
     }
   ],
   "author_commits": {
-    "Aiden Cline": 2620,
-    "Dax": 471,
+    "Aiden Cline": 2658,
+    "Kit Langton": 2440,
+    "Luke Parker": 960,
+    "Adam": 2145,
+    "Dan Smolsky": 59,
+    "James Long": 416,
+    "David Hill": 643,
+    "vprdev": 13,
+    "Filip": 140,
+    "Feng Wang": 2,
+    "Shane Bishop": 4,
+    "Dax": 512,
+    "\u72ac\u5922": 1,
+    "\u963f\u5764": 1,
+    "usrnk1": 196,
+    "Sanghyuk Lee": 1,
+    "Bence Ferdinandy": 3,
+    "argszero": 3,
+    "Sathyajith MC": 1,
+    "Jimmy": 1,
+    "Jack": 127,
+    "Craig Albrecht": 1,
+    "Wish": 1,
+    "yangguan-xue": 1,
+    "Bjarne Kock": 1,
+    "Andras Lassu": 1,
+    "Ludvig Rask": 2,
+    "Walter": 11,
+    "Simon Klee": 137,
     "Renato Moselli": 1,
-    "Adam": 2087,
     "Shoubhit Dash": 479,
-    "DS": 29,
     "Dax Raad": 2520,
-    "Kit Langton": 2427,
     "Richard": 1,
-    "Simon Klee": 136,
     "Jason Sherron": 1,
-    "Luke Parker": 739,
-    "usrnk1": 166,
-    "James Long": 400,
     "Aarav Sareen": 109,
-    "Filip": 133,
     "frank": 1,
-    "David Hill": 629,
     "xjh": 1,
     "OpeOginni": 89,
     "Sebastian": 143,
@@ -68,7 +86,6 @@
     "Vladimir Glafirov": 41,
     "Anmol": 1,
     "Irish Joseph": 1,
-    "Walter": 10,
     "kernel-oops": 1,
     "Brendan Allan": 549,
     "opencode": 633,
@@ -88,12 +105,10 @@
     "thdxr": 4,
     "Divanshu": 1,
     "tobwen": 3,
-    "Jack": 126,
     "Lucas Kim": 2,
     "JasonH": 1,
     "Jensen": 3,
     "xin zhuang": 2,
-    "argszero": 2,
     "Dante": 1,
     "berce": 1,
     "Daniel Nunns": 1,
@@ -101,12 +116,10 @@
     "Kyrylo": 1,
     "Don Bowman": 1,
     "Luca Barbato": 1,
-    "vprdev": 12,
     "Stefan Avram": 6,
     "Tommy D. Rossi": 26,
     "uyencss": 1,
     "Max Weinbach": 1,
-    "Bence Ferdinandy": 2,
     "Henri-Maxime Ducoulombier": 1,
     "Daniel Chen": 11,
     "fihade": 1,
@@ -412,7 +425,6 @@
     "Jhin Lee": 1,
     "bnema": 1,
     "Pan Kaixin": 1,
-    "Shane Bishop": 3,
     "Denys": 1,
     "zerone0x": 13,
     "Brandon Julio Thenaro": 1,
@@ -1078,14 +1090,14 @@
   },
   "commits_by_year": {
     "2025": 6529,
-    "2026": 15358
+    "2026": 15864
   },
   "ai_assisted": {
-    "commits": 136,
+    "commits": 137,
     "authored": 1,
     "assistants": {
       "OpenCode": 81,
-      "Claude": 39,
+      "Claude": 40,
       "GitHub Copilot": 13,
       "Cursor": 3,
       "Jules": 1
@@ -1114,7 +1126,7 @@
       "2026-08": 4,
       "2026-09": 3,
       "2026-10": 3,
-      "2026-11": 0
+      "2026-11": 1
     },
     "commits_by_month": {
       "2024-12": 0,
@@ -1140,19 +1152,19 @@
       "2026-08": 1996,
       "2026-09": 1504,
       "2026-10": 2007,
-      "2026-11": 58
+      "2026-11": 564
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 21887,
+    "commits": 22393,
     "by_kind": {
-      "organization": 1703,
-      "one_person": 3712,
-      "personal": 6204,
-      "hidden": 6565,
+      "organization": 1704,
+      "one_person": 3756,
+      "personal": 6239,
+      "hidden": 6974,
       "unknown": 1,
-      "bot": 3702
+      "bot": 3719
     },
     "organization_count": 4,
     "last_12mo_from": "2025-12",
@@ -1167,11 +1179,11 @@
       },
       {
         "organization": "anoma.ly",
-        "commits": 641,
-        "commits_last_12mo": 641,
+        "commits": 642,
+        "commits_last_12mo": 642,
         "addresses": 3,
         "first_commit": "2025-12-29",
-        "last_commit": "2026-10-20"
+        "last_commit": "2026-11-05"
       },
       {
         "organization": "cloudflare.com",
@@ -1248,44 +1260,44 @@
         "bot": 1116
       },
       "2026-Q4": {
-        "organization": 46,
-        "one_person": 154,
-        "personal": 596,
-        "hidden": 962,
+        "organization": 47,
+        "one_person": 198,
+        "personal": 631,
+        "hidden": 1371,
         "unknown": 0,
-        "bot": 307
+        "bot": 324
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 14530,
-    "authors": 765,
-    "new_authors": 697,
+    "commits": 15019,
+    "authors": 777,
+    "new_authors": 709,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 18185,
+    "commits": 18674,
     "commits_by_year": {
       "2025": 5787,
-      "2026": 12398
+      "2026": 12887
     },
-    "active_days": 577
+    "active_days": 584
   },
   "timezones": {
-    "+0000": 4187,
-    "+0100": 617,
+    "+0000": 4192,
+    "+0100": 660,
     "+0200": 1042,
     "+0300": 77,
     "+0330": 2,
     "+0400": 7,
     "+0500": 3,
-    "+0530": 756,
+    "+0530": 758,
     "+0600": 4,
     "+0700": 46,
-    "+0800": 1019,
-    "+0900": 73,
+    "+0800": 1027,
+    "+0900": 74,
     "+1000": 850,
     "+1030": 2,
     "+1100": 24,
@@ -1293,14 +1305,14 @@
     "+1300": 2,
     "-0300": 88,
     "-0400": 5836,
-    "-0500": 4422,
-    "-0600": 2092,
+    "-0500": 4498,
+    "-0600": 2441,
     "-0700": 583,
-    "-0800": 150,
+    "-0800": 172,
     "-1000": 4
   },
   "source_lines": {
-    "added": 4995321,
-    "current": 1470065
+    "added": 5453877,
+    "current": 1813272
   }
 }

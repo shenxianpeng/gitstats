@@ -1,24 +1,28 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:04:08+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:16:20+00:00",
   "name": "Astro",
   "report_path": "index.html",
   "first_commit": "2021-03-15 17:22:05",
-  "last_commit": "2026-10-30 13:25:29",
-  "age_days": 2055,
-  "active_days": 1631,
-  "total_commits": 15355,
-  "total_authors": 972,
-  "active_authors_12mo": 168,
-  "commits_last_12mo": 2220,
-  "total_files": 7071,
-  "total_lines": 420511,
-  "lines_added": 1862208,
-  "lines_removed": 1441599,
-  "total_tags": 3418,
+  "last_commit": "2026-11-06 21:02:14",
+  "age_days": 2063,
+  "active_days": 1636,
+  "total_commits": 15390,
+  "total_authors": 977,
+  "active_authors_12mo": 173,
+  "commits_last_12mo": 2255,
+  "total_files": 7123,
+  "total_lines": 422418,
+  "lines_added": 1868755,
+  "lines_removed": 1446239,
+  "total_tags": 3439,
   "era": "steady",
   "top_authors": [
+    {
+      "name": "Erika",
+      "commits": 12239
+    },
     {
       "name": "Fred K. Bot",
       "commits": 282
@@ -34,13 +38,14 @@
     {
       "name": "Jonathan Neal",
       "commits": 76
-    },
-    {
-      "name": "tony-sull",
-      "commits": 69
     }
   ],
   "author_commits": {
+    "Erika": 12239,
+    "Praveen Kumar": 3,
+    "David Miotti": 1,
+    "SwastikTripathi": 1,
+    "Alex Vandiver": 1,
     "skezo": 1,
     "Edmund Hung": 2,
     "Waleed Rostom \ud83d\udc26\u200d\u2b1b": 1,
@@ -1020,13 +1025,13 @@
     "2023": 3622,
     "2024": 2797,
     "2025": 1373,
-    "2026": 2111
+    "2026": 2146
   },
   "ai_assisted": {
-    "commits": 30,
+    "commits": 32,
     "authored": 1,
     "assistants": {
-      "Claude": 23,
+      "Claude": 25,
       "GitHub Copilot": 8
     },
     "by_month": {
@@ -1053,7 +1058,7 @@
       "2026-08": 1,
       "2026-09": 2,
       "2026-10": 5,
-      "2026-11": 0
+      "2026-11": 2
     },
     "commits_by_month": {
       "2024-12": 161,
@@ -1079,27 +1084,27 @@
       "2026-08": 171,
       "2026-09": 178,
       "2026-10": 202,
-      "2026-11": 0
+      "2026-11": 35
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15355,
+    "commits": 15390,
     "by_kind": {
       "organization": 1378,
-      "one_person": 2275,
+      "one_person": 2283,
       "personal": 3314,
-      "hidden": 7281,
+      "hidden": 7291,
       "unknown": 0,
-      "bot": 1107
+      "bot": 1124
     },
     "organization_count": 6,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "skypack.dev",
         "commits": 862,
-        "commits_last_12mo": 48,
+        "commits_last_12mo": 42,
         "addresses": 2,
         "first_commit": "2021-03-15",
         "last_commit": "2026-02-03"
@@ -1204,48 +1209,48 @@
       },
       "2026-Q4": {
         "organization": 15,
-        "one_person": 20,
+        "one_person": 28,
         "personal": 4,
-        "hidden": 38,
+        "hidden": 48,
         "unknown": 0,
-        "bot": 125
+        "bot": 142
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 233,
-    "authors": 168,
-    "new_authors": 159,
-    "half_of_commits": 52
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 2252,
+    "authors": 165,
+    "new_authors": 154,
+    "half_of_commits": 1
   },
   "humans": {
-    "commits": 14248,
+    "commits": 14266,
     "commits_by_year": {
       "2021": 1837,
       "2022": 3220,
       "2023": 3558,
       "2024": 2566,
       "2025": 1269,
-      "2026": 1798
+      "2026": 1816
     },
-    "active_days": 1618
+    "active_days": 1623
   },
   "timezones": {
     "+0000": 3637,
-    "+0100": 1713,
+    "+0100": 1733,
     "+0200": 1631,
     "+0300": 96,
     "+0330": 4,
     "+0400": 7,
     "+0500": 16,
-    "+0530": 161,
+    "+0530": 165,
     "+0545": 1,
     "+0600": 20,
     "+0630": 4,
     "+0700": 62,
-    "+0800": 996,
+    "+0800": 997,
     "+0900": 180,
     "+1000": 140,
     "+1030": 1,
@@ -1254,14 +1259,14 @@
     "+1300": 12,
     "-0300": 437,
     "-0400": 1922,
-    "-0500": 1271,
+    "-0500": 1277,
     "-0600": 400,
     "-0700": 1921,
-    "-0800": 696,
+    "-0800": 700,
     "-1000": 1
   },
   "source_lines": {
-    "added": 1301189,
-    "current": 340614
+    "added": 1304540,
+    "current": 342869
   }
 }

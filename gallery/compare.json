@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "title": "How each repository compares",
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:12:16+00:00",
+  "generated_by": "gitstats dev",
+  "generated_at": "2026-11-09T05:23:52+00:00",
   "quarters": [
     "2025-Q4",
     "2026-Q1",
@@ -45,11 +45,11 @@
     {
       "name": "CPython",
       "values": {
-        "commits": 4772.0,
-        "authors": 745.0,
-        "new_authors": 459.0,
-        "half_of_commits": 18.0,
-        "organizations": 21.0,
+        "commits": 4908.0,
+        "authors": 771.0,
+        "new_authors": 482.0,
+        "half_of_commits": 19.0,
+        "organizations": 22.0,
         "ai_share": 0.07501027538018906
       },
       "ranks": {
@@ -89,7 +89,7 @@
             17
           ],
           "all": [
-            8,
+            6,
             107
           ]
         },
@@ -119,9 +119,9 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.23990270300298883,
+          "value": 0.24019237366895504,
           "big": "24%",
-          "sentence": "Of the 13,608,642 lines ever written into CPython's own source, 24% are still there; the rest were rewritten or removed.",
+          "sentence": "Of the 13,617,872 lines ever written into CPython's own source, 24% are still there; the rest were rewritten or removed.",
           "compared": "13th lowest of 97; the median project: 37%."
         }
       ],
@@ -131,11 +131,11 @@
     {
       "name": "Django",
       "values": {
-        "commits": 1026.0,
-        "authors": 219.0,
-        "new_authors": 150.0,
-        "half_of_commits": 6.0,
-        "organizations": 6.0,
+        "commits": 949.0,
+        "authors": 209.0,
+        "new_authors": 142.0,
+        "half_of_commits": 5.0,
+        "organizations": 5.0,
         "ai_share": 0.0
       },
       "ranks": {
@@ -145,7 +145,7 @@
             17
           ],
           "all": [
-            74,
+            75,
             107
           ]
         },
@@ -155,7 +155,7 @@
             17
           ],
           "all": [
-            42,
+            46,
             107
           ]
         },
@@ -165,17 +165,17 @@
             17
           ],
           "all": [
-            45,
+            50,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            4,
+            5,
             17
           ],
           "all": [
-            39,
+            45,
             107
           ]
         },
@@ -185,7 +185,7 @@
             17
           ],
           "all": [
-            39,
+            42,
             107
           ]
         },
@@ -203,7 +203,7 @@
       "group": "python",
       "insights": [],
       "page": "django/compare.html",
-      "headline": "Django's highest place among the 17 Python open source projects is 4th, shared, for how widely its commits are spread."
+      "headline": "Django is 5th of the 17 Python open source projects for how widely its commits are spread."
     },
     {
       "name": "Flask",
@@ -252,7 +252,7 @@
             17
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -262,7 +262,7 @@
             17
           ],
           "all": [
-            101,
+            102,
             107
           ]
         },
@@ -285,7 +285,7 @@
           "value": 0.17625899280575538,
           "big": "18%",
           "sentence": "People made 18% as many commits to Flask in the last 12 months as in 2010, its busiest year (98 against 556).",
-          "compared": "10th lowest of 90; the median project made 50% of its busiest year."
+          "compared": "11th lowest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "flask/compare.html",
@@ -294,9 +294,9 @@
     {
       "name": "FastAPI",
       "values": {
-        "commits": 733.0,
-        "authors": 68.0,
-        "new_authors": 54.0,
+        "commits": 719.0,
+        "authors": 63.0,
+        "new_authors": 51.0,
         "half_of_commits": 1.0,
         "organizations": 0.0,
         "ai_share": 0.0018404907975460123
@@ -308,7 +308,7 @@
             17
           ],
           "all": [
-            78,
+            79,
             107
           ]
         },
@@ -318,7 +318,7 @@
             17
           ],
           "all": [
-            86,
+            91,
             107
           ]
         },
@@ -328,7 +328,7 @@
             17
           ],
           "all": [
-            84,
+            87,
             107
           ]
         },
@@ -338,7 +338,7 @@
             17
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -348,7 +348,7 @@
             17
           ],
           "all": [
-            101,
+            102,
             107
           ]
         },
@@ -405,7 +405,7 @@
             17
           ],
           "all": [
-            102,
+            101,
             107
           ]
         },
@@ -415,7 +415,7 @@
             17
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -425,7 +425,7 @@
             17
           ],
           "all": [
-            101,
+            102,
             107
           ]
         },
@@ -456,7 +456,7 @@
           "value": 0.1776421944332392,
           "big": "18%",
           "sentence": "Of the 158,656 lines ever written into Requests's own source, 18% are still there; the rest were rewritten or removed.",
-          "compared": "4th lowest of 97; the median project: 37%."
+          "compared": "3rd lowest of 97; the median project: 37%."
         }
       ],
       "page": "requests/compare.html",
@@ -465,9 +465,9 @@
     {
       "name": "pandas",
       "values": {
-        "commits": 2781.0,
-        "authors": 365.0,
-        "new_authors": 301.0,
+        "commits": 2866.0,
+        "authors": 377.0,
+        "new_authors": 313.0,
         "half_of_commits": 1.0,
         "organizations": 9.0,
         "ai_share": 0.42223864056150723
@@ -489,7 +489,7 @@
             17
           ],
           "all": [
-            25,
+            24,
             107
           ]
         },
@@ -499,7 +499,7 @@
             17
           ],
           "all": [
-            22,
+            21,
             107
           ]
         },
@@ -509,7 +509,7 @@
             17
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -519,7 +519,7 @@
             17
           ],
           "all": [
-            33,
+            32,
             107
           ]
         },
@@ -551,9 +551,9 @@
     {
       "name": "NumPy",
       "values": {
-        "commits": 2141.0,
-        "authors": 224.0,
-        "new_authors": 160.0,
+        "commits": 2165.0,
+        "authors": 229.0,
+        "new_authors": 164.0,
         "half_of_commits": 3.0,
         "organizations": 12.0,
         "ai_share": 0.012471655328798186
@@ -565,7 +565,7 @@
             17
           ],
           "all": [
-            49,
+            50,
             107
           ]
         },
@@ -575,17 +575,17 @@
             17
           ],
           "all": [
-            39,
+            37,
             107
           ]
         },
         "new_authors": {
           "group": [
-            6,
+            5,
             17
           ],
           "all": [
-            40,
+            39,
             107
           ]
         },
@@ -595,7 +595,7 @@
             17
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -628,10 +628,10 @@
     {
       "name": "SciPy",
       "values": {
-        "commits": 2046.0,
-        "authors": 222.0,
-        "new_authors": 161.0,
-        "half_of_commits": 6.0,
+        "commits": 2088.0,
+        "authors": 226.0,
+        "new_authors": 164.0,
+        "half_of_commits": 7.0,
         "organizations": 17.0,
         "ai_share": 0.02045929018789144
       },
@@ -652,7 +652,7 @@
             17
           ],
           "all": [
-            41,
+            39,
             107
           ]
         },
@@ -668,11 +668,11 @@
         },
         "half_of_commits": {
           "group": [
-            4,
+            3,
             17
           ],
           "all": [
-            39,
+            35,
             107
           ]
         },
@@ -692,7 +692,7 @@
             17
           ],
           "all": [
-            60,
+            59,
             107
           ]
         }
@@ -702,21 +702,21 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.20893815602987093,
+          "value": 0.2090295848947147,
           "big": "21%",
-          "sentence": "Of the 5,665,710 lines ever written into SciPy's own source, 21% are still there; the rest were rewritten or removed.",
+          "sentence": "Of the 5,667,791 lines ever written into SciPy's own source, 21% are still there; the rest were rewritten or removed.",
           "compared": "7th lowest of 97; the median project: 37%."
         }
       ],
       "page": "scipy/compare.html",
-      "headline": "SciPy is 2nd of the 17 Python open source projects for organizations committing. It is also 5th for new contributors."
+      "headline": "SciPy is 2nd of the 17 Python open source projects for organizations committing."
     },
     {
       "name": "scikit-learn",
       "values": {
-        "commits": 905.0,
-        "authors": 176.0,
-        "new_authors": 124.0,
+        "commits": 932.0,
+        "authors": 181.0,
+        "new_authors": 128.0,
         "half_of_commits": 7.0,
         "organizations": 5.0,
         "ai_share": 0.00441306266548985
@@ -728,7 +728,7 @@
             17
           ],
           "all": [
-            75,
+            76,
             107
           ]
         },
@@ -738,17 +738,17 @@
             17
           ],
           "all": [
-            55,
+            54,
             107
           ]
         },
         "new_authors": {
           "group": [
-            9,
+            8,
             17
           ],
           "all": [
-            55,
+            53,
             107
           ]
         },
@@ -764,11 +764,11 @@
         },
         "organizations": {
           "group": [
-            8,
+            7,
             17
           ],
           "all": [
-            43,
+            42,
             107
           ]
         },
@@ -788,29 +788,29 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.15472919686405479,
+          "value": 0.15445575606492964,
           "big": "15%",
-          "sentence": "Of the 3,716,519 lines ever written into scikit-learn's own source, 15% are still there; the rest were rewritten or removed.",
+          "sentence": "Of the 3,717,809 lines ever written into scikit-learn's own source, 15% are still there; the rest were rewritten or removed.",
           "compared": "2nd lowest of 97; the median project: 37%."
         },
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 0.18420516995725625,
-          "big": "18%",
-          "sentence": "People made 18% as many commits to scikit-learn in the last 12 months as in 2011, its busiest year (905 against 4,913).",
-          "compared": "12th lowest of 90; the median project made 50% of its busiest year."
+          "value": 0.18970079381233462,
+          "big": "19%",
+          "sentence": "People made 19% as many commits to scikit-learn in the last 12 months as in 2011, its busiest year (932 against 4,913).",
+          "compared": "12th lowest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "scikit-learn/compare.html",
-      "headline": "scikit-learn is 3rd of the 17 Python open source projects for how widely its commits are spread."
+      "headline": "scikit-learn's highest place among the 17 Python open source projects is 3rd, shared, for how widely its commits are spread."
     },
     {
       "name": "Matplotlib",
       "values": {
-        "commits": 1967.0,
-        "authors": 158.0,
-        "new_authors": 119.0,
+        "commits": 1988.0,
+        "authors": 160.0,
+        "new_authors": 121.0,
         "half_of_commits": 3.0,
         "organizations": 10.0,
         "ai_share": 0.00399800099950025
@@ -842,7 +842,7 @@
             17
           ],
           "all": [
-            56,
+            57,
             107
           ]
         },
@@ -852,7 +852,7 @@
             17
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -862,7 +862,7 @@
             17
           ],
           "all": [
-            29,
+            28,
             107
           ]
         },
@@ -885,12 +885,12 @@
     {
       "name": "pip",
       "values": {
-        "commits": 761.0,
-        "authors": 58.0,
-        "new_authors": 38.0,
+        "commits": 811.0,
+        "authors": 61.0,
+        "new_authors": 41.0,
         "half_of_commits": 2.0,
         "organizations": 3.0,
-        "ai_share": 0.004884004884004884
+        "ai_share": 0.004842615012106538
       },
       "ranks": {
         "commits": {
@@ -919,7 +919,7 @@
             17
           ],
           "all": [
-            91,
+            89,
             107
           ]
         },
@@ -959,9 +959,9 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.19892590846521183,
+          "value": 0.20166887050173884,
           "big": "20%",
-          "sentence": "Of the 1,164,519 lines ever written into pip's own source, 20% are still there; the rest were rewritten or removed.",
+          "sentence": "Of the 1,169,174 lines ever written into pip's own source, 20% are still there; the rest were rewritten or removed.",
           "compared": "6th lowest of 97; the median project: 37%."
         }
       ],
@@ -971,7 +971,7 @@
     {
       "name": "pytest",
       "values": {
-        "commits": 646.0,
+        "commits": 654.0,
         "authors": 118.0,
         "new_authors": 97.0,
         "half_of_commits": 3.0,
@@ -995,7 +995,7 @@
             17
           ],
           "all": [
-            69,
+            70,
             107
           ]
         },
@@ -1005,7 +1005,7 @@
             17
           ],
           "all": [
-            62,
+            63,
             107
           ]
         },
@@ -1015,7 +1015,7 @@
             17
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -1045,9 +1045,9 @@
         {
           "kind": "ai",
           "label": "AI-assisted commits",
-          "value": 0.28112449799196787,
-          "big": "28%",
-          "sentence": "The share of pytest's commits that name an AI coding assistant went from 0% in Aug–Oct 2025 to 28% in Aug–Oct 2026.",
+          "value": 0.2874015748031496,
+          "big": "29%",
+          "sentence": "The share of pytest's commits that name an AI coding assistant went from 0% in Aug–Oct 2025 to 29% in Aug–Oct 2026.",
           "compared": "10th highest of 72; in the median project it rose by 5 points."
         }
       ],
@@ -1057,9 +1057,9 @@
     {
       "name": "SQLAlchemy",
       "values": {
-        "commits": 609.0,
-        "authors": 87.0,
-        "new_authors": 72.0,
+        "commits": 645.0,
+        "authors": 91.0,
+        "new_authors": 76.0,
         "half_of_commits": 1.0,
         "organizations": 4.0,
         "ai_share": 0.0
@@ -1071,7 +1071,7 @@
             17
           ],
           "all": [
-            86,
+            82,
             107
           ]
         },
@@ -1081,7 +1081,7 @@
             17
           ],
           "all": [
-            81,
+            77,
             107
           ]
         },
@@ -1091,7 +1091,7 @@
             17
           ],
           "all": [
-            75,
+            70,
             107
           ]
         },
@@ -1101,7 +1101,7 @@
             17
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -1134,9 +1134,9 @@
     {
       "name": "Pydantic",
       "values": {
-        "commits": 487.0,
-        "authors": 121.0,
-        "new_authors": 108.0,
+        "commits": 519.0,
+        "authors": 127.0,
+        "new_authors": 114.0,
         "half_of_commits": 1.0,
         "organizations": 2.0,
         "ai_share": 0.006006006006006006
@@ -1148,7 +1148,7 @@
             17
           ],
           "all": [
-            88,
+            89,
             107
           ]
         },
@@ -1158,7 +1158,7 @@
             17
           ],
           "all": [
-            68,
+            67,
             107
           ]
         },
@@ -1168,7 +1168,7 @@
             17
           ],
           "all": [
-            60,
+            59,
             107
           ]
         },
@@ -1178,7 +1178,7 @@
             17
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -1208,10 +1208,10 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.5417196429059689,
+          "value": 0.5408888404845127,
           "big": "54%",
-          "sentence": "54% of the 585,168 lines ever written into Pydantic's own source are still there.",
-          "compared": "12th highest of 97; the median project: 37%."
+          "sentence": "54% of the 587,642 lines ever written into Pydantic's own source are still there.",
+          "compared": "11th highest of 97; the median project: 37%."
         }
       ],
       "page": "pydantic/compare.html",
@@ -1220,8 +1220,8 @@
     {
       "name": "uv",
       "values": {
-        "commits": 1698.0,
-        "authors": 164.0,
+        "commits": 1722.0,
+        "authors": 165.0,
         "new_authors": 126.0,
         "half_of_commits": 3.0,
         "organizations": 2.0,
@@ -1234,7 +1234,7 @@
             17
           ],
           "all": [
-            56,
+            58,
             107
           ]
         },
@@ -1244,17 +1244,17 @@
             17
           ],
           "all": [
-            58,
+            56,
             107
           ]
         },
         "new_authors": {
           "group": [
-            8,
+            9,
             17
           ],
           "all": [
-            53,
+            55,
             107
           ]
         },
@@ -1264,7 +1264,7 @@
             17
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -1297,9 +1297,9 @@
     {
       "name": "Ruff",
       "values": {
-        "commits": 4181.0,
-        "authors": 299.0,
-        "new_authors": 224.0,
+        "commits": 4321.0,
+        "authors": 308.0,
+        "new_authors": 232.0,
         "half_of_commits": 2.0,
         "organizations": 2.0,
         "ai_share": 0.013413685847589424
@@ -1331,7 +1331,7 @@
             17
           ],
           "all": [
-            27,
+            26,
             107
           ]
         },
@@ -1371,9 +1371,9 @@
         {
           "kind": "days",
           "label": "Days with a commit",
-          "value": 0.9540750323415266,
+          "value": 0.9536381197681906,
           "big": "95%",
-          "sentence": "Ruff has had a commit by a person on 95% of the days since its first one: 1,475 days in 4 years.",
+          "sentence": "Ruff has had a commit by a person on 95% of the days since its first one: 1,481 days in 4 years.",
           "compared": "7th highest of 97; the median project: 80% of days."
         }
       ],
@@ -1383,9 +1383,9 @@
     {
       "name": "Home Assistant",
       "values": {
-        "commits": 20283.0,
-        "authors": 1423.0,
-        "new_authors": 956.0,
+        "commits": 21167.0,
+        "authors": 1468.0,
+        "new_authors": 995.0,
         "half_of_commits": 15.0,
         "organizations": 14.0,
         "ai_share": 0.14045456987802912
@@ -1427,7 +1427,7 @@
             17
           ],
           "all": [
-            14,
+            13,
             107
           ]
         },
@@ -1457,10 +1457,10 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 1.1811670160726764,
+          "value": 1.2326461681807594,
           "big": "1.2×",
-          "sentence": "Home Assistant's last 12 months were its busiest yet: 20,283 commits by people, more than in any full year before (17,172 in 2024).",
-          "compared": "6th highest of 90; the median project made 50% of its busiest year."
+          "sentence": "Home Assistant's last 12 months were its busiest yet: 21,167 commits by people, more than in any full year before (17,172 in 2024).",
+          "compared": "5th highest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "home-assistant/compare.html",
@@ -1469,10 +1469,10 @@
     {
       "name": "Codex CLI",
       "values": {
-        "commits": 10705.0,
-        "authors": 476.0,
-        "new_authors": 436.0,
-        "half_of_commits": 8.0,
+        "commits": 11069.0,
+        "authors": 491.0,
+        "new_authors": 451.0,
+        "half_of_commits": 9.0,
         "organizations": 2.0,
         "ai_share": 0.006811326262527975
       },
@@ -1493,7 +1493,7 @@
             12
           ],
           "all": [
-            17,
+            16,
             107
           ]
         },
@@ -1513,7 +1513,7 @@
             12
           ],
           "all": [
-            32,
+            27,
             107
           ]
         },
@@ -1546,9 +1546,9 @@
     {
       "name": "Gemini CLI",
       "values": {
-        "commits": 3412.0,
-        "authors": 409.0,
-        "new_authors": 344.0,
+        "commits": 3125.0,
+        "authors": 377.0,
+        "new_authors": 312.0,
         "half_of_commits": 15.0,
         "organizations": 1.0,
         "ai_share": 0.04626982063945932
@@ -1556,31 +1556,31 @@
       "ranks": {
         "commits": {
           "group": [
-            7,
+            8,
             12
           ],
           "all": [
-            35,
+            40,
             107
           ]
         },
         "authors": {
           "group": [
-            4,
+            5,
             12
           ],
           "all": [
-            20,
+            24,
             107
           ]
         },
         "new_authors": {
           "group": [
-            5,
+            6,
             12
           ],
           "all": [
-            18,
+            22,
             107
           ]
         },
@@ -1590,7 +1590,7 @@
             12
           ],
           "all": [
-            14,
+            13,
             107
           ]
         },
@@ -1623,9 +1623,9 @@
     {
       "name": "Claude Code",
       "values": {
-        "commits": 645.0,
-        "authors": 37.0,
-        "new_authors": 24.0,
+        "commits": 599.0,
+        "authors": 30.0,
+        "new_authors": 18.0,
         "half_of_commits": 1.0,
         "organizations": 1.0,
         "ai_share": 0.06037151702786378
@@ -1637,7 +1637,7 @@
             12
           ],
           "all": [
-            82,
+            85,
             107
           ]
         },
@@ -1647,7 +1647,7 @@
             12
           ],
           "all": [
-            100,
+            101,
             107
           ]
         },
@@ -1663,11 +1663,11 @@
         },
         "half_of_commits": {
           "group": [
-            11,
+            10,
             12
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -1700,9 +1700,9 @@
     {
       "name": "OpenCode",
       "values": {
-        "commits": 14530.0,
-        "authors": 765.0,
-        "new_authors": 697.0,
+        "commits": 15019.0,
+        "authors": 777.0,
+        "new_authors": 709.0,
         "half_of_commits": 5.0,
         "organizations": 4.0,
         "ai_share": 0.003308714918759232
@@ -1744,7 +1744,7 @@
             12
           ],
           "all": [
-            49,
+            45,
             107
           ]
         },
@@ -1791,7 +1791,7 @@
             12
           ],
           "all": [
-            92,
+            93,
             107
           ]
         },
@@ -1817,11 +1817,11 @@
         },
         "half_of_commits": {
           "group": [
-            11,
+            10,
             12
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -1854,10 +1854,10 @@
     {
       "name": "Cline",
       "values": {
-        "commits": 3751.0,
-        "authors": 147.0,
-        "new_authors": 117.0,
-        "half_of_commits": 2.0,
+        "commits": 3571.0,
+        "authors": 134.0,
+        "new_authors": 107.0,
+        "half_of_commits": 1.0,
         "organizations": 5.0,
         "ai_share": 0.036941358822009815
       },
@@ -1868,7 +1868,7 @@
             12
           ],
           "all": [
-            31,
+            32,
             107
           ]
         },
@@ -1878,7 +1878,7 @@
             12
           ],
           "all": [
-            62,
+            64,
             107
           ]
         },
@@ -1888,17 +1888,17 @@
             12
           ],
           "all": [
-            58,
+            61,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            9,
+            10,
             12
           ],
           "all": [
-            75,
+            90,
             107
           ]
         },
@@ -1908,7 +1908,7 @@
             12
           ],
           "all": [
-            43,
+            42,
             107
           ]
         },
@@ -1945,7 +1945,7 @@
             12
           ],
           "all": [
-            22,
+            23,
             107
           ]
         },
@@ -1965,7 +1965,7 @@
             12
           ],
           "all": [
-            68,
+            67,
             107
           ]
         },
@@ -2008,9 +2008,9 @@
     {
       "name": "OpenHands",
       "values": {
-        "commits": 3022.0,
-        "authors": 198.0,
-        "new_authors": 175.0,
+        "commits": 3135.0,
+        "authors": 202.0,
+        "new_authors": 179.0,
         "half_of_commits": 5.0,
         "organizations": 1.0,
         "ai_share": 0.5163061026800129
@@ -2018,11 +2018,11 @@
       "ranks": {
         "commits": {
           "group": [
-            8,
+            7,
             12
           ],
           "all": [
-            40,
+            39,
             107
           ]
         },
@@ -2052,7 +2052,7 @@
             12
           ],
           "all": [
-            49,
+            45,
             107
           ]
         },
@@ -2085,9 +2085,9 @@
     {
       "name": "goose",
       "values": {
-        "commits": 2707.0,
-        "authors": 409.0,
-        "new_authors": 356.0,
+        "commits": 2724.0,
+        "authors": 410.0,
+        "new_authors": 358.0,
         "half_of_commits": 10.0,
         "organizations": 4.0,
         "ai_share": 0.07748752568241855
@@ -2099,7 +2099,7 @@
             12
           ],
           "all": [
-            43,
+            44,
             107
           ]
         },
@@ -2109,7 +2109,7 @@
             12
           ],
           "all": [
-            20,
+            21,
             107
           ]
         },
@@ -2119,7 +2119,7 @@
             12
           ],
           "all": [
-            16,
+            17,
             107
           ]
         },
@@ -2129,7 +2129,7 @@
             12
           ],
           "all": [
-            26,
+            25,
             107
           ]
         },
@@ -2162,9 +2162,9 @@
     {
       "name": "Qwen Code",
       "values": {
-        "commits": 9143.0,
-        "authors": 321.0,
-        "new_authors": 311.0,
+        "commits": 9528.0,
+        "authors": 333.0,
+        "new_authors": 323.0,
         "half_of_commits": 4.0,
         "organizations": 2.0,
         "ai_share": 0.06818757921419519
@@ -2186,17 +2186,17 @@
             12
           ],
           "all": [
-            29,
+            28,
             107
           ]
         },
         "new_authors": {
           "group": [
-            6,
+            5,
             12
           ],
           "all": [
-            21,
+            20,
             107
           ]
         },
@@ -2206,7 +2206,7 @@
             12
           ],
           "all": [
-            57,
+            55,
             107
           ]
         },
@@ -2236,10 +2236,10 @@
         {
           "kind": "employer",
           "label": "One company",
-          "value": 0.9994984954864594,
+          "value": 0.9995244888254874,
           "big": "99.9%",
           "sentence": "Of Qwen Code's commits from company addresses in the last 12 months, 99.9% came from one company: alibaba-inc.com.",
-          "compared": "3rd highest of 29; the median project: 91%."
+          "compared": "3rd highest of 29; the median project: 90%."
         }
       ],
       "page": "qwen-code/compare.html",
@@ -2248,12 +2248,12 @@
     {
       "name": "Kilo Code",
       "values": {
-        "commits": 26792.0,
-        "authors": 1004.0,
-        "new_authors": 932.0,
+        "commits": 25792.0,
+        "authors": 919.0,
+        "new_authors": 834.0,
         "half_of_commits": 7.0,
         "organizations": 11.0,
-        "ai_share": 0.0029407833177382704
+        "ai_share": 0.0029405867807257902
       },
       "ranks": {
         "commits": {
@@ -2262,7 +2262,7 @@
             12
           ],
           "all": [
-            2,
+            3,
             107
           ]
         },
@@ -2272,7 +2272,7 @@
             12
           ],
           "all": [
-            7,
+            8,
             107
           ]
         },
@@ -2282,7 +2282,7 @@
             12
           ],
           "all": [
-            5,
+            6,
             107
           ]
         },
@@ -2325,12 +2325,12 @@
     {
       "name": "Crush",
       "values": {
-        "commits": 2307.0,
-        "authors": 101.0,
-        "new_authors": 87.0,
+        "commits": 2385.0,
+        "authors": 103.0,
+        "new_authors": 89.0,
         "half_of_commits": 3.0,
         "organizations": 0.0,
-        "ai_share": 0.016178736517719568
+        "ai_share": 0.016147635524798153
       },
       "ranks": {
         "commits": {
@@ -2339,7 +2339,7 @@
             12
           ],
           "all": [
-            47,
+            46,
             107
           ]
         },
@@ -2349,7 +2349,7 @@
             12
           ],
           "all": [
-            76,
+            74,
             107
           ]
         },
@@ -2369,7 +2369,7 @@
             12
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -2379,7 +2379,7 @@
             12
           ],
           "all": [
-            101,
+            102,
             107
           ]
         },
@@ -2402,11 +2402,11 @@
     {
       "name": "PyTorch",
       "values": {
-        "commits": 17021.0,
-        "authors": 1489.0,
-        "new_authors": 985.0,
+        "commits": 17428.0,
+        "authors": 1514.0,
+        "new_authors": 1005.0,
         "half_of_commits": 30.0,
-        "organizations": 44.0,
+        "organizations": 45.0,
         "ai_share": 0.036711623482007946
       },
       "ranks": {
@@ -2416,7 +2416,7 @@
             12
           ],
           "all": [
-            6,
+            5,
             107
           ]
         },
@@ -2446,7 +2446,7 @@
             12
           ],
           "all": [
-            4,
+            3,
             107
           ]
         },
@@ -2476,10 +2476,10 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 1.1363241871954068,
-          "big": "1.1×",
-          "sentence": "PyTorch's last 12 months were its busiest yet: 17,021 commits by people, more than in any full year before (14,979 in 2025).",
-          "compared": "8th highest of 90; the median project made 50% of its busiest year."
+          "value": 1.1634955604512984,
+          "big": "1.2×",
+          "sentence": "PyTorch's last 12 months were its busiest yet: 17,428 commits by people, more than in any full year before (14,979 in 2025).",
+          "compared": "9th highest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "pytorch/compare.html",
@@ -2488,9 +2488,9 @@
     {
       "name": "Transformers",
       "values": {
-        "commits": 3258.0,
-        "authors": 638.0,
-        "new_authors": 498.0,
+        "commits": 3363.0,
+        "authors": 651.0,
+        "new_authors": 510.0,
         "half_of_commits": 14.0,
         "organizations": 23.0,
         "ai_share": 0.06097560975609756
@@ -2502,7 +2502,7 @@
             12
           ],
           "all": [
-            37,
+            36,
             107
           ]
         },
@@ -2532,7 +2532,7 @@
             12
           ],
           "all": [
-            20,
+            18,
             107
           ]
         },
@@ -2565,9 +2565,9 @@
     {
       "name": "LangChain",
       "values": {
-        "commits": 1415.0,
-        "authors": 214.0,
-        "new_authors": 178.0,
+        "commits": 1448.0,
+        "authors": 217.0,
+        "new_authors": 180.0,
         "half_of_commits": 2.0,
         "organizations": 3.0,
         "ai_share": 0.009838646202282565
@@ -2579,17 +2579,17 @@
             12
           ],
           "all": [
-            63,
+            65,
             107
           ]
         },
         "authors": {
           "group": [
-            11,
+            10,
             12
           ],
           "all": [
-            46,
+            43,
             107
           ]
         },
@@ -2599,7 +2599,7 @@
             12
           ],
           "all": [
-            35,
+            33,
             107
           ]
         },
@@ -2639,10 +2639,10 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.17683747665330368,
+          "value": 0.17840275994506904,
           "big": "18%",
-          "sentence": "Of the 2,768,593 lines ever written into LangChain's own source, 18% are still there; the rest were rewritten or removed.",
-          "compared": "3rd lowest of 97; the median project: 37%."
+          "sentence": "Of the 2,776,577 lines ever written into LangChain's own source, 18% are still there; the rest were rewritten or removed.",
+          "compared": "4th lowest of 97; the median project: 37%."
         }
       ],
       "page": "langchain/compare.html",
@@ -2651,12 +2651,12 @@
     {
       "name": "TensorFlow",
       "values": {
-        "commits": 14808.0,
-        "authors": 678.0,
-        "new_authors": 366.0,
+        "commits": 15373.0,
+        "authors": 694.0,
+        "new_authors": 380.0,
         "half_of_commits": 19.0,
         "organizations": 17.0,
-        "ai_share": 0.0026319341341611555
+        "ai_share": 0.0026262626262626263
       },
       "ranks": {
         "commits": {
@@ -2695,7 +2695,7 @@
             12
           ],
           "all": [
-            7,
+            6,
             107
           ]
         },
@@ -2725,9 +2725,9 @@
         {
           "kind": "days",
           "label": "Days with a commit",
-          "value": 0.9833084205281515,
+          "value": 0.9833333333333333,
           "big": "98%",
-          "sentence": "TensorFlow has had a commit by a person on 98% of the days since its first one: 3,947 days in 11 years.",
+          "sentence": "TensorFlow has had a commit by a person on 98% of the days since its first one: 3,953 days in 11 years.",
           "compared": "3rd highest of 97; the median project: 80% of days."
         }
       ],
@@ -2737,9 +2737,9 @@
     {
       "name": "JAX",
       "values": {
-        "commits": 7450.0,
-        "authors": 304.0,
-        "new_authors": 150.0,
+        "commits": 7659.0,
+        "authors": 309.0,
+        "new_authors": 155.0,
         "half_of_commits": 5.0,
         "organizations": 9.0,
         "ai_share": 0.0010143273741600102
@@ -2751,7 +2751,7 @@
             12
           ],
           "all": [
-            15,
+            14,
             107
           ]
         },
@@ -2771,7 +2771,7 @@
             12
           ],
           "all": [
-            45,
+            42,
             107
           ]
         },
@@ -2781,17 +2781,17 @@
             12
           ],
           "all": [
-            49,
+            45,
             107
           ]
         },
         "organizations": {
           "group": [
-            9,
+            8,
             12
           ],
           "all": [
-            33,
+            32,
             107
           ]
         },
@@ -2811,18 +2811,18 @@
         {
           "kind": "days",
           "label": "Days with a commit",
-          "value": 0.9476944253269098,
+          "value": 0.94782011671816,
           "big": "95%",
-          "sentence": "JAX has had a commit by a person on 95% of the days since its first one: 2,754 days in 8 years.",
+          "sentence": "JAX has had a commit by a person on 95% of the days since its first one: 2,761 days in 8 years.",
           "compared": "8th highest of 97; the median project: 80% of days."
         },
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 0.9733472694016201,
-          "big": "97%",
-          "sentence": "People made 97% as many commits to JAX in the last 12 months as in 2025, its busiest year (7,450 against 7,654).",
-          "compared": "14th highest of 90; the median project made 50% of its busiest year."
+          "value": 1.0006532532009407,
+          "big": "1.0×",
+          "sentence": "JAX's last 12 months were its busiest yet: 7,659 commits by people, more than in any full year before (7,654 in 2025).",
+          "compared": "13th highest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "jax/compare.html",
@@ -2831,10 +2831,10 @@
     {
       "name": "vLLM",
       "values": {
-        "commits": 12516.0,
-        "authors": 2273.0,
-        "new_authors": 1830.0,
-        "half_of_commits": 75.0,
+        "commits": 13100.0,
+        "authors": 2350.0,
+        "new_authors": 1902.0,
+        "half_of_commits": 76.0,
         "organizations": 63.0,
         "ai_share": 0.12826583932070543
       },
@@ -2913,9 +2913,9 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.6325385502484094,
+          "value": 0.631260664058758,
           "big": "63%",
-          "sentence": "63% of the 4,461,385 lines ever written into vLLM's own source are still there.",
+          "sentence": "63% of the 4,707,987 lines ever written into vLLM's own source are still there.",
           "compared": "5th highest of 97; the median project: 37%."
         }
       ],
@@ -2925,10 +2925,10 @@
     {
       "name": "llama.cpp",
       "values": {
-        "commits": 4821.0,
-        "authors": 913.0,
-        "new_authors": 771.0,
-        "half_of_commits": 11.0,
+        "commits": 4999.0,
+        "authors": 943.0,
+        "new_authors": 800.0,
+        "half_of_commits": 12.0,
         "organizations": 19.0,
         "ai_share": 0.03971661657363675
       },
@@ -2949,7 +2949,7 @@
             12
           ],
           "all": [
-            8,
+            7,
             107
           ]
         },
@@ -2969,7 +2969,7 @@
             12
           ],
           "all": [
-            23,
+            22,
             107
           ]
         },
@@ -2979,7 +2979,7 @@
             12
           ],
           "all": [
-            12,
+            13,
             107
           ]
         },
@@ -2999,9 +2999,9 @@
         {
           "kind": "days",
           "label": "Days with a commit",
-          "value": 0.978978978978979,
+          "value": 0.9790888722927558,
           "big": "98%",
-          "sentence": "llama.cpp has had a commit by a person on 98% of the days since its first one: 1,304 days in 4 years.",
+          "sentence": "llama.cpp has had a commit by a person on 98% of the days since its first one: 1,311 days in 4 years.",
           "compared": "4th highest of 97; the median project: 80% of days."
         }
       ],
@@ -3011,9 +3011,9 @@
     {
       "name": "Ollama",
       "values": {
-        "commits": 1235.0,
-        "authors": 111.0,
-        "new_authors": 87.0,
+        "commits": 1150.0,
+        "authors": 86.0,
+        "new_authors": 67.0,
         "half_of_commits": 3.0,
         "organizations": 5.0,
         "ai_share": 0.0024691358024691358
@@ -3025,7 +3025,7 @@
             12
           ],
           "all": [
-            67,
+            70,
             107
           ]
         },
@@ -3035,7 +3035,7 @@
             12
           ],
           "all": [
-            73,
+            81,
             107
           ]
         },
@@ -3045,7 +3045,7 @@
             12
           ],
           "all": [
-            66,
+            75,
             107
           ]
         },
@@ -3055,7 +3055,7 @@
             12
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -3065,7 +3065,7 @@
             12
           ],
           "all": [
-            43,
+            42,
             107
           ]
         },
@@ -3088,9 +3088,9 @@
     {
       "name": "Diffusers",
       "values": {
-        "commits": 1062.0,
-        "authors": 218.0,
-        "new_authors": 165.0,
+        "commits": 1007.0,
+        "authors": 213.0,
+        "new_authors": 160.0,
         "half_of_commits": 5.0,
         "organizations": 7.0,
         "ai_share": 0.08372530573847602
@@ -3102,17 +3102,17 @@
             12
           ],
           "all": [
-            71,
+            73,
             107
           ]
         },
         "authors": {
           "group": [
-            10,
+            11,
             12
           ],
           "all": [
-            43,
+            45,
             107
           ]
         },
@@ -3122,7 +3122,7 @@
             12
           ],
           "all": [
-            38,
+            41,
             107
           ]
         },
@@ -3132,7 +3132,7 @@
             12
           ],
           "all": [
-            49,
+            45,
             107
           ]
         },
@@ -3162,9 +3162,9 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.7228720648126178,
+          "value": 0.7241220664288416,
           "big": "72%",
-          "sentence": "72% of the 1,652,024 lines ever written into Diffusers's own source are still there.",
+          "sentence": "72% of the 1,660,604 lines ever written into Diffusers's own source are still there.",
           "compared": "2nd highest of 97; the median project: 37%."
         }
       ],
@@ -3174,11 +3174,11 @@
     {
       "name": "LlamaIndex",
       "values": {
-        "commits": 614.0,
-        "authors": 290.0,
-        "new_authors": 241.0,
-        "half_of_commits": 39.0,
-        "organizations": 10.0,
+        "commits": 555.0,
+        "authors": 270.0,
+        "new_authors": 221.0,
+        "half_of_commits": 37.0,
+        "organizations": 8.0,
         "ai_share": 0.01680672268907563
       },
       "ranks": {
@@ -3188,7 +3188,7 @@
             12
           ],
           "all": [
-            85,
+            87,
             107
           ]
         },
@@ -3198,7 +3198,7 @@
             12
           ],
           "all": [
-            32,
+            34,
             107
           ]
         },
@@ -3208,7 +3208,7 @@
             12
           ],
           "all": [
-            25,
+            28,
             107
           ]
         },
@@ -3218,17 +3218,17 @@
             12
           ],
           "all": [
-            3,
+            2,
             107
           ]
         },
         "organizations": {
           "group": [
-            8,
+            9,
             12
           ],
           "all": [
-            29,
+            35,
             107
           ]
         },
@@ -3248,10 +3248,18 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.5694308538026485,
+          "value": 0.5694304955881423,
           "big": "57%",
-          "sentence": "57% of the 3,179,271 lines ever written into LlamaIndex's own source are still there.",
+          "sentence": "57% of the 3,179,273 lines ever written into LlamaIndex's own source are still there.",
           "compared": "8th highest of 97; the median project: 37%."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.19204152249134948,
+          "big": "19%",
+          "sentence": "People made 19% as many commits to LlamaIndex in the last 12 months as in 2024, its busiest year (555 against 2,890).",
+          "compared": "13th lowest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "llama-index/compare.html",
@@ -3260,9 +3268,9 @@
     {
       "name": "Ray",
       "values": {
-        "commits": 4159.0,
-        "authors": 462.0,
-        "new_authors": 334.0,
+        "commits": 4307.0,
+        "authors": 474.0,
+        "new_authors": 346.0,
         "half_of_commits": 17.0,
         "organizations": 17.0,
         "ai_share": 0.1667381974248927
@@ -3294,7 +3302,7 @@
             12
           ],
           "all": [
-            20,
+            18,
             107
           ]
         },
@@ -3346,11 +3354,11 @@
     {
       "name": "SGLang",
       "values": {
-        "commits": 14177.0,
-        "authors": 1427.0,
-        "new_authors": 1156.0,
+        "commits": 14699.0,
+        "authors": 1473.0,
+        "new_authors": 1202.0,
         "half_of_commits": 24.0,
-        "organizations": 45.0,
+        "organizations": 46.0,
         "ai_share": 0.09359097278560366
       },
       "ranks": {
@@ -3390,7 +3398,7 @@
             12
           ],
           "all": [
-            5,
+            4,
             107
           ]
         },
@@ -3420,9 +3428,9 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.6740944143796246,
+          "value": 0.6725689181142565,
           "big": "67%",
-          "sentence": "67% of the 5,634,862 lines ever written into SGLang's own source are still there.",
+          "sentence": "67% of the 5,862,791 lines ever written into SGLang's own source are still there.",
           "compared": "3rd highest of 97; the median project: 37%."
         }
       ],
@@ -3432,12 +3440,12 @@
     {
       "name": "Kubernetes",
       "values": {
-        "commits": 6892.0,
-        "authors": 597.0,
-        "new_authors": 352.0,
-        "half_of_commits": 15.0,
-        "organizations": 33.0,
-        "ai_share": 0.0010306917086578104
+        "commits": 7190.0,
+        "authors": 623.0,
+        "new_authors": 374.0,
+        "half_of_commits": 16.0,
+        "organizations": 35.0,
+        "ai_share": 0.001026694045174538
       },
       "ranks": {
         "commits": {
@@ -3466,7 +3474,7 @@
             15
           ],
           "all": [
-            17,
+            16,
             107
           ]
         },
@@ -3476,7 +3484,7 @@
             15
           ],
           "all": [
-            14,
+            12,
             107
           ]
         },
@@ -3506,23 +3514,23 @@
         {
           "kind": "days",
           "label": "Days with a commit",
-          "value": 0.9907305230633414,
+          "value": 0.9909671733862084,
           "big": "99%",
-          "sentence": "Kubernetes has had a commit by a person on 99% of the days since its first one: 4,489 days in 12 years.",
+          "sentence": "Kubernetes has had a commit by a person on 99% of the days since its first one: 4,498 days in 12 years.",
           "compared": "The highest of the 97 GitStats Gallery projects."
         }
       ],
       "page": "kubernetes/compare.html",
-      "headline": "Kubernetes had more new contributors in the last 12 months than any other of the 15 CNCF graduated projects. It also had the most organizations committing."
+      "headline": "Kubernetes had more new contributors in the last 12 months than any other of the 15 CNCF graduated projects. It also had the most people behind half of its commits."
     },
     {
       "name": "Prometheus",
       "values": {
-        "commits": 2475.0,
-        "authors": 276.0,
-        "new_authors": 201.0,
-        "half_of_commits": 6.0,
-        "organizations": 17.0,
+        "commits": 2381.0,
+        "authors": 269.0,
+        "new_authors": 194.0,
+        "half_of_commits": 5.0,
+        "organizations": 15.0,
         "ai_share": 0.023006134969325152
       },
       "ranks": {
@@ -3532,7 +3540,7 @@
             15
           ],
           "all": [
-            45,
+            47,
             107
           ]
         },
@@ -3542,7 +3550,7 @@
             15
           ],
           "all": [
-            33,
+            35,
             107
           ]
         },
@@ -3562,7 +3570,7 @@
             15
           ],
           "all": [
-            39,
+            45,
             107
           ]
         },
@@ -3572,7 +3580,7 @@
             15
           ],
           "all": [
-            16,
+            21,
             107
           ]
         },
@@ -3588,25 +3596,16 @@
         }
       },
       "group": "cncf",
-      "insights": [
-        {
-          "kind": "peak",
-          "label": "Against its busiest year",
-          "value": 1.0295341098169717,
-          "big": "1.0×",
-          "sentence": "Prometheus's last 12 months were its busiest yet: 2,475 commits by people, more than in any full year before (2,404 in 2024).",
-          "compared": "11th highest of 90; the median project made 50% of its busiest year."
-        }
-      ],
+      "insights": [],
       "page": "prometheus/compare.html",
       "headline": "Prometheus is 4th of the 15 CNCF graduated projects for commits."
     },
     {
       "name": "Envoy",
       "values": {
-        "commits": 3291.0,
-        "authors": 335.0,
-        "new_authors": 208.0,
+        "commits": 3405.0,
+        "authors": 349.0,
+        "new_authors": 222.0,
         "half_of_commits": 7.0,
         "organizations": 26.0,
         "ai_share": 0.03634872916097295
@@ -3618,7 +3617,7 @@
             15
           ],
           "all": [
-            36,
+            35,
             107
           ]
         },
@@ -3628,17 +3627,17 @@
             15
           ],
           "all": [
-            28,
+            27,
             107
           ]
         },
         "new_authors": {
           "group": [
-            4,
+            3,
             15
           ],
           "all": [
-            29,
+            27,
             107
           ]
         },
@@ -3678,21 +3677,21 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.6078841744607135,
+          "value": 0.6095205761545911,
           "big": "61%",
-          "sentence": "61% of the 4,817,245 lines ever written into Envoy's own source are still there.",
+          "sentence": "61% of the 4,851,198 lines ever written into Envoy's own source are still there.",
           "compared": "6th highest of 97; the median project: 37%."
         }
       ],
       "page": "envoy/compare.html",
-      "headline": "Envoy is 2nd of the 15 CNCF graduated projects for organizations committing. It is also 3rd for commits."
+      "headline": "Envoy is 2nd of the 15 CNCF graduated projects for organizations committing. It is also 3rd for new contributors."
     },
     {
       "name": "etcd",
       "values": {
-        "commits": 1234.0,
-        "authors": 88.0,
-        "new_authors": 62.0,
+        "commits": 1166.0,
+        "authors": 86.0,
+        "new_authors": 61.0,
         "half_of_commits": 3.0,
         "organizations": 6.0,
         "ai_share": 0.0007209805335255948
@@ -3700,21 +3699,21 @@
       "ranks": {
         "commits": {
           "group": [
-            7,
+            8,
             15
           ],
           "all": [
-            68,
+            69,
             107
           ]
         },
         "authors": {
           "group": [
-            10,
+            11,
             15
           ],
           "all": [
-            79,
+            81,
             107
           ]
         },
@@ -3730,11 +3729,11 @@
         },
         "half_of_commits": {
           "group": [
-            10,
+            9,
             15
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -3764,24 +3763,24 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.2579421360555926,
+          "value": 0.2582322375420186,
           "big": "26%",
-          "sentence": "Of the 941,277 lines ever written into etcd's own source, 26% are still there; the rest were rewritten or removed.",
+          "sentence": "Of the 941,846 lines ever written into etcd's own source, 26% are still there; the rest were rewritten or removed.",
           "compared": "15th lowest of 97; the median project: 37%."
         }
       ],
       "page": "etcd/compare.html",
-      "headline": "etcd sits in the middle of the 15 CNCF graduated projects; its highest place is 7th, for commits."
+      "headline": "etcd sits in the middle of the 15 CNCF graduated projects; its highest place is 8th, for organizations committing."
     },
     {
       "name": "containerd",
       "values": {
-        "commits": 1451.0,
-        "authors": 122.0,
-        "new_authors": 76.0,
-        "half_of_commits": 4.0,
+        "commits": 1481.0,
+        "authors": 123.0,
+        "new_authors": 77.0,
+        "half_of_commits": 3.0,
         "organizations": 20.0,
-        "ai_share": 0.013737836290784202
+        "ai_share": 0.014806378132118452
       },
       "ranks": {
         "commits": {
@@ -3790,7 +3789,7 @@
             15
           ],
           "all": [
-            62,
+            63,
             107
           ]
         },
@@ -3800,7 +3799,7 @@
             15
           ],
           "all": [
-            67,
+            68,
             107
           ]
         },
@@ -3810,7 +3809,7 @@
             15
           ],
           "all": [
-            70,
+            69,
             107
           ]
         },
@@ -3836,11 +3835,11 @@
         },
         "ai_share": {
           "group": [
-            10,
+            8,
             15
           ],
           "all": [
-            68,
+            66,
             107
           ]
         }
@@ -3867,7 +3866,7 @@
             15
           ],
           "all": [
-            79,
+            80,
             107
           ]
         },
@@ -3887,17 +3886,17 @@
             15
           ],
           "all": [
-            80,
+            81,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            10,
+            9,
             15
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -3930,21 +3929,21 @@
     {
       "name": "Istio",
       "values": {
-        "commits": 1164.0,
-        "authors": 157.0,
-        "new_authors": 95.0,
-        "half_of_commits": 6.0,
+        "commits": 1202.0,
+        "authors": 160.0,
+        "new_authors": 98.0,
+        "half_of_commits": 5.0,
         "organizations": 10.0,
         "ai_share": 0.014705882352941176
       },
       "ranks": {
         "commits": {
           "group": [
-            8,
+            7,
             15
           ],
           "all": [
-            69,
+            68,
             107
           ]
         },
@@ -3954,17 +3953,17 @@
             15
           ],
           "all": [
-            61,
+            60,
             107
           ]
         },
         "new_authors": {
           "group": [
-            7,
+            6,
             15
           ],
           "all": [
-            65,
+            62,
             107
           ]
         },
@@ -3974,7 +3973,7 @@
             15
           ],
           "all": [
-            39,
+            45,
             107
           ]
         },
@@ -3984,17 +3983,17 @@
             15
           ],
           "all": [
-            29,
+            28,
             107
           ]
         },
         "ai_share": {
           "group": [
-            8,
+            9,
             15
           ],
           "all": [
-            66,
+            67,
             107
           ]
         }
@@ -4004,21 +4003,21 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.22147743121666547,
+          "value": 0.22294057961177238,
           "big": "22%",
-          "sentence": "Of the 3,424,376 lines ever written into Istio's own source, 22% are still there; the rest were rewritten or removed.",
+          "sentence": "Of the 3,432,677 lines ever written into Istio's own source, 22% are still there; the rest were rewritten or removed.",
           "compared": "10th lowest of 97; the median project: 37%."
         }
       ],
       "page": "istio/compare.html",
-      "headline": "Istio sits in the middle of the 15 CNCF graduated projects; its highest place is 6th, shared, for how widely its commits are spread."
+      "headline": "Istio sits in the middle of the 15 CNCF graduated projects; its highest place is 6th, for new contributors."
     },
     {
       "name": "Argo CD",
       "values": {
-        "commits": 1352.0,
-        "authors": 385.0,
-        "new_authors": 286.0,
+        "commits": 1387.0,
+        "authors": 392.0,
+        "new_authors": 292.0,
         "half_of_commits": 15.0,
         "organizations": 10.0,
         "ai_share": 0.024965955515206535
@@ -4030,7 +4029,7 @@
             15
           ],
           "all": [
-            65,
+            66,
             107
           ]
         },
@@ -4040,7 +4039,7 @@
             15
           ],
           "all": [
-            24,
+            23,
             107
           ]
         },
@@ -4056,11 +4055,11 @@
         },
         "half_of_commits": {
           "group": [
-            1,
+            2,
             15
           ],
           "all": [
-            14,
+            13,
             107
           ]
         },
@@ -4070,7 +4069,7 @@
             15
           ],
           "all": [
-            29,
+            28,
             107
           ]
         },
@@ -4090,24 +4089,24 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 1.1787271142109852,
+          "value": 1.2092414995640801,
           "big": "1.2×",
-          "sentence": "Argo CD's last 12 months were its busiest yet: 1,352 commits by people, more than in any full year before (1,147 in 2025).",
-          "compared": "7th highest of 90; the median project made 50% of its busiest year."
+          "sentence": "Argo CD's last 12 months were its busiest yet: 1,387 commits by people, more than in any full year before (1,147 in 2025).",
+          "compared": "6th highest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "argo-cd/compare.html",
-      "headline": "Argo CD is 2nd of the 15 CNCF graduated projects for new contributors."
+      "headline": "Argo CD is 2nd of the 15 CNCF graduated projects for new contributors. It is also 2nd for how widely its commits are spread."
     },
     {
       "name": "Cilium",
       "values": {
-        "commits": 4564.0,
-        "authors": 343.0,
-        "new_authors": 210.0,
+        "commits": 4706.0,
+        "authors": 351.0,
+        "new_authors": 217.0,
         "half_of_commits": 14.0,
         "organizations": 25.0,
-        "ai_share": 0.00036423238025860496
+        "ai_share": 0.000362844702467344
       },
       "ranks": {
         "commits": {
@@ -4132,11 +4131,11 @@
         },
         "new_authors": {
           "group": [
-            3,
+            4,
             15
           ],
           "all": [
-            28,
+            29,
             107
           ]
         },
@@ -4146,7 +4145,7 @@
             15
           ],
           "all": [
-            20,
+            18,
             107
           ]
         },
@@ -4179,9 +4178,9 @@
     {
       "name": "CoreDNS",
       "values": {
-        "commits": 390.0,
-        "authors": 85.0,
-        "new_authors": 70.0,
+        "commits": 395.0,
+        "authors": 89.0,
+        "new_authors": 74.0,
         "half_of_commits": 3.0,
         "organizations": 1.0,
         "ai_share": 0.00922266139657444
@@ -4193,37 +4192,37 @@
             15
           ],
           "all": [
-            89,
+            90,
             107
           ]
         },
         "authors": {
           "group": [
-            11,
+            10,
             15
           ],
           "all": [
-            83,
+            79,
             107
           ]
         },
         "new_authors": {
           "group": [
-            10,
+            9,
             15
           ],
           "all": [
-            76,
+            72,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            10,
+            9,
             15
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -4253,19 +4252,19 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.566561723154701,
+          "value": 0.5669100034219231,
           "big": "57%",
-          "sentence": "57% of the 262,681 lines ever written into CoreDNS's own source are still there.",
+          "sentence": "57% of the 263,010 lines ever written into CoreDNS's own source are still there.",
           "compared": "9th highest of 97; the median project: 37%."
         }
       ],
       "page": "coredns/compare.html",
-      "headline": "CoreDNS ranks below most of the 15 CNCF graduated projects on every measure here; its highest place is 10th, for new contributors."
+      "headline": "CoreDNS sits in the middle of the 15 CNCF graduated projects; its highest place is 9th, for new contributors."
     },
     {
       "name": "Jaeger",
       "values": {
-        "commits": 1048.0,
+        "commits": 1082.0,
         "authors": 116.0,
         "new_authors": 96.0,
         "half_of_commits": 2.0,
@@ -4279,7 +4278,7 @@
             15
           ],
           "all": [
-            73,
+            71,
             107
           ]
         },
@@ -4295,7 +4294,7 @@
         },
         "new_authors": {
           "group": [
-            6,
+            7,
             15
           ],
           "all": [
@@ -4347,9 +4346,9 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 1.9625468164794007,
+          "value": 2.0262172284644193,
           "big": "2.0×",
-          "sentence": "Jaeger's last 12 months were its busiest yet: 1,048 commits by people, more than in any full year before (534 in 2025).",
+          "sentence": "Jaeger's last 12 months were its busiest yet: 1,082 commits by people, more than in any full year before (534 in 2025).",
           "compared": "The highest of the 90 GitStats Gallery projects."
         }
       ],
@@ -4359,9 +4358,9 @@
     {
       "name": "Linkerd",
       "values": {
-        "commits": 168.0,
-        "authors": 33.0,
-        "new_authors": 25.0,
+        "commits": 160.0,
+        "authors": 31.0,
+        "new_authors": 23.0,
         "half_of_commits": 3.0,
         "organizations": 1.0,
         "ai_share": 0.0011792452830188679
@@ -4383,7 +4382,7 @@
             15
           ],
           "all": [
-            101,
+            100,
             107
           ]
         },
@@ -4399,11 +4398,11 @@
         },
         "half_of_commits": {
           "group": [
-            10,
+            9,
             15
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -4433,19 +4432,19 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 0.17721518987341772,
-          "big": "18%",
-          "sentence": "People made 18% as many commits to Linkerd in the last 12 months as in 2018, its busiest year (168 against 948).",
-          "compared": "11th lowest of 90; the median project made 50% of its busiest year."
+          "value": 0.16877637130801687,
+          "big": "17%",
+          "sentence": "People made 17% as many commits to Linkerd in the last 12 months as in 2018, its busiest year (160 against 948).",
+          "compared": "10th lowest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "linkerd/compare.html",
-      "headline": "Linkerd ranks below most of the 15 CNCF graduated projects on every measure here; its highest place is 10th, shared, for how widely its commits are spread."
+      "headline": "Linkerd sits in the middle of the 15 CNCF graduated projects; its highest place is 9th, shared, for how widely its commits are spread."
     },
     {
       "name": "Harbor",
       "values": {
-        "commits": 343.0,
+        "commits": 349.0,
         "authors": 90.0,
         "new_authors": 73.0,
         "half_of_commits": 5.0,
@@ -4459,7 +4458,7 @@
             15
           ],
           "all": [
-            91,
+            92,
             107
           ]
         },
@@ -4475,21 +4474,21 @@
         },
         "new_authors": {
           "group": [
-            9,
+            10,
             15
           ],
           "all": [
-            72,
+            74,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            8,
+            6,
             15
           ],
           "all": [
-            49,
+            45,
             107
           ]
         },
@@ -4519,15 +4518,15 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 0.13758523866827116,
+          "value": 0.13999197753710388,
           "big": "14%",
-          "sentence": "People made 14% as many commits to Harbor in the last 12 months as in 2019, its busiest year (343 against 2,493).",
-          "compared": "5th lowest of 90; the median project made 50% of its busiest year."
+          "sentence": "People made 14% as many commits to Harbor in the last 12 months as in 2019, its busiest year (349 against 2,493).",
+          "compared": "5th lowest of 90; the median project made 52% of its busiest year."
         },
         {
           "kind": "zone",
           "label": "One time zone",
-          "value": 0.8724308453098439,
+          "value": 0.8719888820259419,
           "big": "87%",
           "sentence": "87% of Harbor's commits were made in one time zone, UTC+08:00, of the 21 it has commits from.",
           "compared": "12th highest of 91; the median project: 34%."
@@ -4539,9 +4538,9 @@
     {
       "name": "Flux",
       "values": {
-        "commits": 386.0,
-        "authors": 49.0,
-        "new_authors": 41.0,
+        "commits": 372.0,
+        "authors": 47.0,
+        "new_authors": 39.0,
         "half_of_commits": 2.0,
         "organizations": 2.0,
         "ai_share": 0.06134969325153374
@@ -4553,7 +4552,7 @@
             15
           ],
           "all": [
-            90,
+            91,
             107
           ]
         },
@@ -4573,7 +4572,7 @@
             15
           ],
           "all": [
-            90,
+            91,
             107
           ]
         },
@@ -4616,7 +4615,7 @@
     {
       "name": "TiKV",
       "values": {
-        "commits": 215.0,
+        "commits": 220.0,
         "authors": 67.0,
         "new_authors": 30.0,
         "half_of_commits": 11.0,
@@ -4630,7 +4629,7 @@
             15
           ],
           "all": [
-            102,
+            101,
             107
           ]
         },
@@ -4640,7 +4639,7 @@
             15
           ],
           "all": [
-            87,
+            86,
             107
           ]
         },
@@ -4676,11 +4675,11 @@
         },
         "ai_share": {
           "group": [
-            9,
+            10,
             15
           ],
           "all": [
-            67,
+            68,
             107
           ]
         }
@@ -4690,15 +4689,15 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 0.11393746687864335,
-          "big": "11%",
-          "sentence": "People made 11% as many commits to TiKV in the last 12 months as in 2016, its busiest year (215 against 1,887).",
-          "compared": "4th lowest of 90; the median project made 50% of its busiest year."
+          "value": 0.11658717541070482,
+          "big": "12%",
+          "sentence": "People made 12% as many commits to TiKV in the last 12 months as in 2016, its busiest year (220 against 1,887).",
+          "compared": "3rd lowest of 90; the median project made 52% of its busiest year."
         },
         {
           "kind": "zone",
           "label": "One time zone",
-          "value": 0.8990170840159138,
+          "value": 0.8988422406736054,
           "big": "90%",
           "sentence": "90% of TiKV's commits were made in one time zone, UTC+08:00, of the 17 it has commits from.",
           "compared": "11th highest of 91; the median project: 34%."
@@ -4706,10 +4705,10 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.5301882975324118,
+          "value": 0.5306766888893086,
           "big": "53%",
-          "sentence": "53% of the 1,586,691 lines ever written into TiKV's own source are still there.",
-          "compared": "13th highest of 97; the median project: 37%."
+          "sentence": "53% of the 1,588,470 lines ever written into TiKV's own source are still there.",
+          "compared": "12th highest of 97; the median project: 37%."
         }
       ],
       "page": "tikv/compare.html",
@@ -4718,11 +4717,11 @@
     {
       "name": "Apache Airflow",
       "values": {
-        "commits": 7750.0,
-        "authors": 878.0,
-        "new_authors": 678.0,
+        "commits": 7972.0,
+        "authors": 901.0,
+        "new_authors": 699.0,
         "half_of_commits": 21.0,
-        "organizations": 19.0,
+        "organizations": 20.0,
         "ai_share": 0.03763183125599233
       },
       "ranks": {
@@ -4762,7 +4761,7 @@
             10
           ],
           "all": [
-            6,
+            5,
             107
           ]
         },
@@ -4772,7 +4771,7 @@
             10
           ],
           "all": [
-            12,
+            11,
             107
           ]
         },
@@ -4792,10 +4791,10 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 1.0451786918408632,
-          "big": "1.0×",
-          "sentence": "Apache Airflow's last 12 months were its busiest yet: 7,750 commits by people, more than in any full year before (7,415 in 2025).",
-          "compared": "10th highest of 90; the median project made 50% of its busiest year."
+          "value": 1.075118004045853,
+          "big": "1.1×",
+          "sentence": "Apache Airflow's last 12 months were its busiest yet: 7,972 commits by people, more than in any full year before (7,415 in 2025).",
+          "compared": "10th highest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "airflow/compare.html",
@@ -4804,9 +4803,9 @@
     {
       "name": "Apache Spark",
       "values": {
-        "commits": 4543.0,
-        "authors": 405.0,
-        "new_authors": 248.0,
+        "commits": 4694.0,
+        "authors": 416.0,
+        "new_authors": 256.0,
         "half_of_commits": 11.0,
         "organizations": 19.0,
         "ai_share": 0.41289640591966176
@@ -4828,7 +4827,7 @@
             10
           ],
           "all": [
-            22,
+            20,
             107
           ]
         },
@@ -4854,11 +4853,11 @@
         },
         "organizations": {
           "group": [
-            1,
+            2,
             10
           ],
           "all": [
-            12,
+            13,
             107
           ]
         },
@@ -4885,15 +4884,15 @@
         }
       ],
       "page": "spark/compare.html",
-      "headline": "Apache Spark had a larger share of commits that name an AI coding assistant than any other of the 10 Apache projects. It is also 2nd for commits."
+      "headline": "Apache Spark had a larger share of commits that name an AI coding assistant than any other of the 10 Apache projects. It is also 2nd for organizations committing."
     },
     {
       "name": "Apache Kafka",
       "values": {
-        "commits": 1884.0,
-        "authors": 247.0,
-        "new_authors": 144.0,
-        "half_of_commits": 18.0,
+        "commits": 1936.0,
+        "authors": 255.0,
+        "new_authors": 152.0,
+        "half_of_commits": 19.0,
         "organizations": 12.0,
         "ai_share": 0.02636916835699797
       },
@@ -4904,7 +4903,7 @@
             10
           ],
           "all": [
-            53,
+            54,
             107
           ]
         },
@@ -4920,11 +4919,11 @@
         },
         "new_authors": {
           "group": [
-            6,
+            5,
             10
           ],
           "all": [
-            49,
+            45,
             107
           ]
         },
@@ -4934,7 +4933,7 @@
             10
           ],
           "all": [
-            8,
+            6,
             107
           ]
         },
@@ -4960,28 +4959,37 @@
         }
       },
       "group": "apache",
-      "insights": [],
+      "insights": [
+        {
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.5281837557502385,
+          "big": "53%",
+          "sentence": "53% of the 3,525,506 lines ever written into Apache Kafka's own source are still there.",
+          "compared": "15th highest of 97; the median project: 37%."
+        }
+      ],
       "page": "kafka/compare.html",
       "headline": "Apache Kafka is 2nd of the 10 Apache projects for how widely its commits are spread."
     },
     {
       "name": "Apache Flink",
       "values": {
-        "commits": 1518.0,
-        "authors": 176.0,
-        "new_authors": 97.0,
+        "commits": 1468.0,
+        "authors": 170.0,
+        "new_authors": 96.0,
         "half_of_commits": 8.0,
-        "organizations": 11.0,
+        "organizations": 10.0,
         "ai_share": 0.10778015703069237
       },
       "ranks": {
         "commits": {
           "group": [
-            6,
+            8,
             10
           ],
           "all": [
-            59,
+            64,
             107
           ]
         },
@@ -5001,7 +5009,7 @@
             10
           ],
           "all": [
-            62,
+            64,
             107
           ]
         },
@@ -5017,11 +5025,11 @@
         },
         "organizations": {
           "group": [
-            5,
+            6,
             10
           ],
           "all": [
-            26,
+            28,
             107
           ]
         },
@@ -5041,7 +5049,7 @@
         {
           "kind": "ai",
           "label": "AI-assisted commits",
-          "value": 0.2781316348195329,
+          "value": 0.27848101265822783,
           "big": "28%",
           "sentence": "The share of Apache Flink's commits that name an AI coding assistant went from 0% in Aug–Oct 2025 to 28% in Aug–Oct 2026.",
           "compared": "11th highest of 72; in the median project it rose by 5 points."
@@ -5053,9 +5061,9 @@
     {
       "name": "Apache Arrow",
       "values": {
-        "commits": 1271.0,
-        "authors": 209.0,
-        "new_authors": 146.0,
+        "commits": 1307.0,
+        "authors": 216.0,
+        "new_authors": 152.0,
         "half_of_commits": 7.0,
         "organizations": 11.0,
         "ai_share": 0.023792357606344627
@@ -5067,7 +5075,7 @@
             10
           ],
           "all": [
-            66,
+            67,
             107
           ]
         },
@@ -5077,7 +5085,7 @@
             10
           ],
           "all": [
-            47,
+            44,
             107
           ]
         },
@@ -5087,7 +5095,7 @@
             10
           ],
           "all": [
-            47,
+            45,
             107
           ]
         },
@@ -5125,14 +5133,14 @@
       "group": "apache",
       "insights": [],
       "page": "arrow/compare.html",
-      "headline": "Apache Arrow sits in the middle of the 10 Apache projects; its highest place is 5th, for new contributors."
+      "headline": "Apache Arrow sits in the middle of the 10 Apache projects; its highest place is 5th, shared, for new contributors."
     },
     {
       "name": "Apache Superset",
       "values": {
-        "commits": 4048.0,
-        "authors": 477.0,
-        "new_authors": 401.0,
+        "commits": 3986.0,
+        "authors": 476.0,
+        "new_authors": 400.0,
         "half_of_commits": 5.0,
         "organizations": 8.0,
         "ai_share": 0.32270634077222815
@@ -5144,7 +5152,7 @@
             10
           ],
           "all": [
-            28,
+            29,
             107
           ]
         },
@@ -5154,7 +5162,7 @@
             10
           ],
           "all": [
-            16,
+            17,
             107
           ]
         },
@@ -5174,7 +5182,7 @@
             10
           ],
           "all": [
-            49,
+            45,
             107
           ]
         },
@@ -5184,7 +5192,7 @@
             10
           ],
           "all": [
-            36,
+            35,
             107
           ]
         },
@@ -5204,10 +5212,10 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 1.3768707482993197,
+          "value": 1.35578231292517,
           "big": "1.4×",
-          "sentence": "Apache Superset's last 12 months were its busiest yet: 4,048 commits by people, more than in any full year before (2,940 in 2021).",
-          "compared": "3rd highest of 90; the median project made 50% of its busiest year."
+          "sentence": "Apache Superset's last 12 months were its busiest yet: 3,986 commits by people, more than in any full year before (2,940 in 2021).",
+          "compared": "3rd highest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "superset/compare.html",
@@ -5216,12 +5224,12 @@
     {
       "name": "Apache Cassandra",
       "values": {
-        "commits": 1050.0,
+        "commits": 1047.0,
         "authors": 88.0,
-        "new_authors": 35.0,
+        "new_authors": 31.0,
         "half_of_commits": 3.0,
         "organizations": 9.0,
-        "ai_share": 0.02265705458290422
+        "ai_share": 0.02263374485596708
       },
       "ranks": {
         "commits": {
@@ -5240,7 +5248,7 @@
             10
           ],
           "all": [
-            79,
+            80,
             107
           ]
         },
@@ -5250,7 +5258,7 @@
             10
           ],
           "all": [
-            94,
+            98,
             107
           ]
         },
@@ -5260,7 +5268,7 @@
             10
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -5270,7 +5278,7 @@
             10
           ],
           "all": [
-            33,
+            32,
             107
           ]
         },
@@ -5286,25 +5294,16 @@
         }
       },
       "group": "apache",
-      "insights": [
-        {
-          "kind": "source",
-          "label": "Code still there",
-          "value": 0.5276672627630759,
-          "big": "53%",
-          "sentence": "53% of the 3,846,134 lines ever written into Apache Cassandra's own source are still there.",
-          "compared": "15th highest of 97; the median project: 37%."
-        }
-      ],
+      "insights": [],
       "page": "cassandra/compare.html",
       "headline": "Apache Cassandra ranks below most of the 10 Apache projects on every measure here; its highest place is 7th, for organizations committing."
     },
     {
       "name": "Apache Beam",
       "values": {
-        "commits": 2146.0,
-        "authors": 215.0,
-        "new_authors": 142.0,
+        "commits": 2219.0,
+        "authors": 222.0,
+        "new_authors": 148.0,
         "half_of_commits": 8.0,
         "organizations": 6.0,
         "ai_share": 0.023273273273273273
@@ -5316,7 +5315,7 @@
             10
           ],
           "all": [
-            48,
+            49,
             107
           ]
         },
@@ -5326,7 +5325,7 @@
             10
           ],
           "all": [
-            45,
+            41,
             107
           ]
         },
@@ -5336,7 +5335,7 @@
             10
           ],
           "all": [
-            50,
+            48,
             107
           ]
         },
@@ -5379,17 +5378,17 @@
     {
       "name": "Apache Iceberg",
       "values": {
-        "commits": 1460.0,
-        "authors": 269.0,
-        "new_authors": 175.0,
+        "commits": 1509.0,
+        "authors": 276.0,
+        "new_authors": 180.0,
         "half_of_commits": 17.0,
-        "organizations": 15.0,
+        "organizations": 17.0,
         "ai_share": 0.05161998901702362
       },
       "ranks": {
         "commits": {
           "group": [
-            8,
+            7,
             10
           ],
           "all": [
@@ -5403,7 +5402,7 @@
             10
           ],
           "all": [
-            35,
+            32,
             107
           ]
         },
@@ -5413,7 +5412,7 @@
             10
           ],
           "all": [
-            36,
+            33,
             107
           ]
         },
@@ -5433,7 +5432,7 @@
             10
           ],
           "all": [
-            21,
+            16,
             107
           ]
         },
@@ -5453,18 +5452,18 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 1.0096818810511756,
+          "value": 1.0435684647302905,
           "big": "1.0×",
-          "sentence": "Apache Iceberg's last 12 months were its busiest yet: 1,460 commits by people, more than in any full year before (1,446 in 2022).",
-          "compared": "13th highest of 90; the median project made 50% of its busiest year."
+          "sentence": "Apache Iceberg's last 12 months were its busiest yet: 1,509 commits by people, more than in any full year before (1,446 in 2022).",
+          "compared": "11th highest of 90; the median project made 52% of its busiest year."
         },
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.22977503652899497,
+          "value": 0.23143524344251123,
           "big": "23%",
-          "sentence": "Of the 6,529,060 lines ever written into Apache Iceberg's own source, 23% are still there; the rest were rewritten or removed.",
-          "compared": "11th lowest of 97; the median project: 37%."
+          "sentence": "Of the 6,545,036 lines ever written into Apache Iceberg's own source, 23% are still there; the rest were rewritten or removed.",
+          "compared": "12th lowest of 97; the median project: 37%."
         }
       ],
       "page": "iceberg/compare.html",
@@ -5473,9 +5472,9 @@
     {
       "name": "Apache Pulsar",
       "values": {
-        "commits": 1506.0,
-        "authors": 132.0,
-        "new_authors": 56.0,
+        "commits": 1675.0,
+        "authors": 134.0,
+        "new_authors": 58.0,
         "half_of_commits": 2.0,
         "organizations": 5.0,
         "ai_share": 0.01800327332242226
@@ -5483,11 +5482,11 @@
       "ranks": {
         "commits": {
           "group": [
-            7,
+            6,
             10
           ],
           "all": [
-            60,
+            59,
             107
           ]
         },
@@ -5497,7 +5496,7 @@
             10
           ],
           "all": [
-            66,
+            64,
             107
           ]
         },
@@ -5527,7 +5526,7 @@
             10
           ],
           "all": [
-            43,
+            42,
             107
           ]
         },
@@ -5547,21 +5546,21 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.2122690529853788,
-          "big": "21%",
-          "sentence": "Of the 6,322,933 lines ever written into Apache Pulsar's own source, 21% are still there; the rest were rewritten or removed.",
+          "value": 0.21514967399776325,
+          "big": "22%",
+          "sentence": "Of the 6,354,711 lines ever written into Apache Pulsar's own source, 22% are still there; the rest were rewritten or removed.",
           "compared": "8th lowest of 97; the median project: 37%."
         }
       ],
       "page": "pulsar/compare.html",
-      "headline": "Apache Pulsar ranks below most of the 10 Apache projects on every measure here; its highest place is 7th, for commits."
+      "headline": "Apache Pulsar sits in the middle of the 10 Apache projects; its highest place is 6th, for commits."
     },
     {
       "name": "React",
       "values": {
-        "commits": 622.0,
-        "authors": 102.0,
-        "new_authors": 67.0,
+        "commits": 545.0,
+        "authors": 97.0,
+        "new_authors": 64.0,
         "half_of_commits": 5.0,
         "organizations": 3.0,
         "ai_share": 0.04582210242587601
@@ -5569,21 +5568,21 @@
       "ranks": {
         "commits": {
           "group": [
-            8,
+            9,
             11
           ],
           "all": [
-            83,
+            88,
             107
           ]
         },
         "authors": {
           "group": [
-            8,
+            9,
             11
           ],
           "all": [
-            75,
+            76,
             107
           ]
         },
@@ -5599,11 +5598,11 @@
         },
         "half_of_commits": {
           "group": [
-            4,
+            3,
             11
           ],
           "all": [
-            49,
+            45,
             107
           ]
         },
@@ -5631,36 +5630,36 @@
       "group": "frontend",
       "insights": [],
       "page": "react/compare.html",
-      "headline": "React's highest place among the 11 open source web frontend projects is 3rd, shared, for organizations committing."
+      "headline": "React is 3rd of the 11 open source web frontend projects for how widely its commits are spread."
     },
     {
       "name": "Vue",
       "values": {
-        "commits": 267.0,
-        "authors": 98.0,
-        "new_authors": 73.0,
-        "half_of_commits": 5.0,
+        "commits": 300.0,
+        "authors": 101.0,
+        "new_authors": 76.0,
+        "half_of_commits": 3.0,
         "organizations": 1.0,
         "ai_share": 0.0
       },
       "ranks": {
         "commits": {
           "group": [
-            10,
+            11,
             11
           ],
           "all": [
-            99,
+            96,
             107
           ]
         },
         "authors": {
           "group": [
-            9,
+            8,
             11
           ],
           "all": [
-            77,
+            75,
             107
           ]
         },
@@ -5670,7 +5669,7 @@
             11
           ],
           "all": [
-            72,
+            70,
             107
           ]
         },
@@ -5680,7 +5679,7 @@
             11
           ],
           "all": [
-            49,
+            57,
             107
           ]
         },
@@ -5708,12 +5707,12 @@
       "group": "frontend",
       "insights": [
         {
-          "kind": "peak",
-          "label": "Against its busiest year",
-          "value": 0.19112383679312814,
-          "big": "19%",
-          "sentence": "People made 19% as many commits to Vue in the last 12 months as in 2020, its busiest year (267 against 1,397).",
-          "compared": "13th lowest of 90; the median project made 50% of its busiest year."
+          "kind": "source",
+          "label": "Code still there",
+          "value": 0.5293001528302431,
+          "big": "53%",
+          "sentence": "53% of the 346,790 lines ever written into Vue's own source are still there.",
+          "compared": "13th highest of 97; the median project: 37%."
         }
       ],
       "page": "vue/compare.html",
@@ -5722,9 +5721,9 @@
     {
       "name": "Angular",
       "values": {
-        "commits": 4009.0,
-        "authors": 236.0,
-        "new_authors": 159.0,
+        "commits": 3576.0,
+        "authors": 206.0,
+        "new_authors": 137.0,
         "half_of_commits": 6.0,
         "organizations": 4.0,
         "ai_share": 0.0
@@ -5736,37 +5735,37 @@
             11
           ],
           "all": [
-            29,
+            31,
             107
           ]
         },
         "authors": {
           "group": [
-            1,
+            3,
             11
           ],
           "all": [
-            37,
+            47,
             107
           ]
         },
         "new_authors": {
           "group": [
-            3,
+            4,
             11
           ],
           "all": [
-            42,
+            51,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            2,
+            1,
             11
           ],
           "all": [
-            39,
+            41,
             107
           ]
         },
@@ -5796,39 +5795,39 @@
         {
           "kind": "days",
           "label": "Days with a commit",
-          "value": 0.9462268413917758,
+          "value": 0.9463117527633657,
           "big": "95%",
-          "sentence": "Angular has had a commit by a person on 95% of the days since its first one: 4,188 days in 12 years.",
+          "sentence": "Angular has had a commit by a person on 95% of the days since its first one: 4,195 days in 12 years.",
           "compared": "9th highest of 97; the median project: 80% of days."
         }
       ],
       "page": "angular/compare.html",
-      "headline": "Angular had more contributors in the last 12 months than any other of the 11 open source web frontend projects. It is also 2nd for organizations committing."
+      "headline": "Angular is 2nd of the 11 open source web frontend projects for organizations committing. It is also 2nd for commits."
     },
     {
       "name": "Svelte",
       "values": {
-        "commits": 651.0,
-        "authors": 145.0,
+        "commits": 611.0,
+        "authors": 143.0,
         "new_authors": 118.0,
-        "half_of_commits": 2.0,
+        "half_of_commits": 3.0,
         "organizations": 1.0,
         "ai_share": 0.02784503631961259
       },
       "ranks": {
         "commits": {
           "group": [
-            7,
+            8,
             11
           ],
           "all": [
-            80,
+            84,
             107
           ]
         },
         "authors": {
           "group": [
-            6,
+            7,
             11
           ],
           "all": [
@@ -5838,21 +5837,21 @@
         },
         "new_authors": {
           "group": [
-            5,
+            6,
             11
           ],
           "all": [
-            57,
+            58,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            7,
+            4,
             11
           ],
           "all": [
-            75,
+            57,
             107
           ]
         },
@@ -5889,14 +5888,14 @@
         }
       ],
       "page": "svelte/compare.html",
-      "headline": "Svelte sits in the middle of the 11 open source web frontend projects; its highest place is 5th, for new contributors."
+      "headline": "Svelte sits in the middle of the 11 open source web frontend projects; its highest place is 4th, shared, for how widely its commits are spread."
     },
     {
       "name": "Next.js",
       "values": {
-        "commits": 4407.0,
-        "authors": 218.0,
-        "new_authors": 160.0,
+        "commits": 4536.0,
+        "authors": 226.0,
+        "new_authors": 167.0,
         "half_of_commits": 6.0,
         "organizations": 3.0,
         "ai_share": 0.04803054662379421
@@ -5908,17 +5907,17 @@
             11
           ],
           "all": [
-            24,
+            22,
             107
           ]
         },
         "authors": {
           "group": [
-            3,
+            1,
             11
           ],
           "all": [
-            43,
+            39,
             107
           ]
         },
@@ -5928,17 +5927,17 @@
             11
           ],
           "all": [
-            40,
+            38,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            2,
+            1,
             11
           ],
           "all": [
-            39,
+            41,
             107
           ]
         },
@@ -5968,21 +5967,21 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.22024252586139775,
+          "value": 0.2224041012207594,
           "big": "22%",
-          "sentence": "Of the 13,806,775 lines ever written into Next.js's own source, 22% are still there; the rest were rewritten or removed.",
+          "sentence": "Of the 13,865,140 lines ever written into Next.js's own source, 22% are still there; the rest were rewritten or removed.",
           "compared": "9th lowest of 97; the median project: 37%."
         }
       ],
       "page": "nextjs/compare.html",
-      "headline": "Next.js had more commits in the last 12 months than any other of the 11 open source web frontend projects."
+      "headline": "Next.js had more contributors in the last 12 months than any other of the 11 open source web frontend projects."
     },
     {
       "name": "Nuxt",
       "values": {
-        "commits": 1411.0,
-        "authors": 177.0,
-        "new_authors": 117.0,
+        "commits": 1498.0,
+        "authors": 184.0,
+        "new_authors": 124.0,
         "half_of_commits": 1.0,
         "organizations": 0.0,
         "ai_share": 0.008201892744479496
@@ -5990,11 +5989,11 @@
       "ranks": {
         "commits": {
           "group": [
-            5,
+            6,
             11
           ],
           "all": [
-            64,
+            62,
             107
           ]
         },
@@ -6004,37 +6003,37 @@
             11
           ],
           "all": [
-            53,
+            52,
             107
           ]
         },
         "new_authors": {
           "group": [
-            6,
+            5,
             11
           ],
           "all": [
-            58,
+            56,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            9,
+            8,
             11
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
         "organizations": {
           "group": [
-            10,
+            11,
             11
           ],
           "all": [
-            101,
+            102,
             107
           ]
         },
@@ -6057,9 +6056,9 @@
     {
       "name": "Vite",
       "values": {
-        "commits": 1074.0,
-        "authors": 225.0,
-        "new_authors": 179.0,
+        "commits": 1007.0,
+        "authors": 221.0,
+        "new_authors": 178.0,
         "half_of_commits": 2.0,
         "organizations": 2.0,
         "ai_share": 0.03805668016194332
@@ -6067,11 +6066,11 @@
       "ranks": {
         "commits": {
           "group": [
-            6,
+            7,
             11
           ],
           "all": [
-            70,
+            73,
             107
           ]
         },
@@ -6081,7 +6080,7 @@
             11
           ],
           "all": [
-            38,
+            42,
             107
           ]
         },
@@ -6091,7 +6090,7 @@
             11
           ],
           "all": [
-            34,
+            37,
             107
           ]
         },
@@ -6134,21 +6133,21 @@
     {
       "name": "Astro",
       "values": {
-        "commits": 233.0,
-        "authors": 168.0,
-        "new_authors": 159.0,
-        "half_of_commits": 52.0,
+        "commits": 2252.0,
+        "authors": 165.0,
+        "new_authors": 154.0,
+        "half_of_commits": 1.0,
         "organizations": 5.0,
         "ai_share": 0.010902747492368076
       },
       "ranks": {
         "commits": {
           "group": [
-            11,
+            3,
             11
           ],
           "all": [
-            100,
+            48,
             107
           ]
         },
@@ -6158,7 +6157,7 @@
             11
           ],
           "all": [
-            57,
+            56,
             107
           ]
         },
@@ -6168,17 +6167,17 @@
             11
           ],
           "all": [
-            42,
+            43,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            1,
+            8,
             11
           ],
           "all": [
-            2,
+            90,
             107
           ]
         },
@@ -6188,7 +6187,7 @@
             11
           ],
           "all": [
-            43,
+            42,
             107
           ]
         },
@@ -6204,33 +6203,24 @@
         }
       },
       "group": "frontend",
-      "insights": [
-        {
-          "kind": "peak",
-          "label": "Against its busiest year",
-          "value": 0.06548622821810006,
-          "big": "7%",
-          "sentence": "People made 7% as many commits to Astro in the last 12 months as in 2023, its busiest year (233 against 3,558).",
-          "compared": "2nd lowest of 90; the median project made 50% of its busiest year."
-        }
-      ],
+      "insights": [],
       "page": "astro/compare.html",
-      "headline": "Astro had more people behind half of its commits than any other of the 11 open source web frontend projects. It also had the most organizations committing."
+      "headline": "Astro had more organizations committing to it than any other of the 11 open source web frontend projects. It is also 3rd for new contributors."
     },
     {
       "name": "Tailwind CSS",
       "values": {
-        "commits": 307.0,
-        "authors": 64.0,
-        "new_authors": 57.0,
+        "commits": 320.0,
+        "authors": 67.0,
+        "new_authors": 60.0,
         "half_of_commits": 1.0,
-        "organizations": 0.0,
+        "organizations": 1.0,
         "ai_share": 0.03155339805825243
       },
       "ranks": {
         "commits": {
           "group": [
-            9,
+            10,
             11
           ],
           "all": [
@@ -6244,7 +6234,7 @@
             11
           ],
           "all": [
-            89,
+            86,
             107
           ]
         },
@@ -6254,27 +6244,27 @@
             11
           ],
           "all": [
-            81,
+            80,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            9,
+            8,
             11
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
         "organizations": {
           "group": [
-            10,
+            7,
             11
           ],
           "all": [
-            101,
+            86,
             107
           ]
         },
@@ -6297,9 +6287,9 @@
     {
       "name": "webpack",
       "values": {
-        "commits": 1841.0,
-        "authors": 45.0,
-        "new_authors": 34.0,
+        "commits": 1959.0,
+        "authors": 47.0,
+        "new_authors": 36.0,
         "half_of_commits": 1.0,
         "organizations": 1.0,
         "ai_share": 0.03910950661853189
@@ -6307,11 +6297,11 @@
       "ranks": {
         "commits": {
           "group": [
-            3,
+            4,
             11
           ],
           "all": [
-            54,
+            53,
             107
           ]
         },
@@ -6321,7 +6311,7 @@
             11
           ],
           "all": [
-            97,
+            95,
             107
           ]
         },
@@ -6331,17 +6321,17 @@
             11
           ],
           "all": [
-            95,
+            93,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            9,
+            8,
             11
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -6369,14 +6359,14 @@
       "group": "frontend",
       "insights": [],
       "page": "webpack/compare.html",
-      "headline": "webpack is 3rd of the 11 open source web frontend projects for commits."
+      "headline": "webpack sits in the middle of the 11 open source web frontend projects; its highest place is 4th, for commits."
     },
     {
       "name": "TypeScript",
       "values": {
-        "commits": 1785.0,
-        "authors": 143.0,
-        "new_authors": 104.0,
+        "commits": 1738.0,
+        "authors": 146.0,
+        "new_authors": 109.0,
         "half_of_commits": 3.0,
         "organizations": 2.0,
         "ai_share": 0.212882096069869
@@ -6384,21 +6374,21 @@
       "ranks": {
         "commits": {
           "group": [
-            4,
+            5,
             11
           ],
           "all": [
-            55,
+            56,
             107
           ]
         },
         "authors": {
           "group": [
-            7,
+            6,
             11
           ],
           "all": [
-            64,
+            62,
             107
           ]
         },
@@ -6408,17 +6398,17 @@
             11
           ],
           "all": [
-            61,
+            60,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            6,
+            4,
             11
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -6448,9 +6438,9 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.05239278713818209,
+          "value": 0.05235918412280631,
           "big": "5%",
-          "sentence": "Of the 27,244,609 lines ever written into TypeScript's own source, 5% are still there; the rest were rewritten or removed.",
+          "sentence": "Of the 27,396,378 lines ever written into TypeScript's own source, 5% are still there; the rest were rewritten or removed.",
           "compared": "The lowest of the 97 GitStats Gallery projects."
         }
       ],
@@ -6460,10 +6450,10 @@
     {
       "name": "Apache Dubbo",
       "values": {
-        "commits": 125.0,
-        "authors": 53.0,
-        "new_authors": 45.0,
-        "half_of_commits": 6.0,
+        "commits": 102.0,
+        "authors": 49.0,
+        "new_authors": 41.0,
+        "half_of_commits": 8.0,
         "organizations": 2.0,
         "ai_share": 0.023668639053254437
       },
@@ -6490,11 +6480,11 @@
         },
         "new_authors": {
           "group": [
-            9,
+            10,
             16
           ],
           "all": [
-            88,
+            89,
             107
           ]
         },
@@ -6504,7 +6494,7 @@
             16
           ],
           "all": [
-            39,
+            32,
             107
           ]
         },
@@ -6534,21 +6524,21 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 0.10416666666666667,
-          "big": "10%",
-          "sentence": "People made 10% as many commits to Apache Dubbo in the last 12 months as in 2012, its busiest year (125 against 1,200).",
-          "compared": "3rd lowest of 90; the median project made 50% of its busiest year."
+          "value": 0.085,
+          "big": "8%",
+          "sentence": "People made 8% as many commits to Apache Dubbo in the last 12 months as in 2012, its busiest year (102 against 1,200).",
+          "compared": "2nd lowest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "dubbo/compare.html",
-      "headline": "Apache Dubbo sits in the middle of the 16 open source projects from China; its highest place is 5th, shared, for how widely its commits are spread."
+      "headline": "Apache Dubbo sits in the middle of the 16 open source projects from China; its highest place is 5th, for how widely its commits are spread."
     },
     {
       "name": "Apache ShardingSphere",
       "values": {
-        "commits": 2699.0,
-        "authors": 62.0,
-        "new_authors": 43.0,
+        "commits": 2736.0,
+        "authors": 64.0,
+        "new_authors": 45.0,
         "half_of_commits": 1.0,
         "organizations": 1.0,
         "ai_share": 0.020530973451327435
@@ -6560,27 +6550,27 @@
             16
           ],
           "all": [
-            44,
+            43,
             107
           ]
         },
         "authors": {
           "group": [
-            10,
+            9,
             16
           ],
           "all": [
-            91,
+            89,
             107
           ]
         },
         "new_authors": {
           "group": [
-            10,
+            9,
             16
           ],
           "all": [
-            89,
+            88,
             107
           ]
         },
@@ -6590,7 +6580,7 @@
             16
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -6610,7 +6600,7 @@
             16
           ],
           "all": [
-            59,
+            58,
             107
           ]
         }
@@ -6620,7 +6610,7 @@
         {
           "kind": "zone",
           "label": "One time zone",
-          "value": 0.9735387439883458,
+          "value": 0.9735183855786871,
           "big": "97%",
           "sentence": "97% of Apache ShardingSphere's commits were made in one time zone, UTC+08:00, of the 20 it has commits from.",
           "compared": "5th highest of 91; the median project: 34%."
@@ -6628,10 +6618,10 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.22994349615319049,
+          "value": 0.2254714654885554,
           "big": "23%",
-          "sentence": "Of the 6,605,214 lines ever written into Apache ShardingSphere's own source, 23% are still there; the rest were rewritten or removed.",
-          "compared": "12th lowest of 97; the median project: 37%."
+          "sentence": "Of the 6,614,429 lines ever written into Apache ShardingSphere's own source, 23% are still there; the rest were rewritten or removed.",
+          "compared": "11th lowest of 97; the median project: 37%."
         }
       ],
       "page": "shardingsphere/compare.html",
@@ -6640,10 +6630,10 @@
     {
       "name": "Apache Doris",
       "values": {
-        "commits": 4244.0,
-        "authors": 163.0,
-        "new_authors": 73.0,
-        "half_of_commits": 16.0,
+        "commits": 4373.0,
+        "authors": 164.0,
+        "new_authors": 74.0,
+        "half_of_commits": 15.0,
         "organizations": 3.0,
         "ai_share": 0.04358626919602529
       },
@@ -6660,17 +6650,17 @@
         },
         "authors": {
           "group": [
-            4,
+            3,
             16
           ],
           "all": [
-            59,
+            58,
             107
           ]
         },
         "new_authors": {
           "group": [
-            4,
+            3,
             16
           ],
           "all": [
@@ -6714,15 +6704,15 @@
         {
           "kind": "employer",
           "label": "One company",
-          "value": 0.9994182664339732,
+          "value": 0.9994337485843715,
           "big": "99.9%",
           "sentence": "Of Apache Doris's commits from company addresses in the last 12 months, 99.9% came from one company: selectdb.com.",
-          "compared": "4th highest of 29; the median project: 91%."
+          "compared": "4th highest of 29; the median project: 90%."
         },
         {
           "kind": "zone",
           "label": "One time zone",
-          "value": 0.9768049061873824,
+          "value": 0.976048628542051,
           "big": "98%",
           "sentence": "98% of Apache Doris's commits were made in one time zone, UTC+08:00, of the 14 it has commits from.",
           "compared": "4th highest of 91; the median project: 34%."
@@ -6730,9 +6720,9 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.6517834779622989,
+          "value": 0.6530549286854679,
           "big": "65%",
-          "sentence": "65% of the 16,988,183 lines ever written into Apache Doris's own source are still there.",
+          "sentence": "65% of the 17,086,209 lines ever written into Apache Doris's own source are still there.",
           "compared": "4th highest of 97; the median project: 37%."
         }
       ],
@@ -6756,7 +6746,7 @@
             16
           ],
           "all": [
-            101,
+            102,
             107
           ]
         },
@@ -6786,7 +6776,7 @@
             16
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -6827,7 +6817,7 @@
           "value": 0.14445910290237468,
           "big": "14%",
           "sentence": "People made 14% as many commits to Apache ECharts in the last 12 months as in 2020, its busiest year (219 against 1,516).",
-          "compared": "8th lowest of 90; the median project made 50% of its busiest year."
+          "compared": "7th lowest of 90; the median project made 52% of its busiest year."
         },
         {
           "kind": "source",
@@ -6844,9 +6834,9 @@
     {
       "name": "Apache DolphinScheduler",
       "values": {
-        "commits": 327.0,
-        "authors": 65.0,
-        "new_authors": 50.0,
+        "commits": 332.0,
+        "authors": 67.0,
+        "new_authors": 52.0,
         "half_of_commits": 2.0,
         "organizations": 2.0,
         "ai_share": 0.0029411764705882353
@@ -6858,7 +6848,7 @@
             16
           ],
           "all": [
-            93,
+            94,
             107
           ]
         },
@@ -6868,7 +6858,7 @@
             16
           ],
           "all": [
-            88,
+            86,
             107
           ]
         },
@@ -6878,7 +6868,7 @@
             16
           ],
           "all": [
-            87,
+            86,
             107
           ]
         },
@@ -6918,7 +6908,7 @@
         {
           "kind": "zone",
           "label": "One time zone",
-          "value": 0.9856296621325142,
+          "value": 0.9855279026422541,
           "big": "99%",
           "sentence": "99% of Apache DolphinScheduler's commits were made in one time zone, UTC+08:00, of the 18 it has commits from.",
           "compared": "3rd highest of 91; the median project: 34%."
@@ -6926,17 +6916,17 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 0.13861805849936415,
+          "value": 0.1407376006782535,
           "big": "14%",
-          "sentence": "People made 14% as many commits to Apache DolphinScheduler in the last 12 months as in 2020, its busiest year (327 against 2,359).",
-          "compared": "6th lowest of 90; the median project made 50% of its busiest year."
+          "sentence": "People made 14% as many commits to Apache DolphinScheduler in the last 12 months as in 2020, its busiest year (332 against 2,359).",
+          "compared": "6th lowest of 90; the median project made 52% of its busiest year."
         },
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.2441871076717774,
+          "value": 0.24488360843867482,
           "big": "24%",
-          "sentence": "Of the 1,829,941 lines ever written into Apache DolphinScheduler's own source, 24% are still there; the rest were rewritten or removed.",
+          "sentence": "Of the 1,831,662 lines ever written into Apache DolphinScheduler's own source, 24% are still there; the rest were rewritten or removed.",
           "compared": "14th lowest of 97; the median project: 37%."
         }
       ],
@@ -6946,9 +6936,9 @@
     {
       "name": "Apache SkyWalking",
       "values": {
-        "commits": 274.0,
-        "authors": 25.0,
-        "new_authors": 15.0,
+        "commits": 285.0,
+        "authors": 26.0,
+        "new_authors": 16.0,
         "half_of_commits": 1.0,
         "organizations": 2.0,
         "ai_share": 0.0037593984962406013
@@ -6960,7 +6950,7 @@
             16
           ],
           "all": [
-            98,
+            100,
             107
           ]
         },
@@ -6976,11 +6966,11 @@
         },
         "new_authors": {
           "group": [
-            15,
+            14,
             16
           ],
           "all": [
-            104,
+            103,
             107
           ]
         },
@@ -6990,7 +6980,7 @@
             16
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -7020,7 +7010,7 @@
         {
           "kind": "zone",
           "label": "One time zone",
-          "value": 0.9571642997344417,
+          "value": 0.9571033210332104,
           "big": "96%",
           "sentence": "96% of Apache SkyWalking's commits were made in one time zone, UTC+08:00, of the 17 it has commits from.",
           "compared": "8th highest of 91; the median project: 34%."
@@ -7028,10 +7018,10 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 0.1453580901856764,
+          "value": 0.15119363395225463,
           "big": "15%",
-          "sentence": "People made 15% as many commits to Apache SkyWalking in the last 12 months as in 2017, its busiest year (274 against 1,885).",
-          "compared": "9th lowest of 90; the median project made 50% of its busiest year."
+          "sentence": "People made 15% as many commits to Apache SkyWalking in the last 12 months as in 2017, its busiest year (285 against 1,885).",
+          "compared": "8th lowest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "skywalking/compare.html",
@@ -7040,21 +7030,21 @@
     {
       "name": "Apache RocketMQ",
       "values": {
-        "commits": 327.0,
+        "commits": 294.0,
         "authors": 64.0,
-        "new_authors": 37.0,
-        "half_of_commits": 6.0,
+        "new_authors": 35.0,
+        "half_of_commits": 7.0,
         "organizations": 2.0,
         "ai_share": 0.021806853582554516
       },
       "ranks": {
         "commits": {
           "group": [
-            10,
+            12,
             16
           ],
           "all": [
-            93,
+            98,
             107
           ]
         },
@@ -7070,21 +7060,21 @@
         },
         "new_authors": {
           "group": [
-            11,
+            12,
             16
           ],
           "all": [
-            92,
+            94,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            5,
+            6,
             16
           ],
           "all": [
-            39,
+            35,
             107
           ]
         },
@@ -7114,7 +7104,7 @@
         {
           "kind": "zone",
           "label": "One time zone",
-          "value": 0.9885405405405405,
+          "value": 0.9885430177258971,
           "big": "99%",
           "sentence": "99% of Apache RocketMQ's commits were made in one time zone, UTC+08:00, of the 12 it has commits from.",
           "compared": "The highest of the 91 GitStats Gallery projects."
@@ -7122,21 +7112,21 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 0.1438627364716234,
-          "big": "14%",
-          "sentence": "People made 14% as many commits to Apache RocketMQ in the last 12 months as in 2013, its busiest year (327 against 2,273).",
-          "compared": "7th lowest of 90; the median project made 50% of its busiest year."
+          "value": 0.1293444786625605,
+          "big": "13%",
+          "sentence": "People made 13% as many commits to Apache RocketMQ in the last 12 months as in 2013, its busiest year (294 against 2,273).",
+          "compared": "4th lowest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "rocketmq/compare.html",
-      "headline": "Apache RocketMQ sits in the middle of the 16 open source projects from China; its highest place is 5th, shared, for how widely its commits are spread."
+      "headline": "Apache RocketMQ sits in the middle of the 16 open source projects from China; its highest place is 6th, for how widely its commits are spread."
     },
     {
       "name": "Apache APISIX",
       "values": {
-        "commits": 615.0,
-        "authors": 55.0,
-        "new_authors": 36.0,
+        "commits": 632.0,
+        "authors": 56.0,
+        "new_authors": 37.0,
         "half_of_commits": 2.0,
         "organizations": 2.0,
         "ai_share": 0.0016366612111292963
@@ -7148,7 +7138,7 @@
             16
           ],
           "all": [
-            84,
+            83,
             107
           ]
         },
@@ -7164,11 +7154,11 @@
         },
         "new_authors": {
           "group": [
-            12,
+            11,
             16
           ],
           "all": [
-            93,
+            92,
             107
           ]
         },
@@ -7216,15 +7206,15 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.7765231489382451,
+          "value": 0.7820809350925352,
           "big": "78%",
-          "sentence": "78% of the 820,340 lines ever written into Apache APISIX's own source are still there.",
+          "sentence": "78% of the 846,975 lines ever written into Apache APISIX's own source are still there.",
           "compared": "The highest of the 97 GitStats Gallery projects."
         },
         {
           "kind": "zone",
           "label": "One time zone",
-          "value": 0.8465930719451846,
+          "value": 0.8465186871561373,
           "big": "85%",
           "sentence": "85% of Apache APISIX's commits were made in one time zone, UTC+08:00, of the 17 it has commits from.",
           "compared": "14th highest of 91; the median project: 34%."
@@ -7246,11 +7236,11 @@
       "ranks": {
         "commits": {
           "group": [
-            6,
+            7,
             16
           ],
           "all": [
-            57,
+            60,
             107
           ]
         },
@@ -7260,7 +7250,7 @@
             16
           ],
           "all": [
-            65,
+            66,
             107
           ]
         },
@@ -7270,17 +7260,17 @@
             16
           ],
           "all": [
-            85,
+            84,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            4,
+            3,
             16
           ],
           "all": [
-            29,
+            27,
             107
           ]
         },
@@ -7317,7 +7307,7 @@
         }
       ],
       "page": "tidb/compare.html",
-      "headline": "TiDB is 4th of the 16 open source projects from China for how widely its commits are spread."
+      "headline": "TiDB's highest place among the 16 open source projects from China is 3rd, shared, for how widely its commits are spread."
     },
     {
       "name": "Milvus",
@@ -7336,7 +7326,7 @@
             16
           ],
           "all": [
-            46,
+            45,
             107
           ]
         },
@@ -7346,7 +7336,7 @@
             16
           ],
           "all": [
-            74,
+            73,
             107
           ]
         },
@@ -7366,7 +7356,7 @@
             16
           ],
           "all": [
-            26,
+            25,
             107
           ]
         },
@@ -7399,7 +7389,7 @@
           "value": 0.307980183787386,
           "big": "31%",
           "sentence": "The share of Milvus's commits that name an AI coding assistant went from 0.2% in Aug–Oct 2025 to 31% in Aug–Oct 2026.",
-          "compared": "8th highest of 72; in the median project it rose by 5 points."
+          "compared": "9th highest of 72; in the median project it rose by 5 points."
         },
         {
           "kind": "zone",
@@ -7411,14 +7401,14 @@
         }
       ],
       "page": "milvus/compare.html",
-      "headline": "Milvus is 4th of the 16 open source projects from China for commits."
+      "headline": "Milvus is 2nd of the 16 open source projects from China for how widely its commits are spread. It is also 4th for commits."
     },
     {
       "name": "Nacos",
       "values": {
-        "commits": 775.0,
-        "authors": 86.0,
-        "new_authors": 65.0,
+        "commits": 765.0,
+        "authors": 84.0,
+        "new_authors": 63.0,
         "half_of_commits": 3.0,
         "organizations": 3.0,
         "ai_share": 0.36723910171730517
@@ -7430,7 +7420,7 @@
             16
           ],
           "all": [
-            76,
+            78,
             107
           ]
         },
@@ -7440,7 +7430,7 @@
             16
           ],
           "all": [
-            82,
+            83,
             107
           ]
         },
@@ -7460,7 +7450,7 @@
             16
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -7498,7 +7488,7 @@
         {
           "kind": "zone",
           "label": "One time zone",
-          "value": 0.986945580371186,
+          "value": 0.9869619855482249,
           "big": "99%",
           "sentence": "99% of Nacos's commits were made in one time zone, UTC+08:00, of the 12 it has commits from.",
           "compared": "2nd highest of 91; the median project: 34%."
@@ -7510,27 +7500,27 @@
     {
       "name": "Ant Design",
       "values": {
-        "commits": 1615.0,
-        "authors": 177.0,
-        "new_authors": 132.0,
+        "commits": 1729.0,
+        "authors": 182.0,
+        "new_authors": 137.0,
         "half_of_commits": 4.0,
         "organizations": 1.0,
-        "ai_share": 0.11433108376339818
+        "ai_share": 0.11128224874855602
       },
       "ranks": {
         "commits": {
           "group": [
-            7,
+            6,
             16
           ],
           "all": [
-            58,
+            57,
             107
           ]
         },
         "authors": {
           "group": [
-            3,
+            2,
             16
           ],
           "all": [
@@ -7544,7 +7534,7 @@
             16
           ],
           "all": [
-            52,
+            51,
             107
           ]
         },
@@ -7554,7 +7544,7 @@
             16
           ],
           "all": [
-            57,
+            55,
             107
           ]
         },
@@ -7584,9 +7574,9 @@
         {
           "kind": "zone",
           "label": "One time zone",
-          "value": 0.905564771527673,
-          "big": "91%",
-          "sentence": "91% of Ant Design's commits were made in one time zone, UTC+08:00, of the 28 it has commits from.",
+          "value": 0.9043517406962785,
+          "big": "90%",
+          "sentence": "90% of Ant Design's commits were made in one time zone, UTC+08:00, of the 28 it has commits from.",
           "compared": "10th highest of 91; the median project: 34%."
         }
       ],
@@ -7596,10 +7586,10 @@
     {
       "name": "PaddlePaddle",
       "values": {
-        "commits": 2092.0,
-        "authors": 186.0,
-        "new_authors": 76.0,
-        "half_of_commits": 10.0,
+        "commits": 1750.0,
+        "authors": 163.0,
+        "new_authors": 65.0,
+        "half_of_commits": 9.0,
         "organizations": 5.0,
         "ai_share": 0.04928989139515455
       },
@@ -7610,37 +7600,37 @@
             16
           ],
           "all": [
-            50,
+            55,
             107
           ]
         },
         "authors": {
           "group": [
-            2,
+            4,
             16
           ],
           "all": [
-            52,
+            59,
             107
           ]
         },
         "new_authors": {
           "group": [
-            3,
+            4,
             16
           ],
           "all": [
-            70,
+            76,
             107
           ]
         },
         "half_of_commits": {
           "group": [
-            2,
+            3,
             16
           ],
           "all": [
-            26,
+            27,
             107
           ]
         },
@@ -7650,7 +7640,7 @@
             16
           ],
           "all": [
-            43,
+            42,
             107
           ]
         },
@@ -7670,7 +7660,7 @@
         {
           "kind": "zone",
           "label": "One time zone",
-          "value": 0.8656954871072478,
+          "value": 0.8657162487117829,
           "big": "87%",
           "sentence": "87% of PaddlePaddle's commits were made in one time zone, UTC+08:00, of the 17 it has commits from.",
           "compared": "13th highest of 91; the median project: 34%."
@@ -7678,14 +7668,14 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 0.19274000368527733,
-          "big": "19%",
-          "sentence": "People made 19% as many commits to PaddlePaddle in the last 12 months as in 2018, its busiest year (2,092 against 10,854).",
-          "compared": "14th lowest of 90; the median project made 50% of its busiest year."
+          "value": 0.16123088262391744,
+          "big": "16%",
+          "sentence": "People made 16% as many commits to PaddlePaddle in the last 12 months as in 2018, its busiest year (1,750 against 10,854).",
+          "compared": "9th lowest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "paddle/compare.html",
-      "headline": "PaddlePaddle is 2nd of the 16 open source projects from China for organizations committing. It is also 2nd for contributors."
+      "headline": "PaddlePaddle is 2nd of the 16 open source projects from China for organizations committing. It is also 4th for new contributors."
     },
     {
       "name": "KubeEdge",
@@ -7700,7 +7690,7 @@
       "ranks": {
         "commits": {
           "group": [
-            12,
+            11,
             16
           ],
           "all": [
@@ -7790,7 +7780,7 @@
             16
           ],
           "all": [
-            5,
+            6,
             107
           ]
         },
@@ -7816,11 +7806,11 @@
         },
         "half_of_commits": {
           "group": [
-            5,
+            7,
             16
           ],
           "all": [
-            39,
+            41,
             107
           ]
         },
@@ -7906,7 +7896,7 @@
             16
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -7916,7 +7906,7 @@
             16
           ],
           "all": [
-            101,
+            102,
             107
           ]
         },
@@ -7932,28 +7922,37 @@
         }
       },
       "group": "china",
-      "insights": [],
+      "insights": [
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.19681908548707752,
+          "big": "20%",
+          "sentence": "People made 20% as many commits to OpenHarmony LiteOS-A in the last 12 months as in 2021, its busiest year (99 against 503).",
+          "compared": "14th lowest of 90; the median project made 52% of its busiest year."
+        }
+      ],
       "page": "openharmony-liteos-a/compare.html",
       "headline": "OpenHarmony LiteOS-A ranks below most of the 16 open source projects from China on every measure here; its highest place is 13th, shared, for how widely its commits are spread."
     },
     {
       "name": "Git",
       "values": {
-        "commits": 3479.0,
-        "authors": 223.0,
-        "new_authors": 141.0,
+        "commits": 3536.0,
+        "authors": 228.0,
+        "new_authors": 146.0,
         "half_of_commits": 3.0,
         "organizations": 13.0,
-        "ai_share": 0.024365221851756862
+        "ai_share": 0.02435897435897436
       },
       "ranks": {
         "commits": {
           "group": [
-            9,
+            8,
             14
           ],
           "all": [
-            34,
+            33,
             107
           ]
         },
@@ -7963,7 +7962,7 @@
             14
           ],
           "all": [
-            40,
+            38,
             107
           ]
         },
@@ -7973,7 +7972,7 @@
             14
           ],
           "all": [
-            51,
+            49,
             107
           ]
         },
@@ -7983,7 +7982,7 @@
             14
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -8013,9 +8012,9 @@
         {
           "kind": "days",
           "label": "Days with a commit",
-          "value": 0.9336125920284336,
+          "value": 0.9337815552454649,
           "big": "93%",
-          "sentence": "Git has had a commit by a person on 93% of the days since its first one: 7,355 days in 22 years.",
+          "sentence": "Git has had a commit by a person on 93% of the days since its first one: 7,361 days in 22 years.",
           "compared": "11th highest of 97; the median project: 80% of days."
         }
       ],
@@ -8039,7 +8038,7 @@
             14
           ],
           "all": [
-            3,
+            2,
             107
           ]
         },
@@ -8069,7 +8068,7 @@
             14
           ],
           "all": [
-            22,
+            21,
             107
           ]
         },
@@ -8118,7 +8117,7 @@
           "value": 1.5898170731707317,
           "big": "1.6×",
           "sentence": "VS Code's last 12 months were its busiest yet: 26,073 commits by people, more than in any full year before (16,400 in 2025).",
-          "compared": "2nd highest of 90; the median project made 50% of its busiest year."
+          "compared": "2nd highest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "vscode/compare.html",
@@ -8127,9 +8126,9 @@
     {
       "name": "Node.js",
       "values": {
-        "commits": 3539.0,
-        "authors": 394.0,
-        "new_authors": 241.0,
+        "commits": 3618.0,
+        "authors": 408.0,
+        "new_authors": 255.0,
         "half_of_commits": 9.0,
         "organizations": 18.0,
         "ai_share": 0.13375965893951505
@@ -8137,11 +8136,11 @@
       "ranks": {
         "commits": {
           "group": [
-            8,
+            7,
             14
           ],
           "all": [
-            33,
+            30,
             107
           ]
         },
@@ -8151,7 +8150,7 @@
             14
           ],
           "all": [
-            23,
+            22,
             107
           ]
         },
@@ -8171,7 +8170,7 @@
             14
           ],
           "all": [
-            29,
+            27,
             107
           ]
         },
@@ -8201,18 +8200,18 @@
         {
           "kind": "days",
           "label": "Days with a commit",
-          "value": 0.9448051948051948,
+          "value": 0.9448648648648649,
           "big": "94%",
-          "sentence": "Node.js has had a commit by a person on 94% of the days since its first one: 6,111 days in 18 years.",
+          "sentence": "Node.js has had a commit by a person on 94% of the days since its first one: 6,118 days in 18 years.",
           "compared": "10th highest of 97; the median project: 80% of days."
         },
         {
           "kind": "ai",
           "label": "AI-assisted commits",
-          "value": 0.30575980392156865,
+          "value": 0.30858186244674374,
           "big": "31%",
           "sentence": "The share of Node.js's commits that name an AI coding assistant went from 0% in Aug–Oct 2025 to 31% in Aug–Oct 2026.",
-          "compared": "9th highest of 72; in the median project it rose by 5 points."
+          "compared": "8th highest of 72; in the median project it rose by 5 points."
         }
       ],
       "page": "nodejs/compare.html",
@@ -8221,12 +8220,12 @@
     {
       "name": "Rust",
       "values": {
-        "commits": 32025.0,
-        "authors": 1266.0,
-        "new_authors": 753.0,
+        "commits": 32978.0,
+        "authors": 1289.0,
+        "new_authors": 773.0,
         "half_of_commits": 15.0,
         "organizations": 55.0,
-        "ai_share": 0.0004147042270209426
+        "ai_share": 0.00041394399929038173
       },
       "ranks": {
         "commits": {
@@ -8265,7 +8264,7 @@
             14
           ],
           "all": [
-            14,
+            13,
             107
           ]
         },
@@ -8295,10 +8294,18 @@
         {
           "kind": "days",
           "label": "Days with a commit",
-          "value": 0.9901387263914424,
+          "value": 0.9903171953255425,
           "big": "99%",
-          "sentence": "Rust has had a commit by a person on 99% of the days since its first one: 5,924 days in 16 years.",
+          "sentence": "Rust has had a commit by a person on 99% of the days since its first one: 5,932 days in 16 years.",
           "compared": "2nd highest of 97; the median project: 80% of days."
+        },
+        {
+          "kind": "peak",
+          "label": "Against its busiest year",
+          "value": 0.9938520884817069,
+          "big": "99%",
+          "sentence": "People made 99% as many commits to Rust in the last 12 months as in 2024, its busiest year (32,978 against 33,182).",
+          "compared": "14th highest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "rust/compare.html",
@@ -8307,21 +8314,21 @@
     {
       "name": "Go",
       "values": {
-        "commits": 3585.0,
-        "authors": 337.0,
-        "new_authors": 187.0,
-        "half_of_commits": 15.0,
+        "commits": 3411.0,
+        "authors": 325.0,
+        "new_authors": 180.0,
+        "half_of_commits": 14.0,
         "organizations": 21.0,
-        "ai_share": 0.0039018952062430325
+        "ai_share": 0.00387382401770891
       },
       "ranks": {
         "commits": {
           "group": [
-            7,
+            9,
             14
           ],
           "all": [
-            32,
+            34,
             107
           ]
         },
@@ -8331,7 +8338,7 @@
             14
           ],
           "all": [
-            27,
+            29,
             107
           ]
         },
@@ -8347,11 +8354,11 @@
         },
         "half_of_commits": {
           "group": [
-            2,
+            3,
             14
           ],
           "all": [
-            14,
+            18,
             107
           ]
         },
@@ -8361,7 +8368,7 @@
             14
           ],
           "all": [
-            9,
+            10,
             107
           ]
         },
@@ -8379,7 +8386,7 @@
       "group": "devtools",
       "insights": [],
       "page": "go/compare.html",
-      "headline": "Go is 2nd of the 14 open source languages and developer tools for organizations committing."
+      "headline": "Go is 2nd of the 14 open source languages and developer tools for organizations committing. It is also 3rd for how widely its commits are spread."
     },
     {
       "name": "Deno",
@@ -8418,7 +8425,7 @@
             14
           ],
           "all": [
-            44,
+            43,
             107
           ]
         },
@@ -8461,7 +8468,7 @@
           "value": 1.1887713588283157,
           "big": "1.2×",
           "sentence": "Deno's last 12 months were its busiest yet: 2,922 commits by people, more than in any full year before (2,458 in 2024).",
-          "compared": "5th highest of 90; the median project made 50% of its busiest year."
+          "compared": "7th highest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "deno/compare.html",
@@ -8470,9 +8477,9 @@
     {
       "name": "Bun",
       "values": {
-        "commits": 4440.0,
-        "authors": 72.0,
-        "new_authors": 52.0,
+        "commits": 4463.0,
+        "authors": 73.0,
+        "new_authors": 53.0,
         "half_of_commits": 1.0,
         "organizations": 2.0,
         "ai_share": 0.10662080825451418
@@ -8484,7 +8491,7 @@
             14
           ],
           "all": [
-            23,
+            24,
             107
           ]
         },
@@ -8504,7 +8511,7 @@
             14
           ],
           "all": [
-            86,
+            84,
             107
           ]
         },
@@ -8514,7 +8521,7 @@
             14
           ],
           "all": [
-            92,
+            90,
             107
           ]
         },
@@ -8544,26 +8551,18 @@
         {
           "kind": "days",
           "label": "Days with a commit",
-          "value": 0.9318181818181818,
+          "value": 0.9315270935960591,
           "big": "93%",
-          "sentence": "Bun has had a commit by a person on 93% of the days since its first one: 1,886 days in 6 years.",
+          "sentence": "Bun has had a commit by a person on 93% of the days since its first one: 1,891 days in 6 years.",
           "compared": "12th highest of 97; the median project: 80% of days."
         },
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 1.247191011235955,
-          "big": "1.2×",
-          "sentence": "Bun's last 12 months were its busiest yet: 4,440 commits by people, more than in any full year before (3,560 in 2023).",
-          "compared": "4th highest of 90; the median project made 50% of its busiest year."
-        },
-        {
-          "kind": "source",
-          "label": "Code still there",
-          "value": 0.5594655098832817,
-          "big": "56%",
-          "sentence": "56% of the 14,464,477 lines ever written into Bun's own source are still there.",
-          "compared": "11th highest of 97; the median project: 37%."
+          "value": 1.2536516853932584,
+          "big": "1.3×",
+          "sentence": "Bun's last 12 months were its busiest yet: 4,463 commits by people, more than in any full year before (3,560 in 2023).",
+          "compared": "4th highest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "bun/compare.html",
@@ -8572,10 +8571,10 @@
     {
       "name": "Zed",
       "values": {
-        "commits": 7477.0,
-        "authors": 1119.0,
-        "new_authors": 924.0,
-        "half_of_commits": 17.0,
+        "commits": 7548.0,
+        "authors": 1139.0,
+        "new_authors": 943.0,
+        "half_of_commits": 18.0,
         "organizations": 5.0,
         "ai_share": 0.016639889832453524
       },
@@ -8586,7 +8585,7 @@
             14
           ],
           "all": [
-            14,
+            15,
             107
           ]
         },
@@ -8606,7 +8605,7 @@
             14
           ],
           "all": [
-            6,
+            5,
             107
           ]
         },
@@ -8616,7 +8615,7 @@
             14
           ],
           "all": [
-            10,
+            9,
             107
           ]
         },
@@ -8626,7 +8625,7 @@
             14
           ],
           "all": [
-            43,
+            42,
             107
           ]
         },
@@ -8646,9 +8645,9 @@
         {
           "kind": "days",
           "label": "Days with a commit",
-          "value": 0.9240749639596348,
+          "value": 0.9243295019157088,
           "big": "92%",
-          "sentence": "Zed has had a commit by a person on 92% of the days since its first one: 1,923 days in 6 years.",
+          "sentence": "Zed has had a commit by a person on 92% of the days since its first one: 1,930 days in 6 years.",
           "compared": "15th highest of 97; the median project: 80% of days."
         }
       ],
@@ -8658,12 +8657,12 @@
     {
       "name": "Neovim",
       "values": {
-        "commits": 3948.0,
-        "authors": 270.0,
-        "new_authors": 188.0,
+        "commits": 4014.0,
+        "authors": 274.0,
+        "new_authors": 191.0,
         "half_of_commits": 2.0,
         "organizations": 1.0,
-        "ai_share": 0.013029315960912053
+        "ai_share": 0.013023255813953489
       },
       "ranks": {
         "commits": {
@@ -8672,7 +8671,7 @@
             14
           ],
           "all": [
-            30,
+            28,
             107
           ]
         },
@@ -8682,7 +8681,7 @@
             14
           ],
           "all": [
-            34,
+            33,
             107
           ]
         },
@@ -8732,9 +8731,9 @@
         {
           "kind": "days",
           "label": "Days with a commit",
-          "value": 0.9680120223271791,
+          "value": 0.9678456591639871,
           "big": "97%",
-          "sentence": "Neovim has had a commit by a person on 97% of the days since its first one: 4,509 days in 13 years.",
+          "sentence": "Neovim has had a commit by a person on 97% of the days since its first one: 4,515 days in 13 years.",
           "compared": "6th highest of 97; the median project: 80% of days."
         }
       ],
@@ -8744,9 +8743,9 @@
     {
       "name": "Homebrew",
       "values": {
-        "commits": 5957.0,
-        "authors": 189.0,
-        "new_authors": 125.0,
+        "commits": 6173.0,
+        "authors": 191.0,
+        "new_authors": 127.0,
         "half_of_commits": 2.0,
         "organizations": 3.0,
         "ai_share": 0.02973445698839243
@@ -8764,11 +8763,11 @@
         },
         "authors": {
           "group": [
-            9,
+            10,
             14
           ],
           "all": [
-            50,
+            51,
             107
           ]
         },
@@ -8818,10 +8817,10 @@
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 1.1305750616815335,
-          "big": "1.1×",
-          "sentence": "Homebrew's last 12 months were its busiest yet: 5,957 commits by people, more than in any full year before (5,269 in 2020).",
-          "compared": "9th highest of 90; the median project made 50% of its busiest year."
+          "value": 1.1715695577908523,
+          "big": "1.2×",
+          "sentence": "Homebrew's last 12 months were its busiest yet: 6,173 commits by people, more than in any full year before (5,269 in 2020).",
+          "compared": "8th highest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "homebrew/compare.html",
@@ -8830,12 +8829,12 @@
     {
       "name": "nginx",
       "values": {
-        "commits": 293.0,
-        "authors": 46.0,
-        "new_authors": 33.0,
+        "commits": 287.0,
+        "authors": 47.0,
+        "new_authors": 34.0,
         "half_of_commits": 3.0,
         "organizations": 2.0,
-        "ai_share": 0.020833333333333332
+        "ai_share": 0.020338983050847456
       },
       "ranks": {
         "commits": {
@@ -8844,7 +8843,7 @@
             14
           ],
           "all": [
-            97,
+            99,
             107
           ]
         },
@@ -8854,7 +8853,7 @@
             14
           ],
           "all": [
-            96,
+            95,
             107
           ]
         },
@@ -8864,7 +8863,7 @@
             14
           ],
           "all": [
-            97,
+            95,
             107
           ]
         },
@@ -8874,7 +8873,7 @@
             14
           ],
           "all": [
-            60,
+            57,
             107
           ]
         },
@@ -8894,7 +8893,7 @@
             14
           ],
           "all": [
-            58,
+            60,
             107
           ]
         }
@@ -8904,9 +8903,9 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.5619232539250361,
+          "value": 0.5619265676643281,
           "big": "56%",
-          "sentence": "56% of the 545,409 lines ever written into nginx's own source are still there.",
+          "sentence": "56% of the 545,509 lines ever written into nginx's own source are still there.",
           "compared": "10th highest of 97; the median project: 37%."
         }
       ],
@@ -8916,9 +8915,9 @@
     {
       "name": "curl",
       "values": {
-        "commits": 3086.0,
-        "authors": 187.0,
-        "new_authors": 146.0,
+        "commits": 3140.0,
+        "authors": 192.0,
+        "new_authors": 151.0,
         "half_of_commits": 2.0,
         "organizations": 17.0,
         "ai_share": 0.0
@@ -8930,17 +8929,17 @@
             14
           ],
           "all": [
-            39,
+            38,
             107
           ]
         },
         "authors": {
           "group": [
-            10,
+            9,
             14
           ],
           "all": [
-            51,
+            50,
             107
           ]
         },
@@ -8993,9 +8992,9 @@
     {
       "name": "Redis",
       "values": {
-        "commits": 562.0,
-        "authors": 118.0,
-        "new_authors": 83.0,
+        "commits": 587.0,
+        "authors": 120.0,
+        "new_authors": 84.0,
         "half_of_commits": 9.0,
         "organizations": 3.0,
         "ai_share": 0.03633217993079585
@@ -9007,7 +9006,7 @@
             14
           ],
           "all": [
-            87,
+            86,
             107
           ]
         },
@@ -9027,7 +9026,7 @@
             14
           ],
           "all": [
-            69,
+            68,
             107
           ]
         },
@@ -9037,7 +9036,7 @@
             14
           ],
           "all": [
-            29,
+            27,
             107
           ]
         },
@@ -9067,9 +9066,9 @@
         {
           "kind": "source",
           "label": "Code still there",
-          "value": 0.5700306522525989,
+          "value": 0.570749357397878,
           "big": "57%",
-          "sentence": "57% of the 1,185,231 lines ever written into Redis's own source are still there.",
+          "sentence": "57% of the 1,188,138 lines ever written into Redis's own source are still there.",
           "compared": "7th highest of 97; the median project: 37%."
         }
       ],
@@ -9079,7 +9078,7 @@
     {
       "name": "PostgreSQL",
       "values": {
-        "commits": 3093.0,
+        "commits": 3169.0,
         "authors": 30.0,
         "new_authors": 0.0,
         "half_of_commits": 6.0,
@@ -9093,7 +9092,7 @@
             14
           ],
           "all": [
-            38,
+            37,
             107
           ]
         },
@@ -9103,7 +9102,7 @@
             14
           ],
           "all": [
-            102,
+            101,
             107
           ]
         },
@@ -9123,7 +9122,7 @@
             14
           ],
           "all": [
-            39,
+            41,
             107
           ]
         },
@@ -9153,18 +9152,18 @@
         {
           "kind": "days",
           "label": "Days with a commit",
-          "value": 0.9269394021493723,
+          "value": 0.9268953068592057,
           "big": "93%",
-          "sentence": "PostgreSQL has had a commit by a person on 93% of the days since its first one: 10,264 days in 30 years.",
+          "sentence": "PostgreSQL has had a commit by a person on 93% of the days since its first one: 10,270 days in 30 years.",
           "compared": "14th highest of 97; the median project: 80% of days."
         },
         {
           "kind": "peak",
           "label": "Against its busiest year",
-          "value": 1.010454099967331,
+          "value": 1.035282587389742,
           "big": "1.0×",
-          "sentence": "PostgreSQL's last 12 months were its busiest yet: 3,093 commits by people, more than in any full year before (3,061 in 2001).",
-          "compared": "12th highest of 90; the median project made 50% of its busiest year."
+          "sentence": "PostgreSQL's last 12 months were its busiest yet: 3,169 commits by people, more than in any full year before (3,061 in 2001).",
+          "compared": "12th highest of 90; the median project made 52% of its busiest year."
         }
       ],
       "page": "postgres/compare.html",

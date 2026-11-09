@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:01:42+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:13:15+00:00",
   "name": "Linkerd",
   "report_path": "index.html",
   "first_commit": "2017-12-05 00:17:02",
-  "last_commit": "2026-10-30 20:15:53",
-  "age_days": 3252,
-  "active_days": 2000,
-  "total_commits": 9202,
-  "total_authors": 402,
+  "last_commit": "2026-11-06 20:52:40",
+  "age_days": 3259,
+  "active_days": 2005,
+  "total_commits": 9211,
+  "total_authors": 403,
   "active_authors_12mo": 33,
-  "commits_last_12mo": 718,
+  "commits_last_12mo": 727,
   "total_files": 1469,
-  "total_lines": 442186,
-  "lines_added": 1209254,
-  "lines_removed": 766916,
+  "total_lines": 442277,
+  "lines_added": 1209432,
+  "lines_removed": 767003,
   "total_tags": 424,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Alejandro Pedraza",
-      "commits": 624
+      "commits": 626
     },
     {
       "name": "Alex Leong",
@@ -41,18 +41,19 @@
     }
   ],
   "author_commits": {
+    "Raymond Kroeker": 11,
+    "toidiu": 5,
+    "l5d-bot": 143,
+    "Alejandro Pedraza": 626,
+    "Spicy Shark": 1,
     "Anthony Turcios": 4,
-    "toidiu": 3,
     "Allison Richardet": 7,
-    "l5d-bot": 142,
-    "Raymond Kroeker": 9,
     "Matt Bailey": 1,
     "Pujitha Paladugu": 2,
     "Flynn": 6,
     "Zain Qureshi": 1,
     "katelyn martin": 27,
     "Alex Leong": 504,
-    "Alejandro Pedraza": 624,
     "Yao Sun": 1,
     "Jojin": 1,
     "Sudhir Jaiswal": 1,
@@ -454,7 +455,7 @@
     "2023": 1054,
     "2024": 1235,
     "2025": 1042,
-    "2026": 669
+    "2026": 678
   },
   "ai_assisted": {
     "commits": 2,
@@ -512,30 +513,30 @@
       "2026-08": 42,
       "2026-09": 59,
       "2026-10": 22,
-      "2026-11": 0
+      "2026-11": 9
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9202,
+    "commits": 9211,
     "by_kind": {
-      "organization": 2922,
+      "organization": 2928,
       "one_person": 705,
       "personal": 817,
-      "hidden": 349,
+      "hidden": 350,
       "unknown": 0,
-      "bot": 4409
+      "bot": 4411
     },
     "organization_count": 4,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "buoyant.io",
-        "commits": 2904,
-        "commits_last_12mo": 91,
+        "commits": 2910,
+        "commits_last_12mo": 89,
         "addresses": 22,
         "first_commit": "2017-12-05",
-        "last_commit": "2026-10-30"
+        "last_commit": "2026-11-06"
       },
       {
         "organization": "fujitsu.com",
@@ -620,25 +621,25 @@
         "bot": 177
       },
       "2026-Q4": {
-        "organization": 5,
+        "organization": 11,
         "one_person": 2,
         "personal": 1,
-        "hidden": 4,
+        "hidden": 5,
         "unknown": 0,
-        "bot": 10
+        "bot": 12
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 168,
-    "authors": 33,
-    "new_authors": 25,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 160,
+    "authors": 31,
+    "new_authors": 23,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 4793,
+    "commits": 4800,
     "commits_by_year": {
       "2017": 65,
       "2018": 948,
@@ -649,9 +650,9 @@
       "2023": 387,
       "2024": 322,
       "2025": 231,
-      "2026": 105
+      "2026": 112
     },
-    "active_days": 1695
+    "active_days": 1700
   },
   "timezones": {
     "+0000": 339,
@@ -668,14 +669,14 @@
     "+1100": 7,
     "-0300": 12,
     "-0400": 372,
-    "-0500": 2134,
+    "-0500": 2136,
     "-0600": 274,
-    "-0700": 3326,
-    "-0800": 1454,
+    "-0700": 3329,
+    "-0800": 1458,
     "-1000": 114
   },
   "source_lines": {
-    "added": 574123,
-    "current": 266240
+    "added": 574298,
+    "current": 266331
   }
 }

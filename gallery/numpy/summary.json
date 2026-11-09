@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:57:13+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:09:02+00:00",
   "name": "NumPy",
   "report_path": "index.html",
   "first_commit": "2001-12-18 15:45:10",
-  "last_commit": "2026-11-01 00:28:47",
-  "age_days": 9084,
-  "active_days": 6836,
-  "total_commits": 42470,
-  "total_authors": 2112,
+  "last_commit": "2026-11-07 21:05:25",
+  "age_days": 9091,
+  "active_days": 6842,
+  "total_commits": 42495,
+  "total_authors": 2116,
   "active_authors_12mo": 239,
-  "commits_last_12mo": 2312,
-  "total_files": 2433,
-  "total_lines": 1008807,
-  "lines_added": 2793773,
-  "lines_removed": 1784664,
+  "commits_last_12mo": 2337,
+  "total_files": 2439,
+  "total_lines": 1009803,
+  "lines_added": 2795351,
+  "lines_removed": 1785245,
   "total_tags": 16,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Matti Picus",
-      "commits": 3035
+      "commits": 3036
     },
     {
       "name": "Sebastian Berg",
@@ -41,24 +41,34 @@
     }
   ],
   "author_commits": {
+    "Inessa Pawson": 52,
+    "Tyler Reddy": 201,
+    "Lazizbek Ergashev": 6,
+    "Nathan Goldbaum": 882,
+    "Iason Krommydas": 39,
+    "Joren Hammudoglu": 1438,
+    "Matti Picus": 3036,
+    "franrizz15": 1,
+    "Fun-Projects-Learn": 3,
+    "Corencas": 1,
+    "Pieter Eendebak": 170,
+    "Shubham Bansal": 8,
+    "Brad Smith": 3,
+    "Isha Zhang": 1,
+    "Dimitri Papadopoulos Orfanos": 268,
+    "ageorgou": 1,
     "Rohit Goswami": 333,
     "Riaz1729": 1,
     "Matthew Digman": 2,
-    "Joren Hammudoglu": 1437,
     "bymasha": 2,
-    "Pieter Eendebak": 169,
     "Pratham Hole": 61,
-    "Nathan Goldbaum": 876,
-    "Iason Krommydas": 36,
     "Andrew Nelson": 96,
     "Ganesh Kathiresan": 162,
     "David King": 2,
     "Dante": 1,
     "dhrub chatterjee": 1,
     "Travis Fortney": 1,
-    "Tyler Reddy": 199,
     "Charles Harris": 7292,
-    "Fun-Projects-Learn": 2,
     "Adnan Sami": 1,
     "LeeMEow23": 1,
     "Dragos-Georgian Ion": 4,
@@ -69,9 +79,7 @@
     "Abhinay Reddy Keesara": 3,
     "pereradrian": 1,
     "HughStanway": 4,
-    "Inessa Pawson": 51,
     "aryangorde6": 1,
-    "Matti Picus": 3035,
     "Michael Zhan": 4,
     "sukeyzhou": 2,
     "ssmore": 1,
@@ -90,11 +98,9 @@
     "Nikita Berezyuk": 1,
     "Johnny Kao": 1,
     "Eero Vaher": 4,
-    "Shubham Bansal": 7,
     "Matt Haberland": 54,
     "Yeonho Kim": 4,
     "NGUY\u1ec4N QU\u1ed0C TU\u1ea4N": 1,
-    "Lazizbek Ergashev": 5,
     "Kumar Aditya": 37,
     "AbhiRKeesara": 2,
     "Anastasis Georgoulas": 1,
@@ -207,7 +213,6 @@
     "Shreya Ghorui": 1,
     "Anarion Zuo": 2,
     "Denis Prokopenko": 1,
-    "Dimitri Papadopoulos Orfanos": 267,
     "Harshith J": 1,
     "Matthias Kneidinger": 1,
     "Joshua Swanson": 1,
@@ -341,7 +346,6 @@
     "!ianlv": 1,
     "Mohammed Abdul Rahman": 3,
     "Diya Singh": 1,
-    "Brad Smith": 2,
     "Developer-Ecosystem-Engineering": 66,
     "Michael Siebert": 5,
     "Mugundan Selvanayagam": 8,
@@ -2180,13 +2184,13 @@
     "2023": 3422,
     "2024": 3054,
     "2025": 2543,
-    "2026": 2106
+    "2026": 2131
   },
   "ai_assisted": {
-    "commits": 38,
+    "commits": 39,
     "authored": 2,
     "assistants": {
-      "Claude": 24,
+      "Claude": 25,
       "Codex": 7,
       "GitHub Copilot": 7
     },
@@ -2214,7 +2218,7 @@
       "2026-08": 0,
       "2026-09": 12,
       "2026-10": 5,
-      "2026-11": 0
+      "2026-11": 1
     },
     "commits_by_month": {
       "2024-12": 191,
@@ -2239,20 +2243,20 @@
       "2026-07": 242,
       "2026-08": 229,
       "2026-09": 333,
-      "2026-10": 232,
-      "2026-11": 1
+      "2026-10": 233,
+      "2026-11": 25
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 42470,
+    "commits": 42495,
     "by_kind": {
       "organization": 2794,
-      "one_person": 6050,
-      "personal": 31252,
-      "hidden": 1273,
+      "one_person": 6052,
+      "personal": 31270,
+      "hidden": 1277,
       "unknown": 486,
-      "bot": 615
+      "bot": 616
     },
     "organization_count": 68,
     "last_12mo_from": "2025-12",
@@ -2861,24 +2865,24 @@
       },
       "2026-Q4": {
         "organization": 6,
-        "one_person": 6,
-        "personal": 186,
-        "hidden": 24,
+        "one_person": 8,
+        "personal": 204,
+        "hidden": 28,
         "unknown": 0,
-        "bot": 11
+        "bot": 12
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2141,
-    "authors": 224,
-    "new_authors": 160,
+    "commits": 2165,
+    "authors": 229,
+    "new_authors": 164,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 41855,
+    "commits": 41879,
     "commits_by_year": {
       "2001": 8,
       "2002": 408,
@@ -2905,19 +2909,19 @@
       "2023": 3343,
       "2024": 2947,
       "2025": 2423,
-      "2026": 1949
+      "2026": 1973
     },
-    "active_days": 6833
+    "active_days": 6839
   },
   "timezones": {
-    "+0000": 9552,
-    "+0100": 4313,
-    "+0200": 6945,
+    "+0000": 9555,
+    "+0100": 4319,
+    "+0200": 6946,
     "+0300": 1943,
     "+0330": 7,
     "+0400": 45,
     "+0430": 2,
-    "+0500": 50,
+    "+0500": 51,
     "+0530": 1110,
     "+0545": 1,
     "+0600": 15,
@@ -2934,14 +2938,14 @@
     "-0300": 284,
     "-0400": 1900,
     "-0430": 1,
-    "-0500": 2748,
-    "-0600": 4909,
-    "-0700": 5667,
-    "-0800": 1762,
+    "-0500": 2752,
+    "-0600": 4911,
+    "-0700": 5674,
+    "-0800": 1763,
     "-1000": 14
   },
   "source_lines": {
-    "added": 3221411,
-    "current": 1008807
+    "added": 3222989,
+    "current": 1009803
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:01:11+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:12:43+00:00",
   "name": "CoreDNS",
   "report_path": "index.html",
   "first_commit": "2016-03-18 20:57:35",
-  "last_commit": "2026-11-02 00:22:53",
-  "age_days": 3881,
-  "active_days": 1684,
-  "total_commits": 5223,
-  "total_authors": 515,
-  "active_authors_12mo": 95,
-  "commits_last_12mo": 739,
-  "total_files": 1071,
-  "total_lines": 149903,
-  "lines_added": 15104227,
-  "lines_removed": 14954251,
+  "last_commit": "2026-11-09 04:54:48",
+  "age_days": 3888,
+  "active_days": 1688,
+  "total_commits": 5237,
+  "total_authors": 519,
+  "active_authors_12mo": 96,
+  "commits_last_12mo": 753,
+  "total_files": 1072,
+  "total_lines": 150185,
+  "lines_added": 15104632,
+  "lines_removed": 14954374,
   "total_tags": 85,
   "era": "peak",
   "top_authors": [
@@ -41,6 +41,11 @@
     }
   ],
   "author_commits": {
+    "adam magued": 1,
+    "Lucas Barros": 1,
+    "Mishal": 1,
+    "Ben Kochie": 33,
+    "Mart\u00edn G\u00f3mez": 1,
     "Ville Vesilehto": 160,
     "ump45nose": 16,
     "mrchatam": 1,
@@ -56,7 +61,6 @@
     "Christian Menges": 1,
     "jxj": 6,
     "MohibShaikh": 1,
-    "Ben Kochie": 32,
     "Choudhry Shehryar": 1,
     "llucas": 2,
     "Arunesh Dwivedi": 1,
@@ -568,7 +572,7 @@
     "2023": 299,
     "2024": 234,
     "2025": 493,
-    "2026": 685
+    "2026": 699
   },
   "ai_assisted": {
     "commits": 8,
@@ -627,19 +631,19 @@
       "2026-08": 81,
       "2026-09": 82,
       "2026-10": 75,
-      "2026-11": 8
+      "2026-11": 22
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5223,
+    "commits": 5237,
     "by_kind": {
       "organization": 594,
       "one_person": 1697,
-      "personal": 755,
-      "hidden": 350,
+      "personal": 757,
+      "hidden": 353,
       "unknown": 0,
-      "bot": 1827
+      "bot": 1836
     },
     "organization_count": 12,
     "last_12mo_from": "2025-12",
@@ -801,23 +805,23 @@
       "2026-Q4": {
         "organization": 5,
         "one_person": 10,
-        "personal": 16,
-        "hidden": 26,
+        "personal": 18,
+        "hidden": 29,
         "unknown": 0,
-        "bot": 26
+        "bot": 35
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 390,
-    "authors": 85,
-    "new_authors": 70,
+    "commits": 395,
+    "authors": 89,
+    "new_authors": 74,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 3396,
+    "commits": 3401,
     "commits_by_year": {
       "2016": 480,
       "2017": 509,
@@ -829,20 +833,20 @@
       "2023": 91,
       "2024": 68,
       "2025": 184,
-      "2026": 369
+      "2026": 374
     },
-    "active_days": 1466
+    "active_days": 1469
   },
   "timezones": {
-    "+0000": 744,
-    "+0100": 872,
-    "+0200": 520,
+    "+0000": 745,
+    "+0100": 873,
+    "+0200": 521,
     "+0300": 300,
     "+0330": 7,
     "+0400": 16,
     "+0430": 3,
     "+0500": 2,
-    "+0530": 50,
+    "+0530": 51,
     "+0600": 1,
     "+0700": 20,
     "+0800": 291,
@@ -853,15 +857,15 @@
     "+1100": 2,
     "+1200": 1,
     "+1300": 3,
-    "-0300": 25,
+    "-0300": 26,
     "-0400": 513,
     "-0500": 289,
     "-0600": 29,
     "-0700": 1097,
-    "-0800": 406
+    "-0800": 415
   },
   "source_lines": {
-    "added": 262681,
-    "current": 148825
+    "added": 263010,
+    "current": 149103
   }
 }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:57:25+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:09:26+00:00",
   "name": "pandas",
   "report_path": "index.html",
   "first_commit": "2009-07-31 15:07:16",
-  "last_commit": "2026-11-01 20:52:44",
-  "age_days": 6303,
-  "active_days": 5315,
-  "total_commits": 39687,
-  "total_authors": 4050,
-  "active_authors_12mo": 395,
-  "commits_last_12mo": 2900,
-  "total_files": 2689,
-  "total_lines": 1076810,
-  "lines_added": 3322110,
-  "lines_removed": 2245290,
+  "last_commit": "2026-11-09 04:56:07",
+  "age_days": 6310,
+  "active_days": 5323,
+  "total_commits": 39778,
+  "total_authors": 4062,
+  "active_authors_12mo": 394,
+  "commits_last_12mo": 2991,
+  "total_files": 2691,
+  "total_lines": 1080274,
+  "lines_added": 3326683,
+  "lines_removed": 2246399,
   "total_tags": 102,
   "era": "steady",
   "top_authors": [
     {
       "name": "jbrockmendel",
-      "commits": 6511
+      "commits": 6567
     },
     {
       "name": "Jeff Reback",
@@ -33,15 +33,36 @@
     },
     {
       "name": "Joris Van den Bossche",
-      "commits": 1696
+      "commits": 1702
     },
     {
       "name": "Matthew Roeschke",
-      "commits": 1556
+      "commits": 1557
     }
   ],
   "author_commits": {
-    "jbrockmendel": 6511,
+    "jbrockmendel": 6567,
+    "Richard Shadrach": 567,
+    "sundeep8967": 1,
+    "Abhishek Kumar": 11,
+    "Joris Van den Bossche": 1702,
+    "tanveer-arch": 1,
+    "Monika Dvorackova": 1,
+    "Ishan Kumar": 2,
+    "Deon Binny": 1,
+    "Anirudh": 1,
+    "Riaz1729": 1,
+    "Maha Rana Yadavalli": 4,
+    "Eugenio \"Jay\" Zuccarelli": 1,
+    "Wrethis": 1,
+    "Sharathkumara": 1,
+    "\u00c1lvaro Kothe": 66,
+    "Junpei Zhang": 2,
+    "Filipe Rangel": 1,
+    "Krishn": 1,
+    "Matthew Roeschke": 1557,
+    "Likhitha J": 4,
+    "Pranav Choudhary": 5,
     "Fangchen Li": 183,
     "Abhishek kr. Chauhan": 1,
     "Shriraj Jadhav": 1,
@@ -51,28 +72,22 @@
     "Noah": 4,
     "matiaslindgren": 10,
     "Enrico Lockner": 1,
-    "Matthew Roeschke": 1556,
-    "Abhishek Kumar": 10,
     "Chetan Sahney": 1,
     "Igor Souza Lima": 1,
     "Davin Khotob": 1,
-    "Junpei Zhang": 1,
     "Ge Li": 1,
     "Minh Tuan Pham": 1,
     "Ammar Hassona": 1,
     "Breno Barreto": 1,
-    "Joris Van den Bossche": 1696,
     "Julian Harbeck": 7,
     "Ryan George": 1,
     "Tiereonna": 1,
     "Gore Williams": 1,
-    "Maha Rana Yadavalli": 2,
     "S.A": 1,
     "Chaimaa Abi": 2,
     "Ayush Kumar": 1,
     "Sugandh Garg": 1,
     "Mannava Daasaradhi": 1,
-    "\u00c1lvaro Kothe": 65,
     "Juan Miguel Contreras": 1,
     "britz": 1,
     "Atik": 1,
@@ -84,9 +99,7 @@
     "Trinh Quoc Anh": 41,
     "Natalia Mokeeva": 179,
     "GON": 1,
-    "Likhitha J": 3,
     "Ayush Srivastava": 1,
-    "Richard Shadrach": 565,
     "H23": 2,
     "Itssubhraneelbruv": 1,
     "furqankhan": 1,
@@ -203,7 +216,6 @@
     "archuserbtw": 2,
     "cheney": 1,
     "Tanishk": 1,
-    "Pranav Choudhary": 4,
     "MD Tanvirul Islam Niloy": 1,
     "simon159736842v": 1,
     "Dr Alex Mitre": 2,
@@ -4110,13 +4122,13 @@
     "2023": 3017,
     "2024": 1769,
     "2025": 1097,
-    "2026": 2765
+    "2026": 2856
   },
   "ai_assisted": {
-    "commits": 1502,
+    "commits": 1558,
     "authored": 1,
     "assistants": {
-      "Claude": 1500,
+      "Claude": 1556,
       "Devin": 1,
       "GitHub Copilot": 1
     },
@@ -4144,7 +4156,7 @@
       "2026-08": 167,
       "2026-09": 289,
       "2026-10": 349,
-      "2026-11": 9
+      "2026-11": 65
     },
     "commits_by_month": {
       "2024-12": 62,
@@ -4170,19 +4182,19 @@
       "2026-08": 275,
       "2026-09": 422,
       "2026-10": 477,
-      "2026-11": 10
+      "2026-11": 101
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39687,
+    "commits": 39778,
     "by_kind": {
       "organization": 968,
       "one_person": 6644,
-      "personal": 23696,
-      "hidden": 8131,
+      "personal": 23770,
+      "hidden": 8142,
       "unknown": 25,
-      "bot": 223
+      "bot": 229
     },
     "organization_count": 56,
     "last_12mo_from": "2025-12",
@@ -4696,23 +4708,23 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 2,
-        "personal": 414,
-        "hidden": 54,
+        "personal": 488,
+        "hidden": 65,
         "unknown": 0,
-        "bot": 16
+        "bot": 22
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2781,
-    "authors": 365,
-    "new_authors": 301,
+    "commits": 2866,
+    "authors": 377,
+    "new_authors": 313,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 39464,
+    "commits": 39549,
     "commits_by_year": {
       "2009": 100,
       "2010": 147,
@@ -4731,24 +4743,24 @@
       "2023": 2991,
       "2024": 1747,
       "2025": 1064,
-      "2026": 2649
+      "2026": 2734
     },
-    "active_days": 5307
+    "active_days": 5315
   },
   "timezones": {
     "+0000": 1633,
-    "+0100": 4025,
+    "+0100": 4037,
     "+0200": 3782,
     "+0300": 700,
     "+0330": 10,
     "+0400": 60,
     "+0430": 3,
     "+0500": 13,
-    "+0530": 1258,
+    "+0530": 1269,
     "+0545": 7,
     "+0600": 11,
     "+0700": 209,
-    "+0800": 610,
+    "+0800": 611,
     "+0900": 522,
     "+0930": 2,
     "+1000": 94,
@@ -4757,17 +4769,17 @@
     "+1300": 4,
     "+1400": 1,
     "-0200": 11,
-    "-0300": 220,
+    "-0300": 222,
     "-0400": 8232,
-    "-0500": 5869,
+    "-0500": 5875,
     "-0600": 709,
     "-0700": 7314,
-    "-0800": 3952,
+    "-0800": 4011,
     "-0900": 1,
     "-1000": 361
   },
   "source_lines": {
-    "added": 3118342,
-    "current": 1000603
+    "added": 3122915,
+    "current": 1004067
   }
 }

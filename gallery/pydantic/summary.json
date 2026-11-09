@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:57:10+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:08:47+00:00",
   "name": "Pydantic",
   "report_path": "index.html",
   "first_commit": "2017-05-03 21:23:41",
-  "last_commit": "2026-11-01 19:43:04",
-  "age_days": 3469,
-  "active_days": 1423,
-  "total_commits": 5896,
-  "total_authors": 805,
-  "active_authors_12mo": 127,
-  "commits_last_12mo": 584,
-  "total_files": 3572,
-  "total_lines": 323246,
-  "lines_added": 542889,
-  "lines_removed": 218289,
+  "last_commit": "2026-11-08 18:43:40",
+  "age_days": 3476,
+  "active_days": 1430,
+  "total_commits": 5934,
+  "total_authors": 811,
+  "active_authors_12mo": 131,
+  "commits_last_12mo": 622,
+  "total_files": 3579,
+  "total_lines": 323595,
+  "lines_added": 545433,
+  "lines_removed": 220484,
   "total_tags": 143,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Victorien",
-      "commits": 777
+      "commits": 794
     },
     {
       "name": "Sydney Runkle",
@@ -41,10 +41,16 @@
     }
   ],
   "author_commits": {
-    "Victorien": 777,
-    "Dylan Pulver": 2,
+    "Alvi Rahman": 2,
+    "aidxhxr": 1,
+    "Victorien": 794,
+    "Wei-Lun Li": 1,
+    "Lior Mashiach": 2,
+    "NingLin Liu": 1,
+    "Alex Hall": 36,
+    "Dylan Pulver": 3,
+    "Viranshul-P": 1,
     "Michael \u0160im\u00e1\u010dek": 4,
-    "Alex Hall": 30,
     "Nenad Mitrovic": 1,
     "Kropiunig": 7,
     "Owen Taylor": 1,
@@ -857,7 +863,7 @@
     "2023": 1775,
     "2024": 1029,
     "2025": 644,
-    "2026": 569
+    "2026": 607
   },
   "ai_assisted": {
     "commits": 4,
@@ -916,19 +922,19 @@
       "2026-08": 82,
       "2026-09": 64,
       "2026-10": 114,
-      "2026-11": 9
+      "2026-11": 47
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5896,
+    "commits": 5934,
     "by_kind": {
       "organization": 263,
       "one_person": 1401,
-      "personal": 1175,
-      "hidden": 2451,
+      "personal": 1186,
+      "hidden": 2472,
       "unknown": 0,
-      "bot": 606
+      "bot": 612
     },
     "organization_count": 2,
     "last_12mo_from": "2025-12",
@@ -1010,23 +1016,23 @@
       "2026-Q4": {
         "organization": 4,
         "one_person": 5,
-        "personal": 14,
-        "hidden": 89,
+        "personal": 25,
+        "hidden": 110,
         "unknown": 0,
-        "bot": 11
+        "bot": 17
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 487,
-    "authors": 121,
-    "new_authors": 108,
+    "commits": 519,
+    "authors": 127,
+    "new_authors": 114,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 5290,
+    "commits": 5322,
     "commits_by_year": {
       "2017": 116,
       "2018": 131,
@@ -1037,24 +1043,24 @@
       "2023": 1663,
       "2024": 927,
       "2025": 577,
-      "2026": 475
+      "2026": 507
     },
-    "active_days": 1367
+    "active_days": 1374
   },
   "timezones": {
-    "+0000": 727,
-    "+0100": 1744,
-    "+0200": 1271,
+    "+0000": 730,
+    "+0100": 1767,
+    "+0200": 1279,
     "+0300": 162,
     "+0330": 111,
     "+0400": 23,
     "+0430": 1,
     "+0500": 6,
-    "+0530": 42,
+    "+0530": 43,
     "+0545": 3,
     "+0600": 2,
     "+0700": 16,
-    "+0800": 92,
+    "+0800": 93,
     "+0900": 44,
     "+0930": 2,
     "+1000": 22,
@@ -1063,13 +1069,13 @@
     "+1300": 3,
     "-0300": 14,
     "-0400": 224,
-    "-0500": 688,
+    "-0500": 689,
     "-0600": 476,
     "-0700": 171,
-    "-0800": 35
+    "-0800": 36
   },
   "source_lines": {
-    "added": 585168,
-    "current": 316997
+    "added": 587642,
+    "current": 317849
   }
 }

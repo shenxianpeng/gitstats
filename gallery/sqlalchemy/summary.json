@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:56:56+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:08:38+00:00",
   "name": "SQLAlchemy",
   "report_path": "index.html",
   "first_commit": "2005-07-01 02:25:16",
-  "last_commit": "2026-11-01 15:19:27",
-  "age_days": 7794,
-  "active_days": 5261,
-  "total_commits": 18453,
-  "total_authors": 855,
-  "active_authors_12mo": 92,
-  "commits_last_12mo": 620,
-  "total_files": 931,
-  "total_lines": 801494,
-  "lines_added": 1761161,
-  "lines_removed": 959504,
-  "total_tags": 199,
+  "last_commit": "2026-11-08 15:34:00",
+  "age_days": 7801,
+  "active_days": 5268,
+  "total_commits": 18492,
+  "total_authors": 859,
+  "active_authors_12mo": 93,
+  "commits_last_12mo": 659,
+  "total_files": 919,
+  "total_lines": 804330,
+  "lines_added": 1764540,
+  "lines_removed": 960047,
+  "total_tags": 201,
   "era": "steady",
   "top_authors": [
     {
       "name": "Michael Bayer",
-      "commits": 14612
+      "commits": 14639
     },
     {
       "name": "Federico Caselli",
-      "commits": 707
+      "commits": 711
     },
     {
       "name": "Jason Kirtland",
@@ -41,8 +41,13 @@
     }
   ],
   "author_commits": {
-    "Michael Bayer": 14612,
-    "Federico Caselli": 707,
+    "Michael Bayer": 14639,
+    "art": 1,
+    "James Addison": 5,
+    "Federico Caselli": 711,
+    "Lushiyao5": 1,
+    "Artur Shiriev": 1,
+    "huang": 1,
     "basavaraj-sm05": 1,
     "Prince Jain": 1,
     "Javid Khan": 7,
@@ -79,7 +84,6 @@
     "w-Jessamine": 1,
     "AVRC26": 1,
     "Ilan Keshet": 1,
-    "James Addison": 4,
     "Oliver Parker": 3,
     "lphuc2250gma": 1,
     "CaoRongkai": 1,
@@ -919,7 +923,7 @@
     "2023": 956,
     "2024": 533,
     "2025": 604,
-    "2026": 564
+    "2026": 603
   },
   "ai_assisted": {
     "commits": 0,
@@ -974,31 +978,31 @@
       "2026-07": 48,
       "2026-08": 79,
       "2026-09": 79,
-      "2026-10": 101,
-      "2026-11": 1
+      "2026-10": 103,
+      "2026-11": 38
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 18453,
+    "commits": 18492,
     "by_kind": {
-      "organization": 14665,
+      "organization": 14692,
       "one_person": 1575,
-      "personal": 1995,
-      "hidden": 154,
+      "personal": 2002,
+      "hidden": 156,
       "unknown": 22,
-      "bot": 42
+      "bot": 45
     },
     "organization_count": 19,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "zzzcomputing.com",
-        "commits": 14612,
-        "commits_last_12mo": 431,
+        "commits": 14639,
+        "commits_last_12mo": 458,
         "addresses": 2,
         "first_commit": "2005-07-01",
-        "last_commit": "2026-11-01"
+        "last_commit": "2026-11-08"
       },
       {
         "organization": "google.com",
@@ -1203,25 +1207,25 @@
         "bot": 3
       },
       "2026-Q4": {
-        "organization": 83,
+        "organization": 110,
         "one_person": 3,
-        "personal": 11,
-        "hidden": 4,
+        "personal": 18,
+        "hidden": 6,
         "unknown": 0,
-        "bot": 1
+        "bot": 4
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 609,
-    "authors": 87,
-    "new_authors": 72,
+    "commits": 645,
+    "authors": 91,
+    "new_authors": 76,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 18411,
+    "commits": 18447,
     "commits_by_year": {
       "2005": 742,
       "2006": 1115,
@@ -1244,13 +1248,13 @@
       "2023": 942,
       "2024": 523,
       "2025": 604,
-      "2026": 553
+      "2026": 589
     },
-    "active_days": 5258
+    "active_days": 5265
   },
   "timezones": {
-    "+0000": 6990,
-    "+0100": 433,
+    "+0000": 7000,
+    "+0100": 436,
     "+0200": 536,
     "+0300": 63,
     "+0330": 3,
@@ -1265,14 +1269,14 @@
     "+1300": 15,
     "-0200": 1,
     "-0300": 10,
-    "-0400": 6459,
-    "-0500": 3379,
+    "-0400": 6461,
+    "-0500": 3403,
     "-0600": 187,
     "-0700": 189,
     "-0800": 57
   },
   "source_lines": {
-    "added": 1787570,
-    "current": 800026
+    "added": 1790949,
+    "current": 802862
   }
 }

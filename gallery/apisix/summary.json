@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:04:53+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:17:02+00:00",
   "name": "Apache APISIX",
   "report_path": "index.html",
   "first_commit": "2019-04-10 02:02:06",
-  "last_commit": "2026-11-02 03:53:58",
-  "age_days": 2764,
-  "active_days": 1716,
-  "total_commits": 5254,
-  "total_authors": 517,
-  "active_authors_12mo": 60,
-  "commits_last_12mo": 630,
-  "total_files": 2134,
-  "total_lines": 642982,
-  "lines_added": 843532,
-  "lines_removed": 200487,
+  "last_commit": "2026-11-09 03:28:27",
+  "age_days": 2771,
+  "active_days": 1720,
+  "total_commits": 5271,
+  "total_authors": 518,
+  "active_authors_12mo": 59,
+  "commits_last_12mo": 647,
+  "total_files": 2340,
+  "total_lines": 668372,
+  "lines_added": 870167,
+  "lines_removed": 201732,
   "total_tags": 14,
   "era": "steady",
   "top_authors": [
@@ -29,11 +29,11 @@
     },
     {
       "name": "Shreemaan Abhishek",
-      "commits": 284
+      "commits": 288
     },
     {
       "name": "Ming Wen",
-      "commits": 238
+      "commits": 239
     },
     {
       "name": "Nic",
@@ -41,11 +41,14 @@
     }
   ],
   "author_commits": {
-    "Shreemaan Abhishek": 284,
+    "AlinsRan": 128,
+    "okaybase": 41,
+    "Traky Deng": 111,
+    "Ming Wen": 239,
+    "Shreemaan Abhishek": 288,
+    "Bhuvan Somisetty": 3,
     "lordcheng10": 2,
     "ruanweihong-aaa": 4,
-    "Traky Deng": 108,
-    "AlinsRan": 123,
     "Nikolai": 1,
     "jlongWang": 1,
     "Nic": 170,
@@ -54,7 +57,6 @@
     "Yilia Lin": 65,
     "Mohammad Izzraff Janius": 39,
     "Arjen10": 7,
-    "Ming Wen": 238,
     "Blaise Wang": 4,
     "LIAN_XIAOYI": 1,
     "Surya Parua": 2,
@@ -68,7 +70,6 @@
     "Zhi Yuan Ju": 46,
     "Tim Wellbrock": 1,
     "Rafael Rivero Garc\u00eda": 2,
-    "okaybase": 40,
     "Francesco De Domenico": 1,
     "charliesheh": 1,
     "Jarek Potiuk": 1,
@@ -567,7 +568,7 @@
     "2023": 495,
     "2024": 231,
     "2025": 288,
-    "2026": 612
+    "2026": 629
   },
   "ai_assisted": {
     "commits": 1,
@@ -625,17 +626,17 @@
       "2026-08": 69,
       "2026-09": 44,
       "2026-10": 45,
-      "2026-11": 1
+      "2026-11": 18
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5254,
+    "commits": 5271,
     "by_kind": {
-      "organization": 489,
+      "organization": 494,
       "one_person": 78,
-      "personal": 3831,
-      "hidden": 748,
+      "personal": 3842,
+      "hidden": 749,
       "unknown": 0,
       "bot": 108
     },
@@ -644,11 +645,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 315,
-        "commits_last_12mo": 107,
+        "commits": 320,
+        "commits_last_12mo": 112,
         "addresses": 13,
         "first_commit": "2019-10-31",
-        "last_commit": "2026-10-29"
+        "last_commit": "2026-11-09"
       },
       {
         "organization": "api7.ai",
@@ -725,10 +726,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 21,
+        "organization": 26,
         "one_person": 0,
-        "personal": 23,
-        "hidden": 2,
+        "personal": 34,
+        "hidden": 3,
         "unknown": 0,
         "bot": 0
       }
@@ -737,13 +738,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 615,
-    "authors": 55,
-    "new_authors": 36,
+    "commits": 632,
+    "authors": 56,
+    "new_authors": 37,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 5146,
+    "commits": 5163,
     "commits_by_year": {
       "2019": 753,
       "2020": 858,
@@ -752,9 +753,9 @@
       "2023": 466,
       "2024": 223,
       "2025": 279,
-      "2026": 599
+      "2026": 616
     },
-    "active_days": 1696
+    "active_days": 1700
   },
   "timezones": {
     "+0000": 3,
@@ -762,10 +763,10 @@
     "+0200": 61,
     "+0300": 15,
     "+0500": 4,
-    "+0530": 292,
+    "+0530": 295,
     "+0545": 142,
     "+0700": 1,
-    "+0800": 4448,
+    "+0800": 4462,
     "+0900": 26,
     "+1000": 62,
     "+1100": 1,
@@ -776,7 +777,7 @@
     "-0800": 14
   },
   "source_lines": {
-    "added": 820340,
-    "current": 637013
+    "added": 846975,
+    "current": 662403
   }
 }

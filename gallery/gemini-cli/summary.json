@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T04:58:02+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev3",
+  "generated_at": "2026-11-09T05:09:39+00:00",
   "name": "Gemini CLI",
   "report_path": "index.html",
   "first_commit": "2025-04-16 04:41:08",
-  "last_commit": "2026-10-30 21:38:47",
-  "age_days": 563,
-  "active_days": 486,
-  "total_commits": 6569,
+  "last_commit": "2026-11-06 21:43:53",
+  "age_days": 570,
+  "active_days": 491,
+  "total_commits": 6600,
   "total_authors": 688,
-  "active_authors_12mo": 409,
-  "commits_last_12mo": 3099,
-  "total_files": 3043,
-  "total_lines": 1674637,
-  "lines_added": 2149148,
-  "lines_removed": 474490,
+  "active_authors_12mo": 403,
+  "commits_last_12mo": 3130,
+  "total_files": 3055,
+  "total_lines": 1688717,
+  "lines_added": 2164360,
+  "lines_removed": 475622,
   "total_tags": 13,
   "era": "steady",
   "top_authors": [
@@ -41,16 +41,16 @@
     }
   ],
   "author_commits": {
-    "villahernandez-coder": 17,
-    "ugorla-dev": 8,
-    "Diego Godinez": 20,
-    "jvargassanchez-dot": 20,
-    "tadipavan": 4,
-    "urielefrenvirtusa": 18,
-    "jesussamuel-byte": 26,
-    "duvanka-prasad": 5,
+    "jesussamuel-byte": 31,
+    "ugorla-dev": 10,
+    "urielefrenvirtusa": 20,
+    "villahernandez-coder": 22,
+    "tadipavan": 8,
+    "Diego Godinez": 24,
+    "jvargassanchez-dot": 23,
+    "duvanka-prasad": 8,
+    "gemini-cli-robot": 186,
     "Dmitry Lyalin": 17,
-    "gemini-cli-robot": 183,
     "elberthc-byte": 11,
     "amelidev": 21,
     "luisfelipe-alt": 26,
@@ -732,13 +732,13 @@
   },
   "commits_by_year": {
     "2025": 3744,
-    "2026": 2825
+    "2026": 2856
   },
   "ai_assisted": {
-    "commits": 273,
+    "commits": 274,
     "authored": 0,
     "assistants": {
-      "Gemini": 262,
+      "Gemini": 263,
       "Jules": 11,
       "GitHub Copilot": 1
     },
@@ -766,7 +766,7 @@
       "2026-08": 3,
       "2026-09": 3,
       "2026-10": 3,
-      "2026-11": 0
+      "2026-11": 1
     },
     "commits_by_month": {
       "2024-12": 0,
@@ -792,30 +792,30 @@
       "2026-08": 60,
       "2026-09": 62,
       "2026-10": 116,
-      "2026-11": 0
+      "2026-11": 31
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 6569,
+    "commits": 6600,
     "by_kind": {
-      "organization": 2500,
+      "organization": 2527,
       "one_person": 300,
       "personal": 2237,
-      "hidden": 1514,
+      "hidden": 1518,
       "unknown": 0,
       "bot": 18
     },
     "organization_count": 2,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "google.com",
-        "commits": 2491,
-        "commits_last_12mo": 1420,
+        "commits": 2518,
+        "commits_last_12mo": 1333,
         "addresses": 114,
         "first_commit": "2025-04-16",
-        "last_commit": "2026-10-30"
+        "last_commit": "2026-11-06"
       },
       {
         "organization": "github.com",
@@ -876,33 +876,33 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 101,
+        "organization": 128,
         "one_person": 1,
         "personal": 0,
-        "hidden": 14,
+        "hidden": 18,
         "unknown": 0,
         "bot": 0
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 3412,
-    "authors": 409,
-    "new_authors": 344,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 3125,
+    "authors": 377,
+    "new_authors": 312,
     "half_of_commits": 15
   },
   "humans": {
-    "commits": 6551,
+    "commits": 6582,
     "commits_by_year": {
       "2025": 3730,
-      "2026": 2821
+      "2026": 2852
     },
-    "active_days": 486
+    "active_days": 491
   },
   "timezones": {
-    "+0000": 670,
+    "+0000": 701,
     "+0100": 105,
     "+0200": 134,
     "+0300": 17,
@@ -925,7 +925,7 @@
     "-1000": 4
   },
   "source_lines": {
-    "added": 2058233,
-    "current": 1624540
+    "added": 2072823,
+    "current": 1638007
   }
 }
