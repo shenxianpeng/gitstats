@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-06T07:17:34+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev4",
+  "generated_at": "2026-11-09T13:32:06+00:00",
   "name": "gitstats",
   "report_path": "index.html",
   "first_commit": "2007-07-30 14:54:43",
-  "last_commit": "2026-11-06 07:16:44",
-  "age_days": 7039,
-  "active_days": 250,
-  "total_commits": 621,
+  "last_commit": "2026-11-09 13:31:07",
+  "age_days": 7042,
+  "active_days": 251,
+  "total_commits": 622,
   "total_authors": 38,
   "active_authors_12mo": 7,
-  "commits_last_12mo": 179,
-  "total_files": 88,
-  "total_lines": 42110,
-  "lines_added": 55363,
-  "lines_removed": 13252,
+  "commits_last_12mo": 180,
+  "total_files": 89,
+  "total_lines": 42224,
+  "lines_added": 55492,
+  "lines_removed": 13267,
   "total_tags": 54,
   "era": "peak",
   "top_authors": [
     {
       "name": "Xianpeng Shen",
-      "commits": 266
+      "commits": 267
     },
     {
       "name": "Heikki Hokkanen",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Xianpeng Shen": 266,
+    "Xianpeng Shen": 267,
     "Devraj Pal": 10,
     "harsh8968": 1,
     "tomatotomata": 1,
@@ -92,14 +92,15 @@
     "2015": 2,
     "2024": 68,
     "2025": 90,
-    "2026": 169
+    "2026": 170
   },
   "ai_assisted": {
-    "commits": 13,
+    "commits": 14,
     "authored": 9,
     "assistants": {
       "GitHub Copilot": 11,
-      "CodeRabbit": 2
+      "CodeRabbit": 2,
+      "Claude": 1
     },
     "by_month": {
       "2024-12": 0,
@@ -125,7 +126,7 @@
       "2026-08": 0,
       "2026-09": 0,
       "2026-10": 0,
-      "2026-11": 0
+      "2026-11": 1
     },
     "commits_by_month": {
       "2024-12": 4,
@@ -151,16 +152,16 @@
       "2026-08": 15,
       "2026-09": 31,
       "2026-10": 53,
-      "2026-11": 3
+      "2026-11": 4
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 621,
+    "commits": 622,
     "by_kind": {
       "organization": 249,
       "one_person": 29,
-      "personal": 286,
+      "personal": 287,
       "hidden": 21,
       "unknown": 0,
       "bot": 36
@@ -245,7 +246,7 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 0,
-        "personal": 50,
+        "personal": 51,
         "hidden": 1,
         "unknown": 0,
         "bot": 5
@@ -255,13 +256,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 163,
+    "commits": 164,
     "authors": 6,
     "new_authors": 5,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 585,
+    "commits": 586,
     "commits_by_year": {
       "2007": 107,
       "2008": 29,
@@ -274,14 +275,14 @@
       "2015": 2,
       "2024": 65,
       "2025": 72,
-      "2026": 154
+      "2026": 155
     },
-    "active_days": 233
+    "active_days": 234
   },
   "timezones": {
     "+0000": 20,
     "+0100": 16,
-    "+0200": 207,
+    "+0200": 208,
     "+0300": 322,
     "+0400": 2,
     "+0530": 11,
@@ -294,7 +295,7 @@
     "-0800": 2
   },
   "source_lines": {
-    "added": 51477,
-    "current": 39782
+    "added": 51606,
+    "current": 39896
   }
 }
