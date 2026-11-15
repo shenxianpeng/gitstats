@@ -79,6 +79,7 @@ def test_parse_repos(repos_script):
         (_list(_repo("ai")), "folder of the gallery's own"),
         (_list(_repo("orgs")), "folder of the gallery's own"),
         (_list(_repo("ecosystems")), "folder of the gallery's own"),
+        (_list(_repo("wrapped")), "folder of the gallery's own"),
         (_list(_repo(url="https://github.com/pallets/flask")), "owner/name"),
         (_list(_repo(url="pallets/../flask")), "owner/name"),
         (_list(_repo(url="")), "url is missing"),

@@ -21,7 +21,7 @@ _ID = re.compile(r"[a-z0-9][a-z0-9-]{0,62}")
 _URL = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9_.-]+")
 # folders of the gallery's own: a report there would mix with them, and the
 # deploy, which removes a report folder without a summary.json, would remove them
-RESERVED_IDS = frozenset({"ai", "orgs", "ecosystems"})
+RESERVED_IDS = frozenset({"ai", "orgs", "ecosystems", "wrapped"})
 DEFAULT_TIMEOUT = 90
 # GitHub Actions: a matrix has at most 256 jobs, and a job runs at most 6 hours
 MAX_REPOS = 256
