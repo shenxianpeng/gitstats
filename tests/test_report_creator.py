@@ -3196,6 +3196,8 @@ def test_badges_page_shows_the_wrapped_card(mock_data_collector, temp_dir):
     ) in section
     assert 'aria-label="Copy Markdown for wrapped-2023.svg"' in section
     assert '<a href="wrapped-2023.svg" download>Download SVG &rarr;</a>' in section
+    # and the card's own page, where it is saved as a PNG and shared
+    assert '<a href="wrapped.html">Its page, with a PNG to share &rarr;</a>' in section
     # it comes after the badges
     assert content.index('<h2 id="other_ways_to_use_them">') < content.index(
         '<h2 id="repo_wrapped">'
@@ -3228,7 +3230,8 @@ def test_history_links_the_wrapped_card_from_its_year(mock_data_collector, temp_
     card = {"year": 2023, "theme": "midnight", "file": "wrapped-2023.svg"}
     history = _report_with_card(mock_data_collector, temp_dir, card)("history.html")
 
-    link = '<p class="history-people"><a href="wrapped-2023.svg">Wrapped card &rarr;</a></p>'
+    # to the card's page, whatever its file is called
+    link = '<p class="history-people"><a href="wrapped.html">Wrapped card &rarr;</a></p>'
     assert history.count(link) == 1
     # in the entry for 2023, not the one for 2022
     assert history.index('<span class="history-year-num">2023</span>') < history.index(link)
@@ -3816,6 +3819,67 @@ def test_report_pages_carry_their_share_tags(mock_data_collector, temp_dir, monk
     assert '<meta property="og:url" content="https://example.com/r/">' in index
     # the card the image is rendered from is written next to the pages
     assert "<h1>test-project</h1>" in _read_page(temp_dir, "share-card.html")
+
+
+def test_the_wrapped_page_gets_its_own_title_card_and_sentence(monkeypatch):
+    """The page gitstats.wrapped writes around the card: its header is the
+    report's, with the year in its title and its own share card."""
+    creator = HTMLReportCreator()
+    creator.title = "my-project"
+    creator.share_description = "my-project: 50 commits by 3 authors."
+    creator.site_url = "https://example.com/r/"
+    creator.wrapped_card = {"year": 2023, "theme": "midnight", "file": "wrapped-2023.svg"}
+    monkeypatch.setitem(load_config(), "share_card", True)
+
+    f = StringIO()
+    creator.print_header(f, "wrapped.html", image="wrapped-card.png", description="A year.")
+    header = f.getvalue()
+    assert "<title>GitStats - my-project: Repo Wrapped 2023</title>" in header
+    assert '<meta property="og:title" content="my-project: Repo Wrapped 2023">' in header
+    assert '<meta property="og:url" content="https://example.com/r/wrapped.html">' in header
+    assert '<meta property="og:image" content="https://example.com/r/wrapped-card.png">' in header
+    assert '<meta name="description" content="A year.">' in header
+    assert "50 commits by 3 authors" not in header
+
+    # the other pages keep the report's card and its sentence
+    f = StringIO()
+    creator.print_header(f, "authors.html")
+    assert '<meta property="og:image" content="https://example.com/r/share-card.png">' in (
+        f.getvalue()
+    )
+    assert '<meta name="description" content="my-project: 50 commits by 3 authors.">' in (
+        f.getvalue()
+    )
+
+    # without a card there is no such page to name
+    creator.wrapped_card = None
+    f = StringIO()
+    creator.print_header(f, "wrapped.html")
+    assert "<title>GitStats - my-project</title>" in f.getvalue()
+
+
+def test_nav_links_the_wrapped_page_when_there_is_a_card(mock_data_collector, temp_dir):
+    card = {"year": 2023, "theme": "midnight", "file": "wrapped-2023.svg"}
+    index = _report_with_card(mock_data_collector, temp_dir, card)("index.html")
+    # after the Badges, where the card is also shown
+    assert (
+        '<li><a href="badges.html">Badges</a></li>\n'
+        '            <li><a href="wrapped.html">Wrapped</a></li>'
+    ) in index
+
+    plain = _report_with_card(mock_data_collector, temp_dir, None)("index.html")
+    assert "wrapped.html" not in plain
+
+    # on the page itself the link is the current one
+    creator = HTMLReportCreator()
+    creator.data = mock_data_collector
+    creator.wrapped_card = card
+    f = StringIO()
+    creator.print_nav(f, "wrapped.html")
+    assert (
+        '<li><a href="wrapped.html" class="active" aria-current="page">Wrapped</a></li>'
+        in f.getvalue()
+    )
 
 
 def test_report_pages_without_share_card(mock_data_collector, temp_dir):

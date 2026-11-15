@@ -33,7 +33,7 @@ from gitstats.main import (
     run,
 )
 from gitstats.utils import get_log_range
-from gitstats.wrapped import THEMES
+from gitstats.wrapped import COMPARED, THEMES, WrappedCardGenerator
 
 # ── DataCollector base class ─────────────────────────────────────────────
 
@@ -2556,7 +2556,65 @@ class TestWrappedCard:
         assert "1080 &times; 1080, sunset theme" in badges
         assert '<img src="wrapped-2023.svg" width="240" height="240"' in badges
         history = (out / "history.html").read_text(encoding="utf-8")
-        assert '<a href="wrapped-2023.svg">Wrapped card &rarr;</a>' in history
+        assert '<a href="wrapped.html">Wrapped card &rarr;</a>' in history
+
+    def test_the_card_gets_a_page_its_numbers_and_a_share_card(
+        self, git_repo_minimal, tmp_path, sequential_map
+    ):
+        out = tmp_path / "report"
+        _use_config(share_card=True)
+        _run_single_repo(
+            git_repo_minimal,
+            str(out),
+            site_url="https://example.org/r/",
+            wrapped_config=self._config(),
+        )
+
+        # the numbers, as data: one commit in 2023, and no 2022 to compare with
+        data = json.loads((out / "wrapped-2023.json").read_text(encoding="utf-8"))
+        assert (data["schema_version"], data["card"]) == (1, "wrapped-2023.svg")
+        assert (data["year"], data["commits"], data["complete"]) == (2023, 1, True)
+        assert (data["through"], data["previous"]) == ("2023-12-31", None)
+
+        # the page: the report's header and nav around the card
+        page = (out / "wrapped.html").read_text(encoding="utf-8")
+        assert "<title>GitStats - git_repo_minimal: Repo Wrapped 2023</title>" in page
+        assert '<meta property="og:image" content="https://example.org/r/wrapped-card.png">' in (
+            page
+        )
+        assert (
+            '<meta name="description" content="git_repo_minimal in 2023: 1 commit, '
+            '1 contributor, 1 active day.">'
+        ) in page
+        assert '<li><a href="wrapped.html" class="active" aria-current="page">Wrapped</a>' in page
+        assert "<h1>Repo Wrapped 2023</h1>" in page
+        assert '<img src="wrapped-2023.svg" width="1080" height="1080"' in page
+        assert "#RepoWrapped https://example.org/r/wrapped.html</pre>" in page
+        assert page.rstrip().endswith("</body></html>")
+        carried = re.search(r'id="wrapped-data">(.*?)</script>', page)
+        assert json.loads(carried[1])["svg"] == (out / "wrapped-2023.svg").read_text(
+            encoding="utf-8"
+        )
+        # every page of the report links to it
+        assert '<li><a href="wrapped.html">Wrapped</a></li>' in (out / "index.html").read_text(
+            encoding="utf-8"
+        )
+
+        # and the card a link to the page shows
+        card = (out / "wrapped-card.html").read_text(encoding="utf-8")
+        assert '<div class="brand">// Repo Wrapped 2023</div><h1>git_repo_minimal</h1>' in card
+
+    def test_a_report_made_again_without_the_card_loses_its_page(
+        self, git_repo_minimal, tmp_path, sequential_map
+    ):
+        out = tmp_path / "report"
+        _run_single_repo(git_repo_minimal, str(out), wrapped_config=self._config())
+        assert (out / "wrapped.html").exists() and (out / "wrapped-card.html").exists()
+
+        _run_single_repo(git_repo_minimal, str(out))
+        assert not (out / "wrapped.html").exists()
+        assert not (out / "wrapped-card.html").exists()
+        assert "wrapped.html" not in (out / "index.html").read_text(encoding="utf-8")
 
     def test_the_report_has_no_card_to_show_when_none_is_next_to_it(
         self, git_repo_minimal, tmp_path, sequential_map
@@ -2586,6 +2644,9 @@ class TestWrappedCard:
             assert "There is none next to this report" in badges, name
             assert 'data-kind="card"' not in badges, name
             assert "Wrapped card" not in history, name
+            # nor a page, a share card or numbers for one
+            assert not list((tmp_path / name).glob("wrapped*")), name
+            assert "wrapped.html" not in badges, name
 
     def test_the_card_holds_the_numbers_of_its_year(
         self, git_repo_minimal, tmp_path, sequential_map
@@ -2904,6 +2965,91 @@ def _collected(repo, monkeypatch, processes=8, **config):
 
 
 ANN = ("Ann", "ann@example.com")
+BEN = ("Ben", "ben@example.com")
+
+
+def _two_years(tmp_path):
+    """Three commits in 2023 and two in 2024, with a release in each year."""
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (*ANN, "2023-02-01T12:00:00", {"a.py": 10}),
+            (*ANN, "2023-02-02T12:00:00", {"a.py": 12}),
+            (*BEN, "2023-11-20T12:00:00", {"b.py": 5}),
+            (*ANN, "2024-03-05T12:00:00", {"a.py": 20}),
+            (*BEN, "2024-06-01T12:00:00", {"b.py": None}),
+        ],
+    )
+    _git(repo, "tag", "v1", "HEAD~2")
+    _git(repo, "tag", "v2", "HEAD")
+    return repo
+
+
+@pytest.mark.parametrize("processes", [8, 1])
+def test_the_commits_and_lines_of_each_day_are_kept(tmp_path, monkeypatch, processes):
+    dc = _collected(_two_years(tmp_path), monkeypatch, processes)
+    assert dc.commits_by_day == {
+        "2023-02-01": 1,
+        "2023-02-02": 1,
+        "2023-11-20": 1,
+        "2024-03-05": 1,
+        "2024-06-01": 1,
+    }
+    # 10 lines, 2 more, 5 in another file, 8 more, and the 5 deleted
+    assert dc.lines_changed_by_day == {
+        "2023-02-01": 10,
+        "2023-02-02": 2,
+        "2023-11-20": 5,
+        "2024-03-05": 8,
+        "2024-06-01": 5,
+    }
+    # they add up to what the report counts in all
+    assert sum(dc.commits_by_day.values()) == dc.get_total_commits()
+    assert set(dc.commits_by_day) == dc.active_days
+    assert sum(dc.lines_changed_by_day.values()) == (
+        dc.total_lines_added + dc.total_lines_removed
+    )
+
+
+def test_a_wrapped_card_counts_the_year_before_as_that_years_own_card_does(
+    tmp_path, monkeypatch
+):
+    """The numbers a card sets its own against come from the days and the
+    authors' days; a year's own come from the year's totals. They agree."""
+    dc = _collected(_two_years(tmp_path), monkeypatch)
+    after = datetime.date(2025, 1, 10)
+    card_2024 = WrappedCardGenerator(dc, year=2024, today=after)._collect_stats()
+    card_2023 = WrappedCardGenerator(dc, year=2023, today=after)._collect_stats()
+    assert card_2023["previous"] is None
+    assert card_2024["previous"] == {
+        "year": 2023,
+        "through": "2023-12-31",
+        "commits": 3,
+        "active_days": 3,
+        "longest_streak": 2,
+        "lines_changed": 17,
+        "contributors": 2,
+        "new_contributors": 2,
+        "releases": 1,
+        "monthly_commits": [0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+    }
+    for key in (*COMPARED, "monthly_commits"):
+        assert card_2024["previous"][key] == card_2023[key], key
+
+    # made on March 10 of 2024, the card stops 2023 at its own March 10:
+    # Ben, his 5 lines and the release had not come
+    early = WrappedCardGenerator(dc, year=2024, today=datetime.date(2024, 3, 10))._collect_stats()
+    assert (early["commits"], early["through"], early["complete"]) == (2, "2024-03-10", False)
+    assert early["previous"] == {
+        **card_2024["previous"],
+        "through": "2023-03-10",
+        "commits": 2,
+        "active_days": 2,
+        "lines_changed": 12,
+        "contributors": 1,
+        "new_contributors": 1,
+        "releases": 0,
+    }
 
 
 @pytest.mark.parametrize("processes", [8, 1])

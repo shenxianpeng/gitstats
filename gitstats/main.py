@@ -56,7 +56,13 @@ from gitstats.utils import (
     source_lines_added,
     unquote_path,
 )
-from gitstats.wrapped import THEMES, WrappedCardGenerator
+from gitstats.wrapped import (
+    THEMES,
+    WrappedCardGenerator,
+    remove_wrapped_page,
+    write_card_data,
+    write_wrapped_page,
+)
 
 os.environ["LC_ALL"] = "C"
 
@@ -249,6 +255,11 @@ class DataCollector:
         self.last_active_day: str | None = None
         self.active_days: set[str] = set()
         self.longest_streak: int = 0  # longest consecutive active days streak
+        # the commits of each day and the lines they changed ("YYYY-MM-DD" ->
+        # count): what part of a year is compared with the same days of the
+        # year before by, on a Wrapped card made before its year is over
+        self.commits_by_day: dict[str, int] = {}
+        self.lines_changed_by_day: dict[str, int] = {}
 
         # lines
         self.total_lines: int = 0
@@ -769,6 +780,7 @@ class GitDataCollector(DataCollector):
 
         # authors: active days
         yymmdd = date.strftime("%Y-%m-%d")
+        self.commits_by_day[yymmdd] = self.commits_by_day.get(yymmdd, 0) + 1
         if "last_active_day" not in self.authors[author]:
             self.authors[author]["last_active_day"] = yymmdd
             self.authors[author]["active_days"] = set([yymmdd])
@@ -1109,6 +1121,11 @@ class GitDataCollector(DataCollector):
                         )
                         self.lines_removed_by_year[yy] = (
                             self.lines_removed_by_year.get(yy, 0) + deleted
+                        )
+
+                        day = date.strftime("%Y-%m-%d")
+                        self.lines_changed_by_day[day] = (
+                            self.lines_changed_by_day.get(day, 0) + inserted + deleted
                         )
 
                         files, inserted, deleted = 0, 0, 0
@@ -1681,6 +1698,11 @@ def _run_single_repo(
     html_report.site_url = site_url
     html_report.wrapped_card = wrapped_card
     html_report.create(data, outputpath)
+    # the card's own page, with the report's header and nav around it
+    if wrapped_card:
+        write_wrapped_page(html_report, outputpath, wrapped_card)
+    else:
+        remove_wrapped_page(outputpath)
     if site_url:
         logger.info(f"README badge: [![GitStats]({site_url}badge.svg)]({site_url})")
         logger.info(f"More badges: {site_url}badges.html")
@@ -1709,9 +1731,13 @@ def _write_wrapped_card(
     year has no commits to put on it, that is logged and the run carries on
     with the report it has.
 
-    Returns what the report needs to show the card, ``{"year", "theme",
-    "file"}`` with the file's name in the report directory, or None when
-    there is no card there: none was written, or it was written elsewhere.
+    A card in the report directory gets its numbers next to it, as
+    ``wrapped-<year>.json``.
+
+    Returns what the report needs to show the card, or None when there is no
+    card there: none was written, or it was written elsewhere. ``{"year",
+    "theme", "file", "data", "stats", "svg"}``: the names of the card and of
+    its data in the report directory, the card's numbers and the card itself.
     """
     logger.info("Generating Wrapped card...")
     try:
@@ -1729,12 +1755,16 @@ def _write_wrapped_card(
     except Exception as e:
         logger.warning(f"Failed to generate Wrapped card: {e}")
         return None
-    if os.path.dirname(written) != os.path.abspath(outputpath):
+    if os.path.dirname(written) != os.path.abspath(outputpath) or generator.stats is None:
         return None  # written elsewhere: the report has nothing next to it to show
+    file = os.path.basename(written)
     return {
         "year": generator.year,
         "theme": generator.theme_name,
-        "file": os.path.basename(written),
+        "file": file,
+        "data": write_card_data(outputpath, generator.stats, generator.theme_name, file),
+        "stats": generator.stats,
+        "svg": generator.svg,
     }
 
 

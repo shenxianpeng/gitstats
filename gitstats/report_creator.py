@@ -848,7 +848,8 @@ class HTMLReportCreator(ReportCreator):
     # The report's public address, ending in "/", when it is known (--site-url)
     site_url = ""
     # The Repo Wrapped card written next to the report by --wrapped, as
-    # {"year", "theme", "file"}; None when there is none to show
+    # {"year", "theme", "file"} and what its own page shows (see
+    # gitstats.wrapped); None when there is none to show
     wrapped_card: dict[str, Any] | None = None
 
     @staticmethod
@@ -2436,7 +2437,8 @@ class HTMLReportCreator(ReportCreator):
                 f'<button type="button" class="badge-copy" '
                 f'aria-label="Copy Markdown for {name}">{_COPY_ICONS}'
                 "<span>Copy</span></button></div></div>"
-                f'<p class="more-link"><a href="{name}" download>Download SVG &rarr;</a></p>'
+                f'<p class="more-link"><a href="{name}" download>Download SVG &rarr;</a> '
+                '&middot; <a href="wrapped.html">Its page, with a PNG to share &rarr;</a></p>'
             )
         else:
             f.write(
@@ -3055,7 +3057,7 @@ class HTMLReportCreator(ReportCreator):
                 if card and card.get("year") == entry["year"]:
                     f.write(
                         '<p class="history-people">'
-                        f'<a href="{html.escape(str(card["file"]))}">Wrapped card &rarr;</a></p>'
+                        '<a href="wrapped.html">Wrapped card &rarr;</a></p>'
                     )
             else:
                 f.write('<p class="history-facts">No commits this year.</p>')
@@ -3455,7 +3457,13 @@ class HTMLReportCreator(ReportCreator):
         """
         file.write(FOOTER)
 
-    def print_header(self, file: Any, page: str = "index.html") -> None:
+    def print_header(
+        self,
+        file: Any,
+        page: str = "index.html",
+        image: str = "share-card.png",
+        description: str | None = None,
+    ) -> None:
         """
         Write the HTML document header and opening body tag into the provided writable file.
 
@@ -3464,15 +3472,20 @@ class HTMLReportCreator(ReportCreator):
         Parameters:
                 file: A writable file-like object opened for text output where the HTML header will be written.
                 page: The file name of the page, such as ``"authors.html"``.
+                image: The share card a link to the page shows, as the image rendered from it.
+                description: What a link to the page says under its title; the report's own sentence when None.
         """
-        label = dict(NAV_PAGES + (("ai-insights.html", "AI Insights"),)).get(page, "")
+        labels = dict(NAV_PAGES + (("ai-insights.html", "AI Insights"),))
+        if self.wrapped_card:
+            labels["wrapped.html"] = f"Repo Wrapped {self.wrapped_card['year']}"
+        label = labels.get(page, "")
         title = self.title if page == "index.html" or not label else f"{self.title}: {label}"
         share = share_meta_html(
             title,
-            getattr(self, "share_description", ""),
+            getattr(self, "share_description", "") if description is None else description,
             self.site_url,
             page,
-            "share-card.png" if load_config().get("share_card") else "",
+            image if load_config().get("share_card") else "",
         )
         file.write(
             """<!DOCTYPE html>
@@ -3517,6 +3530,9 @@ class HTMLReportCreator(ReportCreator):
         has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
 
         links = "\n            ".join(nav_link(href, label, current) for href, label in NAV_PAGES)
+        if self.wrapped_card:
+            # the card's own page, written by gitstats.wrapped
+            links += "\n            " + nav_link("wrapped.html", "Wrapped", current)
         ai_link = nav_link("ai-insights.html", "AI Insights", current) if has_ai else ""
 
         github_icon = (
@@ -4205,6 +4221,9 @@ text-overflow:ellipsis}}
 .tiles div:first-child{{border-left:0}}
 .tiles dt{{font:15px {_CARD_MONO};letter-spacing:.08em;text-transform:uppercase;color:#716b6b}}
 .tiles dd{{margin:6px 0 0;font:700 40px {_CARD_MONO};white-space:nowrap}}
+.tiles dd span{{margin-left:12px;font-size:20px;font-weight:600;color:#716b6b}}
+.tiles dd .wrapped-up{{color:#2d6a3f}}
+.tiles dd .wrapped-down{{color:#8b2323}}
 .note{{margin:20px 0 0}}
 .names{{margin:8px 0 0;font:600 30px/1.5 {_CARD_MONO};display:-webkit-box;-webkit-line-clamp:5;
 -webkit-box-orient:vertical;overflow:hidden}}

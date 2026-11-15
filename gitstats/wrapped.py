@@ -4,16 +4,33 @@ Inspired by Spotify Wrapped: a square card of one year in the repository,
 with that year's commits, active days, longest streak, lines changed,
 contributors, busiest month and weekday, top contributor and the commits
 in each month. Nothing on the card is an all-time number.
+
+Each number is set against the year before: the whole of it for a year that
+is over, and the same days of it for the year under way, so that a card made
+in December does not hold eleven months against twelve.
+
+Next to a report the card comes with its numbers as data
+(``wrapped-<year>.json``), a page that shows it and helps to share it
+(``wrapped.html``), and that page's share card (``wrapped-card.html``).
 """
 
 from __future__ import annotations
 
 import datetime
+import html
+import io
+import json
 import logging
 import os
 from typing import Any
 
-from gitstats.report_creator import compute_project_history
+from gitstats.report_creator import (
+    compute_project_history,
+    is_bot,
+    plural,
+    share_card_page,
+)
+from gitstats.utils import format_int, get_version
 
 logger = logging.getLogger("gitstats")
 
@@ -58,6 +75,8 @@ THEMES: dict[str, dict[str, str]] = {
         "footer": "rgba(255,255,255,0.35)",
         "accent": "#818cf8",
         "separator": "rgba(255,255,255,0.08)",
+        "up": "#6ee7b7",
+        "down": "#fda4af",
     },
     "sunset": {
         "bg_start": "#1a0a1e",
@@ -74,6 +93,8 @@ THEMES: dict[str, dict[str, str]] = {
         "footer": "rgba(255,255,255,0.35)",
         "accent": "#fb923c",
         "separator": "rgba(255,255,255,0.08)",
+        "up": "#86efac",
+        "down": "#fda4af",
     },
     "clean": {
         "bg_start": "#f8fafc",
@@ -90,6 +111,8 @@ THEMES: dict[str, dict[str, str]] = {
         "footer": "#94a3b8",
         "accent": "#6366f1",
         "separator": "#e2e8f0",
+        "up": "#047857",
+        "down": "#be123c",
     },
 }
 
@@ -127,6 +150,19 @@ DAY_PARTS: tuple[tuple[str, int, int], ...] = (
     ("Evening Coder", 18, 24),
 )
 
+# The six numbers a card can show, and whether each moves by a percentage
+# (the large counts) or by a difference (days, people and releases, where
+# "+3" says more than "+50%")
+COMPARED: dict[str, bool] = {
+    "commits": True,
+    "active_days": False,
+    "longest_streak": False,
+    "lines_changed": True,
+    "contributors": False,
+    "new_contributors": False,
+    "releases": False,
+}
+
 WIDTH = 1080
 HEIGHT = 1080
 # The content column: everything on the card sits between these two edges
@@ -144,6 +180,31 @@ def _longest_streak(days: list[str]) -> int:
         longest = max(longest, current)
         previous = date
     return longest
+
+
+def change(now: int, before: int, relative: bool) -> tuple[int, str] | None:
+    """How a number moved from the year before: its direction (1 up, -1 down,
+    0 neither) and what is written next to it.
+
+    ``relative`` numbers move by a percentage, or by a factor from ten times
+    on ("+900%" is the last percentage), and have no change to show when the
+    year before had none of them; the others move by a difference.
+    """
+    if not relative:
+        difference = now - before
+        return (difference > 0) - (difference < 0), f"{difference:+,}" if difference else "same"
+    if not before:
+        return None
+    if now >= 10 * before:
+        return 1, f"{now / before:.0f}x"
+    percent = round(100 * (now - before) / before)
+    return (percent > 0) - (percent < 0), f"{percent:+d}%" if percent else "same"
+
+
+def day_text(day: str) -> str:
+    """ "2025-12-05" as a card and a page write it: "December 5"."""
+    date = datetime.date.fromisoformat(day)
+    return f"{MONTH_NAMES[date.month]} {date.day}"
 
 
 class WrappedCardGenerator:
@@ -165,6 +226,9 @@ class WrappedCardGenerator:
         self.year = year or self.today.year
         self.theme_name = theme
         self.colors = THEMES.get(theme, THEMES["midnight"])
+        # the card generate() last wrote, and its numbers; None before it has
+        self.svg: str | None = None
+        self.stats: dict[str, Any] | None = None
 
     # ── data extraction helpers ─────────────────────────────────────────────
 
@@ -205,6 +269,68 @@ class WrappedCardGenerator:
         ]
         name, start, end = DAY_PARTS[counts.index(max(counts))]
         return {"name": name, "start": start, "end": end, "share": max(counts) / total}
+
+    def _under_way(self) -> bool:
+        """Whether the card is for the year it is made in, which is not over."""
+        return self.year == self.today.year
+
+    def _previous(self) -> dict[str, Any] | None:
+        """The year before, as far into it as the card's year has come: all
+        of it when the card's year is over, and up to the same day when it is
+        under way (February 28 for a February 29 the year before lacks).
+
+        Counted the way the card's own numbers are, from what the collector
+        gathered. None when there is nothing to compare with: the year before
+        has no commits in those days, or the data does not say which days its
+        commits were made on (it was collected before they were kept).
+        """
+        year = self.year - 1
+        end = datetime.date(year, 12, 31)
+        if self._under_way():
+            try:
+                end = self.today.replace(year=year)
+            except ValueError:
+                end = datetime.date(year, 2, 28)
+        first, through = f"{year}-01-01", end.isoformat()
+
+        def within(day: Any) -> bool:
+            return first <= str(day) <= through
+
+        by_day = getattr(self.data, "commits_by_day", {}) or {}
+        commits = sum(count for day, count in by_day.items() if within(day))
+        if not commits:
+            return None
+        lines = getattr(self.data, "lines_changed_by_day", {}) or {}
+        days = sorted(str(day) for day in getattr(self.data, "active_days", ()) if within(day))
+        authors = getattr(self.data, "authors", {}) or {}
+        by_month = getattr(self.data, "commits_by_month", {}) or {}
+
+        def arrived(info: dict[str, Any]) -> str:
+            stamp = info.get("first_commit_stamp")
+            return datetime.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d") if stamp else ""
+
+        return {
+            "year": year,
+            "through": through,
+            "commits": commits,
+            "active_days": len(days),
+            "longest_streak": _longest_streak(days),
+            "lines_changed": sum(count for day, count in lines.items() if within(day)),
+            "contributors": sum(
+                1
+                for info in authors.values()
+                if any(within(day) for day in info.get("active_days", ()))
+            ),
+            "new_contributors": sum(
+                1 for name, info in authors.items() if not is_bot(name) and within(arrived(info))
+            ),
+            "releases": sum(
+                1
+                for info in (getattr(self.data, "tags", {}) or {}).values()
+                if within(info.get("date", ""))
+            ),
+            "monthly_commits": [by_month.get(f"{year}-{month:02d}", 0) for month in range(1, 13)],
+        }
 
     def _collect_stats(self) -> dict[str, Any]:
         """Assemble the card's numbers, every one of them for ``self.year``.
@@ -248,6 +374,11 @@ class WrappedCardGenerator:
             "busiest_month": MONTH_NAMES[monthly.index(max(monthly)) + 1] if any(monthly) else "",
             "busiest_weekday": self._busiest_weekday(),
             "day_part": self._day_part(),
+            # the last day the numbers reach, and whether the year is over
+            "through": self.today.isoformat() if self._under_way() else f"{self.year}-12-31",
+            "complete": not self._under_way(),
+            # the same numbers of the year before, to set them against
+            "previous": self._previous(),
         }
 
     # ── SVG rendering ──────────────────────────────────────────────────────
@@ -274,22 +405,30 @@ class WrappedCardGenerator:
         # The sixth number: the year's releases, or its newcomers when it had
         # no release, so a repository that does not tag still shows a count
         if stats["releases"] or not stats["new_contributors"]:
-            sixth = ("Releases", stats["releases"])
+            sixth = ("Releases", "releases")
         else:
-            sixth = ("New Contributors", stats["new_contributors"])
+            sixth = ("New Contributors", "new_contributors")
         streak = stats["longest_streak"]
         numbers = [
-            ("Commits", self._format_number(stats["commits"])),
-            ("Active Days", self._format_number(stats["active_days"])),
-            ("Longest Streak", f"{streak} day{'' if streak == 1 else 's'}"),
-            ("Lines Changed", self._format_number(stats["lines_changed"])),
-            ("Contributors", self._format_number(stats["contributors"])),
-            (sixth[0], self._format_number(sixth[1])),
+            ("Commits", "commits", self._format_number(stats["commits"])),
+            ("Active Days", "active_days", self._format_number(stats["active_days"])),
+            ("Longest Streak", "longest_streak", f"{streak} day{'' if streak == 1 else 's'}"),
+            ("Lines Changed", "lines_changed", self._format_number(stats["lines_changed"])),
+            ("Contributors", "contributors", self._format_number(stats["contributors"])),
+            (sixth[0], sixth[1], self._format_number(stats[sixth[1]])),
         ]
+        previous = stats.get("previous")
+        months_before = previous["monthly_commits"] if previous else None
         # three columns of 300 with 30 between them fill the content column
         stat_cards = "\n  ".join(
-            self._stat_card(LEFT + 330 * (i % 3), 290 + 150 * (i // 3), label, value)
-            for i, (label, value) in enumerate(numbers)
+            self._stat_card(
+                LEFT + 330 * (i % 3),
+                290 + 150 * (i // 3),
+                label,
+                value,
+                change(stats[key], previous[key], COMPARED[key]) if previous else None,
+            )
+            for i, (label, key, value) in enumerate(numbers)
         )
 
         return f"""<?xml version="1.0" encoding="utf-8"?>
@@ -322,6 +461,7 @@ class WrappedCardGenerator:
 
   <!-- The year in six numbers -->
   {stat_cards}
+  {self._render_compared(stats)}
   <line x1="{LEFT}" y1="590" x2="{RIGHT}" y2="590" stroke="{c["separator"]}" stroke-width="1"/>
 
   <!-- When and by whom -->
@@ -329,7 +469,7 @@ class WrappedCardGenerator:
   {self._render_facts(stats)}
 
   <!-- The year month by month -->
-  {self._render_mini_bar_chart(stats["monthly_commits"])}
+  {self._render_mini_bar_chart(stats["monthly_commits"], months_before)}
 
   <!-- Footer -->
   <line x1="{LEFT}" y1="1000" x2="{RIGHT}" y2="1000" stroke="{c["separator"]}" stroke-width="1"/>
@@ -337,16 +477,44 @@ class WrappedCardGenerator:
   </g>
 </svg>"""
 
-    def _stat_card(self, x: int, y: int, label: str, value: str) -> str:
-        """Render one number in its box (300×120), the pair centered in it."""
+    def _stat_card(
+        self, x: int, y: int, label: str, value: str, moved: tuple[int, str] | None = None
+    ) -> str:
+        """Render one number in its box (300×120), the pair centered in it,
+        and how it ``moved`` from the year before on the line of its label, at
+        the right: green when it went up, red when it went down."""
         c = self.colors
-        return (
+        card = (
             f'<rect x="{x}" y="{y}" width="300" height="120" rx="14" '
             f'fill="{c["card_bg"]}" stroke="{c["card_border"]}" stroke-width="1"/>\n'
             f'  <text x="{x + 24}" y="{y + 60}" font-size="36" font-weight="700" '
             f'fill="{c["stat_value"]}">{value}</text>\n'
             f'  <text x="{x + 24}" y="{y + 90}" font-size="14" font-weight="500" '
             f'fill="{c["stat_label"]}" letter-spacing="0.5">{label}</text>'
+        )
+        if moved is None:
+            return card
+        direction, text = moved
+        color = {1: c["up"], -1: c["down"]}.get(direction, c["stat_label"])
+        return card + (
+            f'\n  <text x="{x + 276}" y="{y + 90}" font-size="14" font-weight="600" '
+            f'fill="{color}" text-anchor="end">{text}</text>'
+        )
+
+    def _render_compared(self, stats: dict[str, Any]) -> str:
+        """Say, under the six numbers, what they are compared with."""
+        previous = stats.get("previous")
+        if not previous:
+            return ""
+        text = f"Compared with {previous['year']}"
+        if not stats["complete"]:
+            text = (
+                f"Compared with the same days of {previous['year']}: "
+                f"January 1 to {day_text(previous['through'])}"
+            )
+        return (
+            f'<text x="{RIGHT}" y="580" font-size="13" fill="{self.colors["stat_label"]}" '
+            f'text-anchor="end">{text}</text>'
         )
 
     def _render_personality(self, day_part: dict[str, Any] | None) -> str:
@@ -396,11 +564,16 @@ class WrappedCardGenerator:
             for i, line in enumerate(lines)
         )
 
-    def _render_mini_bar_chart(self, monthly: list[int]) -> str:
+    def _render_mini_bar_chart(self, monthly: list[int], previous: list[int] | None = None) -> str:
         """Render the year's commits per month as twelve bars across the card.
 
         In the year the card is made in, the months still to come have no bar
         and no baseline: a quiet end of the year is not drawn before it happens.
+
+        ``previous`` is the year before, month by month: each of its months
+        stands as a narrow bar to the right of this year's, in the place the
+        one bar otherwise takes. Only beside the months that are over, as the
+        month under way is not yet what the whole month of a year ago was.
         """
         c = self.colors
         # how many of the year's months have begun: only they are drawn
@@ -409,10 +582,16 @@ class WrappedCardGenerator:
         if not peak:
             return ""
         title = "MONTHLY COMMITS SO FAR" if months < 12 else "MONTHLY COMMITS"
+        before = (previous or [])[: months - 1 if self._under_way() else 12]
+        paired = any(before)
+        # one height for both years, so a bar and the one beside it compare
+        peak = max([peak, *before])
 
-        # twelve bars of 58 with 24 between them fill the content column
-        bar_w = 58
-        step = bar_w + 24
+        # twelve bars of 58 with 24 between them fill the content column; with
+        # the year before, a bar of 40, 4 apart from one of 14, takes the 58
+        slot_w = 58
+        bar_w = 40 if paired else slot_w
+        step = slot_w + 24
         base_y = 940
         bar_max_h = 90
 
@@ -420,13 +599,31 @@ class WrappedCardGenerator:
             f'<text x="{LEFT}" y="826" font-size="13" font-weight="600" '
             f'fill="{c["stat_label"]}" letter-spacing="0.5">{title}</text>'
         ]
+        if paired:
+            # what the narrow bars are: one of them, and the year they stand for
+            parts.append(
+                f'<rect x="{RIGHT - 54}" y="816" width="14" height="10" rx="3" '
+                f'fill="{c["stat_label"]}" fill-opacity="0.45"/>'
+            )
+            parts.append(
+                f'<text x="{RIGHT}" y="826" font-size="13" fill="{c["stat_label"]}" '
+                f'text-anchor="end">{self.year - 1}</text>'
+            )
         for i, commits in enumerate(monthly):
             x = LEFT + i * step
+            # the month's name is centered under its place, its count over its bar
+            name_x = x + slot_w // 2
             middle = x + bar_w // 2
+            if i < len(before) and before[i]:
+                h = max(4, round(before[i] / peak * bar_max_h))
+                parts.append(
+                    f'<rect x="{x + bar_w + 4}" y="{base_y - h}" width="14" height="{h}" rx="3" '
+                    f'fill="{c["stat_label"]}" fill-opacity="0.45"/>'
+                )
             if i >= months:
                 # a month to come: its name, faint, and nothing above it
                 parts.append(
-                    f'<text x="{middle}" y="{base_y + 18}" font-size="11" fill="{c["footer"]}" '
+                    f'<text x="{name_x}" y="{base_y + 18}" font-size="11" fill="{c["footer"]}" '
                     f'fill-opacity="0.5" text-anchor="middle">{MONTH_NAMES[i + 1][:3]}</text>'
                 )
                 continue
@@ -448,7 +645,7 @@ class WrappedCardGenerator:
                     f'fill="{c["accent"]}" fill-opacity="0.25"/>'
                 )
             parts.append(
-                f'<text x="{middle}" y="{base_y + 18}" font-size="11" fill="{c["footer"]}" '
+                f'<text x="{name_x}" y="{base_y + 18}" font-size="11" fill="{c["footer"]}" '
                 f'text-anchor="middle">{MONTH_NAMES[i + 1][:3]}</text>'
             )
         return "\n  ".join(parts)
@@ -485,6 +682,7 @@ class WrappedCardGenerator:
         """
         stats = self._collect_stats()
         svg = self._render_card(stats)
+        self.svg, self.stats = svg, stats
 
         if output_path is None:
             output_path = f"gitstats-wrapped-{self.year}.svg"
@@ -494,3 +692,267 @@ class WrappedCardGenerator:
 
         logger.info(f"Wrapped card saved: {output_path}")
         return output_path
+
+
+# ── next to a report: the numbers as data, a page, and its share card ───────
+
+# The version of what wrapped-<year>.json holds: a field that changes its
+# name, type or meaning comes with a new one
+SCHEMA_VERSION = 1
+PAGE = "wrapped.html"
+SHARE_CARD = "wrapped-card.html"
+# the image the page points to where its link is shared, rendered from SHARE_CARD
+SHARE_IMAGE = "wrapped-card.png"
+
+# The seven numbers of a year, as the page lists them
+NUMBERS: tuple[tuple[str, str], ...] = (
+    ("Commits", "commits"),
+    ("Active days", "active_days"),
+    ("Longest streak, in days", "longest_streak"),
+    ("Lines changed", "lines_changed"),
+    ("Contributors", "contributors"),
+    ("New contributors", "new_contributors"),
+    ("Releases", "releases"),
+)
+
+# Fills in the text to post with the page's address, when the page is served
+# and --site-url did not say it; copies it; and saves the card as a PNG, drawn
+# from the SVG the page carries (#wrapped-data), so that it also works for a
+# page opened from a file.
+WRAPPED_SCRIPT = r"""<script>
+(function() {
+	const data = JSON.parse(document.getElementById('wrapped-data').textContent);
+	const served = /^https?:$/.test(window.location.protocol);
+	const url = data.url || (served ? window.location.href.split(/[?#]/)[0] : '');
+	const text = data.text + (url ? ' ' + url : '');
+	document.getElementById('wrapped-text').textContent = text;
+	document.getElementById('wrapped-x').href =
+		'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text);
+	document.getElementById('wrapped-bluesky').href =
+		'https://bsky.app/intent/compose?text=' + encodeURIComponent(text);
+
+	const copy = document.getElementById('wrapped-copy');
+	copy.addEventListener('click', function() {
+		navigator.clipboard.writeText(text).then(function() {
+			copy.classList.add('is-copied');
+			copy.querySelector('span').textContent = 'Copied';
+			setTimeout(function() {
+				copy.classList.remove('is-copied');
+				copy.querySelector('span').textContent = 'Copy';
+			}, 1500);
+		});
+	});
+
+	document.getElementById('wrapped-png').addEventListener('click', function() {
+		const source = URL.createObjectURL(new Blob([data.svg], {type: 'image/svg+xml'}));
+		const image = new Image();
+		image.onload = function() {
+			// at the card's own size: under the megabyte some places stop at
+			const canvas = document.createElement('canvas');
+			canvas.width = canvas.height = data.size;
+			canvas.getContext('2d').drawImage(image, 0, 0, canvas.width, canvas.height);
+			URL.revokeObjectURL(source);
+			canvas.toBlob(function(blob) {
+				const link = document.createElement('a');
+				link.href = URL.createObjectURL(blob);
+				link.download = data.png;
+				link.click();
+				URL.revokeObjectURL(link.href);
+			}, 'image/png');
+		};
+		image.src = source;
+	});
+})();
+</script>"""
+
+
+def card_data(stats: dict[str, Any], theme: str, card: str) -> dict[str, Any]:
+    """What ``wrapped-<year>.json`` holds: the numbers of a card, with the
+    file it is and the theme it is drawn in."""
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "generated_by": f"gitstats {get_version()}",
+        "generated_at": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
+        "card": card,
+        "theme": theme,
+        **stats,
+    }
+
+
+def write_card_data(directory: str, stats: dict[str, Any], theme: str, card: str) -> str:
+    """Write a card's numbers next to it, in ``directory``; the file's name."""
+    name = f"wrapped-{stats['year']}.json"
+    text = json.dumps(card_data(stats, theme, card), indent=2, ensure_ascii=False)
+    _write_within(directory, name, text + "\n")
+    return name
+
+
+def period_text(stats: dict[str, Any]) -> str:
+    """The days a card's numbers cover, in a sentence: "in 2025", or "from
+    January 1 to December 5, 2025" for a year under way."""
+    if stats["complete"]:
+        return f"in {stats['year']}"
+    return f"from January 1 to {day_text(stats['through'])}, {stats['year']}"
+
+
+def compared_text(stats: dict[str, Any]) -> str:
+    """What a card's numbers are compared with, to end a sentence with; ""
+    when with nothing."""
+    previous = stats["previous"]
+    if not previous:
+        return ""
+    if stats["complete"]:
+        return f", compared with {previous['year']}"
+    return f", compared with the same days of {previous['year']}"
+
+
+def summary_text(stats: dict[str, Any]) -> str:
+    """The year in one sentence: what a link to the page says under its
+    title, and what the line to post starts with."""
+    previous = stats["previous"]
+    commits = plural(stats["commits"], "commit")
+    moved = change(stats["commits"], previous["commits"], True) if previous else None
+    if moved and moved[0]:
+        days = "" if stats["complete"] else "the same days of "
+        commits += f" ({moved[1]} on {days}{previous['year']})"
+    so_far = "" if stats["complete"] else " so far"
+    return (
+        f"{stats['project_name']} in {stats['year']}{so_far}: {commits}, "
+        f"{plural(stats['contributors'], 'contributor')}, "
+        f"{plural(stats['active_days'], 'active day')}."
+    )
+
+
+def _moved_html(stats: dict[str, Any], key: str) -> str:
+    """How one number moved from the year before, as a span coloured by its
+    direction; "" when there is no year before, or nothing to say."""
+    previous = stats["previous"]
+    moved = change(stats[key], previous[key], COMPARED[key]) if previous else None
+    if not moved:
+        return ""
+    direction, text = moved
+    name = {1: "wrapped-up", -1: "wrapped-down"}.get(direction, "wrapped-same")
+    return f'<span class="{name}">{html.escape(text)}</span>'
+
+
+def numbers_table_html(stats: dict[str, Any]) -> str:
+    """The year's numbers as a table: beside those of the year before, and
+    how each moved, when there is one to compare with."""
+    previous = stats["previous"]
+    head = f'<th></th><th class="num">{stats["year"]}</th>'
+    if previous:
+        head += f'<th class="num">{previous["year"]}</th><th class="num">Change</th>'
+    rows = ""
+    for label, key in NUMBERS:
+        rows += f'<tr><td>{label}</td><td class="num">{format_int(stats[key])}</td>'
+        if previous:
+            rows += (
+                f'<td class="num">{format_int(previous[key])}</td>'
+                f'<td class="num">{_moved_html(stats, key)}</td>'
+            )
+        rows += "</tr>"
+    return (
+        '<div class="table-scroll"><table class="wrapped-numbers">'
+        f"<tr>{head}</tr>{rows}</table></div>"
+    )
+
+
+def share_card_html(stats: dict[str, Any]) -> str:
+    """The page's share card: the repository, the year, four of its numbers
+    with how they moved, and its commits month by month."""
+    name = stats["project_name"]
+    tiles = "".join(
+        f"<div><dt>{label}</dt><dd>{format_int(stats[key])}{_moved_html(stats, key)}</dd></div>"
+        for label, key in (
+            ("Commits", "commits"),
+            ("Contributors", "contributors"),
+            ("Active days", "active_days"),
+            ("Lines changed", "lines_changed"),
+        )
+    )
+    # the months that have begun: a month to come is not a month without commits
+    months = datetime.date.fromisoformat(stats["through"]).month
+    monthly = stats["monthly_commits"][:months]
+    top = max(monthly, default=0) or 1
+    columns = "".join(f'<i style="height:{100 * count / top:.1f}%"></i>' for count in monthly)
+    period = period_text(stats) + compared_text(stats)
+    return share_card_page(
+        f"{name}: Repo Wrapped {stats['year']}",
+        f'<div class="brand">// Repo Wrapped {stats["year"]}</div><h1>{html.escape(name)}</h1>'
+        f'<p class="sub">{period[0].upper()}{period[1:]}</p><dl class="tiles">{tiles}</dl>'
+        f'<div class="history"><div class="columns">{columns}</div><div class="axis">'
+        f"<span>Jan</span><span>commits per month</span>"
+        f"<span>{MONTH_NAMES[months][:3]}</span></div></div>",
+    )
+
+
+def page_body_html(card: dict[str, Any], url: str = "") -> str:
+    """What the Wrapped page shows between its nav and its footer: the card,
+    the year's numbers, and what to share it with. ``url`` is the page's
+    public address when the report knows it."""
+    stats = card["stats"]
+    year, name, file = stats["year"], stats["project_name"], html.escape(str(card["file"]))
+    png = f"{os.path.splitext(str(card['file']))[0]}.png"
+    text = f"{summary_text(stats)} #RepoWrapped"
+    page_data = {"svg": card["svg"], "png": png, "size": WIDTH, "text": text, "url": url}
+    return (
+        f"<h1>Repo Wrapped {year}</h1>"
+        f'<p class="section-note">{html.escape(name)} {period_text(stats)}'
+        f"{compared_text(stats)}.</p>"
+        '<div class="wrapped-page">'
+        f'<a class="wrapped-card" href="{file}"><img src="{file}" width="{WIDTH}" '
+        f'height="{HEIGHT}" alt="Repo Wrapped card for {html.escape(name)} in {year}"></a>'
+        '<div class="wrapped-side">'
+        f"{numbers_table_html(stats)}"
+        '<p class="wrapped-actions"><button type="button" id="wrapped-png">Download PNG</button>'
+        f'<a href="{file}" download>Download SVG</a>'
+        f'<a href="{html.escape(str(card["data"]))}">Data</a></p>'
+        "<h2>Share it</h2>"
+        '<p class="section-note">Save the card as a PNG and post it as an image, with a '
+        "line like this one:</p>"
+        '<div class="wrapped-share">'
+        f'<pre class="badge-code" id="wrapped-text">{html.escape(f"{text} {url}".strip())}</pre>'
+        '<button type="button" class="badge-copy" id="wrapped-copy" '
+        'aria-label="Copy the text to post"><span>Copy</span></button></div>'
+        '<p class="more-link"><a id="wrapped-x" target="_blank" rel="noopener" '
+        'href="https://twitter.com/intent/tweet">Post on X &rarr;</a> &middot; '
+        '<a id="wrapped-bluesky" target="_blank" rel="noopener" '
+        'href="https://bsky.app/intent/compose">Post on Bluesky &rarr;</a> &middot; '
+        '<a href="badges.html#repo_wrapped">Show it in a README &rarr;</a></p>'
+        "</div></div>"
+        '<script type="application/json" id="wrapped-data">'
+        + json.dumps(page_data).replace("</", "<\\/")
+        + "</script>"
+        + WRAPPED_SCRIPT
+    )
+
+
+def write_wrapped_page(report: Any, path: str, card: dict[str, Any]) -> None:
+    """Write the Wrapped page of a report, and the page's share card, into
+    the report directory ``path``.
+
+    ``report`` is the HTMLReportCreator that wrote the other pages: the page
+    gets its header, nav and footer. ``card`` is what the report shows the
+    card by, with its numbers (``stats``), its SVG (``svg``) and the name of
+    its data file (``data``).
+    """
+    stats = card["stats"]
+    url = f"{report.site_url}{PAGE}" if report.site_url else ""
+    page = io.StringIO()
+    report.print_header(page, PAGE, image=SHARE_IMAGE, description=summary_text(stats))
+    report.print_nav(page, PAGE)
+    page.write(page_body_html(card, url))
+    report.print_footer(page)
+    page.write("</body></html>")
+    _write_within(path, PAGE, page.getvalue())
+    _write_within(path, SHARE_CARD, share_card_html(stats))
+
+
+def remove_wrapped_page(path: str) -> None:
+    """Remove the Wrapped page an earlier run left in the report directory
+    ``path``, with its share card: a report without a card links to neither,
+    and their numbers would be those of that run."""
+    for name in (PAGE, SHARE_CARD):
+        target = os.path.join(os.path.abspath(path), name)
+        if os.path.isfile(target):
+            os.remove(target)

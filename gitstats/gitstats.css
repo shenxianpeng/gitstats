@@ -981,6 +981,85 @@ tr[hidden] {
 	border: 1px solid var(--border-color);
 }
 
+/* The Repo Wrapped page: the card, and beside it the year's numbers and what
+   to share it with; one under the other when narrow */
+.wrapped-page {
+	display: grid;
+	grid-template-columns: minmax(0, 540px) minmax(0, 1fr);
+	gap: var(--space-6);
+	align-items: start;
+}
+
+.wrapped-card {
+	line-height: 0;
+	border: 1px solid var(--border-color);
+}
+
+.wrapped-card img {
+	display: block;
+	width: 100%;
+	height: auto;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+}
+
+.wrapped-side > :first-child {
+	margin-top: 0;
+}
+
+/* How a number moved from the year before */
+.wrapped-up {
+	color: var(--success-color);
+}
+
+.wrapped-down {
+	color: var(--danger-color);
+}
+
+.wrapped-same {
+	color: var(--text-secondary);
+}
+
+.wrapped-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--space-2) var(--space-4);
+	margin: var(--space-4) 0;
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+}
+
+.wrapped-actions button {
+	padding: var(--space-2) var(--space-4);
+	font: inherit;
+	font-weight: 600;
+	color: var(--bg-color);
+	background-color: var(--accent-color);
+	border: 1px solid var(--accent-color);
+	cursor: pointer;
+}
+
+.wrapped-actions button:hover {
+	opacity: 0.85;
+}
+
+/* The line to post, and the button that copies it */
+.wrapped-share {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 96px;
+	gap: var(--space-3);
+	align-items: start;
+}
+
+@media (max-width: 900px) {
+	.wrapped-page {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
 .badge-json {
 	align-self: flex-start;
 	padding: 1px var(--space-2);
