@@ -91,6 +91,7 @@ def _card(repo_id, name=None, group="python", **data):
         "name": name or repo_id.title(),
         "group": group,
         "data": f"wrapped-{kept['year']}.json",
+        "card": f"wrapped-{kept['year']}.svg",
         **kept,
     }
 
@@ -104,7 +105,6 @@ def test_what_is_kept_of_a_cards_data():
         "year": 2026,
         "complete": False,
         "through": "2026-12-05",
-        "card": "wrapped-2026.svg",
         **_numbers(100),
         "previous": {"year": 2025, "through": "2025-12-05", **_numbers(80)},
     }
@@ -112,10 +112,18 @@ def test_what_is_kept_of_a_cards_data():
     assert wrapped._card_of(_data(complete=True))["complete"] is True
 
 
-def test_a_cards_file_is_looked_for_next_to_its_data():
+def test_a_card_is_the_svg_named_as_its_data_is(tmp_path):
+    """Not the file the data says: no file is looked for by a name read from one."""
+    (tmp_path / "secret.svg").write_text("<svg/>", encoding="utf-8")
     data = _data()
-    data["card"] = "../../elsewhere/card.svg"
-    assert wrapped._card_of(data)["card"] == "card.svg"
+    data["card"] = "../secret.svg"
+    _report(tmp_path, "django", data)
+    (card,) = wrapped.load_cards(str(tmp_path), [_summary("django")])
+    assert (card["data"], card["card"]) == ("wrapped-2026.json", "wrapped-2026.svg")
+
+    # and without that SVG there is no card, whatever the data names
+    os.remove(tmp_path / "django" / "wrapped-2026.svg")
+    assert wrapped.load_cards(str(tmp_path), [_summary("django")]) == []
 
 
 def _without(key, where=None):
@@ -133,13 +141,12 @@ def _without(key, where=None):
         _without("year"),
         _without("commits"),
         _without("releases"),
-        _without("card"),
         _without("through"),
         {**_data(), "year": True},
         {**_data(), "year": "2026"},
         {**_data(), "commits": -1},
         {**_data(), "commits": 1.5},
-        {**_data(), "card": 7},
+        {**_data(), "through": 20261205},
         {**_data(), "previous": [1, 2]},
         _without("commits", "previous"),
         _without("year", "previous"),

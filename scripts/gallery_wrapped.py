@@ -74,7 +74,7 @@ def _card_of(data: Any) -> dict[str, Any] | None:
         return None
     if not all(_count(data.get(key)) for key in COMPARED):
         return None
-    if not isinstance(data.get("card"), str) or not isinstance(data.get("through"), str):
+    if not isinstance(data.get("through"), str):
         return None
     before = data.get("previous")
     if before is not None:
@@ -87,8 +87,6 @@ def _card_of(data: Any) -> dict[str, Any] | None:
         "year": data["year"],
         "complete": bool(data.get("complete")),
         "through": data["through"],
-        # the file's name only: it is looked for next to the data
-        "card": os.path.basename(data["card"]),
         **{key: data[key] for key in COMPARED},
         "previous": before,
     }
@@ -101,7 +99,8 @@ def load_cards(gallery_root: str, summaries: list[dict[str, Any]]) -> list[dict[
     A report has a card when its folder has the data of one, the latest
     year's if it has several, with the card and its page next to it. One
     without, or whose data cannot be read, is left out. Nothing outside the
-    gallery's folder is read.
+    gallery's folder is read, and no file is looked for by a name the data
+    gives: the card is the SVG named as its data is.
     """
     base = os.path.realpath(gallery_root)
     cards = []
@@ -124,7 +123,8 @@ def load_cards(gallery_root: str, summaries: list[dict[str, Any]]) -> list[dict[
         if card is None:
             print(f"Skipping data that is not a card's: {report_id}/{names[-1]}", file=sys.stderr)
             continue
-        if not all(os.path.isfile(os.path.join(folder, name)) for name in (card["card"], PAGE)):
+        image = f"{names[-1][: -len('.json')]}.svg"
+        if not all(os.path.isfile(os.path.join(folder, name)) for name in (image, PAGE)):
             continue
         cards.append(
             {
@@ -132,6 +132,7 @@ def load_cards(gallery_root: str, summaries: list[dict[str, Any]]) -> list[dict[
                 "name": str(summary.get("name") or report_id),
                 "group": str(summary.get("group", "")),
                 "data": names[-1],
+                "card": image,
                 **card,
             }
         )
