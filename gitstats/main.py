@@ -21,15 +21,11 @@ from urllib.parse import urlsplit
 
 import gitstats
 from gitstats import check_git_settings, load_config, parse_config_value, time_start, utils
-from gitstats.aggregate import (
-    AggregateReportCreator,
-    _slugify_repo,
-    compute_repo_summary,
-    write_repo_summary,
-)
+from gitstats.aggregate import AggregateReportCreator
 from gitstats.ai_summarizer import AISummarizer
 from gitstats.collector import DataCollector, GitDataCollector
 from gitstats.report_creator import HTMLReportCreator
+from gitstats.summary import _slugify_repo, compute_repo_summary, write_repo_summary
 from gitstats.utils import get_version
 from gitstats.wrapped import (
     THEMES,

@@ -28,8 +28,8 @@ from typing import Any
 
 from gallery_repos import Group, Repo
 
-from gitstats.aggregate import MIN_RANKED_COMMITS, last_quarters, quarter_id
 from gitstats.compare import complete_ai
+from gitstats.datasets import MIN_RANKED_COMMITS, last_quarters, quarter_id
 from gitstats.markup import (
     AI_ASSISTED_COUNTED,
     FOOTER,

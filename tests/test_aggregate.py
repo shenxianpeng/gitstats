@@ -13,28 +13,32 @@ import pytest
 
 from gitstats.aggregate import (
     AggregateReportCreator,
-    _slugify_repo,
-    ai_assisted_summary,
+    organization_badge_message,
+    organizations_description,
+)
+from gitstats.datasets import (
     ai_csv,
     ai_dataset,
     ai_rows,
-    compute_repo_summary,
-    humans_summary,
     last_quarters,
-    load_repo_summaries,
-    organization_badge_message,
     organization_pages,
     organizations_csv,
     organizations_dataset,
-    organizations_description,
-    organizations_summary,
-    people_summary,
     quarter_id,
     snapshot_label,
+)
+from gitstats.markup import NAV_START, SKIP_LINK
+from gitstats.summary import (
+    _slugify_repo,
+    ai_assisted_summary,
+    compute_repo_summary,
+    humans_summary,
+    load_repo_summaries,
+    organizations_summary,
+    people_summary,
     source_lines_summary,
     write_repo_summary,
 )
-from gitstats.markup import NAV_START, SKIP_LINK
 
 # ── _slugify_repo ────────────────────────────────────────────────────────
 
@@ -358,7 +362,7 @@ def test_load_repo_summaries_skips_entries_it_cannot_place(tmp_path):
     """A path that can't be compared with the root (another drive on Windows) is skipped."""
     (tmp_path / "repo").mkdir()
     (tmp_path / "repo" / "summary.json").write_text('{"name": "repo"}', encoding="utf-8")
-    with patch("gitstats.aggregate.os.path.commonpath", side_effect=ValueError("different drives")):
+    with patch("gitstats.summary.os.path.commonpath", side_effect=ValueError("different drives")):
         assert load_repo_summaries(str(tmp_path)) == []
 
 
@@ -422,7 +426,7 @@ def test_load_repo_summaries_skips_unreadable_files(tmp_path, caplog):
 
 def test_write_repo_summary_refuses_to_write_outside_the_report(tmp_path):
     with (
-        patch("gitstats.aggregate.os.path.commonpath", return_value=str(tmp_path / "elsewhere")),
+        patch("gitstats.summary.os.path.commonpath", return_value=str(tmp_path / "elsewhere")),
         pytest.raises(ValueError, match="Refusing to write outside report directory"),
     ):
         write_repo_summary({"name": "x"}, str(tmp_path))
@@ -878,7 +882,7 @@ class TestAiDataset:
 
 
 def test_snapshot_additions_hold_only_up_to_its_quarter():
-    from gitstats.aggregate import _snapshot_additions
+    from gitstats.datasets import _snapshot_additions
 
     snapshot = {"repositories": [{"name": "alpha", "report": "alpha/index.html"}]}
     beta = {
@@ -948,7 +952,7 @@ def test_a_report_kept_from_before_the_quarter_ended_gets_it_later(tmp_path):
 
 
 def test_a_kept_entry_without_the_quarter_gives_way():
-    from gitstats.aggregate import _snapshot_additions
+    from gitstats.datasets import _snapshot_additions
 
     snapshot = {"repositories": [{"name": "b", "report": "b/index.html", "quarters": {}}]}
     fresh = {"name": "b", "report": "b/index.html", "quarters": {"2026-Q3": {}}, "months": {}}
@@ -957,7 +961,7 @@ def test_a_kept_entry_without_the_quarter_gives_way():
 
 
 def test_a_snapshot_is_read_only_inside_the_output(tmp_path, monkeypatch):
-    from gitstats.aggregate import _read_snapshot
+    from gitstats.datasets import _read_snapshot
 
     out, elsewhere = tmp_path / "out", tmp_path / "elsewhere.json"
     (out / "ai").mkdir(parents=True)
@@ -982,7 +986,7 @@ def test_a_snapshot_is_read_only_inside_the_output(tmp_path, monkeypatch):
 
 
 def test_same_portfolio():
-    from gitstats.aggregate import _same_portfolio
+    from gitstats.datasets import _same_portfolio
 
     dataset = {"repositories": [{"name": "Alpha", "report": "alpha/index.html"}]}
     # by the report, which stays where it is when a name changes
