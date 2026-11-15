@@ -3006,14 +3006,10 @@ def test_the_commits_and_lines_of_each_day_are_kept(tmp_path, monkeypatch, proce
     # they add up to what the report counts in all
     assert sum(dc.commits_by_day.values()) == dc.get_total_commits()
     assert set(dc.commits_by_day) == dc.active_days
-    assert sum(dc.lines_changed_by_day.values()) == (
-        dc.total_lines_added + dc.total_lines_removed
-    )
+    assert sum(dc.lines_changed_by_day.values()) == (dc.total_lines_added + dc.total_lines_removed)
 
 
-def test_a_wrapped_card_counts_the_year_before_as_that_years_own_card_does(
-    tmp_path, monkeypatch
-):
+def test_a_wrapped_card_counts_the_year_before_as_that_years_own_card_does(tmp_path, monkeypatch):
     """The numbers a card sets its own against come from the days and the
     authors' days; a year's own come from the year's totals. They agree."""
     dc = _collected(_two_years(tmp_path), monkeypatch)

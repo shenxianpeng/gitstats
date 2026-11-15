@@ -741,9 +741,7 @@ class TestWrappedCardComparison:
             "Contributors": ("-2", down),
             "Releases": ("same", THEMES["midnight"]["stat_label"]),
         }
-        assert (
-            ">Compared with the same days of 2025: January 1 to March 10</text>" in card
-        )
+        assert ">Compared with the same days of 2025: January 1 to March 10</text>" in card
 
     @pytest.mark.parametrize("theme", sorted(THEMES))
     def test_up_and_down_have_their_colours_in_each_theme(self, theme):
@@ -1063,7 +1061,7 @@ class TestWrappedPage:
         card["file"] = 'card"<.svg'
         body = page_body_html(card)
         assert 'href="card&quot;&lt;.svg"' in body
-        assert "alt=\"Repo Wrapped card for a&lt;b&gt;&amp;&quot;c in 2025\"" in body
+        assert 'alt="Repo Wrapped card for a&lt;b&gt;&amp;&quot;c in 2025"' in body
         assert "a&lt;b&gt;&amp;&quot;c in 2025: 50 commits" in body
         # the card closes its tags: none of them may end the script that carries it
         data = body[body.index('id="wrapped-data">') :]
@@ -1108,15 +1106,11 @@ class TestWrappedPageFiles:
         write_wrapped_page(report, str(tmp_path), card)
 
         page = (tmp_path / PAGE).read_text(encoding="utf-8")
-        assert page == (
-            f"<head><nav {PAGE}>" + page_body_html(card) + "<footer></body></html>"
-        )
+        assert page == (f"<head><nav {PAGE}>" + page_body_html(card) + "<footer></body></html>")
         # a link to the page shows its own card, and says the year in a sentence
         assert report.header == (PAGE, SHARE_IMAGE, summary_text(card["stats"]))
         assert (SHARE_IMAGE, SHARE_CARD) == ("wrapped-card.png", "wrapped-card.html")
-        assert (tmp_path / SHARE_CARD).read_text(encoding="utf-8") == share_card_html(
-            card["stats"]
-        )
+        assert (tmp_path / SHARE_CARD).read_text(encoding="utf-8") == share_card_html(card["stats"])
 
     def test_the_page_knows_its_address_from_the_reports(self, tmp_path):
         report = _Report()

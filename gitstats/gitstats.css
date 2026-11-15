@@ -1060,6 +1060,29 @@ tr[hidden] {
 	}
 }
 
+/* The cards of a gallery's repositories, as many to a row as fit */
+.wrapped-wall {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+	gap: var(--space-4);
+	margin-bottom: var(--space-6);
+}
+
+.wrapped-wall a {
+	line-height: 0;
+	border: 1px solid var(--border-color);
+}
+
+.wrapped-wall img {
+	display: block;
+	width: 100%;
+	height: auto;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: none;
+}
+
 .badge-json {
 	align-self: flex-start;
 	padding: 1px var(--space-2);

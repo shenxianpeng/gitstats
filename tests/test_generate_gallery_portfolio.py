@@ -543,3 +543,124 @@ def test_comparison_pages_are_linked_and_listed(gallery_script, temp_dir, monkey
 def test_note_links_to_the_comparison(gallery_script):
     note = gallery_script.report_note("x", "X", "", badge=False, compared=True)
     assert ('<a href="compare.html">How X compares with the Gallery&#x27;s other projects') in note
+
+
+# ── the Repo Wrapped page ────────────────────────────────────────────────
+
+
+def _write_card(root, entry, commits=100, year=2026):
+    """What a report made with --wrapped has next to it: the card, its
+    numbers, its page and that page's share card."""
+    numbers = {
+        "commits": commits,
+        "active_days": 50,
+        "longest_streak": 4,
+        "lines_changed": 9000,
+        "contributors": 6,
+        "new_contributors": 2,
+        "releases": 3,
+    }
+    data = {
+        "year": year,
+        "card": f"wrapped-{year}.svg",
+        "through": f"{year}-12-05",
+        "complete": False,
+        **numbers,
+        "previous": {"year": year - 1, "through": f"{year - 1}-12-05", **numbers},
+    }
+    folder = os.path.join(root, entry)
+    with open(os.path.join(folder, f"wrapped-{year}.json"), "w", encoding="utf-8") as f:
+        json.dump(data, f)
+    for name, text in (
+        (f"wrapped-{year}.svg", "<svg/>"),
+        ("wrapped.html", _REPORT_PAGE.format(name=entry)),
+        ("wrapped-card.html", "<html><body><main>card</main></body></html>"),
+    ):
+        with open(os.path.join(folder, name), "w", encoding="utf-8") as f:
+            f.write(text)
+
+
+@needs_yaml
+def test_reports_with_a_card_get_the_gallerys_wrapped_page(
+    gallery_script, temp_dir, monkeypatch, capsys
+):
+    gallery, repos = _gallery(temp_dir, monkeypatch)
+    _write_report(gallery, "django", name="Django", total_commits=300)
+    _write_report(gallery, "etcd", name="etcd", total_commits=200)
+    _write_card(gallery, "django", commits=300)
+    _write_card(gallery, "etcd", commits=900)
+    # a report without a card: in the gallery, not on the page
+    _write_report(gallery, "flask", name="Flask", total_commits=100)
+    site = "https://example.com/gallery/"
+
+    assert gallery_script.main([gallery, "--repos", repos, "--site-url", site, "--share-card"]) == 0
+    assert "; Repo Wrapped 2026 of 2; notes added to" in capsys.readouterr().out
+
+    page = _read(gallery, "wrapped", "index.html")
+    assert "<h1>Repo Wrapped 2026</h1>" in page
+    # the most commits first, each with its ecosystem
+    assert page.index("../etcd/wrapped.html") < page.index("../django/wrapped.html")
+    assert "<td>CNCF graduated</td>" in page
+    assert "flask" not in page
+    assert f'<meta property="og:image" content="{site}wrapped/index-card.png">' in page
+    data = json.loads(_read(gallery, "wrapped", "index.json"))
+    assert [entry["id"] for entry in data["repositories"]] == ["etcd", "django"]
+    assert os.path.isfile(os.path.join(gallery, "wrapped", "index-card.html"))
+
+    # its nav leads to the gallery's other pages, and theirs to it
+    tab = "Wrapped 2026</a></li>"
+    assert '<li><a href="../ecosystems/index.html">Ecosystems</a></li>' in page
+    assert ("../ai.html" in page) == os.path.isfile(os.path.join(gallery, "ai.html"))
+    assert "../organizations.html" not in page  # the portfolio wrote none
+    assert f'<li><a href="wrapped/index.html">{tab}' in _read(gallery, "index.html")
+    ecosystems = _read(gallery, "ecosystems", "python.html")
+    assert f'<li><a href="../wrapped/index.html">{tab}' in ecosystems
+
+    # every page of a report with a card leads to it, the card's own page too
+    link = (
+        '<a href="../wrapped/index.html">Repo Wrapped 2026: the year in every project of '
+        "the Gallery &rarr;</a>"
+    )
+    for name in ("index.html", "authors.html", "wrapped.html"):
+        assert link in _read(gallery, "django", name)
+    assert link not in _read(gallery, "flask", "index.html")
+    # the page's share card is an image, not a page to read
+    assert gallery_script.NOTE_MARK not in _read(gallery, "django", "wrapped-card.html")
+
+    sitemap = _read(gallery, "sitemap.xml")
+    for address in ("wrapped/", "django/wrapped.html", "etcd/wrapped.html"):
+        assert f"<loc>{site}{address}</loc>" in sitemap
+    assert "flask/wrapped.html" not in sitemap
+
+
+@needs_yaml
+def test_a_gallery_without_cards_has_no_wrapped_page(gallery_script, temp_dir, monkeypatch, capsys):
+    gallery, repos = _gallery(temp_dir, monkeypatch)
+    _write_report(gallery, "django", name="Django", total_commits=300)
+    site = "https://example.com/gallery/"
+    assert gallery_script.main([gallery, "--repos", repos, "--site-url", site]) == 0
+    assert not os.path.exists(os.path.join(gallery, "wrapped"))
+    assert "Repo Wrapped" not in capsys.readouterr().out
+    for page in (("index.html",), ("ecosystems", "python.html"), ("django", "index.html")):
+        assert "wrapped" not in _read(gallery, *page)
+    assert "wrapped" not in _read(gallery, "sitemap.xml")
+
+
+def test_the_wrapped_page_of_a_gallery_without_a_list(gallery_script, temp_dir):
+    """No list, so no ecosystems: the page has the portfolio's tabs only."""
+    _write_report(temp_dir, "linux", name="Linux", total_commits=5)
+    _write_card(temp_dir, "linux")
+    assert gallery_script.main([temp_dir]) == 0
+    page = _read(temp_dir, "wrapped", "index.html")
+    assert "ecosystems" not in page
+    assert "<th>Project</th><th class=" in page  # and no column for one
+    assert '<li><a href="wrapped/index.html">Wrapped 2026</a></li>' in _read(temp_dir, "index.html")
+
+
+def test_note_links_to_the_gallerys_wrapped_page(gallery_script):
+    note = gallery_script.report_note("x", "X", "", badge=False, wrapped=2026)
+    assert (
+        '<p class="more-link"><a href="../wrapped/index.html">Repo Wrapped 2026: the year in '
+        "every project of the Gallery &rarr;</a></p>"
+    ) in note
+    assert "wrapped" not in gallery_script.report_note("x", "X", "", badge=False)
