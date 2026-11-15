@@ -79,7 +79,7 @@ class AISummarizer:
                 logger.debug("Failed to initialize AI provider", exc_info=e)
                 raise
 
-    def set_cache_dir(self, cache_dir: str):
+    def set_cache_dir(self, cache_dir: str) -> None:
         """Set the directory for caching AI summaries."""
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
@@ -102,12 +102,13 @@ class AISummarizer:
                 with open(cache_file, encoding="utf-8") as f:
                     cached_data = json.load(f)
                     logger.info(f"Using cached AI summary for {cache_key}")
-                    return cached_data["summary"]
+                    summary: str | None = cached_data["summary"]
+                    return summary
             except Exception as e:
                 logger.warning(f"Failed to load cached summary: {str(e)}")
         return None
 
-    def _save_cached_summary(self, cache_key: str, summary: str):
+    def _save_cached_summary(self, cache_key: str, summary: str | None) -> None:
         """Save generated summary to cache."""
         if not self.cache_enabled or not self.cache_dir:
             return
@@ -166,8 +167,10 @@ class AISummarizer:
         """Extract total lines of code with fallback logic."""
         if isinstance(data, dict):
             lines = data.get("total_lines_of_code")
-            return lines if lines is not None else data.get("total_lines", 0)
-        return getattr(data, "total_lines", 0)
+            total: int = lines if lines is not None else data.get("total_lines", 0)
+            return total
+        total = getattr(data, "total_lines", 0)
+        return total
 
     def _get_commit_date(self, data: dict[str, Any], date_type: str) -> str:
         """Extract commit date (first or last) with multiple fallback strategies."""
@@ -178,12 +181,13 @@ class AISummarizer:
         # Try method call on object
         if not isinstance(data, dict) and hasattr(data, method_name):
             try:
-                return getattr(data, method_name)()
+                said: str = getattr(data, method_name)()
+                return said
             except Exception:
                 pass
 
         # Try dict-style field
-        date = self._get_field_value(data, dict_key, "Unknown")
+        date: str = self._get_field_value(data, dict_key, "Unknown")
         if date != "Unknown":
             return date
 
@@ -617,8 +621,9 @@ Generate your analysis:"""
 _FENCE = re.compile(r"\A\s*```[\w-]*[ \t]*\n(.*?)\n?```\s*\Z", re.S)
 
 
-def strip_code_fence(text: str) -> str:
+def strip_code_fence(text: str | None) -> str | None:
     """The answer without the Markdown code fence some models put around it
-    (```html ... ```), which would show on the page as it is."""
+    (```html ... ```), which would show on the page as it is. No answer is
+    none still."""
     match = _FENCE.match(text or "")
     return match.group(1).strip() if match else text

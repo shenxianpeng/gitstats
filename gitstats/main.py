@@ -15,12 +15,12 @@ import sys
 import threading
 import time
 import unicodedata
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from concurrent.futures import Future, ThreadPoolExecutor
 from functools import partial
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from multiprocessing import Pool
-from typing import Any
+from typing import Any, TypeVar
 from urllib.parse import urlsplit
 
 import gitstats
@@ -117,7 +117,11 @@ def configure_logging(verbose: bool = False, quiet: bool = False) -> None:
     )
 
 
-def parallel_map_with_fallback(func, items):
+_T = TypeVar("_T")
+_R = TypeVar("_R")
+
+
+def parallel_map_with_fallback(func: Callable[[_T], _R], items: Iterable[_T]) -> list[_R]:
     """Apply a function to items using multiprocessing, with sequential fallback.
 
     Args:
@@ -360,7 +364,7 @@ class DataCollector:
 
 
 class GitDataCollector(DataCollector):
-    def collect(self, repo_dir):
+    def collect(self, repo_dir: str) -> None:
         """Collect all statistics from the repository.
 
         Each phase below owns one slice of the data model; the only value
@@ -462,12 +466,12 @@ class GitDataCollector(DataCollector):
             # files each commit adds
             self._collect_files_by_stamp(history, lambda: line_counts()[1])
 
-            outputs, _, names = line_counts()
+            outputs, _, changed = line_counts()
             self._collect_line_stats(outputs[0])
             outputs[0] = None  # let go of the text once its phase has read it
             self._collect_per_author_line_stats(name_to_canonical, outputs[1])
             outputs[1] = None
-            self._collect_file_churn_and_ownership(name_to_canonical, names)
+            self._collect_file_churn_and_ownership(name_to_canonical, changed)
             self._collect_ai_assisted(assisted.result() if assisted is not None else None)
             # counted with the others, or, without them, by a walk of its own
             self.source_lines_added = source_lines[0] if source_lines else self._source_lines()
@@ -1597,7 +1601,9 @@ def normalize_site_url(url: str) -> str:
     return url.rstrip("/") + "/"
 
 
-def _generate_ai_summaries(data: Any, conf: dict, outputpath: str) -> dict[str, dict[str, Any]]:
+def _generate_ai_summaries(
+    data: Any, conf: dict[str, Any], outputpath: str
+) -> dict[str, dict[str, Any]]:
     """The AI summaries of the report's pages, page type -> {summary, error}.
 
     Whatever goes wrong here, the report is still written: without the
@@ -1783,7 +1789,12 @@ def _dump_json_within(directory: str, filename: str, data: DataCollector) -> Non
         json.dump(data.__dict__, file, default=str)
 
 
-def run(gitpath, outputpath, extra_fmt=None, wrapped_config=None) -> int:
+def run(
+    gitpath: list[str],
+    outputpath: str,
+    extra_fmt: str | None = None,
+    wrapped_config: dict[str, Any] | None = None,
+) -> int:
     """Run the gitstats program.
 
     With one repository path the report lands directly in ``outputpath``
@@ -1913,9 +1924,9 @@ def _serve_report(outputpath: str, host: str, port: int) -> int:
 
 
 def _run_multi_repo(
-    gitpaths: list,
+    gitpaths: list[str],
     outputpath: str,
-    extra_fmt=None,
+    extra_fmt: str | None = None,
     site_url: str = "",
     wrapped_config: dict[str, Any] | None = None,
 ) -> int:
@@ -2143,7 +2154,7 @@ def get_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _apply_config_from_args(conf: dict, args) -> None:
+def _apply_config_from_args(conf: dict[str, Any], args: argparse.Namespace) -> None:
     """Apply config key=value overrides from CLI arguments."""
     for item in args.config:
         try:
@@ -2156,7 +2167,7 @@ def _apply_config_from_args(conf: dict, args) -> None:
         conf[key] = parse_config_value(value, key)
 
 
-def _apply_ai_args(conf: dict, args) -> None:
+def _apply_ai_args(conf: dict[str, Any], args: argparse.Namespace) -> None:
     """Apply AI-related CLI arguments (take precedence over config)."""
     if args.ai is not None:
         conf["ai_enabled"] = args.ai

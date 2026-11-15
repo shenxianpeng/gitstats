@@ -835,11 +835,11 @@ HOTSPOTS_SCRIPT = r"""<script>
 class ReportCreator:
     """Creates the actual report based on given data."""
 
-    def __init__(self):
-        self.data = None
-        self.path = None
+    def __init__(self) -> None:
+        self.data: Any = None
+        self.path: str | None = None
 
-    def create(self, data, path):
+    def create(self, data: Any, path: str) -> None:
         self.data = data
         self.path = path
 
@@ -853,7 +853,7 @@ class HTMLReportCreator(ReportCreator):
     wrapped_card: dict[str, Any] | None = None
 
     @staticmethod
-    def _heat_level(value, max_value):
+    def _heat_level(value: float, max_value: float) -> int:
         if max_value <= 0 or value <= 0:
             return 0
         ratio = float(value) / float(max_value)
@@ -866,7 +866,7 @@ class HTMLReportCreator(ReportCreator):
         return 4
 
     @classmethod
-    def _heat_td_class(cls, value, max_value):
+    def _heat_td_class(cls, value: float, max_value: float) -> str:
         return f"heat heat{cls._heat_level(value, max_value)}"
 
     def create(self, data: Any, path: str) -> None:
@@ -1083,7 +1083,7 @@ class HTMLReportCreator(ReportCreator):
             "</section>"
         )
 
-    def create_activity_html(self, data, path):
+    def create_activity_html(self, data: Any, path: str) -> None:
         ###
         # Activity
         f = open(path + "/activity.html", "w", encoding="utf-8")
@@ -1119,7 +1119,7 @@ class HTMLReportCreator(ReportCreator):
         ("Commits by timezone", "Timezones"),
     )
 
-    def _write_activity_intro(self, f, data) -> None:
+    def _write_activity_intro(self, f: Any, data: Any) -> None:
         """The page's headline numbers as stat tiles, then links to its sections."""
         full_days = ("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
         streak = data.get_longest_streak()
@@ -1154,7 +1154,7 @@ class HTMLReportCreator(ReportCreator):
             f"<span>On this page</span>{links}</nav>"
         )
 
-    def _write_weekly_activity_section(self, f, data) -> None:
+    def _write_weekly_activity_section(self, f: Any, data: Any) -> None:
         """Commits per week for the last 32 weeks, up to the week of the last
         commit when that is earlier: a repository without commits for months
         would show 32 empty weeks.
@@ -1211,7 +1211,7 @@ class HTMLReportCreator(ReportCreator):
             )
         )
 
-    def _write_punch_card_section(self, f, data) -> None:
+    def _write_punch_card_section(self, f: Any, data: Any) -> None:
         """Commits by day of week x hour of day, with bars for every hour and day.
 
         A row of bars along the top gives the commits per hour of day, and a bar
@@ -1290,7 +1290,7 @@ class HTMLReportCreator(ReportCreator):
         "Dec",
     )
 
-    def _write_month_of_year_section(self, f, data) -> None:
+    def _write_month_of_year_section(self, f: Any, data: Any) -> None:
         """Commits per calendar month, all years combined: counts on the bars, share on hover."""
         f.write(html_header(2, "Month of year"))
         values = [data.activity_by_month_of_year.get(mm, 0) for mm in range(1, 13)]
@@ -1307,7 +1307,7 @@ class HTMLReportCreator(ReportCreator):
             )
         )
 
-    def _write_commits_by_year_month_section(self, f, data) -> None:
+    def _write_commits_by_year_month_section(self, f: Any, data: Any) -> None:
         """Write commits by year/month: the chart, with the per-month table folded away."""
         f.write(html_header(2, "Commits by year/month"))
         cbym_keys = month_range(data.commits_by_month.keys())
@@ -1343,7 +1343,7 @@ class HTMLReportCreator(ReportCreator):
             )
         f.write("</table></div></details>")
 
-    def _write_commits_by_year_section(self, f, data) -> None:
+    def _write_commits_by_year_section(self, f: Any, data: Any) -> None:
         """Commits by year: the chart, with the per-year table folded away below it
         (like the monthly section).
 
@@ -1401,7 +1401,7 @@ class HTMLReportCreator(ReportCreator):
         )
         f.write(f"</table></div>{note}</details>")
 
-    def _write_commits_by_timezone_section(self, f, data) -> None:
+    def _write_commits_by_timezone_section(self, f: Any, data: Any) -> None:
         """Commits per UTC offset, west to east, as horizontal bars."""
         f.write(html_header(2, "Commits by timezone"))
         total = sum(data.commits_by_timezone.values()) or 1
@@ -1424,7 +1424,7 @@ class HTMLReportCreator(ReportCreator):
             f"{BAR_HEADER}</tr>" + "".join(rows) + "</table></div>"
         )
 
-    def _build_author_time_series(self, data):
+    def _build_author_time_series(self, data: Any) -> tuple[list[int], list[dict[str, Any]]]:
         """Build per-author cumulative added-lines time series for Chart.js.
 
         For large repositories, data points are automatically downsampled to keep
@@ -1447,8 +1447,8 @@ class HTMLReportCreator(ReportCreator):
             sampled_indices = set(range(total_points))
 
         lines_by_authors = dict.fromkeys(authors_to_plot, 0)
-        time_labels = []
-        per_author_lines = {a: [] for a in authors_to_plot}
+        time_labels: list[int] = []
+        per_author_lines: dict[str, list[int]] = {a: [] for a in authors_to_plot}
 
         for i, stamp in enumerate(sorted_stamps):
             # Update running totals: only the author(s) of this commit changed
@@ -2562,7 +2562,7 @@ class HTMLReportCreator(ReportCreator):
         risk_files = [fs for fs in ownership["files"] if fs["contributors"] == 1]
         if risk_files:
 
-            def risk_table(table_id: str, rows: list[dict]) -> str:
+            def risk_table(table_id: str, rows: list[dict[str, Any]]) -> str:
                 return (
                     f'<div class="table-scroll"><table class="sortable {FILE_TABLE}" id="{table_id}">'
                     '<tr><th>File</th><th>Sole owner</th><th class="num">Commits</th></tr>'
@@ -2820,7 +2820,7 @@ class HTMLReportCreator(ReportCreator):
                 f"{format_int(authors_of.get(filepath, 0))}</td>"
             )
 
-        def hotspot_table(table_id: str, rows: list[dict]) -> str:
+        def hotspot_table(table_id: str, rows: list[dict[str, Any]]) -> str:
             return (
                 f'<div class="table-scroll"><table class="sortable share-table {FILE_TABLE}" '
                 f'id="{table_id}">'
@@ -2951,11 +2951,11 @@ class HTMLReportCreator(ReportCreator):
         # Runs of dormant years read as one stretch ("2016–2023, 8 years without
         # commits") instead of a row per empty year; a year the AI narration wrote
         # a chapter for keeps its own row.
-        def own_row(entry: dict) -> bool:
+        def own_row(entry: dict[str, Any]) -> bool:
             has_chapter = bool(chronicle and chronicle["chapters"].get(entry["year"]))
             return entry["era"] != "dormant" or entry["commits"] > 0 or has_chapter
 
-        rows: list[list[dict]] = []
+        rows: list[list[dict[str, Any]]] = []
         for entry in years:
             if not own_row(entry) and rows and not own_row(rows[-1][-1]):
                 rows[-1].append(entry)
@@ -3164,7 +3164,11 @@ class HTMLReportCreator(ReportCreator):
     MAX_BAR_THICKNESS = 64
 
     def _top_authors_table(
-        self, table_id: str, period: str, authors_by_period: dict, commits_by_period: dict
+        self,
+        table_id: str,
+        period: str,
+        authors_by_period: dict[Any, dict[str, int]],
+        commits_by_period: dict[Any, int],
     ) -> str:
         """A sortable table of each period's top author, newest period first."""
         top = load_config()["authors_top"]
@@ -3189,20 +3193,20 @@ class HTMLReportCreator(ReportCreator):
 
     def _render_chartjs(
         self,
-        chart_id,
-        chart_type,
-        labels,
-        datasets,
-        x_ticks_rotate=False,
-        aspect_ratio=3,
-        max_bar_thickness=None,
-        time_axis=False,
-        highlight=None,
-        annotations=None,
-        tooltip_share=False,
-        month_axis=False,
-        diverging=False,
-    ):
+        chart_id: str,
+        chart_type: str,
+        labels: list[Any],
+        datasets: list[dict[str, Any]],
+        x_ticks_rotate: bool = False,
+        aspect_ratio: float = 3,
+        max_bar_thickness: int | None = None,
+        time_axis: bool = False,
+        highlight: int | None = None,
+        annotations: dict[str, Any] | None = None,
+        tooltip_share: bool = False,
+        month_axis: bool = False,
+        diverging: bool = False,
+    ) -> str:
         """Render a Chart.js chart as inline HTML.
 
         With ``time_axis=True``, ``labels`` are Unix timestamps (seconds) and the
@@ -3297,7 +3301,7 @@ class HTMLReportCreator(ReportCreator):
             labels, js_datasets, annotations = collapse_gap_categories(
                 labels, js_datasets, annotations
             )
-        collapsed = bool(annotations) and any(
+        collapsed = annotations is not None and any(
             band.get("collapsed") for band in annotations.get("bands", [])
         )
         labels_json = json.dumps(labels).replace("</", "<\\/")
@@ -4437,7 +4441,7 @@ def tag_authors_html(names: list[str], commits: dict[str, int], limit: int) -> s
     )
 
 
-def chart_label(chart_id: str, chart_type: str, labels: list, time_axis: bool = False) -> str:
+def chart_label(chart_id: str, chart_type: str, labels: list[Any], time_axis: bool = False) -> str:
     """What a chart shows, for its canvas's aria-label: its description and
     the span of its labels, "Bar chart of commits per year, 2019 to 2026"."""
     text = CHART_DESCRIPTIONS.get(chart_id, f"{chart_type.capitalize()} chart")

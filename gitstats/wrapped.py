@@ -235,7 +235,8 @@ class WrappedCardGenerator:
     def _year_grid(self) -> dict[int, dict[int, int]]:
         """The year's commits as weekday -> hour -> commits ({} if not collected)."""
         by_year = getattr(self.data, "activity_by_hour_of_week_by_year", {}) or {}
-        return by_year.get(self.year, {})
+        grid: dict[int, dict[int, int]] = by_year.get(self.year, {})
+        return grid
 
     def _monthly_commits(self) -> list[int]:
         """The year's commits in each month, January first."""
