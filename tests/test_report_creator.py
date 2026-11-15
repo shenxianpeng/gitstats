@@ -10,8 +10,8 @@ from types import SimpleNamespace
 import pytest
 
 from gitstats import load_config
+from gitstats.collector import GitDataCollector
 from gitstats.history import _classify_eras, compute_project_history, parse_chronicle
-from gitstats.main import GitDataCollector
 from gitstats.markup import (
     NAV_PAGES,
     NAV_START,
