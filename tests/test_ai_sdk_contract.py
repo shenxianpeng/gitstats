@@ -139,7 +139,8 @@ class TestGemini:
         busy = errors.APIError(429, {"error": {"message": "busy", "status": "RESOURCE_EXHAUSTED"}})
         refused = errors.APIError(400, {"error": {"message": "bad key", "status": "INVALID"}})
         assert (_status_of(busy), _status_of(refused)) == (429, 400)
-        assert _is_retryable(busy) and not _is_retryable(refused)
+        assert _is_retryable(busy)
+        assert not _is_retryable(refused)
 
 
 class TestOllama:
