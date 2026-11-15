@@ -173,7 +173,8 @@ def growth(card: dict[str, Any]) -> float | None:
     before = card["previous"]
     if not before or before["commits"] < MIN_BASE_COMMITS:
         return None
-    return card["commits"] / before["commits"] - 1
+    rate: float = card["commits"] / before["commits"] - 1
+    return rate
 
 
 def standing_out(cards: list[dict[str, Any]]) -> list[tuple[str, dict[str, Any], str]]:

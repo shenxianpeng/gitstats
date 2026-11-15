@@ -17,9 +17,12 @@ from concurrent.futures import ThreadPoolExecutor
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any, NamedTuple
 
-from gitstats import ON_LINUX, check_git_settings, exectime_external, load_config
+from gitstats import ON_LINUX, check_git_settings, load_config
 
 logger = logging.getLogger("gitstats")
+
+# seconds spent in the commands run, added up as each ends: main() reports them
+exectime_external: float = 0.0
 
 _WC_L_CMD = "wc -l"
 

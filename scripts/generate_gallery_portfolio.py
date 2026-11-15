@@ -39,6 +39,7 @@ import html
 import json
 import os
 import sys
+from typing import Any
 
 from gitstats import load_config
 from gitstats.aggregate import AggregateReportCreator
@@ -95,7 +96,7 @@ document.querySelectorAll('.gallery-note .badge-copy').forEach(function (button)
 </script>"""
 
 
-def load_gallery_summaries(gallery_root: str, ids: list[str] | None = None) -> list[dict]:
+def load_gallery_summaries(gallery_root: str, ids: list[str] | None = None) -> list[dict[str, Any]]:
     """Read every ``<gallery_root>/<dir>/summary.json``, one per repository;
     only those of ``ids``, when given, in that order.
 
@@ -135,7 +136,7 @@ def _inside(base: str, *parts: str) -> str:
         return ""
 
 
-def reports_version(summaries: list[dict]) -> str:
+def reports_version(summaries: list[dict[str, Any]]) -> str:
     """The version of gitstats that made the reports, when they all say the
     same one; "" when they do not."""
     versions = {str(summary.get("generated_by", "")) for summary in summaries}
@@ -292,7 +293,7 @@ def _report_pages(folder: str) -> list[str]:
 
 def _add_report_note(
     base: str,
-    summary: dict,
+    summary: dict[str, Any],
     site_url: str,
     groups: dict[str, Group] | None = None,
     wrapped: dict[str, int] | None = None,
@@ -325,7 +326,7 @@ def _add_report_note(
 
 def add_report_notes(
     gallery_root: str,
-    summaries: list[dict],
+    summaries: list[dict[str, Any]],
     site_url: str,
     groups: list[Group] | None = None,
     wrapped: dict[str, int] | None = None,
@@ -345,7 +346,7 @@ def add_report_notes(
 
 def _listed_summaries(
     gallery_root: str, repos_file: str
-) -> tuple[list[dict], list[Group], list[Repo], list[dict[str, str]]]:
+) -> tuple[list[dict[str, Any]], list[Group], list[Repo], list[dict[str, str]]]:
     """The summaries of the repositories of the list, each with its group;
     the groups and the repositories of the list; and those without a report."""
     repo_groups, repos = load_repos(repos_file)
@@ -369,8 +370,8 @@ def _listed_summaries(
 
 
 def _wrapped_cards(
-    gallery_root: str, summaries: list[dict]
-) -> tuple[list[tuple[str, str]], list[dict]]:
+    gallery_root: str, summaries: list[dict[str, Any]]
+) -> tuple[list[tuple[str, str]], list[dict[str, Any]]]:
     """The cards of the reports made with --wrapped, those of the year most of
     them are for, and before them the tab that leads to the gallery's page of
     them: none without a card."""
@@ -396,10 +397,10 @@ def _portfolio_tabs(gallery_root: str) -> list[tuple[str, str]]:
 
 def _what_was_written(
     gallery_root: str,
-    summaries: list[dict],
+    summaries: list[dict[str, Any]],
     failures: list[dict[str, str]],
     ecosystems: list[Group],
-    cards: list[dict],
+    cards: list[dict[str, Any]],
     pages: int,
 ) -> str:
     """What a run wrote, in a line."""

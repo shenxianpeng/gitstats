@@ -44,9 +44,9 @@ from gitstats.report_creator import (
     share_text,
     stat_tiles_html,
     sum_since,
-    tags_newest_first,
     year_span,
 )
+from gitstats.utils import tags_newest_first
 
 # ── html_linkify ─────────────────────────────────────────────────────────
 
