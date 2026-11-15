@@ -17,7 +17,7 @@ sys.path.insert(0, _SCRIPTS)
 
 import gallery_wrapped as wrapped  # noqa: E402
 
-from gitstats.report_creator import NAV_START, SKIP_LINK  # noqa: E402
+from gitstats.markup import NAV_START, SKIP_LINK  # noqa: E402
 from gitstats.wrapped import COMPARED  # noqa: E402
 
 NOW = datetime.datetime(2026, 12, 5, 12, 0)

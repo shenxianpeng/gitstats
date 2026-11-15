@@ -418,7 +418,7 @@ Top 5 Contributors by Lines:
         """
         from types import SimpleNamespace
 
-        from gitstats.report_creator import compute_project_history
+        from gitstats.history import compute_project_history
 
         view = SimpleNamespace(
             **{

@@ -1,4 +1,4 @@
-"""Tests for gitstats.main – DataCollector, parameter parsing, and integration with real git repos."""
+"""Tests for gitstats.collector and gitstats.main – DataCollector, parameter parsing, and integration with real git repos."""
 
 import datetime
 import json
@@ -13,9 +13,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from gitstats.collector import DataCollector, GitDataCollector, parallel_map_with_fallback
 from gitstats.main import (
-    DataCollector,
-    GitDataCollector,
     _apply_ai_args,
     _dump_json_within,
     _make_server,
@@ -29,7 +28,6 @@ from gitstats.main import (
     get_parser,
     main,
     normalize_site_url,
-    parallel_map_with_fallback,
     run,
 )
 from gitstats.utils import get_log_range
@@ -56,11 +54,13 @@ class TestDataCollector:
 
     def test_collect_with_config_project_name(self, temp_dir):
         import gitstats
+        import gitstats.collector
         import gitstats.main
 
         cfg = dict(gitstats.DEFAULT_CONFIG, project_name="my-custom-project")
         gitstats._config = cfg
         gitstats.main.conf = cfg
+        gitstats.collector.conf = cfg
         dc = DataCollector()
         dc.collect(temp_dir)
         assert dc.project_name == "my-custom-project"
@@ -596,12 +596,14 @@ class TestGitDataCollectorIntegration:
     def test_collect_with_exclude_exts(self, git_repo):
         """With py excluded, .py files should not appear in extensions."""
         import gitstats
+        import gitstats.collector
         import gitstats.main
         import gitstats.utils
 
         cfg = dict(gitstats.DEFAULT_CONFIG, exclude_exts="py")
         gitstats._config = cfg
         gitstats.main.conf = cfg
+        gitstats.collector.conf = cfg
         gitstats.utils.conf = cfg
 
         dc = GitDataCollector()
@@ -812,10 +814,10 @@ class TestCollectPhases:
         """Run collect() on a machine of ``cpus`` processors; return the data,
         the git commands that ran through get_pipe_output() and what each of
         the phases that read the whole history was handed."""
-        import gitstats.main as main_mod
+        import gitstats.collector as collector
 
         _use_config(processes=processes)
-        real = main_mod.get_pipe_output
+        real = collector.get_pipe_output
         ran = []
 
         def recording(cmds, quiet=False):
@@ -838,10 +840,10 @@ class TestCollectPhases:
             setattr(dc, phase, spy)
         prevdir = os.getcwd()
         with (
-            patch.object(main_mod, "get_pipe_output", recording),
-            patch.object(main_mod.os, "cpu_count", return_value=cpus),
+            patch.object(collector, "get_pipe_output", recording),
+            patch.object(collector.os, "cpu_count", return_value=cpus),
             patch.object(
-                main_mod, "shortstat_logs", side_effect=shortstat_logs or main_mod.shortstat_logs
+                collector, "shortstat_logs", side_effect=shortstat_logs or collector.shortstat_logs
             ) as spread,
         ):
             try:
@@ -1079,7 +1081,7 @@ class TestCollectPhases:
 
 
 def test_sample_evenly():
-    from gitstats.main import _sample_evenly
+    from gitstats.collector import _sample_evenly
 
     assert _sample_evenly([], 10) == []
     assert _sample_evenly(["a", "b"], 10) == ["a", "b"]
@@ -1093,13 +1095,13 @@ def test_sample_evenly():
 
 class TestCommitSubjects:
     def test_collected_when_ai_enabled(self, git_repo):
-        import gitstats.main as main_mod
+        import gitstats.collector as collector
 
         dc = GitDataCollector()
         prevdir = os.getcwd()
         try:
             os.chdir(git_repo)
-            with patch.dict(main_mod.conf, {"ai_enabled": True}):
+            with patch.dict(collector.conf, {"ai_enabled": True}):
                 dc.collect(git_repo)
         finally:
             os.chdir(prevdir)
@@ -1130,11 +1132,13 @@ class TestRunIntegration:
     def test_run_basic(self, git_repo, temp_dir):
         """run() should produce HTML report files."""
         import gitstats
+        import gitstats.collector
         import gitstats.main
 
         cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
         gitstats._config = cfg
         gitstats.main.conf = cfg
+        gitstats.collector.conf = cfg
         gitstats.utils.conf = cfg
         gitstats.report_creator.conf = cfg
 
@@ -1154,11 +1158,13 @@ class TestRunIntegration:
     def test_run_with_json(self, git_repo, temp_dir):
         """run() with extra_fmt='json' should produce a JSON file."""
         import gitstats
+        import gitstats.collector
         import gitstats.main
 
         cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
         gitstats._config = cfg
         gitstats.main.conf = cfg
+        gitstats.collector.conf = cfg
         gitstats.utils.conf = cfg
         gitstats.report_creator.conf = cfg
 
@@ -1176,11 +1182,13 @@ class TestRunIntegration:
         import json
 
         import gitstats
+        import gitstats.collector
         import gitstats.main
 
         cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
         gitstats._config = cfg
         gitstats.main.conf = cfg
+        gitstats.collector.conf = cfg
         gitstats.utils.conf = cfg
         gitstats.report_creator.conf = cfg
 
@@ -1285,11 +1293,13 @@ class TestRunIntegration:
     def test_run_missing_repository_path(self, temp_dir, caplog):
         """A git path that does not exist is a FATAL error, not a traceback."""
         import gitstats
+        import gitstats.collector
         import gitstats.main
 
         cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
         gitstats._config = cfg
         gitstats.main.conf = cfg
+        gitstats.collector.conf = cfg
 
         missing = os.path.join(temp_dir, "missing")
         output = os.path.join(temp_dir, "report")
@@ -1301,11 +1311,13 @@ class TestRunIntegration:
     def test_run_multi_repo_tolerates_failure(self, git_repo, temp_dir):
         """One broken repo is reported on the portfolio page, not fatal."""
         import gitstats
+        import gitstats.collector
         import gitstats.main
 
         cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
         gitstats._config = cfg
         gitstats.main.conf = cfg
+        gitstats.collector.conf = cfg
         gitstats.utils.conf = cfg
         gitstats.report_creator.conf = cfg
 
@@ -1324,11 +1336,13 @@ class TestRunIntegration:
     def test_run_multi_repo_all_failed(self, temp_dir):
         """run() returns 1 when no repository could be analyzed."""
         import gitstats
+        import gitstats.collector
         import gitstats.main
 
         cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
         gitstats._config = cfg
         gitstats.main.conf = cfg
+        gitstats.collector.conf = cfg
         gitstats.utils.conf = cfg
         gitstats.report_creator.conf = cfg
 
@@ -1508,11 +1522,13 @@ class TestCLI:
 def test_main_basic(git_repo_minimal, temp_dir):
     """Test main() with minimal args."""
     import gitstats
+    import gitstats.collector
     import gitstats.main
 
     cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
     gitstats._config = cfg
     gitstats.main.conf = cfg
+    gitstats.collector.conf = cfg
 
     import sys
 
@@ -1526,11 +1542,13 @@ def test_main_basic(git_repo_minimal, temp_dir):
 def test_main_default_outputpath(git_repo_minimal, temp_dir):
     """Test main() without explicit outputpath (uses default gitstats-report)."""
     import gitstats
+    import gitstats.collector
     import gitstats.main
 
     cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
     gitstats._config = cfg
     gitstats.main.conf = cfg
+    gitstats.collector.conf = cfg
 
     import sys
 
@@ -1549,11 +1567,13 @@ def test_main_outputpath_after_an_option(git_repo_minimal, temp_dir):
     """`gitstats repo -f json out`: argparse itself hands the last path to
     outputpath, so main() has nothing to move out of gitpath."""
     import gitstats
+    import gitstats.collector
     import gitstats.main
 
     cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
     gitstats._config = cfg
     gitstats.main.conf = cfg
+    gitstats.collector.conf = cfg
 
     output = os.path.join(temp_dir, "report")
 
@@ -1568,11 +1588,13 @@ def test_main_keeps_an_outputpath_argparse_filled(git_repo_minimal, temp_dir, mo
     """Same contract on every Python: when the parser already filled outputpath,
     main() leaves gitpath alone instead of moving its last entry."""
     import gitstats
+    import gitstats.collector
     import gitstats.main
 
     cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
     gitstats._config = cfg
     gitstats.main.conf = cfg
+    gitstats.collector.conf = cfg
 
     output = os.path.join(temp_dir, "report")
     args = gitstats.main.get_parser().parse_args([git_repo_minimal, "-f", "json"])
@@ -1591,11 +1613,13 @@ def test_main_keeps_an_outputpath_argparse_filled(git_repo_minimal, temp_dir, mo
 def test_main_with_config_override(git_repo_minimal, temp_dir):
     """Test main() with -c overrides."""
     import gitstats
+    import gitstats.collector
     import gitstats.main
 
     cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
     gitstats._config = cfg
     gitstats.main.conf = cfg
+    gitstats.collector.conf = cfg
 
     import sys
 
@@ -1617,11 +1641,13 @@ def test_main_refuses_a_setting_git_would_take_for_an_option(
     import sys
 
     import gitstats
+    import gitstats.collector
     import gitstats.main
 
     cfg = dict(gitstats.DEFAULT_CONFIG)
     gitstats._config = cfg
     gitstats.main.conf = cfg
+    gitstats.collector.conf = cfg
     victim = os.path.join(temp_dir, "victim.txt")
     with open(victim, "w", encoding="utf-8") as f:
         f.write("important data\n")
@@ -1640,12 +1666,14 @@ def test_main_refuses_a_setting_git_would_take_for_an_option(
 def test_main_with_negative_config_override(git_repo_minimal, temp_dir):
     """-c max_tags_authors=-1 (no limit) must reach the report as an integer."""
     import gitstats
+    import gitstats.collector
     import gitstats.main
     import gitstats.report_creator
 
     cfg = dict(gitstats.DEFAULT_CONFIG, ai_enabled=False)
     gitstats._config = cfg
     gitstats.main.conf = cfg
+    gitstats.collector.conf = cfg
     gitstats.report_creator.conf = cfg
 
     import sys
@@ -1708,6 +1736,7 @@ class TestServe:
 def _use_config(**overrides):
     """Install a config with ``overrides`` in every module that caches one."""
     import gitstats
+    import gitstats.collector
     import gitstats.main
     import gitstats.report_creator
     import gitstats.utils
@@ -1715,6 +1744,7 @@ def _use_config(**overrides):
     cfg = dict(gitstats.DEFAULT_CONFIG, **overrides)
     gitstats._config = cfg
     gitstats.main.conf = cfg
+    gitstats.collector.conf = cfg
     gitstats.utils.conf = cfg
     gitstats.report_creator.conf = cfg
     return cfg
@@ -1724,7 +1754,7 @@ def _use_config(**overrides):
 def sequential_map():
     """Do the per-revision and per-blob work in-process instead of in a pool."""
     with patch(
-        "gitstats.main.parallel_map_with_fallback",
+        "gitstats.collector.parallel_map_with_fallback",
         side_effect=lambda func, items: [func(item) for item in items],
     ):
         yield
@@ -1769,7 +1799,7 @@ def test_configure_logging_levels(verbose, quiet, level):
 
 def test_parallel_map_falls_back_to_sequential_without_a_pool(caplog):
     with (
-        patch("gitstats.main.Pool", side_effect=OSError("no semaphores")),
+        patch("gitstats.collector.Pool", side_effect=OSError("no semaphores")),
         caplog.at_level(logging.WARNING, logger="gitstats"),
     ):
         assert parallel_map_with_fallback(_square, [1, 2, 3]) == [1, 4, 9]
@@ -1791,7 +1821,7 @@ class TestCollectEdgeCases:
                 "git log --topo-order": "c1\te1\tc0\tgarbage Ann\nc0\te0\t\t5 Outside Range",
             }
         )
-        monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+        monkeypatch.setattr("gitstats.collector.get_pipe_output", fake)
         monkeypatch.setattr("gitstats.utils.get_pipe_output", fake)
         dc = GitDataCollector()
         dc._collect_tags()
@@ -1815,7 +1845,7 @@ class TestCollectEdgeCases:
                 "git show-ref --tags --dereference": "c9 refs/tags/elsewhere\n",
             }
         )
-        monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+        monkeypatch.setattr("gitstats.collector.get_pipe_output", fake)
         monkeypatch.setattr("gitstats.utils.get_pipe_output", fake)
         dc = GitDataCollector()
         dc._collect_tags()
@@ -1935,7 +1965,7 @@ class TestCollectEdgeCases:
                 )
             }
         )
-        monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+        monkeypatch.setattr("gitstats.collector.get_pipe_output", fake)
         dc = GitDataCollector()
         identities = dc._collect_commit_stats()
 
@@ -1958,7 +1988,7 @@ class TestCollectEdgeCases:
                 )
             }
         )
-        monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+        monkeypatch.setattr("gitstats.collector.get_pipe_output", fake)
         dc = GitDataCollector()
         dc._collect_commit_stats()
 
@@ -1998,7 +2028,7 @@ class TestCollectEdgeCases:
                 )
             }
         )
-        monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+        monkeypatch.setattr("gitstats.collector.get_pipe_output", fake)
         dc = GitDataCollector()
         dc._collect_commit_stats()
 
@@ -2077,9 +2107,9 @@ class TestCollectEdgeCases:
 
         with (
             patch(
-                "gitstats.main.count_files_in_trees", side_effect=count_files_in_trees
+                "gitstats.collector.count_files_in_trees", side_effect=count_files_in_trees
             ) as counted,
-            patch("gitstats.main.get_num_of_files_from_rev") as listed,
+            patch("gitstats.collector.get_num_of_files_from_rev") as listed,
         ):
             second._collect_files_by_stamp()
 
@@ -2099,7 +2129,7 @@ class TestCollectEdgeCases:
         # with every revision in the cache, git is not asked to count anything
         third = GitDataCollector()
         third.cache = json.loads(json.dumps(first.cache))
-        with patch("gitstats.main.count_files_in_trees") as counted:
+        with patch("gitstats.collector.count_files_in_trees") as counted:
             third._collect_files_by_stamp()
         counted.assert_not_called()
         assert third.files_by_stamp == first.files_by_stamp
@@ -2117,9 +2147,10 @@ class TestCollectEdgeCases:
 
         dc = GitDataCollector()
         with (
-            patch("gitstats.main.count_files_in_trees", return_value={}),
+            patch("gitstats.collector.count_files_in_trees", return_value={}),
             patch(
-                "gitstats.main.get_num_of_files_from_rev", side_effect=get_num_of_files_from_rev
+                "gitstats.collector.get_num_of_files_from_rev",
+                side_effect=get_num_of_files_from_rev,
             ) as listed,
         ):
             dc._collect_files_by_stamp()
@@ -2157,7 +2188,7 @@ class TestCollectEdgeCases:
 
         dc = GitDataCollector()
         with patch(
-            "gitstats.main.get_num_of_files_from_rev", side_effect=get_num_of_files_from_rev
+            "gitstats.collector.get_num_of_files_from_rev", side_effect=get_num_of_files_from_rev
         ) as listed:
             dc._collect_files_by_stamp(history, lambda: added)
 
@@ -2191,7 +2222,7 @@ class TestCollectEdgeCases:
         dc = GitDataCollector()
         with (
             patch(
-                "gitstats.main.count_files_in_trees", side_effect=count_files_in_trees
+                "gitstats.collector.count_files_in_trees", side_effect=count_files_in_trees
             ) as counted,
             caplog.at_level(logging.DEBUG, logger="gitstats"),
         ):
@@ -2211,7 +2242,7 @@ class TestCollectEdgeCases:
         reference._collect_files_by_stamp()
 
         dc = GitDataCollector()
-        with patch("gitstats.main.get_num_of_files_from_rev") as listed:
+        with patch("gitstats.collector.get_num_of_files_from_rev") as listed:
             dc._collect_files_by_stamp(None, lambda: None)
         listed.assert_not_called()
         assert dc.files_by_stamp == reference.files_by_stamp
@@ -2223,7 +2254,7 @@ class TestCollectEdgeCases:
 
         dc = GitDataCollector()
         with patch(
-            "gitstats.main.count_files_in_trees", side_effect=count_files_in_trees
+            "gitstats.collector.count_files_in_trees", side_effect=count_files_in_trees
         ) as counted:
             dc._collect_files_by_stamp()
         assert len(counted.call_args.args[0].commits) == 3
@@ -2278,7 +2309,7 @@ class TestCollectEdgeCases:
                 )
             }
         )
-        monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+        monkeypatch.setattr("gitstats.collector.get_pipe_output", fake)
         dc = GitDataCollector()
         with caplog.at_level(logging.WARNING, logger="gitstats"):
             dc._collect_line_stats()
@@ -2305,7 +2336,7 @@ class TestCollectEdgeCases:
                 )
             }
         )
-        monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+        monkeypatch.setattr("gitstats.collector.get_pipe_output", fake)
         dc = GitDataCollector()
         with caplog.at_level(logging.WARNING, logger="gitstats"):
             dc._collect_per_author_line_stats({})
@@ -2326,7 +2357,7 @@ class TestCollectEdgeCases:
                 )
             }
         )
-        monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+        monkeypatch.setattr("gitstats.collector.get_pipe_output", fake)
         dc = GitDataCollector()
         dc._collect_file_churn_and_ownership({"Bob": "Robert"})
 
@@ -2342,7 +2373,7 @@ class TestCollectEdgeCases:
                 )
             }
         )
-        monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+        monkeypatch.setattr("gitstats.collector.get_pipe_output", fake)
         dc = GitDataCollector()
         dc._collect_commit_subjects()
         assert dc.commit_subjects_by_year == {2023: ["First subject", "Second subject"]}
@@ -2377,7 +2408,7 @@ class TestAccessors:
 
     def test_get_tags_lists_tag_names(self):
         dc = GitDataCollector()
-        with patch("gitstats.main.get_pipe_output", return_value="v1.0.0\nv1.1.0") as git:
+        with patch("gitstats.collector.get_pipe_output", return_value="v1.0.0\nv1.1.0") as git:
             assert dc.get_tags() == ["v1.0.0", "v1.1.0"]
         git.assert_called_once_with(["git show-ref --tags", "cut -d/ -f3"])
 
@@ -2888,7 +2919,7 @@ def test_source_lines_when_git_fails(monkeypatch):
     def failing(cmds, quiet=False):
         raise subprocess.CalledProcessError(128, cmds)
 
-    monkeypatch.setattr("gitstats.main.get_pipe_output", failing)
+    monkeypatch.setattr("gitstats.collector.get_pipe_output", failing)
     assert GitDataCollector()._source_lines() is None
 
 
@@ -2899,7 +2930,7 @@ def test_source_lines_count_insertions(monkeypatch):
     )
     seen = []
     monkeypatch.setattr(
-        "gitstats.main.get_pipe_output", lambda cmds, quiet=False: seen.append(cmds) or printed
+        "gitstats.collector.get_pipe_output", lambda cmds, quiet=False: seen.append(cmds) or printed
     )
     assert GitDataCollector()._source_lines() == 11
     assert seen == [
@@ -2954,9 +2985,9 @@ def _collected(repo, monkeypatch, processes=8, **config):
     monkeypatch.chdir(repo)
     dc = GitDataCollector()
     with (
-        patch("gitstats.main.os.cpu_count", return_value=8),
+        patch("gitstats.collector.os.cpu_count", return_value=8),
         patch(
-            "gitstats.main.parallel_map_with_fallback",
+            "gitstats.collector.parallel_map_with_fallback",
             side_effect=lambda func, items: [func(item) for item in items],
         ),
     ):
@@ -3270,7 +3301,7 @@ def test_a_commit_after_the_year_9999(tmp_path, monkeypatch):
             (*ANN, "@253402300800 +0000", {"b": 1}),
         ],
     )
-    from gitstats.main import _LATEST_STAMP
+    from gitstats.collector import _LATEST_STAMP
 
     latest = datetime.datetime.fromtimestamp(_LATEST_STAMP).year  # 9999, 2999 on Windows
     for processes in (8, 1):
@@ -3450,7 +3481,7 @@ def test_a_signature_check_in_the_users_config_is_not_read_as_data():
 
 
 def test_git_settings_go_after_those_already_in_the_environment(monkeypatch):
-    from gitstats.main import _set_git_config
+    from gitstats.collector import _set_git_config
 
     # an environment of its own, which the test leaves as it found it
     environ = {
@@ -3518,7 +3549,7 @@ def test_files_by_stamp_counts_a_commit_with_an_unreadable_date_at_zero(monkeypa
     """git prints an author date it cannot read as nothing."""
     # the first line too, whose space the output's strip() takes off
     fake = _fake_git({'git log --format="%at %T"': " tree1\n1700000000 tree2\n tree3\n"})
-    monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+    monkeypatch.setattr("gitstats.collector.get_pipe_output", fake)
     dc = GitDataCollector()
     dc.cache = {"files_in_tree": {"tree1": 1, "tree2": 2, "tree3": 3}}
     dc._collect_files_by_stamp()

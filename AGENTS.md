@@ -13,17 +13,6 @@ nox -s docs      # Build Sphinx docs to docs/build/html/
 
 Before committing: `pre-commit run --all-files`
 
-## Architecture
-
-| Module | Purpose |
-|--------|---------|
-| `gitstats/main.py` | Entry point and `DataCollector` class |
-| `gitstats/report_creator.py` | `HTMLReportCreator` — generates HTML with Chart.js |
-| `gitstats/utils.py` | Git command helpers (`get_pipe_output`, etc.) |
-| `gitstats/__init__.py` | Config loading via `load_config()` |
-| `gitstats.conf` | Default config (max_authors, processes, exclusions, …) |
-| `noxfile.py` | Dev automation tasks |
-
 ## Tech Stack
 
 Python 3.10+ | Chart.js (bundled, browser-side) | Sphinx | Nox | ruff + mypy + pre-commit

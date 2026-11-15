@@ -29,7 +29,7 @@ import sys
 from collections import Counter
 from typing import Any
 
-from gitstats.report_creator import (
+from gitstats.markup import (
     FOOTER,
     NAV_END,
     NAV_START,
@@ -39,10 +39,9 @@ from gitstats.report_creator import (
     THEME_TOGGLE_BUTTON,
     nav_link,
     plural,
-    share_card_page,
-    share_meta_html,
     stat_tiles_html,
 )
+from gitstats.share_card import share_card_page, share_meta_html
 from gitstats.utils import format_int
 from gitstats.wrapped import COMPARED, PAGE, change
 

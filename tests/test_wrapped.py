@@ -9,7 +9,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from gitstats.report_creator import SHARE_CARD_CSS
+from gitstats.share_card import SHARE_CARD_CSS
 from gitstats.wrapped import (
     COMPARED,
     MONTH_NAMES,

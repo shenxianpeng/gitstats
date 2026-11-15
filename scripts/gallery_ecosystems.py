@@ -28,9 +28,9 @@ from typing import Any
 
 from gallery_repos import Group, Repo
 
-from gitstats.aggregate import MIN_RANKED_COMMITS, last_quarters, quarter_id
 from gitstats.compare import complete_ai
-from gitstats.report_creator import (
+from gitstats.datasets import MIN_RANKED_COMMITS, last_quarters, quarter_id
+from gitstats.markup import (
     AI_ASSISTED_COUNTED,
     FOOTER,
     NAV_END,
@@ -41,10 +41,9 @@ from gitstats.report_creator import (
     THEME_TOGGLE_BUTTON,
     nav_link,
     percent_text,
-    share_card_page,
-    share_meta_html,
     stat_tiles_html,
 )
+from gitstats.share_card import share_card_page, share_meta_html
 from gitstats.utils import format_int
 
 FOLDER = "ecosystems"

@@ -24,13 +24,10 @@ import logging
 import os
 from typing import Any
 
-from gitstats.report_creator import (
-    compute_project_history,
-    is_bot,
-    plural,
-    share_card_page,
-)
-from gitstats.utils import format_int, get_version
+from gitstats.history import compute_project_history
+from gitstats.markup import plural
+from gitstats.share_card import share_card_page
+from gitstats.utils import format_int, get_version, is_bot
 
 logger = logging.getLogger("gitstats")
 
