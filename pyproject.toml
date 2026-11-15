@@ -52,7 +52,7 @@ docs = ["sphinx", "sphinx-rtd-theme", "sphinx-autobuild"]
 ai = [
     "openai>=1.0",
     "anthropic>=1.0",
-    "google-generativeai>=0.3",
+    "google-genai>=2.33",
     "requests>=2.31"
 ]
 

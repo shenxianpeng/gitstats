@@ -71,8 +71,15 @@ def _is_retryable(error: Exception) -> bool:
     status = _status_of(error)
     if status is not None:
         return status == 429 or status >= 500
-    return isinstance(error, ConnectionError) or "Connection" in type(error).__name__
+    # the SDKs name theirs APIConnectionError, and httpx, ConnectError
+    return isinstance(error, ConnectionError) or "Connect" in type(error).__name__
 
+
+# Google stops serving gemini-2.5-flash, the default until now, on December 1,
+# 2026 (https://ai.google.dev/gemini-api/docs/deprecations), names this model
+# as its replacement, and already keeps the 2.5 models from accounts that have
+# not used them before
+GEMINI_DEFAULT_MODEL = "gemini-3.5-flash-lite"
 
 CLAUDE_DEFAULT_MODEL = "claude-opus-5-5"
 # the models the API can hand a declined request to another model for
@@ -264,35 +271,62 @@ class GeminiProvider(AIProvider):
     def __init__(self, config: dict[str, Any]):
         super().__init__(config)
         try:
-            import google.generativeai as genai
-
-            self.genai = genai
+            from google import genai
+            from google.genai import types
         except ImportError:
             raise AIProviderError(
-                "google-generativeai package not installed. Install with: pip install google-generativeai"
+                "google-genai package not installed. Install with: pip install google-genai"
             ) from None
+        self.genai = genai
 
-        self.api_key = config.get("api_key") or os.environ.get("GOOGLE_API_KEY")
+        # the key by either of the names the SDK itself reads it from
+        self.api_key = (
+            config.get("api_key")
+            or os.environ.get("GOOGLE_API_KEY")
+            or os.environ.get("GEMINI_API_KEY")
+        )
         if not self.api_key:
             raise AIProviderError(
-                "Gemini API key not found. Set GOOGLE_API_KEY environment variable or configure it."
+                "Gemini API key not found. Set GOOGLE_API_KEY or GEMINI_API_KEY environment "
+                "variable or configure it."
             )
 
-        self.model_name = _get_model_with_fallback(config, "gemini-2.5-flash")
-        self.genai.configure(api_key=self.api_key)
-        self.model = self.genai.GenerativeModel(self.model_name)
+        self.model_name = _get_model_with_fallback(config, GEMINI_DEFAULT_MODEL)
+        # The SDK counts its timeout in milliseconds. One attempt: gitstats
+        # retries itself (see _retry_with_backoff)
+        self.client = genai.Client(
+            api_key=self.api_key,
+            http_options=types.HttpOptions(
+                timeout=int(self.timeout * 1000),
+                retry_options=types.HttpRetryOptions(attempts=1),
+            ),
+        )
 
     def generate_summary(self, data: dict[str, Any], prompt: str) -> str | None:
         """Generate summary using Gemini API."""
 
         def _call_api() -> str:
-            response = self.model.generate_content(
-                prompt, request_options={"timeout": self.timeout}
-            )
-            text: str = response.text
+            response = self.client.models.generate_content(model=self.model_name, contents=prompt)
+            # the answer's text, without the thoughts before it; None when the
+            # model stopped before writing any (it was blocked, or ran out of room)
+            text: str = (response.text or "").strip()
+            if not text:
+                raise AIProviderError(f"{self.model_name} gave no text{self._why_not(response)}")
             return text
 
         return self._retry_with_backoff(_call_api)
+
+    @staticmethod
+    def _why_not(response: Any) -> str:
+        """Why an answer has no text, as the API says it, in brackets: the
+        reason the prompt was blocked for, or the one the model stopped for;
+        "" when it says neither."""
+        blocked = getattr(getattr(response, "prompt_feedback", None), "block_reason", None)
+        if blocked:
+            return f" (blocked: {getattr(blocked, 'name', blocked)})"
+        candidates = getattr(response, "candidates", None) or []
+        finish = getattr(candidates[0], "finish_reason", None) if candidates else None
+        return f" (finish reason: {getattr(finish, 'name', finish)})" if finish else ""
 
 
 class _OllamaError(Exception):
