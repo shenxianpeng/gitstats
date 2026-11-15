@@ -1141,3 +1141,17 @@ def _reversed_date(date: str) -> tuple[int, ...]:
         return (0, *(-int(part) for part in date.split("-")))
     except ValueError:
         return (1,)
+
+
+def is_bot(name: str) -> bool:
+    """Bot accounts are named like ``dependabot[bot]``."""
+    return name.endswith("[bot]")
+
+
+def get_keys_sorted_by_values(d: dict[str, int]) -> list[str]:
+    return [el[1] for el in sorted([(el[1], el[0]) for el in d.items()])]
+
+
+# dict['author'] = { 'commits': 512 } - ...key(dict, 'commits')
+def get_keys_sorted_by_value_key(d: dict[str, dict[str, Any]], key: str) -> list[str]:
+    return [el[1] for el in sorted([(d[el][key], el) for el in d.keys()])]

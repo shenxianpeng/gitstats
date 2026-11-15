@@ -58,7 +58,7 @@ ai = [
 
 [tool.setuptools]
 zip-safe = false
-packages = ["gitstats"]
+packages = ["gitstats", "gitstats.pages"]
 
 [tool.setuptools_scm]
 # It would be nice to include the commit hash in the version, but that

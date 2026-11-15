@@ -18,7 +18,7 @@ sys.path.insert(0, _SCRIPTS)
 import gallery_ecosystems as eco  # noqa: E402
 from gallery_repos import Group, Repo  # noqa: E402
 
-from gitstats.report_creator import NAV_START, SKIP_LINK  # noqa: E402
+from gitstats.markup import NAV_START, SKIP_LINK  # noqa: E402
 
 NOW = datetime.datetime(2026, 10, 21, 12, 0)
 Q2 = ["2026-04", "2026-05", "2026-06"]

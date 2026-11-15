@@ -34,7 +34,7 @@ from gitstats.aggregate import (
 from gitstats.ai_summarizer import AISummarizer
 from gitstats.assistants import AssistedCommit, assisted_commits
 from gitstats.employers import BOT, ORGANIZATION, Affiliation, classify
-from gitstats.report_creator import HTMLReportCreator, get_keys_sorted_by_value_key
+from gitstats.report_creator import HTMLReportCreator
 from gitstats.sources import is_source
 from gitstats.utils import (
     SOURCE_LINES_LOG,
@@ -45,6 +45,7 @@ from gitstats.utils import (
     count_files_in_trees,
     count_lines_in_blobs,
     get_commit_range,
+    get_keys_sorted_by_value_key,
     get_log_range,
     get_num_of_files_from_rev,
     get_pipe_output,

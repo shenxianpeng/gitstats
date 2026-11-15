@@ -10,7 +10,7 @@ import tempfile
 import pytest
 
 from gitstats.aggregate import GROUP_FILTER_SCRIPT
-from gitstats.report_creator import HOTSPOTS_SCRIPT
+from gitstats.pages.hotspots import HOTSPOTS_SCRIPT
 from gitstats.wrapped import WRAPPED_SCRIPT
 
 NODE = shutil.which("node")

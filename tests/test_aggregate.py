@@ -34,7 +34,7 @@ from gitstats.aggregate import (
     source_lines_summary,
     write_repo_summary,
 )
-from gitstats.report_creator import NAV_START, SKIP_LINK
+from gitstats.markup import NAV_START, SKIP_LINK
 
 # ── _slugify_repo ────────────────────────────────────────────────────────
 
@@ -1943,7 +1943,7 @@ class TestWhatStandsOut:
             return f.read()
 
     def test_pages_cards_and_data(self, temp_dir):
-        from gitstats.report_creator import INSIGHTS_END, INSIGHTS_START
+        from gitstats.markup import INSIGHTS_END, INSIGHTS_START
 
         placeholder = f"<h1>p11</h1>{INSIGHTS_START}{INSIGHTS_END}<p>tiles</p>"
         self._overview(temp_dir, "p11", placeholder)
@@ -1990,7 +1990,7 @@ class TestWhatStandsOut:
     def test_a_portfolio_too_small_to_say_what_stands_out(self, temp_dir):
         # five to nine projects: a comparison page, and the way to it from the
         # top of each report, the only page that links to it
-        from gitstats.report_creator import INSIGHTS_END, INSIGHTS_START
+        from gitstats.markup import INSIGHTS_END, INSIGHTS_START
 
         summaries = self._summaries(5)
         for summary in summaries:
@@ -2017,7 +2017,7 @@ class TestNavigation:
 
     @staticmethod
     def _report(temp_dir, folder, page="index.html"):
-        from gitstats.report_creator import REPORT_BRAND
+        from gitstats.markup import REPORT_BRAND
 
         os.makedirs(os.path.join(temp_dir, folder), exist_ok=True)
         with open(os.path.join(temp_dir, folder, page), "w", encoding="utf-8") as f:
@@ -2047,7 +2047,7 @@ class TestNavigation:
         assert "Ecosystems" not in self._read(temp_dir, "index.html")
 
     def test_each_report_leads_back(self, temp_dir):
-        from gitstats.report_creator import REPORT_BRAND
+        from gitstats.markup import REPORT_BRAND
 
         for page in ("index.html", "tags.html", "compare-old.html", "share-card.html"):
             self._report(temp_dir, "repo0", page)

@@ -6,8 +6,8 @@ a machine-readable ``summary.json`` per repository plus one aggregate
 ``index.html`` at the output root with a sortable overview table.
 
 The computation functions are pure — they read collector attributes only and
-issue no git commands — mirroring ``compute_project_history`` and
-``compute_code_ownership`` in ``report_creator``.
+issue no git commands — mirroring ``compute_project_history``
+(``gitstats.history``) and ``compute_code_ownership`` (``gitstats.ownership``).
 """
 
 import csv
@@ -26,7 +26,8 @@ from gitstats.badge import compact_count, endpoint_json, render_badge
 from gitstats.employers import KIND_LABELS, ORGANIZATION
 from gitstats.employers import KINDS as ORGANIZATION_KINDS
 from gitstats.employers import summarize as summarize_organizations
-from gitstats.report_creator import (
+from gitstats.history import _classify_eras
+from gitstats.markup import (
     AI_ASSISTED_COUNTED,
     FOOTER,
     INSIGHTS_END,
@@ -38,16 +39,14 @@ from gitstats.report_creator import (
     THEME_INIT_SCRIPT,
     THEME_SCRIPT,
     THEME_TOGGLE_BUTTON,
-    _classify_eras,
     html_header,
     nav_link,
     page_title,
     plural,
-    share_card_page,
-    share_meta_html,
     share_text,
     stat_tiles_html,
 )
+from gitstats.share_card import share_card_page, share_meta_html
 from gitstats.sources import is_source
 from gitstats.utils import format_int, get_version
 
