@@ -600,26 +600,12 @@ class WrappedCardGenerator:
             f'fill="{c["stat_label"]}" letter-spacing="0.5">{title}</text>'
         ]
         if paired:
-            # what the narrow bars are: one of them, and the year they stand for
-            parts.append(
-                f'<rect x="{RIGHT - 54}" y="816" width="14" height="10" rx="3" '
-                f'fill="{c["stat_label"]}" fill-opacity="0.45"/>'
-            )
-            parts.append(
-                f'<text x="{RIGHT}" y="826" font-size="13" fill="{c["stat_label"]}" '
-                f'text-anchor="end">{self.year - 1}</text>'
-            )
+            parts += self._bars_of_the_year_before(before, peak, bar_w, step, base_y, bar_max_h)
         for i, commits in enumerate(monthly):
             x = LEFT + i * step
             # the month's name is centered under its place, its count over its bar
             name_x = x + slot_w // 2
             middle = x + bar_w // 2
-            if i < len(before) and before[i]:
-                h = max(4, round(before[i] / peak * bar_max_h))
-                parts.append(
-                    f'<rect x="{x + bar_w + 4}" y="{base_y - h}" width="14" height="{h}" rx="3" '
-                    f'fill="{c["stat_label"]}" fill-opacity="0.45"/>'
-                )
             if i >= months:
                 # a month to come: its name, faint, and nothing above it
                 parts.append(
@@ -649,6 +635,27 @@ class WrappedCardGenerator:
                 f'text-anchor="middle">{MONTH_NAMES[i + 1][:3]}</text>'
             )
         return "\n  ".join(parts)
+
+    def _bars_of_the_year_before(
+        self, before: list[int], peak: int, bar_w: int, step: int, base_y: int, bar_max_h: int
+    ) -> list[str]:
+        """The narrow bars of the year before, each to the right of its
+        month's own, and above the chart what they are: one of them, and the
+        year they stand for. A month without commits then has none."""
+        fill = f'fill="{self.colors["stat_label"]}" fill-opacity="0.45"'
+        parts = [
+            f'<rect x="{RIGHT - 54}" y="816" width="14" height="10" rx="3" {fill}/>',
+            f'<text x="{RIGHT}" y="826" font-size="13" fill="{self.colors["stat_label"]}" '
+            f'text-anchor="end">{self.year - 1}</text>',
+        ]
+        for i, commits in enumerate(before):
+            if commits:
+                h = max(4, round(commits / peak * bar_max_h))
+                x = LEFT + i * step + bar_w + 4
+                parts.append(
+                    f'<rect x="{x}" y="{base_y - h}" width="14" height="{h}" rx="3" {fill}/>'
+                )
+        return parts
 
     @staticmethod
     def _escape_xml(text: str) -> str:

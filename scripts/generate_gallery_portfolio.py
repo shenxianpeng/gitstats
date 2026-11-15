@@ -368,6 +368,51 @@ def _listed_summaries(
     return summaries, repo_groups, repos, failures
 
 
+def _wrapped_cards(
+    gallery_root: str, summaries: list[dict]
+) -> tuple[list[tuple[str, str]], list[dict]]:
+    """The cards of the reports made with --wrapped, those of the year most of
+    them are for, and before them the tab that leads to the gallery's page of
+    them: none without a card."""
+    year, cards = gallery_wrapped.cards_of_the_year(
+        gallery_wrapped.load_cards(gallery_root, summaries)
+    )
+    tab = f"{gallery_wrapped.FOLDER}/{gallery_wrapped.INDEX}"
+    return ([(tab, f"Wrapped {year}")] if cards else []), cards
+
+
+def _portfolio_tabs(gallery_root: str) -> list[tuple[str, str]]:
+    """The pages the portfolio wrote next to its index, as the nav of another
+    page leads to them."""
+    return [
+        (page, label)
+        for page, label in (
+            ("ai.html", "AI-assisted commits"),
+            ("organizations.html", "Organizations"),
+        )
+        if os.path.isfile(os.path.join(gallery_root, page))
+    ]
+
+
+def _what_was_written(
+    gallery_root: str,
+    summaries: list[dict],
+    failures: list[dict[str, str]],
+    ecosystems: list[Group],
+    cards: list[dict],
+    pages: int,
+) -> str:
+    """What a run wrote, in a line."""
+    line = f"Portfolio page written for {len(summaries)} repositories: {gallery_root}/index.html"
+    if failures:
+        line += f" ({len(failures)} without a report)"
+    if ecosystems:
+        line += f"; {len(ecosystems)} ecosystem pages"
+    if cards:
+        line += f"; Repo Wrapped {cards[0]['year']} of {len(cards)}"
+    return f"{line}; notes added to {pages} pages"
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Assemble the gallery portfolio page.")
     parser.add_argument("gallery_root")
@@ -407,14 +452,7 @@ def main(argv: list[str] | None = None) -> int:
     if version == "dev":
         version = reports_version(summaries) or version
     # the reports made with --wrapped: their cards have a page of the gallery's
-    wrapped_year, cards = gallery_wrapped.cards_of_the_year(
-        gallery_wrapped.load_cards(gallery_root, summaries)
-    )
-    wrapped_tab = (
-        [(f"{gallery_wrapped.FOLDER}/{gallery_wrapped.INDEX}", f"Wrapped {wrapped_year}")]
-        if wrapped_year
-        else []
-    )
+    wrapped_tab, cards = _wrapped_cards(gallery_root, summaries)
     # each listed repository is in a group: with groups, there are ecosystem
     # pages, written below
     ecosystems_tab = [(f"{FOLDER}/{INDEX}", "Ecosystems")] if groups else []
@@ -444,15 +482,7 @@ def main(argv: list[str] | None = None) -> int:
         cards,
         {group.id: group.name for group in groups},
         # the pages the portfolio wrote, and the ecosystems' when they have one
-        [
-            (page, label)
-            for page, label in (
-                ("ai.html", "AI-assisted commits"),
-                ("organizations.html", "Organizations"),
-            )
-            if os.path.isfile(os.path.join(gallery_root, page))
-        ]
-        + (ecosystems_tab if ecosystems else []),
+        _portfolio_tabs(gallery_root) + (ecosystems_tab if ecosystems else []),
         site_url,
         args.share_card,
         version,
@@ -464,13 +494,7 @@ def main(argv: list[str] | None = None) -> int:
         ecosystems,
         {card["id"]: card["year"] for card in cards},
     )
-    print(
-        f"Portfolio page written for {len(summaries)} repositories: {gallery_root}/index.html"
-        + (f" ({len(failures)} without a report)" if failures else "")
-        + (f"; {len(ecosystems)} ecosystem pages" if ecosystems else "")
-        + (f"; Repo Wrapped {wrapped_year} of {len(cards)}" if cards else "")
-        + f"; notes added to {pages} pages"
-    )
+    print(_what_was_written(gallery_root, summaries, failures, ecosystems, cards, pages))
     return 0
 
 

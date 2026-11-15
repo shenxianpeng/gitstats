@@ -2609,7 +2609,8 @@ class TestWrappedCard:
     ):
         out = tmp_path / "report"
         _run_single_repo(git_repo_minimal, str(out), wrapped_config=self._config())
-        assert (out / "wrapped.html").exists() and (out / "wrapped-card.html").exists()
+        assert (out / "wrapped.html").exists()
+        assert (out / "wrapped-card.html").exists()
 
         _run_single_repo(git_repo_minimal, str(out))
         assert not (out / "wrapped.html").exists()

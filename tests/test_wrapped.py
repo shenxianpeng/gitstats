@@ -958,7 +958,8 @@ class TestWrappedNumbersTable:
         table = numbers_table_html(_stats(year=2024))
         assert '<tr><th></th><th class="num">2024</th></tr>' in table
         assert '<tr><td>Commits</td><td class="num">30</td></tr>' in table
-        assert "Change" not in table and "wrapped-" not in table.replace("wrapped-numbers", "")
+        assert "Change" not in table
+        assert "wrapped-" not in table.replace("wrapped-numbers", "")
 
     def test_no_percentage_of_nothing(self):
         """No lines were counted in 2024: the cell is there, and empty."""

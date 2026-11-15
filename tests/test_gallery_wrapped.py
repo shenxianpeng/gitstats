@@ -199,7 +199,9 @@ def test_load_cards(tmp_path, capsys):
     errors = capsys.readouterr().err
     assert "Skipping unreadable card data: broken/wrapped-2026.json (" in errors
     assert "Skipping data that is not a card's: other/wrapped-2026.json" in errors
-    assert "nopage" not in errors and "plain" not in errors
+    # a report without a card, or with one that has no page, is no error
+    assert "nopage" not in errors
+    assert "plain" not in errors
 
 
 def test_load_cards_reads_nothing_outside_the_gallery(tmp_path):
