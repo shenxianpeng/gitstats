@@ -27,4 +27,10 @@ def _packages_here():
 
 
 def test_every_package_is_listed_for_the_build():
-    assert _listed_packages() == _packages_here()
+    listed, here = _listed_packages(), _packages_here()
+    missing, gone = sorted(here - listed), sorted(listed - here)
+    assert not missing, (
+        f"add {missing} to `packages` under [tool.setuptools] in pyproject.toml, "
+        "or the wheel is built without it"
+    )
+    assert not gone, f"`packages` in pyproject.toml lists {gone}, which no folder of gitstats/ is"
