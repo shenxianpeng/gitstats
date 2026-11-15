@@ -13,17 +13,6 @@ nox -s docs      # Build Sphinx docs to docs/build/html/
 
 Before committing: `pre-commit run --all-files`
 
-## Architecture
-
-| Module | Purpose |
-|--------|---------|
-| `gitstats/main.py` | Entry point and `DataCollector` class |
-| `gitstats/report_creator.py` | `HTMLReportCreator` — generates HTML with Chart.js |
-| `gitstats/utils.py` | Git command helpers (`get_pipe_output`, etc.) |
-| `gitstats/__init__.py` | Config loading via `load_config()` |
-| `gitstats.conf` | Default config (max_authors, processes, exclusions, …) |
-| `noxfile.py` | Dev automation tasks |
-
 ## Tech Stack
 
 Python 3.10+ | Chart.js (bundled, browser-side) | Sphinx | Nox | ruff + mypy + pre-commit
@@ -32,6 +21,7 @@ Python 3.10+ | Chart.js (bundled, browser-side) | Sphinx | Nox | ruff + mypy + p
 
 - PR target branch: `main`
 - Always run `nox -s lint` before committing
+- `gitstats/` and `scripts/` are type-checked as `mypy --strict` checks (see `[tool.mypy]` in `pyproject.toml`): annotate every new function, and add a new script to the list there
 - Git commands use `LC_ALL=C` for reproducible output
 - Use `parallel_map_with_fallback()` for parallel processing — falls back to sequential
 - Charts rendered browser-side via bundled `chart.umd.min.js`

@@ -1,0 +1,84 @@
+name: Repo Wrapped
+
+# The Repo Wrapped card of gitstats itself, made when asked for: Actions,
+# "Repo Wrapped", "Run workflow". The card is an artifact of the run, as SVG
+# and PNG with its numbers as JSON, and the run's summary says the year.
+#
+# The steps are those of the workflow docs/source/wrapped.rst gives to copy
+# into another repository, but for gitstats, which is run here from the
+# checkout rather than installed from PyPI.
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        description: "Year of the card (empty: this year)"
+        required: false
+        type: string
+      theme:
+        description: Color theme of the card
+        required: false
+        type: choice
+        default: midnight
+        options:
+          - midnight
+          - sunset
+          - clean
+
+permissions:
+  contents: read
+
+jobs:
+  wrapped:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # the whole history, with its tags: a shallow clone has one commit
+          # to show, and the releases of the year are counted from the tags
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+
+      - name: Make the Card
+        env:
+          YEAR: ${{ inputs.year }}
+          THEME: ${{ inputs.theme }}
+        # gitstats has no dependencies: it runs from the checkout as it is
+        run: |
+          python -m gitstats.main --wrapped --wrapped-theme "$THEME" \
+            ${YEAR:+--wrapped-year "$YEAR"} . "$RUNNER_TEMP/report"
+          mkdir card
+          cp "$RUNNER_TEMP"/report/wrapped-*.svg "$RUNNER_TEMP"/report/wrapped-*.json card/
+
+      - name: Render It as a PNG
+        run: |
+          for svg in card/*.svg; do
+            google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars \
+              --window-size=1080,1080 --screenshot="$PWD/${svg%.svg}.png" "file://$PWD/$svg"
+          done
+
+      - name: Say the Year in the Summary
+        run: |
+          python - >> "$GITHUB_STEP_SUMMARY" <<'PYTHON'
+          import glob, json
+
+          card = json.load(open(glob.glob("card/*.json")[0], encoding="utf-8"))
+          years = [card] + ([card["previous"]] if card["previous"] else [])
+          print(f"### {card['project_name']}: Repo Wrapped {card['year']}\n")
+          print("| |" + "".join(f" {year['year']} |" for year in years))
+          print("|---|" + "---:|" * len(years))
+          for key in ("commits", "contributors", "active_days", "longest_streak", "lines_changed", "releases"):
+              name = key.replace("_", " ").capitalize()
+              print(f"| {name} |" + "".join(f" {year[key]:,} |" for year in years))
+          print("\nThe card is in the `repo-wrapped` artifact of this run, as SVG and PNG.")
+          PYTHON
+
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: repo-wrapped
+          path: card/

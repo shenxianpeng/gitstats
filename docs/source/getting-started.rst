@@ -119,7 +119,8 @@ Basic Syntax
 
 **Repo Wrapped card:**
 
-- ``--wrapped`` - Also write a shareable "Repo Wrapped" SVG card next to the report
+- ``--wrapped`` - Also write a shareable "Repo Wrapped" SVG card next to the report,
+  with its page and its numbers (see :doc:`wrapped`)
 - ``--wrapped-year YEAR`` - Year the card is for (default: the current year); a year
   without commits gets no card
 - ``--wrapped-theme {midnight,sunset,clean}`` - Color theme of the card (default: ``midnight``)
@@ -173,7 +174,8 @@ Generate the report and open it in a browser at http://127.0.0.1:8000/:
 
     gitstats . --serve
 
-Also write this year's Repo Wrapped card:
+Also write this year's :doc:`Repo Wrapped <wrapped>` card, set against the same
+days of last year:
 
 .. code-block:: bash
 

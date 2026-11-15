@@ -28,9 +28,9 @@ from typing import Any
 
 from gallery_repos import Group, Repo
 
-from gitstats.aggregate import MIN_RANKED_COMMITS, last_quarters, quarter_id
 from gitstats.compare import complete_ai
-from gitstats.report_creator import (
+from gitstats.datasets import MIN_RANKED_COMMITS, last_quarters, quarter_id
+from gitstats.markup import (
     AI_ASSISTED_COUNTED,
     FOOTER,
     NAV_END,
@@ -41,10 +41,9 @@ from gitstats.report_creator import (
     THEME_TOGGLE_BUTTON,
     nav_link,
     percent_text,
-    share_card_page,
-    share_meta_html,
     stat_tiles_html,
 )
+from gitstats.share_card import share_card_page, share_meta_html
 from gitstats.utils import format_int
 
 FOLDER = "ecosystems"
@@ -273,7 +272,9 @@ def _header(title: str, share: str, canonical: str) -> str:
     )
 
 
-def _nav() -> str:
+def _nav(tabs: Iterable[tuple[str, str]] = ()) -> str:
+    """The nav of an ecosystem page; ``tabs`` are the gallery's pages that
+    come after the ecosystems, as (address from the gallery, label)."""
     return (
         f'{NAV_START}<a href="../index.html" class="nav-brand">GitStats</a><ul>'
         + nav_link("../index.html", "GitStats Gallery")
@@ -282,6 +283,10 @@ def _nav() -> str:
         # every page of the ecosystems is under this tab, as an organization's
         # page is under Organizations
         + nav_link(INDEX, "Ecosystems", current=INDEX)
+        + "".join(
+            nav_link(html.escape(f"../{href}", quote=True), html.escape(label))
+            for href, label in tabs
+        )
         + f'</ul><div class="nav-right">{THEME_TOGGLE_BUTTON}</div>{NAV_END}'
     )
 
@@ -358,6 +363,7 @@ def group_page(
     site_url: str,
     card: bool,
     generated: str,
+    tabs: Iterable[tuple[str, str]] = (),
 ) -> str:
     """A group's page: the sentence, the headline numbers, and the table."""
     (previous_label, _), (label, latest) = quarters
@@ -373,7 +379,7 @@ def group_page(
             ),
             folder_url + page if folder_url else "",
         ),
-        _nav(),
+        _nav(tabs),
         f"<h1>{html.escape(group.name)}: ranked by AI-assisted commits</h1>",
         f'<p class="portfolio-subtitle">{html.escape(label)} &middot; '
         f"{summary['repositories']} repositories &middot; updated {generated} &middot; "
@@ -434,6 +440,7 @@ def index_page(
     site_url: str,
     card: bool,
     generated: str,
+    tabs: Iterable[tuple[str, str]] = (),
 ) -> str:
     """Every group side by side."""
     title = f"Open source ecosystems ranked by AI-assisted commits – {quarter.replace('-', ' ')}"
@@ -464,7 +471,7 @@ def index_page(
                 ),
                 folder_url,
             ),
-            _nav(),
+            _nav(tabs),
             "<h1>Ecosystems, ranked by AI-assisted commits</h1>",
             f'<p class="portfolio-subtitle">{html.escape(label)} &middot; {len(groups)} '
             f'ecosystems &middot; updated {generated} &middot; <a href="index.json">data</a></p>',
@@ -570,11 +577,15 @@ def write_ecosystems(
     card: bool = False,
     version: str = "",
     now: datetime.datetime | None = None,
+    tabs: Iterable[tuple[str, str]] = (),
 ) -> list[Group]:
     """Write the ecosystem pages, their data and cards, and the sitemap when
     ``site_url`` (the gallery's address, ending in "/") is known. ``card``:
-    the pages point to their cards as images. The groups that have a page:
-    those with a report."""
+    the pages point to their cards as images. ``tabs`` are the gallery's
+    pages that come after the ecosystems, as (address from the gallery,
+    label): the nav leads to them, and the sitemap lists them. The groups
+    that have a page: those with a report."""
+    tabs = list(tabs)
     now = now or datetime.datetime.now()
     quarters = last_quarters(now, 2)
     label, latest = quarters[-1]
@@ -596,7 +607,7 @@ def write_ecosystems(
     for group, rows, summary in ranked:
         data = group_json(group, rows, summary, quarters, meta)
         _write(gallery_root, f"{FOLDER}/{group.id}.json", _dump(data))
-        page = group_page(group, pages, rows, summary, quarters, site_url, card, generated)
+        page = group_page(group, pages, rows, summary, quarters, site_url, card, generated, tabs)
         _write(gallery_root, f"{FOLDER}/{group.id}.html", page)
         _write(
             gallery_root, f"{FOLDER}/{group.id}-card.html", group_card(group, rows, summary, label)
@@ -622,19 +633,22 @@ def write_ecosystems(
     _write(
         gallery_root,
         f"{FOLDER}/index.html",
-        index_page(written, label, quarter, site_url, card, generated),
+        index_page(written, label, quarter, site_url, card, generated, tabs),
     )
     _write(gallery_root, f"{FOLDER}/index-card.html", index_card(written, label))
     if site_url:
         urls = ["", "ai.html", "organizations.html", f"{FOLDER}/"]
         urls += [f"{FOLDER}/{group.id}.html" for group in pages]
+        # a folder's index is at the folder's own address
+        urls += [href[: -len(INDEX)] if href.endswith(f"/{INDEX}") else href for href, _ in tabs]
         urls += [f"{repo.id}/" for repo in repos if repo.id in by_id]
-        # each repository's comparison, as the portfolio wrote it
+        # each repository's comparison, as the portfolio wrote it, and the
+        # page of its Wrapped card, as its report did
         urls += [
-            f"{repo.id}/compare.html"
+            f"{repo.id}/{page}"
+            for page in ("compare.html", "wrapped.html")
             for repo in repos
-            if repo.id in by_id
-            and os.path.isfile(os.path.join(gallery_root, repo.id, "compare.html"))
+            if repo.id in by_id and os.path.isfile(os.path.join(gallery_root, repo.id, page))
         ]
         # the organizations' own pages, as the portfolio wrote them
         orgs = os.path.join(gallery_root, "orgs")

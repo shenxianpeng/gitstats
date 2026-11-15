@@ -17,6 +17,7 @@ Welcome to GitStats documentation!
    getting-started
    configuration
    integration
+   wrapped
    ai-integration
    gallery
    comparison

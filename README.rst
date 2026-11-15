@@ -348,7 +348,8 @@ Repo Wrapped Card
 -----------------
 
 Add ``--wrapped`` to also get a "Repo Wrapped" card: a square (1080×1080) SVG
-image written next to the report as ``wrapped-<year>.svg``, made for sharing.
+image written next to the report as ``wrapped-<year>.svg``, made for sharing:
+one year in the repository, set against the year before.
 
 .. code-block:: bash
 
@@ -364,8 +365,20 @@ the busiest month and weekday, the top contributor, the commits in each month
 and the part of the day most of them were made in. A year without commits
 gets no card: ``gitstats`` says so and names the last year that has any.
 
-The report shows the card on its Badges page, with a snippet to put it in a
-README, and links to it from its year on the History page.
+Each number says how it moved from the year before. A card for a year that is
+over is compared with the whole year before; one made before its year is over,
+with the same days of the year before, so that a card made in December does
+not hold eleven months against twelve.
+
+The card has its own page in the report, ``wrapped.html``: the year's numbers
+beside those of the year before, a button that saves the card as a PNG, and a
+line to post with it. Its numbers are next to it as ``wrapped-<year>.json``.
+The Badges page shows the card with a snippet to put it in a README, and the
+History page links to it from its year.
+
+To get the card of a repository on GitHub without installing anything, copy
+the `Repo Wrapped workflow <https://gitstats.readthedocs.io/en/latest/wrapped.html#make-the-card-in-github-actions>`_
+into it and run it from the Actions tab.
 
 With several repositories, each one gets its card in its own report
 directory; ``--wrapped-output`` names a single file, so it only works with one
@@ -387,7 +400,7 @@ Here is a list of some features of ``gitstats``:
 * **Hotspots**: every file plotted by its size against how often it changes, and the large, frequently changed files ranked by score, with how many people have changed each.
 * **History**: the project's life one year at a time — its peaks, quiet years and revivals, newcomers and releases — with optional AI narration.
 * **Portfolio**: analyze several repositories at once for an aggregate overview, with a page that compares their AI-assisted commits quarter by quarter.
-* **Wrapped card**: a shareable SVG card of one year in the repository, with ``--wrapped``.
+* **Wrapped card**: a shareable SVG card of one year in the repository, set against the year before, with ``--wrapped``.
 * **Readable anywhere**: interactive charts, light and dark themes, and layouts that work on phones; long quiet periods are shaded on every timeline, and cut down to a short break when they would take up a quarter of it or more.
 * **Ready to share**: every page carries a title and a description for link previews, and with ``site_url`` and ``share_card`` a 1200×630 card with the repository's numbers (rendered from ``share-card.html``).
 * **Customizable**: config values through ``gitstats.conf``.

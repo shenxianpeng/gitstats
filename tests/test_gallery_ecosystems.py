@@ -18,7 +18,7 @@ sys.path.insert(0, _SCRIPTS)
 import gallery_ecosystems as eco  # noqa: E402
 from gallery_repos import Group, Repo  # noqa: E402
 
-from gitstats.report_creator import NAV_START, SKIP_LINK  # noqa: E402
+from gitstats.markup import NAV_START, SKIP_LINK  # noqa: E402
 
 NOW = datetime.datetime(2026, 10, 21, 12, 0)
 Q2 = ["2026-04", "2026-05", "2026-06"]
@@ -393,3 +393,42 @@ def test_sitemap_lists_the_organizations_pages(tmp_path):
     assert f"<loc>{site}orgs/google.com.html</loc>" in sitemap
     assert "google.com.svg" not in sitemap
     assert sitemap.index("acme.org") < sitemap.index("google.com")
+
+
+def test_the_gallerys_later_tabs_are_in_the_nav_and_the_sitemap(tmp_path):
+    groups, repos, summaries = _gallery(tmp_path)
+    # pandas has the page of a Wrapped card, as its report wrote it
+    (tmp_path / "pandas").mkdir()
+    (tmp_path / "pandas" / "wrapped.html").write_text("x", encoding="utf-8")
+    site = "https://example.com/gallery/"
+    tabs = [("wrapped/index.html", "Wrapped <2026>"), ("about.html", "About")]
+    eco.write_ecosystems(str(tmp_path), groups, repos, summaries, site, now=NOW, tabs=iter(tabs))
+
+    for page in ("python.html", "index.html"):
+        text = _read(tmp_path / "ecosystems" / page)
+        # after the ecosystems' own tab, which stays the current one
+        assert (
+            '<li><a href="index.html" class="active" aria-current="page">Ecosystems</a></li>'
+            '<li><a href="../wrapped/index.html">Wrapped &lt;2026&gt;</a></li>'
+            '<li><a href="../about.html">About</a></li></ul>'
+        ) in text
+
+    tree = ET.fromstring(_read(tmp_path / "sitemap.xml"))
+    ns = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
+    locs = [url.find(f"{ns}loc").text for url in tree]
+    assert locs == [
+        site,
+        site + "ai.html",
+        site + "organizations.html",
+        site + "ecosystems/",
+        site + "ecosystems/python.html",
+        site + "ecosystems/china.html",
+        # a folder's index at the folder's address, a page at its own
+        site + "wrapped/",
+        site + "about.html",
+        site + "pandas/",
+        site + "flask/",
+        site + "tiny/",
+        site + "dubbo/",
+        site + "pandas/wrapped.html",
+    ]

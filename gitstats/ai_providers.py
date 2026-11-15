@@ -8,9 +8,13 @@ import logging
 import os
 import time
 from abc import ABC, abstractmethod
-from typing import Any
+from collections.abc import Callable
+from typing import Any, ParamSpec, TypeVar
 
 logger = logging.getLogger("gitstats")
+
+_P = ParamSpec("_P")
+_T = TypeVar("_T")
 
 
 def _get_model_with_fallback(config: dict[str, Any], default: str) -> str:
@@ -102,7 +106,7 @@ class AIProvider(ABC):
         self.timeout = config.get("timeout", 120)
 
     @abstractmethod
-    def generate_summary(self, data: dict[str, Any], prompt: str) -> str:
+    def generate_summary(self, data: dict[str, Any], prompt: str) -> str | None:
         """
         Generate a summary using the AI service.
 
@@ -111,18 +115,22 @@ class AIProvider(ABC):
             prompt: Prompt template with instructions
 
         Returns:
-            Generated summary text
+            Generated summary text; None when ``max_retries`` allows no call
+            at all, or the service answers without text
 
         Raises:
             AIProviderError: If the generation fails
         """
         pass
 
-    def _retry_with_backoff(self, func, *args, **kwargs):
+    def _retry_with_backoff(
+        self, func: Callable[_P, _T], *args: _P.args, **kwargs: _P.kwargs
+    ) -> _T | None:
         """Call ``func``, and again with exponential backoff while it fails in a
         way worth retrying (see ``_is_retryable``), ``max_retries`` calls in
         all. The SDKs are told not to retry on their own, so these are all
-        the calls made.
+        the calls made. What ``func`` returns, or None when ``max_retries``
+        is 0 and it is not called at all.
 
         Raises AIProviderUnavailableError when the service timed out or could not
         be reached, AIProviderError for any other failure.
@@ -147,6 +155,7 @@ class AIProvider(ABC):
                 if _is_retryable(e) and _status_of(e) is None:
                     raise AIProviderUnavailableError(message) from e  # could not connect
                 raise AIProviderError(message) from e
+        return None
 
 
 class OpenAIProvider(AIProvider):
@@ -174,10 +183,10 @@ class OpenAIProvider(AIProvider):
         # gitstats retries itself (see _retry_with_backoff)
         self.client = openai.OpenAI(api_key=self.api_key, max_retries=0, timeout=self.timeout)
 
-    def generate_summary(self, data: dict[str, Any], prompt: str) -> str:
+    def generate_summary(self, data: dict[str, Any], prompt: str) -> str | None:
         """Generate summary using OpenAI API."""
 
-        def _call_api():
+        def _call_api() -> str | None:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
@@ -190,7 +199,9 @@ class OpenAIProvider(AIProvider):
                 temperature=0.7,
                 max_tokens=2000,
             )
-            return response.choices[0].message.content
+            # None when the model answers with something other than text
+            answer: str | None = response.choices[0].message.content
+            return answer
 
         return self._retry_with_backoff(_call_api)
 
@@ -221,10 +232,10 @@ class ClaudeProvider(AIProvider):
             api_key=self.api_key, max_retries=0, timeout=self.timeout
         )
 
-    def generate_summary(self, data: dict[str, Any], prompt: str) -> str:
+    def generate_summary(self, data: dict[str, Any], prompt: str) -> str | None:
         """Generate summary using Claude API."""
 
-        def _call_api():
+        def _call_api() -> str:
             # No temperature: current models and SDKs (anthropic 1.0 on) refuse it.
             # The answer is a few paragraphs; the room above that is for thinking.
             request = {
@@ -291,14 +302,14 @@ class GeminiProvider(AIProvider):
             ),
         )
 
-    def generate_summary(self, data: dict[str, Any], prompt: str) -> str:
+    def generate_summary(self, data: dict[str, Any], prompt: str) -> str | None:
         """Generate summary using Gemini API."""
 
-        def _call_api():
+        def _call_api() -> str:
             response = self.client.models.generate_content(model=self.model_name, contents=prompt)
             # the answer's text, without the thoughts before it; None when the
             # model stopped before writing any (it was blocked, or ran out of room)
-            text = (response.text or "").strip()
+            text: str = (response.text or "").strip()
             if not text:
                 raise AIProviderError(f"{self.model_name} gave no text{self._why_not(response)}")
             return text
@@ -343,10 +354,10 @@ class OllamaProvider(AIProvider):
         self.base_url = config.get("base_url", "http://localhost:11434")
         self.model = _get_model_with_fallback(config, "llama2")
 
-    def generate_summary(self, data: dict[str, Any], prompt: str) -> str:
+    def generate_summary(self, data: dict[str, Any], prompt: str) -> str | None:
         """Generate summary using Ollama API."""
 
-        def _call_api():
+        def _call_api() -> str:
             url = f"{self.base_url}/api/generate"
             response = self.requests.post(
                 url,
@@ -369,7 +380,8 @@ class OllamaProvider(AIProvider):
                 raise AIProviderError(f"Ollama: {error}")
             if not isinstance(answer, dict) or not isinstance(answer.get("response"), str):
                 raise AIProviderError(f"{url} did not answer as Ollama does")
-            return answer["response"]
+            text: str = answer["response"]
+            return text
 
         return self._retry_with_backoff(_call_api)
 
@@ -410,6 +422,6 @@ class AIProviderFactory:
         return provider_class(config)
 
     @classmethod
-    def list_providers(cls) -> list:
+    def list_providers(cls) -> list[str]:
         """Get list of supported provider names."""
         return list(cls._providers.keys())

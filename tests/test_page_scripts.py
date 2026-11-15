@@ -10,7 +10,8 @@ import tempfile
 import pytest
 
 from gitstats.aggregate import GROUP_FILTER_SCRIPT
-from gitstats.report_creator import HOTSPOTS_SCRIPT
+from gitstats.pages.hotspots import HOTSPOTS_SCRIPT
+from gitstats.wrapped import WRAPPED_SCRIPT
 
 NODE = shutil.which("node")
 pytestmark = pytest.mark.skipif(NODE is None, reason="Node is not installed")
@@ -268,3 +269,88 @@ def test_the_skip_link_keeps_the_group():
     assert _groups_after("#group=py", "") == ["py", "py", "web"]
     # a page opened at #main shows every group
     assert _groups_after("#main", "#main") == ["py", "py", "web"]
+
+
+# ── the Repo Wrapped page ────────────────────────────────────────────────
+
+
+def _wrapped_page(data, address):
+    """Run the Wrapped page's script with ``data`` as the page carries it, as
+    if it were opened at ``address``; then copy the line and save the PNG.
+    What the page shows and does: the line, the two links, what was copied
+    and what was saved."""
+    script = WRAPPED_SCRIPT.split("<script>", 1)[1].rsplit("</script>", 1)[0]
+    stubs = f"""
+    const nodes = {{}};
+    const clicks = {{}};
+    function node(id) {{
+      return nodes[id] = nodes[id] || {{id, textContent: "", href: "", classList: {{add() {{}}, remove() {{}}}},
+        querySelector: () => ({{textContent: ""}}),
+        addEventListener(name, fn) {{ clicks[id] = fn; }}}};
+    }}
+    node("wrapped-data").textContent = {json.dumps(json.dumps(data))};
+    const document = {{getElementById: node, createElement(tag) {{
+      if (tag === "canvas") return {{getContext: () => ({{drawImage(image, x, y, w, h) {{ saved.drawn = [w, h]; }}}}),
+        toBlob(done, type) {{ saved.type = type; done({{png: true}}); }}}};
+      return {{click() {{ saved.name = this.download; }}}};
+    }}}};
+    const address = new URL({json.dumps(address)});
+    const window = {{location: {{protocol: address.protocol, href: address.href}}}};
+    const copied = [];
+    const navigator = {{clipboard: {{writeText(text) {{ copied.push(text); return {{then() {{}}}}; }}}}}};
+    const saved = {{}};
+    const made = [];
+    class Blob {{ constructor(parts, options) {{ this.parts = parts; this.type = options.type; }} }}
+    URL.createObjectURL = blob => {{ made.push(blob); return "blob:" + made.length; }};
+    URL.revokeObjectURL = () => {{}};
+    class Image {{ set src(value) {{ this.onload(); }} }}
+    """
+    body = """
+    clicks["wrapped-copy"]();
+    clicks["wrapped-png"]();
+    console.log(JSON.stringify({text: nodes["wrapped-text"].textContent, x: nodes["wrapped-x"].href,
+      bluesky: nodes["wrapped-bluesky"].href, copied, saved, svg: [made[0].parts[0], made[0].type]}));
+    """
+    return _run(stubs + script + body)
+
+
+_WRAPPED_DATA = {
+    "svg": "<svg>card</svg>",
+    "png": "wrapped-2026.png",
+    "size": 1080,
+    "text": "repo in 2026: 170 commits (+121% on 2025). #RepoWrapped",
+    "url": "",
+}
+
+
+def test_the_wrapped_page_posts_the_line_with_its_own_address():
+    page = _wrapped_page(_WRAPPED_DATA, "https://example.org/r/wrapped.html?x=1#main")
+    line = _WRAPPED_DATA["text"] + " https://example.org/r/wrapped.html"
+    assert page["text"] == line
+    assert page["copied"] == [line]
+    encoded = (
+        "repo%20in%202026%3A%20170%20commits%20(%2B121%25%20on%202025).%20%23RepoWrapped"
+        "%20https%3A%2F%2Fexample.org%2Fr%2Fwrapped.html"
+    )
+    assert page["x"] == "https://twitter.com/intent/tweet?text=" + encoded
+    assert page["bluesky"] == "https://bsky.app/intent/compose?text=" + encoded
+
+
+def test_the_wrapped_page_takes_the_address_it_was_given():
+    data = {**_WRAPPED_DATA, "url": "https://reports.example.com/wrapped.html"}
+    page = _wrapped_page(data, "https://mirror.example.net/elsewhere.html")
+    assert page["text"].endswith("#RepoWrapped https://reports.example.com/wrapped.html")
+
+
+def test_the_wrapped_page_opened_from_a_file_posts_the_line_alone():
+    page = _wrapped_page(_WRAPPED_DATA, "file:///home/me/report/wrapped.html")
+    assert page["text"] == _WRAPPED_DATA["text"]
+    assert page["copied"] == [_WRAPPED_DATA["text"]]
+    assert "file" not in page["x"]
+
+
+def test_the_wrapped_page_saves_the_card_it_carries_as_a_png():
+    page = _wrapped_page(_WRAPPED_DATA, "file:///home/me/report/wrapped.html")
+    # drawn from the SVG in the page, at the card's size, and saved under its name
+    assert page["svg"] == ["<svg>card</svg>", "image/svg+xml"]
+    assert page["saved"] == {"drawn": [1080, 1080], "type": "image/png", "name": "wrapped-2026.png"}

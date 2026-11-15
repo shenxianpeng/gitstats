@@ -15,13 +15,14 @@ import os
 import re
 import sys
 from dataclasses import dataclass
+from typing import Any
 
 # a report's folder, and the end of its address: never more than this
 _ID = re.compile(r"[a-z0-9][a-z0-9-]{0,62}")
 _URL = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*/[A-Za-z0-9_.-]+")
 # folders of the gallery's own: a report there would mix with them, and the
 # deploy, which removes a report folder without a summary.json, would remove them
-RESERVED_IDS = frozenset({"ai", "orgs", "ecosystems"})
+RESERVED_IDS = frozenset({"ai", "orgs", "ecosystems", "wrapped"})
 DEFAULT_TIMEOUT = 90
 # GitHub Actions: a matrix has at most 256 jobs, and a job runs at most 6 hours
 MAX_REPOS = 256
@@ -78,7 +79,7 @@ def parse_repos(data: object) -> tuple[list[Group], list[Repo]]:
     return groups, repos
 
 
-def _parse_group(group: object, taken: set[str]) -> tuple[Group, list]:
+def _parse_group(group: object, taken: set[str]) -> tuple[Group, list[Any]]:
     """One group, and the entries of its repositories."""
     if not isinstance(group, dict):
         raise RepoListError(f"not a group: {group!r}")
@@ -114,7 +115,7 @@ def _parse_repo(entry: object, group_id: str) -> Repo:
     return Repo(repo_id, _text(entry, "name", repo_id), url, group_id, timeout)
 
 
-def _text(mapping: dict, key: str, where: str) -> str:
+def _text(mapping: dict[str, Any], key: str, where: str) -> str:
     value = mapping.get(key)
     if not isinstance(value, str) or not value.strip():
         raise RepoListError(f"{where}: {key} is missing")
@@ -158,7 +159,7 @@ def load_repos(path: str) -> tuple[list[Group], list[Repo]]:
     return parse_repos(data)
 
 
-def matrix(repos: list[Repo]) -> list[dict]:
+def matrix(repos: list[Repo]) -> list[dict[str, Any]]:
     """The job matrix of the workflow: one entry for each repository."""
     return [
         {"id": r.id, "name": r.name, "url": r.url, "group": r.group, "timeout": r.timeout}

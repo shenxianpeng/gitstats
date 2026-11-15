@@ -18,6 +18,9 @@ have no report, so one that failed does not stop the others. Each ecosystem
 also gets its ranking page under ecosystems/ (see gallery_ecosystems.py),
 and the gallery its sitemap.xml when ``--site-url`` is given.
 
+The reports made with ``--wrapped`` have a Repo Wrapped card each: the
+gallery then gets a page of them all under wrapped/ (see gallery_wrapped.py).
+
 ``--site-url`` is the gallery's public address; with ``--share-card`` too, its
 pages point to their share cards as images (share-card.png and
 ai-share-card.png), which are left to render from the HTML the script writes.
@@ -36,12 +39,14 @@ import html
 import json
 import os
 import sys
+from typing import Any
 
 from gitstats import load_config
 from gitstats.aggregate import AggregateReportCreator
 from gitstats.utils import get_version
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import gallery_wrapped  # noqa: E402
 from gallery_ecosystems import FOLDER, INDEX, in_a_sentence, write_ecosystems  # noqa: E402
 from gallery_repos import Group, Repo, RepoListError, load_repos  # noqa: E402
 
@@ -91,7 +96,7 @@ document.querySelectorAll('.gallery-note .badge-copy').forEach(function (button)
 </script>"""
 
 
-def load_gallery_summaries(gallery_root: str, ids: list[str] | None = None) -> list[dict]:
+def load_gallery_summaries(gallery_root: str, ids: list[str] | None = None) -> list[dict[str, Any]]:
     """Read every ``<gallery_root>/<dir>/summary.json``, one per repository;
     only those of ``ids``, when given, in that order.
 
@@ -131,7 +136,7 @@ def _inside(base: str, *parts: str) -> str:
         return ""
 
 
-def reports_version(summaries: list[dict]) -> str:
+def reports_version(summaries: list[dict[str, Any]]) -> str:
     """The version of gitstats that made the reports, when they all say the
     same one; "" when they do not."""
     versions = {str(summary.get("generated_by", "")) for summary in summaries}
@@ -155,10 +160,13 @@ def report_note(
     badge: bool,
     group: Group | None = None,
     compared: bool = False,
+    wrapped: int | None = None,
 ) -> str:
     """The note at the end of a report page: how the repository compares with
     the others, when ``compared``, the badge, when ``badge``, how it ranks in
-    its ``group``, and how to make the report for another repository."""
+    its ``group``, the gallery's Repo Wrapped page of the year ``wrapped``,
+    when the report has a card, and how to make the report for another
+    repository."""
     parts = [NOTE_MARK, '<section class="gallery-note" id="gallery-note">']
     if compared:
         peers = (
@@ -175,6 +183,11 @@ def report_note(
             f'<p class="more-link"><a href="../{FOLDER}/{group.id}.html">How {html.escape(name)} '
             f"ranks among {html.escape(in_a_sentence(group.title))} by AI-assisted commits "
             "&rarr;</a></p>"
+        )
+    if wrapped:
+        parts.append(
+            f'<p class="more-link"><a href="../{gallery_wrapped.FOLDER}/{gallery_wrapped.INDEX}">'
+            f"Repo Wrapped {wrapped}: the year in every project of the Gallery &rarr;</a></p>"
         )
     if badge:
         code = badge_markdown(report_id, name, site_url)
@@ -268,19 +281,26 @@ def add_note(base: str, page: str, note: str) -> bool:
 
 
 def _report_pages(folder: str) -> list[str]:
-    """The pages of a report to read: not its share card, nor the comparison
+    """The pages of a report to read: not its share cards, nor the comparison
     page and card the portfolio wrote next to them."""
     return [
         entry
         for entry in sorted(os.listdir(folder))
-        if entry.endswith(".html") and not entry.startswith(("share-card", "compare"))
+        if entry.endswith(".html")
+        and not entry.startswith(("share-card", "compare", "wrapped-card"))
     ]
 
 
 def _add_report_note(
-    base: str, summary: dict, site_url: str, groups: dict[str, Group] | None = None
+    base: str,
+    summary: dict[str, Any],
+    site_url: str,
+    groups: dict[str, Group] | None = None,
+    wrapped: dict[str, int] | None = None,
 ) -> int:
-    """Add the note to every page of one report; how many pages got it."""
+    """Add the note to every page of one report; how many pages got it.
+    ``wrapped``: the year of the gallery's Repo Wrapped page, for each report
+    that is on it."""
     report_id = summary["report_path"].split("/", 1)[0]
     folder = _inside(base, report_id)
     if not folder or folder == base or not os.path.isdir(folder):
@@ -292,19 +312,31 @@ def _add_report_note(
     added = 0
     for entry in _report_pages(folder):
         note = report_note(
-            report_id, name, site_url, badge and entry == "index.html", group, compared
+            report_id,
+            name,
+            site_url,
+            badge and entry == "index.html",
+            group,
+            compared,
+            (wrapped or {}).get(report_id),
         )
         added += add_note(base, os.path.join(folder, entry), note)
     return added
 
 
 def add_report_notes(
-    gallery_root: str, summaries: list[dict], site_url: str, groups: list[Group] | None = None
+    gallery_root: str,
+    summaries: list[dict[str, Any]],
+    site_url: str,
+    groups: list[Group] | None = None,
+    wrapped: dict[str, int] | None = None,
 ) -> int:
-    """Add the note to every page of each report; how many pages got it."""
+    """Add the note to every page of each report; how many pages got it.
+    ``wrapped``: the year of the gallery's Repo Wrapped page, for each report
+    that is on it."""
     base = os.path.realpath(gallery_root)
     by_id = {group.id: group for group in groups or []}
-    added = sum(_add_report_note(base, summary, site_url, by_id) for summary in summaries)
+    added = sum(_add_report_note(base, summary, site_url, by_id, wrapped) for summary in summaries)
     for entry in ("index.html", "ai.html", "organizations.html"):
         page = os.path.join(base, entry)
         if os.path.isfile(page):
@@ -314,7 +346,7 @@ def add_report_notes(
 
 def _listed_summaries(
     gallery_root: str, repos_file: str
-) -> tuple[list[dict], list[Group], list[Repo], list[dict[str, str]]]:
+) -> tuple[list[dict[str, Any]], list[Group], list[Repo], list[dict[str, str]]]:
     """The summaries of the repositories of the list, each with its group;
     the groups and the repositories of the list; and those without a report."""
     repo_groups, repos = load_repos(repos_file)
@@ -335,6 +367,51 @@ def _listed_summaries(
     for failure in failures:
         print(f"{failure['name']}: {failure['error']}", file=sys.stderr)
     return summaries, repo_groups, repos, failures
+
+
+def _wrapped_cards(
+    gallery_root: str, summaries: list[dict[str, Any]]
+) -> tuple[list[tuple[str, str]], list[dict[str, Any]]]:
+    """The cards of the reports made with --wrapped, those of the year most of
+    them are for, and before them the tab that leads to the gallery's page of
+    them: none without a card."""
+    year, cards = gallery_wrapped.cards_of_the_year(
+        gallery_wrapped.load_cards(gallery_root, summaries)
+    )
+    tab = f"{gallery_wrapped.FOLDER}/{gallery_wrapped.INDEX}"
+    return ([(tab, f"Wrapped {year}")] if cards else []), cards
+
+
+def _portfolio_tabs(gallery_root: str) -> list[tuple[str, str]]:
+    """The pages the portfolio wrote next to its index, as the nav of another
+    page leads to them."""
+    return [
+        (page, label)
+        for page, label in (
+            ("ai.html", "AI-assisted commits"),
+            ("organizations.html", "Organizations"),
+        )
+        if os.path.isfile(os.path.join(gallery_root, page))
+    ]
+
+
+def _what_was_written(
+    gallery_root: str,
+    summaries: list[dict[str, Any]],
+    failures: list[dict[str, str]],
+    ecosystems: list[Group],
+    cards: list[dict[str, Any]],
+    pages: int,
+) -> str:
+    """What a run wrote, in a line."""
+    line = f"Portfolio page written for {len(summaries)} repositories: {gallery_root}/index.html"
+    if failures:
+        line += f" ({len(failures)} without a report)"
+    if ecosystems:
+        line += f"; {len(ecosystems)} ecosystem pages"
+    if cards:
+        line += f"; Repo Wrapped {cards[0]['year']} of {len(cards)}"
+    return f"{line}; notes added to {pages} pages"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -375,6 +452,11 @@ def main(argv: list[str] | None = None) -> int:
     version = get_version()
     if version == "dev":
         version = reports_version(summaries) or version
+    # the reports made with --wrapped: their cards have a page of the gallery's
+    wrapped_tab, cards = _wrapped_cards(gallery_root, summaries)
+    # each listed repository is in a group: with groups, there are ecosystem
+    # pages, written below
+    ecosystems_tab = [(f"{FOLDER}/{INDEX}", "Ecosystems")] if groups else []
     AggregateReportCreator().create(
         summaries,
         failures,
@@ -384,20 +466,36 @@ def main(argv: list[str] | None = None) -> int:
         version=version,
         groups=[(group.id, group.name) for group in groups],
         group_titles={group.id: in_a_sentence(group.title) for group in groups},
-        # each listed repository is in a group: with groups, there are
-        # ecosystem pages, written below
-        nav=[(f"{FOLDER}/{INDEX}", "Ecosystems")] if groups else [],
+        nav=ecosystems_tab + wrapped_tab,
     )
     ecosystems = write_ecosystems(
-        gallery_root, groups, repos, summaries, site_url, args.share_card, version
+        gallery_root,
+        groups,
+        repos,
+        summaries,
+        site_url,
+        args.share_card,
+        version,
+        tabs=wrapped_tab,
     )
-    pages = add_report_notes(gallery_root, summaries, site_url, ecosystems)
-    print(
-        f"Portfolio page written for {len(summaries)} repositories: {gallery_root}/index.html"
-        + (f" ({len(failures)} without a report)" if failures else "")
-        + (f"; {len(ecosystems)} ecosystem pages" if ecosystems else "")
-        + f"; notes added to {pages} pages"
+    gallery_wrapped.write_wrapped(
+        gallery_root,
+        cards,
+        {group.id: group.name for group in groups},
+        # the pages the portfolio wrote, and the ecosystems' when they have one
+        _portfolio_tabs(gallery_root) + (ecosystems_tab if ecosystems else []),
+        site_url,
+        args.share_card,
+        version,
     )
+    pages = add_report_notes(
+        gallery_root,
+        summaries,
+        site_url,
+        ecosystems,
+        {card["id"]: card["year"] for card in cards},
+    )
+    print(_what_was_written(gallery_root, summaries, failures, ecosystems, cards, pages))
     return 0
 
 

@@ -111,6 +111,7 @@ def _set_config(**kwargs):
     # Also update module-level conf variables
     gitstats.utils.conf = cfg
     gitstats.main.conf = cfg
+    gitstats.collector.conf = cfg
     gitstats.report_creator.conf = cfg
 
 

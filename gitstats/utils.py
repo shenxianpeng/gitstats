@@ -17,9 +17,12 @@ from concurrent.futures import ThreadPoolExecutor
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any, NamedTuple
 
-from gitstats import ON_LINUX, check_git_settings, exectime_external, load_config
+from gitstats import ON_LINUX, check_git_settings, load_config
 
 logger = logging.getLogger("gitstats")
+
+# seconds spent in the commands run, added up as each ends: main() reports them
+exectime_external: float = 0.0
 
 _WC_L_CMD = "wc -l"
 
@@ -1138,3 +1141,17 @@ def _reversed_date(date: str) -> tuple[int, ...]:
         return (0, *(-int(part) for part in date.split("-")))
     except ValueError:
         return (1,)
+
+
+def is_bot(name: str) -> bool:
+    """Bot accounts are named like ``dependabot[bot]``."""
+    return name.endswith("[bot]")
+
+
+def get_keys_sorted_by_values(d: dict[str, int]) -> list[str]:
+    return [el[1] for el in sorted([(el[1], el[0]) for el in d.items()])]
+
+
+# dict['author'] = { 'commits': 512 } - ...key(dict, 'commits')
+def get_keys_sorted_by_value_key(d: dict[str, dict[str, Any]], key: str) -> list[str]:
+    return [el[1] for el in sorted([(d[el][key], el) for el in d.keys()])]

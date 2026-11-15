@@ -452,6 +452,7 @@ def mock_data_collector_with_ai_error(mock_data_collector):
 def reset_config():
     """Reset the cached config before each test to avoid cross-test pollution."""
     import gitstats
+    import gitstats.collector
     import gitstats.main
     import gitstats.report_creator
     import gitstats.utils
@@ -463,9 +464,11 @@ def reset_config():
     gitstats.utils._last_commits.clear()
     gitstats.utils.conf = cfg
     gitstats.main.conf = cfg
+    gitstats.collector.conf = cfg
     gitstats.report_creator.conf = cfg
     yield
     gitstats._config = None
     gitstats.utils.conf = gitstats.DEFAULT_CONFIG.copy()
     gitstats.main.conf = gitstats.DEFAULT_CONFIG.copy()
+    gitstats.collector.conf = gitstats.DEFAULT_CONFIG.copy()
     gitstats.report_creator.conf = gitstats.DEFAULT_CONFIG.copy()

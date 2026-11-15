@@ -32,7 +32,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from gitstats.compare import complete_ai, ordinal
-from gitstats.report_creator import html_header, percent_text
+from gitstats.markup import html_header, percent_text
 
 EXTREME = 0.85  # in the top or bottom 15% of the portfolio
 MIN_VALUES = 10  # fewer projects with a value, and a place says nothing

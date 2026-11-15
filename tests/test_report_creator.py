@@ -10,42 +10,40 @@ from types import SimpleNamespace
 import pytest
 
 from gitstats import load_config
-from gitstats.main import GitDataCollector
-from gitstats.report_creator import (
-    BADGES_PLACEHOLDER_URL,
+from gitstats.collector import GitDataCollector
+from gitstats.history import _classify_eras, compute_project_history, parse_chronicle
+from gitstats.markup import (
     NAV_PAGES,
     NAV_START,
     SKIP_LINK,
-    HTMLReportCreator,
-    ReportCreator,
-    _classify_eras,
     author_html,
+    html_header,
+    html_linkify,
+    page_title,
+    share_text,
+    stat_tiles_html,
+)
+from gitstats.ownership import compute_code_ownership, compute_hotspots
+from gitstats.pages.badges import BADGES_PLACEHOLDER_URL
+from gitstats.periods import (
     collapse_gap_categories,
     collapse_gap_time,
     collapsed_slots,
     collapsed_width,
-    compute_code_ownership,
-    compute_hotspots,
-    compute_project_history,
     gap_annotations,
-    get_keys_sorted_by_value_key,
-    get_keys_sorted_by_values,
-    html_header,
-    html_linkify,
     longest_zero_run,
     month_range,
     months_back,
-    page_title,
-    parse_chronicle,
     quiet_months,
-    report_share_card_html,
-    report_share_description,
-    share_meta_html,
-    share_text,
-    stat_tiles_html,
     sum_since,
-    tags_newest_first,
     year_span,
+)
+from gitstats.report_creator import HTMLReportCreator, ReportCreator
+from gitstats.share_card import report_share_card_html, report_share_description, share_meta_html
+from gitstats.utils import (
+    get_keys_sorted_by_value_key,
+    get_keys_sorted_by_values,
+    tags_newest_first,
 )
 
 # ── html_linkify ─────────────────────────────────────────────────────────
@@ -869,7 +867,7 @@ def test_weekly_activity_labels_weeks_by_monday(mock_data_collector, monkeypatch
         def now(cls, tz=None):
             return cls(2026, 9, 25, 12, 0)  # a Friday; its week starts on Mon 21 Sep
 
-    monkeypatch.setattr("gitstats.report_creator.datetime.datetime", FixedDatetime)
+    monkeypatch.setattr("datetime.datetime", FixedDatetime)
     mock_data_collector.activity_by_year_week = {"2026-39": 7}  # the ISO week of 2026-09-21
     # the last commit in the same week
     mock_data_collector.last_commit_stamp = int(FixedDatetime(2026, 9, 22, 9, 0).timestamp())
@@ -899,7 +897,7 @@ def test_weekly_activity_keeps_the_week_of_new_year_whole(mock_data_collector, m
         def now(cls, tz=None):
             return cls(2026, 9, 25, 12, 0)
 
-    monkeypatch.setattr("gitstats.report_creator.datetime.datetime", FixedDatetime)
+    monkeypatch.setattr("datetime.datetime", FixedDatetime)
     mock_data_collector.last_commit_stamp = int(FixedDatetime(2025, 1, 2, 10, 0).timestamp())
     collector = GitDataCollector()
     for day in (30, 31, 31):
@@ -921,7 +919,7 @@ def test_weekly_activity_ends_at_the_last_commit(mock_data_collector, monkeypatc
         def now(cls, tz=None):
             return cls(2026, 9, 25, 12, 0)
 
-    monkeypatch.setattr("gitstats.report_creator.datetime.datetime", FixedDatetime)
+    monkeypatch.setattr("datetime.datetime", FixedDatetime)
     # nothing since May 2021: 32 weeks up to today would all be empty
     mock_data_collector.last_commit_stamp = int(FixedDatetime(2021, 5, 1, 10, 0).timestamp())
     mock_data_collector.activity_by_year_week = {"2021-16": 3}  # the week of 2021-04-19
@@ -2939,7 +2937,7 @@ def test_render_chartjs_collapses_a_long_gap_on_a_year_axis():
 
 
 def test_chart_script_knows_how_to_draw_a_collapsed_stretch():
-    from gitstats.report_creator import CHART_SCRIPT
+    from gitstats.charts import CHART_SCRIPT
 
     for name in ("function squeezeTime(gap, ms)", "function stretchTime(gap, at)"):
         assert name in CHART_SCRIPT
@@ -2980,7 +2978,7 @@ def test_authors_page_states_the_top_n_once_per_section(mock_data_collector, tem
     from unittest.mock import patch
 
     config = {**load_config(), "max_authors": 2, "max_authors_list": 10}
-    with patch("gitstats.report_creator.load_config", return_value=config):
+    with patch("gitstats.pages.authors.load_config", return_value=config):
         HTMLReportCreator().create(mock_data_collector, temp_dir)
     with open(os.path.join(temp_dir, "authors.html"), encoding="utf-8") as f:
         html = f.read()
@@ -3196,6 +3194,8 @@ def test_badges_page_shows_the_wrapped_card(mock_data_collector, temp_dir):
     ) in section
     assert 'aria-label="Copy Markdown for wrapped-2023.svg"' in section
     assert '<a href="wrapped-2023.svg" download>Download SVG &rarr;</a>' in section
+    # and the card's own page, where it is saved as a PNG and shared
+    assert '<a href="wrapped.html">Its page, with a PNG to share &rarr;</a>' in section
     # it comes after the badges
     assert content.index('<h2 id="other_ways_to_use_them">') < content.index(
         '<h2 id="repo_wrapped">'
@@ -3212,7 +3212,7 @@ def test_badges_page_without_a_wrapped_card_says_how_to_get_one(mock_data_collec
 
 
 def test_badges_script_gives_the_card_its_own_file_and_a_width():
-    from gitstats.report_creator import BADGES_SCRIPT
+    from gitstats.pages.badges import BADGES_SCRIPT
 
     assert "if (kind === 'card') { path = name; alt = row.getAttribute('data-alt'); }" in (
         BADGES_SCRIPT
@@ -3228,7 +3228,8 @@ def test_history_links_the_wrapped_card_from_its_year(mock_data_collector, temp_
     card = {"year": 2023, "theme": "midnight", "file": "wrapped-2023.svg"}
     history = _report_with_card(mock_data_collector, temp_dir, card)("history.html")
 
-    link = '<p class="history-people"><a href="wrapped-2023.svg">Wrapped card &rarr;</a></p>'
+    # to the card's page, whatever its file is called
+    link = '<p class="history-people"><a href="wrapped.html">Wrapped card &rarr;</a></p>'
     assert history.count(link) == 1
     # in the entry for 2023, not the one for 2022
     assert history.index('<span class="history-year-num">2023</span>') < history.index(link)
@@ -3818,6 +3819,67 @@ def test_report_pages_carry_their_share_tags(mock_data_collector, temp_dir, monk
     assert "<h1>test-project</h1>" in _read_page(temp_dir, "share-card.html")
 
 
+def test_the_wrapped_page_gets_its_own_title_card_and_sentence(monkeypatch):
+    """The page gitstats.wrapped writes around the card: its header is the
+    report's, with the year in its title and its own share card."""
+    creator = HTMLReportCreator()
+    creator.title = "my-project"
+    creator.share_description = "my-project: 50 commits by 3 authors."
+    creator.site_url = "https://example.com/r/"
+    creator.wrapped_card = {"year": 2023, "theme": "midnight", "file": "wrapped-2023.svg"}
+    monkeypatch.setitem(load_config(), "share_card", True)
+
+    f = StringIO()
+    creator.print_header(f, "wrapped.html", image="wrapped-card.png", description="A year.")
+    header = f.getvalue()
+    assert "<title>GitStats - my-project: Repo Wrapped 2023</title>" in header
+    assert '<meta property="og:title" content="my-project: Repo Wrapped 2023">' in header
+    assert '<meta property="og:url" content="https://example.com/r/wrapped.html">' in header
+    assert '<meta property="og:image" content="https://example.com/r/wrapped-card.png">' in header
+    assert '<meta name="description" content="A year.">' in header
+    assert "50 commits by 3 authors" not in header
+
+    # the other pages keep the report's card and its sentence
+    f = StringIO()
+    creator.print_header(f, "authors.html")
+    assert '<meta property="og:image" content="https://example.com/r/share-card.png">' in (
+        f.getvalue()
+    )
+    assert '<meta name="description" content="my-project: 50 commits by 3 authors.">' in (
+        f.getvalue()
+    )
+
+    # without a card there is no such page to name
+    creator.wrapped_card = None
+    f = StringIO()
+    creator.print_header(f, "wrapped.html")
+    assert "<title>GitStats - my-project</title>" in f.getvalue()
+
+
+def test_nav_links_the_wrapped_page_when_there_is_a_card(mock_data_collector, temp_dir):
+    card = {"year": 2023, "theme": "midnight", "file": "wrapped-2023.svg"}
+    index = _report_with_card(mock_data_collector, temp_dir, card)("index.html")
+    # after the Badges, where the card is also shown
+    assert (
+        '<li><a href="badges.html">Badges</a></li>\n'
+        '            <li><a href="wrapped.html">Wrapped</a></li>'
+    ) in index
+
+    plain = _report_with_card(mock_data_collector, temp_dir, None)("index.html")
+    assert "wrapped.html" not in plain
+
+    # on the page itself the link is the current one
+    creator = HTMLReportCreator()
+    creator.data = mock_data_collector
+    creator.wrapped_card = card
+    f = StringIO()
+    creator.print_nav(f, "wrapped.html")
+    assert (
+        '<li><a href="wrapped.html" class="active" aria-current="page">Wrapped</a></li>'
+        in f.getvalue()
+    )
+
+
 def test_report_pages_without_share_card(mock_data_collector, temp_dir):
     creator = HTMLReportCreator()
     creator.site_url = "https://example.com/r/"
@@ -3903,7 +3965,7 @@ def test_organizations_section_is_left_out_without_any(mock_data_collector):
 
 def test_overview_keeps_an_empty_place_for_what_stands_out(mock_data_collector, temp_dir):
     """A report made alone shows nothing there; a portfolio fills it."""
-    from gitstats.report_creator import INSIGHTS_END, INSIGHTS_START
+    from gitstats.markup import INSIGHTS_END, INSIGHTS_START
 
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     page = _read_page(temp_dir, "index.html")
@@ -3916,7 +3978,7 @@ def test_overview_keeps_an_empty_place_for_what_stands_out(mock_data_collector, 
 
 
 def test_plural():
-    from gitstats.report_creator import plural
+    from gitstats.markup import plural
 
     assert plural(1, "commit") == "1 commit"
     assert plural(0, "commit") == "0 commits"
@@ -3947,7 +4009,7 @@ def test_a_one_commit_report_says_its_counts_in_the_singular(mock_data_collector
 
 
 def test_chart_label():
-    from gitstats.report_creator import chart_label
+    from gitstats.charts import chart_label
 
     assert chart_label("chart-commits-by-year", "bar", [2019, 2026]) == (
         "Bar chart of commits per year, 2019 to 2026"
@@ -3981,7 +4043,7 @@ def test_render_chartjs_shows_the_points_of_a_short_line():
 
 
 def test_time_axis_widens_around_a_single_moment():
-    from gitstats.report_creator import CHART_SCRIPT
+    from gitstats.charts import CHART_SCRIPT
 
     assert "if (xs.length && min === max) {" in CHART_SCRIPT
     assert "min -= 15 * 864e5;" in CHART_SCRIPT
@@ -4009,7 +4071,7 @@ def test_time_axis_widens_around_a_single_moment():
     ],
 )
 def test_tag_authors_html(count, limit, expected):
-    from gitstats.report_creator import tag_authors_html
+    from gitstats.markup import tag_authors_html
 
     names = [f"A{n}" for n in range(count)]
     commits = {name: 10 - n for n, name in enumerate(names)}
@@ -4033,7 +4095,7 @@ def test_tags_page_folds_long_author_lists(mock_data_collector, temp_dir):
 def test_a_year_whose_lines_count_in_a_later_one(mock_data_collector, temp_dir):
     """Along the main line of history, a branch's lines count in the year it
     is merged: the years of its commits show a dash, and why."""
-    from gitstats.report_creator import FIRST_PARENT_LINES
+    from gitstats.markup import FIRST_PARENT_LINES
 
     data = mock_data_collector
     data.commits_by_year = {2023: 50, 2024: 2}
@@ -4056,7 +4118,7 @@ def test_a_year_whose_lines_count_in_a_later_one(mock_data_collector, temp_dir):
 
 def test_lines_uncounted_only_along_the_main_line(monkeypatch):
     import gitstats
-    from gitstats.report_creator import lines_uncounted
+    from gitstats.markup import lines_uncounted
 
     assert lines_uncounted(2, 0, 0) is True
     assert lines_uncounted(2, 1, 0) is False
@@ -4067,7 +4129,7 @@ def test_lines_uncounted_only_along_the_main_line(monkeypatch):
 
 
 def test_report_nav_starts_with_its_brand(mock_data_collector):
-    from gitstats.report_creator import REPORT_BRAND
+    from gitstats.markup import REPORT_BRAND
 
     creator = HTMLReportCreator()
     creator.data = mock_data_collector
