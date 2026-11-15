@@ -96,11 +96,19 @@ Google's advanced AI model for analysis and insights.
 
    export GOOGLE_API_KEY=...
 
+``GEMINI_API_KEY`` is read as well; ``GOOGLE_API_KEY`` is the one used when
+both are set.
+
 **Usage:**
 
 .. code-block:: bash
 
    gitstats --ai --ai-provider gemini /path/to/repo output/
+
+The default model is ``gemini-3.5-flash-lite``; ``--ai-model`` picks another
+one, such as ``gemini-3.8-flash``. It needs ``google-genai`` 2.33 or later,
+which ``pip install gitstats[ai]`` installs: the ``google-generativeai``
+package gitstats used before is no longer supported by Google.
 
 Ollama (Local LLM)
 ~~~~~~~~~~~~~~~~~~

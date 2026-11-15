@@ -87,7 +87,7 @@ credentials:
   a warning that names them. Set them on the command line (``--ai``,
   ``--ai-provider``, ``--ai-model``, ``--ai-language``, ``--site-url`` or
   ``-c key=value``), and API keys in the environment (``OPENAI_API_KEY``,
-  ``ANTHROPIC_API_KEY``, ``GOOGLE_API_KEY``). See :doc:`ai-integration`.
+  ``ANTHROPIC_API_KEY``, ``GOOGLE_API_KEY`` or ``GEMINI_API_KEY``). See :doc:`ai-integration`.
 * ``commit_begin``, ``commit_end``, ``start_date``, ``end_date`` and
   ``authors`` go on git's command line. gitstats stops with an error when one
   of them could be read as something else (a revision that starts with ``-``

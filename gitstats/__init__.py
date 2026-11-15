@@ -53,7 +53,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "ai_enabled": False,  # Enable AI-powered summaries (requires AI provider configuration).
     "ai_provider": "openai",  # AI provider: openai, claude, gemini, ollama.
     "ai_api_key": "",  # API key for AI provider (can also use environment variables).
-    "ai_model": "",  # AI model to use (e.g., gpt-4, claude-opus-5-5, gemini-2.5-flash, llama2).
+    "ai_model": "",  # AI model to use (e.g., gpt-4, claude-opus-5-5, gemini-3.5-flash-lite, llama2).
     "ai_language": "en",  # Language of the AI summaries; en, zh, ja, ko, es, fr and de also for the page's headings.
     "ai_cache_enabled": True,  # Cache AI-generated summaries to save API costs.
     "ai_max_retries": 3,  # Maximum retry attempts for AI API calls.
