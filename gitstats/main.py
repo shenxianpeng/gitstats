@@ -2063,7 +2063,7 @@ def get_parser() -> argparse.ArgumentParser:
 
     parser.add_argument(
         "--ai-model",
-        help="AI model to use (e.g., gpt-4, claude-opus-5-5, gemini-2.5-flash, llama2)",
+        help="AI model to use (e.g., gpt-4, claude-opus-5-5, gemini-3.5-flash-lite, llama2)",
     )
 
     parser.add_argument(

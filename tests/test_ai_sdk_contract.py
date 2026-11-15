@@ -107,23 +107,39 @@ class TestClaude:
 
 
 class TestGemini:
-    """``GeminiProvider`` against the installed ``google-generativeai``."""
+    """``GeminiProvider`` against the installed ``google-genai``."""
 
-    def test_the_model_is_configured_and_built_the_same_way(self):
-        pytest.importorskip("google.generativeai")
-        provider = AIProviderFactory.create("gemini", {"api_key": KEY})
-        assert provider.model is not None
+    def test_the_client_takes_our_retry_and_timeout_settings(self):
+        genai = pytest.importorskip("google.genai")
+        assert_takes(genai.Client, "api_key", "http_options")
+        # the timeout, in milliseconds, and how many attempts the SDK makes
+        assert_has_fields(genai.types.HttpOptions, "timeout", "retry_options")
+        assert_has_fields(genai.types.HttpRetryOptions, "attempts")
+        provider = AIProviderFactory.create("gemini", {"api_key": KEY, "timeout": TIMEOUT})
+        assert provider.client is not None
 
-    def test_the_generate_call_takes_the_request_options(self):
-        pytest.importorskip("google.generativeai")
+    def test_the_generate_call_takes_what_the_provider_passes(self):
+        pytest.importorskip("google.genai")
         provider = AIProviderFactory.create("gemini", {"api_key": KEY})
-        # the timeout rides in request_options, not as a keyword of its own
-        assert_takes(provider.model.generate_content, "request_options")
+        assert_takes(provider.client.models.generate_content, "model", "contents")
 
     def test_the_answer_is_still_read_the_same_way(self):
-        types = pytest.importorskip("google.generativeai.types")
+        types = pytest.importorskip("google.genai.types")
         # response.text
         assert isinstance(getattr(types.GenerateContentResponse, "text", None), property)
+        # and, of an answer without text, why: the block reason, or the finish reason
+        assert_has_fields(types.GenerateContentResponse, "prompt_feedback", "candidates")
+        assert_has_fields(types.GenerateContentResponsePromptFeedback, "block_reason")
+        assert_has_fields(types.Candidate, "finish_reason")
+
+    def test_an_error_carries_its_status_where_the_retries_look_for_it(self):
+        errors = pytest.importorskip("google.genai.errors")
+        from gitstats.ai_providers import _is_retryable, _status_of
+
+        busy = errors.APIError(429, {"error": {"message": "busy", "status": "RESOURCE_EXHAUSTED"}})
+        refused = errors.APIError(400, {"error": {"message": "bad key", "status": "INVALID"}})
+        assert (_status_of(busy), _status_of(refused)) == (429, 400)
+        assert _is_retryable(busy) and not _is_retryable(refused)
 
 
 class TestOllama:

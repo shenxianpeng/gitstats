@@ -12,6 +12,7 @@ import pytest
 
 from gitstats.ai_providers import (
     CLAUDE_DEFAULT_MODEL,
+    GEMINI_DEFAULT_MODEL,
     AIProvider,
     AIProviderError,
     AIProviderFactory,
@@ -50,7 +51,7 @@ def missing_module(monkeypatch):
 
 @pytest.fixture(autouse=True)
 def no_api_keys(monkeypatch):
-    for name in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GOOGLE_API_KEY"):
+    for name in ("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GOOGLE_API_KEY", "GEMINI_API_KEY"):
         monkeypatch.delenv(name, raising=False)
 
 
@@ -98,6 +99,14 @@ class APITimeoutError(Exception):
 
 class APIConnectionError(Exception):
     """Named as the SDKs name theirs."""
+
+
+class ConnectError(Exception):
+    """Named as httpx names its own, which the Gemini SDK lets through."""
+
+
+class ConnectTimeout(Exception):  # noqa: N818 - the name is httpx's, and what is tested
+    """httpx's: a connection that was not made in time is a timeout."""
 
 
 def test_provider_retry_settings_default():
@@ -163,7 +172,8 @@ def test_a_refused_request_is_not_retried(error):
 
 
 @pytest.mark.parametrize(
-    "error", [APITimeoutError("Request timed out."), TimeoutError("timed out")]
+    "error",
+    [APITimeoutError("Request timed out."), TimeoutError("timed out"), ConnectTimeout("timed out")],
 )
 def test_a_timeout_is_not_retried_and_says_the_service_is_unavailable(error):
     provider = _EchoProvider({"max_retries": 3, "retry_delay": 0, "timeout": 30})
@@ -178,7 +188,12 @@ def test_a_timeout_is_not_retried_and_says_the_service_is_unavailable(error):
 
 
 @pytest.mark.parametrize(
-    "error", [APIConnectionError("Connection error."), ConnectionRefusedError("refused")]
+    "error",
+    [
+        APIConnectionError("Connection error."),
+        ConnectionRefusedError("refused"),
+        ConnectError("[Errno 111] Connection refused"),
+    ],
 )
 def test_a_connection_error_is_retried_then_says_the_service_is_unavailable(error):
     provider = _EchoProvider({"max_retries": 2, "retry_delay": 0})
@@ -338,41 +353,124 @@ class TestClaudeProvider:
 # ── Gemini ───────────────────────────────────────────────────────────────
 
 
-def _install_genai(fake_module, model):
-    genai = fake_module(
-        "google.generativeai",
-        configure=MagicMock(),
-        GenerativeModel=MagicMock(return_value=model),
+def _install_genai(fake_module, client):
+    """Stand-ins for ``google.genai`` and its ``types``: the client the
+    provider is given, and the options it is built with as plain objects."""
+    options = fake_module(
+        "google.genai.types",
+        HttpOptions=lambda **fields: types.SimpleNamespace(**fields),
+        HttpRetryOptions=lambda **fields: types.SimpleNamespace(**fields),
     )
-    fake_module("google", generativeai=genai)
+    genai = fake_module("google.genai", Client=MagicMock(return_value=client), types=options)
+    fake_module("google", genai=genai)
     return genai
 
 
+def _answer(text, **fields):
+    client = MagicMock()
+    client.models.generate_content.return_value = types.SimpleNamespace(text=text, **fields)
+    return client
+
+
 class TestGeminiProvider:
-    def test_requires_the_package(self, missing_module):
-        missing_module("google.generativeai")
-        with pytest.raises(AIProviderError, match="google-generativeai package not installed"):
+    def test_requires_the_package(self, fake_module, missing_module):
+        # other packages of Google's may be installed: only this one is missing
+        fake_module("google")
+        missing_module("google.genai")
+        with pytest.raises(AIProviderError, match="google-genai package not installed"):
             GeminiProvider({"api_key": "test-key"})
 
     def test_requires_an_api_key(self, fake_module):
         _install_genai(fake_module, MagicMock())
-        with pytest.raises(AIProviderError, match="Gemini API key not found"):
+        with pytest.raises(AIProviderError, match="Set GOOGLE_API_KEY or GEMINI_API_KEY"):
             GeminiProvider({})
 
     def test_generate_summary(self, fake_module, monkeypatch):
-        model = MagicMock()
-        model.generate_content.return_value.text = "A growing project."
-        genai = _install_genai(fake_module, model)
+        client = _answer("  A growing project.\n")
+        genai = _install_genai(fake_module, client)
         monkeypatch.setenv("GOOGLE_API_KEY", "env-test-key")
 
         provider = GeminiProvider({"model": "test-model"})
         assert provider.generate_summary({}, "the prompt") == "A growing project."
 
-        genai.configure.assert_called_once_with(api_key="env-test-key")
-        genai.GenerativeModel.assert_called_once_with("test-model")
-        model.generate_content.assert_called_once_with(
-            "the prompt", request_options={"timeout": 120}
+        (call,) = genai.Client.call_args_list
+        assert call.kwargs["api_key"] == "env-test-key"
+        # two minutes, in the SDK's milliseconds, and no retries of its own
+        assert call.kwargs["http_options"].timeout == 120_000
+        assert call.kwargs["http_options"].retry_options.attempts == 1
+        client.models.generate_content.assert_called_once_with(
+            model="test-model", contents="the prompt"
         )
+
+    def test_the_key_under_either_name_and_the_configured_one_first(self, fake_module, monkeypatch):
+        genai = _install_genai(fake_module, MagicMock())
+        monkeypatch.setenv("GEMINI_API_KEY", "gemini-key")
+        assert GeminiProvider({}).api_key == "gemini-key"
+        # the SDK itself takes GOOGLE_API_KEY when both are set
+        monkeypatch.setenv("GOOGLE_API_KEY", "google-key")
+        assert GeminiProvider({}).api_key == "google-key"
+        assert GeminiProvider({"api_key": "configured"}).api_key == "configured"
+        assert [call.kwargs["api_key"] for call in genai.Client.call_args_list] == [
+            "gemini-key",
+            "google-key",
+            "configured",
+        ]
+
+    def test_the_default_model_is_one_google_still_serves(self, fake_module):
+        """Not gemini-2.5-flash, which stops being served on December 1, 2026."""
+        client = _answer("ok")
+        _install_genai(fake_module, client)
+        provider = GeminiProvider({"api_key": "test-key"})
+        assert provider.model_name == GEMINI_DEFAULT_MODEL == "gemini-3.5-flash-lite"
+        provider.generate_summary({}, "the prompt")
+        assert client.models.generate_content.call_args.kwargs["model"] == GEMINI_DEFAULT_MODEL
+        # a model left blank in the configuration is the default too
+        assert GeminiProvider({"api_key": "test-key", "model": " "}).model_name == (
+            GEMINI_DEFAULT_MODEL
+        )
+
+    def test_the_timeout_is_given_in_milliseconds(self, fake_module):
+        genai = _install_genai(fake_module, MagicMock())
+        GeminiProvider({"api_key": "test-key", "timeout": 7.5})
+        assert genai.Client.call_args.kwargs["http_options"].timeout == 7500
+
+    @pytest.mark.parametrize(
+        ("answer", "message"),
+        [
+            # the model stopped before it wrote any text
+            (
+                {"candidates": [types.SimpleNamespace(finish_reason="MAX_TOKENS")]},
+                r"test-model gave no text \(finish reason: MAX_TOKENS\)$",
+            ),
+            # as the SDK gives a reason: an enum, by its name
+            (
+                {
+                    "prompt_feedback": types.SimpleNamespace(
+                        block_reason=types.SimpleNamespace(name="SAFETY")
+                    ),
+                    "candidates": [],
+                },
+                r"test-model gave no text \(blocked: SAFETY\)$",
+            ),
+            (
+                {"candidates": [types.SimpleNamespace(finish_reason=None)]},
+                "test-model gave no text$",
+            ),
+            ({"prompt_feedback": None, "candidates": None}, "test-model gave no text$"),
+            ({}, "test-model gave no text$"),
+        ],
+        ids=["stopped", "blocked", "no-reason", "nothing", "bare"],
+    )
+    @pytest.mark.parametrize("text", [None, "", "  \n"])
+    def test_an_answer_without_text_says_why(self, fake_module, text, answer, message):
+        client = _answer(text, **answer)
+        _install_genai(fake_module, client)
+        provider = GeminiProvider({"api_key": "test-key", "model": "test-model"})
+        with pytest.raises(AIProviderError, match=message) as error:
+            provider.generate_summary({}, "the prompt")
+        # an answer that came, and is empty: asking again would get the same
+        assert client.models.generate_content.call_count == 1
+        assert not isinstance(error.value, AIProviderUnavailableError)
 
 
 # ── Ollama ───────────────────────────────────────────────────────────────
