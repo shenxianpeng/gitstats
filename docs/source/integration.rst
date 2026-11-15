@@ -60,6 +60,10 @@ Use gitstats in GitHub Actions to generate reports and deploy them to GitHub Pag
             github_token: ${{ secrets.GITHUB_TOKEN }}
             publish_dir: gitstats-report
 
+For the year's :doc:`Repo Wrapped <wrapped>` card alone, without publishing a
+report, there is a workflow that only reads the repository: see
+:ref:`wrapped-workflow`.
+
 
 Use gitstats in GitLab CI
 -------------------------

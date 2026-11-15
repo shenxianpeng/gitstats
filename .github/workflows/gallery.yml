@@ -83,17 +83,28 @@ jobs:
           FONTCONFIG_FILE: /dev/null
           REPO_ID: ${{ matrix.repo.id }}
           REPO_NAME: ${{ matrix.repo.name }}
+        # With the repository's Repo Wrapped card, for the year it was a month
+        # ago: all of January still shows the year that has just ended, whole,
+        # and from February on the card is for the year under way, set against
+        # the same days of the year before. A repository without commits in
+        # that year gets no card, and its report is made all the same.
         run: |
           gitstats -c "project_name=$REPO_NAME" -c share_card=true \
+            --wrapped --wrapped-year "$(date -u -d '31 days ago' +%Y)" \
             --site-url "https://shenxianpeng.dev/gitstats/gallery/$REPO_ID/" \
             /tmp/repo "report"
 
-      # what a link to the report shows where it is shared: the pages point to it
-      - name: Render Share Card
-        run: >-
-          google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars
-          --window-size=1200,630 --screenshot="$PWD/report/share-card.png"
-          "file://$PWD/report/share-card.html"
+      # what a link to the report, or to the page of its Wrapped card, shows
+      # where it is shared: the pages point to them
+      - name: Render Share Cards
+        run: |
+          for card in report/share-card.html report/wrapped-card.html; do
+            if [ -f "$card" ]; then
+              google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars \
+                --window-size=1200,630 --screenshot="$PWD/${card%.html}.png" \
+                "file://$PWD/$card"
+            fi
+          done
 
       # the cache of the line counts makes a second run on the same output
       # faster; the gallery's reports are made afresh each time, and it is
@@ -178,7 +189,8 @@ jobs:
         # lists the repositories without one, and adds to each report the
         # badge of its AI-assisted commits and how to make it for another
         # repository. Each ecosystem gets its ranking page and its data under
-        # ecosystems/, and the gallery its sitemap.xml.
+        # ecosystems/, the Repo Wrapped cards a page of them all under
+        # wrapped/, and the gallery its sitemap.xml.
         run: >-
           PYTHONPATH="$PWD" python scripts/generate_gallery_portfolio.py gallery
           --repos gallery/repos.yml
@@ -186,10 +198,11 @@ jobs:
 
       - name: Render Share Cards
         run: |
-          # the gallery's two cards, each ecosystem page's and each
-          # repository's comparison
+          # the gallery's two cards, each ecosystem page's, the Repo
+          # Wrapped page's and each repository's comparison
           for card in gallery/share-card.html gallery/ai-share-card.html \
-            gallery/ecosystems/*-card.html gallery/*/compare-card.html; do
+            gallery/ecosystems/*-card.html gallery/wrapped/index-card.html \
+            gallery/*/compare-card.html; do
             if [ -f "$card" ]; then
               google-chrome --headless=new --no-sandbox --disable-gpu --hide-scrollbars \
                 --window-size=1200,630 --screenshot="$PWD/${card%.html}.png" \

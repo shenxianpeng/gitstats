@@ -179,6 +179,47 @@ In ``organizations.json``, each organization's ``by_repository`` lists the
 repositories it committed to, each with its ``commits``, ``commits_last_12mo``,
 ``addresses``, ``first_commit`` and ``last_commit``.
 
+Repo Wrapped
+------------
+
+Each report of the gallery is made with a :doc:`Repo Wrapped <wrapped>` card:
+one year in the repository, set against the year before. The card is for the
+year it was a month ago: all of January still shows the year that has just
+ended, whole, and from February on the card is for the year under way,
+compared with the same days of the year before.
+
+* ``/gitstats/gallery/<id>/wrapped.html``: a repository's card, with its
+  numbers and a button that saves it as a PNG, and next to it
+  ``wrapped-<year>.json``, the numbers as data (see :doc:`wrapped`);
+* ``/gitstats/gallery/wrapped/``: the cards of all the repositories, the
+  year's commits in all of them, and what stands out among them: the most
+  commits, the fastest growing, the longest streak and the most new
+  contributors;
+* ``/gitstats/gallery/wrapped/index.json``: the same numbers as data.
+
+A repository without commits in the year has no card and is not on the page.
+The fastest growing is looked for among the repositories with 100 commits or
+more in the days of the year before: 12 commits that became 60 are five times
+as many, and say little. The commits of all the repositories are compared with
+the year before among those that had commits then, like with like.
+
+While the ``schema_version`` of ``wrapped/index.json`` is ``1``, these fields
+keep their names, types and meaning; a change to any of them comes with a new
+``schema_version``:
+
+* ``schema_version``, ``year`` and ``complete`` (whether the year was over
+  when every card was made);
+* ``totals.repositories`` and ``totals.commits``, and ``totals.compared``: of
+  the repositories with a year before to compare with, how many they are
+  (``repositories``), their ``commits`` and their ``previous_commits``;
+* for each of ``repositories``, the most commits first: ``id``, ``name``,
+  ``group`` (its ecosystem's id), ``page``, ``card`` and ``data`` (addresses
+  from the gallery's own), ``through``, the seven numbers of a card
+  (``commits``, ``active_days``, ``longest_streak``, ``lines_changed``,
+  ``contributors``, ``new_contributors`` and ``releases``), and ``previous``:
+  ``null``, or the ``year``, the ``through`` and the same seven numbers of
+  the year before.
+
 How each project compares
 -------------------------
 
