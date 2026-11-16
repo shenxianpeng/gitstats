@@ -4375,6 +4375,20 @@ def test_a_bus_factor_of_one_is_a_risk(mock_data_collector):
         "Alice &lt;Smith&gt; is the primary owner of 3 of 3 files. "
         "2 files have only ever been changed by one person."
     )
+    # one file that only one person has changed is said in the singular, and
+    # none is not said at all
+    mock_data_collector.author_files = {
+        "Alice Smith": {"a.py": 5, "b.py": 5},
+        "Bob Jones": {"a.py": 1},
+    }
+    assert _signals(mock_data_collector)["Code Ownership"]["detail"] == (
+        "Alice Smith is the primary owner of 2 of 2 files. "
+        "1 file has only ever been changed by one person."
+    )
+    mock_data_collector.author_files["Bob Jones"]["b.py"] = 1
+    assert _signals(mock_data_collector)["Code Ownership"]["detail"] == (
+        "Alice Smith is the primary owner of 2 of 2 files."
+    )
     # a project one person has written has nobody else to share its files with
     mock_data_collector.author_files = {"Alice Smith": {"a.py": 5, "b.py": 5}}
     assert "Code Ownership" not in _signals(mock_data_collector)
@@ -4589,3 +4603,19 @@ def test_every_page_says_how_the_report_was_made(mock_data_collector, temp_dir, 
     # the same on every page of a report, and no longer under the overview's heading
     assert made[2] in _read_page(temp_dir, "index.html")
     assert "generated" not in re.search(r'<p class="page-meta">(.*?)</p>|$', content)[0]
+
+
+def test_a_footer_without_the_time_of_the_run_leaves_it_out():
+    # a page written before any data was collected has no start to count from
+    creator = HTMLReportCreator()
+    f = StringIO()
+    creator.print_footer(f)
+    footer = f.getvalue()
+    assert re.search(
+        r"gitstats</a> \S+ &middot; \d{4}-\d\d-\d\d \d\d:\d\d:\d\d &middot; [^<]+</span>", footer
+    )
+    assert " s &middot; " not in footer
+    # what the first page said is what the others say
+    again = StringIO()
+    creator.print_footer(again)
+    assert again.getvalue() == footer
