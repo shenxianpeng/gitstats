@@ -10,7 +10,7 @@ import tempfile
 import pytest
 
 from gitstats.aggregate import GROUP_FILTER_SCRIPT
-from gitstats.report_creator import HOTSPOTS_SCRIPT
+from gitstats.report_creator import CHART_SCRIPT, HOTSPOTS_SCRIPT
 
 NODE = shutil.which("node")
 pytestmark = pytest.mark.skipif(NODE is None, reason="Node is not installed")
@@ -235,6 +235,43 @@ def test_a_few_hotspots_are_not_split():
     # one file is not "large, changed often"
     assert _hotspot_series([(1, 1)], 1, 1) == {"series": [["Files", 1]], "medians": False}
     assert _hotspot_series([(5, 1), (9, 3), (12, 2)], 9, 2)["series"] == [["Files", 3]]
+
+
+def _chart_script(chart_js: str, body: str):
+    """Run the charts' shared script and then ``body`` in Node, on a page where
+    Chart.js is ``chart_js`` (JavaScript for ``window.Chart``)."""
+    script = CHART_SCRIPT.split("<script>", 1)[1].rsplit("</script>", 1)[0]
+    stubs = f"""
+    const document = {{addEventListener() {{}}}};
+    let registered = [];
+    const Chart = {chart_js};
+    const window = {{Chart: Chart}};
+    """
+    return _run(stubs + script + body)
+
+
+def test_a_chart_that_is_built_takes_its_note_away():
+    # the note that the chart is not shown is in the chart's box, with the canvas
+    removed = _chart_script(
+        "{register: plugin => registered.push(plugin)}",
+        """
+        const note = {gone: false, remove() { this.gone = true; }};
+        const asked = [];
+        const box = {querySelector: selector => { asked.push(selector); return note; }};
+        registered[0].beforeInit({canvas: {parentNode: box}});
+        // a chart in a box without the note is built all the same
+        registered[0].beforeInit({canvas: {parentNode: {querySelector: () => null}}});
+        console.log(JSON.stringify({plugins: registered.length, asked: asked, gone: note.gone}));
+        """,
+    )
+    assert removed == {"plugins": 1, "asked": [".chart-note"], "gone": True}
+
+
+def test_the_chart_script_runs_without_chart_js():
+    # chart.umd.min.js did not load: the helpers are still defined, and the
+    # charts' own scripts fail one by one, leaving their notes
+    defined = _chart_script("undefined", "console.log(JSON.stringify(typeof applyChartTheme));")
+    assert defined == "function"
 
 
 def _groups_after(hash_at_load: str, then: str) -> list:

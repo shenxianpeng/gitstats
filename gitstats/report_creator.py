@@ -400,6 +400,18 @@ CHART_SCRIPT = """<script>
 			}
 		};
 	}
+
+	// A chart's box starts with a note that the chart is not shown (CHART_NOTE),
+	// which is all a page whose scripts do not run has of it. A chart that is
+	// built takes the note away first, so that it is laid out in the whole box.
+	const chartNote = {
+		id: 'chartNote',
+		beforeInit: function(chart) {
+			const note = chart.canvas.parentNode.querySelector('.chart-note');
+			if (note) note.remove();
+		}
+	};
+	if (window.Chart) Chart.register(chartNote);
 </script>"""
 
 _THEME_TOGGLE_ICONS = (
@@ -455,6 +467,18 @@ CHART_DESCRIPTIONS = {
     "chart-lines-of-code": "Line chart of lines of code over time",
     "chart-lines-by-month": "Bar chart of lines added and removed per month",
 }
+
+# What a chart's box holds until its chart is drawn, and so what it shows
+# where the page's scripts do not run: JavaScript turned off, or blocked by
+# the Content Security Policy of the server the report is on, as Jenkins does
+# by default. A chart that is built takes it away (see CHART_SCRIPT). The link
+# opens in the same tab: such a policy also blocks new ones.
+CHART_NOTE = (
+    '<p class="chart-note">Chart not shown: it is drawn with JavaScript, which is '
+    "turned off or blocked on this page, as it is on Jenkins by default. "
+    '<a href="https://gitstats.readthedocs.io/en/latest/integration.html#blank-charts">'
+    "How to show the charts</a></p>"
+)
 
 # The brand at the start of a report's nav bar. A portfolio that puts the
 # report in one of its folders replaces it with the way back to itself.
@@ -2771,7 +2795,7 @@ class HTMLReportCreator(ReportCreator):
             "points": [[fs["path"], fs["lines"], fs["churn"], fs["score"]] for fs in plotted],
         }
         f.write(
-            '<div class="chart-box has-legend" style="--chart-ratio: 2.4">'
+            f'<div class="chart-box has-legend" style="--chart-ratio: 2.4">{CHART_NOTE}'
             '<canvas id="chart-hotspots" role="img" aria-label="Scatter plot of '
             f"{plural(len(plotted), 'file')} by size in lines and number of changes, "
             'both on logarithmic scales"></canvas></div>'
@@ -3418,7 +3442,7 @@ class HTMLReportCreator(ReportCreator):
         # but has a minimum height, so phones don't get a flattened plot.
         box_class = "chart-box has-legend" if is_multi else "chart-box"
         aria = html.escape(chart_label(chart_id, chart_type, shown_labels, time_axis), quote=True)
-        return f"""<div class="{box_class}" style="--chart-ratio: {aspect_ratio}"><canvas id="{chart_id}" role="img" aria-label="{aria}"></canvas></div>
+        return f"""<div class="{box_class}" style="--chart-ratio: {aspect_ratio}">{CHART_NOTE}<canvas id="{chart_id}" role="img" aria-label="{aria}"></canvas></div>
 <script>
 (function() {{
   var ctx = document.getElementById('{chart_id}').getContext('2d');
