@@ -1017,9 +1017,9 @@ class HTMLReportCreator(ReportCreator):
         # Create AI Insights page if AI is enabled
         if hasattr(data, "ai_summaries") and data.ai_summaries:
             self.create_ai_insights_html(data, path)
-        elif os.path.isfile(os.path.join(path, "ai-insights.html")):
+        elif os.path.isfile(os.path.join(path, AI_PAGE[0])):
             # an earlier run's page, no longer linked and with its old numbers
-            os.remove(os.path.join(path, "ai-insights.html"))
+            os.remove(os.path.join(path, AI_PAGE[0]))
 
     def create_index_html(self, data: Any, path: str) -> None:
         f = open(path + "/index.html", "w", encoding="utf-8")
@@ -1249,7 +1249,7 @@ class HTMLReportCreator(ReportCreator):
             '<div class="table-scroll"><table class="share-table">'
             '<tr><th class="num rank"><abbr title="Rank by commits">#</abbr></th>'
             '<th>Author</th><th class="num">Commits</th><th class="num">Share</th>'
-            f"{SHARE_SCALE_HEADER}</tr>" + "".join(rows) + "</table></div>",
+            f"{SHARE_SCALE_HEADER}</tr>" + "".join(rows) + "</table></div>"
             f'<p class="more-link"><a href="authors.html">{more} &rarr;</a></p>',
         )
 
@@ -1276,7 +1276,7 @@ class HTMLReportCreator(ReportCreator):
             '<div class="table-scroll"><table class="share-table">'
             '<tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr>'
             + "".join(rows)
-            + "</table></div>",
+            + "</table></div>"
             f'<p class="more-link"><a href="tags.html">{more} &rarr;</a></p>',
         )
 
@@ -3305,9 +3305,9 @@ class HTMLReportCreator(ReportCreator):
         # Get language from config
         language = load_config().get("ai_language", "en")
 
-        f = open(path + "/ai-insights.html", "w", encoding="utf-8")
-        self.print_header(f, "ai-insights.html")
-        self.print_nav(f, "ai-insights.html")
+        f = open(os.path.join(path, AI_PAGE[0]), "w", encoding="utf-8")
+        self.print_header(f, AI_PAGE[0])
+        self.print_nav(f, AI_PAGE[0])
         f.write(f"<h1>{get_i18n_text('ai_insights_title', language)}</h1>")
 
         f.write(f"""
