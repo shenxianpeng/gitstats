@@ -585,6 +585,26 @@ table {
 	margin-bottom: var(--space-2);
 }
 
+/* The note a box holds until its chart is drawn (CHART_NOTE). Where the
+   page's scripts do not run it stays, and the box is as tall as the note
+   instead of leaving a chart's height empty. */
+.chart-note {
+	max-width: 75ch;
+	margin: 0;
+	padding: var(--space-3) var(--space-4);
+	border: 1px dashed var(--border-strong);
+	color: var(--text-secondary);
+}
+
+.chart-box:has(> .chart-note) {
+	aspect-ratio: auto;
+	min-height: 0;
+}
+
+.chart-box:has(> .chart-note) > canvas {
+	display: none;
+}
+
 /* AI-assisted commits across repositories: one hue behind the share, darker
    for more (at most three quarters of it, so the text stays readable) */
 table.ai-grid td.share {

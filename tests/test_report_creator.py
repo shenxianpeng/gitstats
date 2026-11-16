@@ -13,6 +13,8 @@ from gitstats import load_config
 from gitstats.main import GitDataCollector
 from gitstats.report_creator import (
     BADGES_PLACEHOLDER_URL,
+    CHART_NOTE,
+    CHART_SCRIPT,
     NAV_PAGES,
     NAV_START,
     SKIP_LINK,
@@ -447,6 +449,27 @@ def test_render_chartjs_single_dataset_follows_theme():
     result = creator._render_chartjs("chart-th", "bar", ["X"], [{"label": "C", "data": [1]}])
     assert '"themed": true' in result
     assert "applyChartTheme();" in result
+
+
+def test_a_chart_box_says_that_its_chart_is_not_shown():
+    # where scripts are blocked (as on Jenkins by default) the note is all that
+    # is left of a chart, so it comes with every chart, ahead of the canvas
+    result = HTMLReportCreator()._render_chartjs(
+        "chart-note", "bar", ["X"], [{"label": "C", "data": [1]}]
+    )
+    assert f'">{CHART_NOTE}<canvas id="chart-note"' in result
+    assert "Chart not shown" in CHART_NOTE
+    assert "integration.html#blank-charts" in CHART_NOTE
+    # such a page cannot open a new tab either
+    assert "target=" not in CHART_NOTE
+    # the chart that is built takes the note away
+    assert "note.remove();" in CHART_SCRIPT
+
+
+def test_the_hotspots_plot_says_that_it_is_not_shown(mock_data_collector, temp_dir):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    content = _read_page(temp_dir, "hotspots.html")
+    assert f'{CHART_NOTE}<canvas id="chart-hotspots"' in content
 
 
 # ── month_range ──────────────────────────────────────────────────────────
