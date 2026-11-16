@@ -456,6 +456,7 @@ NAV_PAGES = (
 # The chart adds the span its labels cover ("…, 2019 to 2026").
 CHART_DESCRIPTIONS = {
     "chart-overview-yearly": "Bar chart of commits per year",
+    "chart-last-12-months": "Bar chart of commits per month over the last 12 months",
     "chart-weekly-activity": "Bar chart of commits per week",
     "chart-month-of-year": "Bar chart of commits by month of the year",
     "chart-commits-by-year-month": "Bar chart of commits per month",
@@ -487,6 +488,15 @@ REPORT_BRAND = '<a href="index.html" class="nav-brand">GitStats</a>'
 # The header of a column of share bars: the bars are drawn for the eye only
 # (aria-hidden), and a header cell still needs a name
 BAR_HEADER = '<th class="unsortable"><span class="visually-hidden">Bar</span></th>'
+
+# The header of a column of bars that are shares of a whole, drawn from 0 to
+# 100%: the scale is written out, so a bar that stops short reads as a share
+SHARE_SCALE_HEADER = (
+    '<th class="unsortable share-scale">'
+    '<span class="visually-hidden">Share of all commits as a bar, from 0 to 100%</span>'
+    '<span class="share-ticks" aria-hidden="true"><span>0</span><span>50%</span>'
+    "<span>100%</span></span></th>"
+)
 
 # A page's frame, the same on every page: the first Tab reaches a link past
 # the nav (hidden until then), the nav and the page's own content are
@@ -746,8 +756,11 @@ HOTSPOTS_SCRIPT = r"""<script>
 	const low = Math.min.apply(null, scores);
 	const range = (Math.max.apply(null, scores) - low) || 1;
 
-	// One dataset per quadrant around the medians: each gets a legend entry and
-	// a --series-N color that applyChartTheme() keeps in step with the theme.
+	// One dataset per quadrant around the medians. The large files that change
+	// often are in color and the other three quadrants grey (--series-hot and
+	// --series-rest, which applyChartTheme() keeps in step with the theme), so
+	// the plot does not ask the reader to tell four hues apart: the quadrants'
+	// names are written on the plot instead of in a legend (quadrantNames).
 	// A file at the median is in the upper half, as the tiles say, unless the
 	// median is also the smallest value: then "at least the median" is every
 	// file, and only those above it are large or changed often.
@@ -759,17 +772,19 @@ HOTSPOTS_SCRIPT = r"""<script>
 	const busy = function(p) { return above(p.y, data.medianChurn, data.leastChurn); };
 	// With a few files, halves say nothing: they are one series, without medians
 	const split = points.length >= 4;
+	const hot = function(p) { return split && large(p) && busy(p); };
 	const quadrants = split ? [
-		['Large, changed often', 3, function(p) { return large(p) && busy(p); }],
-		['Small, changed often', 5, function(p) { return !large(p) && busy(p); }],
-		['Large, rarely changed', 2, function(p) { return large(p) && !busy(p); }],
-		['Small, rarely changed', 1, function(p) { return !large(p) && !busy(p); }]
+		['Large, changed often', 'hot', hot],
+		['Small, changed often', 'rest', function(p) { return !large(p) && busy(p); }],
+		['Large, rarely changed', 'rest', function(p) { return large(p) && !busy(p); }],
+		['Small, rarely changed', 'rest', function(p) { return !large(p) && !busy(p); }]
 	] : [['Files', 1, function() { return true; }]];
+	// a bigger dot is a higher score, by area: a dot twice as wide is four times the score
+	const dotRadius = function(p) { return 3 + 11 * Math.sqrt((p.score - low) / range); };
 	const datasets = quadrants.map(function(q) {
 		const own = points.filter(q[2]);
 		const color = getCSSVar('--series-' + q[1]);
-		// a bigger dot is a higher score
-		const radius = own.map(function(p) { return 3 + 9 * (p.score - low) / range; });
+		const radius = own.map(dotRadius);
 		return {
 			label: q[0],
 			series: q[1],
@@ -803,6 +818,76 @@ HOTSPOTS_SCRIPT = r"""<script>
 		}
 	};
 
+	// What a legend and a hover would say, written on the plot: each
+	// quadrant's name in its corner, the medians along their lines, and a
+	// number on the highest-scoring files (data.numbered of them), the same as
+	// in the list next to the plot. The points come highest score first.
+	const quadrantNames = {
+		id: 'gsQuadrantNames',
+		beforeDatasetsDraw: function(chart) {
+			if (!split) return;
+			const ctx = chart.ctx, area = chart.chartArea;
+			const x = chart.scales.x.getPixelForValue(data.medianLines);
+			const y = chart.scales.y.getPixelForValue(data.medianChurn);
+			const hotColor = getCSSVar('--series-hot'), text = getCSSVar('--chart-text');
+			const count = points.filter(hot).length;
+			ctx.save();
+			// the quadrant the page is about, tinted
+			ctx.fillStyle = hotColor + '0d';
+			ctx.fillRect(x, area.top, area.right - x, y - area.top);
+			const family = Chart.defaults.font.family;
+			// [text, x, y, align, baseline, color, weight, the width it has]
+			const pad = 8;
+			[
+				['LARGE, CHANGED OFTEN \u00b7 ' + count.toLocaleString() + (count === 1 ? ' FILE' : ' FILES'),
+					x + pad, area.top + pad, 'left', 'top', hotColor, '600', area.right - x],
+				['SMALL, CHANGED OFTEN', area.left + pad, area.top + pad, 'left', 'top', text, '400', x - area.left],
+				['SMALL, RARELY CHANGED', area.left + pad, area.bottom - pad, 'left', 'bottom', text, '400', x - area.left],
+				['LARGE, RARELY CHANGED', area.right - pad, area.bottom - pad, 'right', 'bottom', text, '400', area.right - x]
+			].forEach(function(name) {
+				ctx.font = name[6] + ' 11px ' + family;
+				// a quadrant too narrow for its name goes without
+				if (ctx.measureText(name[0]).width > name[7] - 2 * pad) return;
+				ctx.textAlign = name[3];
+				ctx.textBaseline = name[4];
+				ctx.fillStyle = name[5];
+				ctx.fillText(name[0], name[1], name[2]);
+			});
+			// the medians, at the far ends of their lines from the names; without
+			// the room, the tiles above the plot still say them
+			const lines = 'median ' + data.medianLines.toLocaleString() + (data.medianLines === 1 ? ' line' : ' lines');
+			const changes = 'median ' + data.medianChurn.toLocaleString() + (data.medianChurn === 1 ? ' change' : ' changes');
+			ctx.font = '400 11px ' + family;
+			ctx.fillStyle = text;
+			ctx.textAlign = 'right';
+			if (ctx.measureText(lines).width + ctx.measureText('SMALL, CHANGED OFTEN').width + 4 * pad < x - area.left) {
+				ctx.textBaseline = 'top';
+				ctx.fillText(lines, x - pad, area.top + pad);
+			}
+			if (ctx.measureText(changes).width + 2 * pad < area.right - x) {
+				ctx.textBaseline = 'bottom';
+				ctx.fillText(changes, area.right - pad, y - 5);
+			}
+			ctx.restore();
+		},
+		afterDatasetsDraw: function(chart) {
+			const ctx = chart.ctx;
+			ctx.save();
+			ctx.font = '700 11px ' + Chart.defaults.font.family;
+			ctx.textBaseline = 'middle';
+			points.slice(0, data.numbered || 0).forEach(function(p, index) {
+				const x = chart.scales.x.getPixelForValue(p.x);
+				const y = chart.scales.y.getPixelForValue(p.y);
+				const r = dotRadius(p);
+				ctx.fillStyle = hot(p) ? getCSSVar('--series-hot') : getCSSVar('--chart-text');
+				// inside a dot with room for it, otherwise at its upper right
+				ctx.textAlign = r >= 8 ? 'center' : 'left';
+				ctx.fillText(String(index + 1), r >= 8 ? x : x + r + 2, r >= 8 ? y + 0.5 : y - r - 2);
+			});
+			ctx.restore();
+		}
+	};
+
 	// A logarithmic axis ticked at 1, 2, 5, 10, 20, 50, ... with room past the
 	// largest value, so the highest-scoring dots are not drawn on the frame
 	function logAxis(title) {
@@ -827,13 +912,13 @@ HOTSPOTS_SCRIPT = r"""<script>
 	applyChartTheme();
 	new Chart(document.getElementById('chart-hotspots').getContext('2d'), {
 		type: 'scatter',
-		plugins: [medianLines],
+		plugins: [medianLines, quadrantNames],
 		data: { datasets: datasets },
 		options: {
 			responsive: true,
 			maintainAspectRatio: false,
 			plugins: {
-				legend: { display: true, labels: { usePointStyle: true, pointStyle: 'circle' } },
+				legend: { display: false },
 				tooltip: {
 					callbacks: {
 						// the path on its own line: a deep one is as wide as the rest together
@@ -865,6 +950,7 @@ class ReportCreator:
 
     def create(self, data, path):
         self.data = data
+        self.footer_made = ""
         self.path = path
 
 
@@ -934,21 +1020,22 @@ class HTMLReportCreator(ReportCreator):
 
     def create_index_html(self, data: Any, path: str) -> None:
         f = open(path + "/index.html", "w", encoding="utf-8")
-        format = "%Y-%m-%d %H:%M:%S"
         self.print_header(f, "index.html")
 
         self.print_nav(f, "index.html")
 
-        # The repository's name heads its overview; report metadata sits under it
-        f.write(f"<h1>{html.escape(data.project_name)}</h1>")
+        # The repository's name heads its overview, with the span of its history
+        # under it; how the report was made is in the footer
+        delta_days = data.get_commit_delta_days()
+        f.write(
+            f'<div class="page-head"><h1>{html.escape(data.project_name)}</h1>'
+            '<a href="badges.html">Badge for your README</a></div>'
+        )
         f.write(
             '<p class="page-meta">'
             f"{data.get_first_commit_date().strftime('%Y-%m-%d')} &rarr; "
             f"{data.get_last_commit_date().strftime('%Y-%m-%d')}"
-            f" &middot; generated {datetime.datetime.now().strftime(format)}"
-            f" in {time.time() - data.get_stamp_created():.0f} s"
-            f" &middot; gitstats {get_version()}, {get_git_version()}"
-            ' &middot; <a href="badges.html">Badge for your README</a>'
+            f" &middot; {span_text(delta_days)}"
             "</p>"
         )
         # where a portfolio of repositories writes what stands out about this one
@@ -960,53 +1047,70 @@ class HTMLReportCreator(ReportCreator):
                 "(for example <code>git fetch --unshallow</code>) and generate it again.</p>"
             )
 
+        f.write(signals_html(overview_signals(data)))
+
         total_commits = data.get_total_commits()
         active_days = len(data.get_active_days())
-        delta_days = data.get_commit_delta_days()
         # the "no extension" row is not an extension
         extensions = len([ext for ext in data.extensions if ext])
-        streak = data.get_longest_streak()
-        f.write(
-            stat_tiles_html(
-                [
-                    (
-                        "Commits",
-                        format_int(total_commits),
-                        f"{total_commits / active_days:.1f} per active day"
-                        f" &middot; {total_commits / delta_days:.1f} per day",
-                    ),
-                    (
-                        "Authors",
-                        format_int(data.get_total_authors()),
-                        f"{total_commits / data.get_total_authors():.1f} commits per author",
-                    ),
-                    (
-                        "Lines of Code",
-                        format_int(data.get_total_loc()),
-                        f'<span class="stat-added">+{format_int(data.total_lines_added)}</span> added'
-                        f' &middot; <span class="stat-removed">−{format_int(data.total_lines_removed)}</span>'
-                        " removed",
-                    ),
-                    (
-                        "Files",
-                        format_int(data.get_total_files()),
-                        plural(extensions, "extension"),
-                    ),
-                    (
-                        "Active Days",
-                        format_int(active_days),
-                        f"of {plural(delta_days, 'day')} &middot; {100.0 * active_days / delta_days:.1f}%",
-                    ),
-                    (
-                        "Longest Streak",
-                        plural(streak, "day"),
-                        "consecutive active days",
-                    ),
-                ]
+        recent, _before = last_year_commits(data)
+        # the last 12 months say how the project is doing now; a history no
+        # longer than that has them as its total, and the pace says more
+        if recent is not None and len(recent) == 12 and sum(recent.values()) < total_commits:
+            commits_value = (
+                f'<span class="stat-spark">{format_int(total_commits)}'
+                f"{sparkline_svg(list(recent.values()))}</span>"
             )
-        )
+            commits_note = f"{format_int(sum(recent.values()))} in the last 12 months"
+        else:
+            commits_value = format_int(total_commits)
+            commits_note = (
+                f"{total_commits / active_days:.1f} per active day"
+                f" &middot; {total_commits / delta_days:.1f} per day"
+            )
+        active_authors = recent_authors(data)
+        if active_authors and active_authors[0] < data.get_total_authors():
+            authors_note = f"{format_int(active_authors[0])} active in the last 12 months"
+        else:
+            authors_note = f"{total_commits / data.get_total_authors():.1f} commits per author"
+        tiles = [
+            ("Commits", commits_value, commits_note),
+            ("Authors", format_int(data.get_total_authors()), authors_note),
+            (
+                "Lines of Code",
+                format_int(data.get_total_loc()),
+                f'<span class="stat-added">+{format_int(data.total_lines_added)}</span> added'
+                f' &middot; <span class="stat-removed">−{format_int(data.total_lines_removed)}</span>'
+                " removed",
+            ),
+            ("Files", format_int(data.get_total_files()), plural(extensions, "extension")),
+            (
+                "Active Days",
+                format_int(active_days),
+                f"of {plural(delta_days, 'day')} &middot; {100.0 * active_days / delta_days:.1f}%",
+            ),
+        ]
+        if data.tags:
+            # the releases have their own section below; the newest dates the project
+            latest = tags_newest_first(data.tags)[0]
+            tiles.append(
+                (
+                    "Latest Release",
+                    html.escape(latest),
+                    f"{data.tags[latest]['date']} &middot; {plural(len(data.tags), 'tag')}",
+                )
+            )
+        else:
+            streak = data.get_longest_streak()
+            tiles.append(("Longest Streak", plural(streak, "day"), "consecutive active days"))
+        f.write(stat_tiles_html(tiles))
 
-        self._write_overview_yearly(f, data)
+        yearly = self._overview_yearly_html(data)
+        monthly = self._overview_last_year_html(data)
+        if monthly:
+            f.write(f'<div class="overview-charts">{yearly}{monthly}</div>')
+        else:
+            f.write(yearly)
 
         sections = [self._overview_contributors_html(data)]
         if data.tags:
@@ -1020,9 +1124,8 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body>\n</html>")
         f.close()
 
-    def _write_overview_yearly(self, f: Any, data: Any) -> None:
+    def _overview_yearly_html(self, data: Any) -> str:
         """Commits per year across the whole history, noting the longest quiet stretch."""
-        f.write(html_header(2, "Commits per year"))
         if data.commits_by_year:
             years = list(range(min(data.commits_by_year), max(data.commits_by_year) + 1))
         else:
@@ -1030,49 +1133,126 @@ class HTMLReportCreator(ReportCreator):
         values = [data.commits_by_year.get(y, 0) for y in years]
         # Shade the longest run of two or more years without commits
         annotations = gap_annotations(years, values, min_gap=2)
-        f.write(
-            self._render_chartjs(
+        # The chart's canvas is invisible to screen readers, and a quiet stretch
+        # is easy to pass over: say both in words
+        note = ""
+        with_commits = [year for year, value in zip(years, values) if value]
+        if with_commits:
+            total = plural(sum(values), "commit")
+            if len(with_commits) == 1:
+                note = f"{total}, all in {with_commits[0]}"
+            else:
+                note = f"{total} in {len(with_commits)} years with commits"
+            if annotations:
+                band = annotations["bands"][0]
+                note += f"; none from {years[band['from']]} to {years[band['to']]}"
+            note = f'<p class="section-note">{note}.</p>'
+        return (
+            "<section>"
+            + html_header(2, "Commits per year")
+            + note
+            + self._render_chartjs(
                 "chart-overview-yearly",
                 "bar",
                 years,
                 [{"label": "Commits", "data": values}],
-                aspect_ratio=5,
+                aspect_ratio=3.3,
                 annotations=annotations,
             )
+            + '<p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p>'
+            "</section>"
         )
-        if annotations:
-            # the chart's canvas is invisible to screen readers; say the same in text
-            band = annotations["bands"][0]
-            f.write(
-                f'<p class="visually-hidden">No commits from {years[band["from"]]} '
-                f"to {years[band['to']]}.</p>"
+
+    def _overview_last_year_html(self, data: Any) -> str:
+        """Commits in each of the 12 months up to the last commit, next to the
+        12 months before them: whether the project is active now, which the
+        years of a long history do not show. Nothing for a history that is
+        not longer than those 12 months."""
+        recent, before = last_year_commits(data)
+        if recent is None or sum(recent.values()) >= data.get_total_commits():
+            return ""
+        months = list(recent)
+        labels = [self.MONTH_NAMES[int(month[5:]) - 1] for month in months]
+        total = sum(recent.values())
+        note = (
+            f"{plural(total, 'commit')} from {labels[0]} {months[0][:4]} to "
+            f"{labels[-1]} {months[-1][:4]}"
+        )
+        earlier = sum(before.values())
+        if earlier > total:
+            note += f", down from {format_int(earlier)} in the 12 months before"
+        elif earlier and earlier < total:
+            note += f", up from {format_int(earlier)} in the 12 months before"
+        elif earlier:
+            note += ", as many as in the 12 months before"
+        else:
+            note += "; none in the 12 months before"
+        # The last month is short of days while it is the month of the report
+        footnote = ""
+        if months[-1] == datetime.datetime.now().strftime("%Y-%m"):
+            footnote = (
+                f'<p class="chart-footnote">{labels[-1]} {months[-1][:4]} was not over '
+                "when this report was made.</p>"
             )
-        f.write('<p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p>')
+        return (
+            "<section>"
+            + html_header(2, "Last 12 months")
+            + f'<p class="section-note">{note}.</p>'
+            + self._render_chartjs(
+                "chart-last-12-months",
+                "bar",
+                labels,
+                [{"label": "Commits", "data": list(recent.values())}],
+                aspect_ratio=1.65,
+                annotations={"values": True},
+                all_ticks=True,
+            )
+            + footnote
+            + "</section>"
+        )
 
     def _overview_contributors_html(self, data: Any) -> str:
-        """Top five authors by commits, with their share as a bar."""
+        """Top five authors by commits, and the rest as one row, so that the
+        rows add up to every commit. Each bar is the author's share of all
+        commits on a scale from 0 to 100%: the top author's is as long as
+        their share, not the whole width."""
         authors = data.get_authors(5)
-        top = max((data.get_author_info(a)["commits"] for a in authors), default=0) or 1
         rows = []
-        for author in authors:
+        listed = 0
+        for rank, author in enumerate(authors, 1):
             info = data.get_author_info(author)
-            width = 100.0 * info["commits"] / top
+            listed += info["commits"]
+            # a bot's commits are not a person's work: its bar is grey
+            bar_class = "share-bar share-bar-muted" if is_bot(author) else "share-bar"
             rows.append(
-                f"<tr><td>{author_html(author)}</td>"
+                f'<tr><td class="num rank">{rank}</td><td>{author_html(author)}</td>'
                 f'<td class="num">{format_int(info["commits"])}</td>'
                 f'<td class="num">{info["commits_frac"]:.1f}%</td>'
-                f'<td class="share-cell"><span class="share-bar" aria-hidden="true">'
-                f'<span style="width: {width:.1f}%"></span></span></td></tr>'
+                f'<td class="share-cell"><span class="{bar_class}" aria-hidden="true">'
+                f'<span style="width: {min(info["commits_frac"], 100.0):.1f}%"></span></span></td></tr>'
             )
         total = data.get_total_authors()
+        commits = data.get_total_commits()
+        others = total - len(authors)
+        rest = commits - listed
+        if others > 0 and rest > 0 and commits:
+            rows.append(
+                '<tr class="share-rest"><td></td>'
+                f"<td>{plural(others, 'other author')}</td>"
+                f'<td class="num">{format_int(rest)}</td>'
+                f'<td class="num">{html.escape(percent_text(rest / commits))}</td>'
+                '<td class="share-cell"><span class="share-bar share-bar-muted" aria-hidden="true">'
+                f'<span style="width: {100.0 * rest / commits:.1f}%"></span></span></td></tr>'
+            )
         # "All 1 author" would point to the one already listed
         more = f"All {format_int(total)} authors" if total > 1 else "The author in detail"
         return (
             "<section>"
             + html_header(2, "Top contributors")
             + '<div class="table-scroll"><table class="share-table">'
-            '<tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th>'
-            f"{BAR_HEADER}</tr>" + "".join(rows) + "</table></div>"
+            '<tr><th class="num rank"><abbr title="Rank by commits">#</abbr></th>'
+            '<th>Author</th><th class="num">Commits</th><th class="num">Share</th>'
+            f"{SHARE_SCALE_HEADER}</tr>" + "".join(rows) + "</table></div>"
             f'<p class="more-link"><a href="authors.html">{more} &rarr;</a></p>'
             "</section>"
         )
@@ -1622,12 +1802,9 @@ class HTMLReportCreator(ReportCreator):
                 f"incl. {plural(bots, 'bot account')}" if bots else "no bot accounts",
             )
         ]
-        last = data.get_last_commit_date()
-        if isinstance(last, datetime.datetime):
-            cutoff = (last - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
-            infos = [data.get_author_info(a) for a in everyone]
-            active = sum(1 for i in infos if str(i.get("date_last", "")) >= cutoff)
-            new = sum(1 for i in infos if str(i.get("date_first", "")) >= cutoff)
+        recent = recent_authors(data)
+        if recent:
+            active, new = recent
             tiles.append(("Active Authors", format_int(active), "committed in the last 12 months"))
             tiles.append(("New Authors", format_int(new), "first commit in the last 12 months"))
         top = everyone[:2]
@@ -2682,6 +2859,10 @@ class HTMLReportCreator(ReportCreator):
     # The scatter plot shows at most this many files (the highest-scoring),
     # so the page stays light on repositories with tens of thousands of files
     HOTSPOTS_MAX_POINTS = 2000
+    # The highest scores listed next to the plot, and how many of them carry
+    # their number on it
+    HOTSPOTS_LISTED = 8
+    HOTSPOTS_NUMBERED = 5
 
     def create_hotspots_html(self, data: Any, path: str) -> None:
         """Create the Hotspots page: change frequency against file size.
@@ -2776,16 +2957,19 @@ class HTMLReportCreator(ReportCreator):
                 f"{format_int(len(files))} files."
             )
         # the plot splits the files at the medians from four files on (HOTSPOTS_SCRIPT)
+        split = len(plotted) >= 4
         medians = (
             " The dashed lines mark the median file size and the median number of "
-            "changes, so the large files that change often are in the top right."
-            if len(plotted) >= 4
+            "changes: the large files that change often, in the top right, are in color."
+            if split
             else ""
         )
+        numbered = files[: self.HOTSPOTS_NUMBERED]
         f.write(
             '<p class="section-note">'
             f"Each dot is a file; a bigger dot is a higher score.{medians} "
-            f"Both axes are logarithmic.{shown}</p>"
+            f"The {'highest score is' if len(numbered) == 1 else f'{len(numbered)} highest scores are'}"
+            f" numbered as in the list. Both axes are logarithmic.{shown}</p>"
         )
         page_data = {
             "medianLines": median_lines,
@@ -2793,12 +2977,43 @@ class HTMLReportCreator(ReportCreator):
             "leastLines": min(fs["lines"] for fs in files),
             "leastChurn": min(fs["churn"] for fs in files),
             "points": [[fs["path"], fs["lines"], fs["churn"], fs["score"]] for fs in plotted],
+            "numbered": min(self.HOTSPOTS_NUMBERED, len(plotted)),
         }
+
+        # The highest scores next to the plot, the first of them numbered as on
+        # it: which file a dot is can be read without hovering over it, and on a
+        # page whose scripts do not run the list is what there is of the plot
+        def above(value: int, median: int, least: int) -> bool:
+            # as HOTSPOTS_SCRIPT: at the median is the upper half, unless that is every file
+            return value >= median if median > least else value > median
+
+        def in_color(fs: dict) -> bool:
+            return (
+                split
+                and above(fs["lines"], median_lines, page_data["leastLines"])
+                and above(fs["churn"], median_churn, page_data["leastChurn"])
+            )
+
+        listed = "".join(
+            '<li><span class="hotspot-rank'
+            + (" numbered" if rank <= len(numbered) else "")
+            + (" hot" if in_color(fs) else "")
+            + f'">{rank}</span>'
+            f'<span class="hotspot-file"><span class="path">{html.escape(fs["path"])}</span>'
+            f'<span class="hotspot-numbers">{plural(fs["lines"], "line")} &middot; '
+            f"{plural(fs['churn'], 'change')}</span></span></li>"
+            for rank, fs in enumerate(files[: self.HOTSPOTS_LISTED], 1)
+        )
         f.write(
-            f'<div class="chart-box has-legend" style="--chart-ratio: 2.4">{CHART_NOTE}'
+            '<div class="hotspot-plot">'
+            f'<div class="chart-box" style="--chart-ratio: 1.6">{CHART_NOTE}'
             '<canvas id="chart-hotspots" role="img" aria-label="Scatter plot of '
             f"{plural(len(plotted), 'file')} by size in lines and number of changes, "
             'both on logarithmic scales"></canvas></div>'
+            '<div class="hotspot-top"><h3>Highest scores</h3>'
+            f"<ol>{listed}</ol>"
+            '<p class="more-link"><a href="#top_hotspots">The files as a table &darr;</a></p>'
+            "</div></div>"
         )
         # "<" is escaped whole: a path is repository content, and must not be
         # able to end or re-open the script element it is embedded in
@@ -3224,6 +3439,7 @@ class HTMLReportCreator(ReportCreator):
         tooltip_share=False,
         month_axis=False,
         diverging=False,
+        all_ticks=False,
     ):
         """Render a Chart.js chart as inline HTML.
 
@@ -3256,6 +3472,10 @@ class HTMLReportCreator(ReportCreator):
         tooltip line (e.g. "+2 new"); empty strings add nothing. A dataset with
         ``colorVar`` (e.g. "--success-color") takes its color from that CSS
         variable, following the theme.
+
+        With ``all_ticks=True`` every category keeps its label on the x-axis,
+        for a few short ones (the months of a year) in a narrow chart, where
+        every other one would be dropped to keep them apart.
 
         With ``diverging=True`` (bars), datasets stack around zero: positive
         values above it, negative ones below, and the y-axis and tooltips show
@@ -3373,6 +3593,8 @@ class HTMLReportCreator(ReportCreator):
                 x_ticks = (
                     "maxRotation: 45, minRotation: 45"
                     if x_ticks_rotate
+                    else "maxRotation: 0, autoSkip: false"
+                    if all_ticks
                     else "maxRotation: 0, autoSkipPadding: 12"
                 )
                 if collapsed:
@@ -3472,12 +3694,26 @@ class HTMLReportCreator(ReportCreator):
 
     def print_footer(self, file: Any) -> None:
         """
-        Write the HTML page footer with a "Generated by gitstats" link.
+        Write the HTML page footer: the "Generated by gitstats" link, and how
+        this report was made (the gitstats version, when and in how long, and
+        the git version).
 
         Parameters:
             file: A writable file-like object opened in text mode.
         """
-        file.write(FOOTER)
+        made = getattr(self, "footer_made", "")
+        if not made:
+            # once for a report: every page says the same, and git is asked once
+            made = (
+                f"{get_version()} &middot; {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+            )
+            created = getattr(getattr(self, "data", None), "get_stamp_created", None)
+            stamp = created() if callable(created) else None
+            if isinstance(stamp, (int, float)):
+                made += f" in {time.time() - stamp:.0f} s"
+            made += f" &middot; {html.escape(get_git_version())}"
+            self.footer_made = made
+        file.write(FOOTER.replace("gitstats</a>", f"gitstats</a> {made}", 1))
 
     def print_header(self, file: Any, page: str = "index.html") -> None:
         """
@@ -3542,6 +3778,16 @@ class HTMLReportCreator(ReportCreator):
 
         links = "\n            ".join(nav_link(href, label, current) for href, label in NAV_PAGES)
         ai_link = nav_link("ai-insights.html", "AI Insights", current) if has_ai else ""
+        # On a phone the row of links shows three or four of the pages and the
+        # rest by scrolling sideways, which nothing on screen says. There the
+        # same links are a menu named after the current page: a <details>, so
+        # it opens where the page's scripts do not run.
+        pages = dict(NAV_PAGES + ((("ai-insights.html", "AI Insights"),) if has_ai else ()))
+        menu = (
+            '<details class="nav-menu"><summary><span class="nav-menu-label">Page</span> '
+            f"{pages.get(current or '', 'Menu')}</summary>"
+            f"<ul>{links}{ai_link}</ul></details>"
+        )
 
         github_icon = (
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" '
@@ -3564,6 +3810,7 @@ class HTMLReportCreator(ReportCreator):
             {links}
             {ai_link}
             </ul>
+            {menu}
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub">{github_icon}</a>
             {THEME_TOGGLE_BUTTON}
@@ -4407,6 +4654,242 @@ def months_back(month: str, count: int) -> str:
 def sum_since(by_month: dict[str, int], month: str) -> int:
     """What ``by_month`` ("YYYY-MM" -> count) adds up to from ``month`` on."""
     return sum(count for key, count in by_month.items() if key >= month)
+
+
+def last_year_commits(data: Any) -> tuple[dict[str, int] | None, dict[str, int]]:
+    """Commits in each of the 12 months that end with the month of the last
+    commit, and in each of the 12 before them, oldest first ("YYYY-MM" ->
+    count). ``(None, {})`` when the data has no commits by month."""
+    by_month = getattr(data, "commits_by_month", None)
+    if not isinstance(by_month, dict) or not by_month:
+        return None, {}
+    last = max(by_month)
+
+    def window(first: int, end: int) -> dict[str, int]:
+        months = (months_back(last, back) for back in range(first, end, -1))
+        return {month: by_month.get(month, 0) for month in months}
+
+    return window(11, -1), window(23, 11)
+
+
+def recent_authors(data: Any) -> tuple[int, int] | None:
+    """How many authors committed in the 12 months up to the last commit, and
+    how many of them made their first commit then. None without that date."""
+    last = data.get_last_commit_date()
+    if not isinstance(last, datetime.datetime):
+        return None
+    cutoff = (last - datetime.timedelta(days=365)).strftime("%Y-%m-%d")
+    infos = [data.get_author_info(author) for author in data.get_authors()]
+    active = sum(1 for info in infos if str(info.get("date_last", "")) >= cutoff)
+    new = sum(1 for info in infos if str(info.get("date_first", "")) >= cutoff)
+    return active, new
+
+
+def span_text(days: int) -> str:
+    """How long a history of ``days`` days is, in the largest unit that says
+    it: "19 years", "7 months", "12 days"."""
+    years = int(days / 365.25)
+    if years:
+        return plural(years, "year")
+    months = int(days / 30.44)
+    if months >= 2:
+        return plural(months, "month")
+    return plural(days, "day")
+
+
+def sparkline_svg(values: list[int]) -> str:
+    """``values`` as a row of small bars, the tallest 28px. An image for the
+    eye only: the text next to it says the number. The bars are sized by
+    attributes, not styles, so a server that forbids inline styles (Jenkins
+    does by default) still shows them."""
+    top = max(values, default=0) or 1
+    bars = []
+    for index, value in enumerate(values):
+        # the smallest value that is not zero is still a bar
+        height = max(1, round(28 * value / top)) if value > 0 else 0
+        if height:
+            bars.append(f'<rect x="{7 * index}" y="{28 - height}" width="5" height="{height}"/>')
+    width = max(7 * len(values) - 2, 1)
+    return (
+        f'<svg class="sparkline" viewBox="0 0 {width} 28" width="{width}" height="28" '
+        f'aria-hidden="true" focusable="false">{"".join(bars)}</svg>'
+    )
+
+
+# When the overview points at a page (see overview_signals)
+SIGNAL_MAX_BUS_FACTOR = 2  # so few people own more than half of the files
+SIGNAL_TOP_AUTHORS_SHARE = 80.0  # percent of all commits made by one or two authors
+SIGNAL_HOTSPOT_SHARE = 0.5  # of the total hotspot score in the ten highest files
+SIGNAL_TREND_CHANGE = 0.25  # the last 12 months against the 12 before, up or down
+
+
+def overview_signals(data: Any) -> list[dict[str, str]]:
+    """What a reader of the overview should look at first: up to four
+    findings that the other pages have in their tiles, each with the page
+    that shows it. Each is ``{"level", "tag", "title", "detail", "href",
+    "page"}``; title and detail are HTML.
+
+    A finding is said only where the numbers call for it:
+
+    - the bus factor, when one or two people are primary owner of more than
+      half of the files and more than one person has changed files;
+    - one or two authors with 80% of the commits or more, of three or more;
+    - the ten highest-scoring files holding half of the hotspot score or
+      more, when more than ten files have a score;
+    - the commits of the last 12 months being a quarter more or fewer than
+      those of the 12 months before, in a history that covers both.
+
+    "The last 12 months" are the ones up to the last commit, as on the
+    other pages.
+    """
+    found = []
+
+    ownership = head_ownership(data)
+    bus_factor = ownership["bus_factor"]
+    if 0 < bus_factor <= SIGNAL_MAX_BUS_FACTOR and len(ownership["authors"]) > 1:
+        owners = [author_html(name) for name in ownership["bus_factor_authors"]]
+        owned = (
+            f"primary owner of {format_int(ownership['bus_factor_files'])} of "
+            f"{plural(ownership['total_files'], 'file')}"
+        )
+        detail = (
+            f"{owners[0]} is the {owned}."
+            if bus_factor == 1
+            else f"{' and '.join(owners)} are, between them, {owned}."
+        )
+        single = ownership["single_owner_files"]
+        if single:
+            detail += (
+                f" {plural(single, 'file')} {'has' if single == 1 else 'have'} only ever "
+                "been changed by one person."
+            )
+        found.append(
+            {
+                "level": "risk" if bus_factor == 1 else "watch",
+                "tag": "Risk" if bus_factor == 1 else "Watch",
+                "title": f"Bus factor is {bus_factor}",
+                "detail": detail,
+                "href": "ownership.html",
+                "page": "Code Ownership",
+            }
+        )
+
+    everyone = data.get_authors()
+    if len(everyone) >= 3:
+        shares = [data.get_author_info(author)["commits_frac"] for author in everyone[:2]]
+        title = ""
+        if shares[0] >= SIGNAL_TOP_AUTHORS_SHARE:
+            title = f"{author_html(everyone[0])} made {shares[0]:.1f}% of the commits"
+        elif sum(shares) >= SIGNAL_TOP_AUTHORS_SHARE:
+            title = f"2 authors made {sum(shares):.1f}% of the commits"
+        if title:
+            # how many of the authors are still there; with all of them active
+            # (a young project) that says nothing, and the two shares do
+            recent = recent_authors(data)
+            if recent and recent[0] < len(everyone):
+                active, new = recent
+                detail = (
+                    f"{format_int(active)} of {plural(len(everyone), 'author')} committed "
+                    "in the last 12 months"
+                    + (f", {format_int(new)} of them for the first time." if new else ".")
+                )
+            else:
+                detail = (
+                    " and ".join(
+                        f"{author_html(author)} {share:.1f}%"
+                        for author, share in zip(everyone[:2], shares)
+                    )
+                    + "."
+                )
+            found.append(
+                {
+                    "level": "watch",
+                    "tag": "Watch",
+                    "title": title,
+                    "detail": detail,
+                    "href": "authors.html",
+                    "page": "Authors",
+                }
+            )
+
+    hotspot_files = getattr(data, "hotspot_files", {})
+    files = compute_hotspots(hotspot_files if isinstance(hotspot_files, dict) else {})["files"]
+    total_score = sum(fs["score"] for fs in files)
+    if len(files) > 10 and total_score:
+        share = sum(fs["score"] for fs in files[:10]) / total_score
+        if share >= SIGNAL_HOTSPOT_SHARE:
+            first = files[0]
+            found.append(
+                {
+                    "level": "watch",
+                    "tag": "Watch",
+                    "title": f"10 files hold {100.0 * share:.1f}% of the hotspot score",
+                    "detail": (
+                        f'<span class="path">{html.escape(first["path"])}</span> leads: '
+                        f"{plural(first['lines'], 'line')}, changed "
+                        f"{plural(first['churn'], 'time')}."
+                    ),
+                    "href": "hotspots.html",
+                    "page": "Hotspots",
+                }
+            )
+
+    recent_months, before_months = last_year_commits(data)
+    by_month = getattr(data, "commits_by_month", None)
+    # both windows are inside the history: a project in its second year has
+    # not "doubled", it has had more months
+    if (
+        recent_months is not None
+        and isinstance(by_month, dict)
+        and min(by_month) <= min(before_months)
+    ):
+        now, then = sum(recent_months.values()), sum(before_months.values())
+        title = ""
+        if now and not then:
+            title = "Commits again, after 12 months without any"
+        elif now > 2 * then:
+            title = "Activity more than doubled in a year"
+        elif then and now >= (1 + SIGNAL_TREND_CHANGE) * then:
+            title = f"Activity is up {100.0 * (now - then) / then:.0f}% on the year before"
+        elif then and 2 * now < then:
+            title = "Activity fell by more than half in a year"
+        elif then and now <= (1 - SIGNAL_TREND_CHANGE) * then:
+            title = f"Activity is down {100.0 * (then - now) / then:.0f}% on the year before"
+        if title:
+            found.append(
+                {
+                    "level": "up" if now > then else "down",
+                    "tag": "Trend",
+                    "title": title,
+                    "detail": (
+                        f"{plural(now, 'commit')} in the last 12 months, against "
+                        f"{format_int(then)} in the 12 months before."
+                    ),
+                    "href": "activity.html",
+                    "page": "Activity",
+                }
+            )
+    return found
+
+
+def signals_html(signals: list[dict[str, str]]) -> str:
+    """The overview's "Worth a look" section: each finding with its tag, and
+    a link to the page that shows it. Nothing when there is none."""
+    if not signals:
+        return ""
+    items = "".join(
+        f'<li class="signal signal-{signal["level"]}">'
+        f'<span class="signal-tag">{signal["tag"]}</span>'
+        f'<strong class="signal-title">{signal["title"]}</strong>'
+        + (f'<span class="signal-detail">{signal["detail"]}</span>' if signal["detail"] else "")
+        + f'<a class="signal-link" href="{signal["href"]}">{signal["page"]} &rarr;</a></li>'
+        for signal in signals
+    )
+    return (
+        '<section class="signals-section">'
+        + html_header(2, "Worth a look")
+        + f'<ul class="signals">{items}</ul></section>'
+    )
 
 
 # Why a year with commits can have no lines: see lines_uncounted()

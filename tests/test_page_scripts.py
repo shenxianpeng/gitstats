@@ -274,6 +274,95 @@ def test_the_chart_script_runs_without_chart_js():
     assert defined == "function"
 
 
+def _hotspot_plot(points, median_lines, median_churn, numbered, width):
+    """What the Hotspots plot draws besides its dots, on a plot ``width``
+    pixels wide: each dataset's label and color series, whether it has a
+    legend, and the text written on it before and after the dots."""
+    script = HOTSPOTS_SCRIPT.split("<script>", 1)[1].rsplit("</script>", 1)[0]
+    data = {
+        "medianLines": median_lines,
+        "medianChurn": median_churn,
+        "leastLines": min(p[0] for p in points),
+        "leastChurn": min(p[1] for p in points),
+        "points": [
+            [f"f{n}", lines, churn, score] for n, (lines, churn, score) in enumerate(points)
+        ],
+        "numbered": numbered,
+    }
+    stubs = f"""
+    const document = {{getElementById: () => ({{textContent: {json.dumps(json.dumps(data))},
+                                                   getContext: () => ({{}})}})}};
+    function getCSSVar(name) {{ return name; }}
+    function applyChartTheme() {{}}
+    let made = null;
+    function Chart(ctx, config) {{ made = config; }}
+    Chart.defaults = {{font: {{family: "mono"}}}};
+    """
+    body = f"""
+    const names = made.plugins[1];
+    const written = [], fills = [];
+    // a character is 7px wide; values are their own pixels, the median in the middle
+    const ctx = {{save() {{}}, restore() {{}}, fillRect() {{ fills.push(this.fillStyle); }},
+                 measureText: text => ({{width: 7 * text.length}}),
+                 fillText(text) {{ written.push([text, this.fillStyle]); }}}};
+    const chart = {{ctx: ctx, chartArea: {{top: 0, bottom: 400, left: 0, right: {width}}},
+                   scales: {{x: {{getPixelForValue: () => {width} / 2}},
+                            y: {{getPixelForValue: () => 200}}}}}};
+    names.beforeDatasetsDraw(chart);
+    const before = written.splice(0);
+    names.afterDatasetsDraw(chart);
+    console.log(JSON.stringify({{
+      series: made.data.datasets.map(d => [d.label, d.series]),
+      legend: made.options.plugins.legend.display,
+      tint: fills, before: before, numbers: written}}));
+    """
+    return _run(stubs + script + body)
+
+
+def test_the_hotspots_plot_names_its_quadrants_and_numbers_its_top_files():
+    # [lines, churn, score], highest score first, as the page gives them
+    points = [(400, 9, 180.0), (100, 5, 50.0), (50, 2, 14.0), (10, 1, 3.0)]
+    plot = _hotspot_plot(points, 100, 5, numbered=3, width=1000)
+    # two colors, not four: the large files that change often, and the rest
+    assert plot["series"] == [
+        ["Large, changed often", "hot"],
+        ["Small, rarely changed", "rest"],
+    ]
+    # the names are on the plot, each in its corner, in place of a legend
+    assert plot["legend"] is False
+    assert plot["tint"] == ["--series-hot0d"]
+    assert plot["before"] == [
+        ["LARGE, CHANGED OFTEN \u00b7 2 FILES", "--series-hot"],
+        ["SMALL, CHANGED OFTEN", "--chart-text"],
+        ["SMALL, RARELY CHANGED", "--chart-text"],
+        ["LARGE, RARELY CHANGED", "--chart-text"],
+        ["median 100 lines", "--chart-text"],
+        ["median 5 changes", "--chart-text"],
+    ]
+    # the highest scores carry their rank, in their dot's color
+    assert plot["numbers"] == [
+        ["1", "--series-hot"],
+        ["2", "--series-hot"],
+        ["3", "--chart-text"],
+    ]
+
+
+def test_a_narrow_hotspots_plot_leaves_out_the_names_that_do_not_fit():
+    points = [(400, 9, 180.0), (100, 5, 50.0), (50, 2, 14.0), (10, 1, 3.0)]
+    # 150px a quadrant: room for no name ("SMALL, CHANGED OFTEN" is 140px and its
+    # margins) and for the changes' median; the numbers are on the dots all the same
+    plot = _hotspot_plot(points, 100, 5, numbered=2, width=300)
+    assert plot["before"] == [["median 5 changes", "--chart-text"]]
+    assert [number for number, _ in plot["numbers"]] == ["1", "2"]
+
+
+def test_a_few_hotspots_are_numbered_without_quadrants():
+    plot = _hotspot_plot([(9, 3, 9.0), (5, 1, 2.2)], 9, 3, numbered=2, width=1000)
+    assert plot["series"] == [["Files", 1]]
+    assert plot["before"] == [] and plot["tint"] == []
+    assert plot["numbers"] == [["1", "--chart-text"], ["2", "--chart-text"]]
+
+
 def _groups_after(hash_at_load: str, then: str) -> list:
     """Which rows the group filter shows when the page opens at
     ``hash_at_load`` and the address then changes to ``then``."""
