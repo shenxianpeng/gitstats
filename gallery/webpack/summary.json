@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:16:35+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:29:03+00:00",
   "name": "webpack",
   "report_path": "index.html",
   "first_commit": "2012-03-10 12:11:23",
-  "last_commit": "2026-11-08 22:11:16",
-  "age_days": 5357,
-  "active_days": 3271,
-  "total_commits": 20425,
-  "total_authors": 935,
-  "active_authors_12mo": 48,
-  "commits_last_12mo": 2199,
-  "total_files": 45181,
-  "total_lines": 1369265,
-  "lines_added": 2584218,
-  "lines_removed": 1214578,
+  "last_commit": "2026-11-16 01:17:28",
+  "age_days": 5364,
+  "active_days": 3279,
+  "total_commits": 20547,
+  "total_authors": 939,
+  "active_authors_12mo": 52,
+  "commits_last_12mo": 2321,
+  "total_files": 49445,
+  "total_lines": 1484823,
+  "lines_added": 2754305,
+  "lines_removed": 1269111,
   "total_tags": 654,
   "era": "surge",
   "top_authors": [
@@ -24,8 +24,8 @@
       "commits": 9452
     },
     {
-      "name": "Sebastian Beltran",
-      "commits": 3261
+      "name": "Alexander Akait",
+      "commits": 3366
     },
     {
       "name": "Sean Larkin",
@@ -41,12 +41,16 @@
     }
   ],
   "author_commits": {
-    "Sebastian Beltran": 3261,
-    "Raj Aryan": 108,
+    "Alexander Akait": 3366,
+    "Richard Crovern": 1,
+    "Prakash Meena": 2,
+    "Lucas Pereira": 1,
+    "Raj Aryan": 113,
+    "Dinesh H Suthar": 1,
+    "hai-x": 224,
     "faizan": 2,
     "Xiao": 174,
     "Aviv Keller": 31,
-    "hai-x": 223,
     "bob": 2,
     "Eshiv": 8,
     "Victor Hugo Macedo Paes Leme": 1,
@@ -992,13 +996,13 @@
     "2023": 1153,
     "2024": 1152,
     "2025": 681,
-    "2026": 2146
+    "2026": 2268
   },
   "ai_assisted": {
-    "commits": 346,
+    "commits": 395,
     "authored": 2,
     "assistants": {
-      "Claude": 335,
+      "Claude": 384,
       "CodeRabbit": 8,
       "GitHub Copilot": 4
     },
@@ -1026,7 +1030,7 @@
       "2026-08": 2,
       "2026-09": 30,
       "2026-10": 219,
-      "2026-11": 62
+      "2026-11": 111
     },
     "commits_by_month": {
       "2024-12": 25,
@@ -1052,19 +1056,19 @@
       "2026-08": 238,
       "2026-09": 383,
       "2026-10": 554,
-      "2026-11": 146
+      "2026-11": 268
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 20425,
+    "commits": 20547,
     "by_kind": {
       "organization": 331,
-      "one_person": 1492,
-      "personal": 14270,
-      "hidden": 2697,
+      "one_person": 1493,
+      "personal": 14277,
+      "hidden": 2805,
       "unknown": 6,
-      "bot": 1629
+      "bot": 1635
     },
     "organization_count": 15,
     "last_12mo_from": "2025-12",
@@ -1249,24 +1253,24 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 5,
-        "personal": 80,
-        "hidden": 569,
+        "one_person": 6,
+        "personal": 87,
+        "hidden": 677,
         "unknown": 0,
-        "bot": 46
+        "bot": 52
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1959,
-    "authors": 47,
-    "new_authors": 36,
+    "commits": 2075,
+    "authors": 51,
+    "new_authors": 40,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 18796,
+    "commits": 18912,
     "commits_by_year": {
       "2012": 274,
       "2013": 306,
@@ -1282,36 +1286,36 @@
       "2023": 1088,
       "2024": 1053,
       "2025": 587,
-      "2026": 1919
+      "2026": 2035
     },
-    "active_days": 3139
+    "active_days": 3147
   },
   "timezones": {
-    "+0000": 1407,
+    "+0000": 1411,
     "+0100": 4713,
     "+0200": 6308,
-    "+0300": 4036,
+    "+0300": 4140,
     "+0330": 1,
     "+0400": 38,
     "+0500": 7,
-    "+0530": 702,
+    "+0530": 710,
     "+0600": 1,
     "+0700": 56,
-    "+0800": 919,
+    "+0800": 920,
     "+0900": 100,
     "+1000": 81,
     "+1100": 334,
     "+1300": 2,
     "-0200": 5,
-    "-0300": 21,
+    "-0300": 22,
     "-0400": 224,
-    "-0500": 415,
+    "-0500": 419,
     "-0600": 221,
     "-0700": 628,
     "-0800": 206
   },
   "source_lines": {
-    "added": 1900744,
-    "current": 887431
+    "added": 1986052,
+    "current": 922063
   }
 }

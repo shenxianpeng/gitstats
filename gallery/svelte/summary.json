@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:15:10+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:28:00+00:00",
   "name": "Svelte",
   "report_path": "index.html",
   "first_commit": "2016-11-16 00:33:17",
-  "last_commit": "2026-11-08 11:19:40",
-  "age_days": 3645,
-  "active_days": 2125,
-  "total_commits": 11465,
-  "total_authors": 960,
-  "active_authors_12mo": 146,
-  "commits_last_12mo": 712,
-  "total_files": 9291,
-  "total_lines": 288525,
-  "lines_added": 1033221,
-  "lines_removed": 744494,
+  "last_commit": "2026-11-15 07:47:25",
+  "age_days": 3652,
+  "active_days": 2130,
+  "total_commits": 11477,
+  "total_authors": 963,
+  "active_authors_12mo": 150,
+  "commits_last_12mo": 724,
+  "total_files": 9301,
+  "total_lines": 289626,
+  "lines_added": 1034455,
+  "lines_removed": 744627,
   "total_tags": 1016,
   "era": "steady",
   "top_authors": [
     {
       "name": "Rich Harris",
-      "commits": 5272
+      "commits": 5274
     },
     {
       "name": "Conduitry",
@@ -29,7 +29,7 @@
     },
     {
       "name": "Simon H",
-      "commits": 760
+      "commits": 761
     },
     {
       "name": "Dominic Gannaway",
@@ -41,15 +41,20 @@
     }
   ],
   "author_commits": {
-    "Elliott Johnson": 39,
+    "Rich Harris": 5274,
+    "Abderrahmane Messaadi": 1,
+    "Simon H": 761,
+    "NingLin Liu": 1,
+    "Puru Vijay": 120,
+    "G": 2,
+    "Panda Xiong": 2,
+    "Nic Polumeyv": 29,
+    "Elliott Johnson": 40,
     "Huang-404-Q": 1,
     "Tee Ming": 11,
-    "Simon H": 760,
     "Junpei Zhang": 1,
     "Filip Gornitzka Abelson": 1,
     "Muspi Merol": 1,
-    "Rich Harris": 5272,
-    "Nic Polumeyv": 28,
     "Raphael Fakhri": 1,
     "Serghei": 2,
     "Conduitry": 806,
@@ -64,7 +69,6 @@
     "Paolo Ricciuti": 253,
     "Minh Vu": 1,
     "waltu": 1,
-    "G": 1,
     "Dex": 1,
     "Mariana Castro": 1,
     "Kunpeng Xie": 1,
@@ -256,7 +260,6 @@
     "Kid": 1,
     "pgliang001": 1,
     "Shay Molcho": 1,
-    "Puru Vijay": 118,
     "eyalkutz": 1,
     "Gonzalo Ruiz": 2,
     "Basti Ortiz": 1,
@@ -1013,7 +1016,7 @@
     "2023": 860,
     "2024": 2054,
     "2025": 955,
-    "2026": 670
+    "2026": 682
   },
   "ai_assisted": {
     "commits": 23,
@@ -1073,17 +1076,17 @@
       "2026-08": 102,
       "2026-09": 32,
       "2026-10": 40,
-      "2026-11": 6
+      "2026-11": 18
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11465,
+    "commits": 11477,
     "by_kind": {
-      "organization": 965,
-      "one_person": 1325,
-      "personal": 5977,
-      "hidden": 2479,
+      "organization": 967,
+      "one_person": 1328,
+      "personal": 5981,
+      "hidden": 2482,
       "unknown": 16,
       "bot": 703
     },
@@ -1092,11 +1095,11 @@
     "top": [
       {
         "organization": "vercel.com",
-        "commits": 965,
-        "commits_last_12mo": 180,
+        "commits": 967,
+        "commits_last_12mo": 182,
         "addresses": 2,
         "first_commit": "2023-03-28",
-        "last_commit": "2026-10-22"
+        "last_commit": "2026-11-15"
       }
     ],
     "quarters": {
@@ -1157,10 +1160,10 @@
         "bot": 22
       },
       "2026-Q4": {
-        "organization": 15,
-        "one_person": 4,
-        "personal": 11,
-        "hidden": 10,
+        "organization": 17,
+        "one_person": 7,
+        "personal": 15,
+        "hidden": 13,
         "unknown": 0,
         "bot": 6
       }
@@ -1169,13 +1172,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 611,
-    "authors": 143,
-    "new_authors": 118,
+    "commits": 623,
+    "authors": 147,
+    "new_authors": 121,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 10762,
+    "commits": 10774,
     "commits_by_year": {
       "2016": 408,
       "2017": 1558,
@@ -1187,24 +1190,24 @@
       "2023": 814,
       "2024": 1732,
       "2025": 736,
-      "2026": 579
+      "2026": 591
     },
-    "active_days": 2096
+    "active_days": 2101
   },
   "timezones": {
     "+0000": 385,
-    "+0100": 1161,
+    "+0100": 1164,
     "+0200": 1191,
     "+0300": 166,
     "+0330": 8,
     "+0400": 5,
     "+0430": 2,
     "+0500": 9,
-    "+0530": 204,
+    "+0530": 206,
     "+0545": 63,
     "+0600": 5,
     "+0700": 53,
-    "+0800": 455,
+    "+0800": 458,
     "+0900": 156,
     "+1000": 26,
     "+1030": 1,
@@ -1215,14 +1218,14 @@
     "-0230": 1,
     "-0300": 82,
     "-0400": 4344,
-    "-0500": 2313,
+    "-0500": 2316,
     "-0600": 107,
-    "-0700": 545,
+    "-0700": 546,
     "-0800": 144,
     "-1000": 14
   },
   "source_lines": {
-    "added": 825395,
-    "current": 283939
+    "added": 826629,
+    "current": 285040
   }
 }

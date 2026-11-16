@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:10:21+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:23:24+00:00",
   "name": "OpenHands",
   "report_path": "index.html",
   "first_commit": "2024-03-13 03:36:30",
-  "last_commit": "2026-11-09 00:12:46",
-  "age_days": 971,
-  "active_days": 922,
-  "total_commits": 8990,
-  "total_authors": 584,
-  "active_authors_12mo": 210,
-  "commits_last_12mo": 3391,
-  "total_files": 2935,
-  "total_lines": 593470,
-  "lines_added": 2260511,
-  "lines_removed": 1667040,
-  "total_tags": 109,
+  "last_commit": "2026-11-16 00:00:59",
+  "age_days": 978,
+  "active_days": 929,
+  "total_commits": 9107,
+  "total_authors": 589,
+  "active_authors_12mo": 214,
+  "commits_last_12mo": 3508,
+  "total_files": 2974,
+  "total_lines": 601922,
+  "lines_added": 2287098,
+  "lines_removed": 1685175,
+  "total_tags": 112,
   "era": "peak",
   "top_authors": [
     {
       "name": "Hiep",
-      "commits": 719
+      "commits": 728
     },
     {
       "name": "Tim O'Farrell",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Engel Nyst",
-      "commits": 611
+      "commits": 636
     },
     {
       "name": "Robert Brennan",
@@ -41,25 +41,32 @@
     }
   ],
   "author_commits": {
-    "Juan Pedro Michelini Jorge": 43,
+    "Yuchuan He": 1,
+    "Su": 1,
+    "Graham Neubig": 504,
+    "Engel Nyst": 636,
+    "OpenHands Bot": 80,
+    "simonrosenberg": 96,
+    "Hiep": 728,
+    "Marcello Pichini": 1,
+    "\ud83d\udc3e smolpaws": 37,
+    "Bin MingQing": 1,
+    "Mohit Singh": 2,
+    "Alona": 147,
+    "Yunus Arda G\u00fcney": 1,
+    "Juan Pedro Michelini Jorge": 46,
+    "Vasco Schiavo": 131,
+    "MindOfqc": 2,
+    "Mayank Joshi": 3,
     "phatloi0010": 1,
     "Rajiv Shah": 2,
-    "Engel Nyst": 611,
-    "OpenHands Bot": 76,
-    "Alona": 144,
-    "simonrosenberg": 94,
     "jpelletier1": 17,
     "kuse": 1,
-    "Hiep": 719,
-    "Vasco Schiavo": 129,
-    "Graham Neubig": 498,
     "John-Mason P. Shackelford": 23,
     "Devin": 16,
     "Sneha Pawar": 1,
     "Henrique Hirako": 5,
     "Harsh Kashyap": 9,
-    "\ud83d\udc3e smolpaws": 35,
-    "MindOfqc": 1,
     "Rohit Malhotra": 523,
     "Tim O'Farrell": 664,
     "Tanishq": 1,
@@ -97,7 +104,6 @@
     "Jabrail": 1,
     "Shinji": 1,
     "lsmlhi_25": 1,
-    "Mayank Joshi": 2,
     "MarMar Labs": 7,
     "Tyyyy": 1,
     "kuldeepzz": 1,
@@ -140,7 +146,6 @@
     "mikemikimike": 1,
     "Nicholas-Xiong": 1,
     "karan singh": 1,
-    "Mohit Singh": 1,
     "Joe Castle": 1,
     "Christopher Haugen": 1,
     "Lokesh Kank": 1,
@@ -629,17 +634,17 @@
   "commits_by_year": {
     "2024": 2995,
     "2025": 2790,
-    "2026": 3205
+    "2026": 3322
   },
   "ai_assisted": {
-    "commits": 2608,
+    "commits": 2644,
     "authored": 17,
     "assistants": {
-      "OpenHands": 2388,
-      "Claude": 206,
+      "OpenHands": 2414,
+      "Claude": 218,
       "Cursor": 38,
       "GitHub Copilot": 5,
-      "Codex": 3,
+      "Codex": 4,
       "CodeRabbit": 1,
       "Devin": 1,
       "Jules": 1
@@ -668,7 +673,7 @@
       "2026-08": 63,
       "2026-09": 161,
       "2026-10": 161,
-      "2026-11": 44
+      "2026-11": 80
     },
     "commits_by_month": {
       "2024-12": 275,
@@ -694,30 +699,30 @@
       "2026-08": 179,
       "2026-09": 250,
       "2026-10": 454,
-      "2026-11": 163
+      "2026-11": 280
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8990,
+    "commits": 9107,
     "by_kind": {
-      "organization": 1033,
-      "one_person": 1176,
-      "personal": 3339,
-      "hidden": 2283,
+      "organization": 1040,
+      "one_person": 1182,
+      "personal": 3374,
+      "hidden": 2299,
       "unknown": 0,
-      "bot": 1159
+      "bot": 1212
     },
     "organization_count": 1,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "openhands.dev",
-        "commits": 1033,
-        "commits_last_12mo": 518,
+        "commits": 1040,
+        "commits_last_12mo": 525,
         "addresses": 11,
         "first_commit": "2024-08-28",
-        "last_commit": "2026-11-07"
+        "last_commit": "2026-11-13"
       }
     ],
     "quarters": {
@@ -778,58 +783,58 @@
         "bot": 88
       },
       "2026-Q4": {
-        "organization": 101,
-        "one_person": 34,
-        "personal": 323,
-        "hidden": 110,
+        "organization": 108,
+        "one_person": 40,
+        "personal": 358,
+        "hidden": 126,
         "unknown": 0,
-        "bot": 49
+        "bot": 102
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 3135,
-    "authors": 202,
-    "new_authors": 179,
+    "commits": 3199,
+    "authors": 207,
+    "new_authors": 184,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 7831,
+    "commits": 7895,
     "commits_by_year": {
       "2024": 2270,
       "2025": 2591,
-      "2026": 2970
+      "2026": 3034
     },
-    "active_days": 922
+    "active_days": 928
   },
   "timezones": {
-    "+0000": 429,
-    "+0100": 381,
+    "+0000": 448,
+    "+0100": 413,
     "+0200": 1100,
-    "+0300": 104,
+    "+0300": 105,
     "+0330": 4,
     "+0400": 388,
     "+0500": 3,
-    "+0530": 252,
+    "+0530": 253,
     "+0545": 5,
     "+0600": 1,
-    "+0700": 801,
-    "+0800": 767,
+    "+0700": 813,
+    "+0800": 771,
     "+0900": 54,
     "+1000": 2,
     "+1100": 2,
     "+1300": 1,
-    "-0300": 64,
+    "-0300": 67,
     "-0400": 2094,
-    "-0500": 1129,
+    "-0500": 1171,
     "-0600": 546,
-    "-0700": 771,
-    "-0800": 92
+    "-0700": 773,
+    "-0800": 93
   },
   "source_lines": {
-    "added": 1937249,
-    "current": 568294
+    "added": 1961146,
+    "current": 579115
   }
 }

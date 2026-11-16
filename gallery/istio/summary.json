@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:12:45+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:25:54+00:00",
   "name": "Istio",
   "report_path": "index.html",
   "first_commit": "2016-11-18 23:57:24",
-  "last_commit": "2026-11-08 21:31:28",
-  "age_days": 3642,
-  "active_days": 3365,
-  "total_commits": 26872,
-  "total_authors": 1285,
-  "active_authors_12mo": 166,
-  "commits_last_12mo": 1206,
-  "total_files": 6786,
-  "total_lines": 993846,
-  "lines_added": 8140202,
-  "lines_removed": 7141240,
+  "last_commit": "2026-11-15 18:17:55",
+  "age_days": 3649,
+  "active_days": 3371,
+  "total_commits": 26891,
+  "total_authors": 1291,
+  "active_authors_12mo": 168,
+  "commits_last_12mo": 1225,
+  "total_files": 6796,
+  "total_lines": 994376,
+  "lines_added": 8140873,
+  "lines_removed": 7141381,
   "total_tags": 54,
   "era": "steady",
   "top_authors": [
     {
       "name": "Istio Automation",
-      "commits": 4205
+      "commits": 4211
     },
     {
       "name": "John Howard",
@@ -41,8 +41,19 @@
     }
   ],
   "author_commits": {
-    "Istio Automation": 4205,
-    "Petr McAllister": 105,
+    "Sonu Kumar": 1,
+    "Donald Anyamba": 1,
+    "Istio Automation": 4211,
+    "Liam White": 77,
+    "Jianyu Feng": 1,
+    "rajeshjalagam": 2,
+    "Daniel Grimm": 91,
+    "JangHyukJin": 2,
+    "Alexey Vostrikov": 1,
+    "Daniel Hawton": 22,
+    "artikq": 1,
+    "Maxim Babushkin": 33,
+    "Petr McAllister": 106,
     "Adil Fulara": 2,
     "Francisco Herrera": 25,
     "Jackson Greer": 22,
@@ -54,7 +65,6 @@
     "Jackie Maertens": 46,
     "Rudrakh Panigrahi": 23,
     "Rama Chavali": 873,
-    "Maxim Babushkin": 32,
     "Nils DEYBACH": 1,
     "yzheatlas": 1,
     "David Jumani": 2,
@@ -85,10 +95,8 @@
     "Filip Brychta": 2,
     "chansuke": 4,
     "Cameron Garrison": 7,
-    "Daniel Grimm": 90,
     "cyran-ryan": 1,
     "Steven Landow": 348,
-    "Liam White": 76,
     "Gustavo Meira": 8,
     "Sandeep Varma": 3,
     "Rajat Vig": 1,
@@ -100,7 +108,6 @@
     "Krinkin, Mike": 33,
     "Jeremy Schoemaker": 1,
     "Yap Sok Ann": 3,
-    "JangHyukJin": 1,
     "Johanan Liebermann": 2,
     "Sridhar Gaddam": 47,
     "Tom Reeb": 2,
@@ -122,7 +129,6 @@
     "Dmitry Kartsev": 3,
     "Matthew Wynn": 1,
     "Aslak Knutsen": 3,
-    "Daniel Hawton": 21,
     "Nikolaus Schuetz": 2,
     "Alan Wang": 5,
     "Ricardo Pchevuzinske Katz": 7,
@@ -1338,13 +1344,13 @@
     "2023": 2538,
     "2024": 2341,
     "2025": 1459,
-    "2026": 1145
+    "2026": 1164
   },
   "ai_assisted": {
-    "commits": 23,
+    "commits": 25,
     "authored": 0,
     "assistants": {
-      "Claude": 16,
+      "Claude": 18,
       "GitHub Copilot": 6,
       "Cursor": 1
     },
@@ -1372,7 +1378,7 @@
       "2026-08": 2,
       "2026-09": 0,
       "2026-10": 5,
-      "2026-11": 0
+      "2026-11": 2
     },
     "commits_by_month": {
       "2024-12": 151,
@@ -1398,19 +1404,19 @@
       "2026-08": 122,
       "2026-09": 137,
       "2026-10": 145,
-      "2026-11": 41
+      "2026-11": 60
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 26872,
+    "commits": 26891,
     "by_kind": {
-      "organization": 12997,
+      "organization": 13000,
       "one_person": 913,
-      "personal": 4531,
-      "hidden": 4470,
+      "personal": 4536,
+      "hidden": 4475,
       "unknown": 0,
-      "bot": 3961
+      "bot": 3967
     },
     "organization_count": 30,
     "last_12mo_from": "2025-12",
@@ -1449,11 +1455,11 @@
       },
       {
         "organization": "redhat.com",
-        "commits": 660,
-        "commits_last_12mo": 46,
+        "commits": 662,
+        "commits_last_12mo": 48,
         "addresses": 37,
         "first_commit": "2017-08-15",
-        "last_commit": "2026-11-03"
+        "last_commit": "2026-11-12"
       },
       {
         "organization": "daocloud.io",
@@ -1465,11 +1471,11 @@
       },
       {
         "organization": "solo.io",
-        "commits": 277,
-        "commits_last_12mo": 84,
+        "commits": 278,
+        "commits_last_12mo": 85,
         "addresses": 23,
         "first_commit": "2021-02-24",
-        "last_commit": "2026-11-03"
+        "last_commit": "2026-11-10"
       },
       {
         "organization": "microsoft.com",
@@ -1714,25 +1720,25 @@
         "bot": 86
       },
       "2026-Q4": {
-        "organization": 51,
+        "organization": 54,
         "one_person": 8,
-        "personal": 52,
-        "hidden": 14,
+        "personal": 57,
+        "hidden": 19,
         "unknown": 0,
-        "bot": 61
+        "bot": 67
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1202,
-    "authors": 160,
-    "new_authors": 98,
-    "half_of_commits": 5
+    "commits": 1221,
+    "authors": 166,
+    "new_authors": 104,
+    "half_of_commits": 6
   },
   "humans": {
-    "commits": 22911,
+    "commits": 22924,
     "commits_by_year": {
       "2016": 134,
       "2017": 2811,
@@ -1744,15 +1750,15 @@
       "2023": 1702,
       "2024": 1497,
       "2025": 849,
-      "2026": 796
+      "2026": 809
     },
-    "active_days": 3123
+    "active_days": 3129
   },
   "timezones": {
-    "+0000": 254,
-    "+0100": 502,
-    "+0200": 761,
-    "+0300": 275,
+    "+0000": 255,
+    "+0100": 506,
+    "+0200": 762,
+    "+0300": 276,
     "+0330": 1,
     "+0400": 6,
     "+0500": 3,
@@ -1760,7 +1766,7 @@
     "+0600": 1,
     "+0700": 23,
     "+0800": 3700,
-    "+0900": 106,
+    "+0900": 107,
     "+1000": 17,
     "+1100": 6,
     "+1200": 8,
@@ -1768,15 +1774,15 @@
     "-0200": 7,
     "-0300": 146,
     "-0400": 2280,
-    "-0500": 1523,
-    "-0600": 338,
-    "-0700": 10378,
-    "-0800": 5267,
+    "-0500": 1524,
+    "-0600": 344,
+    "-0700": 10379,
+    "-0800": 5270,
     "-0900": 1,
     "-1000": 13
   },
   "source_lines": {
-    "added": 3432677,
-    "current": 765283
+    "added": 3433161,
+    "current": 765703
   }
 }

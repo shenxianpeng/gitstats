@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:17:38+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:29:32+00:00",
   "name": "Apache ShardingSphere",
   "report_path": "index.html",
   "first_commit": "2016-01-18 12:49:26",
-  "last_commit": "2026-11-08 14:55:54",
-  "age_days": 3948,
-  "active_days": 3439,
-  "total_commits": 50148,
+  "last_commit": "2026-11-15 15:39:53",
+  "age_days": 3955,
+  "active_days": 3443,
+  "total_commits": 50154,
   "total_authors": 740,
-  "active_authors_12mo": 68,
-  "commits_last_12mo": 2742,
-  "total_files": 17446,
-  "total_lines": 1491760,
-  "lines_added": 4836598,
-  "lines_removed": 3344577,
+  "active_authors_12mo": 66,
+  "commits_last_12mo": 2748,
+  "total_files": 17448,
+  "total_lines": 1492353,
+  "lines_added": 4837232,
+  "lines_removed": 3344618,
   "total_tags": 37,
   "era": "steady",
   "top_authors": [
     {
       "name": "Liang Zhang",
-      "commits": 18924
+      "commits": 18925
     },
     {
       "name": "Juan Pan(Trista)",
@@ -37,17 +37,17 @@
     },
     {
       "name": "Zhengqiang Duan",
-      "commits": 1573
+      "commits": 1575
     }
   ],
   "author_commits": {
-    "Liang Zhang": 18924,
+    "Liang Zhang": 18925,
+    "Hongsheng Zhong": 738,
+    "Zhengqiang Duan": 1575,
     "ZIHAN DAI": 13,
-    "Hongsheng Zhong": 735,
     "Raigor": 505,
     "Mohd Irshad": 1,
     "Reassoonn": 1,
-    "Zhengqiang Duan": 1573,
     "Eunbin Son": 58,
     "jingouzhui": 1,
     "ZhangCheng": 542,
@@ -793,7 +793,7 @@
     "2023": 4028,
     "2024": 3620,
     "2025": 2956,
-    "2026": 2436
+    "2026": 2442
   },
   "ai_assisted": {
     "commits": 63,
@@ -854,14 +854,14 @@
       "2026-08": 339,
       "2026-09": 298,
       "2026-10": 295,
-      "2026-11": 45
+      "2026-11": 51
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 50148,
+    "commits": 50154,
     "by_kind": {
-      "organization": 15880,
+      "organization": 15886,
       "one_person": 526,
       "personal": 30566,
       "hidden": 3084,
@@ -873,11 +873,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 15415,
-        "commits_last_12mo": 2088,
+        "commits": 15421,
+        "commits_last_12mo": 2094,
         "addresses": 21,
         "first_commit": "2018-03-02",
-        "last_commit": "2026-11-08"
+        "last_commit": "2026-11-15"
       },
       {
         "organization": "huobi.com",
@@ -978,7 +978,7 @@
         "bot": 4
       },
       "2026-Q4": {
-        "organization": 273,
+        "organization": 279,
         "one_person": 0,
         "personal": 17,
         "hidden": 50,
@@ -990,13 +990,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2736,
+    "commits": 2742,
     "authors": 64,
     "new_authors": 45,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 50127,
+    "commits": 50133,
     "commits_by_year": {
       "2016": 399,
       "2017": 2025,
@@ -1008,9 +1008,9 @@
       "2023": 4025,
       "2024": 3617,
       "2025": 2953,
-      "2026": 2430
+      "2026": 2436
     },
-    "active_days": 3439
+    "active_days": 3443
   },
   "timezones": {
     "+0000": 14,
@@ -1021,7 +1021,7 @@
     "+0530": 482,
     "+0600": 1,
     "+0700": 49,
-    "+0800": 48820,
+    "+0800": 48826,
     "+0900": 106,
     "+1000": 8,
     "+1100": 6,
@@ -1035,7 +1035,7 @@
     "-0800": 10
   },
   "source_lines": {
-    "added": 6614429,
-    "current": 1491365
+    "added": 6615063,
+    "current": 1491958
   }
 }

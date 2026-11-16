@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:10:03+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:23:22+00:00",
   "name": "Cline",
   "report_path": "index.html",
   "first_commit": "2024-07-06 00:51:41",
-  "last_commit": "2026-11-06 18:48:41",
-  "age_days": 854,
-  "active_days": 754,
-  "total_commits": 7751,
-  "total_authors": 349,
-  "active_authors_12mo": 145,
-  "commits_last_12mo": 3626,
-  "total_files": 4464,
-  "total_lines": 1231852,
-  "lines_added": 2772876,
-  "lines_removed": 1541019,
+  "last_commit": "2026-11-12 22:03:14",
+  "age_days": 860,
+  "active_days": 758,
+  "total_commits": 7767,
+  "total_authors": 351,
+  "active_authors_12mo": 143,
+  "commits_last_12mo": 3642,
+  "total_files": 4470,
+  "total_lines": 1236307,
+  "lines_added": 2780249,
+  "lines_removed": 1543937,
   "total_tags": 777,
   "era": "peak",
   "top_authors": [
     {
-      "name": "Haley Park",
-      "commits": 3626
+      "name": "Saoud Rizwan",
+      "commits": 3630
     },
     {
       "name": "celestial-vault",
@@ -41,13 +41,15 @@
     }
   ],
   "author_commits": {
-    "Haley Park": 3626,
-    "John Choi": 96,
+    "Dominic Cooney": 232,
+    "Saoud Rizwan": 3630,
+    "Tom\u00e1s Barreiro": 254,
+    "John Choi": 97,
+    "Steven Huang": 1,
+    "Nagizaaz Shaik": 1,
     "Aditya Batra": 1,
-    "Miko\u0142aj Kondratek": 224,
     "zhengqiuyang": 1,
     "Max": 106,
-    "Tom\u00e1s Barreiro": 253,
     "Etisha Garg": 6,
     "coby-mckinney": 1,
     "Hugo": 1,
@@ -394,7 +396,7 @@
   "commits_by_year": {
     "2024": 1067,
     "2025": 3336,
-    "2026": 3348
+    "2026": 3364
   },
   "ai_assisted": {
     "commits": 168,
@@ -454,17 +456,17 @@
       "2026-08": 392,
       "2026-09": 323,
       "2026-10": 227,
-      "2026-11": 24
+      "2026-11": 40
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7751,
+    "commits": 7767,
     "by_kind": {
-      "organization": 913,
+      "organization": 918,
       "one_person": 257,
-      "personal": 1223,
-      "hidden": 5170,
+      "personal": 1225,
+      "hidden": 5179,
       "unknown": 0,
       "bot": 188
     },
@@ -473,11 +475,11 @@
     "top": [
       {
         "organization": "cline.bot",
-        "commits": 858,
-        "commits_last_12mo": 673,
+        "commits": 863,
+        "commits_last_12mo": 678,
         "addresses": 16,
         "first_commit": "2025-04-15",
-        "last_commit": "2026-10-29"
+        "last_commit": "2026-11-12"
       },
       {
         "organization": "sap.com",
@@ -578,10 +580,10 @@
         "bot": 9
       },
       "2026-Q4": {
-        "organization": 15,
+        "organization": 20,
         "one_person": 4,
-        "personal": 22,
-        "hidden": 209,
+        "personal": 24,
+        "hidden": 218,
         "unknown": 0,
         "bot": 1
       }
@@ -590,44 +592,44 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 3571,
-    "authors": 134,
-    "new_authors": 107,
+    "commits": 3587,
+    "authors": 136,
+    "new_authors": 109,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 7563,
+    "commits": 7579,
     "commits_by_year": {
       "2024": 1067,
       "2025": 3188,
-      "2026": 3308
+      "2026": 3324
     },
-    "active_days": 753
+    "active_days": 757
   },
   "timezones": {
     "+0000": 81,
-    "+0100": 111,
+    "+0100": 114,
     "+0200": 231,
     "+0300": 35,
     "+0400": 37,
     "+0500": 4,
     "+0530": 61,
     "+0700": 18,
-    "+0800": 213,
-    "+0900": 161,
+    "+0800": 214,
+    "+0900": 166,
     "+1000": 5,
     "+1100": 1,
     "+1200": 3,
-    "-0300": 232,
+    "-0300": 233,
     "-0400": 969,
-    "-0500": 111,
+    "-0500": 112,
     "-0600": 66,
     "-0700": 3840,
-    "-0800": 1512,
+    "-0800": 1517,
     "-1000": 60
   },
   "source_lines": {
-    "added": 2659309,
-    "current": 1190581
+    "added": 2666679,
+    "current": 1195033
   }
 }

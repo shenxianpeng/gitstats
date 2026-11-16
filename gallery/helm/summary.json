@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:12:30+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:25:28+00:00",
   "name": "Helm",
   "report_path": "index.html",
   "first_commit": "2015-11-02 23:52:56",
-  "last_commit": "2026-11-07 10:35:14",
-  "age_days": 4023,
-  "active_days": 2447,
-  "total_commits": 10030,
-  "total_authors": 949,
-  "active_authors_12mo": 87,
-  "commits_last_12mo": 862,
+  "last_commit": "2026-11-15 13:07:59",
+  "age_days": 4031,
+  "active_days": 2452,
+  "total_commits": 10043,
+  "total_authors": 951,
+  "active_authors_12mo": 86,
+  "commits_last_12mo": 875,
   "total_files": 2048,
-  "total_lines": 133989,
-  "lines_added": 345173,
-  "lines_removed": 211099,
+  "total_lines": 134125,
+  "lines_added": 345411,
+  "lines_removed": 211201,
   "total_tags": 43,
   "era": "steady",
   "top_authors": [
@@ -41,10 +41,12 @@
     }
   ],
   "author_commits": {
+    "Terry Howe": 256,
+    "berce": 1,
+    "ump45nose": 2,
+    "Sean Schneeweiss": 2,
     "Sam Darwin": 1,
     "Piotr \u0141\u0105czykowski": 1,
-    "Terry Howe": 255,
-    "ump45nose": 1,
     "Zain Qureshi": 1,
     "Gerard Louis Andres Recinto": 2,
     "George Jenkins": 309,
@@ -1003,7 +1005,7 @@
     "2023": 439,
     "2024": 618,
     "2025": 1342,
-    "2026": 770
+    "2026": 783
   },
   "ai_assisted": {
     "commits": 30,
@@ -1064,19 +1066,19 @@
       "2026-08": 36,
       "2026-09": 37,
       "2026-10": 26,
-      "2026-11": 3
+      "2026-11": 16
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 10030,
+    "commits": 10043,
     "by_kind": {
       "organization": 3709,
-      "one_person": 2184,
-      "personal": 2786,
-      "hidden": 859,
+      "one_person": 2186,
+      "personal": 2787,
+      "hidden": 861,
       "unknown": 10,
-      "bot": 482
+      "bot": 490
     },
     "organization_count": 32,
     "last_12mo_from": "2025-12",
@@ -1397,24 +1399,24 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 1,
-        "personal": 10,
-        "hidden": 3,
+        "one_person": 3,
+        "personal": 11,
+        "hidden": 5,
         "unknown": 0,
-        "bot": 15
+        "bot": 23
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 703,
-    "authors": 81,
-    "new_authors": 59,
+    "commits": 708,
+    "authors": 83,
+    "new_authors": 61,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 9548,
+    "commits": 9553,
     "commits_by_year": {
       "2015": 237,
       "2016": 2248,
@@ -1427,15 +1429,15 @@
       "2023": 383,
       "2024": 529,
       "2025": 1218,
-      "2026": 625
+      "2026": 630
     },
-    "active_days": 2372
+    "active_days": 2374
   },
   "timezones": {
-    "+0000": 794,
-    "+0100": 753,
+    "+0000": 795,
+    "+0100": 755,
     "+0200": 549,
-    "+0300": 113,
+    "+0300": 114,
     "+0330": 4,
     "+0400": 3,
     "+0430": 2,
@@ -1443,7 +1445,7 @@
     "+0530": 154,
     "+0600": 1,
     "+0700": 27,
-    "+0800": 382,
+    "+0800": 383,
     "+0900": 67,
     "+1000": 5,
     "+1100": 7,
@@ -1454,12 +1456,12 @@
     "-0400": 1133,
     "-0500": 768,
     "-0600": 1673,
-    "-0700": 2353,
+    "-0700": 2361,
     "-0800": 1176,
     "-1000": 1
   },
   "source_lines": {
-    "added": 319136,
-    "current": 115198
+    "added": 319322,
+    "current": 115334
   }
 }

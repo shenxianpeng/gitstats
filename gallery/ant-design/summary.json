@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:19:06+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:30:58+00:00",
   "name": "Ant Design",
   "report_path": "index.html",
   "first_commit": "2015-05-07 10:50:36",
-  "last_commit": "2026-11-09 02:31:56",
-  "age_days": 4204,
-  "active_days": 3851,
-  "total_commits": 33320,
-  "total_authors": 2618,
-  "active_authors_12mo": 194,
-  "commits_last_12mo": 2303,
-  "total_files": 5069,
-  "total_lines": 1863467,
-  "lines_added": 6415927,
-  "lines_removed": 4552459,
+  "last_commit": "2026-11-16 03:12:48",
+  "age_days": 4211,
+  "active_days": 3856,
+  "total_commits": 33346,
+  "total_authors": 2619,
+  "active_authors_12mo": 192,
+  "commits_last_12mo": 2329,
+  "total_files": 5071,
+  "total_lines": 1863697,
+  "lines_added": 6416450,
+  "lines_removed": 4552752,
   "total_tags": 759,
   "era": "steady",
   "top_authors": [
@@ -29,7 +29,7 @@
     },
     {
       "name": "lijianan",
-      "commits": 1568
+      "commits": 1579
     },
     {
       "name": "Benjy Cui",
@@ -41,14 +41,16 @@
     }
   ],
   "author_commits": {
-    "lijianan": 1568,
+    "lijianan": 1579,
+    "Amumu": 235,
+    "Bin": 5,
+    "\u9ad8\u8273\u5175": 372,
+    "Karim Masmoudi": 1,
     "AMin": 4,
     "Insan Rizky": 1,
     "Kayokoi": 1,
     "Wan Xiankai": 1,
-    "Amumu": 233,
     "Nicol\u00f2 Zandarin": 15,
-    "\u9ad8\u8273\u5175": 363,
     "Daliik": 1,
     "\u4e8c\u8d27\u7231\u5403\u767d\u841d\u535c": 2820,
     "Raphael Fakhri": 1,
@@ -121,7 +123,6 @@
     "Orwa Mahmoud": 1,
     "OrbisAI Security": 1,
     "Deepak Yadav": 1,
-    "Bin": 4,
     "greymoth": 1,
     "Guo Yunhe": 96,
     "Olawuni Olagoke": 1,
@@ -2672,7 +2673,7 @@
     "2023": 2676,
     "2024": 2021,
     "2025": 2248,
-    "2026": 2117
+    "2026": 2143
   },
   "ai_assisted": {
     "commits": 342,
@@ -2734,19 +2735,19 @@
       "2026-08": 200,
       "2026-09": 186,
       "2026-10": 159,
-      "2026-11": 43
+      "2026-11": 69
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 33320,
+    "commits": 33346,
     "by_kind": {
       "organization": 903,
       "one_person": 678,
-      "personal": 27189,
-      "hidden": 2555,
+      "personal": 27211,
+      "hidden": 2557,
       "unknown": 5,
-      "bot": 1990
+      "bot": 1992
     },
     "organization_count": 13,
     "last_12mo_from": "2025-12",
@@ -2916,23 +2917,23 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 5,
-        "personal": 113,
-        "hidden": 48,
+        "personal": 135,
+        "hidden": 50,
         "unknown": 0,
-        "bot": 36
+        "bot": 38
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1729,
-    "authors": 182,
-    "new_authors": 137,
+    "commits": 1753,
+    "authors": 183,
+    "new_authors": 138,
     "half_of_commits": 4
   },
   "humans": {
-    "commits": 31330,
+    "commits": 31354,
     "commits_by_year": {
       "2015": 3342,
       "2016": 3938,
@@ -2945,13 +2946,13 @@
       "2023": 2426,
       "2024": 1693,
       "2025": 1828,
-      "2026": 1591
+      "2026": 1615
     },
-    "active_days": 3813
+    "active_days": 3818
   },
   "timezones": {
     "+0000": 1026,
-    "+0100": 309,
+    "+0100": 310,
     "+0200": 396,
     "+0300": 227,
     "+0330": 39,
@@ -2962,7 +2963,7 @@
     "+0545": 12,
     "+0600": 9,
     "+0700": 144,
-    "+0800": 30133,
+    "+0800": 30158,
     "+0900": 116,
     "+0930": 7,
     "+1000": 40,
@@ -2980,7 +2981,7 @@
     "-1000": 1
   },
   "source_lines": {
-    "added": 1199689,
-    "current": 367999
+    "added": 1200208,
+    "current": 368227
   }
 }

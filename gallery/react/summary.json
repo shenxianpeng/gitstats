@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:16:02+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:28:46+00:00",
   "name": "React",
   "report_path": "index.html",
   "first_commit": "2013-05-28 17:04:45",
-  "last_commit": "2026-11-06 19:43:46",
-  "age_days": 4911,
-  "active_days": 3819,
-  "total_commits": 21761,
+  "last_commit": "2026-11-12 15:46:50",
+  "age_days": 4916,
+  "active_days": 3823,
+  "total_commits": 21791,
   "total_authors": 1938,
-  "active_authors_12mo": 99,
-  "commits_last_12mo": 549,
-  "total_files": 7300,
-  "total_lines": 1175233,
-  "lines_added": 3049566,
-  "lines_removed": 1871410,
+  "active_authors_12mo": 97,
+  "commits_last_12mo": 579,
+  "total_files": 7275,
+  "total_lines": 1168232,
+  "lines_added": 3053194,
+  "lines_removed": 1882039,
   "total_tags": 73,
   "era": "quiet",
   "top_authors": [
@@ -41,10 +41,13 @@
     }
   ],
   "author_commits": {
+    "Hendrik Liebau": 72,
+    "Ruslan Lesiutin": 317,
+    "Sam Zhou": 10,
+    "Alex Hunt": 7,
+    "Rub\u00e9n Norte": 35,
     "Andrew Clark": 1440,
-    "Hendrik Liebau": 70,
     "Jan Kassens": 349,
-    "Ruslan Lesiutin": 293,
     "Sebastian \"Sebbie\" Silbermann": 480,
     "Xinzi Zhou": 2,
     "Jack Pope": 147,
@@ -76,7 +79,6 @@
     "Changsu Seong": 1,
     "Sidi Eyel": 1,
     "Matt Carroll": 15,
-    "Rub\u00e9n Norte": 34,
     "Masaharu Hori": 1,
     "Will Binns-Smith": 4,
     "Matthew Costabile": 1,
@@ -88,7 +90,6 @@
     "ronnakamoto": 1,
     "BIKI DAS": 20,
     "Minh Vu": 6,
-    "Alex Hunt": 5,
     "Sam Poder": 1,
     "Tim Neutkens": 4,
     "MaxwellCohen": 1,
@@ -105,7 +106,6 @@
     "Jude Gao": 1,
     "Ulises Jeremias": 1,
     "Michael Hart": 1,
-    "Sam Zhou": 9,
     "Joseph Savona": 1165,
     "Janka Uryga": 4,
     "zxuhan7": 1,
@@ -1994,7 +1994,7 @@
     "2023": 1955,
     "2024": 2173,
     "2025": 1434,
-    "2026": 510
+    "2026": 540
   },
   "ai_assisted": {
     "commits": 39,
@@ -2054,16 +2054,16 @@
       "2026-08": 45,
       "2026-09": 48,
       "2026-10": 48,
-      "2026-11": 4
+      "2026-11": 34
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 21761,
+    "commits": 21791,
     "by_kind": {
       "organization": 4456,
-      "one_person": 7600,
-      "personal": 7357,
+      "one_person": 7629,
+      "personal": 7358,
       "hidden": 2243,
       "unknown": 7,
       "bot": 98
@@ -2235,8 +2235,8 @@
       },
       "2026-Q4": {
         "organization": 9,
-        "one_person": 15,
-        "personal": 24,
+        "one_person": 44,
+        "personal": 25,
         "hidden": 4,
         "unknown": 0,
         "bot": 0
@@ -2246,13 +2246,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 545,
+    "commits": 575,
     "authors": 97,
     "new_authors": 64,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 21663,
+    "commits": 21693,
     "commits_by_year": {
       "2013": 1412,
       "2014": 1946,
@@ -2267,13 +2267,13 @@
       "2023": 1938,
       "2024": 2146,
       "2025": 1432,
-      "2026": 506
+      "2026": 536
     },
-    "active_days": 3819
+    "active_days": 3823
   },
   "timezones": {
-    "+0000": 1290,
-    "+0100": 2411,
+    "+0000": 1315,
+    "+0100": 2413,
     "+0200": 912,
     "+0300": 233,
     "+0330": 8,
@@ -2294,15 +2294,15 @@
     "-0200": 34,
     "-0300": 71,
     "-0400": 3451,
-    "-0500": 1694,
+    "-0500": 1695,
     "-0600": 265,
     "-0700": 6967,
-    "-0800": 3326,
+    "-0800": 3328,
     "-1000": 16,
     "-1100": 1
   },
   "source_lines": {
-    "added": 2294037,
-    "current": 801959
+    "added": 2294505,
+    "current": 797270
   }
 }

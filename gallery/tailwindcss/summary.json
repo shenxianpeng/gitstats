@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:17:29+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:28:40+00:00",
   "name": "Tailwind CSS",
   "report_path": "index.html",
   "first_commit": "2017-07-20 12:38:55",
-  "last_commit": "2026-11-06 14:49:51",
-  "age_days": 3397,
-  "active_days": 1566,
-  "total_commits": 6905,
-  "total_authors": 381,
+  "last_commit": "2026-11-11 00:02:07",
+  "age_days": 3401,
+  "active_days": 1569,
+  "total_commits": 6924,
+  "total_authors": 383,
   "active_authors_12mo": 69,
-  "commits_last_12mo": 376,
-  "total_files": 563,
-  "total_lines": 201754,
-  "lines_added": 5233723,
-  "lines_removed": 5031969,
+  "commits_last_12mo": 395,
+  "total_files": 565,
+  "total_lines": 204474,
+  "lines_added": 5236618,
+  "lines_removed": 5032144,
   "total_tags": 265,
   "era": "steady",
   "top_authors": [
     {
       "name": "Adam Wathan",
-      "commits": 2900
+      "commits": 2901
     },
     {
       "name": "Robin Malfait",
-      "commits": 1023
+      "commits": 1030
     },
     {
       "name": "Jordan Pittman",
@@ -41,7 +41,10 @@
     }
   ],
   "author_commits": {
-    "Robin Malfait": 1023,
+    "Robin Malfait": 1030,
+    "huuya": 1,
+    "Adam Wathan": 2901,
+    "Rohan Dedhia": 1,
     "\uae40\ubbfc\uc6b1": 1,
     "Kevin Krausse": 1,
     "Wei-Lun Li": 3,
@@ -79,7 +82,6 @@
     "Jordan Brough": 1,
     "Serge Yudin": 1,
     "Antoine Lethimonnier": 1,
-    "Adam Wathan": 2900,
     "silverwind": 1,
     "Abhijeet Abhi": 1,
     "Daniel Polito": 1,
@@ -433,7 +435,7 @@
     "2023": 258,
     "2024": 643,
     "2025": 712,
-    "2026": 331
+    "2026": 350
   },
   "ai_assisted": {
     "commits": 17,
@@ -493,19 +495,19 @@
       "2026-08": 24,
       "2026-09": 5,
       "2026-10": 25,
-      "2026-11": 28
+      "2026-11": 47
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 6905,
+    "commits": 6924,
     "by_kind": {
       "organization": 13,
-      "one_person": 1371,
-      "personal": 4320,
+      "one_person": 1372,
+      "personal": 4329,
       "hidden": 167,
       "unknown": 5,
-      "bot": 1029
+      "bot": 1038
     },
     "organization_count": 2,
     "last_12mo_from": "2025-12",
@@ -586,24 +588,24 @@
       },
       "2026-Q4": {
         "organization": 2,
-        "one_person": 0,
-        "personal": 36,
+        "one_person": 1,
+        "personal": 45,
         "hidden": 4,
         "unknown": 0,
-        "bot": 11
+        "bot": 20
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 320,
-    "authors": 67,
-    "new_authors": 60,
+    "commits": 330,
+    "authors": 69,
+    "new_authors": 62,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 5876,
+    "commits": 5886,
     "commits_by_year": {
       "2017": 1392,
       "2018": 263,
@@ -614,21 +616,21 @@
       "2023": 213,
       "2024": 609,
       "2025": 504,
-      "2026": 297
+      "2026": 307
     },
-    "active_days": 1328
+    "active_days": 1331
   },
   "timezones": {
-    "+0000": 834,
+    "+0000": 843,
     "+0100": 908,
     "+0200": 889,
     "+0300": 30,
     "+0500": 8,
-    "+0530": 24,
+    "+0530": 25,
     "+0600": 2,
     "+0700": 6,
     "+0800": 38,
-    "+0900": 21,
+    "+0900": 22,
     "+0930": 27,
     "+1000": 18,
     "+1030": 1,
@@ -637,13 +639,13 @@
     "-0200": 4,
     "-0300": 16,
     "-0400": 2576,
-    "-0500": 1399,
+    "-0500": 1407,
     "-0600": 37,
     "-0700": 48,
     "-0800": 9
   },
   "source_lines": {
-    "added": 591699,
-    "current": 177195
+    "added": 594594,
+    "current": 179915
   }
 }

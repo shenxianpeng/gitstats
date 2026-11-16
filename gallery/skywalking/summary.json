@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:16:52+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:29:17+00:00",
   "name": "Apache SkyWalking",
   "report_path": "index.html",
   "first_commit": "2015-11-07 03:30:37",
-  "last_commit": "2026-11-07 10:38:39",
-  "age_days": 4019,
-  "active_days": 2713,
-  "total_commits": 8672,
+  "last_commit": "2026-11-16 00:27:19",
+  "age_days": 4027,
+  "active_days": 2719,
+  "total_commits": 8681,
   "total_authors": 517,
   "active_authors_12mo": 27,
-  "commits_last_12mo": 285,
-  "total_files": 5646,
-  "total_lines": 615726,
-  "lines_added": 2383704,
-  "lines_removed": 1767820,
+  "commits_last_12mo": 294,
+  "total_files": 5792,
+  "total_lines": 643918,
+  "lines_added": 2415326,
+  "lines_removed": 1771250,
   "total_tags": 18,
   "era": "steady",
   "top_authors": [
     {
       "name": "\u5434\u665f Wu Sheng",
-      "commits": 3198
+      "commits": 3205
     },
     {
       "name": "\u5f6d\u52c7\u5347 pengys",
@@ -33,7 +33,7 @@
     },
     {
       "name": "kezhenxu94",
-      "commits": 537
+      "commits": 538
     },
     {
       "name": "Wan Kai",
@@ -41,14 +41,14 @@
     }
   ],
   "author_commits": {
-    "\u5434\u665f Wu Sheng": 3198,
+    "\u5434\u665f Wu Sheng": 3205,
+    "kezhenxu94": 538,
+    "songzhendong": 26,
     "Wan Kai": 388,
-    "songzhendong": 25,
     "Mohd Irshad": 1,
     "S1Jackson-cmd": 1,
     "dennis zhuang": 1,
     "Leo Camus": 3,
-    "kezhenxu94": 537,
     "mike-realuptime": 1,
     "hope350": 1,
     "peachisai": 26,
@@ -571,7 +571,7 @@
     "2023": 409,
     "2024": 312,
     "2025": 232,
-    "2026": 274
+    "2026": 283
   },
   "ai_assisted": {
     "commits": 3,
@@ -629,16 +629,16 @@
       "2026-08": 18,
       "2026-09": 25,
       "2026-10": 36,
-      "2026-11": 14
+      "2026-11": 23
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8672,
+    "commits": 8681,
     "by_kind": {
-      "organization": 778,
+      "organization": 779,
       "one_person": 262,
-      "personal": 7309,
+      "personal": 7317,
       "hidden": 315,
       "unknown": 8,
       "bot": 0
@@ -648,11 +648,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 769,
-        "commits_last_12mo": 12,
+        "commits": 770,
+        "commits_last_12mo": 13,
         "addresses": 24,
         "first_commit": "2017-12-19",
-        "last_commit": "2026-09-29"
+        "last_commit": "2026-11-14"
       },
       {
         "organization": "tetrate.io",
@@ -721,9 +721,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 0,
+        "organization": 1,
         "one_person": 0,
-        "personal": 48,
+        "personal": 56,
         "hidden": 2,
         "unknown": 0,
         "bot": 0
@@ -733,13 +733,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 285,
+    "commits": 294,
     "authors": 26,
     "new_authors": 16,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 8672,
+    "commits": 8681,
     "commits_by_year": {
       "2015": 301,
       "2016": 985,
@@ -752,9 +752,9 @@
       "2023": 409,
       "2024": 312,
       "2025": 232,
-      "2026": 274
+      "2026": 283
     },
-    "active_days": 2713
+    "active_days": 2719
   },
   "timezones": {
     "+0000": 23,
@@ -764,7 +764,7 @@
     "+0400": 16,
     "+0530": 10,
     "+0700": 11,
-    "+0800": 8300,
+    "+0800": 8309,
     "+0900": 23,
     "+1000": 1,
     "+1100": 3,
@@ -776,7 +776,7 @@
     "-0800": 10
   },
   "source_lines": {
-    "added": 2108698,
-    "current": 603980
+    "added": 2140320,
+    "current": 632172
   }
 }

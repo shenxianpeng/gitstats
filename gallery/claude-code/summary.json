@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:09:40+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:22:49+00:00",
   "name": "Claude Code",
   "report_path": "index.html",
   "first_commit": "2025-02-22 17:23:42",
-  "last_commit": "2026-11-06 17:03:45",
-  "age_days": 622,
-  "active_days": 381,
-  "total_commits": 966,
+  "last_commit": "2026-11-15 23:10:53",
+  "age_days": 632,
+  "active_days": 388,
+  "total_commits": 1027,
   "total_authors": 60,
-  "active_authors_12mo": 35,
-  "commits_last_12mo": 599,
-  "total_files": 1483,
-  "total_lines": 66255,
-  "lines_added": 117209,
-  "lines_removed": 50952,
-  "total_tags": 264,
+  "active_authors_12mo": 33,
+  "commits_last_12mo": 660,
+  "total_files": 1556,
+  "total_lines": 78377,
+  "lines_added": 132573,
+  "lines_removed": 54194,
+  "total_tags": 268,
   "era": "steady",
   "top_authors": [
     {
-      "name": "GitHub Actions",
-      "commits": 505
+      "name": "GitHub Actions (publish-mods)",
+      "commits": 566
     },
     {
       "name": "Alice T'Poteat",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "GitHub Actions": 505,
+    "GitHub Actions (publish-mods)": 566,
     "Alice T'Poteat": 114,
     "ant-kurt": 33,
     "Claude": 16,
@@ -104,7 +104,7 @@
   },
   "commits_by_year": {
     "2025": 405,
-    "2026": 561
+    "2026": 622
   },
   "ai_assisted": {
     "commits": 85,
@@ -162,19 +162,19 @@
       "2026-08": 30,
       "2026-09": 155,
       "2026-10": 58,
-      "2026-11": 9
+      "2026-11": 70
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 966,
+    "commits": 1027,
     "by_kind": {
       "organization": 246,
       "one_person": 10,
       "personal": 31,
       "hidden": 173,
       "unknown": 0,
-      "bot": 506
+      "bot": 567
     },
     "organization_count": 1,
     "last_12mo_from": "2025-12",
@@ -251,14 +251,14 @@
         "personal": 0,
         "hidden": 9,
         "unknown": 0,
-        "bot": 54
+        "bot": 115
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 599,
+    "commits": 660,
     "authors": 30,
     "new_authors": 18,
     "half_of_commits": 1
@@ -272,7 +272,7 @@
     "active_days": 154
   },
   "timezones": {
-    "+0000": 540,
+    "+0000": 601,
     "+0100": 7,
     "+0200": 5,
     "+0300": 3,
@@ -287,7 +287,7 @@
     "-0800": 72
   },
   "source_lines": {
-    "added": 114042,
-    "current": 60665
+    "added": 128923,
+    "current": 72332
   }
 }

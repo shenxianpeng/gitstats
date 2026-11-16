@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:15:16+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:27:16+00:00",
   "name": "Apache Iceberg",
   "report_path": "index.html",
   "first_commit": "2017-12-13 21:52:43",
-  "last_commit": "2026-11-09 04:48:34",
-  "age_days": 3253,
-  "active_days": 2305,
-  "total_commits": 9600,
-  "total_authors": 852,
-  "active_authors_12mo": 283,
-  "commits_last_12mo": 1833,
-  "total_files": 6662,
-  "total_lines": 1514752,
-  "lines_added": 6786461,
-  "lines_removed": 5271665,
+  "last_commit": "2026-11-16 04:05:45",
+  "age_days": 3260,
+  "active_days": 2311,
+  "total_commits": 9663,
+  "total_authors": 857,
+  "active_authors_12mo": 285,
+  "commits_last_12mo": 1896,
+  "total_files": 6675,
+  "total_lines": 1526815,
+  "lines_added": 6800476,
+  "lines_removed": 5273617,
   "total_tags": 20,
   "era": "peak",
   "top_authors": [
@@ -41,29 +41,48 @@
     }
   ],
   "author_commits": {
-    "Yuya Ebihara": 153,
+    "Yuya Ebihara": 166,
+    "Gera Shegalov": 3,
+    "Kevin Liu": 115,
+    "Yong Zheng": 2,
+    "Anoop Johnson": 47,
+    "Russell Spitzer": 140,
+    "GuoYu": 103,
+    "Wei Luo": 1,
+    "Steven Zhen Wu": 165,
+    "Rakesh Pai": 2,
+    "Romain Manni-Bucau": 1,
+    "Gang Wu": 7,
+    "Manu Zhang": 207,
+    "YangJie": 1,
+    "Amogh Jahagirdar": 174,
+    "Rahul Shivu Mahadev": 11,
+    "Kaiqi Jin": 1,
+    "Maximilian Michels": 104,
+    "mengna-lin": 3,
+    "Lavkush Kumar": 1,
+    "chenjian2664": 4,
+    "Swapna Marru": 19,
+    "Andrei Tserakhau": 6,
+    "Raunaq Morarka": 9,
+    "Daniel Weeks": 69,
+    "zhengxiang378928908-code": 2,
+    "Hongyue/Steve Zhang": 100,
     "Yusuf YILDIZ": 3,
-    "Swapna Marru": 17,
-    "Daniel Weeks": 68,
     "Akash R Nilugal": 1,
     "Eunbin Son": 23,
     "kumarpritam863": 8,
-    "Anoop Johnson": 44,
     "gaborkaszab": 81,
-    "chenjian2664": 3,
     "Sylwester Lachiewicz": 1,
     "Aditya Kumar": 1,
-    "GuoYu": 101,
     "Anurag Mantripragada": 27,
     "Joy Haldar": 15,
     "Huaxin Gao": 92,
-    "Maximilian Michels": 102,
     "raashed": 5,
     "Prashant Singh": 124,
     "Ryan Blue": 770,
     "Philipp Fischbeck": 1,
     "Sergei Nikolaev": 12,
-    "Rahul Shivu Mahadev": 10,
     "Ross Andreucetti": 1,
     "Venkata krishnan Sowrirajan": 4,
     "slfan1989": 39,
@@ -74,16 +93,10 @@
     "jiwen624": 1,
     "Simranjeet Singh": 1,
     "Alejandro Morgante": 1,
-    "Raunaq Morarka": 8,
     "Dzeri96": 1,
     "Prathamesh Kulkarni": 2,
-    "Manu Zhang": 206,
-    "Kevin Liu": 111,
     "Szehon Ho": 104,
     "Xin Huang": 18,
-    "zhengxiang378928908-code": 1,
-    "Steven Zhen Wu": 163,
-    "Hongyue/Steve Zhang": 99,
     "pvary": 140,
     "Daksh Dave": 1,
     "Xiduo You": 1,
@@ -91,18 +104,15 @@
     "Thomas Powell": 10,
     "Vova Kolmakov": 29,
     "openinx": 86,
-    "Rakesh Pai": 1,
     "aiborodin": 17,
     "lnc": 2,
     "hreddygayam": 1,
     "Christian": 5,
     "Robin Moffatt": 20,
     "S N Munendra": 9,
-    "Amogh Jahagirdar": 173,
     "John Zhuge": 10,
     "Damanpreet Singh": 3,
     "Jaeyeon Park": 1,
-    "mengna-lin": 1,
     "Eduard Tudenhoefner": 565,
     "Akash Malbari": 2,
     "Nicholas Barton": 1,
@@ -135,7 +145,6 @@
     "Gianluca Graziadei": 4,
     "Muralikrishna Dudaka": 1,
     "Rango": 1,
-    "Andrei Tserakhau": 5,
     "Noritaka Sekiyama": 5,
     "Lucas Gameiro": 2,
     "Anish Mehta": 1,
@@ -160,7 +169,6 @@
     "Steve Loughran": 2,
     "DB Tsai": 1,
     "Bobby Morck": 2,
-    "Russell Spitzer": 138,
     "yangshangqing": 8,
     "Rainer Schamm": 1,
     "evro": 1,
@@ -187,12 +195,10 @@
     "James Dilworth": 1,
     "Anupam Yadav": 8,
     "drexler-sky": 17,
-    "Gera Shegalov": 2,
     "William E. Murray": 1,
     "Raghvendra Singh": 1,
     "Adam Szita": 15,
     "Gabriel Baldez": 1,
-    "Gang Wu": 6,
     "Ajantha Bhat": 208,
     "Zehua Zou": 1,
     "Sejal Gupta": 1,
@@ -219,7 +225,6 @@
     "Jordan Epstein": 5,
     "SevenJ": 1,
     "Pratham Manja": 1,
-    "Yong Zheng": 1,
     "Stepan Stepanishchev": 4,
     "Vrishabh": 3,
     "Maksim Konstantinov": 4,
@@ -904,20 +909,20 @@
     "2023": 1472,
     "2024": 1231,
     "2025": 1512,
-    "2026": 1716
+    "2026": 1779
   },
   "ai_assisted": {
-    "commits": 123,
+    "commits": 133,
     "authored": 0,
     "assistants": {
-      "Claude": 64,
-      "Codex": 35,
-      "Cursor": 14,
-      "GitHub Copilot": 12,
+      "Claude": 70,
+      "Codex": 37,
+      "GitHub Copilot": 17,
+      "Cursor": 15,
       "ChatGPT": 7,
       "Grok": 2,
-      "Kiro": 1,
-      "OpenCode": 1
+      "OpenCode": 2,
+      "Kiro": 1
     },
     "by_month": {
       "2024-12": 0,
@@ -943,7 +948,7 @@
       "2026-08": 12,
       "2026-09": 21,
       "2026-10": 22,
-      "2026-11": 7
+      "2026-11": 17
     },
     "commits_by_month": {
       "2024-12": 96,
@@ -969,38 +974,38 @@
       "2026-08": 197,
       "2026-09": 195,
       "2026-10": 178,
-      "2026-11": 64
+      "2026-11": 127
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9600,
+    "commits": 9663,
     "by_kind": {
-      "organization": 2992,
-      "one_person": 354,
-      "personal": 3586,
-      "hidden": 1540,
+      "organization": 3002,
+      "one_person": 356,
+      "personal": 3616,
+      "hidden": 1548,
       "unknown": 0,
-      "bot": 1128
+      "bot": 1141
     },
     "organization_count": 23,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "apache.org",
-        "commits": 1714,
-        "commits_last_12mo": 254,
+        "commits": 1721,
+        "commits_last_12mo": 261,
         "addresses": 43,
         "first_commit": "2017-12-13",
-        "last_commit": "2026-11-06"
+        "last_commit": "2026-11-13"
       },
       {
         "organization": "apple.com",
-        "commits": 577,
-        "commits_last_12mo": 15,
+        "commits": 579,
+        "commits_last_12mo": 17,
         "addresses": 14,
         "first_commit": "2018-12-21",
-        "last_commit": "2026-11-04"
+        "last_commit": "2026-11-10"
       },
       {
         "organization": "amazon.com",
@@ -1075,6 +1080,14 @@
         "last_commit": "2026-09-21"
       },
       {
+        "organization": "databricks.com",
+        "commits": 8,
+        "commits_last_12mo": 8,
+        "addresses": 5,
+        "first_commit": "2026-03-18",
+        "last_commit": "2026-11-10"
+      },
+      {
         "organization": "google.com",
         "commits": 8,
         "commits_last_12mo": 7,
@@ -1089,14 +1102,6 @@
         "addresses": 2,
         "first_commit": "2020-07-22",
         "last_commit": "2023-09-20"
-      },
-      {
-        "organization": "databricks.com",
-        "commits": 7,
-        "commits_last_12mo": 7,
-        "addresses": 4,
-        "first_commit": "2026-03-18",
-        "last_commit": "2026-10-01"
       },
       {
         "organization": "snowflake.com",
@@ -1229,25 +1234,25 @@
         "bot": 102
       },
       "2026-Q4": {
-        "organization": 46,
-        "one_person": 5,
-        "personal": 106,
-        "hidden": 44,
+        "organization": 56,
+        "one_person": 7,
+        "personal": 136,
+        "hidden": 52,
         "unknown": 0,
-        "bot": 41
+        "bot": 54
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1509,
-    "authors": 276,
-    "new_authors": 180,
+    "commits": 1559,
+    "authors": 281,
+    "new_authors": 185,
     "half_of_commits": 17
   },
   "humans": {
-    "commits": 8472,
+    "commits": 8522,
     "commits_by_year": {
       "2017": 17,
       "2018": 264,
@@ -1258,32 +1263,32 @@
       "2023": 1223,
       "2024": 962,
       "2025": 1253,
-      "2026": 1411
+      "2026": 1461
     },
-    "active_days": 2238
+    "active_days": 2244
   },
   "timezones": {
     "+0000": 53,
-    "+0100": 1177,
+    "+0100": 1181,
     "+0200": 1634,
     "+0300": 61,
     "+0400": 3,
-    "+0530": 540,
+    "+0530": 542,
     "+0700": 48,
-    "+0800": 1206,
-    "+0900": 327,
+    "+0800": 1212,
+    "+0900": 340,
     "+1000": 7,
     "+1100": 15,
     "-0300": 12,
     "-0400": 219,
-    "-0500": 230,
-    "-0600": 133,
-    "-0700": 2645,
-    "-0800": 1269,
+    "-0500": 231,
+    "-0600": 136,
+    "-0700": 2646,
+    "-0800": 1302,
     "-1000": 21
   },
   "source_lines": {
-    "added": 6545036,
-    "current": 1514752
+    "added": 6559051,
+    "current": 1526815
   }
 }

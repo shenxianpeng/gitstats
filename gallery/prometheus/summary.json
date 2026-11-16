@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:12:42+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:25:21+00:00",
   "name": "Prometheus",
   "report_path": "index.html",
   "first_commit": "2012-11-24 11:14:12",
-  "last_commit": "2026-11-08 10:01:10",
-  "age_days": 5097,
-  "active_days": 3789,
-  "total_commits": 19224,
-  "total_authors": 1344,
-  "active_authors_12mo": 280,
-  "commits_last_12mo": 2666,
-  "total_files": 1768,
-  "total_lines": 622923,
-  "lines_added": 4533030,
-  "lines_removed": 3910094,
-  "total_tags": 480,
+  "last_commit": "2026-11-15 21:33:00",
+  "age_days": 5105,
+  "active_days": 3795,
+  "total_commits": 19286,
+  "total_authors": 1360,
+  "active_authors_12mo": 291,
+  "commits_last_12mo": 2728,
+  "total_files": 1773,
+  "total_lines": 629020,
+  "lines_added": 4539610,
+  "lines_removed": 3910577,
+  "total_tags": 489,
   "era": "surge",
   "top_authors": [
     {
       "name": "Julien",
-      "commits": 1778
+      "commits": 1785
     },
     {
       "name": "Fabian Reinartz",
@@ -37,32 +37,49 @@
     },
     {
       "name": "Bryan Boreham",
-      "commits": 1004
+      "commits": 1007
     }
   ],
   "author_commits": {
-    "Bryan Boreham": 1004,
-    "Bartlomiej Plotka": 615,
+    "Julien": 1785,
+    "Max Freedom": 1,
+    "Zain Qureshi": 1,
+    "vigohan95": 1,
+    "Suraj Nath": 6,
+    "Bartlomiej Plotka": 618,
+    "\u0110urica Yuri Nikoli\u0107": 55,
+    "George Krajcsovits": 332,
+    "Bryan Boreham": 1007,
+    "Roshan Ramani": 1,
+    "Dezhen Lu": 1,
+    "Donald Anyamba": 1,
+    "Tejasva Singh Chouhan": 1,
+    "Ismail Tarim": 1,
+    "Ayaan": 1,
+    "Subham Mahanty": 1,
+    "Utpal Sen": 1,
+    "Andrew Hall": 16,
+    "Owen Williams": 61,
+    "g4lb": 1,
+    "Gy\u00f6rgy Krajcsovits": 257,
+    "yusheng.wang": 1,
+    "Ayush": 1,
+    "Arve Knudsen": 267,
     "Dan Mattheiss": 3,
-    "Julien": 1778,
     "Victor Herrero Otal": 2,
-    "Arve Knudsen": 266,
-    "George Krajcsovits": 324,
     "Kyle Eckhart": 22,
     "Inanna Malick": 6,
     "Shane": 1,
+    "hy": 1,
     "Aditya Raj": 1,
     "Dean Chen": 3,
     "Huang-404-Q": 2,
-    "Andrew Hall": 15,
-    "Solomon Jacobs": 3,
+    "Solomon Jacobs": 4,
     "Anton Karpov": 1,
     "Perfloop Agent": 4,
-    "Gy\u00f6rgy Krajcsovits": 255,
     "hd": 1,
     "Aditya Agrawal": 3,
     "Pedro Tanaka": 2,
-    "\u0110urica Yuri Nikoli\u0107": 54,
     "Gauvain CLAUSS": 1,
     "roth-wine": 1,
     "Rohilalala": 3,
@@ -77,14 +94,13 @@
     "xinjun.jiang": 1,
     "shilohlee98": 11,
     "zenador": 28,
-    "Owen Williams": 44,
     "Arthur Silva Sens": 127,
     "Serhiy Bzhezytskyy": 3,
     "Minh Vu": 12,
     "Jo\u00e3o Vitor Bomfim de Souza": 1,
     "Jeanette Tan": 77,
     "hexonal": 1,
-    "Ramya Eliger": 3,
+    "Ramya Eliger": 4,
     "Jonas Lammler": 2,
     "kamothi": 3,
     "NamanParlecha": 16,
@@ -284,6 +300,7 @@
     "Ian Kerins": 2,
     "Mohammad Abbasi": 1,
     "Sasha": 1,
+    "Nagashima, Masato | Masato | ECFD": 1,
     "Eric Eastwood": 1,
     "Abu": 1,
     "1seal": 1,
@@ -489,7 +506,6 @@
     "Sandro": 2,
     "Nathan Baulch": 1,
     "Robert Fratto": 20,
-    "Suraj Nath": 5,
     "Kevin Rawal": 1,
     "Justin Lei": 18,
     "riskrole": 1,
@@ -1400,14 +1416,14 @@
     "2022": 991,
     "2023": 1401,
     "2024": 2727,
-    "2025": 1789,
-    "2026": 2531
+    "2025": 1790,
+    "2026": 2592
   },
   "ai_assisted": {
-    "commits": 73,
+    "commits": 78,
     "authored": 3,
     "assistants": {
-      "Claude": 48,
+      "Claude": 53,
       "GitHub Copilot": 14,
       "Cursor": 12,
       "OpenCode": 2,
@@ -1437,7 +1453,7 @@
       "2026-08": 10,
       "2026-09": 6,
       "2026-10": 9,
-      "2026-11": 3
+      "2026-11": 8
     },
     "commits_by_month": {
       "2024-12": 223,
@@ -1452,7 +1468,7 @@
       "2025-09": 115,
       "2025-10": 197,
       "2025-11": 156,
-      "2025-12": 135,
+      "2025-12": 136,
       "2026-01": 200,
       "2026-02": 237,
       "2026-03": 217,
@@ -1462,18 +1478,18 @@
       "2026-07": 231,
       "2026-08": 302,
       "2026-09": 265,
-      "2026-10": 361,
-      "2026-11": 50
+      "2026-10": 378,
+      "2026-11": 94
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 19224,
+    "commits": 19286,
     "by_kind": {
-      "organization": 5409,
-      "one_person": 1697,
-      "personal": 8576,
-      "hidden": 2260,
+      "organization": 5431,
+      "one_person": 1701,
+      "personal": 8591,
+      "hidden": 2281,
       "unknown": 8,
       "bot": 1274
     },
@@ -1482,11 +1498,11 @@
     "top": [
       {
         "organization": "grafana.com",
-        "commits": 1525,
-        "commits_last_12mo": 232,
+        "commits": 1546,
+        "commits_last_12mo": 253,
         "addresses": 38,
         "first_commit": "2019-05-29",
-        "last_commit": "2026-11-03"
+        "last_commit": "2026-11-13"
       },
       {
         "organization": "soundcloud.com",
@@ -1538,8 +1554,8 @@
       },
       {
         "organization": "google.com",
-        "commits": 143,
-        "commits_last_12mo": 77,
+        "commits": 144,
+        "commits_last_12mo": 78,
         "addresses": 14,
         "first_commit": "2017-02-15",
         "last_commit": "2026-10-27"
@@ -1876,7 +1892,7 @@
       },
       "2025-Q4": {
         "organization": 75,
-        "one_person": 13,
+        "one_person": 14,
         "personal": 205,
         "hidden": 150,
         "unknown": 0,
@@ -1907,10 +1923,10 @@
         "bot": 149
       },
       "2026-Q4": {
-        "organization": 75,
-        "one_person": 19,
-        "personal": 175,
-        "hidden": 109,
+        "organization": 97,
+        "one_person": 22,
+        "personal": 190,
+        "hidden": 130,
         "unknown": 0,
         "bot": 33
       }
@@ -1919,13 +1935,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2381,
-    "authors": 269,
-    "new_authors": 194,
+    "commits": 2443,
+    "authors": 286,
+    "new_authors": 210,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 17950,
+    "commits": 18012,
     "commits_by_year": {
       "2012": 26,
       "2013": 841,
@@ -1940,38 +1956,38 @@
       "2022": 902,
       "2023": 1318,
       "2024": 2404,
-      "2025": 1391,
-      "2026": 2266
+      "2025": 1392,
+      "2026": 2327
     },
-    "active_days": 3769
+    "active_days": 3775
   },
   "timezones": {
-    "+0000": 1997,
-    "+0100": 5865,
-    "+0200": 6808,
-    "+0300": 340,
+    "+0000": 2001,
+    "+0100": 5890,
+    "+0200": 6809,
+    "+0300": 341,
     "+0330": 7,
     "+0400": 18,
     "+0430": 1,
     "+0500": 30,
-    "+0530": 1013,
+    "+0530": 1021,
     "+0700": 33,
-    "+0800": 678,
-    "+0900": 96,
+    "+0800": 680,
+    "+0900": 97,
     "+1000": 88,
-    "+1100": 64,
+    "+1100": 65,
     "+1200": 2,
     "+1300": 3,
     "-0200": 6,
     "-0300": 157,
-    "-0400": 578,
-    "-0500": 282,
+    "-0400": 588,
+    "-0500": 289,
     "-0600": 135,
     "-0700": 718,
-    "-0800": 305
+    "-0800": 307
   },
   "source_lines": {
-    "added": 1026679,
-    "current": 474114
+    "added": 1033829,
+    "current": 480208
   }
 }

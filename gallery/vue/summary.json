@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:15:09+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:27:28+00:00",
   "name": "Vue",
   "report_path": "index.html",
   "first_commit": "2018-09-19 15:35:38",
-  "last_commit": "2026-11-05 09:10:59",
-  "age_days": 2969,
-  "active_days": 1237,
-  "total_commits": 7281,
-  "total_authors": 646,
-  "active_authors_12mo": 105,
-  "commits_last_12mo": 433,
-  "total_files": 703,
-  "total_lines": 201960,
-  "lines_added": 480796,
-  "lines_removed": 278836,
+  "last_commit": "2026-11-13 05:56:28",
+  "age_days": 2977,
+  "active_days": 1240,
+  "total_commits": 7290,
+  "total_authors": 648,
+  "active_authors_12mo": 106,
+  "commits_last_12mo": 442,
+  "total_files": 704,
+  "total_lines": 203731,
+  "lines_added": 482778,
+  "lines_removed": 279047,
   "total_tags": 268,
   "era": "steady",
   "top_authors": [
@@ -24,8 +24,8 @@
       "commits": 3576
     },
     {
-      "name": "daiwei",
-      "commits": 397
+      "name": "edison",
+      "commits": 401
     },
     {
       "name": "Kevin Deng \u4e09\u54b2\u667a\u5b50",
@@ -41,14 +41,16 @@
     }
   ],
   "author_commits": {
-    "daiwei": 397,
+    "edison": 401,
+    "Daniel Roe": 17,
+    "The number one sword cultivator in the south of the sky": 3,
+    "KevinZhou": 1,
+    "Abderrahmane Messaadi": 1,
     "Max": 2,
     "\u00d6nderhan \u0130\u015fleko\u011flu": 9,
     "Maksym Lyskov": 2,
     "JoaoMarcos44": 1,
     "Dylan Pulver": 1,
-    "Daniel Roe": 15,
-    "The number one sword cultivator in the south of the sky": 2,
     "Alexander Lichter": 1,
     "Junpei Zhang": 1,
     "Robby Russell": 1,
@@ -697,7 +699,7 @@
     "2023": 867,
     "2024": 1027,
     "2025": 372,
-    "2026": 405
+    "2026": 414
   },
   "ai_assisted": {
     "commits": 0,
@@ -753,16 +755,16 @@
       "2026-08": 42,
       "2026-09": 29,
       "2026-10": 39,
-      "2026-11": 44
+      "2026-11": 53
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7281,
+    "commits": 7290,
     "by_kind": {
-      "organization": 250,
-      "one_person": 294,
-      "personal": 5048,
+      "organization": 254,
+      "one_person": 296,
+      "personal": 5051,
       "hidden": 572,
       "unknown": 0,
       "bot": 1117
@@ -772,11 +774,11 @@
     "top": [
       {
         "organization": "vuejs.org",
-        "commits": 244,
-        "commits_last_12mo": 34,
+        "commits": 248,
+        "commits_last_12mo": 38,
         "addresses": 2,
         "first_commit": "2024-06-22",
-        "last_commit": "2026-11-05"
+        "last_commit": "2026-11-13"
       },
       {
         "organization": "bytedance.com",
@@ -845,9 +847,9 @@
         "bot": 27
       },
       "2026-Q4": {
-        "organization": 27,
-        "one_person": 6,
-        "personal": 24,
+        "organization": 31,
+        "one_person": 8,
+        "personal": 27,
         "hidden": 10,
         "unknown": 0,
         "bot": 16
@@ -857,13 +859,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 300,
-    "authors": 101,
-    "new_authors": 76,
+    "commits": 309,
+    "authors": 103,
+    "new_authors": 78,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 6164,
+    "commits": 6173,
     "commits_by_year": {
       "2018": 223,
       "2019": 961,
@@ -873,13 +875,13 @@
       "2023": 786,
       "2024": 831,
       "2025": 243,
-      "2026": 281
+      "2026": 290
     },
-    "active_days": 1105
+    "active_days": 1108
   },
   "timezones": {
-    "+0000": 497,
-    "+0100": 261,
+    "+0000": 499,
+    "+0100": 262,
     "+0200": 190,
     "+0300": 92,
     "+0330": 3,
@@ -889,7 +891,7 @@
     "+0600": 4,
     "+0630": 1,
     "+0700": 11,
-    "+0800": 3473,
+    "+0800": 3479,
     "+0900": 60,
     "+1000": 5,
     "+1100": 8,
@@ -902,7 +904,7 @@
     "-0800": 6
   },
   "source_lines": {
-    "added": 346790,
-    "current": 183556
+    "added": 348747,
+    "current": 185302
   }
 }

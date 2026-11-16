@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:13:24+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:26:01+00:00",
   "name": "Argo CD",
   "report_path": "index.html",
   "first_commit": "2018-02-15 00:53:07",
-  "last_commit": "2026-11-09 03:16:37",
-  "age_days": 3190,
-  "active_days": 2460,
-  "total_commits": 11933,
-  "total_authors": 2055,
-  "active_authors_12mo": 410,
-  "commits_last_12mo": 2301,
-  "total_files": 6234,
-  "total_lines": 2528320,
-  "lines_added": 8471964,
-  "lines_removed": 5943327,
+  "last_commit": "2026-11-15 00:58:02",
+  "age_days": 3196,
+  "active_days": 2466,
+  "total_commits": 11984,
+  "total_authors": 2067,
+  "active_authors_12mo": 413,
+  "commits_last_12mo": 2352,
+  "total_files": 6252,
+  "total_lines": 2529673,
+  "lines_added": 8484267,
+  "lines_removed": 5954277,
   "total_tags": 21,
   "era": "peak",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Michael Crenshaw",
-      "commits": 743
+      "commits": 745
     },
     {
       "name": "Jesse Suen",
@@ -41,14 +41,35 @@
     }
   ],
   "author_commits": {
-    "Shivam Agrawal": 7,
-    "Durgesh": 3,
-    "Blake Pettersson": 158,
+    "Rover van der Noort": 1,
+    "Pasha Kostohrys": 163,
+    "Bhavishya Jain": 2,
+    "Oscar Wieman": 2,
+    "claudiosuccar": 1,
+    "zshuying-field-ai": 1,
+    "Darsh Patel": 1,
+    "Blake Pettersson": 160,
+    "jhansi": 3,
+    "Tobias G.": 1,
+    "Jaewoo Choi": 67,
+    "Durgesh": 4,
+    "rumstead": 64,
+    "anant": 7,
+    "Michael Crenshaw": 745,
+    "Thorben Below": 1,
+    "Shivam Agrawal": 12,
+    "Diego Caspi": 1,
+    "sudarshanvashisht": 2,
+    "Dmitry Pavlenko": 1,
+    "Leonidas Avdelas": 1,
+    "Kilian": 1,
+    "Afzal Ansari": 13,
+    "Navid Khan (Ali)": 3,
+    "Minseok Kang": 4,
+    "Bilal Mustafa": 1,
     "gunwoo": 1,
     "Itoje Dollar": 1,
     "Aditya Raj": 30,
-    "Michael Crenshaw": 743,
-    "Minseok Kang": 3,
     "araksgrigoryan": 1,
     "Mohammed Armaan Kazi": 1,
     "rahulsgh21": 1,
@@ -62,17 +83,11 @@
     "Chandan Sahoo": 3,
     "ElenaSeg": 1,
     "sarankumar": 1,
-    "anant": 6,
     "Frederico Fraz\u00e3o": 2,
-    "Afzal Ansari": 12,
-    "Navid Khan (Ali)": 1,
-    "Jaewoo Choi": 66,
     "Linghao Su": 36,
-    "sudarshanvashisht": 1,
     "Kenny Rasschaert": 1,
     "Jonathan Ogilvie": 7,
     "Eren Direk": 1,
-    "jhansi": 2,
     "Saeed Moradi": 1,
     "Atif Ali": 31,
     "Bisman Singh": 3,
@@ -149,7 +164,6 @@
     "Tyler": 1,
     "maithilijoshi20": 1,
     "Alexander Matyushentsev": 1496,
-    "rumstead": 62,
     "Son Hyunbin": 1,
     "mrchatam": 1,
     "jwinters01": 18,
@@ -184,7 +198,6 @@
     "Om Kulkarni": 1,
     "AliGhotbizadeh": 1,
     "Kobi Hikri": 1,
-    "Pasha Kostohrys": 162,
     "Oliver Gond\u017ea": 26,
     "Mladjan Gadzic": 2,
     "V Vishnu": 1,
@@ -986,7 +999,6 @@
     "Sonam": 2,
     "Muhammad Zain ul abidin": 1,
     "Damon Edstrom": 1,
-    "Oscar Wieman": 1,
     "Wilson Wang": 1,
     "Adrian Moisey": 3,
     "itayvolo": 1,
@@ -2106,15 +2118,15 @@
     "2023": 1237,
     "2024": 1639,
     "2025": 1759,
-    "2026": 2137
+    "2026": 2188
   },
   "ai_assisted": {
-    "commits": 107,
+    "commits": 115,
     "authored": 0,
     "assistants": {
-      "Claude": 62,
+      "Claude": 69,
       "Cursor": 29,
-      "GitHub Copilot": 17
+      "GitHub Copilot": 18
     },
     "by_month": {
       "2024-12": 0,
@@ -2140,7 +2152,7 @@
       "2026-08": 6,
       "2026-09": 17,
       "2026-10": 36,
-      "2026-11": 16
+      "2026-11": 24
     },
     "commits_by_month": {
       "2024-12": 144,
@@ -2166,19 +2178,19 @@
       "2026-08": 179,
       "2026-09": 252,
       "2026-10": 266,
-      "2026-11": 58
+      "2026-11": 109
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 11933,
+    "commits": 11984,
     "by_kind": {
-      "organization": 2179,
-      "one_person": 1271,
-      "personal": 2902,
-      "hidden": 3168,
+      "organization": 2184,
+      "one_person": 1273,
+      "personal": 2913,
+      "hidden": 3185,
       "unknown": 0,
-      "bot": 2413
+      "bot": 2429
     },
     "organization_count": 20,
     "last_12mo_from": "2025-12",
@@ -2224,20 +2236,20 @@
         "last_commit": "2026-10-21"
       },
       {
+        "organization": "akuity.io",
+        "commits": 23,
+        "commits_last_12mo": 15,
+        "addresses": 3,
+        "first_commit": "2023-10-31",
+        "last_commit": "2026-11-10"
+      },
+      {
         "organization": "weave.works",
         "commits": 21,
         "commits_last_12mo": 0,
         "addresses": 2,
         "first_commit": "2019-10-17",
         "last_commit": "2020-08-25"
-      },
-      {
-        "organization": "akuity.io",
-        "commits": 18,
-        "commits_last_12mo": 10,
-        "addresses": 3,
-        "first_commit": "2023-10-31",
-        "last_commit": "2026-11-08"
       },
       {
         "organization": "nvidia.com",
@@ -2402,25 +2414,25 @@
         "bot": 269
       },
       "2026-Q4": {
-        "organization": 16,
-        "one_person": 10,
-        "personal": 82,
-        "hidden": 108,
+        "organization": 21,
+        "one_person": 12,
+        "personal": 93,
+        "hidden": 125,
         "unknown": 0,
-        "bot": 108
+        "bot": 124
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1387,
-    "authors": 392,
-    "new_authors": 292,
-    "half_of_commits": 15
+    "commits": 1422,
+    "authors": 405,
+    "new_authors": 304,
+    "half_of_commits": 16
   },
   "humans": {
-    "commits": 9520,
+    "commits": 9555,
     "commits_by_year": {
       "2018": 871,
       "2019": 1073,
@@ -2430,37 +2442,37 @@
       "2023": 1001,
       "2024": 1078,
       "2025": 1147,
-      "2026": 1287
+      "2026": 1322
     },
-    "active_days": 2393
+    "active_days": 2400
   },
   "timezones": {
-    "+0000": 515,
-    "+0100": 773,
-    "+0200": 1622,
+    "+0000": 518,
+    "+0100": 793,
+    "+0200": 1625,
     "+0300": 828,
     "+0330": 8,
     "+0400": 7,
     "+0500": 22,
-    "+0530": 722,
+    "+0530": 732,
     "+0545": 3,
     "+0700": 27,
     "+0800": 346,
-    "+0900": 414,
+    "+0900": 417,
     "+1000": 53,
     "+1100": 21,
     "+1200": 2,
     "+1300": 4,
     "-0300": 44,
     "-0400": 1928,
-    "-0500": 915,
+    "-0500": 920,
     "-0600": 137,
     "-0700": 2415,
-    "-0800": 1029,
-    "-1000": 98
+    "-0800": 1033,
+    "-1000": 101
   },
   "source_lines": {
-    "added": 7839376,
-    "current": 2229593
+    "added": 7851571,
+    "current": 2230943
   }
 }

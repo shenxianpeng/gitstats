@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:20:28+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:31:43+00:00",
   "name": "Homebrew",
   "report_path": "index.html",
   "first_commit": "2009-05-20 23:04:11",
-  "last_commit": "2026-11-08 22:43:05",
-  "age_days": 6381,
-  "active_days": 5617,
-  "total_commits": 53716,
+  "last_commit": "2026-11-16 00:29:54",
+  "age_days": 6389,
+  "active_days": 5625,
+  "total_commits": 53877,
   "total_authors": 1326,
-  "active_authors_12mo": 199,
-  "commits_last_12mo": 6352,
-  "total_files": 3484,
-  "total_lines": 553312,
-  "lines_added": 1985114,
-  "lines_removed": 1431796,
-  "total_tags": 540,
+  "active_authors_12mo": 195,
+  "commits_last_12mo": 6513,
+  "total_files": 3588,
+  "total_lines": 577227,
+  "lines_added": 2016042,
+  "lines_removed": 1438809,
+  "total_tags": 541,
   "era": "peak",
   "top_authors": [
     {
       "name": "Mike McQuaid",
-      "commits": 14707
+      "commits": 14764
     },
     {
       "name": "BrewTestBot",
-      "commits": 3355
+      "commits": 3361
     },
     {
       "name": "Markus Reiter",
@@ -41,23 +41,26 @@
     }
   ],
   "author_commits": {
-    "Douglas Eichelberger": 1021,
-    "Mike McQuaid": 14707,
-    "Harald Nordgren": 160,
-    "Bevan Kay": 311,
+    "Douglas Eichelberger": 1039,
+    "BrewTestBot": 3361,
+    "Mike McQuaid": 14764,
+    "hyuraku": 357,
+    "Harald Nordgren": 202,
+    "Daeho Ro": 45,
+    "Justin Krehel": 62,
+    "Bevan Kay": 317,
+    "Ruoyu Zhong": 586,
+    "Roshan Ramani": 19,
+    "Sam Ford": 543,
+    "Patrick Linnane": 1579,
     "Michael Cho": 628,
-    "hyuraku": 352,
-    "BrewTestBot": 3355,
-    "Patrick Linnane": 1577,
     "Carlo Cabrera": 1218,
-    "Ruoyu Zhong": 573,
     "Anton Melnikov": 200,
     "Anatoli Babenia": 96,
     "zhuoqun-chen": 1,
     "Bruno Volpato": 1,
     "Zhizhen He": 5,
     "edel67": 17,
-    "Justin Krehel": 59,
     "ZT_Jun": 1,
     "Andrew Nesbitt": 110,
     "Thiago Genez": 8,
@@ -72,18 +75,15 @@
     "QuillVot": 1,
     "Izaak Beekman": 17,
     "Ingmar Stein": 5,
-    "Sam Ford": 542,
     "BrandenXia": 3,
     "Xavier Lange": 1,
     "Hafez": 19,
     "adamv": 1074,
     "Issy Long": 1039,
-    "Daeho Ro": 44,
     "Sakutaro Shiina": 12,
     "Caleb Xu": 90,
     "Rui Chen": 48,
     "Nanda H Krishna": 545,
-    "rawsun007": 18,
     "Michka Popoff": 221,
     "Nick Reilingh": 2,
     "gritse": 2,
@@ -1386,13 +1386,13 @@
     "2023": 4255,
     "2024": 5411,
     "2025": 4570,
-    "2026": 5967
+    "2026": 6128
   },
   "ai_assisted": {
-    "commits": 220,
+    "commits": 221,
     "authored": 39,
     "assistants": {
-      "GitHub Copilot": 131,
+      "GitHub Copilot": 132,
       "Claude": 85,
       "CodeRabbit": 2,
       "Codex": 1,
@@ -1422,7 +1422,7 @@
       "2026-08": 4,
       "2026-09": 7,
       "2026-10": 1,
-      "2026-11": 2
+      "2026-11": 3
     },
     "commits_by_month": {
       "2024-12": 335,
@@ -1447,20 +1447,20 @@
       "2026-07": 971,
       "2026-08": 640,
       "2026-09": 761,
-      "2026-10": 481,
-      "2026-11": 261
+      "2026-10": 482,
+      "2026-11": 421
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 53716,
+    "commits": 53877,
     "by_kind": {
       "organization": 1125,
-      "one_person": 27120,
-      "personal": 15945,
-      "hidden": 6910,
+      "one_person": 27193,
+      "personal": 16003,
+      "hidden": 6934,
       "unknown": 49,
-      "bot": 2567
+      "bot": 2573
     },
     "organization_count": 19,
     "last_12mo_from": "2025-12",
@@ -1677,24 +1677,24 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 477,
-        "personal": 162,
-        "hidden": 76,
+        "one_person": 550,
+        "personal": 220,
+        "hidden": 100,
         "unknown": 0,
-        "bot": 27
+        "bot": 33
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 6173,
+    "commits": 6328,
     "authors": 191,
     "new_authors": 127,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 51149,
+    "commits": 51304,
     "commits_by_year": {
       "2009": 617,
       "2010": 567,
@@ -1713,41 +1713,41 @@
       "2023": 4098,
       "2024": 4850,
       "2025": 4188,
-      "2026": 5797
+      "2026": 5952
     },
-    "active_days": 5614
+    "active_days": 5622
   },
   "timezones": {
-    "+0000": 16773,
-    "+0100": 12504,
+    "+0000": 16863,
+    "+0100": 12540,
     "+0200": 3706,
     "+0300": 295,
     "+0330": 1,
     "+0400": 26,
     "+0500": 16,
-    "+0530": 839,
+    "+0530": 840,
     "+0600": 6,
     "+0700": 17,
-    "+0800": 2739,
-    "+0900": 574,
+    "+0800": 2747,
+    "+0900": 580,
     "+0930": 1,
     "+1000": 509,
     "+1030": 3,
-    "+1100": 330,
+    "+1100": 334,
     "+1200": 34,
     "+1300": 16,
     "-0200": 2,
     "-0230": 1,
     "-0300": 89,
-    "-0400": 3875,
-    "-0500": 4500,
+    "-0400": 3876,
+    "-0500": 4503,
     "-0600": 927,
     "-0700": 3945,
-    "-0800": 1982,
+    "-0800": 1994,
     "-1000": 6
   },
   "source_lines": {
-    "added": 1845624,
-    "current": 493274
+    "added": 1862788,
+    "current": 503053
   }
 }

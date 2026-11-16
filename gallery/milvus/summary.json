@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev2",
-  "generated_at": "2026-11-02T05:05:46+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:30:20+00:00",
   "name": "Milvus",
   "report_path": "index.html",
   "first_commit": "2019-03-18 11:33:09",
-  "last_commit": "2026-11-02 03:13:57",
-  "age_days": 2786,
-  "active_days": 2308,
-  "total_commits": 25951,
-  "total_authors": 385,
-  "active_authors_12mo": 106,
-  "commits_last_12mo": 2393,
-  "total_files": 7718,
-  "total_lines": 3645876,
-  "lines_added": 8171105,
-  "lines_removed": 4525125,
+  "last_commit": "2026-11-16 03:38:01",
+  "age_days": 2800,
+  "active_days": 2322,
+  "total_commits": 26144,
+  "total_authors": 394,
+  "active_authors_12mo": 114,
+  "commits_last_12mo": 2586,
+  "total_files": 8355,
+  "total_lines": 3844467,
+  "lines_added": 8498067,
+  "lines_removed": 4653497,
   "total_tags": 35,
   "era": "steady",
   "top_authors": [
     {
       "name": "congqixia",
-      "commits": 1804
+      "commits": 1812
     },
     {
       "name": "jinhai",
@@ -29,68 +29,80 @@
     },
     {
       "name": "yihao.dai",
-      "commits": 1093
+      "commits": 1098
     },
     {
       "name": "zhuwenxing",
-      "commits": 866
+      "commits": 877
     },
     {
       "name": "cai.zhang",
-      "commits": 838
+      "commits": 842
     }
   ],
   "author_commits": {
-    "Zhen Ye": 492,
-    "Bingyi Sun": 690,
+    "Zhen Ye": 512,
+    "zhagnlu": 247,
+    "congqixia": 1812,
+    "Lcos": 2,
+    "James": 495,
+    "sparknack": 95,
+    "Lluczel": 1,
+    "Hemendu Roy": 1,
+    "Li Liu": 126,
+    "wei liu": 612,
+    "aleks-s10": 2,
+    "Amal Saidov": 1,
+    "zhikunyao": 62,
+    "sijie-ni-0214": 88,
+    "aoiasd": 326,
+    "zhenshan.cao": 493,
+    "junjiejiangjjj": 67,
+    "zhuwenxing": 877,
+    "jiaqizho": 42,
+    "XuanYang-cn": 782,
+    "Douglas": 2,
+    "Bingyi Sun": 705,
+    "marcelo-cjl": 43,
+    "Jeng.Gwan": 18,
+    "sarveshls": 1,
+    "Beinan": 1,
+    "Jonathan Chen": 1,
+    "sre-ci-robot": 568,
+    "fudongying": 9,
+    "cai.zhang": 842,
+    "WAR10CK": 3,
+    "Chun Han": 219,
+    "Buqian Zheng": 208,
+    "christinewang-zilliz": 1,
+    "loupipalien": 2,
+    "Pardeep Singh": 3,
+    "somfornot": 10,
+    "linfanqian": 1,
+    "Ted Xu": 101,
+    "Yuanzhan Gao": 3,
+    "santiago-wjq": 2,
+    "yihao.dai": 1098,
+    "tinswzy": 67,
+    "Gao": 97,
+    "Li Yiyang": 18,
+    "yanliang567": 476,
     "PerryLink": 1,
-    "Buqian Zheng": 197,
-    "Chun Han": 217,
-    "zhikunyao": 59,
-    "zhenshan.cao": 485,
-    "marcelo-cjl": 37,
-    "yihao.dai": 1093,
-    "sre-ci-robot": 567,
-    "wei liu": 605,
-    "James": 482,
-    "fudongying": 4,
-    "sijie-ni-0214": 78,
-    "cai.zhang": 838,
-    "jiaqizho": 40,
     "Feilong Hou": 46,
-    "aleks-s10": 1,
-    "Li Liu": 114,
-    "zhuwenxing": 866,
-    "congqixia": 1804,
-    "aoiasd": 321,
-    "somfornot": 9,
     "Clint": 2,
-    "tinswzy": 66,
-    "XuanYang-cn": 779,
     "Simon Hearne": 2,
     "\u5b59\u8fbe\u660e": 1,
-    "yanliang567": 473,
     "WuXingying": 2,
-    "Jeng.Gwan": 12,
     "Wangshu": 2,
-    "Gao": 96,
-    "sparknack": 90,
-    "zhagnlu": 246,
     "foxspy": 76,
-    "Ted Xu": 99,
-    "Pardeep Singh": 1,
-    "Douglas": 1,
     "aadigolchha": 1,
-    "WAR10CK": 2,
     "Lucien": 1,
     "L1ric": 4,
-    "junjiejiangjjj": 64,
     "pymilvus-bot": 11,
     "Kuroda Kayn": 2,
     "Alexander Guzhva": 18,
     "2sumtech": 7,
     "ChenLiqing": 6,
-    "santiago-wjq": 1,
     "huanghaoyuanhhy": 5,
     "AbNoZ&v02": 1,
     "YHW": 1,
@@ -98,7 +110,6 @@
     "shaoyue": 150,
     "Spade  A": 158,
     "Pujitha Paladugu": 1,
-    "Yuanzhan Gao": 2,
     "Jae Jahng (Jude)": 1,
     "lorenzozane": 1,
     "Lior Friedman": 2,
@@ -109,8 +120,6 @@
     "microbluey": 1,
     "Emmanuel Adebiyi": 1,
     "Yurui Zhou": 1,
-    "Li Yiyang": 17,
-    "loupipalien": 1,
     "Woojoong Kim": 1,
     "nico": 277,
     "Jeremiah": 1,
@@ -435,14 +444,14 @@
     "2023": 2450,
     "2024": 2810,
     "2025": 2228,
-    "2026": 2167
+    "2026": 2360
   },
   "ai_assisted": {
-    "commits": 717,
+    "commits": 763,
     "authored": 0,
     "assistants": {
-      "Claude": 713,
-      "Cursor": 5,
+      "Claude": 759,
+      "Cursor": 6,
       "OpenCode": 1,
       "Warp": 1
     },
@@ -470,7 +479,7 @@
       "2026-08": 80,
       "2026-09": 79,
       "2026-10": 57,
-      "2026-11": 0
+      "2026-11": 46
     },
     "commits_by_month": {
       "2024-12": 219,
@@ -496,17 +505,17 @@
       "2026-08": 219,
       "2026-09": 217,
       "2026-10": 261,
-      "2026-11": 4
+      "2026-11": 197
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 25951,
+    "commits": 26144,
     "by_kind": {
-      "organization": 18969,
+      "organization": 19054,
       "one_person": 164,
-      "personal": 2693,
-      "hidden": 4088,
+      "personal": 2751,
+      "hidden": 4138,
       "unknown": 7,
       "bot": 30
     },
@@ -515,11 +524,11 @@
     "top": [
       {
         "organization": "zilliz.com",
-        "commits": 18955,
-        "commits_last_12mo": 1226,
-        "addresses": 103,
+        "commits": 19039,
+        "commits_last_12mo": 1310,
+        "addresses": 105,
         "first_commit": "2019-03-18",
-        "last_commit": "2026-10-31"
+        "last_commit": "2026-11-16"
       },
       {
         "organization": "apache.org",
@@ -539,11 +548,11 @@
       },
       {
         "organization": "alibaba-inc.com",
-        "commits": 2,
-        "commits_last_12mo": 1,
+        "commits": 3,
+        "commits_last_12mo": 2,
         "addresses": 2,
         "first_commit": "2025-09-30",
-        "last_commit": "2026-10-18"
+        "last_commit": "2026-11-10"
       },
       {
         "organization": "intel.com",
@@ -620,10 +629,10 @@
         "bot": 1
       },
       "2026-Q4": {
-        "organization": 112,
+        "organization": 197,
         "one_person": 0,
-        "personal": 79,
-        "hidden": 74,
+        "personal": 137,
+        "hidden": 124,
         "unknown": 0,
         "bot": 0
       }
@@ -632,13 +641,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2391,
-    "authors": 104,
-    "new_authors": 55,
+    "commits": 2584,
+    "authors": 113,
+    "new_authors": 64,
     "half_of_commits": 10
   },
   "humans": {
-    "commits": 25921,
+    "commits": 26114,
     "commits_by_year": {
       "2019": 4644,
       "2020": 1360,
@@ -647,9 +656,9 @@
       "2023": 2443,
       "2024": 2810,
       "2025": 2226,
-      "2026": 2165
+      "2026": 2358
     },
-    "active_days": 2308
+    "active_days": 2322
   },
   "timezones": {
     "+0000": 296,
@@ -657,20 +666,20 @@
     "+0200": 10,
     "+0300": 16,
     "+0400": 6,
-    "+0530": 46,
-    "+0700": 1,
-    "+0800": 25163,
+    "+0530": 49,
+    "+0700": 2,
+    "+0800": 25316,
     "+0900": 16,
     "+1000": 2,
     "-0300": 2,
     "-0400": 32,
-    "-0500": 72,
+    "-0500": 80,
     "-0600": 11,
-    "-0700": 249,
-    "-0800": 15
+    "-0700": 250,
+    "-0800": 42
   },
   "source_lines": {
-    "added": 6355567,
-    "current": 2880768
+    "added": 6651646,
+    "current": 3070398
   }
 }

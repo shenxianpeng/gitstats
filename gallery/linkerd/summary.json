@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:13:15+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:26:06+00:00",
   "name": "Linkerd",
   "report_path": "index.html",
   "first_commit": "2017-12-05 00:17:02",
-  "last_commit": "2026-11-06 20:52:40",
-  "age_days": 3259,
-  "active_days": 2005,
-  "total_commits": 9211,
+  "last_commit": "2026-11-13 17:34:45",
+  "age_days": 3266,
+  "active_days": 2006,
+  "total_commits": 9212,
   "total_authors": 403,
-  "active_authors_12mo": 33,
-  "commits_last_12mo": 727,
+  "active_authors_12mo": 32,
+  "commits_last_12mo": 728,
   "total_files": 1469,
   "total_lines": 442277,
-  "lines_added": 1209432,
-  "lines_removed": 767003,
-  "total_tags": 424,
+  "lines_added": 1209433,
+  "lines_removed": 767004,
+  "total_tags": 425,
   "era": "steady",
   "top_authors": [
     {
@@ -41,9 +41,9 @@
     }
   ],
   "author_commits": {
+    "l5d-bot": 144,
     "Raymond Kroeker": 11,
     "toidiu": 5,
-    "l5d-bot": 143,
     "Alejandro Pedraza": 626,
     "Spicy Shark": 1,
     "Anthony Turcios": 4,
@@ -455,7 +455,7 @@
     "2023": 1054,
     "2024": 1235,
     "2025": 1042,
-    "2026": 678
+    "2026": 679
   },
   "ai_assisted": {
     "commits": 2,
@@ -513,19 +513,19 @@
       "2026-08": 42,
       "2026-09": 59,
       "2026-10": 22,
-      "2026-11": 9
+      "2026-11": 10
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9211,
+    "commits": 9212,
     "by_kind": {
       "organization": 2928,
       "one_person": 705,
       "personal": 817,
       "hidden": 350,
       "unknown": 0,
-      "bot": 4411
+      "bot": 4412
     },
     "organization_count": 4,
     "last_12mo_from": "2025-12",
@@ -626,14 +626,14 @@
         "personal": 1,
         "hidden": 5,
         "unknown": 0,
-        "bot": 12
+        "bot": 13
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 160,
+    "commits": 161,
     "authors": 31,
     "new_authors": 23,
     "half_of_commits": 3
@@ -672,11 +672,11 @@
     "-0500": 2136,
     "-0600": 274,
     "-0700": 3329,
-    "-0800": 1458,
+    "-0800": 1459,
     "-1000": 114
   },
   "source_lines": {
-    "added": 574298,
+    "added": 574299,
     "current": 266331
   }
 }

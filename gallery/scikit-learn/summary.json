@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:08:47+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:21:58+00:00",
   "name": "scikit-learn",
   "report_path": "index.html",
   "first_commit": "2010-01-05 13:26:32",
-  "last_commit": "2026-11-06 12:37:21",
-  "age_days": 6149,
-  "active_days": 5139,
-  "total_commits": 34133,
-  "total_authors": 3375,
-  "active_authors_12mo": 194,
-  "commits_last_12mo": 937,
-  "total_files": 1868,
-  "total_lines": 576698,
-  "lines_added": 2937107,
-  "lines_removed": 2360659,
+  "last_commit": "2026-11-16 00:51:39",
+  "age_days": 6159,
+  "active_days": 5145,
+  "total_commits": 34151,
+  "total_authors": 3377,
+  "active_authors_12mo": 192,
+  "commits_last_12mo": 955,
+  "total_files": 1872,
+  "total_lines": 577321,
+  "lines_added": 2938117,
+  "lines_removed": 2361046,
   "total_tags": 25,
   "era": "steady",
   "top_authors": [
@@ -41,15 +41,18 @@
     }
   ],
   "author_commits": {
-    "Arthur Lacote": 63,
-    "scikit-learn-bot": 536,
+    "Christian Lorentzen": 293,
+    "Arthur Lacote": 69,
+    "Lucy Liu": 258,
+    "Virgil Chan": 27,
+    "Eric Hare": 1,
+    "yi111": 1,
+    "Anne Beyer": 63,
+    "scikit-learn-bot": 539,
     "Loic Esteve": 657,
     "Hayden Barolette": 2,
     "antoinebaker": 21,
-    "Virgil Chan": 26,
-    "Christian Lorentzen": 289,
     "Fran\u00e7ois Paugam": 47,
-    "Anne Beyer": 62,
     "Rugved Bane": 2,
     "Soledad Galli": 2,
     "blank-0007": 1,
@@ -90,7 +93,6 @@
     "Omar Salman": 93,
     "noQbot": 1,
     "Luke Brace": 2,
-    "Lucy Liu": 257,
     "Yann Lechelle": 2,
     "Sepuri Sai Krishna": 1,
     "Bru": 1,
@@ -3434,14 +3436,14 @@
     "2023": 1349,
     "2024": 1268,
     "2025": 1237,
-    "2026": 868
+    "2026": 886
   },
   "ai_assisted": {
-    "commits": 12,
+    "commits": 17,
     "authored": 3,
     "assistants": {
-      "GitHub Copilot": 5,
-      "Claude": 4,
+      "Claude": 8,
+      "GitHub Copilot": 6,
       "Cursor": 4
     },
     "by_month": {
@@ -3468,7 +3470,7 @@
       "2026-08": 1,
       "2026-09": 1,
       "2026-10": 5,
-      "2026-11": 1
+      "2026-11": 6
     },
     "commits_by_month": {
       "2024-12": 72,
@@ -3494,17 +3496,17 @@
       "2026-08": 77,
       "2026-09": 62,
       "2026-10": 70,
-      "2026-11": 31
+      "2026-11": 49
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 34133,
+    "commits": 34151,
     "by_kind": {
       "organization": 8785,
       "one_person": 8375,
-      "personal": 13515,
-      "hidden": 3400,
+      "personal": 13532,
+      "hidden": 3401,
       "unknown": 38,
       "bot": 20
     },
@@ -4012,8 +4014,8 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 6,
-        "personal": 74,
-        "hidden": 20,
+        "personal": 91,
+        "hidden": 21,
         "unknown": 0,
         "bot": 1
       }
@@ -4022,13 +4024,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 932,
-    "authors": 181,
-    "new_authors": 128,
+    "commits": 950,
+    "authors": 183,
+    "new_authors": 130,
     "half_of_commits": 7
   },
   "humans": {
-    "commits": 34113,
+    "commits": 34131,
     "commits_by_year": {
       "2010": 2604,
       "2011": 4913,
@@ -4046,13 +4048,13 @@
       "2023": 1349,
       "2024": 1262,
       "2025": 1230,
-      "2026": 863
+      "2026": 881
     },
-    "active_days": 5139
+    "active_days": 5145
   },
   "timezones": {
     "+0000": 1119,
-    "+0100": 8431,
+    "+0100": 8445,
     "+0200": 11673,
     "+0300": 940,
     "+0330": 24,
@@ -4063,11 +4065,11 @@
     "+0545": 2,
     "+0600": 35,
     "+0700": 16,
-    "+0800": 802,
+    "+0800": 803,
     "+0900": 944,
     "+1000": 756,
     "+1030": 1,
-    "+1100": 527,
+    "+1100": 528,
     "+1200": 5,
     "+1300": 27,
     "-0200": 20,
@@ -4076,11 +4078,11 @@
     "-0500": 1747,
     "-0600": 189,
     "-0700": 1630,
-    "-0800": 819,
+    "-0800": 821,
     "-1000": 21
   },
   "source_lines": {
-    "added": 3717809,
-    "current": 574237
+    "added": 3718699,
+    "current": 574862
   }
 }

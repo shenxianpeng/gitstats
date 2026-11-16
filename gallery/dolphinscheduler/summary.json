@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:17:07+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:29:27+00:00",
   "name": "Apache DolphinScheduler",
   "report_path": "index.html",
   "first_commit": "2019-03-01 16:39:25",
-  "last_commit": "2026-11-07 01:23:43",
-  "age_days": 2808,
-  "active_days": 1909,
-  "total_commits": 9121,
-  "total_authors": 674,
-  "active_authors_12mo": 73,
-  "commits_last_12mo": 332,
-  "total_files": 4882,
-  "total_lines": 452437,
-  "lines_added": 1682352,
-  "lines_removed": 1229698,
+  "last_commit": "2026-11-14 02:27:48",
+  "age_days": 2815,
+  "active_days": 1913,
+  "total_commits": 9127,
+  "total_authors": 675,
+  "active_authors_12mo": 72,
+  "commits_last_12mo": 338,
+  "total_files": 4897,
+  "total_lines": 455648,
+  "lines_added": 1686505,
+  "lines_removed": 1230641,
   "total_tags": 8,
   "era": "quiet",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Wenjun",
-      "commits": 532
+      "commits": 533
     },
     {
       "name": "qiaozhanwei",
@@ -41,8 +41,11 @@
     }
   ],
   "author_commits": {
-    "LHY_CODE": 2,
-    "Wenjun": 532,
+    "yueqingshu": 2,
+    "Wenjun": 533,
+    "michaellx1057": 2,
+    "LHY_CODE": 3,
+    "QHU": 2,
     "Hyacinth-of-Security": 1,
     "Jay Choukikar": 2,
     "Sharang Gupta": 1,
@@ -63,7 +66,6 @@
     "Adarsh Mishra": 1,
     "Jakub Kondrat": 1,
     "luxiaolong": 16,
-    "michaellx1057": 1,
     "huangrunxing": 5,
     "\u9648\u5bb6\u540d": 24,
     "Goutam Adwant": 1,
@@ -84,7 +86,6 @@
     "eye-gu": 18,
     "Victor Laborie": 1,
     "Jarek Potiuk": 1,
-    "yueqingshu": 1,
     "leocook": 2,
     "includetts": 1,
     "SHRIHARI KULKARNI": 1,
@@ -724,7 +725,7 @@
     "2023": 571,
     "2024": 429,
     "2025": 224,
-    "2026": 312
+    "2026": 318
   },
   "ai_assisted": {
     "commits": 1,
@@ -782,17 +783,17 @@
       "2026-08": 23,
       "2026-09": 26,
       "2026-10": 31,
-      "2026-11": 6
+      "2026-11": 12
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9121,
+    "commits": 9127,
     "by_kind": {
-      "organization": 1583,
+      "organization": 1584,
       "one_person": 412,
-      "personal": 5342,
-      "hidden": 1781,
+      "personal": 5345,
+      "hidden": 1783,
       "unknown": 1,
       "bot": 2
     },
@@ -801,11 +802,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 800,
-        "commits_last_12mo": 91,
+        "commits": 801,
+        "commits_last_12mo": 92,
         "addresses": 18,
         "first_commit": "2020-03-08",
-        "last_commit": "2026-11-05"
+        "last_commit": "2026-11-13"
       },
       {
         "organization": "analysys.com.cn",
@@ -890,10 +891,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 1,
+        "organization": 2,
         "one_person": 2,
-        "personal": 24,
-        "hidden": 10,
+        "personal": 27,
+        "hidden": 12,
         "unknown": 0,
         "bot": 0
       }
@@ -902,13 +903,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 332,
-    "authors": 67,
-    "new_authors": 52,
+    "commits": 338,
+    "authors": 68,
+    "new_authors": 53,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 9119,
+    "commits": 9125,
     "commits_by_year": {
       "2019": 1889,
       "2020": 2359,
@@ -917,9 +918,9 @@
       "2023": 571,
       "2024": 429,
       "2025": 224,
-      "2026": 312
+      "2026": 318
     },
-    "active_days": 1909
+    "active_days": 1913
   },
   "timezones": {
     "+0000": 2,
@@ -930,7 +931,7 @@
     "+0530": 33,
     "+0545": 1,
     "+0700": 3,
-    "+0800": 8989,
+    "+0800": 8995,
     "+0900": 3,
     "+1000": 10,
     "+1100": 1,
@@ -942,7 +943,7 @@
     "-0800": 2
   },
   "source_lines": {
-    "added": 1831662,
-    "current": 448544
+    "added": 1835815,
+    "current": 451755
   }
 }

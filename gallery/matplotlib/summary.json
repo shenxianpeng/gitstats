@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:09:01+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:22:20+00:00",
   "name": "Matplotlib",
   "report_path": "index.html",
   "first_commit": "2003-05-12 15:20:38",
-  "last_commit": "2026-11-09 05:07:36",
-  "age_days": 8582,
-  "active_days": 7036,
-  "total_commits": 55630,
-  "total_authors": 1841,
-  "active_authors_12mo": 166,
-  "commits_last_12mo": 2033,
-  "total_files": 4606,
-  "total_lines": 804120,
-  "lines_added": 1902940,
-  "lines_removed": 1333820,
+  "last_commit": "2026-11-15 19:29:28",
+  "age_days": 8589,
+  "active_days": 7041,
+  "total_commits": 55664,
+  "total_authors": 1844,
+  "active_authors_12mo": 167,
+  "commits_last_12mo": 2067,
+  "total_files": 4605,
+  "total_lines": 804407,
+  "lines_added": 1903481,
+  "lines_removed": 1334074,
   "total_tags": 142,
   "era": "steady",
   "top_authors": [
@@ -25,11 +25,11 @@
     },
     {
       "name": "Elliott Sales de Andrade",
-      "commits": 6028
+      "commits": 6030
     },
     {
       "name": "Tim Hoffmann",
-      "commits": 4736
+      "commits": 4737
     },
     {
       "name": "Antony Lee",
@@ -41,11 +41,18 @@
     }
   ],
   "author_commits": {
-    "Tim Hoffmann": 4736,
+    "hannah": 665,
+    "Ruth Comer": 624,
+    "Tim Hoffmann": 4737,
+    "Elliott Sales de Andrade": 6030,
+    "Dan Yeaw": 2,
+    "Kyle Sunden": 1087,
+    "Ricci Adams": 78,
+    "maaz7409": 21,
     "Gabriel Luca": 5,
-    "Ricci Adams": 74,
     "Monika Dvorackova": 1,
     "Daniel Liu": 3,
+    "Nillohit Roy": 8,
     "Jody Klymak": 2604,
     "Anu jangir": 2,
     "Melissa Weber Mendon\u00e7a": 51,
@@ -53,16 +60,12 @@
     "msaimanish": 2,
     "rahulgupta": 1,
     "mansi tomar": 2,
-    "Kyle Sunden": 1084,
-    "Elliott Sales de Andrade": 6028,
+    "Marcin Juszkiewicz": 2,
     "Christian Aurich Zanettini Martins": 2,
     "Omar Zagonel El Laden": 1,
-    "Mohd Maaz Khan": 19,
     "Greg Lucas": 344,
-    "Ruth Comer": 620,
     "Sebastian Torres": 3,
     "DavidVadnais": 1,
-    "hannah": 660,
     "Shamik Basu": 2,
     "Carlos Ramos Carre\u00f1o": 3,
     "Albert Y. Shih": 74,
@@ -1907,7 +1910,7 @@
     "2023": 3663,
     "2024": 2333,
     "2025": 1843,
-    "2026": 1933
+    "2026": 1967
   },
   "ai_assisted": {
     "commits": 9,
@@ -1967,20 +1970,20 @@
       "2026-07": 199,
       "2026-08": 135,
       "2026-09": 177,
-      "2026-10": 165,
-      "2026-11": 18
+      "2026-10": 173,
+      "2026-11": 44
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 55630,
+    "commits": 55664,
     "by_kind": {
-      "organization": 3510,
-      "one_person": 3210,
-      "personal": 42666,
-      "hidden": 6023,
+      "organization": 3516,
+      "one_person": 3226,
+      "personal": 42675,
+      "hidden": 6025,
       "unknown": 78,
-      "bot": 143
+      "bot": 144
     },
     "organization_count": 61,
     "last_12mo_from": "2025-12",
@@ -1995,11 +1998,11 @@
       },
       {
         "organization": "metoffice.gov.uk",
-        "commits": 621,
-        "commits_last_12mo": 146,
+        "commits": 625,
+        "commits_last_12mo": 150,
         "addresses": 2,
         "first_commit": "2014-12-03",
-        "last_commit": "2026-10-17"
+        "last_commit": "2026-11-15"
       },
       {
         "organization": "utoronto.ca",
@@ -2194,20 +2197,20 @@
         "last_commit": "2021-02-18"
       },
       {
+        "organization": "redhat.com",
+        "commits": 12,
+        "commits_last_12mo": 3,
+        "addresses": 5,
+        "first_commit": "2017-01-09",
+        "last_commit": "2026-10-02"
+      },
+      {
         "organization": "rit.edu",
         "commits": 11,
         "commits_last_12mo": 0,
         "addresses": 2,
         "first_commit": "2023-04-05",
         "last_commit": "2025-05-10"
-      },
-      {
-        "organization": "redhat.com",
-        "commits": 10,
-        "commits_last_12mo": 1,
-        "addresses": 4,
-        "first_commit": "2017-01-09",
-        "last_commit": "2026-05-30"
       },
       {
         "organization": "aueb.gr",
@@ -2532,25 +2535,25 @@
         "bot": 13
       },
       "2026-Q4": {
-        "organization": 3,
-        "one_person": 12,
-        "personal": 81,
-        "hidden": 80,
+        "organization": 9,
+        "one_person": 28,
+        "personal": 90,
+        "hidden": 82,
         "unknown": 0,
-        "bot": 7
+        "bot": 8
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1988,
-    "authors": 160,
-    "new_authors": 121,
+    "commits": 2021,
+    "authors": 163,
+    "new_authors": 124,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 55487,
+    "commits": 55520,
     "commits_by_year": {
       "2003": 88,
       "2004": 673,
@@ -2575,20 +2578,20 @@
       "2023": 3641,
       "2024": 2302,
       "2025": 1818,
-      "2026": 1889
+      "2026": 1922
     },
-    "active_days": 7032
+    "active_days": 7037
   },
   "timezones": {
-    "+0000": 8723,
-    "+0100": 7834,
-    "+0200": 7428,
+    "+0000": 8730,
+    "+0100": 7835,
+    "+0200": 7430,
     "+0300": 561,
     "+0330": 3,
     "+0400": 13,
     "+0430": 4,
     "+0500": 12,
-    "+0530": 679,
+    "+0530": 687,
     "+0545": 7,
     "+0600": 9,
     "+0700": 5,
@@ -2603,16 +2606,16 @@
     "-0200": 1,
     "-0300": 111,
     "-0400": 12188,
-    "-0500": 7308,
-    "-0600": 1536,
+    "-0500": 7317,
+    "-0600": 1539,
     "-0700": 4980,
-    "-0800": 2510,
+    "-0800": 2514,
     "-0900": 1,
     "-1000": 954,
     "-1100": 2
   },
   "source_lines": {
-    "added": 2186567,
-    "current": 804081
+    "added": 2187295,
+    "current": 804368
   }
 }

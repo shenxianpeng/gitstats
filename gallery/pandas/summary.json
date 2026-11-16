@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:09:26+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:22:28+00:00",
   "name": "pandas",
   "report_path": "index.html",
   "first_commit": "2009-07-31 15:07:16",
-  "last_commit": "2026-11-09 04:56:07",
-  "age_days": 6310,
-  "active_days": 5323,
-  "total_commits": 39778,
-  "total_authors": 4062,
-  "active_authors_12mo": 394,
-  "commits_last_12mo": 2991,
-  "total_files": 2691,
-  "total_lines": 1080274,
-  "lines_added": 3326683,
-  "lines_removed": 2246399,
+  "last_commit": "2026-11-15 19:46:08",
+  "age_days": 6317,
+  "active_days": 5329,
+  "total_commits": 39876,
+  "total_authors": 4076,
+  "active_authors_12mo": 404,
+  "commits_last_12mo": 3089,
+  "total_files": 2700,
+  "total_lines": 1087804,
+  "lines_added": 3338273,
+  "lines_removed": 2250459,
   "total_tags": 102,
   "era": "steady",
   "top_authors": [
     {
       "name": "jbrockmendel",
-      "commits": 6567
+      "commits": 6630
     },
     {
       "name": "Jeff Reback",
@@ -41,8 +41,28 @@
     }
   ],
   "author_commits": {
-    "jbrockmendel": 6567,
-    "Richard Shadrach": 567,
+    "jbrockmendel": 6630,
+    "Richard Shadrach": 573,
+    "hatemadi15": 2,
+    "Mutasim ur Rehman": 2,
+    "Fangchen Li": 186,
+    "Youeeeee": 1,
+    "Zeyad Rabie": 1,
+    "Antsiferov Bogdan": 1,
+    "G Karthik Koundinya": 4,
+    "layeh": 1,
+    "Iason Krommydas": 1,
+    "Vividh Yadav": 1,
+    "Aidan Feldman": 22,
+    "Anirudh": 2,
+    "Laraib Butt": 1,
+    "Koussay-mehdouani": 1,
+    "Shuheng (Markus) Ma": 1,
+    "Chaimaa Abi": 3,
+    "Aarya": 3,
+    "Pieter Eendebak": 1,
+    "Seungtaek Oh": 1,
+    "Pablo Galindo Salgado": 1,
     "sundeep8967": 1,
     "Abhishek Kumar": 11,
     "Joris Van den Bossche": 1702,
@@ -50,7 +70,6 @@
     "Monika Dvorackova": 1,
     "Ishan Kumar": 2,
     "Deon Binny": 1,
-    "Anirudh": 1,
     "Riaz1729": 1,
     "Maha Rana Yadavalli": 4,
     "Eugenio \"Jay\" Zuccarelli": 1,
@@ -63,7 +82,6 @@
     "Matthew Roeschke": 1557,
     "Likhitha J": 4,
     "Pranav Choudhary": 5,
-    "Fangchen Li": 183,
     "Abhishek kr. Chauhan": 1,
     "Shriraj Jadhav": 1,
     "Tharoboiz": 1,
@@ -84,7 +102,6 @@
     "Tiereonna": 1,
     "Gore Williams": 1,
     "S.A": 1,
-    "Chaimaa Abi": 2,
     "Ayush Kumar": 1,
     "Sugandh Garg": 1,
     "Mannava Daasaradhi": 1,
@@ -93,7 +110,6 @@
     "Atik": 1,
     "Saihritesh": 2,
     "DeviousCardi": 1,
-    "Aidan Feldman": 21,
     "Leo Camus": 1,
     "yuchen-xu": 1,
     "Trinh Quoc Anh": 41,
@@ -112,7 +128,6 @@
     "Johnny Wilson Dougherty": 1,
     "Odysseas Yiakoumis": 1,
     "Anushka Dudhe": 1,
-    "Aarya": 2,
     "Parman Mohammadalizadeh": 1,
     "Manvi Soni": 1,
     "Trupti603": 1,
@@ -486,7 +501,6 @@
     "HulusiOzy": 5,
     "asoledad33": 2,
     "GuruprashanthKrishnakumar": 1,
-    "G Karthik Koundinya": 3,
     "ahmedbektic": 1,
     "Hongxu Jia": 1,
     "thwait": 1,
@@ -4122,13 +4136,14 @@
     "2023": 3017,
     "2024": 1769,
     "2025": 1097,
-    "2026": 2856
+    "2026": 2954
   },
   "ai_assisted": {
-    "commits": 1558,
+    "commits": 1627,
     "authored": 1,
     "assistants": {
-      "Claude": 1556,
+      "Claude": 1623,
+      "Cursor": 2,
       "Devin": 1,
       "GitHub Copilot": 1
     },
@@ -4156,7 +4171,7 @@
       "2026-08": 167,
       "2026-09": 289,
       "2026-10": 349,
-      "2026-11": 65
+      "2026-11": 134
     },
     "commits_by_month": {
       "2024-12": 62,
@@ -4182,19 +4197,19 @@
       "2026-08": 275,
       "2026-09": 422,
       "2026-10": 477,
-      "2026-11": 101
+      "2026-11": 199
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39778,
+    "commits": 39876,
     "by_kind": {
       "organization": 968,
-      "one_person": 6644,
-      "personal": 23770,
-      "hidden": 8142,
+      "one_person": 6646,
+      "personal": 23850,
+      "hidden": 8153,
       "unknown": 25,
-      "bot": 229
+      "bot": 234
     },
     "organization_count": 56,
     "last_12mo_from": "2025-12",
@@ -4707,24 +4722,24 @@
       },
       "2026-Q4": {
         "organization": 1,
-        "one_person": 2,
-        "personal": 488,
-        "hidden": 65,
+        "one_person": 4,
+        "personal": 568,
+        "hidden": 76,
         "unknown": 0,
-        "bot": 22
+        "bot": 27
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2866,
-    "authors": 377,
-    "new_authors": 313,
+    "commits": 2959,
+    "authors": 392,
+    "new_authors": 327,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 39549,
+    "commits": 39642,
     "commits_by_year": {
       "2009": 100,
       "2010": 147,
@@ -4743,25 +4758,25 @@
       "2023": 2991,
       "2024": 1747,
       "2025": 1064,
-      "2026": 2734
+      "2026": 2827
     },
-    "active_days": 5315
+    "active_days": 5321
   },
   "timezones": {
     "+0000": 1633,
-    "+0100": 4037,
-    "+0200": 3782,
-    "+0300": 700,
+    "+0100": 4041,
+    "+0200": 3784,
+    "+0300": 701,
     "+0330": 10,
-    "+0400": 60,
+    "+0400": 61,
     "+0430": 3,
-    "+0500": 13,
-    "+0530": 1269,
+    "+0500": 16,
+    "+0530": 1273,
     "+0545": 7,
     "+0600": 11,
     "+0700": 209,
-    "+0800": 611,
-    "+0900": 522,
+    "+0800": 612,
+    "+0900": 523,
     "+0930": 2,
     "+1000": 94,
     "+1100": 68,
@@ -4771,15 +4786,15 @@
     "-0200": 11,
     "-0300": 222,
     "-0400": 8232,
-    "-0500": 5875,
-    "-0600": 709,
-    "-0700": 7314,
-    "-0800": 4011,
+    "-0500": 5882,
+    "-0600": 711,
+    "-0700": 7315,
+    "-0800": 4082,
     "-0900": 1,
     "-1000": 361
   },
   "source_lines": {
-    "added": 3122915,
-    "current": 1004067
+    "added": 3134458,
+    "current": 1011597
   }
 }

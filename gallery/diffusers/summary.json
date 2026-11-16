@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:11:18+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:24:14+00:00",
   "name": "Diffusers",
   "report_path": "index.html",
   "first_commit": "2022-05-30 16:07:33",
-  "last_commit": "2026-11-09 01:25:41",
-  "age_days": 1624,
-  "active_days": 1325,
-  "total_commits": 7044,
-  "total_authors": 1158,
-  "active_authors_12mo": 223,
-  "commits_last_12mo": 1017,
-  "total_files": 3043,
-  "total_lines": 1202681,
-  "lines_added": 1655809,
-  "lines_removed": 453081,
+  "last_commit": "2026-11-13 22:33:33",
+  "age_days": 1629,
+  "active_days": 1329,
+  "total_commits": 7068,
+  "total_authors": 1163,
+  "active_authors_12mo": 224,
+  "commits_last_12mo": 1041,
+  "total_files": 3062,
+  "total_lines": 1203582,
+  "lines_added": 1666035,
+  "lines_removed": 462406,
   "total_tags": 26,
   "era": "steady",
   "top_authors": [
     {
       "name": "Sayak Paul",
-      "commits": 1082
+      "commits": 1091
     },
     {
       "name": "Patrick von Platen",
@@ -29,7 +29,7 @@
     },
     {
       "name": "Dhruv Nair",
-      "commits": 363
+      "commits": 364
     },
     {
       "name": "Suraj Patil",
@@ -37,12 +37,21 @@
     },
     {
       "name": "YiYi Xu",
-      "commits": 294
+      "commits": 296
     }
   ],
   "author_commits": {
-    "YiYi Xu": 294,
-    "Sayak Paul": 1082,
+    "YiYi Xu": 296,
+    "Steven Liu": 221,
+    "Sayak Paul": 1091,
+    "Auden Venn": 1,
+    "Akhil Gupta": 1,
+    "Dhruv Nair": 364,
+    "Yiming Zhao": 2,
+    "Mishig": 20,
+    "Nabid Nur": 1,
+    "drbh": 1,
+    "Yi Gu": 1,
     "sarankumar": 1,
     "Jingya HUANG": 12,
     "G\u00f6rkem G\u00fcl": 1,
@@ -50,14 +59,12 @@
     "Gorka Dab\u00f3": 2,
     "mlzerotoheroyoutube": 1,
     "Parth Vadera": 1,
-    "Mishig": 19,
     "Raghul chandramouli": 1,
     "Nils": 1,
     "nvsm": 1,
     "kahlun": 1,
     "Aloys Jehwin": 2,
     "Sylvan Liu": 1,
-    "Dhruv Nair": 363,
     "Wang, Yi": 23,
     "Ziyu Lin": 1,
     "A-Raphie": 1,
@@ -80,7 +87,6 @@
     "Lucas Ruan": 1,
     "Patrick Ribbsaeter": 1,
     "Subodh": 1,
-    "Steven Liu": 216,
     "naykun": 10,
     "Aritra Roy Gosthipaty": 9,
     "TB": 1,
@@ -95,7 +101,6 @@
     "Shivam Shrirao": 2,
     "jiqing-feng": 24,
     "\u9648\u5fd7\u8c26": 1,
-    "Yiming Zhao": 1,
     "iridescentWen": 4,
     "Shreshth Saini": 1,
     "Jeremy Schoemaker": 1,
@@ -1205,13 +1210,13 @@
     "2023": 1890,
     "2024": 1466,
     "2025": 1151,
-    "2026": 956
+    "2026": 980
   },
   "ai_assisted": {
-    "commits": 117,
+    "commits": 122,
     "authored": 0,
     "assistants": {
-      "Claude": 111,
+      "Claude": 116,
       "GitHub Copilot": 6
     },
     "by_month": {
@@ -1238,7 +1243,7 @@
       "2026-08": 25,
       "2026-09": 15,
       "2026-10": 19,
-      "2026-11": 9
+      "2026-11": 14
     },
     "commits_by_month": {
       "2024-12": 184,
@@ -1264,17 +1269,17 @@
       "2026-08": 132,
       "2026-09": 64,
       "2026-10": 78,
-      "2026-11": 19
+      "2026-11": 43
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7044,
+    "commits": 7068,
     "by_kind": {
       "organization": 817,
       "one_person": 335,
-      "personal": 4282,
-      "hidden": 1589,
+      "personal": 4299,
+      "hidden": 1596,
       "unknown": 1,
       "bot": 20
     },
@@ -1462,8 +1467,8 @@
       "2026-Q4": {
         "organization": 11,
         "one_person": 1,
-        "personal": 58,
-        "hidden": 27,
+        "personal": 75,
+        "hidden": 34,
         "unknown": 0,
         "bot": 0
       }
@@ -1472,34 +1477,35 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1007,
-    "authors": 213,
-    "new_authors": 160,
+    "commits": 1031,
+    "authors": 218,
+    "new_authors": 165,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 7024,
+    "commits": 7048,
     "commits_by_year": {
       "2022": 1581,
       "2023": 1889,
       "2024": 1462,
       "2025": 1146,
-      "2026": 946
+      "2026": 970
     },
-    "active_days": 1325
+    "active_days": 1329
   },
   "timezones": {
-    "+0000": 394,
-    "+0100": 739,
+    "+0000": 395,
+    "+0100": 740,
     "+0200": 1551,
-    "+0300": 258,
+    "+0300": 264,
     "+0330": 1,
     "+0400": 24,
     "+0500": 6,
-    "+0530": 1731,
+    "+0530": 1735,
     "+0545": 2,
+    "+0600": 1,
     "+0700": 74,
-    "+0800": 627,
+    "+0800": 628,
     "+0900": 181,
     "+1000": 12,
     "+1100": 6,
@@ -1510,11 +1516,11 @@
     "-0500": 94,
     "-0600": 65,
     "-0700": 544,
-    "-0800": 239,
-    "-1000": 294
+    "-0800": 247,
+    "-1000": 296
   },
   "source_lines": {
-    "added": 1660604,
-    "current": 1202480
+    "added": 1670830,
+    "current": 1203381
   }
 }

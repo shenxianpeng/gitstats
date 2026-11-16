@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:18:59+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:30:25+00:00",
   "name": "PaddlePaddle",
   "report_path": "index.html",
   "first_commit": "2016-08-29 14:32:53",
-  "last_commit": "2026-11-05 06:22:26",
-  "age_days": 3720,
-  "active_days": 3315,
-  "total_commits": 58220,
+  "last_commit": "2026-11-13 13:41:38",
+  "age_days": 3728,
+  "active_days": 3320,
+  "total_commits": 58230,
   "total_authors": 1236,
-  "active_authors_12mo": 180,
-  "commits_last_12mo": 1750,
-  "total_files": 15609,
-  "total_lines": 3607574,
-  "lines_added": 7842817,
-  "lines_removed": 4235166,
+  "active_authors_12mo": 176,
+  "commits_last_12mo": 1760,
+  "total_files": 15612,
+  "total_lines": 3608384,
+  "lines_added": 7843969,
+  "lines_removed": 4235508,
   "total_tags": 12,
   "era": "quiet",
   "top_authors": [
@@ -41,18 +41,19 @@
     }
   ],
   "author_commits": {
+    "zhengshengning": 109,
+    "ZhenxingLi": 81,
+    "omoYang": 32,
+    "Ray961123": 8,
+    "Wang Shigure": 6,
+    "Chen Zhiyang": 133,
+    "LxG_01": 3,
     "Difer": 54,
-    "ZhenxingLi": 79,
     "SUN Dong": 140,
-    "LxG_01": 2,
     "liym27": 209,
-    "zhengshengning": 106,
     "yuweivvv": 1,
-    "Wang Shigure": 5,
-    "Ray961123": 7,
     "liuruyan": 157,
     "feixi": 44,
-    "omoYang": 31,
     "Gu Shiwei": 184,
     "Xiangrui Yu": 17,
     "Paddle-bot": 1,
@@ -191,7 +192,6 @@
     "Jiaxin Sui": 1,
     "Tao Luo": 1835,
     "zyfncg": 454,
-    "Chen Zhiyang": 132,
     "huangjiyi": 254,
     "GoldPancake": 7,
     "\u693f\u4e0b\u6e6b\u549a": 1,
@@ -1289,7 +1289,7 @@
     "2023": 6440,
     "2024": 6646,
     "2025": 4381,
-    "2026": 1419
+    "2026": 1429
   },
   "ai_assisted": {
     "commits": 147,
@@ -1350,17 +1350,17 @@
       "2026-08": 54,
       "2026-09": 47,
       "2026-10": 47,
-      "2026-11": 9
+      "2026-11": 19
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 58220,
+    "commits": 58230,
     "by_kind": {
-      "organization": 23077,
+      "organization": 23082,
       "one_person": 532,
-      "personal": 18165,
-      "hidden": 16309,
+      "personal": 18167,
+      "hidden": 16312,
       "unknown": 135,
       "bot": 2
     },
@@ -1369,11 +1369,11 @@
     "top": [
       {
         "organization": "baidu.com",
-        "commits": 21178,
-        "commits_last_12mo": 245,
+        "commits": 21183,
+        "commits_last_12mo": 250,
         "addresses": 186,
         "first_commit": "2016-08-31",
-        "last_commit": "2026-11-04"
+        "last_commit": "2026-11-13"
       },
       {
         "organization": "intel.com",
@@ -1514,10 +1514,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 18,
+        "organization": 23,
         "one_person": 0,
-        "personal": 6,
-        "hidden": 31,
+        "personal": 8,
+        "hidden": 34,
         "unknown": 0,
         "bot": 1
       }
@@ -1526,13 +1526,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1750,
+    "commits": 1760,
     "authors": 163,
     "new_authors": 65,
     "half_of_commits": 9
   },
   "humans": {
-    "commits": 58218,
+    "commits": 58228,
     "commits_by_year": {
       "2016": 1423,
       "2017": 9090,
@@ -1544,9 +1544,9 @@
       "2023": 6440,
       "2024": 6646,
       "2025": 4381,
-      "2026": 1418
+      "2026": 1428
     },
-    "active_days": 3315
+    "active_days": 3320
   },
   "timezones": {
     "+0000": 2308,
@@ -1558,7 +1558,7 @@
     "+0530": 21,
     "+0600": 1,
     "+0700": 1,
-    "+0800": 50402,
+    "+0800": 50412,
     "+0900": 6,
     "+1400": 9,
     "-0400": 100,
@@ -1568,7 +1568,7 @@
     "-0800": 937
   },
   "source_lines": {
-    "added": 8056456,
-    "current": 3607203
+    "added": 8057608,
+    "current": 3608013
   }
 }

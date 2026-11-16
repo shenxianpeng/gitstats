@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:18:21+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:30:04+00:00",
   "name": "KubeEdge",
   "report_path": "index.html",
   "first_commit": "2018-09-28 08:57:50",
-  "last_commit": "2026-10-29 02:22:09",
-  "age_days": 2953,
-  "active_days": 1770,
-  "total_commits": 6497,
-  "total_authors": 402,
+  "last_commit": "2026-11-13 01:52:18",
+  "age_days": 2968,
+  "active_days": 1772,
+  "total_commits": 6499,
+  "total_authors": 403,
   "active_authors_12mo": 42,
-  "commits_last_12mo": 274,
+  "commits_last_12mo": 276,
   "total_files": 14112,
   "total_lines": 3804223,
-  "lines_added": 8084705,
-  "lines_removed": 4284649,
+  "lines_added": 8084707,
+  "lines_removed": 4284651,
   "total_tags": 35,
   "era": "steady",
   "top_authors": [
     {
       "name": "KubeEdge Bot",
-      "commits": 2320
+      "commits": 2321
     },
     {
       "name": "fisherxu",
@@ -41,10 +41,11 @@
     }
   ],
   "author_commits": {
-    "KubeEdge Bot": 2320,
+    "KubeEdge Bot": 2321,
     "tarone-saloni": 1,
     "D.Leap": 1,
     "Aditya Raut": 7,
+    "saket0187": 1,
     "Vidhi Singh": 1,
     "ryoheimorimoto": 4,
     "Shelley-BaoYue": 278,
@@ -453,7 +454,7 @@
     "2023": 569,
     "2024": 624,
     "2025": 453,
-    "2026": 234
+    "2026": 236
   },
   "ai_assisted": {
     "commits": 5,
@@ -511,28 +512,28 @@
       "2026-07": 35,
       "2026-08": 20,
       "2026-09": 30,
-      "2026-10": 15,
-      "2026-11": 0
+      "2026-10": 16,
+      "2026-11": 1
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 6497,
+    "commits": 6499,
     "by_kind": {
       "organization": 2230,
       "one_person": 225,
       "personal": 1653,
-      "hidden": 66,
+      "hidden": 67,
       "unknown": 2,
-      "bot": 2321
+      "bot": 2322
     },
     "organization_count": 14,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "huawei.com",
         "commits": 1649,
-        "commits_last_12mo": 31,
+        "commits_last_12mo": 24,
         "addresses": 42,
         "first_commit": "2018-09-28",
         "last_commit": "2026-09-22"
@@ -540,7 +541,7 @@
       {
         "organization": "daocloud.io",
         "commits": 310,
-        "commits_last_12mo": 4,
+        "commits_last_12mo": 3,
         "addresses": 31,
         "first_commit": "2019-08-06",
         "last_commit": "2025-12-16"
@@ -556,7 +557,7 @@
       {
         "organization": "sony.com",
         "commits": 53,
-        "commits_last_12mo": 6,
+        "commits_last_12mo": 5,
         "addresses": 4,
         "first_commit": "2022-06-17",
         "last_commit": "2026-10-02"
@@ -703,22 +704,22 @@
         "organization": 1,
         "one_person": 0,
         "personal": 5,
-        "hidden": 0,
+        "hidden": 1,
         "unknown": 0,
-        "bot": 9
+        "bot": 10
       }
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 300,
-    "authors": 43,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 276,
+    "authors": 42,
     "new_authors": 33,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 4176,
+    "commits": 4177,
     "commits_by_year": {
       "2018": 79,
       "2019": 1157,
@@ -728,17 +729,17 @@
       "2023": 348,
       "2024": 383,
       "2025": 266,
-      "2026": 127
+      "2026": 128
     },
-    "active_days": 1516
+    "active_days": 1517
   },
   "timezones": {
     "+0000": 96,
     "+0100": 38,
     "+0200": 75,
     "+0300": 2,
-    "+0530": 739,
-    "+0800": 5420,
+    "+0530": 740,
+    "+0800": 5421,
     "+0900": 27,
     "-0300": 2,
     "-0400": 13,
@@ -749,7 +750,7 @@
     "-1000": 2
   },
   "source_lines": {
-    "added": 537186,
+    "added": 537188,
     "current": 283750
   }
 }

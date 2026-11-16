@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:08:31+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:22:04+00:00",
   "name": "FastAPI",
   "report_path": "index.html",
   "first_commit": "2018-12-05 06:56:50",
-  "last_commit": "2026-11-08 17:59:44",
-  "age_days": 2896,
-  "active_days": 918,
-  "total_commits": 8041,
+  "last_commit": "2026-11-15 17:10:38",
+  "age_days": 2903,
+  "active_days": 924,
+  "total_commits": 8076,
   "total_authors": 887,
-  "active_authors_12mo": 67,
-  "commits_last_12mo": 1770,
-  "total_files": 3239,
-  "total_lines": 410948,
-  "lines_added": 829327,
-  "lines_removed": 418379,
-  "total_tags": 346,
+  "active_authors_12mo": 66,
+  "commits_last_12mo": 1805,
+  "total_files": 3244,
+  "total_lines": 412855,
+  "lines_added": 840110,
+  "lines_removed": 427255,
+  "total_tags": 353,
   "era": "surge",
   "top_authors": [
     {
       "name": "Sebasti\u00e1n Ram\u00edrez",
-      "commits": 2334
+      "commits": 2346
     },
     {
       "name": "github-actions",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Yurii Motov",
-      "commits": 125
+      "commits": 128
     },
     {
       "name": "Alejandra",
@@ -41,8 +41,8 @@
     }
   ],
   "author_commits": {
-    "Sebasti\u00e1n Ram\u00edrez": 2334,
-    "Yurii Motov": 125,
+    "Sebasti\u00e1n Ram\u00edrez": 2346,
+    "Yurii Motov": 128,
     "Alejandra": 64,
     "Mix": 1,
     "Victorien": 3,
@@ -938,7 +938,7 @@
     "2023": 780,
     "2024": 1999,
     "2025": 1150,
-    "2026": 1538
+    "2026": 1573
   },
   "ai_assisted": {
     "commits": 3,
@@ -998,19 +998,19 @@
       "2026-08": 88,
       "2026-09": 35,
       "2026-10": 227,
-      "2026-11": 84
+      "2026-11": 119
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8041,
+    "commits": 8076,
     "by_kind": {
       "organization": 7,
       "one_person": 152,
-      "personal": 3357,
-      "hidden": 877,
+      "personal": 3369,
+      "hidden": 880,
       "unknown": 0,
-      "bot": 3648
+      "bot": 3668
     },
     "organization_count": 3,
     "last_12mo_from": "2025-12",
@@ -1100,23 +1100,23 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 0,
-        "personal": 71,
-        "hidden": 8,
+        "personal": 83,
+        "hidden": 11,
         "unknown": 0,
-        "bot": 232
+        "bot": 252
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 719,
+    "commits": 734,
     "authors": 63,
     "new_authors": 51,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 4393,
+    "commits": 4408,
     "commits_by_year": {
       "2018": 190,
       "2019": 510,
@@ -1126,13 +1126,13 @@
       "2023": 395,
       "2024": 974,
       "2025": 535,
-      "2026": 592
+      "2026": 607
     },
-    "active_days": 857
+    "active_days": 863
   },
   "timezones": {
-    "+0000": 3384,
-    "+0100": 943,
+    "+0000": 3398,
+    "+0100": 964,
     "+0200": 1515,
     "+0300": 218,
     "+0330": 17,
@@ -1157,7 +1157,7 @@
     "-0800": 202
   },
   "source_lines": {
-    "added": 815181,
-    "current": 405806
+    "added": 824468,
+    "current": 408362
   }
 }

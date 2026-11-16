@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:14:52+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:27:41+00:00",
   "name": "Apache Cassandra",
   "report_path": "index.html",
   "first_commit": "2009-03-02 07:57:22",
-  "last_commit": "2026-11-07 14:20:31",
-  "age_days": 6460,
-  "active_days": 4885,
-  "total_commits": 32584,
-  "total_authors": 591,
-  "active_authors_12mo": 88,
-  "commits_last_12mo": 1047,
-  "total_files": 8824,
-  "total_lines": 2033466,
-  "lines_added": 3711130,
-  "lines_removed": 1677466,
+  "last_commit": "2026-11-15 12:20:36",
+  "age_days": 6468,
+  "active_days": 4890,
+  "total_commits": 32616,
+  "total_authors": 592,
+  "active_authors_12mo": 89,
+  "commits_last_12mo": 1079,
+  "total_files": 8848,
+  "total_lines": 2040795,
+  "lines_added": 3718918,
+  "lines_removed": 1677925,
   "total_tags": 246,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Brandon Williams",
-      "commits": 3036
+      "commits": 3038
     },
     {
       "name": "Sylvain Lebresne",
@@ -37,35 +37,38 @@
     },
     {
       "name": "Marcus Eriksson",
-      "commits": 1249
+      "commits": 1252
     }
   ],
   "author_commits": {
-    "Dmitry Konstantinov": 219,
+    "Brandon Williams": 3038,
+    "tommy stendahl": 9,
+    "Stefan Miklosovic": 1159,
+    "Bernardo Botella": 27,
+    "Sam Tunnicliffe": 633,
+    "nivy": 13,
+    "Benedict Elliott Smith": 808,
+    "David Capwell": 359,
+    "Hugo de Sousa Pereira": 1,
+    "Dmitry Konstantinov": 224,
+    "Marcus Eriksson": 1252,
     "mck": 1034,
     "Patrick McFadin": 17,
     "Alan Wang": 11,
     "Francisco Guerrero": 100,
-    "Bernardo Botella": 26,
-    "Stefan Miklosovic": 1146,
     "Dipankar Achinta": 1,
     "Caleb Rackliffe": 292,
-    "nivy": 12,
     "Arvind Kandpal": 25,
     "Yuqi Yan": 6,
     "Galarcel": 2,
     "Pranav Chaurasia": 2,
     "Maxim Muzafarov": 53,
     "Jacek Lewandowski": 167,
-    "Brandon Williams": 3036,
     "prithvi": 1,
     "Artur Malchanau": 1,
-    "Marcus Eriksson": 1249,
     "Erick Ramirez": 21,
     "Yifan Cai": 87,
-    "Benedict Elliott Smith": 806,
     "Alexandre Viau": 3,
-    "Sam Tunnicliffe": 632,
     "Yash Nasery": 1,
     "Pranav Shenoy": 4,
     "Jeremiah Jordan": 23,
@@ -80,10 +83,8 @@
     "Mohammad Suhel": 5,
     "Doyeon Kim": 1,
     "manish-m-pillai-ksolves": 1,
-    "David Capwell": 357,
     "Minal Kyada": 6,
     "viktoriiakotovets": 1,
-    "tommy stendahl": 8,
     "Sunil Ramchandra Pawar": 11,
     "Aparna Naik": 3,
     "samlightfoot": 12,
@@ -651,7 +652,7 @@
     "2023": 1367,
     "2024": 945,
     "2025": 1008,
-    "2026": 991
+    "2026": 1023
   },
   "ai_assisted": {
     "commits": 24,
@@ -710,18 +711,18 @@
       "2026-06": 119,
       "2026-07": 111,
       "2026-08": 140,
-      "2026-09": 124,
-      "2026-10": 141,
-      "2026-11": 37
+      "2026-09": 125,
+      "2026-10": 150,
+      "2026-11": 59
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 32584,
+    "commits": 32616,
     "by_kind": {
-      "organization": 25488,
-      "one_person": 2501,
-      "personal": 4490,
+      "organization": 25513,
+      "one_person": 2503,
+      "personal": 4495,
       "hidden": 84,
       "unknown": 21,
       "bot": 0
@@ -731,11 +732,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 20340,
-        "commits_last_12mo": 642,
+        "commits": 20363,
+        "commits_last_12mo": 665,
         "addresses": 58,
         "first_commit": "2009-03-02",
-        "last_commit": "2026-11-05"
+        "last_commit": "2026-11-15"
       },
       {
         "organization": "datastax.com",
@@ -747,8 +748,8 @@
       },
       {
         "organization": "apple.com",
-        "commits": 624,
-        "commits_last_12mo": 32,
+        "commits": 625,
+        "commits_last_12mo": 33,
         "addresses": 45,
         "first_commit": "2012-10-16",
         "last_commit": "2026-11-03"
@@ -771,11 +772,11 @@
       },
       {
         "organization": "ericsson.com",
-        "commits": 35,
-        "commits_last_12mo": 1,
+        "commits": 36,
+        "commits_last_12mo": 2,
         "addresses": 7,
         "first_commit": "2015-04-17",
-        "last_commit": "2026-08-25"
+        "last_commit": "2026-10-21"
       },
       {
         "organization": "ksolves.com",
@@ -1012,7 +1013,7 @@
         "bot": 0
       },
       "2026-Q3": {
-        "organization": 284,
+        "organization": 285,
         "one_person": 10,
         "personal": 76,
         "hidden": 5,
@@ -1020,9 +1021,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 95,
-        "one_person": 9,
-        "personal": 74,
+        "organization": 119,
+        "one_person": 11,
+        "personal": 79,
         "hidden": 0,
         "unknown": 0,
         "bot": 0
@@ -1032,13 +1033,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1047,
-    "authors": 88,
-    "new_authors": 31,
+    "commits": 1079,
+    "authors": 89,
+    "new_authors": 32,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 32584,
+    "commits": 32616,
     "commits_by_year": {
       "2009": 1025,
       "2010": 1862,
@@ -1057,14 +1058,14 @@
       "2023": 1367,
       "2024": 945,
       "2025": 1008,
-      "2026": 991
+      "2026": 1023
     },
-    "active_days": 4885
+    "active_days": 4890
   },
   "timezones": {
-    "+0000": 6804,
-    "+0100": 5024,
-    "+0200": 4831,
+    "+0000": 6812,
+    "+0100": 5034,
+    "+0200": 4839,
     "+0300": 1404,
     "+0400": 24,
     "+0530": 81,
@@ -1079,14 +1080,14 @@
     "+1300": 15,
     "-0200": 56,
     "-0300": 86,
-    "-0400": 2112,
+    "-0400": 2113,
     "-0500": 6313,
-    "-0600": 2425,
+    "-0600": 2427,
     "-0700": 1789,
-    "-0800": 888
+    "-0800": 891
   },
   "source_lines": {
-    "added": 3850328,
-    "current": 2033466
+    "added": 3858112,
+    "current": 2040795
   }
 }

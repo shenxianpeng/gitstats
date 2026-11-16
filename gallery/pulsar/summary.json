@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:14:53+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:27:40+00:00",
   "name": "Apache Pulsar",
   "report_path": "index.html",
   "first_commit": "2016-09-07 04:17:28",
-  "last_commit": "2026-11-09 04:10:54",
-  "age_days": 3715,
-  "active_days": 2961,
-  "total_commits": 15537,
-  "total_authors": 774,
-  "active_authors_12mo": 136,
-  "commits_last_12mo": 1691,
-  "total_files": 6433,
-  "total_lines": 1371802,
-  "lines_added": 6370175,
-  "lines_removed": 4998263,
+  "last_commit": "2026-11-15 22:44:47",
+  "age_days": 3722,
+  "active_days": 2967,
+  "total_commits": 15665,
+  "total_authors": 780,
+  "active_authors_12mo": 140,
+  "commits_last_12mo": 1819,
+  "total_files": 6499,
+  "total_lines": 1390077,
+  "lines_added": 6394233,
+  "lines_removed": 5004047,
   "total_tags": 6,
   "era": "steady",
   "top_authors": [
     {
       "name": "Matteo Merli",
-      "commits": 1637
+      "commits": 1691
     },
     {
       "name": "Lari Hotari",
-      "commits": 1471
+      "commits": 1482
     },
     {
       "name": "Rajan Dhabalia",
@@ -37,25 +37,33 @@
     },
     {
       "name": "Penghui Li",
-      "commits": 473
+      "commits": 478
     }
   ],
   "author_commits": {
+    "Aurora Twinkle": 17,
+    "void-ptr974": 81,
+    "Oneby Wang": 57,
+    "Gustavo de Camargo": 1,
+    "subodhwandile": 2,
+    "SeungTaek Lim": 20,
+    "havefunatcode": 1,
+    "Chris Robison": 1,
+    "Himanshu Jha": 1,
+    "fengyubiao": 397,
+    "xh123637": 1,
+    "Penghui Li": 478,
+    "David Kjerrumgaard": 40,
+    "Matteo Merli": 1691,
+    "RiemannChow": 1,
+    "Lari Hotari": 1482,
     "\u4f55\u6668": 1,
-    "Matteo Merli": 1637,
     "Yike Xiao": 35,
-    "SeungTaek Lim": 15,
     "sinan liu": 80,
-    "Oneby Wang": 44,
-    "Penghui Li": 473,
     "Takahiro Hozumi": 1,
-    "void-ptr974": 71,
-    "Lari Hotari": 1471,
     "Sharang Gupta": 11,
-    "Aurora Twinkle": 13,
     "Rahul": 5,
     "Radiance' \u6ce2\u6ce2": 6,
-    "fengyubiao": 393,
     "Zixuan Liu": 242,
     "kannar": 21,
     "sakshichitnis27": 4,
@@ -98,7 +106,6 @@
     "QIAOZHENYU": 1,
     "water": 1,
     "B\u00e4m": 3,
-    "David Kjerrumgaard": 39,
     "StevenLuMT": 14,
     "Omar Yasin": 7,
     "Stochastic": 6,
@@ -115,7 +122,6 @@
     "atomchen": 6,
     "Don\u00e1t Csik\u00f3s": 1,
     "Roman Melnyk": 1,
-    "subodhwandile": 1,
     "Jakub Kucharovic": 1,
     "Burak Kalayc\u0131": 1,
     "Tim": 2,
@@ -827,13 +833,13 @@
     "2023": 1165,
     "2024": 931,
     "2025": 719,
-    "2026": 1648
+    "2026": 1776
   },
   "ai_assisted": {
-    "commits": 36,
+    "commits": 38,
     "authored": 0,
     "assistants": {
-      "Claude": 27,
+      "Claude": 29,
       "GitHub Copilot": 8,
       "Cursor": 1
     },
@@ -861,7 +867,7 @@
       "2026-08": 3,
       "2026-09": 3,
       "2026-10": 5,
-      "2026-11": 2
+      "2026-11": 4
     },
     "commits_by_month": {
       "2024-12": 50,
@@ -887,38 +893,38 @@
       "2026-08": 82,
       "2026-09": 256,
       "2026-10": 413,
-      "2026-11": 183
+      "2026-11": 311
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15537,
+    "commits": 15665,
     "by_kind": {
-      "organization": 5863,
-      "one_person": 251,
-      "personal": 5652,
-      "hidden": 3739,
+      "organization": 5926,
+      "one_person": 252,
+      "personal": 5687,
+      "hidden": 3754,
       "unknown": 0,
-      "bot": 32
+      "bot": 46
     },
     "organization_count": 9,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "apache.org",
-        "commits": 4580,
-        "commits_last_12mo": 605,
+        "commits": 4639,
+        "commits_last_12mo": 664,
         "addresses": 33,
         "first_commit": "2016-09-22",
-        "last_commit": "2026-11-09"
+        "last_commit": "2026-11-14"
       },
       {
         "organization": "streamnative.io",
-        "commits": 682,
-        "commits_last_12mo": 48,
+        "commits": 686,
+        "commits_last_12mo": 52,
         "addresses": 24,
         "first_commit": "2020-02-10",
-        "last_commit": "2026-11-06"
+        "last_commit": "2026-11-15"
       },
       {
         "organization": "yahoo-corp.jp",
@@ -1035,25 +1041,25 @@
         "bot": 4
       },
       "2026-Q4": {
-        "organization": 277,
-        "one_person": 15,
-        "personal": 150,
-        "hidden": 150,
+        "organization": 340,
+        "one_person": 16,
+        "personal": 185,
+        "hidden": 165,
         "unknown": 0,
-        "bot": 4
+        "bot": 18
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1675,
-    "authors": 134,
-    "new_authors": 58,
+    "commits": 1789,
+    "authors": 140,
+    "new_authors": 64,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 15505,
+    "commits": 15619,
     "commits_by_year": {
       "2016": 118,
       "2017": 636,
@@ -1065,31 +1071,31 @@
       "2023": 1163,
       "2024": 924,
       "2025": 712,
-      "2026": 1633
+      "2026": 1747
     },
-    "active_days": 2959
+    "active_days": 2965
   },
   "timezones": {
     "+0000": 74,
     "+0100": 429,
-    "+0200": 1127,
+    "+0200": 1138,
     "+0300": 1001,
     "+0400": 2,
     "+0430": 1,
-    "+0530": 115,
+    "+0530": 117,
     "+0700": 2,
-    "+0800": 7117,
-    "+0900": 445,
+    "+0800": 7150,
+    "+0900": 451,
     "+1000": 6,
-    "-0300": 44,
+    "-0300": 45,
     "-0400": 109,
     "-0500": 268,
-    "-0600": 214,
+    "-0600": 215,
     "-0700": 3091,
-    "-0800": 1492
+    "-0800": 1566
   },
   "source_lines": {
-    "added": 6354711,
-    "current": 1367214
+    "added": 6378769,
+    "current": 1385489
   }
 }

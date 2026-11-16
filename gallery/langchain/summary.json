@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev3",
-  "generated_at": "2026-11-09T05:11:11+00:00",
+  "generated_by": "gitstats 2.12.2.post1.dev5",
+  "generated_at": "2026-11-16T05:24:19+00:00",
   "name": "LangChain",
   "report_path": "index.html",
   "first_commit": "2022-10-24 21:51:15",
-  "last_commit": "2026-11-09 01:34:51",
-  "age_days": 1477,
-  "active_days": 1325,
-  "total_commits": 17154,
-  "total_authors": 3599,
-  "active_authors_12mo": 226,
-  "commits_last_12mo": 2333,
-  "total_files": 3285,
-  "total_lines": 587618,
-  "lines_added": 3885010,
-  "lines_removed": 3297391,
-  "total_tags": 1326,
+  "last_commit": "2026-11-15 23:07:35",
+  "age_days": 1484,
+  "active_days": 1331,
+  "total_commits": 17211,
+  "total_authors": 3600,
+  "active_authors_12mo": 222,
+  "commits_last_12mo": 2390,
+  "total_files": 3300,
+  "total_lines": 590668,
+  "lines_added": 3902025,
+  "lines_removed": 3311356,
+  "total_tags": 1338,
   "era": "steady",
   "top_authors": [
     {
@@ -29,11 +29,11 @@
     },
     {
       "name": "ccurme",
-      "commits": 1191
+      "commits": 1208
     },
     {
       "name": "Mason Daugherty",
-      "commits": 980
+      "commits": 986
     },
     {
       "name": "Erick Friis",
@@ -41,22 +41,23 @@
     }
   ],
   "author_commits": {
-    "Hunter Lovell": 31,
+    "ccurme": 1208,
+    "Mason Daugherty": 986,
+    "Christophe Bornet": 425,
+    "Sai Annam": 10,
+    "Elior Nataf Lackritz": 2,
+    "Hunter Lovell": 32,
     "Thushanth Bengre": 4,
-    "ccurme": 1191,
     "John Kennedy": 24,
-    "Mason Daugherty": 980,
     "nm-fireworks": 2,
     "Zlatko Duric": 1,
     "Caspar Broekhuizen": 4,
     "Sera": 2,
     "Ch Revanth reddy": 1,
-    "Elior Nataf Lackritz": 1,
     "Eugene Yurtsev": 764,
     "Richard Scarrott": 11,
     "Vladislav Nechakhin": 1,
     "Ant White": 2,
-    "Christophe Bornet": 419,
     "David Duong": 16,
     "Baihao Wang": 2,
     "gethin-langchain": 1,
@@ -3646,14 +3647,14 @@
     "2023": 6342,
     "2024": 5701,
     "2025": 2693,
-    "2026": 2134
+    "2026": 2191
   },
   "ai_assisted": {
-    "commits": 48,
+    "commits": 57,
     "authored": 9,
     "assistants": {
-      "GitHub Copilot": 27,
-      "Claude": 21
+      "Claude": 30,
+      "GitHub Copilot": 27
     },
     "by_month": {
       "2024-12": 0,
@@ -3679,7 +3680,7 @@
       "2026-08": 3,
       "2026-09": 1,
       "2026-10": 1,
-      "2026-11": 1
+      "2026-11": 10
     },
     "commits_by_month": {
       "2024-12": 313,
@@ -3705,30 +3706,30 @@
       "2026-08": 193,
       "2026-09": 187,
       "2026-10": 229,
-      "2026-11": 51
+      "2026-11": 108
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17154,
+    "commits": 17211,
     "by_kind": {
-      "organization": 2511,
+      "organization": 2528,
       "one_person": 824,
-      "personal": 7473,
-      "hidden": 5439,
+      "personal": 7496,
+      "hidden": 5440,
       "unknown": 0,
-      "bot": 907
+      "bot": 923
     },
     "organization_count": 34,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "langchain.dev",
-        "commits": 2209,
-        "commits_last_12mo": 565,
-        "addresses": 20,
+        "commits": 2226,
+        "commits_last_12mo": 582,
+        "addresses": 22,
         "first_commit": "2023-07-25",
-        "last_commit": "2026-11-05"
+        "last_commit": "2026-11-15"
       },
       {
         "organization": "unstructuredai.io",
@@ -4053,37 +4054,37 @@
         "bot": 214
       },
       "2026-Q4": {
-        "organization": 31,
+        "organization": 48,
         "one_person": 2,
-        "personal": 56,
-        "hidden": 12,
+        "personal": 79,
+        "hidden": 13,
         "unknown": 0,
-        "bot": 179
+        "bot": 195
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1448,
-    "authors": 217,
-    "new_authors": 180,
+    "commits": 1489,
+    "authors": 218,
+    "new_authors": 181,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 16247,
+    "commits": 16288,
     "commits_by_year": {
       "2022": 284,
       "2023": 6340,
       "2024": 5700,
       "2025": 2672,
-      "2026": 1251
+      "2026": 1292
     },
-    "active_days": 1290
+    "active_days": 1296
   },
   "timezones": {
-    "+0000": 260,
-    "+0100": 1150,
+    "+0000": 261,
+    "+0100": 1156,
     "+0200": 1206,
     "+0300": 258,
     "+0330": 9,
@@ -4104,14 +4105,14 @@
     "-0100": 1,
     "-0300": 147,
     "-0400": 3623,
-    "-0500": 1473,
+    "-0500": 1508,
     "-0600": 209,
-    "-0700": 4140,
-    "-0800": 2015,
+    "-0700": 4141,
+    "-0800": 2029,
     "-1000": 3
   },
   "source_lines": {
-    "added": 2776577,
-    "current": 495349
+    "added": 2792999,
+    "current": 507698
   }
 }
