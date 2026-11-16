@@ -485,6 +485,9 @@ CHART_NOTE = (
 # report in one of its folders replaces it with the way back to itself.
 REPORT_BRAND = '<a href="index.html" class="nav-brand">GitStats</a>'
 
+# The page a report has after the others when AI summaries were written
+AI_PAGE = ("ai-insights.html", "AI Insights")
+
 # The header of a column of share bars: the bars are drawn for the eye only
 # (aria-hidden), and a header cell still needs a name
 BAR_HEADER = '<th class="unsortable"><span class="visually-hidden">Bar</span></th>'
@@ -1147,20 +1150,18 @@ class HTMLReportCreator(ReportCreator):
                 band = annotations["bands"][0]
                 note += f"; none from {years[band['from']]} to {years[band['to']]}"
             note = f'<p class="section-note">{note}.</p>'
-        return (
-            "<section>"
-            + html_header(2, "Commits per year")
-            + note
-            + self._render_chartjs(
+        return section_html(
+            "Commits per year",
+            note,
+            self._render_chartjs(
                 "chart-overview-yearly",
                 "bar",
                 years,
                 [{"label": "Commits", "data": values}],
                 aspect_ratio=3.3,
                 annotations=annotations,
-            )
-            + '<p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p>'
-            "</section>"
+            ),
+            '<p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p>',
         )
 
     def _overview_last_year_html(self, data: Any) -> str:
@@ -1194,21 +1195,18 @@ class HTMLReportCreator(ReportCreator):
                 f'<p class="chart-footnote">{labels[-1]} {months[-1][:4]} was not over '
                 "when this report was made.</p>"
             )
-        return (
-            "<section>"
-            + html_header(2, "Last 12 months")
-            + f'<p class="section-note">{note}.</p>'
-            + self._render_chartjs(
+        return section_html(
+            "Last 12 months",
+            f'<p class="section-note">{note}.</p>',
+            self._render_chartjs(
                 "chart-last-12-months",
                 "bar",
                 labels,
                 [{"label": "Commits", "data": list(recent.values())}],
                 aspect_ratio=1.65,
                 annotations={"values": True},
-                all_ticks=True,
-            )
-            + footnote
-            + "</section>"
+            ),
+            footnote,
         )
 
     def _overview_contributors_html(self, data: Any) -> str:
@@ -1246,15 +1244,13 @@ class HTMLReportCreator(ReportCreator):
             )
         # "All 1 author" would point to the one already listed
         more = f"All {format_int(total)} authors" if total > 1 else "The author in detail"
-        return (
-            "<section>"
-            + html_header(2, "Top contributors")
-            + '<div class="table-scroll"><table class="share-table">'
+        return section_html(
+            "Top contributors",
+            '<div class="table-scroll"><table class="share-table">'
             '<tr><th class="num rank"><abbr title="Rank by commits">#</abbr></th>'
             '<th>Author</th><th class="num">Commits</th><th class="num">Share</th>'
-            f"{SHARE_SCALE_HEADER}</tr>" + "".join(rows) + "</table></div>"
-            f'<p class="more-link"><a href="authors.html">{more} &rarr;</a></p>'
-            "</section>"
+            f"{SHARE_SCALE_HEADER}</tr>" + "".join(rows) + "</table></div>",
+            f'<p class="more-link"><a href="authors.html">{more} &rarr;</a></p>',
         )
 
     def _overview_releases_html(self, data: Any) -> str:
@@ -1275,15 +1271,13 @@ class HTMLReportCreator(ReportCreator):
             )
         total = len(data.tags)
         more = f"All {format_int(total)} tags" if total > 1 else "The tag in detail"
-        return (
-            "<section>"
-            + html_header(2, "Latest releases")
-            + '<div class="table-scroll"><table class="share-table">'
+        return section_html(
+            "Latest releases",
+            '<div class="table-scroll"><table class="share-table">'
             '<tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr>'
             + "".join(rows)
-            + "</table></div>"
-            f'<p class="more-link"><a href="tags.html">{more} &rarr;</a></p>'
-            "</section>"
+            + "</table></div>",
+            f'<p class="more-link"><a href="tags.html">{more} &rarr;</a></p>',
         )
 
     def create_activity_html(self, data, path):
@@ -3439,7 +3433,6 @@ class HTMLReportCreator(ReportCreator):
         tooltip_share=False,
         month_axis=False,
         diverging=False,
-        all_ticks=False,
     ):
         """Render a Chart.js chart as inline HTML.
 
@@ -3460,7 +3453,10 @@ class HTMLReportCreator(ReportCreator):
         ``annotations`` (category bar charts) is a dict for the gsAnnotations
         plugin: ``bands`` ``[{"from": i, "to": j, "text", "short"}]`` shade
         category ranges, ``peaks`` ``[{"index": i, "text"}]`` label bars, and
-        ``values: True`` labels every non-zero bar. See gap_annotations().
+        ``values: True`` labels every non-zero bar, and then every bar keeps its
+        label on the x-axis too: a narrow chart would otherwise drop every other
+        one to keep them apart, leaving values over bars without a name. See
+        gap_annotations().
 
         With ``tooltip_share=True`` (single series), the tooltip also gives the
         value's share of the series total: "67 commits (12.1%)".
@@ -3472,10 +3468,6 @@ class HTMLReportCreator(ReportCreator):
         tooltip line (e.g. "+2 new"); empty strings add nothing. A dataset with
         ``colorVar`` (e.g. "--success-color") takes its color from that CSS
         variable, following the theme.
-
-        With ``all_ticks=True`` every category keeps its label on the x-axis,
-        for a few short ones (the months of a year) in a narrow chart, where
-        every other one would be dropped to keep them apart.
 
         With ``diverging=True`` (bars), datasets stack around zero: positive
         values above it, negative ones below, and the y-axis and tooltips show
@@ -3590,13 +3582,13 @@ class HTMLReportCreator(ReportCreator):
                 )
             else:
                 # unrotated labels keep a gap between them, as on the time axes
-                x_ticks = (
-                    "maxRotation: 45, minRotation: 45"
-                    if x_ticks_rotate
-                    else "maxRotation: 0, autoSkip: false"
-                    if all_ticks
-                    else "maxRotation: 0, autoSkipPadding: 12"
-                )
+                if x_ticks_rotate:
+                    x_ticks = "maxRotation: 45, minRotation: 45"
+                elif annotations and annotations.get("values"):
+                    # a bar with its value over it has its name under it
+                    x_ticks = "maxRotation: 0, autoSkip: false"
+                else:
+                    x_ticks = "maxRotation: 0, autoSkipPadding: 12"
                 if collapsed:
                     x_ticks += ", callback: categoryTick"
                 # each bar is its own category: a gridline per bar is only noise
@@ -3725,7 +3717,7 @@ class HTMLReportCreator(ReportCreator):
                 file: A writable file-like object opened for text output where the HTML header will be written.
                 page: The file name of the page, such as ``"authors.html"``.
         """
-        label = dict(NAV_PAGES + (("ai-insights.html", "AI Insights"),)).get(page, "")
+        label = dict(NAV_PAGES + (AI_PAGE,)).get(page, "")
         title = self.title if page == "index.html" or not label else f"{self.title}: {label}"
         share = share_meta_html(
             title,
@@ -3777,12 +3769,12 @@ class HTMLReportCreator(ReportCreator):
         has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
 
         links = "\n            ".join(nav_link(href, label, current) for href, label in NAV_PAGES)
-        ai_link = nav_link("ai-insights.html", "AI Insights", current) if has_ai else ""
+        ai_link = nav_link(*AI_PAGE, current) if has_ai else ""
         # On a phone the row of links shows three or four of the pages and the
         # rest by scrolling sideways, which nothing on screen says. There the
         # same links are a menu named after the current page: a <details>, so
         # it opens where the page's scripts do not run.
-        pages = dict(NAV_PAGES + ((("ai-insights.html", "AI Insights"),) if has_ai else ()))
+        pages = dict(NAV_PAGES + ((AI_PAGE,) if has_ai else ()))
         menu = (
             '<details class="nav-menu"><summary><span class="nav-menu-label">Page</span> '
             f"{pages.get(current or '', 'Menu')}</summary>"
@@ -4742,134 +4734,136 @@ def overview_signals(data: Any) -> list[dict[str, str]]:
     "The last 12 months" are the ones up to the last commit, as on the
     other pages.
     """
-    found = []
+    kinds = (_ownership_signal, _authors_signal, _hotspots_signal, _trend_signal)
+    return [signal for signal in (kind(data) for kind in kinds) if signal]
 
+
+def _signal(level: str, tag: str, title: str, detail: str, page: str) -> dict[str, str]:
+    """A finding of the overview, linked to the page named ``page`` in the nav."""
+    href = {label: href for href, label in NAV_PAGES}[page]
+    return {
+        "level": level,
+        "tag": tag,
+        "title": title,
+        "detail": detail,
+        "href": href,
+        "page": page,
+    }
+
+
+def _ownership_signal(data: Any) -> dict[str, str] | None:
+    """The bus factor, when it is low: see overview_signals()."""
     ownership = head_ownership(data)
     bus_factor = ownership["bus_factor"]
-    if 0 < bus_factor <= SIGNAL_MAX_BUS_FACTOR and len(ownership["authors"]) > 1:
-        owners = [author_html(name) for name in ownership["bus_factor_authors"]]
-        owned = (
-            f"primary owner of {format_int(ownership['bus_factor_files'])} of "
-            f"{plural(ownership['total_files'], 'file')}"
+    if not 0 < bus_factor <= SIGNAL_MAX_BUS_FACTOR or len(ownership["authors"]) < 2:
+        return None
+    owners = [author_html(name) for name in ownership["bus_factor_authors"]]
+    owned = (
+        f"primary owner of {format_int(ownership['bus_factor_files'])} of "
+        f"{plural(ownership['total_files'], 'file')}"
+    )
+    if bus_factor == 1:
+        detail = f"{owners[0]} is the {owned}."
+    else:
+        detail = f"{' and '.join(owners)} are, between them, {owned}."
+    single = ownership["single_owner_files"]
+    if single:
+        detail += (
+            f" {plural(single, 'file')} {'has' if single == 1 else 'have'} only ever "
+            "been changed by one person."
         )
-        detail = (
-            f"{owners[0]} is the {owned}."
-            if bus_factor == 1
-            else f"{' and '.join(owners)} are, between them, {owned}."
-        )
-        single = ownership["single_owner_files"]
-        if single:
-            detail += (
-                f" {plural(single, 'file')} {'has' if single == 1 else 'have'} only ever "
-                "been changed by one person."
-            )
-        found.append(
-            {
-                "level": "risk" if bus_factor == 1 else "watch",
-                "tag": "Risk" if bus_factor == 1 else "Watch",
-                "title": f"Bus factor is {bus_factor}",
-                "detail": detail,
-                "href": "ownership.html",
-                "page": "Code Ownership",
-            }
-        )
+    level, tag = ("risk", "Risk") if bus_factor == 1 else ("watch", "Watch")
+    return _signal(level, tag, f"Bus factor is {bus_factor}", detail, "Code Ownership")
 
+
+def _authors_signal(data: Any) -> dict[str, str] | None:
+    """One or two authors with most of the commits: see overview_signals()."""
     everyone = data.get_authors()
-    if len(everyone) >= 3:
-        shares = [data.get_author_info(author)["commits_frac"] for author in everyone[:2]]
-        title = ""
-        if shares[0] >= SIGNAL_TOP_AUTHORS_SHARE:
-            title = f"{author_html(everyone[0])} made {shares[0]:.1f}% of the commits"
-        elif sum(shares) >= SIGNAL_TOP_AUTHORS_SHARE:
-            title = f"2 authors made {sum(shares):.1f}% of the commits"
-        if title:
-            # how many of the authors are still there; with all of them active
-            # (a young project) that says nothing, and the two shares do
-            recent = recent_authors(data)
-            if recent and recent[0] < len(everyone):
-                active, new = recent
-                detail = (
-                    f"{format_int(active)} of {plural(len(everyone), 'author')} committed "
-                    "in the last 12 months"
-                    + (f", {format_int(new)} of them for the first time." if new else ".")
-                )
-            else:
-                detail = (
-                    " and ".join(
-                        f"{author_html(author)} {share:.1f}%"
-                        for author, share in zip(everyone[:2], shares)
-                    )
-                    + "."
-                )
-            found.append(
-                {
-                    "level": "watch",
-                    "tag": "Watch",
-                    "title": title,
-                    "detail": detail,
-                    "href": "authors.html",
-                    "page": "Authors",
-                }
+    if len(everyone) < 3:
+        return None
+    shares = [data.get_author_info(author)["commits_frac"] for author in everyone[:2]]
+    if shares[0] >= SIGNAL_TOP_AUTHORS_SHARE:
+        title = f"{author_html(everyone[0])} made {shares[0]:.1f}% of the commits"
+    elif sum(shares) >= SIGNAL_TOP_AUTHORS_SHARE:
+        title = f"2 authors made {sum(shares):.1f}% of the commits"
+    else:
+        return None
+    # how many of the authors are still there; with all of them active (a
+    # young project) that says nothing, and the two shares do
+    recent = recent_authors(data)
+    if recent and recent[0] < len(everyone):
+        active, new = recent
+        detail = (
+            f"{format_int(active)} of {plural(len(everyone), 'author')} committed "
+            "in the last 12 months"
+            + (f", {format_int(new)} of them for the first time." if new else ".")
+        )
+    else:
+        detail = (
+            " and ".join(
+                f"{author_html(author)} {share:.1f}%" for author, share in zip(everyone[:2], shares)
             )
+            + "."
+        )
+    return _signal("watch", "Watch", title, detail, "Authors")
 
+
+def _hotspots_signal(data: Any) -> dict[str, str] | None:
+    """The ten highest hotspot scores being most of the total: see overview_signals()."""
     hotspot_files = getattr(data, "hotspot_files", {})
     files = compute_hotspots(hotspot_files if isinstance(hotspot_files, dict) else {})["files"]
     total_score = sum(fs["score"] for fs in files)
-    if len(files) > 10 and total_score:
-        share = sum(fs["score"] for fs in files[:10]) / total_score
-        if share >= SIGNAL_HOTSPOT_SHARE:
-            first = files[0]
-            found.append(
-                {
-                    "level": "watch",
-                    "tag": "Watch",
-                    "title": f"10 files hold {100.0 * share:.1f}% of the hotspot score",
-                    "detail": (
-                        f'<span class="path">{html.escape(first["path"])}</span> leads: '
-                        f"{plural(first['lines'], 'line')}, changed "
-                        f"{plural(first['churn'], 'time')}."
-                    ),
-                    "href": "hotspots.html",
-                    "page": "Hotspots",
-                }
-            )
+    if len(files) <= 10 or not total_score:
+        return None
+    share = sum(fs["score"] for fs in files[:10]) / total_score
+    if share < SIGNAL_HOTSPOT_SHARE:
+        return None
+    first = files[0]
+    detail = (
+        f'<span class="path">{html.escape(first["path"])}</span> leads: '
+        f"{plural(first['lines'], 'line')}, changed {plural(first['churn'], 'time')}."
+    )
+    title = f"10 files hold {100.0 * share:.1f}% of the hotspot score"
+    return _signal("watch", "Watch", title, detail, "Hotspots")
 
+
+def _trend_title(now: int, then: int) -> str:
+    """How ``now`` commits compare with ``then`` the year before, in words, or
+    nothing when they are within a quarter of each other."""
+    if not then:
+        return "Commits again, after 12 months without any" if now else ""
+    if now > 2 * then:
+        return "Activity more than doubled in a year"
+    if now >= (1 + SIGNAL_TREND_CHANGE) * then:
+        return f"Activity is up {100.0 * (now - then) / then:.0f}% on the year before"
+    if 2 * now < then:
+        return "Activity fell by more than half in a year"
+    if now <= (1 - SIGNAL_TREND_CHANGE) * then:
+        return f"Activity is down {100.0 * (then - now) / then:.0f}% on the year before"
+    return ""
+
+
+def _trend_signal(data: Any) -> dict[str, str] | None:
+    """The last 12 months against the 12 before them: see overview_signals()."""
     recent_months, before_months = last_year_commits(data)
     by_month = getattr(data, "commits_by_month", None)
     # both windows are inside the history: a project in its second year has
     # not "doubled", it has had more months
     if (
-        recent_months is not None
-        and isinstance(by_month, dict)
-        and min(by_month) <= min(before_months)
+        recent_months is None
+        or not isinstance(by_month, dict)
+        or min(by_month) > min(before_months)
     ):
-        now, then = sum(recent_months.values()), sum(before_months.values())
-        title = ""
-        if now and not then:
-            title = "Commits again, after 12 months without any"
-        elif now > 2 * then:
-            title = "Activity more than doubled in a year"
-        elif then and now >= (1 + SIGNAL_TREND_CHANGE) * then:
-            title = f"Activity is up {100.0 * (now - then) / then:.0f}% on the year before"
-        elif then and 2 * now < then:
-            title = "Activity fell by more than half in a year"
-        elif then and now <= (1 - SIGNAL_TREND_CHANGE) * then:
-            title = f"Activity is down {100.0 * (then - now) / then:.0f}% on the year before"
-        if title:
-            found.append(
-                {
-                    "level": "up" if now > then else "down",
-                    "tag": "Trend",
-                    "title": title,
-                    "detail": (
-                        f"{plural(now, 'commit')} in the last 12 months, against "
-                        f"{format_int(then)} in the 12 months before."
-                    ),
-                    "href": "activity.html",
-                    "page": "Activity",
-                }
-            )
-    return found
+        return None
+    now, then = sum(recent_months.values()), sum(before_months.values())
+    title = _trend_title(now, then)
+    if not title:
+        return None
+    detail = (
+        f"{plural(now, 'commit')} in the last 12 months, against "
+        f"{format_int(then)} in the 12 months before."
+    )
+    return _signal("up" if now > then else "down", "Trend", title, detail, "Activity")
 
 
 def signals_html(signals: list[dict[str, str]]) -> str:
@@ -5019,6 +5013,11 @@ def stat_tiles_html(tiles: list[tuple[str, str, str]]) -> str:
         for suffix, (cols, span) in (("", columns(6)), ("-md", columns(3)), ("-sm", columns(2)))
     )
     return f'<dl class="stat-tiles" style="{style}">{items}</dl>'
+
+
+def section_html(title: str, *parts: str) -> str:
+    """A section of a page: its heading, then its parts."""
+    return "<section>" + html_header(2, title) + "".join(parts) + "</section>"
 
 
 def html_header(level: int, text: str) -> str:

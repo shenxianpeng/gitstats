@@ -359,7 +359,8 @@ def test_a_narrow_hotspots_plot_leaves_out_the_names_that_do_not_fit():
 def test_a_few_hotspots_are_numbered_without_quadrants():
     plot = _hotspot_plot([(9, 3, 9.0), (5, 1, 2.2)], 9, 3, numbered=2, width=1000)
     assert plot["series"] == [["Files", 1]]
-    assert plot["before"] == [] and plot["tint"] == []
+    assert plot["before"] == []
+    assert plot["tint"] == []
     assert plot["numbers"] == [["1", "--chart-text"], ["2", "--chart-text"]]
 
 

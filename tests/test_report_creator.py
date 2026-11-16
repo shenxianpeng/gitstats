@@ -4310,7 +4310,8 @@ def test_last_year_commits_are_the_12_months_up_to_the_last_commit(mock_data_col
         "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12",
         "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06",
     ]  # fmt: skip
-    assert list(before)[0] == "2021-07" and list(before)[-1] == "2022-06"
+    assert list(before)[0] == "2021-07"
+    assert list(before)[-1] == "2022-06"
     assert (sum(recent.values()), sum(before.values())) == (100, 40)
     # data that has no commits by month
     assert last_year_commits(SimpleNamespace()) == (None, {})
@@ -4333,7 +4334,8 @@ def test_sparkline_is_sized_by_attributes():
         ("14", "0", "28"),
         ("21", "25", "3"),
     ]
-    assert 'viewBox="0 0 26 28"' in svg and 'aria-hidden="true"' in svg
+    assert 'viewBox="0 0 26 28"' in svg
+    assert 'aria-hidden="true"' in svg
     # a server that forbids inline styles (Jenkins) would drop a styled bar
     assert "style" not in svg
     assert sparkline_svg([0, 0]).count("<rect") == 0
