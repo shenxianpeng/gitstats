@@ -377,14 +377,14 @@ Features
 
 Here is a list of some features of ``gitstats``:
 
-* **General**: headline numbers (commits, authors, lines, files, active days, longest streak), commits per year, top contributors, latest releases.
+* **General**: what is worth a look first (a low bus factor, a few authors with most of the commits, a few files with most of the hotspot score, a year much busier or quieter than the one before), each with the page that shows it; headline numbers (commits, authors, lines, files, active days, latest release); commits per year and in each of the last 12 months; top contributors; latest releases.
 * **Activity**: commits by year, month and week; a punch card of day of week by hour of day; month of year; timezones.
 * **Authors**: every author's commits, lines and active span; a contributor timeline; cumulative lines added per author; the top author per year and month; commits by organization, from the domain of each author's address, and by quarter how many come from organizations, personal mail, hidden addresses and bots; commits by email domain; contributor growth; and the commits that name an AI coding assistant, by month and by assistant.
 * **Files**: file count over time, extensions ranked by lines, and the most-changed files.
 * **Lines**: lines of code over time, and lines added and removed per month.
 * **Tags**: every tag with its commits and authors.
 * **Code Ownership**: the bus factor, bus-factor risk (files only one person has changed), ownership by author, and the files shared by the most people.
-* **Hotspots**: every file plotted by its size against how often it changes, and the large, frequently changed files ranked by score, with how many people have changed each.
+* **Hotspots**: every file plotted by its size against how often it changes, with the large, frequently changed ones in color and the highest scores numbered and listed next to the plot; and the files ranked by score, with how many people have changed each.
 * **History**: the project's life one year at a time — its peaks, quiet years and revivals, newcomers and releases — with optional AI narration.
 * **Portfolio**: analyze several repositories at once for an aggregate overview, with a page that compares their AI-assisted commits quarter by quarter.
 * **Wrapped card**: a shareable SVG card of one year in the repository, with ``--wrapped``.

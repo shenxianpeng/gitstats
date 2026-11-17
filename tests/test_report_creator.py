@@ -15,8 +15,10 @@ from gitstats.report_creator import (
     BADGES_PLACEHOLDER_URL,
     CHART_NOTE,
     CHART_SCRIPT,
+    INSIGHTS_END,
     NAV_PAGES,
     NAV_START,
+    SHARE_SCALE_HEADER,
     SKIP_LINK,
     HTMLReportCreator,
     ReportCreator,
@@ -34,9 +36,11 @@ from gitstats.report_creator import (
     get_keys_sorted_by_values,
     html_header,
     html_linkify,
+    last_year_commits,
     longest_zero_run,
     month_range,
     months_back,
+    overview_signals,
     page_title,
     parse_chronicle,
     quiet_months,
@@ -44,6 +48,9 @@ from gitstats.report_creator import (
     report_share_description,
     share_meta_html,
     share_text,
+    signals_html,
+    span_text,
+    sparkline_svg,
     stat_tiles_html,
     sum_since,
     tags_newest_first,
@@ -607,7 +614,14 @@ def test_print_nav_marks_current_page():
 
     assert '<a href="authors.html" class="active" aria-current="page">Authors</a>' in output
     assert '<a href="index.html">General</a>' in output
-    assert output.count('aria-current="page"') == 1
+    # once in the row of links and once in the menu a phone shows in its place
+    assert output.count('aria-current="page"') == 2
+    assert (
+        '<details class="nav-menu"><summary><span class="nav-menu-label">Page</span> '
+        "Authors</summary><ul>"
+    ) in output
+    menu = output[output.index('<details class="nav-menu">') : output.index("</details>")]
+    assert [label for _, label in NAV_PAGES] == re.findall(r">([^<>]+)</a>", menu)
 
 
 @pytest.mark.parametrize(
@@ -630,7 +644,8 @@ def test_each_page_marks_itself_current(mock_data_collector, temp_dir, page):
     with open(os.path.join(temp_dir, page), encoding="utf-8") as f:
         content = f.read()
     assert f'<a href="{page}" class="active" aria-current="page">' in content
-    assert content.count('aria-current="page"') == 1
+    # the row of links, and the menu that replaces it on a phone
+    assert content.count('aria-current="page"') == 2
 
 
 # ── HTMLReportCreator.create_index_html ──────────────────────────────────
@@ -645,9 +660,16 @@ def test_create_index_html(mock_data_collector, temp_dir):
     with open(f"{temp_dir}/index.html", encoding="utf-8") as f:
         html = f.read()
 
-    # The repository's name heads the page, with report metadata under it
-    assert "<h1>test-project</h1>" in html
-    assert '<p class="page-meta">2022-12-01 &rarr; 2023-04-01 &middot; generated ' in html
+    # The repository's name heads the page, with the span of its history under
+    # it; how the report was made is in the footer
+    assert (
+        '<div class="page-head"><h1>test-project</h1>'
+        '<a href="badges.html">Badge for your README</a></div>'
+        '<p class="page-meta">2022-12-01 &rarr; 2023-04-01 &middot; 3 months</p>'
+    ) in html
+    assert re.search(
+        r"gitstats</a> \S+ &middot; \d{4}-\d\d-\d\d \d\d:\d\d:\d\d in \d+ s &middot; ", html
+    )
     assert "</html>" in html
 
     # Headline numbers are stat tiles, with the old table's averages as notes
@@ -668,7 +690,13 @@ def test_create_index_html(mock_data_collector, temp_dir):
         '<span class="nowrap">of 120 days</span>&nbsp;&middot; <span class="nowrap">3.3%</span>'
         in html
     )
-    assert '<dt>Longest Streak</dt><dd class="stat-value">4 days</dd>' in html
+    # the newest tag dates the project; without tags the tile is the longest streak
+    assert (
+        '<dt>Latest Release</dt><dd class="stat-value">v1.1.0</dd>'
+        '<dd class="stat-note"><span class="nowrap">2023-04-05</span>&nbsp;&middot; '
+        '<span class="nowrap">2 tags</span></dd>'
+    ) in html
+    assert "Longest Streak" not in html
 
     # The old key/value table is gone: its rows live in the tiles and the meta line
     assert "Report Details" not in html
@@ -682,13 +710,19 @@ def test_create_index_html(mock_data_collector, temp_dir):
     ) in html
     assert 'href="activity.html">Activity in detail &rarr;</a>' in html
 
-    # Top contributors: commits, share, and a bar relative to the top author
+    # Top contributors: rank, commits, share, and the share as a bar from 0 to
+    # 100%, so the top author's bar is as long as their share
     assert (
-        '<tr><td>Alice Smith</td><td class="num">30</td><td class="num">60.0%</td>'
+        '<tr><td class="num rank">1</td><td>Alice Smith</td><td class="num">30</td>'
+        '<td class="num">60.0%</td>'
         '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
-        '<span style="width: 100.0%"></span></span></td></tr>'
+        '<span style="width: 60.0%"></span></span></td></tr>'
     ) in html
-    assert '<span style="width: 50.0%">' in html  # Bob: 15 of Alice's 30
+    assert '<span style="width: 30.0%">' in html  # Bob: 15 of all 50
+    assert SHARE_SCALE_HEADER in html
+    assert ">0</span><span>50%</span><span>100%</span>" in SHARE_SCALE_HEADER
+    # all three authors are listed: there are no others to add up
+    assert "share-rest" not in html
     assert "All 3 authors &rarr;" in html
 
     # Latest releases, newest first, next to the contributors
@@ -711,13 +745,17 @@ def test_index_notes_longest_quiet_stretch(mock_data_collector, temp_dir):
     mock_data_collector.commits_by_year = {2010: 3, 2011: 0, 2014: 2, 2016: 1}
     html = _render_index(mock_data_collector, temp_dir)
     # 2012-2013 are missing and 2011 is empty: the longest run is 2011-2013
-    # drawn on the chart; the canvas is invisible to screen readers, so also as hidden text
-    assert '<p class="visually-hidden">No commits from 2011 to 2013.</p>' in html
+    # drawn on the chart; the canvas is invisible to screen readers, so also in words
+    assert (
+        '<p class="section-note">6 commits in 3 years with commits; none from 2011 to 2013.</p>'
+    ) in html
 
 
 def test_index_single_empty_year_is_not_noted(mock_data_collector, temp_dir):
     mock_data_collector.commits_by_year = {2020: 1, 2022: 1}
-    assert "No commits from" not in _render_index(mock_data_collector, temp_dir)
+    html = _render_index(mock_data_collector, temp_dir)
+    assert "; none from" not in html
+    assert '<p class="section-note">2 commits in 2 years with commits.</p>' in html
 
 
 def test_index_without_tags_has_no_releases(mock_data_collector, temp_dir):
@@ -748,7 +786,11 @@ def test_bot_badges_in_contributor_tables(mock_data_collector, temp_dir):
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     badge = 'renovate <span class="badge" title="renovate[bot]">bot</span>'
     with open(f"{temp_dir}/index.html", encoding="utf-8") as f:
-        assert f"<tr><td>{badge}</td>" in f.read()  # Top Contributors
+        index = f.read()
+    assert f'<tr><td class="num rank">3</td><td>{badge}</td>' in index  # Top Contributors
+    # a bot's commits are not a person's work: its bar is grey
+    row = index[index.index(f"<td>{badge}</td>") :]
+    assert 'class="share-bar share-bar-muted"' in row[: row.index("</tr>")]
     with open(f"{temp_dir}/authors.html", encoding="utf-8") as f:
         assert f"<tr><td>{badge}</td>" in f.read()  # List of Authors
 
@@ -1948,8 +1990,9 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
     assert '<dt>Median File Size</dt><dd class="stat-value">120 lines</dd>' in content
     assert '<dt>Median Changes</dt><dd class="stat-value">10 commits</dd>' in content
 
-    # the scatter plot: every file as [path, lines, churn, score], highest score first
-    assert '<div class="chart-box has-legend"' in content
+    # the scatter plot: every file as [path, lines, churn, score], highest score first.
+    # The quadrants are named on the plot, so there is no legend to leave room for
+    assert '<div class="hotspot-plot"><div class="chart-box" style="--chart-ratio: 1.6">' in content
     assert (
         '<canvas id="chart-hotspots" role="img" aria-label="Scatter plot of 4 files by size in '
         'lines and number of changes, both on logarithmic scales"></canvas>'
@@ -1965,7 +2008,24 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
             ["README.md", 60, 8, 62.0],
             ["Dockerfile", 30, 2, 11.0],
         ],
+        "numbered": 4,
     }
+
+    # the highest scores next to the plot, numbered as on it; the files at or
+    # above both medians are the ones in color
+    top = content[content.index('<div class="hotspot-top">') :]
+    top = top[: top.index("</ol>")]
+    assert re.findall(r'<span class="hotspot-rank([^"]*)">(\d+)</span>', top) == [
+        (" numbered hot", "1"),
+        (" numbered hot", "2"),
+        (" numbered", "3"),
+        (" numbered", "4"),
+    ]
+    assert (
+        '<span class="hotspot-file"><span class="path">main.py</span>'
+        '<span class="hotspot-numbers">400 lines &middot; 15 changes</span></span>'
+    ) in top
+    assert "The 4 highest scores are numbered as in the list." in content
 
     # the table ranks every file by score, with a bar scaled to the top score
     assert "Top hotspots</a></h2>" in content
@@ -2119,7 +2179,7 @@ def test_hotspots_table_shows_ten_and_folds_the_rest(mock_data_collector, temp_d
     # ten files or fewer are all shown, with nothing folded away
     content = _hotspots_html(mock_data_collector, temp_dir)
     assert content.count('<td class="path">') == 10
-    assert "<details" not in content
+    assert '<details class="table-details"' not in content
 
     mock_data_collector.hotspot_files = {
         f"f{i:03d}.py": {"lines": 100, "churn": 400 - i, "score": 10.0 * (400 - i)}
@@ -3313,8 +3373,10 @@ def test_overview_links_the_badges_page(mock_data_collector, temp_dir):
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     with open(os.path.join(temp_dir, "index.html"), encoding="utf-8") as f:
         content = f.read()
-    meta = re.search(r'<p class="page-meta">(.*?)</p>', content)[1]
-    assert '<a href="badges.html">Badge for your README</a>' in meta
+    # at the far end of the heading, not among the facts under it
+    head = re.search(r'<div class="page-head">(.*?)</div>', content)[1]
+    assert '<a href="badges.html">Badge for your README</a>' in head
+    assert "badges.html" not in re.search(r'<p class="page-meta">(.*?)</p>', content)[1]
 
 
 def test_nav_orders_pages_by_importance(mock_data_collector, temp_dir):
@@ -4206,7 +4268,12 @@ def test_a_few_hotspots_have_no_medians_to_mark(mock_data_collector, temp_dir):
     }
     page = _hotspots_html(mock_data_collector, temp_dir)
     assert "dashed lines" not in page
-    assert "a bigger dot is a higher score. Both axes are logarithmic." in page
+    assert (
+        "a bigger dot is a higher score. The highest score is numbered as in the list. "
+        "Both axes are logarithmic."
+    ) in page
+    # one file is not "large, changed often": it is numbered, not in color
+    assert '<span class="hotspot-rank numbered">1</span>' in page
 
 
 @pytest.mark.parametrize("month_axis", [False, True])
@@ -4223,3 +4290,332 @@ def test_a_single_point_is_in_the_middle(month_axis):
     assert "offset: true" not in two
     bar = creator._render_chartjs("c", "bar", labels, [{"label": "C", "data": [1]}])
     assert "offset: true" not in bar
+
+
+# ── the overview: what to look at first, and the last 12 months ──────────
+
+
+def _history(data, before: int, recent: int, first: str = "2019-01") -> None:
+    """A history from ``first`` whose last 12 months (2022-07 to 2023-06) have
+    ``recent`` commits and the 12 before them ``before``."""
+    data.commits_by_month = {first: 5, "2022-01": before, "2023-06": recent}
+    data.commits_by_month = {m: n for m, n in data.commits_by_month.items() if n}
+    data.get_total_commits.return_value = sum(data.commits_by_month.values())
+
+
+def test_last_year_commits_are_the_12_months_up_to_the_last_commit(mock_data_collector):
+    _history(mock_data_collector, before=40, recent=100)
+    recent, before = last_year_commits(mock_data_collector)
+    assert list(recent) == [
+        "2022-07", "2022-08", "2022-09", "2022-10", "2022-11", "2022-12",
+        "2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06",
+    ]  # fmt: skip
+    assert list(before)[0] == "2021-07"
+    assert list(before)[-1] == "2022-06"
+    assert (sum(recent.values()), sum(before.values())) == (100, 40)
+    # data that has no commits by month
+    assert last_year_commits(SimpleNamespace()) == (None, {})
+    assert last_year_commits(SimpleNamespace(commits_by_month={})) == (None, {})
+
+
+@pytest.mark.parametrize(
+    "days, text",
+    [(7050, "19 years"), (400, "1 year"), (120, "3 months"), (59, "59 days"), (1, "1 day")],
+)
+def test_span_text(days, text):
+    assert span_text(days) == text
+
+
+def test_sparkline_is_sized_by_attributes():
+    svg = sparkline_svg([0, 5, 10, 1])
+    # no bar for no commits; the smallest count still shows; the largest is 28px
+    assert re.findall(r'<rect x="(\d+)" y="(\d+)" width="5" height="(\d+)"/>', svg) == [
+        ("7", "14", "14"),
+        ("14", "0", "28"),
+        ("21", "25", "3"),
+    ]
+    assert 'viewBox="0 0 26 28"' in svg
+    assert 'aria-hidden="true"' in svg
+    # a server that forbids inline styles (Jenkins) would drop a styled bar
+    assert "style" not in svg
+    assert sparkline_svg([0, 0]).count("<rect") == 0
+
+
+def _signals(data) -> dict[str, dict[str, str]]:
+    return {signal["page"]: signal for signal in overview_signals(data)}
+
+
+def test_overview_signals_of_the_sample_project(mock_data_collector):
+    found = _signals(mock_data_collector)
+    # two of three people own more than half of the files; four files and a
+    # history of six months give no hotspot share and no trend
+    assert list(found) == ["Code Ownership", "Authors"]
+    assert found["Code Ownership"] == {
+        "level": "watch",
+        "tag": "Watch",
+        "title": "Bus factor is 2",
+        "detail": "Alice Smith and Bob Jones are, between them, primary owner of 4 of 4 "
+        "files. 2 files have only ever been changed by one person.",
+        "href": "ownership.html",
+        "page": "Code Ownership",
+    }
+    # everyone is still active, which says nothing: the two shares do
+    assert found["Authors"]["title"] == "2 authors made 90.0% of the commits"
+    assert found["Authors"]["detail"] == "Alice Smith 60.0% and Bob Jones 30.0%."
+
+
+def test_a_bus_factor_of_one_is_a_risk(mock_data_collector):
+    mock_data_collector.author_files = {
+        "Alice <Smith>": {"a.py": 5, "b.py": 5, "c.py": 5},
+        "Bob Jones": {"a.py": 1},
+    }
+    signal = _signals(mock_data_collector)["Code Ownership"]
+    assert (signal["level"], signal["tag"], signal["title"]) == ("risk", "Risk", "Bus factor is 1")
+    assert signal["detail"] == (
+        "Alice &lt;Smith&gt; is the primary owner of 3 of 3 files. "
+        "2 files have only ever been changed by one person."
+    )
+    # one file that only one person has changed is said in the singular, and
+    # none is not said at all
+    mock_data_collector.author_files = {
+        "Alice Smith": {"a.py": 5, "b.py": 5},
+        "Bob Jones": {"a.py": 1},
+    }
+    assert _signals(mock_data_collector)["Code Ownership"]["detail"] == (
+        "Alice Smith is the primary owner of 2 of 2 files. "
+        "1 file has only ever been changed by one person."
+    )
+    mock_data_collector.author_files["Bob Jones"]["b.py"] = 1
+    assert _signals(mock_data_collector)["Code Ownership"]["detail"] == (
+        "Alice Smith is the primary owner of 2 of 2 files."
+    )
+    # a project one person has written has nobody else to share its files with
+    mock_data_collector.author_files = {"Alice Smith": {"a.py": 5, "b.py": 5}}
+    assert "Code Ownership" not in _signals(mock_data_collector)
+    # it takes three of the four to own more than half: not few enough to say
+    mock_data_collector.author_files = {
+        "Alice Smith": {"a.py": 5, "b.py": 5},
+        "Bob Jones": {"c.py": 5, "d.py": 5},
+        "Charlie Brown": {"e.py": 5, "f.py": 5},
+        "Dana White": {"g.py": 5, "h.py": 5},
+    }
+    assert "Code Ownership" not in _signals(mock_data_collector)
+
+
+def test_the_authors_signal_needs_a_few_authors_with_most_of_the_commits(mock_data_collector):
+    authors = mock_data_collector.authors
+    authors["Alice Smith"]["commits_frac"] = 85.0
+    authors["Bob Jones"]["commits_frac"] = 10.0
+    assert (
+        _signals(mock_data_collector)["Authors"]["title"] == "Alice Smith made 85.0% of the commits"
+    )
+    authors["Alice Smith"]["commits_frac"] = 45.0
+    authors["Bob Jones"]["commits_frac"] = 30.0
+    assert "Authors" not in _signals(mock_data_collector)  # 75% between two
+    # one of the three has not committed in the last 12 months
+    authors["Alice Smith"]["commits_frac"] = 60.0
+    authors["Charlie Brown"]["date_last"] = "2021-04-20"
+    authors["Charlie Brown"]["date_first"] = "2021-03-10"
+    assert _signals(mock_data_collector)["Authors"]["detail"] == (
+        "2 of 3 authors committed in the last 12 months, 2 of them for the first time."
+    )
+    # two authors are the whole project
+    mock_data_collector.authors = {name: authors[name] for name in ("Alice Smith", "Bob Jones")}
+    assert "Authors" not in _signals(mock_data_collector)
+
+
+def test_the_hotspots_signal_is_the_share_of_the_ten_highest_scores(mock_data_collector):
+    def files(count: int, top_score: float) -> dict:
+        return {
+            f"f{i:02d}.py": {"lines": 100, "churn": 5, "score": top_score if i < 10 else 1.0}
+            for i in range(count)
+        }
+
+    mock_data_collector.hotspot_files = files(30, 4.0)  # 40 of 60
+    signal = _signals(mock_data_collector)["Hotspots"]
+    assert signal["title"] == "10 files hold 66.7% of the hotspot score"
+    assert signal["detail"] == (
+        '<span class="path">f00.py</span> leads: 100 lines, changed 5 times.'
+    )
+    mock_data_collector.hotspot_files = files(30, 1.0)  # a third: spread evenly
+    assert "Hotspots" not in _signals(mock_data_collector)
+    mock_data_collector.hotspot_files = files(10, 4.0)  # the ten are all there are
+    assert "Hotspots" not in _signals(mock_data_collector)
+
+
+@pytest.mark.parametrize(
+    "before, recent, level, title",
+    [
+        (40, 100, "up", "Activity more than doubled in a year"),
+        (40, 60, "up", "Activity is up 50% on the year before"),
+        (40, 44, None, ""),
+        (40, 36, None, ""),
+        (40, 28, "down", "Activity is down 30% on the year before"),
+        (40, 10, "down", "Activity fell by more than half in a year"),
+        (0, 12, "up", "Commits again, after 12 months without any"),
+    ],
+)
+def test_the_trend_signal_compares_the_last_12_months_with_those_before(
+    mock_data_collector, before, recent, level, title
+):
+    _history(mock_data_collector, before, recent)
+    signal = _signals(mock_data_collector).get("Activity")
+    if level is None:
+        assert signal is None
+        return
+    assert (signal["level"], signal["tag"], signal["title"]) == (level, "Trend", title)
+    assert signal["detail"] == (
+        f"{recent} commits in the last 12 months, against {before} in the 12 months before."
+    )
+
+
+def test_a_project_in_its_second_year_has_no_trend(mock_data_collector):
+    # the 12 months before the last 12 began before the project did
+    _history(mock_data_collector, before=5, recent=100, first="2021-12")
+    assert "Activity" not in _signals(mock_data_collector)
+
+
+def test_signals_are_a_section_of_the_overview(mock_data_collector, temp_dir):
+    assert signals_html([]) == ""
+    html = _render_index(mock_data_collector, temp_dir)
+    section = html[html.index('<section class="signals-section">') :]
+    section = section[: section.index("</section>")]
+    assert "Worth a look</a></h2>" in section
+    assert (
+        '<li class="signal signal-watch"><span class="signal-tag">Watch</span>'
+        '<strong class="signal-title">Bus factor is 2</strong>'
+    ) in section
+    assert '<a class="signal-link" href="ownership.html">Code Ownership &rarr;</a>' in section
+    # under what a portfolio writes about the project, above its numbers
+    assert html.index(INSIGHTS_END) < html.index("signals-section") < html.index("stat-tiles")
+    # nothing to point at: no section
+    mock_data_collector.author_files = {}
+    mock_data_collector.get_authors.side_effect = lambda limit=None: ["Alice Smith"]
+    assert "signals-section" not in _render_index(mock_data_collector, temp_dir)
+
+
+def test_overview_of_a_long_history_shows_the_last_12_months(mock_data_collector, temp_dir):
+    _history(mock_data_collector, before=40, recent=100)
+    mock_data_collector.authors["Charlie Brown"]["date_last"] = "2021-04-20"
+    html = _render_index(mock_data_collector, temp_dir)
+    # the tiles say how the project is doing now, the commits with the months as bars
+    assert (
+        '<dt>Commits</dt><dd class="stat-value"><span class="stat-spark">145<svg class="sparkline"'
+    ) in html
+    assert '<dd class="stat-note">100 in the last 12 months</dd>' in html
+    assert '<dd class="stat-note">2 active in the last 12 months</dd>' in html
+    # and a chart of them next to the years
+    assert '<div class="overview-charts"><section>' in html
+    assert "Last 12 months</a></h2>" in html
+    assert (
+        '<p class="section-note">100 commits from Jul 2022 to Jun 2023, up from 40 in '
+        "the 12 months before.</p>"
+    ) in html
+    chart = html[html.index("getElementById('chart-last-12-months')") :]
+    chart = chart[: chart.index("</script>")]
+    assert 'var labels = ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb"' in chart
+    assert '"data": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100]' in chart
+    # twelve short labels in a third of the width: none is dropped
+    assert "autoSkip: false" in chart
+    # the last commit was not this month: its month is whole
+    assert "chart-footnote" not in html
+
+
+@pytest.mark.parametrize(
+    "before, recent, wording",
+    [
+        (100, 40, "40 commits from Jul 2022 to Jun 2023, down from 100 in the 12 months before."),
+        (40, 40, "40 commits from Jul 2022 to Jun 2023, as many as in the 12 months before."),
+        (0, 1, "1 commit from Jul 2022 to Jun 2023; none in the 12 months before."),
+    ],
+)
+def test_the_last_12_months_against_those_before(
+    mock_data_collector, temp_dir, before, recent, wording
+):
+    _history(mock_data_collector, before, recent)
+    assert f'<p class="section-note">{wording}</p>' in _render_index(mock_data_collector, temp_dir)
+
+
+def test_a_month_that_is_not_over_is_said_so(mock_data_collector, temp_dir):
+    now = datetime.datetime.now()
+    mock_data_collector.commits_by_month = {"2019-01": 5, now.strftime("%Y-%m"): 3}
+    html = _render_index(mock_data_collector, temp_dir)
+    assert (
+        f'<p class="chart-footnote">{now.strftime("%b %Y")} was not over when this report '
+        "was made.</p>"
+    ) in html
+
+
+def test_a_history_of_a_year_or_less_keeps_the_pace(mock_data_collector, temp_dir):
+    # every commit is in the last 12 months: they are the total, not news
+    html = _render_index(mock_data_collector, temp_dir)
+    assert "Last 12 months" not in html
+    assert "overview-charts" not in html
+    assert "sparkline" not in html
+    assert "12.5 per active day" in html
+    assert "16.7 commits per author" in html
+    # without tags there is no release to date the project by
+    mock_data_collector.tags = {}
+    html = _render_index(mock_data_collector, temp_dir)
+    assert '<dt>Longest Streak</dt><dd class="stat-value">4 days</dd>' in html
+    assert "Latest Release" not in html
+
+
+def test_contributors_beyond_the_top_five_are_one_row(mock_data_collector, temp_dir):
+    people = {
+        f"Author {n}": {
+            **mock_data_collector.authors["Charlie Brown"],
+            "commits": 2,
+            "commits_frac": 4.0,
+        }
+        for n in range(1, 6)
+    }
+    mock_data_collector.authors = {**mock_data_collector.authors, **people}
+    mock_data_collector.get_total_authors.return_value = 8
+    html = _render_index(mock_data_collector, temp_dir)
+    table = html[html.index("Top contributors</a></h2>") :]
+    table = table[: table.index("</table>")]
+    assert table.count('<td class="num rank">') == 5
+    # the five listed have every one of the sample's 50 commits and more: counts
+    # that leave nothing over get no row, rather than one with nothing in it
+    assert '<tr class="share-rest">' not in table
+    # 60 commits, 30 + 15 + 5 + 2 + 2 of them listed: the rows add up to all of them
+    mock_data_collector.get_total_commits.return_value = 60
+    html = _render_index(mock_data_collector, temp_dir)
+    assert (
+        '<tr class="share-rest"><td></td><td>3 other authors</td><td class="num">6</td>'
+        '<td class="num">10.0%</td>'
+        '<td class="share-cell"><span class="share-bar share-bar-muted" aria-hidden="true">'
+        '<span style="width: 10.0%"></span></span></td></tr>'
+    ) in html
+
+
+@pytest.mark.parametrize("page", [page for page, _ in NAV_PAGES])
+def test_every_page_says_how_the_report_was_made(mock_data_collector, temp_dir, page):
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    content = _read_page(temp_dir, page)
+    footer = content[content.index('<footer class="footer">') :]
+    made = re.search(
+        r"gitstats</a> (\S+) &middot; (\d{4}-\d\d-\d\d \d\d:\d\d:\d\d) in \d+ s &middot; (.+?)</span>",
+        footer,
+    )
+    assert made, footer
+    # the same on every page of a report, and no longer under the overview's heading
+    assert made[2] in _read_page(temp_dir, "index.html")
+    assert "generated" not in re.search(r'<p class="page-meta">(.*?)</p>|$', content)[0]
+
+
+def test_a_footer_without_the_time_of_the_run_leaves_it_out():
+    # a page written before any data was collected has no start to count from
+    creator = HTMLReportCreator()
+    f = StringIO()
+    creator.print_footer(f)
+    footer = f.getvalue()
+    assert re.search(
+        r"gitstats</a> \S+ &middot; \d{4}-\d\d-\d\d \d\d:\d\d:\d\d &middot; [^<]+</span>", footer
+    )
+    assert " s &middot; " not in footer
+    # what the first page said is what the others say
+    again = StringIO()
+    creator.print_footer(again)
+    assert again.getvalue() == footer
