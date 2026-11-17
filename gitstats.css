@@ -68,6 +68,9 @@
 	--series-4: #8250df;
 	--series-5: #e16f24;
 	--series-6: #0550ae;
+	/* The Hotspots plot: the large files that change often, and the rest */
+	--series-hot: #b3261e;
+	--series-rest: #8c8787;
 
 	/* Heatmap — GitHub green scale (user preference) */
 	--heat0-bg: #ebedf0;
@@ -121,6 +124,8 @@
 	--series-4: #a371f7;
 	--series-5: #f0883e;
 	--series-6: #79c0ff;
+	--series-hot: #f47067;
+	--series-rest: #8a8484;
 
 	/* Heatmap dark — GitHub dark green, empty cells in the page's warm grey */
 	--heat0-bg: #2d2929;
@@ -184,6 +189,155 @@ dd {
 	font-family: var(--font-mono);
 	font-size: var(--font-size-sm);
 	color: var(--text-secondary);
+}
+
+/* The overview's heading: the repository's name, and a link at the far end */
+.page-head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--space-1) var(--space-5);
+	margin: var(--space-5) 0 var(--space-4);
+	padding-bottom: var(--space-3);
+	border-bottom: 1px solid var(--border-strong);
+}
+
+.page-head h1 {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.page-head > a {
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+}
+
+/* "Worth a look": what the overview points at, each finding a cell with its
+   tag, a sentence, and the page that shows it. The cells share a row and
+   grow to fill it, so a row of three leaves no gap. */
+.signals-section {
+	margin-bottom: var(--space-5);
+}
+
+.signals {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	background-color: var(--border-color);
+	border: 1px solid var(--border-strong);
+}
+
+.signal {
+	flex: 1 1 240px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--space-2);
+	min-width: 0;
+	padding: var(--space-4);
+	background-color: var(--bg-color);
+	overflow-wrap: break-word;
+}
+
+/* The tag says the kind in words; its color only repeats it */
+.signal-tag {
+	padding: 0 6px;
+	border: 1px solid currentColor;
+	font-family: var(--font-mono);
+	font-size: 10px;
+	font-weight: 600;
+	line-height: 1.6;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--warn-color);
+}
+
+.signal-risk .signal-tag {
+	color: var(--danger-color);
+}
+
+.signal-up .signal-tag {
+	color: var(--success-color);
+}
+
+.signal-title {
+	font-size: 15px;
+	line-height: 1.35;
+}
+
+.signal-detail {
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+}
+
+.signal-detail .path {
+	font-family: var(--font-mono);
+	overflow-wrap: anywhere;
+}
+
+.signal-link {
+	margin-top: auto;
+	padding-top: var(--space-1);
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
+}
+
+/* A tile's number with the last months as small bars at the far end */
+.stat-spark {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: var(--space-2);
+}
+
+.sparkline {
+	flex: none;
+	margin-bottom: 4px;
+	fill: var(--bar-color);
+}
+
+/* The overview's two charts: the years, and the last 12 months at a third of
+   the width. Their boxes have the same height at these proportions. */
+.overview-charts {
+	display: grid;
+	grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+	column-gap: var(--space-6);
+}
+
+/* Side by side, heading, sentence, chart and what follows it are rows the two
+   sections share, so the charts start level whichever sentence is longer */
+@supports (grid-template-rows: subgrid) {
+	@media (min-width: 901px) {
+		.overview-charts > section {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr);
+			grid-template-rows: subgrid;
+			grid-row: span 4;
+			align-content: start;
+		}
+	}
+}
+
+.chart-footnote {
+	margin: var(--space-2) 0 0;
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+}
+
+@media (max-width: 900px) {
+	.overview-charts {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	/* a chart that was a third of the width is now all of it */
+	.overview-charts .chart-box {
+		aspect-ratio: 3;
+	}
 }
 
 /* "On this page" links to a long page's sections */
@@ -272,6 +426,31 @@ dd {
 	display: block;
 	height: 100%;
 	background-color: var(--bar-color);
+}
+
+/* A bar that is not a person's work, or stands for several: bots, "others" */
+.share-bar-muted > span {
+	background-color: var(--border-strong);
+}
+
+/* The scale over a column of bars drawn from 0 to 100% */
+.share-ticks {
+	display: flex;
+	justify-content: space-between;
+	font-weight: 400;
+	letter-spacing: 0;
+	text-transform: none;
+	color: var(--text-secondary);
+}
+
+.share-table .rank {
+	width: 1%;
+	padding-right: 0;
+	color: var(--text-secondary);
+}
+
+.share-table .share-rest td {
+	color: var(--text-secondary);
 }
 
 /* The same bar, thinner, under a number inside a table cell */
@@ -603,6 +782,97 @@ table {
 
 .chart-box:has(> .chart-note) > canvas {
 	display: none;
+}
+
+/* The Hotspots plot with its highest scores listed next to it */
+.hotspot-plot {
+	display: grid;
+	grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+	column-gap: var(--space-6);
+	align-items: start;
+	margin-bottom: var(--space-5);
+}
+
+.hotspot-top h3 {
+	margin: 0;
+	padding-bottom: var(--space-2);
+	border-bottom: 1px solid var(--border-strong);
+	font-family: var(--font-mono);
+	font-size: var(--font-size-xs);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.hotspot-top ol {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.hotspot-top li {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	padding: var(--space-2) 0;
+	border-bottom: 1px solid var(--table-border);
+}
+
+/* The rank; a file that is numbered on the plot has it in a circle, as there */
+.hotspot-rank {
+	flex: none;
+	box-sizing: border-box;
+	width: 24px;
+	height: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: var(--font-mono);
+	font-size: var(--font-size-xs);
+	color: var(--text-secondary);
+}
+
+.hotspot-rank.numbered {
+	border: 1.5px solid var(--series-rest);
+	border-radius: 50%;
+	font-weight: 700;
+	color: var(--text-color);
+}
+
+.hotspot-rank.numbered.hot {
+	border-color: var(--series-hot);
+	background-color: color-mix(in srgb, var(--series-hot) 14%, transparent);
+	color: var(--series-hot);
+}
+
+.hotspot-file {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	font-size: var(--font-size-sm);
+}
+
+.hotspot-file .path {
+	font-family: var(--font-mono);
+	overflow-wrap: anywhere;
+}
+
+.hotspot-numbers {
+	color: var(--text-secondary);
+}
+
+@media (max-width: 900px) {
+	.hotspot-plot {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: var(--space-4);
+	}
+}
+
+/* on a phone the plot is as tall as it is wide: a wide strip would crowd its dots */
+@media (max-width: 560px) {
+	.hotspot-plot .chart-box {
+		aspect-ratio: 1;
+	}
 }
 
 /* AI-assisted commits across repositories: one hue behind the share, darker
@@ -1140,6 +1410,11 @@ tr[hidden] {
 	outline-color: var(--bg-color);
 }
 
+/* The pages as a menu, in place of the row of links on a phone (see below) */
+.nav-menu {
+	display: none;
+}
+
 /* ===== Nav Brand ===== */
 .nav-brand {
 	font-family: var(--font-mono);
@@ -1264,6 +1539,91 @@ tr[hidden] {
 @media (max-width: 768px) {
 	body {
 		padding: 0 var(--space-4);
+	}
+
+	/* The row of page links becomes a menu named after the current page: the
+	   row showed a few of the pages, and the rest only by scrolling sideways */
+	.nav > ul {
+		display: none;
+	}
+
+	.nav-menu {
+		display: block;
+		margin-left: auto;
+	}
+
+	.nav-menu summary {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		min-height: 44px;
+		padding: 0 var(--space-3);
+		border: 1px solid var(--border-strong);
+		font-family: var(--font-mono);
+		font-size: var(--font-size-sm);
+		font-weight: 600;
+		color: var(--text-color);
+		list-style: none;
+		cursor: pointer;
+		user-select: none;
+	}
+
+	.nav-menu summary::-webkit-details-marker {
+		display: none;
+	}
+
+	/* a chevron, drawn with borders, that turns over while the menu is open */
+	.nav-menu summary::after {
+		content: '';
+		width: 6px;
+		height: 6px;
+		margin: -3px 2px 0 var(--space-1);
+		border-right: 1.5px solid currentColor;
+		border-bottom: 1.5px solid currentColor;
+		transform: rotate(45deg);
+	}
+
+	.nav-menu[open] summary::after {
+		margin-top: 3px;
+		transform: rotate(-135deg);
+	}
+
+	.nav-menu-label {
+		font-weight: 400;
+		color: var(--text-secondary);
+	}
+
+	/* the open menu hangs under the whole nav bar, over the page */
+	.nav-menu ul {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		z-index: 101;
+		flex-direction: column;
+		overflow-x: visible;
+		background-color: var(--nav-bg);
+		border: 1px solid var(--border-strong);
+	}
+
+	.nav-menu li {
+		display: flex;
+	}
+
+	.nav-menu li + li {
+		border-left: none;
+		border-top: 1px solid var(--table-border);
+	}
+
+	.nav-menu li a {
+		flex: 1;
+		min-height: 44px;
+		padding: 0 var(--space-4);
+		font-size: 13px;
+	}
+
+	.nav .nav-right {
+		margin-left: var(--space-2);
 	}
 
 	/* "On this page" stays one row that scrolls sideways, like the nav, instead
