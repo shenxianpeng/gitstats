@@ -368,7 +368,7 @@ def mock_data_collector():
     data.file_churn = {
         "main.py": 15,
         "utils.py": 10,
-        "README.md": 8,
+        "setup.py": 8,
         "tests/test_main.py": 5,
         "Dockerfile": 2,
     }
@@ -376,7 +376,7 @@ def mock_data_collector():
     # Code ownership: author -> file -> commits touching it
     data.author_files = {
         "Alice Smith": {"main.py": 10, "utils.py": 2, "solo_alice.py": 4},
-        "Bob Jones": {"main.py": 5, "utils.py": 8, "README.md": 8},
+        "Bob Jones": {"main.py": 5, "utils.py": 8, "setup.py": 8},
         "Charlie Brown": {"main.py": 1},
     }
 
@@ -384,7 +384,7 @@ def mock_data_collector():
     data.hotspot_files = {
         "main.py": {"churn": 15, "lines": 400, "score": 300.0},
         "utils.py": {"churn": 10, "lines": 120, "score": 109.5},
-        "README.md": {"churn": 8, "lines": 60, "score": 62.0},
+        "setup.py": {"churn": 8, "lines": 60, "score": 62.0},
         "Dockerfile": {"churn": 2, "lines": 30, "score": 11.0},
     }
 

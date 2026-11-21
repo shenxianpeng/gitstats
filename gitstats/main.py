@@ -993,7 +993,7 @@ class GitDataCollector(DataCollector):
                     continue
 
             if ext not in self.extensions:
-                self.extensions[ext] = {"files": 0, "lines": 0}
+                self.extensions[ext] = {"files": 0, "lines": 0, "line_files": 0}
             self.extensions[ext]["files"] += 1
             counted_files.append((fullpath, blob_id, ext))
             # the line count of a blob comes from the cache if it is there
@@ -1006,12 +1006,17 @@ class GitDataCollector(DataCollector):
 
         # The lines of code are those of these files: what the diffs add up
         # to would count the excluded files, and only the commits that the
-        # date, author and range filters leave. Per-file line counts go to
-        # the hotspot analysis; refine() adds each file's churn and score.
+        # date, author and range filters leave. Those of vendored, generated
+        # and asset files are not lines of code (see gitstats.sources): an
+        # extension's "line_files" are the files its lines are those of.
+        # Per-file line counts go to the hotspot analysis, every file's, which
+        # picks the code out; refine() adds each file's churn and score.
         for fullpath, blob_id, ext in counted_files:
             lines = lines_in_blob[blob_id]
-            self.total_lines += lines
-            self.extensions[ext]["lines"] += lines
+            if is_source(fullpath):
+                self.total_lines += lines
+                self.extensions[ext]["lines"] += lines
+                self.extensions[ext]["line_files"] += 1
             self.hotspot_files[fullpath] = {"lines": lines, "churn": 0, "score": 0.0}
 
     @staticmethod
@@ -1050,8 +1055,9 @@ class GitDataCollector(DataCollector):
     @classmethod
     def _churn_command(cls) -> str:
         """The `git log` that _collect_file_churn_and_ownership() reads: the
-        paths as they are, but for those git always quotes (see unquote_path())."""
-        return 'git -c core.quotePath=false log --root --format="{}" --name-only {}'.format(
+        paths as they are, but for those git always quotes (see unquote_path()),
+        with the old name of a renamed file."""
+        return 'git -c core.quotePath=false log --root --format="{}" --name-status {}'.format(
             cls.CHURN_FORMAT, get_log_range("HEAD", False)
         )
 
@@ -1209,27 +1215,50 @@ class GitDataCollector(DataCollector):
     ) -> None:
         """Record how often each file changes and who changes it.
 
-        A single name-only pass drives two metrics:
+        A single name-status pass drives two metrics:
         ``file_churn`` (commits touching each file) and ``author_files``
         (which files each author touches, for code ownership). Each commit is
         prefixed with a ``COMMIT:<author>`` marker line; the lines that follow
-        are the file paths changed by that commit. Authors are resolved to their
-        canonical identity so aliases merge here directly. ``output`` is that of
-        _churn_command() when collect() has it already, from the diffs that
-        count the lines (see shortstat_logs()).
+        are the files changed by that commit, a status and a name, or for a
+        renamed file a status and the old name and the new. Authors are
+        resolved to their canonical identity so aliases merge here directly.
+        ``output`` is that of _churn_command() when collect() has it already,
+        from the diffs that count the lines (see shortstat_logs()).
+
+        A file is counted under the name it has at the end of the range: the
+        commits come newest first, and once the walk has passed the commit
+        that renamed a file, the commits before it count under the new name
+        what they did to the old. Without this, moving a project into src/
+        would leave each of its files with the history of the months since,
+        and the Code Ownership page would name as the only author of a module
+        whoever moved it.
         """
         if output is None:
             output = get_pipe_output([self._churn_command()])
         current_author = None
+        # an older name of a file -> the name it has at the end of the range
+        renamed_to: dict[str, str] = {}
+        # the renames of the commit being read, (old, new): they hold for the
+        # commits before it, not for itself
+        renames: list[tuple[str, str]] = []
         for line in output.split("\n"):
             if not line:
                 continue
             if line.startswith("COMMIT:"):
+                for old, new in renames:
+                    renamed_to[old] = renamed_to.get(new, new)
+                renames.clear()
                 name = _author_name(line[7:])
                 current_author = name_to_canonical.get(name, name)
                 continue
-            # A changed-file line: the path, as the files at HEAD have it
-            path = unquote_path(line)
+            # A changed-file line: "M\t<path>", or "R087\t<old>\t<new>". A
+            # tab in a name is one git quotes. A line without one is a name
+            # alone, as `--name-only` prints it.
+            status, _, names = line.partition("\t") if "\t" in line else ("", "", line)
+            path = unquote_path(names.rpartition("\t")[2])
+            if status.startswith("R") and "\t" in names:
+                renames.append((unquote_path(names.partition("\t")[0]), path))
+            path = renamed_to.get(path, path)
             self.file_churn[path] = self.file_churn.get(path, 0) + 1
             if current_author:
                 author_map = self.author_files.setdefault(current_author, {})

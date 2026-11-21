@@ -1051,9 +1051,9 @@ CHURN = "COMMIT:%aN"
 
 
 def _names_command(log_range, header=CHURN):
-    """What `git log --name-only` itself prints, blank lines aside."""
+    """What `git log --name-status` itself prints, blank lines aside."""
     output = get_pipe_output(
-        [f'git -c core.quotePath=false log --format="{header}" --name-only {log_range}']
+        [f'git -c core.quotePath=false log --format="{header}" --name-status {log_range}']
     )
     return [line for line in output.split("\n") if line]
 
@@ -1069,8 +1069,8 @@ def test_shortstat_logs_name_the_files_each_commit_changes(
     merged_repo, monkeypatch, passes, per_process
 ):
     """Whatever the walks that have their lines counted: the names are those
-    of every commit of the range, a merge has none, and a renamed file goes
-    by its new name."""
+    of every commit of the range, a merge has none, and a renamed file has
+    its old name and its new."""
     import gitstats.utils as utils
 
     monkeypatch.chdir(merged_repo)
@@ -1081,7 +1081,7 @@ def test_shortstat_logs_name_the_files_each_commit_changes(
     assert len([line for line in expected if line.startswith("COMMIT:")]) == 14
     assert "COMMIT:Zoë Müller" in expected
     renamed = expected[expected.index("COMMIT:Zoë Müller") + 1]
-    assert renamed == "renamed.txt"
+    assert renamed == "R100\tc.txt\trenamed.txt"
     # the merges are there, with no name under them
     merges = [
         i
@@ -1095,7 +1095,7 @@ def test_shortstat_logs_name_the_files_each_commit_changes(
 
 
 def test_shortstat_logs_name_files_with_awkward_names(git_repo, monkeypatch):
-    """git quotes the names it has to, in a raw line as in `--name-only`; the
+    """git quotes the names it has to, in a raw line as in `--name-status`; the
     others are taken as they are, whatever they look like."""
     awkward = [
         " leading space.txt",
@@ -1134,7 +1134,7 @@ def test_shortstat_logs_name_files_with_awkward_names(git_repo, monkeypatch):
     expected = _names_command("HEAD")
     assert _names(LINEAR, "HEAD") == expected
     assert len(expected) > 5 + 2 * len(awkward)
-    assert " leading space.txt" in expected
+    assert "A\t leading space.txt" in expected
     # the counts and the files added are still read right, under such names
     assert _shortstat_logs(LINEAR, "HEAD") == _shortstat_commands(LINEAR, "HEAD")
     _, added, _ = shortstat_logs(LINEAR, "HEAD", 3, None, CHURN)
@@ -1507,7 +1507,7 @@ def test_shortstat_logs_count_the_lines_of_the_source(vendored_repo):
     assert found == [20]
     # the counts of the walks are those they would be without
     assert texts == shortstat_logs(LINEAR, "HEAD", 3, None, "COMMIT:%aN")[0]
-    assert "\nsrc/a.py" in names
+    assert "\nA\tsrc/a.py" in names
 
 
 def test_shortstat_logs_count_the_lines_of_the_source_without_names(vendored_repo):
@@ -1575,7 +1575,7 @@ def test_numstat_paths(printed, paths):
 @pytest.mark.parametrize("passes", [LINEAR, EVERY_COMMIT])
 def test_shortstat_logs_name_the_files_as_they_are(git_repo, monkeypatch, passes):
     """With core.quotePath=false, as `git -c core.quotePath=false log
-    --name-only` prints them: git quotes only what it always quotes."""
+    --name-status` prints them: git quotes only what it always quotes."""
     # a Windows checkout cannot hold a name with a double quote
     awkward = ["résumé.py"] + (['say"hi".py'] if os.name != "nt" else [])
     for name in awkward:
@@ -1586,8 +1586,8 @@ def test_shortstat_logs_name_the_files_as_they_are(git_repo, monkeypatch, passes
     monkeypatch.chdir(git_repo)
     names = _names(passes, "HEAD")
     assert names == _names_command("HEAD")
-    assert "résumé.py" in names
-    assert os.name == "nt" or '"say\\"hi\\".py"' in names
+    assert "A\trésumé.py" in names
+    assert os.name == "nt" or 'A\t"say\\"hi\\".py"' in names
 
 
 def test_shortstat_logs_count_the_root_commit_whatever_log_show_root_says(git_repo, monkeypatch):
@@ -1599,7 +1599,7 @@ def test_shortstat_logs_count_the_root_commit_whatever_log_show_root_says(git_re
     texts, _, names = shortstat_logs(LINEAR, "HEAD", 3, None, CHURN, is_source, found)
     # the root commit's two files, README.md and main.py: 3 + 2 lines
     assert texts[0].rstrip().endswith("2 files changed, 5 insertions(+)")
-    assert names.endswith("README.md\nmain.py")
+    assert names.endswith("A\tREADME.md\nA\tmain.py")
     # and of the source: README.md and main.py, utils.py, main.py rewritten, .gitignore
     assert found == [3 + 2 + 5 + 3 + 2]
 
