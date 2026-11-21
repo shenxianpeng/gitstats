@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.4.post1.dev2",
-  "generated_at": "2026-11-21T21:08:43+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev3",
+  "generated_at": "2026-11-21T21:53:40+00:00",
   "name": "gitstats",
   "report_path": "index.html",
   "first_commit": "2007-07-30 14:54:43",
-  "last_commit": "2026-11-21 21:07:52",
+  "last_commit": "2026-11-21 21:52:50",
   "age_days": 7055,
   "active_days": 255,
-  "total_commits": 627,
+  "total_commits": 628,
   "total_authors": 38,
   "active_authors_12mo": 6,
-  "commits_last_12mo": 185,
+  "commits_last_12mo": 186,
   "total_files": 89,
-  "total_lines": 42150,
-  "lines_added": 58264,
-  "lines_removed": 13955,
+  "total_lines": 42523,
+  "lines_added": 58943,
+  "lines_removed": 14261,
   "total_tags": 56,
   "era": "peak",
   "top_authors": [
     {
       "name": "Xianpeng Shen",
-      "commits": 272
+      "commits": 273
     },
     {
       "name": "Heikki Hokkanen",
@@ -41,7 +41,7 @@
     }
   ],
   "author_commits": {
-    "Xianpeng Shen": 272,
+    "Xianpeng Shen": 273,
     "Devraj Pal": 10,
     "harsh8968": 1,
     "tomatotomata": 1,
@@ -92,7 +92,7 @@
     "2015": 2,
     "2024": 68,
     "2025": 90,
-    "2026": 175
+    "2026": 176
   },
   "ai_assisted": {
     "commits": 14,
@@ -152,16 +152,16 @@
       "2026-08": 15,
       "2026-09": 31,
       "2026-10": 53,
-      "2026-11": 9
+      "2026-11": 10
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 627,
+    "commits": 628,
     "by_kind": {
       "organization": 249,
       "one_person": 29,
-      "personal": 292,
+      "personal": 293,
       "hidden": 21,
       "unknown": 0,
       "bot": 36
@@ -246,7 +246,7 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 0,
-        "personal": 56,
+        "personal": 57,
         "hidden": 1,
         "unknown": 0,
         "bot": 5
@@ -256,13 +256,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 169,
+    "commits": 170,
     "authors": 6,
     "new_authors": 5,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 591,
+    "commits": 592,
     "commits_by_year": {
       "2007": 107,
       "2008": 29,
@@ -275,14 +275,14 @@
       "2015": 2,
       "2024": 65,
       "2025": 72,
-      "2026": 160
+      "2026": 161
     },
     "active_days": 238
   },
   "timezones": {
     "+0000": 20,
     "+0100": 16,
-    "+0200": 213,
+    "+0200": 214,
     "+0300": 322,
     "+0400": 2,
     "+0530": 11,
@@ -295,7 +295,7 @@
     "-0800": 2
   },
   "source_lines": {
-    "added": 54299,
-    "current": 42150
+    "added": 54978,
+    "current": 42523
   }
 }
