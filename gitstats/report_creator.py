@@ -436,22 +436,21 @@ THEME_TOGGLE_BUTTON = (
 # heading), and the header row becomes the sort controls. See gitstats.css.
 FILE_TABLE = "file-table"
 
-# Most-read first: the overview, then who and when, what is at risk (knowledge
-# held by one person, then large files that keep changing), the code itself,
-# the story, and the reference lists; the Badges tool comes last
-NAV_PAGES = (
-    ("index.html", "General"),
-    ("activity.html", "Activity"),
-    ("authors.html", "Authors"),
-    ("ownership.html", "Code Ownership"),
-    ("hotspots.html", "Hotspots"),
-    ("files.html", "Files"),
-    ("history.html", "History"),
-    ("lines.html", "Lines"),
-    ("tags.html", "Tags"),
-    ("badges.html", "Badges"),
+# The pages, by the question each group answers: how the project is doing
+# (the overview, and the badges that put it in a README), who works on it
+# and who knows what, what the code is and where it hurts, and how its pace
+# has gone. The nav bar has the groups; the pages of the current group are
+# tabs under it. A group's first page is where its link goes.
+NAV_GROUPS: tuple[tuple[str, tuple[tuple[str, str], ...]], ...] = (
+    ("Overview", (("index.html", "Summary"), ("badges.html", "Badges"))),
+    ("People", (("authors.html", "Authors"), ("ownership.html", "Code Ownership"))),
+    ("Code", (("hotspots.html", "Hotspots"), ("files.html", "Files"), ("lines.html", "Lines"))),
+    (
+        "Timeline",
+        (("activity.html", "Activity"), ("history.html", "History"), ("tags.html", "Tags")),
+    ),
 )
-
+NAV_PAGES = tuple(page for _, pages in NAV_GROUPS for page in pages)
 
 # What each chart of a report shows, for screen readers: a canvas has no text.
 # The chart adds the span its labels cover ("…, 2019 to 2026").
@@ -520,6 +519,32 @@ def nav_link(href: str, label: str, current: str | None = None) -> str:
     if href == current:
         return f'<li><a href="{href}" class="active" aria-current="page">{label}</a></li>'
     return f'<li><a href="{href}">{label}</a></li>'
+
+
+def nav_groups_html(current: str | None, has_ai: bool) -> tuple[str, str]:
+    """The nav bar's links to the groups of pages (see NAV_GROUPS), and the
+    tabs of the pages in the current page's group, "" on a page in none.
+
+    The link to the current page's group is marked as the current one: the
+    group, not the page, which its tab marks. The AI Insights page, when the
+    report has one, is in the overview's group after the summary.
+    """
+    links = []
+    tabs = ""
+    for name, pages in NAV_GROUPS:
+        if has_ai and pages[0][0] == "index.html":
+            pages = (pages[0], AI_PAGE, *pages[1:])
+        href = pages[0][0]
+        if any(page == current for page, _ in pages):
+            links.append(f'<li><a href="{href}" class="active" aria-current="true">{name}</a></li>')
+            tabs = (
+                f'<ul class="nav-tabs" aria-label="{name}">'
+                + "".join(nav_link(page, label, current) for page, label in pages)
+                + "</ul>"
+            )
+        else:
+            links.append(f'<li><a href="{href}">{name}</a></li>')
+    return '<ul class="nav-groups">' + "".join(links) + "</ul>", tabs
 
 
 # The Badges page: its sections, and each badge's name and what it shows
@@ -2280,49 +2305,13 @@ class HTMLReportCreator(ReportCreator):
             f"{BAR_HEADER}</tr>" + "".join(rows) + "</table></div>"
         )
 
-        # Files :: Code Churn (most frequently changed files)
-        if data.file_churn:
-            f.write(html_header(2, "Most changed files (code churn)"))
-            f.write(
-                '<p class="section-note">'
-                "Files of code in the current tree touched most often across all "
-                "commits, under their names of today or of before a rename. "
-                "High-churn files are hotspots that may benefit from extra review or refactoring.</p>"
-            )
-            # Only code that still exists: a deleted file is no hotspot to
-            # review, and a guide that changes often is no hotspot at all
-            current = code_files(data)
-            churn_sorted = sorted(
-                (
-                    (path, count)
-                    for path, count in data.file_churn.items()
-                    if current is None or path in current
-                ),
-                key=lambda x: x[1],
-                reverse=True,
-            )
-            top_churn = churn_sorted[:25]
-            max_churn = max(1, top_churn[0][1]) if top_churn else 1
-            # A bar table: the counts used to be shown twice, in a heat-colored
-            # table and a bar chart whose rotated path labels were unreadable
-            rows = [
-                f'<tr><td class="path">{html.escape(filepath)}</td>'
-                f'<td class="num" data-label="Times changed">{format_int(count)}</td>'
-                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
-                f'<span style="width: {100.0 * count / max_churn:.1f}%"></span></span></td></tr>'
-                for filepath, count in top_churn
-            ]
-            f.write(
-                f'<div class="table-scroll"><table class="sortable share-table {FILE_TABLE}" id="churn">'
-                f'<tr><th>File</th><th class="num">Times Changed</th>{BAR_HEADER}</tr>'
-                + "".join(rows)
-                + "</table></div>"
-            )
-            # The Hotspots page weighs the same counts against each file's size
-            f.write(
-                '<p class="more-link"><a href="hotspots.html">'
-                "Change frequency by file size &rarr;</a></p>"
-            )
+        # The files that change most were listed here too, and the Hotspots
+        # page, next to this one, ranks the same counts against each file's
+        # size, its table sortable by changes alone
+        f.write(
+            '<p class="more-link"><a href="hotspots.html">'
+            "The files that change most, by size and by changes &rarr;</a></p>"
+        )
 
         self.print_footer(f)
         f.write("</body></html>")
@@ -3793,20 +3782,7 @@ class HTMLReportCreator(ReportCreator):
         """
         # Check if AI insights are available
         has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
-
-        links = "\n            ".join(nav_link(href, label, current) for href, label in NAV_PAGES)
-        ai_link = nav_link(*AI_PAGE, current) if has_ai else ""
-        # On a phone the row of links shows three or four of the pages and the
-        # rest by scrolling sideways, which nothing on screen says. There the
-        # same links are a menu named after the current page: a <details>, so
-        # it opens where the page's scripts do not run.
-        pages = dict(NAV_PAGES + ((AI_PAGE,) if has_ai else ()))
-        menu = (
-            '<details class="nav-menu"><summary><span class="nav-menu-label">Page</span> '
-            f"{pages.get(current or '', 'Menu')}</summary>"
-            f"<ul>{links}{ai_link}</ul></details>"
-        )
-
+        groups, tabs = nav_groups_html(current, has_ai)
         github_icon = (
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" '
             'fill="currentColor" aria-hidden="true">'
@@ -3824,15 +3800,12 @@ class HTMLReportCreator(ReportCreator):
             f"""
             {NAV_START}
             {REPORT_BRAND}
-            <ul>
-            {links}
-            {ai_link}
-            </ul>
-            {menu}
+            {groups}
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub">{github_icon}</a>
             {THEME_TOGGLE_BUTTON}
             </div>
+            {tabs}
             {NAV_END}
             """
         )

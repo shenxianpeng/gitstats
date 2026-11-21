@@ -16,6 +16,7 @@ from gitstats.report_creator import (
     CHART_NOTE,
     CHART_SCRIPT,
     INSIGHTS_END,
+    NAV_GROUPS,
     NAV_PAGES,
     NAV_START,
     SHARE_SCALE_HEADER,
@@ -558,12 +559,14 @@ def test_print_nav_without_ai():
     creator.print_nav(f)
     output = f.getvalue()
 
-    assert '<a href="index.html">General</a>' in output
-    assert '<a href="activity.html">Activity</a>' in output
-    assert '<a href="authors.html">Authors</a>' in output
-    assert '<a href="files.html">Files</a>' in output
-    assert '<a href="lines.html">Lines</a>' in output
-    assert '<a href="tags.html">Tags</a>' in output
+    # the groups, each linking to its first page; on no page of a group, no tabs
+    assert (
+        '<ul class="nav-groups"><li><a href="index.html">Overview</a></li>'
+        '<li><a href="authors.html">People</a></li>'
+        '<li><a href="hotspots.html">Code</a></li>'
+        '<li><a href="activity.html">Timeline</a></li></ul>'
+    ) in output
+    assert "nav-tabs" not in output
     assert "AI Insights" not in output
 
 
@@ -575,11 +578,12 @@ def test_print_nav_with_ai():
     creator.data.ai_summaries = {"index": {"summary": "test"}}
 
     f = StringIO()
-    creator.print_nav(f)
+    creator.print_nav(f, "index.html")
     output = f.getvalue()
 
-    assert "AI Insights" in output
-    assert 'href="ai-insights.html"' in output
+    # in the overview's group, after the summary
+    tabs = re.search(r'<ul class="nav-tabs" aria-label="Overview">(.*?)</ul>', output)[1]
+    assert re.findall(r'href="([^"]+)"', tabs) == ["index.html", "ai-insights.html", "badges.html"]
 
 
 def test_print_nav_has_github_link():
@@ -609,19 +613,18 @@ def test_print_nav_marks_current_page():
     creator.data.ai_summaries = {}
 
     f = StringIO()
-    creator.print_nav(f, "authors.html")
+    creator.print_nav(f, "ownership.html")
     output = f.getvalue()
 
-    assert '<a href="authors.html" class="active" aria-current="page">Authors</a>' in output
-    assert '<a href="index.html">General</a>' in output
-    # once in the row of links and once in the menu a phone shows in its place
-    assert output.count('aria-current="page"') == 2
+    # the group is the current one, and its pages are tabs, this one current
+    assert '<a href="authors.html" class="active" aria-current="true">People</a>' in output
     assert (
-        '<details class="nav-menu"><summary><span class="nav-menu-label">Page</span> '
-        "Authors</summary><ul>"
+        '<ul class="nav-tabs" aria-label="People"><li><a href="authors.html">Authors</a></li>'
+        '<li><a href="ownership.html" class="active" aria-current="page">Code Ownership</a></li>'
+        "</ul>"
     ) in output
-    menu = output[output.index('<details class="nav-menu">') : output.index("</details>")]
-    assert [label for _, label in NAV_PAGES] == re.findall(r">([^<>]+)</a>", menu)
+    assert output.count('aria-current="page"') == 1
+    assert '<a href="index.html">Overview</a>' in output
 
 
 @pytest.mark.parametrize(
@@ -644,8 +647,9 @@ def test_each_page_marks_itself_current(mock_data_collector, temp_dir, page):
     with open(os.path.join(temp_dir, page), encoding="utf-8") as f:
         content = f.read()
     assert f'<a href="{page}" class="active" aria-current="page">' in content
-    # the row of links, and the menu that replaces it on a phone
-    assert content.count('aria-current="page"') == 2
+    # its tab, under the group the nav bar marks
+    assert content.count('aria-current="page"') == 1
+    assert content.count('aria-current="true"') == 1
 
 
 # ── HTMLReportCreator.create_index_html ──────────────────────────────────
@@ -1255,9 +1259,13 @@ def test_create_files_html(mock_data_collector, temp_dir):
     assert "Extensions" in html
     assert "py" in html
     assert "md" in html
-    assert "Most changed files" in html
-    assert "main.py" in html
-    assert "utils.py" in html
+    # the files that change most are on the Hotspots page, next to this one
+    assert "Most changed files" not in html
+    assert 'id="churn"' not in html
+    assert (
+        '<p class="more-link"><a href="hotspots.html">'
+        "The files that change most, by size and by changes &rarr;</a></p>"
+    ) in html
 
 
 # ── HTMLReportCreator.create_lines_html ──────────────────────────────────
@@ -1816,16 +1824,6 @@ def test_ownership_page_renders(mock_data_collector, temp_dir):
 
 def test_file_paths_are_monospace_cells(mock_data_collector, temp_dir):
     HTMLReportCreator().create(mock_data_collector, temp_dir)
-    with open(f"{temp_dir}/files.html", encoding="utf-8") as f:
-        files = f.read()
-    # Churn: a bar table of paths; no heat-colored cells, no duplicate chart
-    assert (
-        '<tr><td class="path">main.py</td><td class="num" data-label="Times changed">15</td>'
-        '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
-        '<span style="width: 100.0%"></span></span></td></tr>'
-    ) in files
-    assert '<span style="width: 66.7%">' in files  # utils.py: 10 of 15
-    assert "chart-file-churn" not in files
     with open(f"{temp_dir}/ownership.html", encoding="utf-8") as f:
         ownership = f.read()
     assert ownership.count('<td class="path">') >= 2  # single-owner and shared tables
@@ -1837,7 +1835,6 @@ def test_file_tables_name_their_cells_for_phones(mock_data_collector, temp_dir):
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     expected = {
         "hotspots.html": {"hotspots": ["Lines", "Changes", "Authors", "Score"]},
-        "files.html": {"churn": ["Times changed"]},
         "ownership.html": {
             "ownership-busfactor": ["Sole owner", "Commits"],
             "ownership-shared": ["Contributors", "Primary owner", "Owner share"],
@@ -2103,16 +2100,6 @@ def test_path_flag_is_drawn_by_css():
     rule = rule[: rule.index("}")]
     assert "content: attr(data-tag);" in rule
     assert "color: var(--warn-color);" in rule
-
-
-def test_files_page_links_churn_to_the_hotspots_page(mock_data_collector, temp_dir):
-    HTMLReportCreator().create(mock_data_collector, temp_dir)
-    files = _read_page(temp_dir, "files.html")
-    churn = files[files.index('id="churn"') :]
-    assert (
-        '</table></div><p class="more-link"><a href="hotspots.html">'
-        "Change frequency by file size &rarr;</a></p>"
-    ) in churn
 
 
 def test_hotspots_chart_follows_the_theme(mock_data_collector, temp_dir):
@@ -2706,7 +2693,7 @@ def test_extensions_bar_table_ranked_by_lines(mock_data_collector, temp_dir):
     assert "<td><em>no extension</em></td>" in table
 
 
-def test_ownership_and_churn_skip_deleted_files(mock_data_collector, temp_dir):
+def test_ownership_and_hotspots_skip_deleted_files(mock_data_collector, temp_dir):
     mock_data_collector.head_files = ["main.py", "utils.py", "setup.py"]
     mock_data_collector.author_files = {
         "Alice Smith": {"main.py": 10, "old_script": 40},
@@ -2724,10 +2711,8 @@ def test_ownership_and_churn_skip_deleted_files(mock_data_collector, temp_dir):
     assert (
         '<dd class="stat-value">3</dd><dd class="stat-note">of code in the current tree</dd>'
     ) in ownership
-    files = page("files.html")
-    churn = files[files.index('id="churn"') :]
-    assert "old_script" not in churn
-    assert '<td class="path">main.py</td>' in churn
+    hotspots = page("hotspots.html")
+    assert "old_script" not in hotspots
 
 
 def test_bus_factor_shows_ten_and_folds_the_rest(mock_data_collector, temp_dir):
@@ -3379,23 +3364,16 @@ def test_overview_links_the_badges_page(mock_data_collector, temp_dir):
     assert "badges.html" not in re.search(r'<p class="page-meta">(.*?)</p>', content)[1]
 
 
-def test_nav_orders_pages_by_importance(mock_data_collector, temp_dir):
+def test_nav_groups_the_pages_by_question(mock_data_collector, temp_dir):
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     with open(os.path.join(temp_dir, "index.html"), encoding="utf-8") as f:
-        nav = f.read().split('<nav class="nav" aria-label="Pages">', 1)[1].split("</ul>", 1)[0]
-    labels = re.findall(r'<a href="[^"]+\.html"[^>]*>([^<]+)</a></li>', nav)
-    assert labels == [
-        "General",
-        "Activity",
-        "Authors",
-        "Code Ownership",
-        "Hotspots",
-        "Files",
-        "History",
-        "Lines",
-        "Tags",
-        "Badges",
-    ]
+        nav = f.read().split('<ul class="nav-groups">', 1)[1].split("</ul>", 1)[0]
+    assert re.findall(r">([^<]+)</a></li>", nav) == ["Overview", "People", "Code", "Timeline"]
+    # every page is in one group, once
+    assert sorted(page for page, _ in NAV_PAGES) == sorted(
+        {page for _, pages in NAV_GROUPS for page, _ in pages}
+    )
+    assert len(NAV_PAGES) == 10
 
 
 def test_authors_sections_order(mock_data_collector, temp_dir):
@@ -4624,7 +4602,7 @@ def test_a_footer_without_the_time_of_the_run_leaves_it_out():
 # ── the code, apart from the documentation and the assets ────────────────
 
 
-def test_hotspots_ownership_and_churn_leave_out_what_is_not_code(mock_data_collector, temp_dir):
+def test_hotspots_and_ownership_leave_out_what_is_not_code(mock_data_collector, temp_dir):
     """A guide rewritten with every release, the AUTHORS file and a logo are
     no hotspots, and who changed them says nothing of who knows the code."""
     data = mock_data_collector
@@ -4650,10 +4628,6 @@ def test_hotspots_ownership_and_churn_leave_out_what_is_not_code(mock_data_colle
     ownership = _read_page(temp_dir, "ownership.html")
     assert "Dana" not in ownership
     assert "AUTHORS" not in ownership
-    files = _read_page(temp_dir, "files.html")
-    churn = files[files.index('id="churn"') :]
-    assert "docs/guide.rst" not in churn
-    assert "AUTHORS" not in churn
 
 
 def test_a_repository_of_documents_has_them_analyzed(mock_data_collector, temp_dir):

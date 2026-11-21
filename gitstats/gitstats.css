@@ -1336,6 +1336,7 @@ tr[hidden] {
 /* ===== Navigation ===== */
 .nav {
 	display: flex;
+	flex-wrap: wrap;
 	align-items: center;
 	justify-content: space-between;
 	padding: var(--space-4) 0;
@@ -1410,9 +1411,47 @@ tr[hidden] {
 	outline-color: var(--bg-color);
 }
 
-/* The pages as a menu, in place of the row of links on a phone (see below) */
-.nav-menu {
-	display: none;
+/* The pages of the current group, as tabs in a row of their own under the
+   groups: lighter than the groups, the current one underlined */
+.nav .nav-tabs {
+	order: 4;
+	flex: 0 0 100%;
+	margin-top: var(--space-3);
+	/* the current tab's underline lies on the bar's bottom border */
+	margin-bottom: -1px;
+	border-top: 1px solid var(--table-border);
+}
+
+.nav:has(> .nav-tabs) {
+	padding-bottom: 0;
+}
+
+.nav .nav-tabs li + li {
+	border-left: none;
+}
+
+.nav .nav-tabs li a {
+	padding: var(--space-2) var(--space-3);
+	border-bottom: 2px solid transparent;
+	color: var(--text-secondary);
+	font-weight: 400;
+}
+
+.nav .nav-tabs li:first-child a {
+	padding-left: 0;
+}
+
+.nav .nav-tabs li a:hover {
+	color: var(--nav-hover-color);
+	background-color: transparent;
+}
+
+.nav .nav-tabs li a.active,
+.nav .nav-tabs li a.active:hover {
+	color: var(--text-color);
+	background-color: transparent;
+	border-bottom-color: var(--text-color);
+	font-weight: 600;
 }
 
 /* ===== Nav Brand ===== */
@@ -1539,91 +1578,6 @@ tr[hidden] {
 @media (max-width: 768px) {
 	body {
 		padding: 0 var(--space-4);
-	}
-
-	/* The row of page links becomes a menu named after the current page: the
-	   row showed a few of the pages, and the rest only by scrolling sideways */
-	.nav > ul {
-		display: none;
-	}
-
-	.nav-menu {
-		display: block;
-		margin-left: auto;
-	}
-
-	.nav-menu summary {
-		display: flex;
-		align-items: center;
-		gap: var(--space-2);
-		min-height: 44px;
-		padding: 0 var(--space-3);
-		border: 1px solid var(--border-strong);
-		font-family: var(--font-mono);
-		font-size: var(--font-size-sm);
-		font-weight: 600;
-		color: var(--text-color);
-		list-style: none;
-		cursor: pointer;
-		user-select: none;
-	}
-
-	.nav-menu summary::-webkit-details-marker {
-		display: none;
-	}
-
-	/* a chevron, drawn with borders, that turns over while the menu is open */
-	.nav-menu summary::after {
-		content: '';
-		width: 6px;
-		height: 6px;
-		margin: -3px 2px 0 var(--space-1);
-		border-right: 1.5px solid currentColor;
-		border-bottom: 1.5px solid currentColor;
-		transform: rotate(45deg);
-	}
-
-	.nav-menu[open] summary::after {
-		margin-top: 3px;
-		transform: rotate(-135deg);
-	}
-
-	.nav-menu-label {
-		font-weight: 400;
-		color: var(--text-secondary);
-	}
-
-	/* the open menu hangs under the whole nav bar, over the page */
-	.nav-menu ul {
-		position: absolute;
-		top: 100%;
-		left: 0;
-		right: 0;
-		z-index: 101;
-		flex-direction: column;
-		overflow-x: visible;
-		background-color: var(--nav-bg);
-		border: 1px solid var(--border-strong);
-	}
-
-	.nav-menu li {
-		display: flex;
-	}
-
-	.nav-menu li + li {
-		border-left: none;
-		border-top: 1px solid var(--table-border);
-	}
-
-	.nav-menu li a {
-		flex: 1;
-		min-height: 44px;
-		padding: 0 var(--space-4);
-		font-size: 13px;
-	}
-
-	.nav .nav-right {
-		margin-left: var(--space-2);
 	}
 
 	/* "On this page" stays one row that scrolls sideways, like the nav, instead
