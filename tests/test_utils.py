@@ -36,6 +36,7 @@ from gitstats.utils import (
     should_exclude_file,
     source_lines_added,
     unquote_path,
+    utc_offset_minutes,
 )
 
 # ── get_stat_summary_counts ──────────────────────────────────────────────
@@ -803,10 +804,37 @@ def test_commit_local_time_is_the_committers_clock(offset, expected):
     assert commit_local_time(1700000000, offset) == expected
 
 
-@pytest.mark.parametrize("offset", ["", "UTC", "+9", "0300", "+2400", "-9960"])
+@pytest.mark.parametrize(
+    "offset", ["", "UTC", "+9", "0300", "+2400", "-9960", "+51800", "+1900", "-1300", "+0560"]
+)
 def test_commit_local_time_falls_back_to_this_machines_clock(offset):
     """An offset git would not print, or one no timezone has."""
     assert commit_local_time(1700000000, offset) == datetime.datetime.fromtimestamp(1700000000)
+
+
+@pytest.mark.parametrize(
+    "offset,minutes",
+    [
+        ("+0000", 0),
+        ("-0000", 0),
+        ("+0300", 180),
+        ("-0530", -330),
+        (" +0545 ", 345),
+        # the ends of the range clocks keep: Baker Island and the Line Islands
+        ("-1200", -720),
+        ("+1400", 840),
+        # what git records from a machine with a wrong clock
+        ("-1201", None),
+        ("+1401", None),
+        ("+1900", None),
+        ("+0560", None),
+        ("+51800", None),
+        ("UTC", None),
+        ("", None),
+    ],
+)
+def test_utc_offset_minutes(offset, minutes):
+    assert utc_offset_minutes(offset) == minutes
 
 
 # ── shortstat_logs ───────────────────────────────────────────────────────
