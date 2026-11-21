@@ -2738,19 +2738,56 @@ def test_ownership_and_hotspots_skip_deleted_files(mock_data_collector, temp_dir
     assert "old_script" not in hotspots
 
 
-def test_bus_factor_shows_ten_and_folds_the_rest(mock_data_collector, temp_dir):
-    mock_data_collector.author_files = {"Alice Smith": {f"f{i:02d}.py": 30 - i for i in range(15)}}
+def test_single_owner_files_are_grouped_by_owner(mock_data_collector, temp_dir):
+    """The owners with the most single-owner files first, each with their
+    most-changed files by name; after ten owners, the rest as one row; and
+    every file folded away under them."""
+    files = {"Alice Smith": {f"a{i:02d}.py": 30 - i for i in range(12)}}
+    files["Bob Jones"] = {"b1.py": 9, "b2.py": 1}
+    # ten more owners of one file each: the last two are summed up
+    files.update({f"Person {n:02d}": {f"p{n:02d}.py": 20 - n} for n in range(10)})
+    mock_data_collector.author_files = files
     HTMLReportCreator().create(mock_data_collector, temp_dir)
-    with open(os.path.join(temp_dir, "ownership.html"), encoding="utf-8") as f:
-        html = f.read()
-    shown = html[html.index('id="ownership-busfactor"') :]
-    shown = shown[: shown.index("</table>")]
-    assert shown.count("<tr>") == 11  # header + the ten most-changed
-    assert "f09.py" in shown and "f10.py" not in shown
+    page = _read_page(temp_dir, "ownership.html")
+    section = page[page.index('id="bus_factor_risk') : page.index('id="ownership_by_author"')]
+
+    assert "Alice Smith is the only one to have changed 12 of the 24." in section
+    owners = section[section.index('id="ownership-owners"') : section.index("</table>")]
+    assert owners.count('<td class="owner-name">') == 11
+    assert owners.index("Alice Smith") < owners.index("Bob Jones") < owners.index("Person 00")
+    assert "Person 07" in owners
+    assert "Person 08" not in owners
+    # Alice: 12 files, 30 + 29 + ... + 19 commits, her three most-changed by name
     assert (
-        '<details class="table-details"><summary>Table: all 15 single-owner files</summary>'
-        '<div class="table-scroll"><table class="sortable file-table" id="ownership-busfactor-all">'
-    ) in html
+        '<td class="num" data-label="Files">12</td><td class="num" data-label="Commits">294</td>'
+    ) in owners
+    assert (
+        '<td class="owner-files"><span class="path">a00.py</span><span class="path">a01.py</span>'
+        '<span class="path">a02.py</span><span class="owner-files-more">and 9 more</span></td>'
+    ) in owners
+    # Bob's two files, both named
+    assert '<span class="path">b2.py</span></td>' in owners
+    assert (
+        '<tr class="share-rest"><td class="owner-name">2 other owners</td>'
+        '<td class="num" data-label="Files">2</td>'
+    ) in owners
+    assert (
+        '<details class="table-details"><summary>All 24 single-owner files</summary>'
+        '<div class="table-scroll"><table class="sortable file-table" id="ownership-busfactor">'
+    ) in section
+
+
+def test_single_owner_files_of_one_owner_and_more_than_a_hundred(mock_data_collector, temp_dir):
+    mock_data_collector.author_files = {"Alice Smith": {f"a{i:03d}.py": i + 1 for i in range(120)}}
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    page = _read_page(temp_dir, "ownership.html")
+    assert "Alice Smith is the only one to have changed all 120." in page
+    assert "other owner" not in page
+    folded = page[page.index("<summary>The 100 most-changed of 120 single-owner files</summary>") :]
+    folded = folded[: folded.index("</details>")]
+    assert folded.count('<td class="path">') == 100
+    assert "a119.py" in folded
+    assert "a019.py" not in folded
 
 
 def test_every_page_opens_the_same_way(mock_data_collector, temp_dir):

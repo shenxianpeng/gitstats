@@ -2897,15 +2897,28 @@ class HTMLReportCreator(ReportCreator):
             )
         )
 
-        # Bus-factor risk: single-owner files, most-changed first
+        # Bus-factor risk: single-owner files, grouped by their owner, then
+        # every one of them, most-changed first
         f.write(html_header(2, "Bus factor risk — single-owner files"))
+        risk_files = [fs for fs in ownership["files"] if fs["contributors"] == 1]
+        groups = single_owner_groups(risk_files)
+        lead = ""
+        if groups:
+            first = groups[0]
+            changed = (
+                f"all {format_int(len(risk_files))}"
+                if len(groups) == 1
+                else f"{format_int(len(first['files']))} of the {format_int(len(risk_files))}"
+            )
+            lead = f" {author_html(first['owner'])} is the only one to have changed {changed}."
         f.write(
             '<p class="section-note">'
-            "Files only one author has ever changed. The more a file has "
-            "changed, the more knowledge is at risk if that person leaves.</p>"
+            "Files only one author has ever changed, grouped by that author: if "
+            "they left, no one else would have worked on them. The more a file "
+            f"has changed, the more knowledge is at risk.{lead}</p>"
         )
-        risk_files = [fs for fs in ownership["files"] if fs["contributors"] == 1]
         if risk_files:
+            f.write(self._single_owners_html(groups))
 
             def risk_table(table_id: str, rows: list[dict]) -> str:
                 return (
@@ -2920,18 +2933,16 @@ class HTMLReportCreator(ReportCreator):
                     + "</table></div>"
                 )
 
-            # The ten most-changed are shown; the full list (up to 100) is folded away
-            f.write(risk_table("ownership-busfactor", risk_files[:10]))
-            if len(risk_files) > 10:
-                count = len(risk_files)
-                what = (
-                    f"all {format_int(count)} single-owner files"
-                    if count <= 100
-                    else f"the 100 most-changed of {format_int(count)} single-owner files"
-                )
-                f.write(f'<details class="table-details"><summary>Table: {what}</summary>')
-                f.write(risk_table("ownership-busfactor-all", risk_files[:100]))
-                f.write("</details>")
+            # Every file (up to 100, the most-changed), folded away under the owners
+            count = len(risk_files)
+            what = (
+                f"All {format_int(count)} single-owner files"
+                if count <= 100
+                else f"The 100 most-changed of {format_int(count)} single-owner files"
+            )
+            f.write(f'<details class="table-details"><summary>{what}</summary>')
+            f.write(risk_table("ownership-busfactor", risk_files[:100]))
+            f.write("</details>")
         else:
             f.write("<p>No single-owner files — every file has multiple contributors.</p>")
 
@@ -3001,6 +3012,65 @@ class HTMLReportCreator(ReportCreator):
         self.print_footer(f)
         f.write("</body></html>")
         f.close()
+
+    # The owners of single-owner files the Code Ownership page lists before
+    # summing up the rest, and the files it names for each
+    SINGLE_OWNERS_SHOWN = 10
+    SINGLE_OWNER_FILES_NAMED = 3
+
+    def _single_owners_html(self, groups: list[dict[str, Any]]) -> str:
+        """The single-owner files by owner: how many each has, the commits
+        to them, their share of all of them, and the most-changed by name;
+        the owners after the first ten as one row."""
+        busiest = max((len(group["files"]) for group in groups), default=0) or 1
+
+        def row(name: str, files: int, edits: int, named: str, rest: bool = False) -> str:
+            bar = "share-bar share-bar-muted" if rest else "share-bar"
+            cls = ' class="share-rest"' if rest else ""
+            return (
+                f'<tr{cls}><td class="owner-name">{name}</td>'
+                f'<td class="num" data-label="Files">{format_int(files)}</td>'
+                f'<td class="num" data-label="Commits">{format_int(edits)}</td>'
+                f'<td class="share-cell"><span class="{bar}" aria-hidden="true">'
+                f'<span style="width: {100.0 * files / busiest:.1f}%"></span></span></td>'
+                f'<td class="owner-files">{named}</td></tr>'
+            )
+
+        def named(files: list[dict[str, Any]]) -> str:
+            shown = files[: self.SINGLE_OWNER_FILES_NAMED]
+            more = len(files) - len(shown)
+            return "".join(
+                f'<span class="path">{html.escape(fs["path"])}</span>' for fs in shown
+            ) + (
+                f'<span class="owner-files-more">and {format_int(more)} more</span>' if more else ""
+            )
+
+        rows = [
+            row(
+                author_html(group["owner"]),
+                len(group["files"]),
+                group["edits"],
+                named(group["files"]),
+            )
+            for group in groups[: self.SINGLE_OWNERS_SHOWN]
+        ]
+        rest = groups[self.SINGLE_OWNERS_SHOWN :]
+        if rest:
+            rows.append(
+                row(
+                    plural(len(rest), "other owner"),
+                    sum(len(group["files"]) for group in rest),
+                    sum(group["edits"] for group in rest),
+                    "",
+                    rest=True,
+                )
+            )
+        return (
+            '<div class="table-scroll"><table class="share-table owners-table" '
+            'id="ownership-owners">'
+            '<tr><th>Owner</th><th class="num">Files</th><th class="num">Commits</th>'
+            f"{BAR_HEADER}<th>Most-changed</th></tr>" + "".join(rows) + "</table></div>"
+        )
 
     # The scatter plot shows at most this many files (the highest-scoring),
     # so the page stays light on repositories with tens of thousands of files
@@ -4279,6 +4349,24 @@ def parse_chronicle(text: str) -> dict[str, Any]:
 
     prologue = " ".join(line for line in prologue_lines if line).strip()
     return {"prologue": prologue, "chapters": chapters}
+
+
+def single_owner_groups(files: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Single-owner files grouped by their owner: ``{"owner", "files",
+    "edits"}``, each owner's files most-changed first, the owners with the
+    most files first (then the most commits to them, then by name)."""
+    by_owner: dict[str, list[dict[str, Any]]] = {}
+    for fs in files:
+        by_owner.setdefault(fs["owner"], []).append(fs)
+    groups = [
+        {
+            "owner": owner,
+            "files": sorted(owned, key=lambda fs: (-fs["edits"], fs["path"])),
+            "edits": sum(fs["edits"] for fs in owned),
+        }
+        for owner, owned in by_owner.items()
+    ]
+    return sorted(groups, key=lambda g: (-len(g["files"]), -g["edits"], g["owner"]))
 
 
 def is_bot(name: str) -> bool:

@@ -494,6 +494,83 @@ table.authors .rank {
 	color: var(--text-secondary);
 }
 
+/* The Code Ownership page's single owners: each one's most-changed files,
+   one path to a line */
+.owners-table .share-cell {
+	width: 20%;
+}
+
+.owner-files {
+	font-size: var(--font-size-sm);
+}
+
+.owner-files .path {
+	display: block;
+	font-family: var(--font-mono);
+	overflow-wrap: anywhere;
+}
+
+.owner-files-more {
+	display: block;
+	color: var(--text-secondary);
+}
+
+/* On a phone each owner is two lines: the name and the counts, then the
+   files, the full width; the bars give way to the paths */
+@media (max-width: 560px) {
+	table.owners-table,
+	table.owners-table tbody {
+		display: block;
+	}
+
+	table.owners-table tr {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 2px 12px;
+		padding: var(--space-2) 0;
+		border-bottom: 1px solid var(--table-border);
+	}
+
+	table.owners-table tr:first-child {
+		display: none;
+	}
+
+	.table-scroll table.owners-table tr > td,
+	.table-scroll table.owners-table tr:hover > td {
+		position: static;
+		padding: 0;
+		border: 0;
+		box-shadow: none;
+		background-color: transparent;
+	}
+
+	table.owners-table .owner-name {
+		flex: 1 1 auto;
+		font-weight: 500;
+	}
+
+	table.owners-table td[data-label]::before {
+		content: attr(data-label);
+		margin-right: 4px;
+		font-family: var(--font-sans);
+		color: var(--text-secondary);
+	}
+
+	table.owners-table .share-cell {
+		display: none;
+	}
+
+	table.owners-table .owner-files {
+		flex: 0 0 100%;
+		padding-top: var(--space-1);
+	}
+
+	table.owners-table .owner-files:empty {
+		display: none;
+	}
+}
+
 /* The same bar, thinner, under a number inside a table cell */
 .share-bar-inline {
 	height: 3px;
