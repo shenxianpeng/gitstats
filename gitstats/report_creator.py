@@ -2730,6 +2730,13 @@ class HTMLReportCreator(ReportCreator):
             "The <strong>bus factor</strong> is the smallest number of people who are, "
             "between them, primary owner of more than half of the files.</p>"
         )
+        if current is None:
+            tracked_note = "every file changed"
+        elif any(is_code(path) for path in current):
+            tracked_note = "of code in the current tree"
+        else:
+            # a repository of documents has them counted
+            tracked_note = "in the current tree"
         bus_factor = ownership["bus_factor"]
         bus_owned = (
             f"primary owner of {format_int(ownership['bus_factor_files'])} "
@@ -2741,14 +2748,7 @@ class HTMLReportCreator(ReportCreator):
                     (
                         "Files Tracked",
                         format_int(total),
-                        (
-                            "every file changed"
-                            if current is None
-                            else "of code in the current tree"
-                            if any(is_code(path) for path in current)
-                            # a repository of documents has them counted
-                            else "in the current tree"
-                        ),
+                        tracked_note,
                     ),
                     (
                         "Bus Factor",
