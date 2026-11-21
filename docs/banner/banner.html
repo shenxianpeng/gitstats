@@ -228,7 +228,10 @@
 
 	// A made-up year that picks up pace: the same every time it is drawn
 	let seed = 7;
-	const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+	const random = () => {
+		seed = (seed * 16807) % 2147483647;
+		return seed / 2147483647;
+	};
 	const weeks = 36;
 	const days = [];
 	for (let week = 0; week < weeks; week++) {
