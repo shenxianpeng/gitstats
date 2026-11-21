@@ -4789,7 +4789,8 @@ def test_tags_page_leads_with_releases_per_year_and_folds_the_table(mock_data_co
     # of the 11 gaps, and of the 9 between the releases since 2016, is 152
     assert '<dt>Days between Releases</dt><dd class="stat-value">152</dd>' in page
     assert '<span class="nowrap">152 since 2016</span>' in page
-    assert "<dt>Tags</dt>" in page and "since 2015" in page
+    assert "<dt>Tags</dt>" in page
+    assert "since 2015" in page
 
     latest = page[page.index('id="latest_tags"') : page.index('<details class="table-details"')]
     assert latest.count("<tr><td") == HTMLReportCreator.TAGS_SHOWN
