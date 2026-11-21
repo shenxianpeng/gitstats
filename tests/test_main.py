@@ -901,7 +901,7 @@ class TestCollectPhases:
             assert self._text(handed[phase]) == self._text(get_pipe_output([command])), phase
         assert "files changed" in handed["_collect_line_stats"]
         assert handed["_collect_file_churn_and_ownership"].startswith("COMMIT:")
-        assert "\nutils.py\n" in handed["_collect_file_churn_and_ownership"]
+        assert "\nA\tutils.py\n" in handed["_collect_file_churn_and_ownership"]
         # the messages were read beside the rest: no commit of this history names an assistant
         assert handed["_collect_ai_assisted"] == []
 
@@ -2252,11 +2252,11 @@ class TestCollectEdgeCases:
         assert "vendor/lib" not in dc.head_files
         assert dc.total_files == 6
         # no extension (.gitignore) and one too long to be one share the row
-        assert dc.extensions[""] == {"files": 2, "lines": 4}
+        assert dc.extensions[""] == {"files": 2, "lines": 4, "line_files": 2}
         # the rows add up to the tiles
         assert sum(e["files"] for e in dc.extensions.values()) == dc.total_files
         assert sum(e["lines"] for e in dc.extensions.values()) == dc.total_lines
-        assert dc.extensions["py"] == {"files": 2, "lines": 8}
+        assert dc.extensions["py"] == {"files": 2, "lines": 8, "line_files": 2}
         # the six blobs of the files, .gitignore without an extension among
         # them, were read and added to the cache
         assert len(dc.cache["lines_in_blob"]) == 7
@@ -3366,7 +3366,10 @@ def test_files_without_an_extension_are_in_the_extensions(tmp_path, monkeypatch)
         [(*ANN, "2021-01-01T10:00:00", {"a.py": 5, "Makefile": 3, ".gitignore": 2})],
     )
     dc = _collected(repo, monkeypatch)
-    assert dc.extensions == {"py": {"files": 1, "lines": 5}, "": {"files": 2, "lines": 5}}
+    assert dc.extensions == {
+        "py": {"files": 1, "lines": 5, "line_files": 1},
+        "": {"files": 2, "lines": 5, "line_files": 2},
+    }
     assert (dc.total_files, dc.total_lines) == (3, 10)
     assert set(dc.hotspot_files) == {"a.py", "Makefile", ".gitignore"}
 
@@ -3607,3 +3610,133 @@ def test_a_folder_of_a_repository_in_a_portfolio_is_named_after_it(tmp_path, seq
     assert run([str(repo / "nested"), str(other)], str(out)) == 0
     reports = {p.name for p in out.iterdir() if (p / "index.html").exists()}
     assert reports == {"other", "repo"}
+
+
+# ── files followed through their renames ─────────────────────────────────
+
+BEN = ("Ben", "ben@example.com")
+CAL = ("Cal", "cal@example.com")
+# a file whose content git recognizes when it moves
+MODULE = "".join(f"def function_{n}():\n    return {n}\n" for n in range(20))
+
+
+def _edited(text, n):
+    """``text`` with its last line changed, still the same file to git."""
+    return text.rsplit("\n", 2)[0] + f"\n    return {n * 1000}\n"
+
+
+@pytest.mark.parametrize("processes", [8, 1])
+def test_a_moved_file_keeps_its_history(tmp_path, monkeypatch, processes):
+    """A project moved into src/ keeps, under the new names, who changed its
+    files before the move: the one who moved them is not their sole author."""
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (*ANN, "2021-01-01T10:00:00", {"pkg/api.py": MODULE}),
+            (*BEN, "2021-01-02T10:00:00", {"pkg/api.py": _edited(MODULE, 1)}),
+            (
+                *CAL,
+                "2021-01-03T10:00:00",
+                {"pkg/api.py": None, "src/pkg/api.py": _edited(MODULE, 1)},
+            ),
+            (*CAL, "2021-01-04T10:00:00", {"src/pkg/api.py": _edited(MODULE, 2)}),
+        ],
+    )
+    dc = _collected(repo, monkeypatch, processes)
+    assert dc.file_churn == {"src/pkg/api.py": 4}
+    assert dc.author_files == {
+        "Ann": {"src/pkg/api.py": 1},
+        "Ben": {"src/pkg/api.py": 1},
+        "Cal": {"src/pkg/api.py": 2},
+    }
+    assert dc.hotspot_files["src/pkg/api.py"]["churn"] == 4
+
+
+@pytest.mark.parametrize("processes", [8, 1])
+def test_a_file_renamed_twice_keeps_its_history(tmp_path, monkeypatch, processes):
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (*ANN, "2021-01-01T10:00:00", {"a.py": MODULE}),
+            (*ANN, "2021-01-02T10:00:00", {"a.py": None, "b.py": MODULE}),
+            (*BEN, "2021-01-03T10:00:00", {"b.py": None, "c.py": MODULE}),
+        ],
+    )
+    dc = _collected(repo, monkeypatch, processes)
+    assert dc.file_churn == {"c.py": 3}
+    assert dc.author_files == {"Ann": {"c.py": 2}, "Ben": {"c.py": 1}}
+
+
+@pytest.mark.parametrize("processes", [8, 1])
+def test_a_new_file_under_an_old_name_has_its_own_history(tmp_path, monkeypatch, processes):
+    """Once a file has moved away, a file made under its old name is another
+    file: it has only the commits since."""
+    other = "".join(f"OTHER = {n}\n" for n in range(30))
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (*ANN, "2021-01-01T10:00:00", {"a.py": MODULE}),
+            (*ANN, "2021-01-02T10:00:00", {"a.py": _edited(MODULE, 1)}),
+            (*BEN, "2021-01-03T10:00:00", {"a.py": None, "b.py": _edited(MODULE, 1)}),
+            (*CAL, "2021-01-04T10:00:00", {"a.py": other}),
+        ],
+    )
+    dc = _collected(repo, monkeypatch, processes)
+    assert dc.file_churn == {"b.py": 3, "a.py": 1}
+    assert dc.author_files == {"Ann": {"b.py": 2}, "Ben": {"b.py": 1}, "Cal": {"a.py": 1}}
+
+
+def test_file_churn_reads_renames_from_the_name_status(monkeypatch):
+    """The commits come newest first: a rename holds for those after it in
+    the text, not for its own commit, and a name git quoted is unquoted."""
+    fake = _fake_git(
+        {
+            'git -c core.quotePath=false log --root --format="COMMIT:%aN"': (
+                'COMMIT:Cal\nM\t"new\\tname.py"\n'
+                'COMMIT:Ben\nR095\told.py\t"new\\tname.py"\nA\tdocs.md\n'
+                "COMMIT:Ann\nM\told.py\nD\tgone.py\n"
+            )
+        }
+    )
+    monkeypatch.setattr("gitstats.main.get_pipe_output", fake)
+    dc = GitDataCollector()
+    dc._collect_file_churn_and_ownership({})
+
+    assert dc.file_churn == {"new\tname.py": 3, "docs.md": 1, "gone.py": 1}
+    assert dc.author_files == {
+        "Cal": {"new\tname.py": 1},
+        "Ben": {"new\tname.py": 1, "docs.md": 1},
+        "Ann": {"new\tname.py": 1, "gone.py": 1},
+    }
+
+
+@pytest.mark.parametrize("processes", [8, 1])
+def test_lines_of_code_are_the_projects_own_text(tmp_path, monkeypatch, processes):
+    """Artwork, certificates, vendored and generated files are text, and
+    their lines are not lines of code; the documentation and the tests are."""
+    repo = _history(
+        tmp_path / "repo",
+        [
+            (
+                *ANN,
+                "2021-01-01T10:00:00",
+                {
+                    "src/app.py": 10,
+                    "tests/test_app.py": 4,
+                    "README.md": 3,
+                    "ext/logo.ai": 500,
+                    "tests/certs/server.pem": 30,
+                    "vendor/lib/big.go": 200,
+                    "Cargo.lock": 50,
+                },
+            )
+        ],
+    )
+    dc = _collected(repo, monkeypatch, processes)
+    assert dc.get_total_loc() == 10 + 4 + 3
+    assert dc.get_total_files() == 7
+    assert dc.extensions["ai"] == {"files": 1, "lines": 0, "line_files": 0}
+    assert dc.extensions["py"] == {"files": 2, "lines": 14, "line_files": 2}
+    assert sum(e["lines"] for e in dc.extensions.values()) == dc.total_lines
+    # the hotspots still know every file's size, and pick the code themselves
+    assert dc.hotspot_files["ext/logo.ai"]["lines"] == 500

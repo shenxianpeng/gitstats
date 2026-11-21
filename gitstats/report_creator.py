@@ -18,6 +18,7 @@ from gitstats.badge import AI_ASSISTED_LABEL, STYLE_NAMES, ai_assisted_share, cr
 from gitstats.employers import KIND_LABELS, KINDS, ORGANIZATION
 from gitstats.employers import summarize as summarize_organizations
 from gitstats.safe_html import sanitize_ai_html
+from gitstats.sources import is_code
 from gitstats.utils import (
     WEEK_KEY,
     format_bytes,
@@ -2239,7 +2240,10 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<p class="section-note">'
             "Files with excluded extensions are not shown; "
-            "configure <code>exclude_exts</code> in gitstats.conf.</p>"
+            "configure <code>exclude_exts</code> in gitstats.conf. "
+            "The lines of vendored and generated files, and of text that is not "
+            "code (artwork, certificates, data), are not lines of code: "
+            "an extension that has only such files shows none.</p>"
         )
         # A bar table ranked by lines, like the churn and domain tables; binary
         # files (no lines) show a dash instead of "0 (0.0%)"
@@ -2251,12 +2255,14 @@ class HTMLReportCreator(ReportCreator):
         rows = []
         for ext, info in exts:
             files, lines = info["files"], info["lines"]
+            # the files the lines are those of, when the data says
+            per_file = info.get("line_files", files)
             name = html.escape(ext) if ext else "<em>no extension</em>"
             if lines:
                 share = f"{100.0 * lines / total_loc:.1f}%" if total_loc else "—"
                 cells = (
                     f'<td class="num">{format_int(lines)}</td><td class="num">{share}</td>'
-                    f'<td class="num">{format_int(lines // files) if files else "—"}</td>'
+                    f'<td class="num">{format_int(lines // per_file) if per_file else "—"}</td>'
                 )
                 bar = f'<span style="width: {100.0 * lines / max_lines:.1f}%"></span>'
             else:
@@ -2279,11 +2285,13 @@ class HTMLReportCreator(ReportCreator):
             f.write(html_header(2, "Most changed files (code churn)"))
             f.write(
                 '<p class="section-note">'
-                "Files in the current tree touched most often across all commits. "
+                "Files of code in the current tree touched most often across all "
+                "commits, under their names of today or of before a rename. "
                 "High-churn files are hotspots that may benefit from extra review or refactoring.</p>"
             )
-            # Only files that still exist: a deleted file is no hotspot to review
-            current = head_files(data)
+            # Only code that still exists: a deleted file is no hotspot to
+            # review, and a guide that changes often is no hotspot at all
+            current = code_files(data)
             churn_sorted = sorted(
                 (
                     (path, count)
@@ -2358,6 +2366,16 @@ class HTMLReportCreator(ReportCreator):
         f.write(html_header(2, "Lines of code"))
         loc_stamps = sorted(data.changes_by_date.keys())
         loc_values = [data.changes_by_date[s]["lines"] for s in loc_stamps]
+        if loc_values and loc_values[-1] != data.get_total_loc():
+            # the chart adds up the diffs of every file, the tile counts the code
+            f.write(
+                '<p class="section-note">Over time: the lines every commit added '
+                "and removed, in every file. That ends at "
+                f"{format_int(loc_values[-1])}, where the lines of code above, "
+                f"{format_int(data.get_total_loc())}, leave out vendored and generated "
+                "files, text that is not code (artwork, certificates, data) and the "
+                "extensions excluded in gitstats.conf.</p>"
+            )
         f.write(
             self._render_chartjs(
                 "chart-lines-of-code",
@@ -2705,11 +2723,20 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<p class="section-note">'
             "Ownership is measured by how many commits each author made to each "
-            "file in the current tree. It highlights <strong>bus-factor risk</strong> "
+            "file of code in the current tree, its tests included, and to the same "
+            "file under the names it had before. Documentation, vendored and "
+            "generated files are left out. It highlights <strong>bus-factor risk</strong> "
             "(files only one person has ever touched) and where knowledge is concentrated. "
             "The <strong>bus factor</strong> is the smallest number of people who are, "
             "between them, primary owner of more than half of the files.</p>"
         )
+        if current is None:
+            tracked_note = "every file changed"
+        elif any(is_code(path) for path in current):
+            tracked_note = "of code in the current tree"
+        else:
+            # a repository of documents has them counted
+            tracked_note = "in the current tree"
         bus_factor = ownership["bus_factor"]
         bus_owned = (
             f"primary owner of {format_int(ownership['bus_factor_files'])} "
@@ -2721,7 +2748,7 @@ class HTMLReportCreator(ReportCreator):
                     (
                         "Files Tracked",
                         format_int(total),
-                        "in the current tree" if current is not None else "every file changed",
+                        tracked_note,
                     ),
                     (
                         "Bus Factor",
@@ -2874,10 +2901,7 @@ class HTMLReportCreator(ReportCreator):
         self.print_nav(f, page)
         f.write("<h1>Hotspots</h1>")
 
-        hotspot_files = getattr(data, "hotspot_files", {})
-        if not isinstance(hotspot_files, dict):
-            hotspot_files = {}
-        hotspots = compute_hotspots(hotspot_files)
+        hotspots = code_hotspots(data)
         files = hotspots["files"]
 
         if not files:
@@ -2902,10 +2926,12 @@ class HTMLReportCreator(ReportCreator):
         f.write(
             '<p class="section-note">'
             "Files that are both large and changed often are where bugs tend to "
-            "cluster and where refactoring pays off first. Each file in the current "
-            "tree is placed by its size and by the number of commits that changed it; "
+            "cluster and where refactoring pays off first. Each file of code in the "
+            "current tree, tests included, is placed by its size and by the number "
+            "of commits that changed it, under this name or one it had before; "
             "its <strong>hotspot score</strong> is changes &times; &radic;lines. "
-            "Files without counted lines, such as binary files, are left out.</p>"
+            "Documentation, vendored and generated files, and files without counted "
+            "lines, such as binary files, are left out.</p>"
         )
         tiles = [
             (
@@ -4148,15 +4174,16 @@ def is_bot(name: str) -> bool:
 
 
 def head_ownership(data: Any) -> dict[str, Any]:
-    """compute_code_ownership() over the files that still exist.
+    """compute_code_ownership() over the code that still exists.
 
     A deleted file carries no bus-factor risk, so when the data knows the
-    files at HEAD only those are counted.
+    files at HEAD only those are counted, and of them the code (see
+    code_files()).
     """
     author_files = getattr(data, "author_files", {})
     if not isinstance(author_files, dict):
         author_files = {}
-    current = head_files(data)
+    current = code_files(data)
     if current is not None:
         author_files = {
             author: {p: n for p, n in files.items() if p in current}
@@ -4171,6 +4198,32 @@ def head_files(data: Any) -> set[str] | None:
     if isinstance(paths, (list, tuple, set)) and paths:
         return set(paths)
     return None
+
+
+def code_files(data: Any) -> set[str] | None:
+    """Paths of the code at HEAD, its tests included (see gitstats.sources),
+    or None when the data predates head_files.
+
+    The documentation, the vendored and generated files and the assets are
+    left out: a guide that is rewritten with every release is no hotspot,
+    and who wrote the AUTHORS file says nothing of who knows the code. A
+    repository with nothing else has all its files counted.
+    """
+    current = head_files(data)
+    if current is None:
+        return None
+    return {path for path in current if is_code(path)} or current
+
+
+def code_hotspots(data: Any) -> dict[str, Any]:
+    """compute_hotspots() over the code at HEAD (see code_files())."""
+    hotspot_files = getattr(data, "hotspot_files", {})
+    if not isinstance(hotspot_files, dict):
+        hotspot_files = {}
+    code = {path for path in hotspot_files if is_code(path)}
+    if code:
+        hotspot_files = {path: info for path, info in hotspot_files.items() if path in code}
+    return compute_hotspots(hotspot_files)
 
 
 def author_html(name: str) -> str:
@@ -4810,8 +4863,7 @@ def _authors_signal(data: Any) -> dict[str, str] | None:
 
 def _hotspots_signal(data: Any) -> dict[str, str] | None:
     """The ten highest hotspot scores being most of the total: see overview_signals()."""
-    hotspot_files = getattr(data, "hotspot_files", {})
-    files = compute_hotspots(hotspot_files if isinstance(hotspot_files, dict) else {})["files"]
+    files = code_hotspots(data)["files"]
     total_score = sum(fs["score"] for fs in files)
     if len(files) <= 10 or not total_score:
         return None

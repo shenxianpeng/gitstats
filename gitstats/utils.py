@@ -514,7 +514,7 @@ def shortstat_logs(
     ``names`` is the format of the line that starts a commit, and the third
     text returned is, blank lines aside, the output of::
 
-        git log --format=<names> --name-only <log_range>
+        git log --format=<names> --name-status <log_range>
 
     which would compare every commit once more. Without it, None is returned
     in its place.
@@ -599,11 +599,12 @@ def shortstat_logs(
         """For one process's share of the commits: commit -> the count git
         prints under it, commit -> the files it adds less those it deletes,
         where that is not nothing, and, when the names are asked for,
-        commit -> the files it changes, a line each. Then, when the lines of
-        the source are asked for, those its diffs add, and commit -> the
-        files it moves into the source (see _source_lines_of())."""
+        commit -> the files it changes, a line each, as `--name-status` has
+        them. Then, when the lines of the source are asked for, those its
+        diffs add, and commit -> the files it moves into the source (see
+        _source_lines_of())."""
         commits, first_parent = job
-        # the names are those of the plain diff, as `git log --name-only` shows it
+        # the names are those of the plain diff, as `git log --name-status` shows them
         with_names = names is not None and not first_parent
         numstat = with_numstat and not first_parent
         with allowed:
@@ -620,9 +621,10 @@ def shortstat_logs(
                     "--shortstat",
                     # the files created and deleted, from the same diff
                     "--summary",
-                    # and every file changed. --name-only would print the names
-                    # and nothing else; a raw line ends with the name, quoted
-                    # the same way, and full hashes cost git nothing to print
+                    # and every file changed. --name-status would print the
+                    # status and the names and nothing else; a raw line ends
+                    # with them, quoted the same way, and full hashes cost git
+                    # nothing to print
                     *(["--raw", "--no-abbrev"] if with_names else []),
                     # and, file by file, the lines added and removed
                     *(["--numstat"] if numstat else []),
@@ -685,12 +687,15 @@ def shortstat_logs(
                 if moved_in:
                     moved[commit] = moved_in
             if with_names:
-                # the name is what follows the last tab: for a renamed file,
-                # the new name, which comes after the old one. It is left
-                # quoted as `git log --name-only` would print it.
+                # what follows the two modes and the two blobs: the status,
+                # then the name, or for a renamed file the old name and the
+                # new, a tab before each. The names are left quoted as `git
+                # log --name-status` would print them: a name with a tab in
+                # it is one git quotes. The four fields before the status
+                # have no space in them, whatever the names have.
                 changed[commit] = "".join(
                     [
-                        "\n" + line.rpartition("\t")[2]
+                        "\n" + line.split(" ", 4)[4]
                         for line in raw.split("\n")
                         if line.startswith(":")
                     ]

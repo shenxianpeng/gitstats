@@ -2005,7 +2005,7 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
         "points": [
             ["main.py", 400, 15, 300.0],
             ["utils.py", 120, 10, 109.5],
-            ["README.md", 60, 8, 62.0],
+            ["setup.py", 60, 8, 62.0],
             ["Dockerfile", 30, 2, 11.0],
         ],
         "numbered": 4,
@@ -2036,7 +2036,7 @@ def test_hotspots_page_renders(mock_data_collector, temp_dir):
     assert re.findall(r'<td class="path"[^>]*>([^<]+)</td>', table) == [
         "main.py",
         "utils.py",
-        "README.md",
+        "setup.py",
         "Dockerfile",
     ]
     assert (
@@ -2063,24 +2063,24 @@ def test_hotspots_table_counts_the_authors_of_each_file(mock_data_collector, tem
     authors = dict(
         re.findall(r'<td class="path"[^>]*>([^<]+)</td>.*?data-label="Authors">(\d+)</td>', table)
     )
-    # main.py: Alice, Bob and Charlie; README.md: Bob; nobody on record for Dockerfile
-    assert authors == {"main.py": "3", "utils.py": "2", "README.md": "1", "Dockerfile": "0"}
+    # main.py: Alice, Bob and Charlie; setup.py: Bob; nobody on record for Dockerfile
+    assert authors == {"main.py": "3", "utils.py": "2", "setup.py": "1", "Dockerfile": "0"}
 
     # a hotspot only one person has changed is flagged; the flag is drawn by CSS
     # from the attribute, so the cell's text, which the table sorts by, is the path
     assert (
         '<td class="path" data-tag="sole owner" '
-        'title="Only one person has changed this file">README.md</td>'
+        'title="Only one person has changed this file">setup.py</td>'
     ) in table
     assert table.count("data-tag=") == 1
     assert "sole owner</td>" not in table
     assert '<a href="ownership.html">Code Ownership</a>' in content
 
     # only the files that still exist count, as on the Code Ownership page
-    mock_data_collector.head_files = ["main.py", "utils.py", "README.md", "Dockerfile"]
-    mock_data_collector.author_files["Dana"] = {"gone.py": 3, "README.md": 1}
+    mock_data_collector.head_files = ["main.py", "utils.py", "setup.py", "Dockerfile"]
+    mock_data_collector.author_files["Dana"] = {"gone.py": 3, "setup.py": 1}
     content = _hotspots_html(mock_data_collector, temp_dir)
-    assert 'data-tag="sole owner"' not in content  # README.md has two authors now
+    assert 'data-tag="sole owner"' not in content  # setup.py has two authors now
 
 
 def test_hotspots_table_without_ownership_data_has_no_authors_column(mock_data_collector, temp_dir):
@@ -2128,7 +2128,7 @@ def test_hotspots_chart_follows_the_theme(mock_data_collector, temp_dir):
 
 
 def test_hotspots_page_counts_against_the_current_tree(mock_data_collector, temp_dir):
-    mock_data_collector.head_files = ["main.py", "utils.py", "README.md", "Dockerfile", "logo.png"]
+    mock_data_collector.head_files = ["main.py", "utils.py", "setup.py", "Dockerfile", "logo.png"]
     page = _hotspots_html(mock_data_collector, temp_dir)
     assert (
         '<dt>Files Analyzed</dt><dd class="stat-value">4</dd>'
@@ -2707,10 +2707,10 @@ def test_extensions_bar_table_ranked_by_lines(mock_data_collector, temp_dir):
 
 
 def test_ownership_and_churn_skip_deleted_files(mock_data_collector, temp_dir):
-    mock_data_collector.head_files = ["main.py", "utils.py", "README.md"]
+    mock_data_collector.head_files = ["main.py", "utils.py", "setup.py"]
     mock_data_collector.author_files = {
         "Alice Smith": {"main.py": 10, "old_script": 40},
-        "Bob Jones": {"main.py": 5, "utils.py": 8, "README.md": 8},
+        "Bob Jones": {"main.py": 5, "utils.py": 8, "setup.py": 8},
     }
     mock_data_collector.file_churn = {"old_script": 40, "main.py": 15, "utils.py": 8}
     HTMLReportCreator().create(mock_data_collector, temp_dir)
@@ -2721,9 +2721,9 @@ def test_ownership_and_churn_skip_deleted_files(mock_data_collector, temp_dir):
 
     ownership = page("ownership.html")
     assert "old_script" not in ownership
-    assert '<dd class="stat-value">3</dd><dd class="stat-note">in the current tree</dd>' in (
-        ownership
-    )
+    assert (
+        '<dd class="stat-value">3</dd><dd class="stat-note">of code in the current tree</dd>'
+    ) in ownership
     files = page("files.html")
     churn = files[files.index('id="churn"') :]
     assert "old_script" not in churn
@@ -4619,3 +4619,96 @@ def test_a_footer_without_the_time_of_the_run_leaves_it_out():
     again = StringIO()
     creator.print_footer(again)
     assert again.getvalue() == footer
+
+
+# ── the code, apart from the documentation and the assets ────────────────
+
+
+def test_hotspots_ownership_and_churn_leave_out_what_is_not_code(mock_data_collector, temp_dir):
+    """A guide rewritten with every release, the AUTHORS file and a logo are
+    no hotspots, and who changed them says nothing of who knows the code."""
+    data = mock_data_collector
+    data.head_files = [
+        "main.py",
+        "utils.py",
+        "setup.py",
+        "Dockerfile",
+        "docs/guide.rst",
+        "AUTHORS",
+        "ext/logo.ai",
+    ]
+    data.hotspot_files["docs/guide.rst"] = {"churn": 90, "lines": 900, "score": 2700.0}
+    data.hotspot_files["ext/logo.ai"] = {"churn": 3, "lines": 8000, "score": 268.3}
+    data.file_churn.update({"docs/guide.rst": 90, "AUTHORS": 60})
+    data.author_files["Dana"] = {"docs/guide.rst": 90, "AUTHORS": 60, "ext/logo.ai": 3}
+    HTMLReportCreator().create(data, temp_dir)
+
+    hotspots = _read_page(temp_dir, "hotspots.html")
+    assert _hotspot_points(hotspots)["points"][0][0] == "main.py"
+    assert "docs/guide.rst" not in hotspots
+    assert "ext/logo.ai" not in hotspots
+    ownership = _read_page(temp_dir, "ownership.html")
+    assert "Dana" not in ownership
+    assert "AUTHORS" not in ownership
+    files = _read_page(temp_dir, "files.html")
+    churn = files[files.index('id="churn"') :]
+    assert "docs/guide.rst" not in churn
+    assert "AUTHORS" not in churn
+
+
+def test_a_repository_of_documents_has_them_analyzed(mock_data_collector, temp_dir):
+    """With no code at all, the documents are what there is to look at."""
+    data = mock_data_collector
+    data.head_files = ["README.md", "docs/guide.rst"]
+    data.hotspot_files = {
+        "README.md": {"churn": 4, "lines": 50, "score": 28.3},
+        "docs/guide.rst": {"churn": 9, "lines": 400, "score": 180.0},
+    }
+    data.file_churn = {"README.md": 4, "docs/guide.rst": 9}
+    data.author_files = {"Ann": {"README.md": 4, "docs/guide.rst": 9}}
+    HTMLReportCreator().create(data, temp_dir)
+
+    assert [
+        point[0] for point in _hotspot_points(_read_page(temp_dir, "hotspots.html"))["points"]
+    ] == [
+        "docs/guide.rst",
+        "README.md",
+    ]
+    ownership = _read_page(temp_dir, "ownership.html")
+    assert (
+        '<dd class="stat-value">2</dd><dd class="stat-note">in the current tree</dd>'
+    ) in ownership
+
+
+def test_extensions_divide_their_lines_by_the_files_they_are_those_of(
+    mock_data_collector, temp_dir
+):
+    """Vendored files of an extension count no lines: lines per file are
+    those of the project's own files of it."""
+    mock_data_collector.extensions = {
+        "go": {"files": 10, "lines": 600, "line_files": 2},
+        "ai": {"files": 1, "lines": 0, "line_files": 0},
+    }
+    HTMLReportCreator().create(mock_data_collector, temp_dir)
+    files = _read_page(temp_dir, "files.html")
+    table = files[files.index('id="ext"') :]
+    table = table[: table.index("</table>")]
+    assert '<tr><td>go</td><td class="num">10</td><td class="num">600</td>' in table
+    assert '<td class="num">300</td>' in table
+    assert (
+        '<tr><td>ai</td><td class="num">1</td><td class="num">—</td><td class="num">—</td>'
+        '<td class="num">—</td>'
+    ) in table
+
+
+def test_the_lines_chart_says_why_it_ends_elsewhere(mock_data_collector, temp_dir):
+    """The chart adds up every diff; the lines of code are those of the code."""
+    data = mock_data_collector
+    data.changes_by_date = {1672531200: {"lines": 2600}}
+    HTMLReportCreator().create(data, temp_dir)
+    lines = _read_page(temp_dir, "lines.html")
+    assert "That ends at 2,600, where the lines of code above, 2,000, leave out" in lines
+
+    data.changes_by_date = {1672531200: {"lines": 2000}}
+    HTMLReportCreator().create(data, temp_dir)
+    assert "That ends at" not in _read_page(temp_dir, "lines.html")
