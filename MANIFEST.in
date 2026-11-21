@@ -1,3 +1,5 @@
 # The source distribution has the code, the tests and the docs' text; the
-# docs' images (demo.gif alone is 8 MB) are left to the repository.
+# docs' images (demo.gif alone is 8 MB) and their sources are left to the
+# repository.
 recursive-exclude docs *.gif *.png *.tape
+prune docs/banner

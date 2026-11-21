@@ -1,0 +1,265 @@
+<!doctype html>
+<!--
+  The README's banner. It follows the report's look (gitstats/gitstats.css):
+  ink on paper, the data in shades of blue, the sans for words and the
+  monospace for the name and the command.
+
+  docs/source/banner-light.png and banner-dark.png are this page at
+  1280x400, at twice the density: open banner.html?light and banner.html?dark
+  in a headless browser and screenshot the #banner element. The fonts are the
+  report's: the system sans (Inter where it is installed) and IBM Plex Mono or
+  JetBrains Mono.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>gitstats banner</title>
+<style>
+	:root {
+		--bg: #ffffff;
+		--ink: #1c1a19;
+		--ink-2: #57524f;
+		--ink-3: #6f6a67;
+		--rule: #e6e3e0;
+		--rule-strong: #b5aea9;
+		--blue: #2f6db5;
+		--heat0: #f3f2f0;
+		--heat1: #dbe7f6;
+		--heat2: #a9c6ea;
+		--heat3: #3f74b8;
+		--heat4: #1f4f8a;
+		--frame: #e6e3e0;
+	}
+
+	.dark {
+		--bg: #1c1a19;
+		--ink: #eeeae6;
+		--ink-2: #b4aea9;
+		--ink-3: #9a938e;
+		--rule: #3a3634;
+		--rule-strong: #5f5955;
+		--blue: #5f93d6;
+		--heat0: #262322;
+		--heat1: #1e3350;
+		--heat2: #2c4f7c;
+		--heat3: #3e6aa5;
+		--heat4: #7fb0ea;
+		--frame: #3a3634;
+	}
+
+	body {
+		margin: 0;
+	}
+
+	#banner {
+		box-sizing: border-box;
+		display: flex;
+		align-items: center;
+		width: 1280px;
+		height: 400px;
+		padding: 0 56px;
+		background: var(--bg);
+		border: 1px solid var(--frame);
+		color: var(--ink);
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, "Noto Sans", Helvetica, Arial, sans-serif;
+	}
+
+	.mono {
+		font-family: "IBM Plex Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	}
+
+	.about {
+		flex: none;
+		width: 470px;
+	}
+
+	.label {
+		margin: 0;
+		font-size: 13px;
+		font-weight: 600;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: var(--ink-3);
+	}
+
+	.name {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+		margin: 22px 0 0;
+		font-size: 88px;
+		font-weight: 600;
+		line-height: 1;
+		letter-spacing: -0.03em;
+	}
+
+	/* the cursor, in the data blue */
+	.name::after {
+		content: "";
+		flex: none;
+		width: 20px;
+		height: 72px;
+		margin-top: 8px;
+		border-radius: 3px;
+		background: var(--blue);
+	}
+
+	.tagline {
+		margin: 22px 0 0;
+		font-size: 24px;
+		font-weight: 500;
+		color: var(--ink-2);
+	}
+
+	.install {
+		margin: 40px 0 0;
+		font-size: 17px;
+		color: var(--ink-3);
+	}
+
+	.divider {
+		flex: none;
+		width: 1px;
+		height: 292px;
+		margin: 0 48px;
+		background: var(--rule);
+	}
+
+	.chart {
+		flex: 1;
+		min-width: 0;
+	}
+
+	/* commits per week, over the grid's columns */
+	.bars,
+	.grid,
+	.legend {
+		margin-left: 38px;
+	}
+
+	.bars {
+		display: grid;
+		grid-template-columns: repeat(36, 1fr);
+		gap: 4px;
+		align-items: end;
+		height: 72px;
+		padding-bottom: 8px;
+		border-bottom: 1px solid var(--rule-strong);
+	}
+
+	.bars span {
+		border-radius: 2px 2px 0 0;
+		background: var(--blue);
+	}
+
+	.days {
+		position: relative;
+	}
+
+	.days span {
+		position: absolute;
+		left: 0;
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.08em;
+		color: var(--ink-3);
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(36, 1fr);
+		grid-auto-flow: column;
+		grid-template-rows: repeat(7, 14px);
+		gap: 4px;
+		margin-top: 12px;
+	}
+
+	.grid span {
+		border-radius: 3px;
+	}
+
+	.h0 { background: var(--heat0); }
+	.h1 { background: var(--heat1); }
+	.h2 { background: var(--heat2); }
+	.h3 { background: var(--heat3); }
+	.h4 { background: var(--heat4); }
+
+	/* the report's four groups of pages, as in its nav bar */
+	.groups {
+		display: flex;
+		align-items: center;
+		margin: 28px 0 0 38px;
+		font-size: 15px;
+		font-weight: 500;
+		color: var(--ink-2);
+	}
+
+	.groups span + span::before {
+		content: "";
+		display: inline-block;
+		width: 1px;
+		height: 14px;
+		margin: 0 18px;
+		vertical-align: -2px;
+		background: var(--rule-strong);
+	}
+</style>
+</head>
+<body>
+<div id="banner">
+	<div class="about">
+		<p class="label">Git history statistics</p>
+		<p class="name mono">gitstats</p>
+		<p class="tagline">every commit, accounted for.</p>
+		<p class="install mono">$ pip install gitstats</p>
+	</div>
+	<div class="divider"></div>
+	<div class="chart" aria-hidden="true">
+		<div class="bars" id="bars"></div>
+		<div class="days"><span style="top: 12px">MON</span><span style="top: 48px">WED</span><span style="top: 84px">FRI</span></div>
+		<div class="grid" id="grid"></div>
+		<p class="groups"><span>Overview</span><span>People</span><span>Code</span><span>Timeline</span></p>
+	</div>
+</div>
+<script>
+	if (location.search.includes("dark")) {
+		document.getElementById("banner").classList.add("dark");
+	}
+
+	// A made-up year that picks up pace: the same every time it is drawn
+	let seed = 7;
+	const random = () => {
+		seed = (seed * 16807) % 2147483647;
+		return seed / 2147483647;
+	};
+	const weeks = 36;
+	const days = [];
+	for (let week = 0; week < weeks; week++) {
+		const pace = 0.3 + 0.7 * (week / (weeks - 1)) ** 1.2;
+		for (let day = 0; day < 7; day++) {
+			const weekend = day >= 5 ? 0.35 : 1;
+			const value = random() < 0.3 + 0.6 * pace ? (0.25 + 0.75 * random()) * pace * weekend : 0;
+			days.push(value);
+		}
+	}
+	const grid = document.getElementById("grid");
+	for (const value of days) {
+		const level = value === 0 ? 0 : Math.min(4, 1 + Math.floor(value * 4));
+		const cell = document.createElement("span");
+		cell.className = "h" + level;
+		grid.appendChild(cell);
+	}
+	const bars = document.getElementById("bars");
+	const totals = [];
+	for (let week = 0; week < weeks; week++) {
+		totals.push(days.slice(week * 7, week * 7 + 7).reduce((a, b) => a + b, 0));
+	}
+	const most = Math.max(...totals);
+	for (const total of totals) {
+		const bar = document.createElement("span");
+		bar.style.height = Math.max(2, Math.round((64 * total) / most)) + "px";
+		bars.appendChild(bar);
+	}
+</script>
+</body>
+</html>
