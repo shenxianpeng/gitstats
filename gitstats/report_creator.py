@@ -505,6 +505,11 @@ AI_PAGE = ("ai-insights.html", "AI Insights")
 # (aria-hidden), and a header cell still needs a name
 BAR_HEADER = '<th class="unsortable"><span class="visually-hidden">Bar</span></th>'
 
+# A bar's classes: a person's share, and one that is not a person's work or
+# stands for several (bots, "others")
+SHARE_BAR = "share-bar"
+MUTED_BAR = "share-bar share-bar-muted"
+
 # The header of a column of bars that are shares of a whole, drawn from 0 to
 # 100%: the scale is written out, so a bar that stops short reads as a share
 SHARE_SCALE_HEADER = (
@@ -1262,7 +1267,7 @@ class HTMLReportCreator(ReportCreator):
             info = data.get_author_info(author)
             listed += info["commits"]
             # a bot's commits are not a person's work: its bar is grey
-            bar_class = "share-bar share-bar-muted" if is_bot(author) else "share-bar"
+            bar_class = MUTED_BAR if is_bot(author) else SHARE_BAR
             rows.append(
                 f'<tr><td class="num rank">{rank}</td><td>{author_html(author)}</td>'
                 f'<td class="num">{format_int(info["commits"])}</td>'
@@ -1675,7 +1680,7 @@ class HTMLReportCreator(ReportCreator):
         )
 
         def row(label: str, commits: int, rest: bool = False, title: str = "") -> str:
-            bar = "share-bar share-bar-muted" if rest else "share-bar"
+            bar = MUTED_BAR if rest else SHARE_BAR
             cls = ' class="share-rest"' if rest else ""
             hint = f' title="{html.escape(title)}"' if title else ""
             return (
@@ -3025,7 +3030,7 @@ class HTMLReportCreator(ReportCreator):
         busiest = max((len(group["files"]) for group in groups), default=0) or 1
 
         def row(name: str, files: int, edits: int, named: str, rest: bool = False) -> str:
-            bar = "share-bar share-bar-muted" if rest else "share-bar"
+            bar = MUTED_BAR if rest else SHARE_BAR
             cls = ' class="share-rest"' if rest else ""
             return (
                 f'<tr{cls}><td class="owner-name">{name}</td>'
