@@ -1251,18 +1251,28 @@ class GitDataCollector(DataCollector):
                 name = _author_name(line[7:])
                 current_author = name_to_canonical.get(name, name)
                 continue
-            # A changed-file line: "M\t<path>", or "R087\t<old>\t<new>". A
-            # tab in a name is one git quotes. A line without one is a name
-            # alone, as `--name-only` prints it.
-            status, _, names = line.partition("\t") if "\t" in line else ("", "", line)
-            path = unquote_path(names.rpartition("\t")[2])
-            if status.startswith("R") and "\t" in names:
-                renames.append((unquote_path(names.partition("\t")[0]), path))
+            path, renamed_from = self._changed_file(line)
+            if renamed_from is not None:
+                renames.append((renamed_from, path))
             path = renamed_to.get(path, path)
             self.file_churn[path] = self.file_churn.get(path, 0) + 1
             if current_author:
                 author_map = self.author_files.setdefault(current_author, {})
                 author_map[path] = author_map.get(path, 0) + 1
+
+    @staticmethod
+    def _changed_file(line: str) -> tuple[str, str | None]:
+        """The name of a file a commit changed, and its old name when the
+        commit renamed it, from a line of `--name-status`: "M\t<path>", or
+        "R087\t<old>\t<new>". A tab in a name is one git quotes. A line
+        without one is a name alone, as `--name-only` prints it."""
+        if "\t" not in line:
+            return unquote_path(line), None
+        status, _, names = line.partition("\t")
+        old, tab, new = names.partition("\t")
+        if status.startswith("R") and tab:
+            return unquote_path(new), unquote_path(old)
+        return unquote_path(names.rpartition("\t")[2]), None
 
     @staticmethod
     def _source_lines_command() -> str:
