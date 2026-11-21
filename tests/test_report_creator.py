@@ -4854,3 +4854,16 @@ def test_timezones_list_the_busiest_then_the_rest_with_all_folded(mock_data_coll
     assert "<summary>All 12 offsets, west to east</summary>" in folded
     assert folded.index("UTC-08:00") < folded.index("UTC+00:00") < folded.index("UTC+03:00")
     assert "Remaining" not in folded
+
+
+def test_overview_charts_have_no_row_gap_side_by_side():
+    """Side by side, the two chart sections share their rows through a subgrid:
+    a row gap would open between each heading, sentence and chart."""
+    css_path = os.path.join(os.path.dirname(__file__), "..", "gitstats", "gitstats.css")
+    with open(css_path, encoding="utf-8") as f:
+        css = f.read()
+    rule = css[css.index(".overview-charts {") :]
+    rule = rule[: rule.index("}")]
+    assert "column-gap: var(--space-7);" in rule
+    assert "\tgap:" not in rule
+    assert "row-gap" not in rule
