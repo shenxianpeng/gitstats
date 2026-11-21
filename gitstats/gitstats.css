@@ -483,7 +483,8 @@ dd {
 	color: var(--text-secondary);
 }
 
-.share-table .rank {
+.share-table .rank,
+table.authors .rank {
 	width: 1%;
 	padding-right: 0;
 	color: var(--text-secondary);
@@ -608,6 +609,10 @@ table {
 
 /* Wide tables scroll inside their own box instead of widening the page */
 .table-scroll {
+	/* positioned, so that what is placed absolutely inside it (the column
+	   headers' text for screen readers) is clipped with the table instead of
+	   widening the page */
+	position: relative;
 	max-width: 100%;
 	overflow-x: auto;
 	margin-bottom: var(--space-4);
@@ -1770,6 +1775,36 @@ tr[hidden] {
 	}
 
 	.table-scroll tr:hover > td:first-child {
+		background-color: var(--table-hover-bg);
+	}
+
+	/* The authors table leads with the rank: the name, next to it, stays
+	   pinned too. The rank column is as wide as three digits, and the name
+	   is pinned that far from the edge. */
+	.table-scroll table.authors tr > .rank {
+		box-sizing: border-box;
+		width: 2.5rem;
+		min-width: 2.5rem;
+		max-width: 2.5rem;
+		padding-left: var(--space-1);
+	}
+
+	.table-scroll table.authors tr > :nth-child(2) {
+		position: sticky;
+		left: 2.5rem;
+		z-index: 1;
+		background-color: var(--bg-color);
+	}
+
+	.table-scroll.is-scrollable table.authors tr > :first-child {
+		box-shadow: none;
+	}
+
+	.table-scroll.is-scrollable table.authors tr > :nth-child(2) {
+		box-shadow: inset -1px 0 0 var(--table-border);
+	}
+
+	.table-scroll table.authors tr:hover > td:nth-child(2) {
 		background-color: var(--table-hover-bg);
 	}
 

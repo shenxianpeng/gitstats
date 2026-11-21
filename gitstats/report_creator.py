@@ -27,6 +27,7 @@ from gitstats.utils import (
     get_git_version,
     get_version,
     tags_newest_first,
+    utc_offset_minutes,
 )
 
 # A table with its chart beside it; the chart wraps below on narrow screens.
@@ -1654,22 +1655,31 @@ class HTMLReportCreator(ReportCreator):
     def _write_commits_by_timezone_section(self, f, data) -> None:
         """Commits per UTC offset as horizontal bars: the busiest offsets,
         then the rest as one row, so that the rows add up to every commit;
-        and every offset, west to east, folded away under them."""
+        and every offset, west to east, folded away under them. Offsets no
+        clock keeps (see utc_offset_minutes()) are one row of their own, at
+        the end."""
         f.write(html_header(2, "Commits by timezone"))
-        by_zone = data.commits_by_timezone
-        total = sum(by_zone.values()) or 1
-        busiest = max(by_zone.values(), default=0) or 1
+        by_zone = {
+            zone: commits
+            for zone, commits in data.commits_by_timezone.items()
+            if utc_offset_minutes(zone) is not None
+        }
+        invalid = sorted(zone for zone in data.commits_by_timezone if zone not in by_zone)
+        unread = sum(data.commits_by_timezone[zone] for zone in invalid)
+        total = sum(data.commits_by_timezone.values()) or 1
+        busiest = max(data.commits_by_timezone.values(), default=0) or 1
         header = (
             '<div class="table-scroll"><table class="share-table">'
             '<tr><th>UTC offset</th><th class="num">Commits</th><th class="num">Share</th>'
             f"{BAR_HEADER}</tr>"
         )
 
-        def row(label: str, commits: int, rest: bool = False) -> str:
+        def row(label: str, commits: int, rest: bool = False, title: str = "") -> str:
             bar = "share-bar share-bar-muted" if rest else "share-bar"
             cls = ' class="share-rest"' if rest else ""
+            hint = f' title="{html.escape(title)}"' if title else ""
             return (
-                f'<tr{cls}><td class="nowrap">{label}</td>'
+                f'<tr{cls}><td class="nowrap"{hint}>{label}</td>'
                 f'<td class="num">{format_int(commits)}</td>'
                 f'<td class="num">{100.0 * commits / total:.1f}%</td>'
                 f'<td class="share-cell"><span class="{bar}" aria-hidden="true">'
@@ -1678,20 +1688,35 @@ class HTMLReportCreator(ReportCreator):
 
         def label(offset: str) -> str:
             # "+0530" -> "UTC+05:30"
-            return f"UTC{offset[:3]}:{offset[3:]}" if len(offset) == 5 else html.escape(offset)
+            return f"UTC{offset[:3]}:{offset[3:]}"
 
-        west_to_east = sorted(by_zone, key=lambda n: int(n))
-        everything = header + "".join(row(label(o), by_zone[o]) for o in west_to_east)
+        # the commits whose machine said an offset no clock keeps, such as +51800
+        unreadable = (
+            row(
+                plural(len(invalid), "invalid offset"),
+                unread,
+                rest=True,
+                title="Recorded as " + ", ".join(invalid),
+            )
+            if invalid
+            else ""
+        )
+        west_to_east = sorted(by_zone, key=lambda zone: utc_offset_minutes(zone) or 0)
+        everything = (
+            header + "".join(row(label(zone), by_zone[zone]) for zone in west_to_east) + unreadable
+        )
         if len(by_zone) <= self.TIMEZONES_SHOWN + 1:
             f.write(everything + "</table></div>")
             return
-        top = sorted(by_zone, key=lambda o: (-by_zone[o], int(o)))[: self.TIMEZONES_SHOWN]
+        top = sorted(by_zone, key=lambda zone: (-by_zone[zone], utc_offset_minutes(zone) or 0))
+        top = top[: self.TIMEZONES_SHOWN]
         others = len(by_zone) - len(top)
-        rest = sum(by_zone.values()) - sum(by_zone[o] for o in top)
+        rest = sum(by_zone.values()) - sum(by_zone[zone] for zone in top)
         f.write(
             header
-            + "".join(row(label(o), by_zone[o]) for o in top)
+            + "".join(row(label(zone), by_zone[zone]) for zone in top)
             + row(f"Remaining {others} offsets", rest, rest=True)
+            + unreadable
             + "</table></div>"
             f'<details class="table-details"><summary>All {len(by_zone)} offsets, '
             f"west to east</summary>{everything}</table></div></details>"
@@ -2090,7 +2115,10 @@ class HTMLReportCreator(ReportCreator):
 
         f.write('<div class="table-scroll"><table class="authors sortable" id="authors">')
         f.write(
-            '<tr><th>Author</th><th class="num">Commits (%)</th><th class="num">+ lines</th><th class="num">- lines</th><th>First commit</th><th>Last commit</th><th class="num">Age</th><th class="num">Active days</th><th class="num"># by commits</th></tr>'
+            '<tr><th class="num rank"><abbr title="Rank by commits">#</abbr></th>'
+            '<th>Author</th><th class="num">Commits (%)</th><th class="num">+ lines</th>'
+            '<th class="num">- lines</th><th>First commit</th><th>Last commit</th>'
+            '<th class="num">Age</th><th class="num">Active days</th></tr>'
         )
         listed = data.get_authors(load_config()["max_authors"])
         top_commits = max((data.get_author_info(a)["commits"] for a in listed), default=0) or 1
@@ -2102,8 +2130,9 @@ class HTMLReportCreator(ReportCreator):
                 f'<span style="width: {100.0 * info["commits"] / top_commits:.1f}%"></span></span>'
             )
             f.write(
-                '<tr><td>%s</td><td class="num">%s (%.1f%%)%s</td><td class="num stat-added">%s</td><td class="num stat-removed">%s</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap num" title="%s" data-sort="%d">%s</td><td class="num">%s</td><td class="num">%d</td></tr>'
+                '<tr><td class="num rank">%d</td><td>%s</td><td class="num">%s (%.1f%%)%s</td><td class="num stat-added">%s</td><td class="num stat-removed">%s</td><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="nowrap num" title="%s" data-sort="%d">%s</td><td class="num">%s</td></tr>'
                 % (
+                    info["place_by_commits"],
                     author_html(author),
                     format_int(info["commits"]),
                     info["commits_frac"],
@@ -2116,7 +2145,6 @@ class HTMLReportCreator(ReportCreator):
                     info["timedelta"].days,
                     format_duration(info["timedelta"]),
                     format_int(len(info["active_days"])),
-                    info["place_by_commits"],
                 )
             )
         f.write("</table></div>")

@@ -822,7 +822,7 @@ def test_bot_badges_in_contributor_tables(mock_data_collector, temp_dir):
     row = index[index.index(f"<td>{badge}</td>") :]
     assert 'class="share-bar share-bar-muted"' in row[: row.index("</tr>")]
     with open(f"{temp_dir}/authors.html", encoding="utf-8") as f:
-        assert f"<tr><td>{badge}</td>" in f.read()  # List of Authors
+        assert f'<tr><td class="num rank">3</td><td>{badge}</td>' in f.read()  # List of Authors
 
 
 def test_index_release_authors_are_capped_and_escaped(mock_data_collector, temp_dir):
@@ -1655,7 +1655,7 @@ def test_numeric_columns_are_marked(mock_data_collector, temp_dir):
         authors = f.read()
     # Alice Smith: 30 commits (60%) with a full-width share bar, +2,000 / -500
     assert (
-        '<tr><td>Alice Smith</td><td class="num">30 (60.0%)'
+        '<tr><td class="num rank">1</td><td>Alice Smith</td><td class="num">30 (60.0%)'
         '<span class="share-bar share-bar-inline" aria-hidden="true">'
         '<span style="width: 100.0%"></span></span></td>'
         '<td class="num stat-added">2,000</td><td class="num stat-removed">500</td>'
@@ -4867,3 +4867,58 @@ def test_overview_charts_have_no_row_gap_side_by_side():
     assert "column-gap: var(--space-7);" in rule
     assert "\tgap:" not in rule
     assert "row-gap" not in rule
+
+
+def test_timezones_put_offsets_no_clock_keeps_in_one_row_at_the_end(mock_data_collector, temp_dir):
+    mock_data_collector.commits_by_timezone = {"+0800": 30, "+51800": 2, "+1900": 1, "-0500": 15}
+    _creator(mock_data_collector).create_activity_html(mock_data_collector, temp_dir)
+    page = _read_page(temp_dir, "activity.html")
+    section = page[page.index('id="commits_by_timezone"') :]
+    section = section[: section.index("</table>")]
+    assert "UTC+51" not in section
+    assert "UTC+19" not in section
+    # west to east, then the invalid ones, counted in the shares
+    assert section.index("UTC-05:00") < section.index("UTC+08:00") < section.index("2 invalid")
+    # 3 of 48 commits
+    assert (
+        '<tr class="share-rest"><td class="nowrap" title="Recorded as +1900, +51800">'
+        '2 invalid offsets</td><td class="num">3</td><td class="num">6.2%'
+    ) in section
+
+
+def test_timezones_fold_with_the_invalid_offsets_last(mock_data_collector, temp_dir):
+    zones = {f"{'+' if h >= 0 else '-'}{abs(h):02d}00": 20 - abs(h) for h in range(-8, 4)}
+    mock_data_collector.commits_by_timezone = {**zones, "+99999": 1}
+    _creator(mock_data_collector).create_activity_html(mock_data_collector, temp_dir)
+    page = _read_page(temp_dir, "activity.html")
+    section = page[page.index('id="commits_by_timezone"') :]
+    shown = section[: section.index('<details class="table-details"')]
+    assert shown.index("Remaining 4 offsets") < shown.index("1 invalid offset<")
+    folded = section[section.index('<details class="table-details"') : section.index("</details>")]
+    assert "<summary>All 12 offsets, west to east</summary>" in folded
+    assert folded.index("UTC+03:00") < folded.index("1 invalid offset<")
+
+
+def test_authors_table_leads_with_the_rank(mock_data_collector, temp_dir):
+    _creator(mock_data_collector).create_authors_html(mock_data_collector, temp_dir)
+    page = _read_page(temp_dir, "authors.html")
+    table = page[page.index('<table class="authors sortable" id="authors">') :]
+    table = table[: table.index("</table>")]
+    assert table.startswith(
+        '<table class="authors sortable" id="authors">'
+        '<tr><th class="num rank"><abbr title="Rank by commits">#</abbr></th><th>Author</th>'
+    )
+    assert "# by commits" not in table
+    assert '<tr><td class="num rank">1</td><td>' in table
+
+
+def test_table_scroll_clips_what_is_placed_absolutely_inside_it():
+    """The bar column's header text for screen readers is placed absolutely:
+    outside a positioned box, it widened the Files page on a phone."""
+    css_path = os.path.join(os.path.dirname(__file__), "..", "gitstats", "gitstats.css")
+    with open(css_path, encoding="utf-8") as f:
+        css = f.read()
+    rule = css[css.index(".table-scroll {") :]
+    rule = rule[: rule.index("}")]
+    assert "position: relative;" in rule
+    assert "overflow-x: auto;" in rule

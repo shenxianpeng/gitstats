@@ -1091,26 +1091,39 @@ def get_log_range(defaultrange: str = "HEAD", end_only: bool = True, authors: bo
     )
 
 
+# The offsets clocks keep: from UTC-12:00 to UTC+14:00
+_OFFSET_RANGE = (-12 * 60, 14 * 60)
+
+
+def utc_offset_minutes(utc_offset: str) -> int | None:
+    """Minutes east of UTC of a commit's offset as git prints it (``+0300``
+    -> 180, ``-0530`` -> -330), or None for one no clock keeps: git records
+    whatever the committing machine said, such as ``+51800`` or ``+1900``."""
+    match = re.fullmatch(r"([+-])(\d{2})(\d{2})", utc_offset.strip())
+    if not match:
+        return None
+    sign, hours, minutes = match.groups()
+    if int(minutes) >= 60:
+        return None
+    total = int(hours) * 60 + int(minutes)
+    total = -total if sign == "-" else total
+    return total if _OFFSET_RANGE[0] <= total <= _OFFSET_RANGE[1] else None
+
+
 def commit_local_time(stamp: float, utc_offset: str) -> datetime.datetime:
     """The moment ``stamp`` on the clock of whoever made the commit.
 
     ``utc_offset`` is the commit's own offset as git prints it (``+0300``,
     ``-0530``), so the result does not depend on the timezone of the machine
     the report is generated on. It is naive, like the report's other
-    datetimes. An offset that cannot be read falls back to this machine's
-    local time.
+    datetimes. An offset that cannot be read, or that no clock keeps (see
+    utc_offset_minutes()), falls back to this machine's local time.
     """
-    match = re.fullmatch(r"([+-])(\d{2})(\d{2})", utc_offset.strip())
-    if match:
-        sign, hours, minutes = match.groups()
-        offset = datetime.timedelta(hours=int(hours), minutes=int(minutes))
-        try:
-            zone = datetime.timezone(-offset if sign == "-" else offset)
-        except ValueError:  # a day or more, which no timezone is
-            zone = None
-        if zone is not None:
-            return datetime.datetime.fromtimestamp(stamp, zone).replace(tzinfo=None)
-    return datetime.datetime.fromtimestamp(stamp)
+    minutes = utc_offset_minutes(utc_offset)
+    if minutes is None:
+        return datetime.datetime.fromtimestamp(stamp)
+    zone = datetime.timezone(datetime.timedelta(minutes=minutes))
+    return datetime.datetime.fromtimestamp(stamp, zone).replace(tzinfo=None)
 
 
 def tags_newest_first(tags: dict[str, Any]) -> list[str]:
