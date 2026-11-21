@@ -32,6 +32,7 @@ from gitstats.report_creator import (
     compute_code_ownership,
     compute_hotspots,
     compute_project_history,
+    first_tag_year,
     gap_annotations,
     get_keys_sorted_by_value_key,
     get_keys_sorted_by_values,
@@ -45,6 +46,8 @@ from gitstats.report_creator import (
     page_title,
     parse_chronicle,
     quiet_months,
+    release_cadence,
+    release_gaps,
     report_share_card_html,
     report_share_description,
     share_meta_html,
@@ -54,6 +57,7 @@ from gitstats.report_creator import (
     sparkline_svg,
     stat_tiles_html,
     sum_since,
+    tag_year,
     tags_newest_first,
     year_span,
 )
@@ -904,9 +908,8 @@ def test_page_summaries_use_stat_tiles(mock_data_collector, temp_dir):
 
     # Tags: v1.1.0 (2023-04-05) is the latest of two; 50 commits / 2 tags
     tags = page("tags.html")
-    assert (
-        '<span class="nowrap">latest v1.1.0</span>&nbsp;&middot; <span class="nowrap">2023-04-05</span>'
-    ) in tags
+    assert '<dt>Latest</dt><dd class="stat-value">v1.1.0</dd>' in tags
+    assert '<dd class="stat-note">2023-04-05</dd>' in tags
     assert '<dt>Commits per Tag</dt><dd class="stat-value">25.0</dd>' in tags
 
     # Ownership and History keep their intro paragraph above the tiles
@@ -934,8 +937,8 @@ def test_create_activity_html(mock_data_collector, temp_dir):
     assert "Month of year" in html
     assert "Commits by year/month" in html
 
-    # Coarse to fine: year, month, week, then the daily rhythm
-    order = ["Commits by year", "Commits by year/month", "Weekly activity", "Punch card"]
+    # The months lead, then coarse to fine: year, week, the daily rhythm
+    order = ["Commits by year/month", "Commits by year", "Weekly activity", "Punch card"]
     positions = [html.index(f">{title}</a></h2>") for title in order]
     assert positions == sorted(positions)
 
@@ -1615,9 +1618,7 @@ def test_commits_by_year_chart_first_table_folded(mock_data_collector, temp_dir)
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     with open(os.path.join(temp_dir, "activity.html"), encoding="utf-8") as f:
         content = f.read()
-    section = content[
-        content.index('id="commits_by_year"') : content.index('<h2 id="commits_by_year/month"')
-    ]
+    section = content[content.index('id="commits_by_year"') : content.index('id="weekly_activity"')]
     assert section.index('id="chart-commits-by-year"') < section.index("<details")
     assert (
         '<details class="table-details"><summary>Table: commits and lines per year '
@@ -2121,7 +2122,7 @@ def test_path_flag_is_drawn_by_css():
     rule = css[css.index("td.path[data-tag]::after {") :]
     rule = rule[: rule.index("}")]
     assert "content: attr(data-tag);" in rule
-    assert "color: var(--warn-color);" in rule
+    assert "color: var(--orange-strong);" in rule
 
 
 def test_hotspots_chart_follows_the_theme(mock_data_collector, temp_dir):
@@ -4716,3 +4717,140 @@ def test_the_lines_chart_says_why_it_ends_elsewhere(mock_data_collector, temp_di
     data.changes_by_date = {1672531200: {"lines": 2000}}
     HTMLReportCreator().create(data, temp_dir)
     assert "That ends at" not in _read_page(temp_dir, "lines.html")
+
+
+# ── The Tags page's cadence, and the folded tables ───────────────────────
+
+
+def _creator(data) -> HTMLReportCreator:
+    creator = HTMLReportCreator()
+    creator.title = data.project_name
+    creator.data = data
+    return creator
+
+
+def _tag(date: str, commits: int = 1) -> dict:
+    return {"date": date, "commits": commits, "authors": {"Alice Smith": commits}}
+
+
+def test_tag_year_and_first_tag_year():
+    assert tag_year(_tag("2026-05-14")) == 2026
+    assert tag_year({"date": ""}) is None
+    assert tag_year({}) is None
+    assert first_tag_year({"a": _tag("2013-01-01"), "b": _tag("2011-06-01")}) == "2011"
+    assert first_tag_year({"a": {"date": "unknown"}}) == "the start"
+
+
+def test_release_gaps_count_days_since_the_previous_release_date():
+    tags = {
+        "v1": _tag("2026-01-01"),
+        "v2": _tag("2026-01-11"),
+        # an alias made the same day has the same gap
+        "v2-alias": _tag("2026-01-11"),
+        "v3": _tag("2026-02-10"),
+        "broken": {"date": "not a date"},
+    }
+    assert release_gaps(tags) == {"v2": 10, "v2-alias": 10, "v3": 30}
+
+
+def test_release_cadence_is_the_median_overall_and_over_the_last_five_years():
+    dates = ["2011-01-01", "2011-01-03", "2011-01-05", "2011-01-07"]
+    dates += ["2022-01-01", "2022-01-21", "2022-02-10", "2026-01-01"]
+    tags = {f"v{i}": _tag(date) for i, date in enumerate(dates)}
+    overall, recent, since = release_cadence(tags)
+    assert since == 2022
+    # gaps: 2, 2, 2, ~4000, 20, 20, ~1421
+    assert overall == 20
+    # between releases since 2022: 20, 20 and 1421 days (not the ~4000 before)
+    assert recent == 20
+
+
+def test_release_cadence_leaves_out_recent_years_that_are_the_whole_history():
+    tags = {"a": _tag("2025-01-01"), "b": _tag("2025-01-11"), "c": _tag("2025-01-31")}
+    assert release_cadence(tags) == (15, None, 2021)
+    # one release date is no cadence
+    assert release_cadence({"a": _tag("2025-01-01"), "b": _tag("2025-01-01")}) is None
+    assert release_cadence({}) is None
+
+
+def test_tags_page_leads_with_releases_per_year_and_folds_the_table(mock_data_collector, temp_dir):
+    tags = {f"v1.{i}": _tag(f"{2015 + i // 2}-0{1 + i % 2 * 5}-15", i + 1) for i in range(12)}
+    for i, name in enumerate(tags):
+        tags[name]["order"] = 12 - i
+    mock_data_collector.tags = tags
+    _creator(mock_data_collector).create_tags_html(mock_data_collector, temp_dir)
+    page = _read_page(temp_dir, "tags.html")
+
+    assert '<section class="lead-section">' in page
+    assert 'id="chart-tags-per-year"' in page
+    assert "12 tags from 2015 to 2020. The most were in 2015, with 2; 2 in 2020." in page
+    assert "<dt>Days between Releases</dt>" in page
+    # Jan to Jun is 151 days (152 in a leap year), Jun to Jan 214: the median
+    # of the 11 gaps, and of the 9 between the releases since 2016, is 152
+    assert '<dt>Days between Releases</dt><dd class="stat-value">152</dd>' in page
+    assert '<span class="nowrap">152 since 2016</span>' in page
+    assert "<dt>Tags</dt>" in page
+    assert "since 2015" in page
+
+    latest = page[page.index('id="latest_tags"') : page.index('<details class="table-details"')]
+    assert latest.count("<tr><td") == HTMLReportCreator.TAGS_SHOWN
+    assert '<td class="nowrap">v1.11</td>' in latest
+    assert '<td class="nowrap">v1.3</td>' not in latest
+    assert 'id="tags"' not in latest
+    folded = page[page.index('<details class="table-details"') :]
+    assert (
+        '<summary>All 12 tags</summary><div class="table-scroll">'
+        '<table class="tags sortable" id="tags">'
+    ) in folded
+    assert folded.count("<tr><td") == 12
+    # the oldest tag has no release before it
+    assert (
+        '<td class="nowrap">v1.0</td><td class="nowrap">2015-01-15</td><td class="num">&mdash;</td>'
+    ) in folded
+
+
+def test_tags_page_without_a_cadence_or_dates(mock_data_collector, temp_dir):
+    mock_data_collector.tags = {"v1": {"date": "", "commits": 3, "authors": {"Alice Smith": 3}}}
+    _creator(mock_data_collector).create_tags_html(mock_data_collector, temp_dir)
+    page = _read_page(temp_dir, "tags.html")
+    assert "since the start" in page
+    assert "Days between Releases" not in page
+    assert "chart-tags-per-year" not in page
+    assert 'id="all_tags"' in page
+
+
+def test_activity_page_leads_with_the_months(mock_data_collector, temp_dir):
+    _creator(mock_data_collector).create_activity_html(mock_data_collector, temp_dir)
+    page = _read_page(temp_dir, "activity.html")
+    lead = page[page.index('<section class="lead-section">') : page.index("</section>")]
+    assert 'id="chart-commits-by-year-month"' in lead
+    busiest = max(
+        mock_data_collector.commits_by_month, key=mock_data_collector.commits_by_month.get
+    )
+    count = mock_data_collector.commits_by_month[busiest]
+    month = HTMLReportCreator.MONTH_NAMES[int(busiest[5:]) - 1]
+    assert f"The busiest was {month} {busiest[:4]}, with {count} commits.</p>" in lead
+
+
+def test_activity_page_without_commits_names_no_busiest_month(mock_data_collector, temp_dir):
+    mock_data_collector.commits_by_month = {}
+    _creator(mock_data_collector).create_activity_html(mock_data_collector, temp_dir)
+    assert "The busiest was" not in _read_page(temp_dir, "activity.html")
+
+
+def test_timezones_list_the_busiest_then_the_rest_with_all_folded(mock_data_collector, temp_dir):
+    zones = {f"{'+' if h >= 0 else '-'}{abs(h):02d}00": 20 - abs(h) for h in range(-8, 4)}
+    mock_data_collector.commits_by_timezone = zones
+    _creator(mock_data_collector).create_activity_html(mock_data_collector, temp_dir)
+    page = _read_page(temp_dir, "activity.html")
+    section = page[page.index('id="commits_by_timezone"') :]
+    shown = section[: section.index('<details class="table-details"')]
+    # the eight busiest, from the busiest, then the other four as one row
+    assert shown.index("UTC+00:00") < shown.index("UTC-01:00") < shown.index("UTC+01:00")
+    assert "UTC-08:00" not in shown
+    assert '<tr class="share-rest"><td class="nowrap">Remaining 4 offsets</td>' in shown
+    assert 'class="share-bar share-bar-muted"' in shown
+    folded = section[section.index('<details class="table-details"') : section.index("</details>")]
+    assert "<summary>All 12 offsets, west to east</summary>" in folded
+    assert folded.index("UTC-08:00") < folded.index("UTC+00:00") < folded.index("UTC+03:00")
+    assert "Remaining" not in folded
