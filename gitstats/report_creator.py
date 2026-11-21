@@ -1330,9 +1330,10 @@ class HTMLReportCreator(ReportCreator):
 
         self._write_activity_intro(f, data)
 
-        # From the long view down to the daily rhythm
-        self._write_commits_by_year_section(f, data)
+        # The months lead: the whole history at the grain where its busy and
+        # quiet stretches show; then the years, down to the daily rhythm
         self._write_commits_by_year_month_section(f, data)
+        self._write_commits_by_year_section(f, data)
         self._write_weekly_activity_section(f, data)
         self._write_punch_card_section(f, data)
         # Month of year and timezones side by side (stacked on narrow screens)
@@ -1348,8 +1349,8 @@ class HTMLReportCreator(ReportCreator):
 
     # The Activity page's sections, in page order, for its "On this page" links
     ACTIVITY_SECTIONS = (
-        ("Commits by year", "By year"),
         ("Commits by year/month", "By month"),
+        ("Commits by year", "By year"),
         ("Weekly activity", "Last weeks"),
         ("Punch card", "Punch card"),
         ("Month of year", "Month of year"),
@@ -1545,10 +1546,19 @@ class HTMLReportCreator(ReportCreator):
         )
 
     def _write_commits_by_year_month_section(self, f, data) -> None:
-        """Write commits by year/month: the chart, with the per-month table folded away."""
-        f.write(html_header(2, "Commits by year/month"))
+        """Write commits by year/month, the page's lead section: a sentence
+        naming the busiest month, the chart, and the per-month table folded
+        away."""
+        f.write('<section class="lead-section">' + html_header(2, "Commits by year/month"))
         cbym_keys = month_range(data.commits_by_month.keys())
         cbym_values = [data.commits_by_month.get(k, 0) for k in cbym_keys]
+        if any(cbym_values):
+            busiest = cbym_keys[cbym_values.index(max(cbym_values))]
+            name = f"{self.MONTH_NAMES[int(busiest[5:]) - 1]} {busiest[:4]}"
+            f.write(
+                f'<p class="section-note">{plural(len(cbym_keys), "month")}. The busiest '
+                f"was {name}, with {plural(max(cbym_values), 'commit')}.</p>"
+            )
         f.write(
             self._render_chartjs(
                 "chart-commits-by-year-month",
@@ -1578,7 +1588,7 @@ class HTMLReportCreator(ReportCreator):
                     format_int(data.lines_removed_by_month.get(yymm, 0)),
                 )
             )
-        f.write("</table></div></details>")
+        f.write("</table></div></details></section>")
 
     def _write_commits_by_year_section(self, f, data) -> None:
         """Commits by year: the chart, with the per-year table folded away below it
@@ -1638,27 +1648,53 @@ class HTMLReportCreator(ReportCreator):
         )
         f.write(f"</table></div>{note}</details>")
 
+    # The time zones the Activity page lists before summing up the rest
+    TIMEZONES_SHOWN = 8
+
     def _write_commits_by_timezone_section(self, f, data) -> None:
-        """Commits per UTC offset, west to east, as horizontal bars."""
+        """Commits per UTC offset as horizontal bars: the busiest offsets,
+        then the rest as one row, so that the rows add up to every commit;
+        and every offset, west to east, folded away under them."""
         f.write(html_header(2, "Commits by timezone"))
-        total = sum(data.commits_by_timezone.values()) or 1
-        busiest = max(data.commits_by_timezone.values(), default=0) or 1
-        rows = []
-        for offset in sorted(data.commits_by_timezone, key=lambda n: int(n)):
-            commits = data.commits_by_timezone[offset]
-            # "+0530" -> "UTC+05:30"
-            label = f"UTC{offset[:3]}:{offset[3:]}" if len(offset) == 5 else html.escape(offset)
-            rows.append(
-                f'<tr><td class="nowrap">{label}</td>'
-                f'<td class="num">{format_int(commits)}</td>'
-                f'<td class="num">{100.0 * commits / total:.1f}%</td>'
-                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
-                f'<span style="width: {100.0 * commits / busiest:.1f}%"></span></span></td></tr>'
-            )
-        f.write(
+        by_zone = data.commits_by_timezone
+        total = sum(by_zone.values()) or 1
+        busiest = max(by_zone.values(), default=0) or 1
+        header = (
             '<div class="table-scroll"><table class="share-table">'
             '<tr><th>UTC offset</th><th class="num">Commits</th><th class="num">Share</th>'
-            f"{BAR_HEADER}</tr>" + "".join(rows) + "</table></div>"
+            f"{BAR_HEADER}</tr>"
+        )
+
+        def row(label: str, commits: int, rest: bool = False) -> str:
+            bar = "share-bar share-bar-muted" if rest else "share-bar"
+            cls = ' class="share-rest"' if rest else ""
+            return (
+                f'<tr{cls}><td class="nowrap">{label}</td>'
+                f'<td class="num">{format_int(commits)}</td>'
+                f'<td class="num">{100.0 * commits / total:.1f}%</td>'
+                f'<td class="share-cell"><span class="{bar}" aria-hidden="true">'
+                f'<span style="width: {100.0 * commits / busiest:.1f}%"></span></span></td></tr>'
+            )
+
+        def label(offset: str) -> str:
+            # "+0530" -> "UTC+05:30"
+            return f"UTC{offset[:3]}:{offset[3:]}" if len(offset) == 5 else html.escape(offset)
+
+        west_to_east = sorted(by_zone, key=lambda n: int(n))
+        everything = header + "".join(row(label(o), by_zone[o]) for o in west_to_east)
+        if len(by_zone) <= self.TIMEZONES_SHOWN + 1:
+            f.write(everything + "</table></div>")
+            return
+        top = sorted(by_zone, key=lambda o: (-by_zone[o], int(o)))[: self.TIMEZONES_SHOWN]
+        others = len(by_zone) - len(top)
+        rest = sum(by_zone.values()) - sum(by_zone[o] for o in top)
+        f.write(
+            header
+            + "".join(row(label(o), by_zone[o]) for o in top)
+            + row(f"Remaining {others} offsets", rest, rest=True)
+            + "</table></div>"
+            f'<details class="table-details"><summary>All {len(by_zone)} offsets, '
+            f"west to east</summary>{everything}</table></div></details>"
         )
 
     def _build_author_time_series(self, data):
@@ -2433,67 +2469,125 @@ class HTMLReportCreator(ReportCreator):
         f.write("</body></html>")
         f.close()
 
+    # The tags the Tags page lists before folding the rest away
+    TAGS_SHOWN = 8
+
     def create_tags_html(self, data: Any, path: str) -> None:
-        ###
-        # tags.html
+        """The Tags page: the headline numbers, the releases of each year,
+        and the latest tags, with every tag folded away under them."""
         f = open(path + "/tags.html", "w", encoding="utf-8")
         self.print_header(f, TAGS_PAGE)
         self.print_nav(f, TAGS_PAGE)
         f.write("<h1>Tags</h1>")
 
-        if data.tags:
-            latest = tags_newest_first(data.tags)[0]
-            f.write(
-                stat_tiles_html(
-                    [
-                        (
-                            "Tags",
-                            format_int(len(data.tags)),
-                            f"latest {html.escape(latest)} &middot; {data.tags[latest]['date']}",
-                        ),
-                        (
-                            "Commits per Tag",
-                            f"{data.get_total_commits() / len(data.tags):.1f}",
-                            f"{plural(data.get_total_commits(), 'commit')} in total",
-                        ),
-                    ]
-                )
-            )
-        else:
+        if not data.tags:
             f.write(stat_tiles_html([("Tags", "0", "no tags yet")]))
+            self.print_footer(f)
+            f.write("</body></html>")
+            f.close()
+            return
 
-        if data.tags:
-            f.write(html_header(2, "All tags"))
-            f.write(
-                '<p class="section-note">Newest first. Commits are those since the '
-                "previous tag, and the authors who made them.</p>"
+        newest = tags_newest_first(data.tags)
+        latest = newest[0]
+        gaps = release_gaps(data.tags)
+        tiles = [
+            ("Tags", format_int(len(data.tags)), f"since {first_tag_year(data.tags)}"),
+            ("Latest", html.escape(latest), data.tags[latest]["date"]),
+        ]
+        cadence = release_cadence(data.tags)
+        if cadence:
+            overall, recent, since = cadence
+            note = "median"
+            if recent is not None:
+                note += f" &middot; {format_int(recent)} since {since}"
+            tiles.append(("Days between Releases", format_int(overall), note))
+        tiles.append(
+            (
+                "Commits per Tag",
+                f"{data.get_total_commits() / len(data.tags):.1f}",
+                f"{plural(data.get_total_commits(), 'commit')} in total",
             )
-            f.write('<div class="table-scroll"><table class="tags sortable" id="tags">')
-            f.write(
-                '<tr><th data-sort-as="text">Name</th><th>Date</th><th class="num">Commits</th>'
-                '<th class="unsortable">Authors</th></tr>'
-            )
+        )
+        f.write(stat_tiles_html(tiles))
+
+        f.write(self._tags_per_year_html(data))
+
+        def table(tags: list[str], table_id: str = "") -> str:
             max_tags_authors = load_config()["max_tags_authors"]
-            for tag in tags_newest_first(data.tags):
-                self.authors_by_commits = get_keys_sorted_by_values(data.tags[tag]["authors"])
-                f.write(
-                    '<tr><td class="nowrap">%s</td><td class="nowrap">%s</td><td class="num">%s</td><td>%s</td></tr>'
-                    % (
-                        html.escape(tag),
-                        data.tags[tag]["date"],
-                        format_int(data.tags[tag]["commits"]),
-                        tag_authors_html(
-                            list(reversed(self.authors_by_commits)),
-                            data.tags[tag]["authors"],
-                            max_tags_authors,
-                        ),
-                    )
+            rows = []
+            for tag in tags:
+                info = data.tags[tag]
+                authors = get_keys_sorted_by_values(info["authors"])
+                gap = gaps.get(tag)
+                rows.append(
+                    f'<tr><td class="nowrap">{html.escape(tag)}</td>'
+                    f'<td class="nowrap">{info["date"]}</td>'
+                    f'<td class="num">{"&mdash;" if gap is None else format_int(gap)}</td>'
+                    f'<td class="num">{format_int(info["commits"])}</td>'
+                    f"<td>{tag_authors_html(list(reversed(authors)), info['authors'], max_tags_authors)}"
+                    "</td></tr>"
                 )
-            f.write("</table></div>")
+            sortable = f' sortable" id="{table_id}' if table_id else ""
+            return (
+                f'<div class="table-scroll"><table class="tags{sortable}">'
+                '<tr><th data-sort-as="text">Name</th><th>Date</th>'
+                '<th class="num"><abbr title="Days since the release before it">Days</abbr></th>'
+                '<th class="num">Commits</th><th class="unsortable">Authors</th></tr>'
+                + "".join(rows)
+                + "</table></div>"
+            )
+
+        note = (
+            '<p class="section-note">Newest first. Days are those since the release '
+            "before; commits are those since the previous tag, and the authors who "
+            "made them.</p>"
+        )
+        if len(newest) <= self.TAGS_SHOWN + 1:
+            f.write(html_header(2, "All tags") + note + table(newest, "tags"))
+        else:
+            f.write(
+                html_header(2, "Latest tags")
+                + note
+                + table(newest[: self.TAGS_SHOWN])
+                + f'<details class="table-details"><summary>All {format_int(len(newest))} '
+                f"tags</summary>{table(newest, 'tags')}</details>"
+            )
 
         self.print_footer(f)
         f.write("</body></html>")
         f.close()
+
+    def _tags_per_year_html(self, data: Any) -> str:
+        """The page's lead: the tags of each year, from the first to the last,
+        when they span more than one year."""
+        per_year: dict[int, int] = {}
+        for info in data.tags.values():
+            year = tag_year(info)
+            if year is not None:
+                per_year[year] = per_year.get(year, 0) + 1
+        if len(per_year) < 2:
+            return ""
+        years = list(range(min(per_year), max(per_year) + 1))
+        values = [per_year.get(year, 0) for year in years]
+        most = years[values.index(max(values))]
+        note = (
+            f"{plural(sum(values), 'tag')} from {years[0]} to {years[-1]}. The most were "
+            f"in {most}, with {format_int(max(values))}; {format_int(values[-1])} in {years[-1]}."
+        )
+        return (
+            '<section class="lead-section">'
+            + html_header(2, "Releases per year")
+            + f'<p class="section-note">{note}</p>'
+            + self._render_chartjs(
+                "chart-tags-per-year",
+                "bar",
+                years,
+                [{"label": "Tags", "data": values}],
+                aspect_ratio=4,
+                annotations={"values": True},
+            )
+            + "</section>"
+        )
 
     def create_badges_html(self, data: Any, path: str) -> None:
         """Create the Badges page: every badge, ready to copy into a README.
@@ -4935,6 +5029,65 @@ FIRST_PARENT_LINES = (
     "commit against its first parent), where the lines of a branch count in the "
     "year it was merged, not in the years its commits were made."
 )
+
+
+def tag_year(info: dict[str, Any]) -> int | None:
+    """The year of a tag's date ("2026-05-14"), or None without one."""
+    date = str(info.get("date", ""))
+    return int(date[:4]) if date[:4].isdigit() else None
+
+
+def first_tag_year(tags: dict[str, Any]) -> str:
+    """The year of the oldest tag, or "the start" when no tag has a date."""
+    years = [year for year in (tag_year(info) for info in tags.values()) if year is not None]
+    return str(min(years)) if years else "the start"
+
+
+def _release_dates(tags: dict[str, Any]) -> list[datetime.date]:
+    """The distinct dates tags were made on, oldest first."""
+    dates = set()
+    for info in tags.values():
+        try:
+            dates.add(datetime.date.fromisoformat(str(info.get("date", ""))[:10]))
+        except ValueError:
+            continue
+    return sorted(dates)
+
+
+def release_gaps(tags: dict[str, Any]) -> dict[str, int]:
+    """For each tag, the days since the release before it: the latest
+    earlier date a tag was made on, so that two tags of one day (a version
+    and its alias) have the same gap. The oldest tags, and those without a
+    date, have none."""
+    dates = _release_dates(tags)
+    before = {later: (later - earlier).days for earlier, later in zip(dates, dates[1:])}
+    gaps = {}
+    for tag, info in tags.items():
+        try:
+            date = datetime.date.fromisoformat(str(info.get("date", ""))[:10])
+        except ValueError:
+            continue
+        if date in before:
+            gaps[tag] = before[date]
+    return gaps
+
+
+def release_cadence(tags: dict[str, Any]) -> tuple[int, int | None, int] | None:
+    """The median days between releases over all of them, and between the
+    releases of the last five calendar years (the year of the latest and
+    the four before) with the year they start in; the second is None when those years are
+    the whole history or hold fewer than two gaps. None for fewer than two
+    release dates."""
+    dates = _release_dates(tags)
+    if len(dates) < 2:
+        return None
+    gaps = [(earlier, (later - earlier).days) for earlier, later in zip(dates, dates[1:])]
+    overall = round(statistics.median(days for _, days in gaps))
+    since = dates[-1].year - 4
+    recent = [days for earlier, days in gaps if earlier.year >= since]
+    if dates[0].year >= since or len(recent) < 2:
+        return overall, None, since
+    return overall, round(statistics.median(recent)), since
 
 
 # A tag's authors the Tags page lists before folding the rest away: a release
