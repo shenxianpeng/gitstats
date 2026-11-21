@@ -559,14 +559,21 @@ def test_print_nav_without_ai():
     creator.print_nav(f)
     output = f.getvalue()
 
-    # the groups, each linking to its first page; on no page of a group, no tabs
-    assert (
-        '<ul class="nav-groups"><li><a href="index.html">Overview</a></li>'
-        '<li><a href="authors.html">People</a></li>'
-        '<li><a href="hotspots.html">Code</a></li>'
-        '<li><a href="activity.html">Timeline</a></li></ul>'
-    ) in output
-    assert "nav-tabs" not in output
+    # every page in one row, group by group, a divider before each group after the first
+    row = re.search(r'<ul class="nav-pages">(.*?)</ul>', output)[1]
+    assert re.findall(r'<li( class="nav-group-start")?><a href="([^"]+)">', row) == [
+        ("", "index.html"),
+        ("", "badges.html"),
+        (' class="nav-group-start"', "authors.html"),
+        ("", "ownership.html"),
+        (' class="nav-group-start"', "hotspots.html"),
+        ("", "files.html"),
+        ("", "lines.html"),
+        (' class="nav-group-start"', "activity.html"),
+        ("", "history.html"),
+        ("", "tags.html"),
+    ]
+    assert '<a href="index.html">General</a>' in row
     assert "AI Insights" not in output
 
 
@@ -578,12 +585,16 @@ def test_print_nav_with_ai():
     creator.data.ai_summaries = {"index": {"summary": "test"}}
 
     f = StringIO()
-    creator.print_nav(f, "index.html")
+    creator.print_nav(f)
     output = f.getvalue()
 
-    # in the overview's group, after the summary
-    tabs = re.search(r'<ul class="nav-tabs" aria-label="Overview">(.*?)</ul>', output)[1]
-    assert re.findall(r'href="([^"]+)"', tabs) == ["index.html", "ai-insights.html", "badges.html"]
+    # after the summary, in the overview's group
+    row = re.search(r'<ul class="nav-pages">(.*?)</ul>', output)[1]
+    assert re.findall(r'href="([^"]+)"', row)[:3] == [
+        "index.html",
+        "ai-insights.html",
+        "badges.html",
+    ]
 
 
 def test_print_nav_has_github_link():
@@ -613,18 +624,30 @@ def test_print_nav_marks_current_page():
     creator.data.ai_summaries = {}
 
     f = StringIO()
-    creator.print_nav(f, "ownership.html")
+    creator.print_nav(f, "authors.html")
     output = f.getvalue()
 
-    # the group is the current one, and its pages are tabs, this one current
-    assert '<a href="authors.html" class="active" aria-current="true">People</a>' in output
     assert (
-        '<ul class="nav-tabs" aria-label="People"><li><a href="authors.html">Authors</a></li>'
-        '<li><a href="ownership.html" class="active" aria-current="page">Code Ownership</a></li>'
-        "</ul>"
+        '<li class="nav-group-start"><a href="authors.html" class="active" aria-current="page">'
+        "Authors</a></li>"
     ) in output
-    assert output.count('aria-current="page"') == 1
-    assert '<a href="index.html">Overview</a>' in output
+    assert '<a href="index.html">General</a>' in output
+    # once in the row of links and once in the menu a phone shows in its place
+    assert output.count('aria-current="page"') == 2
+    assert (
+        '<details class="nav-menu"><summary><span class="nav-menu-label">Page</span> '
+        "Authors</summary><ul>"
+    ) in output
+    # the menu has each group's name over its pages, every page once
+    menu = output[output.index('<details class="nav-menu">') : output.index("</details>")]
+    assert re.findall(r'<li class="nav-menu-heading" aria-hidden="true">([^<]+)</li>', menu) == [
+        "Overview",
+        "People",
+        "Code",
+        "Timeline",
+    ]
+    assert re.findall(r"<a [^>]*>([^<>]+)</a>", menu) == [label for _, label in NAV_PAGES]
+    assert "nav-group-start" not in menu
 
 
 @pytest.mark.parametrize(
@@ -647,9 +670,8 @@ def test_each_page_marks_itself_current(mock_data_collector, temp_dir, page):
     with open(os.path.join(temp_dir, page), encoding="utf-8") as f:
         content = f.read()
     assert f'<a href="{page}" class="active" aria-current="page">' in content
-    # its tab, under the group the nav bar marks
-    assert content.count('aria-current="page"') == 1
-    assert content.count('aria-current="true"') == 1
+    # the row of links, and the menu that replaces it on a phone
+    assert content.count('aria-current="page"') == 2
 
 
 # ── HTMLReportCreator.create_index_html ──────────────────────────────────
@@ -3364,16 +3386,24 @@ def test_overview_links_the_badges_page(mock_data_collector, temp_dir):
     assert "badges.html" not in re.search(r'<p class="page-meta">(.*?)</p>', content)[1]
 
 
-def test_nav_groups_the_pages_by_question(mock_data_collector, temp_dir):
+def test_nav_lists_the_pages_group_by_group(mock_data_collector, temp_dir):
     HTMLReportCreator().create(mock_data_collector, temp_dir)
     with open(os.path.join(temp_dir, "index.html"), encoding="utf-8") as f:
-        nav = f.read().split('<ul class="nav-groups">', 1)[1].split("</ul>", 1)[0]
-    assert re.findall(r">([^<]+)</a></li>", nav) == ["Overview", "People", "Code", "Timeline"]
-    # every page is in one group, once
-    assert sorted(page for page, _ in NAV_PAGES) == sorted(
-        {page for _, pages in NAV_GROUPS for page, _ in pages}
-    )
-    assert len(NAV_PAGES) == 10
+        nav = f.read().split('<ul class="nav-pages">', 1)[1].split("</ul>", 1)[0]
+    labels = re.findall(r'<a href="[^"]+\.html"[^>]*>([^<]+)</a></li>', nav)
+    assert labels == [
+        "General",
+        "Badges",
+        "Authors",
+        "Code Ownership",
+        "Hotspots",
+        "Files",
+        "Lines",
+        "Activity",
+        "History",
+        "Tags",
+    ]
+    assert [name for name, _ in NAV_GROUPS] == ["Overview", "People", "Code", "Timeline"]
 
 
 def test_authors_sections_order(mock_data_collector, temp_dir):

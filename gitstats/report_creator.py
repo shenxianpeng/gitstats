@@ -451,10 +451,10 @@ TAGS_PAGE = "tags.html"
 # The pages, by the question each group answers: how the project is doing
 # (the overview, and the badges that put it in a README), who works on it
 # and who knows what, what the code is and where it hurts, and how its pace
-# has gone. The nav bar has the groups; the pages of the current group are
-# tabs under it. A group's first page is where its link goes.
+# has gone. The nav bar lists every page in this order, a divider between
+# groups; a phone's menu has each group's name over its pages.
 NAV_GROUPS: tuple[tuple[str, tuple[tuple[str, str], ...]], ...] = (
-    ("Overview", ((INDEX_PAGE, "Summary"), (BADGES_PAGE, "Badges"))),
+    ("Overview", ((INDEX_PAGE, "General"), (BADGES_PAGE, "Badges"))),
     ("People", ((AUTHORS_PAGE, "Authors"), (OWNERSHIP_PAGE, "Code Ownership"))),
     ("Code", ((HOTSPOTS_PAGE, "Hotspots"), (FILES_PAGE, "Files"), (LINES_PAGE, "Lines"))),
     (
@@ -533,30 +533,32 @@ def nav_link(href: str, label: str, current: str | None = None) -> str:
     return f'<li><a href="{href}">{label}</a></li>'
 
 
-def nav_groups_html(current: str | None, has_ai: bool) -> tuple[str, str]:
-    """The nav bar's links to the groups of pages (see NAV_GROUPS), and the
-    tabs of the pages in the current page's group, "" on a page in none.
+def nav_html(current: str | None, has_ai: bool) -> tuple[str, str]:
+    """The nav bar's row of links to every page, and the menu that stands in
+    for it on a phone.
 
-    The link to the current page's group is marked as the current one: the
-    group, not the page, which its tab marks. The AI Insights page, when the
-    report has one, is in the overview's group after the summary.
+    The pages come group by group (see NAV_GROUPS): in the row, the first of
+    a group after the first has a divider before it; in the menu, each group
+    has its name over its pages. The AI Insights page, when the report has
+    one, comes after the summary.
     """
-    links = []
-    tabs = ""
-    for name, pages in NAV_GROUPS:
+    row = []
+    menu = []
+    for number, (name, pages) in enumerate(NAV_GROUPS):
         if has_ai and pages[0][0] == INDEX_PAGE:
             pages = (pages[0], AI_PAGE, *pages[1:])
-        href = pages[0][0]
-        if any(page == current for page, _ in pages):
-            links.append(f'<li><a href="{href}" class="active" aria-current="true">{name}</a></li>')
-            tabs = (
-                f'<ul class="nav-tabs" aria-label="{name}">'
-                + "".join(nav_link(page, label, current) for page, label in pages)
-                + "</ul>"
-            )
-        else:
-            links.append(f'<li><a href="{href}">{name}</a></li>')
-    return '<ul class="nav-groups">' + "".join(links) + "</ul>", tabs
+        links = [nav_link(page, label, current) for page, label in pages]
+        # the name is for the eye: a screen reader has the page names
+        menu += [f'<li class="nav-menu-heading" aria-hidden="true">{name}</li>', *links]
+        if number:
+            links[0] = links[0].replace("<li>", '<li class="nav-group-start">', 1)
+        row += links
+    label = dict(NAV_PAGES + (AI_PAGE,)).get(current or "", "Menu")
+    return (
+        '<ul class="nav-pages">' + "".join(row) + "</ul>",
+        '<details class="nav-menu"><summary><span class="nav-menu-label">Page</span> '
+        f"{label}</summary><ul>{''.join(menu)}</ul></details>",
+    )
 
 
 # The Badges page: its sections, and each badge's name and what it shows
@@ -3794,7 +3796,11 @@ class HTMLReportCreator(ReportCreator):
         """
         # Check if AI insights are available
         has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
-        groups, tabs = nav_groups_html(current, has_ai)
+        # On a phone the row of links shows three or four of the pages and the
+        # rest by scrolling sideways, which nothing on screen says. There the
+        # same links are a menu named after the current page: a <details>, so
+        # it opens where the page's scripts do not run.
+        row, menu = nav_html(current, has_ai)
         github_icon = (
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" '
             'fill="currentColor" aria-hidden="true">'
@@ -3812,12 +3818,12 @@ class HTMLReportCreator(ReportCreator):
             f"""
             {NAV_START}
             {REPORT_BRAND}
-            {groups}
+            {row}
+            {menu}
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub">{github_icon}</a>
             {THEME_TOGGLE_BUTTON}
             </div>
-            {tabs}
             {NAV_END}
             """
         )

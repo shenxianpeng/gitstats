@@ -377,12 +377,13 @@ Features
 
 Here is a list of some features of ``gitstats``:
 
-A report's pages are in four groups, by the question each answers; the nav bar
-has the groups, and the pages of the current one are tabs under it.
+A report's pages are in four groups, by the question each answers. The nav bar
+lists every page, group by group, with a divider between groups; on a phone its
+page menu has each group's name over its pages.
 
 * **Overview**, how the project is doing:
 
-  * *Summary*: what is worth a look first (a low bus factor, a few authors with most of the commits, a few files with most of the hotspot score, a year much busier or quieter than the one before), each with the page that shows it; headline numbers (commits, authors, lines, files, active days, latest release); commits per year and in each of the last 12 months; top contributors; latest releases.
+  * *General*: what is worth a look first (a low bus factor, a few authors with most of the commits, a few files with most of the hotspot score, a year much busier or quieter than the one before), each with the page that shows it; headline numbers (commits, authors, lines, files, active days, latest release); commits per year and in each of the last 12 months; top contributors; latest releases.
   * *Badges*: badges for a README, ready to copy, from the report's numbers.
 
 * **People**, who works on it and who knows what:
