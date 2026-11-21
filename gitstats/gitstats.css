@@ -333,7 +333,9 @@ dd {
 .overview-charts {
 	display: grid;
 	grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-	gap: var(--space-7);
+	/* no row gap: side by side, the rows are the sections' heading, sentence,
+	   chart and footnote (see the subgrid below) */
+	column-gap: var(--space-7);
 	margin-top: var(--space-7);
 }
 
@@ -364,8 +366,10 @@ dd {
 }
 
 @media (max-width: 900px) {
+	/* stacked, the rows are the two sections */
 	.overview-charts {
 		grid-template-columns: minmax(0, 1fr);
+		row-gap: var(--space-7);
 	}
 
 	/* a chart that was a third of the width is now all of it */
