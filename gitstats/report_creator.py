@@ -436,22 +436,33 @@ THEME_TOGGLE_BUTTON = (
 # heading), and the header row becomes the sort controls. See gitstats.css.
 FILE_TABLE = "file-table"
 
-# Most-read first: the overview, then who and when, what is at risk (knowledge
-# held by one person, then large files that keep changing), the code itself,
-# the story, and the reference lists; the Badges tool comes last
-NAV_PAGES = (
-    ("index.html", "General"),
-    ("activity.html", "Activity"),
-    ("authors.html", "Authors"),
-    ("ownership.html", "Code Ownership"),
-    ("hotspots.html", "Hotspots"),
-    ("files.html", "Files"),
-    ("history.html", "History"),
-    ("lines.html", "Lines"),
-    ("tags.html", "Tags"),
-    ("badges.html", "Badges"),
-)
+# The pages' files, named once
+INDEX_PAGE = "index.html"
+BADGES_PAGE = "badges.html"
+AUTHORS_PAGE = "authors.html"
+OWNERSHIP_PAGE = "ownership.html"
+HOTSPOTS_PAGE = "hotspots.html"
+FILES_PAGE = "files.html"
+LINES_PAGE = "lines.html"
+ACTIVITY_PAGE = "activity.html"
+HISTORY_PAGE = "history.html"
+TAGS_PAGE = "tags.html"
 
+# The pages, by the question each group answers: how the project is doing
+# (the overview, and the badges that put it in a README), who works on it
+# and who knows what, what the code is and where it hurts, and how its pace
+# has gone. The nav bar lists every page in this order, a divider between
+# groups; a phone's menu has each group's name over its pages.
+NAV_GROUPS: tuple[tuple[str, tuple[tuple[str, str], ...]], ...] = (
+    ("Overview", ((INDEX_PAGE, "General"), (BADGES_PAGE, "Badges"))),
+    ("People", ((AUTHORS_PAGE, "Authors"), (OWNERSHIP_PAGE, "Code Ownership"))),
+    ("Code", ((HOTSPOTS_PAGE, "Hotspots"), (FILES_PAGE, "Files"), (LINES_PAGE, "Lines"))),
+    (
+        "Timeline",
+        ((ACTIVITY_PAGE, "Activity"), (HISTORY_PAGE, "History"), (TAGS_PAGE, "Tags")),
+    ),
+)
+NAV_PAGES = tuple(page for _, pages in NAV_GROUPS for page in pages)
 
 # What each chart of a report shows, for screen readers: a canvas has no text.
 # The chart adds the span its labels cover ("…, 2019 to 2026").
@@ -520,6 +531,34 @@ def nav_link(href: str, label: str, current: str | None = None) -> str:
     if href == current:
         return f'<li><a href="{href}" class="active" aria-current="page">{label}</a></li>'
     return f'<li><a href="{href}">{label}</a></li>'
+
+
+def nav_html(current: str | None, has_ai: bool) -> tuple[str, str]:
+    """The nav bar's row of links to every page, and the menu that stands in
+    for it on a phone.
+
+    The pages come group by group (see NAV_GROUPS): in the row, the first of
+    a group after the first has a divider before it; in the menu, each group
+    has its name over its pages. The AI Insights page, when the report has
+    one, comes after the summary.
+    """
+    row = []
+    menu = []
+    for number, (name, pages) in enumerate(NAV_GROUPS):
+        if has_ai and pages[0][0] == INDEX_PAGE:
+            pages = (pages[0], AI_PAGE, *pages[1:])
+        links = [nav_link(page, label, current) for page, label in pages]
+        # the name is for the eye: a screen reader has the page names
+        menu += [f'<li class="nav-menu-heading" aria-hidden="true">{name}</li>', *links]
+        if number:
+            links[0] = links[0].replace("<li>", '<li class="nav-group-start">', 1)
+        row += links
+    label = dict(NAV_PAGES + (AI_PAGE,)).get(current or "", "Menu")
+    return (
+        '<ul class="nav-pages">' + "".join(row) + "</ul>",
+        '<details class="nav-menu"><summary><span class="nav-menu-label">Page</span> '
+        f"{label}</summary><ul>{''.join(menu)}</ul></details>",
+    )
 
 
 # The Badges page: its sections, and each badge's name and what it shows
@@ -1024,9 +1063,9 @@ class HTMLReportCreator(ReportCreator):
 
     def create_index_html(self, data: Any, path: str) -> None:
         f = open(path + "/index.html", "w", encoding="utf-8")
-        self.print_header(f, "index.html")
+        self.print_header(f, INDEX_PAGE)
 
-        self.print_nav(f, "index.html")
+        self.print_nav(f, INDEX_PAGE)
 
         # The repository's name heads its overview, with the span of its history
         # under it; how the report was made is in the footer
@@ -1285,8 +1324,8 @@ class HTMLReportCreator(ReportCreator):
         ###
         # Activity
         f = open(path + "/activity.html", "w", encoding="utf-8")
-        self.print_header(f, "activity.html")
-        self.print_nav(f, "activity.html")
+        self.print_header(f, ACTIVITY_PAGE)
+        self.print_nav(f, ACTIVITY_PAGE)
         f.write("<h1>Activity</h1>")
 
         self._write_activity_intro(f, data)
@@ -1994,9 +2033,9 @@ class HTMLReportCreator(ReportCreator):
         ###
         # Authors
         f = open(path + "/authors.html", "w", encoding="utf-8")
-        self.print_header(f, "authors.html")
+        self.print_header(f, AUTHORS_PAGE)
 
-        self.print_nav(f, "authors.html")
+        self.print_nav(f, AUTHORS_PAGE)
         f.write("<h1>Authors</h1>")
         f.write(self._authors_summary_html(data))
 
@@ -2181,8 +2220,8 @@ class HTMLReportCreator(ReportCreator):
         ###
         # Files
         f = open(path + "/files.html", "w", encoding="utf-8")
-        self.print_header(f, "files.html")
-        self.print_nav(f, "files.html")
+        self.print_header(f, FILES_PAGE)
+        self.print_nav(f, FILES_PAGE)
         f.write("<h1>Files</h1>")
 
         total_files = data.get_total_files()
@@ -2280,49 +2319,13 @@ class HTMLReportCreator(ReportCreator):
             f"{BAR_HEADER}</tr>" + "".join(rows) + "</table></div>"
         )
 
-        # Files :: Code Churn (most frequently changed files)
-        if data.file_churn:
-            f.write(html_header(2, "Most changed files (code churn)"))
-            f.write(
-                '<p class="section-note">'
-                "Files of code in the current tree touched most often across all "
-                "commits, under their names of today or of before a rename. "
-                "High-churn files are hotspots that may benefit from extra review or refactoring.</p>"
-            )
-            # Only code that still exists: a deleted file is no hotspot to
-            # review, and a guide that changes often is no hotspot at all
-            current = code_files(data)
-            churn_sorted = sorted(
-                (
-                    (path, count)
-                    for path, count in data.file_churn.items()
-                    if current is None or path in current
-                ),
-                key=lambda x: x[1],
-                reverse=True,
-            )
-            top_churn = churn_sorted[:25]
-            max_churn = max(1, top_churn[0][1]) if top_churn else 1
-            # A bar table: the counts used to be shown twice, in a heat-colored
-            # table and a bar chart whose rotated path labels were unreadable
-            rows = [
-                f'<tr><td class="path">{html.escape(filepath)}</td>'
-                f'<td class="num" data-label="Times changed">{format_int(count)}</td>'
-                '<td class="share-cell"><span class="share-bar" aria-hidden="true">'
-                f'<span style="width: {100.0 * count / max_churn:.1f}%"></span></span></td></tr>'
-                for filepath, count in top_churn
-            ]
-            f.write(
-                f'<div class="table-scroll"><table class="sortable share-table {FILE_TABLE}" id="churn">'
-                f'<tr><th>File</th><th class="num">Times Changed</th>{BAR_HEADER}</tr>'
-                + "".join(rows)
-                + "</table></div>"
-            )
-            # The Hotspots page weighs the same counts against each file's size
-            f.write(
-                '<p class="more-link"><a href="hotspots.html">'
-                "Change frequency by file size &rarr;</a></p>"
-            )
+        # The files that change most were listed here too, and the Hotspots
+        # page, next to this one, ranks the same counts against each file's
+        # size, its table sortable by changes alone
+        f.write(
+            '<p class="more-link"><a href="hotspots.html">'
+            "The files that change most, by size and by changes &rarr;</a></p>"
+        )
 
         self.print_footer(f)
         f.write("</body></html>")
@@ -2332,8 +2335,8 @@ class HTMLReportCreator(ReportCreator):
         ###
         # Lines
         f = open(path + "/lines.html", "w", encoding="utf-8")
-        self.print_header(f, "lines.html")
-        self.print_nav(f, "lines.html")
+        self.print_header(f, LINES_PAGE)
+        self.print_nav(f, LINES_PAGE)
         f.write("<h1>Lines</h1>")
 
         total_commits = data.get_total_commits()
@@ -2434,8 +2437,8 @@ class HTMLReportCreator(ReportCreator):
         ###
         # tags.html
         f = open(path + "/tags.html", "w", encoding="utf-8")
-        self.print_header(f, "tags.html")
-        self.print_nav(f, "tags.html")
+        self.print_header(f, TAGS_PAGE)
+        self.print_nav(f, TAGS_PAGE)
         f.write("<h1>Tags</h1>")
 
         if data.tags:
@@ -2536,9 +2539,9 @@ class HTMLReportCreator(ReportCreator):
                 "<span>Copy</span></button></div>"
             )
 
-        f = self._open_report_file(path, "badges.html")
-        self.print_header(f, "badges.html")
-        self.print_nav(f, "badges.html")
+        f = self._open_report_file(path, BADGES_PAGE)
+        self.print_header(f, BADGES_PAGE)
+        self.print_nav(f, BADGES_PAGE)
         f.write("<h1>Badges</h1>")
         f.write(
             '<p class="section-note">Live badges for this report. Pick a style and a format, '
@@ -2696,9 +2699,9 @@ class HTMLReportCreator(ReportCreator):
         concentrated per author, and the files touched by the most people
         (coordination hotspots).
         """
-        f = self._open_report_file(path, "ownership.html")
-        self.print_header(f, "ownership.html")
-        self.print_nav(f, "ownership.html")
+        f = self._open_report_file(path, OWNERSHIP_PAGE)
+        self.print_header(f, OWNERSHIP_PAGE)
+        self.print_nav(f, OWNERSHIP_PAGE)
         f.write("<h1>Code Ownership</h1>")
 
         current = head_files(data)
@@ -2895,7 +2898,7 @@ class HTMLReportCreator(ReportCreator):
         color the plot: half of the files are above each one in any
         repository, so being above both says nothing about a file by itself.
         """
-        page = "hotspots.html"
+        page = HOTSPOTS_PAGE
         f = self._open_report_file(path, page)
         self.print_header(f, page)
         self.print_nav(f, page)
@@ -3135,9 +3138,9 @@ class HTMLReportCreator(ReportCreator):
         the year's leading author, the contributors who made their first
         commit that year, and the releases tagged in it.
         """
-        f = self._open_report_file(path, "history.html")
-        self.print_header(f, "history.html")
-        self.print_nav(f, "history.html")
+        f = self._open_report_file(path, HISTORY_PAGE)
+        self.print_header(f, HISTORY_PAGE)
+        self.print_nav(f, HISTORY_PAGE)
         f.write("<h1>History</h1>")
 
         history = compute_project_history(data)
@@ -3733,7 +3736,7 @@ class HTMLReportCreator(ReportCreator):
             self.footer_made = made
         file.write(FOOTER.replace("gitstats</a>", f"gitstats</a> {made}", 1))
 
-    def print_header(self, file: Any, page: str = "index.html") -> None:
+    def print_header(self, file: Any, page: str = INDEX_PAGE) -> None:
         """
         Write the HTML document header and opening body tag into the provided writable file.
 
@@ -3744,7 +3747,7 @@ class HTMLReportCreator(ReportCreator):
                 page: The file name of the page, such as ``"authors.html"``.
         """
         label = dict(NAV_PAGES + (AI_PAGE,)).get(page, "")
-        title = self.title if page == "index.html" or not label else f"{self.title}: {label}"
+        title = self.title if page == INDEX_PAGE or not label else f"{self.title}: {label}"
         share = share_meta_html(
             title,
             getattr(self, "share_description", ""),
@@ -3793,20 +3796,11 @@ class HTMLReportCreator(ReportCreator):
         """
         # Check if AI insights are available
         has_ai = hasattr(self.data, "ai_summaries") and self.data.ai_summaries
-
-        links = "\n            ".join(nav_link(href, label, current) for href, label in NAV_PAGES)
-        ai_link = nav_link(*AI_PAGE, current) if has_ai else ""
         # On a phone the row of links shows three or four of the pages and the
         # rest by scrolling sideways, which nothing on screen says. There the
         # same links are a menu named after the current page: a <details>, so
         # it opens where the page's scripts do not run.
-        pages = dict(NAV_PAGES + ((AI_PAGE,) if has_ai else ()))
-        menu = (
-            '<details class="nav-menu"><summary><span class="nav-menu-label">Page</span> '
-            f"{pages.get(current or '', 'Menu')}</summary>"
-            f"<ul>{links}{ai_link}</ul></details>"
-        )
-
+        row, menu = nav_html(current, has_ai)
         github_icon = (
             '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" '
             'fill="currentColor" aria-hidden="true">'
@@ -3824,10 +3818,7 @@ class HTMLReportCreator(ReportCreator):
             f"""
             {NAV_START}
             {REPORT_BRAND}
-            <ul>
-            {links}
-            {ai_link}
-            </ul>
+            {row}
             {menu}
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub">{github_icon}</a>
@@ -4574,7 +4565,7 @@ def share_meta_html(title: str, description: str, site_url: str, page: str, imag
     ]
     picture = site_url + image if site_url and image else ""
     if site_url:
-        tags.append(("property", "og:url", site_url + ("" if page == "index.html" else page)))
+        tags.append(("property", "og:url", site_url + ("" if page == INDEX_PAGE else page)))
     if picture:
         tags += [
             ("property", "og:image", picture),

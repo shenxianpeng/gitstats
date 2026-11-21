@@ -1369,6 +1369,20 @@ tr[hidden] {
 	border-left: 1px solid var(--border-color);
 }
 
+/* A report's pages come group by group (overview, people, code, timeline).
+   The groups are told apart by spacing: no divider between the pages of a
+   group, and a darker one, with room on either side, before each group
+   after the first */
+.nav .nav-pages li + li {
+	border-left: none;
+}
+
+.nav .nav-pages li.nav-group-start {
+	margin-left: var(--space-2);
+	padding-left: var(--space-2);
+	border-left: 1px solid var(--border-strong);
+}
+
 .nav li a {
 	display: inline-flex;
 	align-items: center;
@@ -1496,10 +1510,11 @@ tr[hidden] {
 	display: block;
 }
 
-/* ===== Below 1024px: brand + icons on top, page links in their own row =====
-   One row needs about 860px (970px with the AI Insights link); switching
-   earlier keeps the links from scrolling inside a squeezed row. */
-@media (max-width: 1024px) {
+/* ===== Below 1100px: brand + icons on top, page links in their own row =====
+   The links need about 900px (1010px with the AI Insights link), and the
+   brand and icons about 200px more; switching earlier keeps the links from
+   scrolling inside a squeezed row. */
+@media (max-width: 1100px) {
 	.nav {
 		flex-wrap: wrap;
 		padding: 0;
@@ -1512,8 +1527,16 @@ tr[hidden] {
 		border-top: 1px solid var(--border-color);
 	}
 
+	/* a little narrower, for the row of ten pages to fit a tablet's width */
 	.nav li a {
 		min-height: 44px;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	.nav .nav-pages li.nav-group-start {
+		margin-left: var(--space-1);
+		padding-left: var(--space-1);
 	}
 
 	.nav-right {
@@ -1620,6 +1643,21 @@ tr[hidden] {
 		min-height: 44px;
 		padding: 0 var(--space-4);
 		font-size: 13px;
+	}
+
+	/* each group's name over its pages */
+	.nav-menu li.nav-menu-heading {
+		padding: var(--space-3) var(--space-4) var(--space-1);
+		font-family: var(--font-mono);
+		font-size: 11px;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--text-secondary);
+		background-color: var(--surface-color);
+	}
+
+	.nav-menu li.nav-menu-heading + li {
+		border-top: none;
 	}
 
 	.nav .nav-right {
