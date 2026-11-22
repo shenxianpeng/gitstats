@@ -112,6 +112,7 @@ CHART_SCRIPT = """<script>
 	function applyChartTheme(chart) {
 		const text = getCSSVar('--chart-text');
 		const grid = getCSSVar('--chart-grid');
+		const axis = getCSSVar('--chart-axis');
 		Chart.defaults.color = text;
 		Chart.defaults.borderColor = grid;
 		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
@@ -124,12 +125,20 @@ CHART_SCRIPT = """<script>
 			scale.title.color = text;
 			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
 			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
-			scale.border.color = grid;
+			// the x-axis is the baseline the bars stand on; the y-axis has no line
+			scale.border.color = scale.axis === 'x' ? axis : grid;
 		});
 		chart.options.plugins.legend.labels.color = text;
 		const bar = getCSSVar('--bar-color');
+		const latest = getCSSVar('--bar-latest');
 		chart.data.datasets.forEach(function(ds) {
 			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			// the latest bar, darker: where the project is now
+			if (ds.themed && ds.latest) {
+				ds.backgroundColor = ds.data.map(function(v, i) {
+					return i === ds.data.length - 1 ? latest : bar;
+				});
+			}
 			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
 			if (ds.series) {
 				const color = getCSSVar('--series-' + ds.series);
@@ -149,7 +158,8 @@ CHART_SCRIPT = """<script>
 
 	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
 	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
-	//   peaks  a label above chosen bars
+	//   peaks  a label above chosen bars (the latest in its own color); one
+	//          that would run into a label already placed is left out
 	//   values a value label above every non-zero bar
 	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
 	// hatched, its caption runs up the band, and `axis` names it under the plot.
@@ -254,7 +264,9 @@ CHART_SCRIPT = """<script>
 					ctx.fillStyle = getCSSVar('--surface-color');
 					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
 				}
-				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillStyle = getCSSVar(
+					mark.latest ? '--bar-latest' : mark.plain ? '--chart-text' : '--text-color'
+				);
 				ctx.fillText(mark.text, mark.x, mark.y);
 				ctx.restore();
 			});
@@ -292,8 +304,21 @@ CHART_SCRIPT = """<script>
 			const onBand = bands.some(function(edges) {
 				return x + half > edges[0] && x - half < edges[1];
 			});
-			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
-				half: half, onBand: onBand });
+			// above every bar the label spans, so a small value among taller
+			// neighbours (one month of many) is not drawn over them
+			let top = bar.y;
+			meta.data.forEach(function(other) {
+				if (Math.abs(other.x - x) <= half + 2) top = Math.min(top, other.y);
+			});
+			const y = top - 6;
+			// the marks come in order of importance: one that would overlap an
+			// earlier one is left out rather than drawn over it
+			const clash = placed.some(function(other) {
+				return Math.abs(other.x - x) < other.half + half + 6 && Math.abs(other.y - y) < 14;
+			});
+			if (clash && !mark.plain) return;
+			placed.push({ text: mark.text, plain: mark.plain, latest: mark.latest, font: font,
+				x: x, y: y, half: half, onBand: onBand });
 		});
 		return placed;
 	}
@@ -1543,7 +1568,8 @@ class HTMLReportCreator(ReportCreator):
                 "chart-month-of-year",
                 "bar",
                 list(self.MONTH_NAMES),
-                [{"label": "Commits", "data": values}],
+                # the months of all years together: no month is the latest
+                [{"label": "Commits", "data": values, "latest": False}],
                 max_bar_thickness=40,
                 aspect_ratio=2,
                 annotations={"values": True},
@@ -3698,8 +3724,18 @@ class HTMLReportCreator(ReportCreator):
         With ``diverging=True`` (bars), datasets stack around zero: positive
         values above it, negative ones below, and the y-axis and tooltips show
         magnitudes, e.g. lines added up and lines removed down.
+
+        Every chart follows one grammar: a few dashed guides, labelled at the
+        right, and a baseline. A bar chart of one series whose bars are in
+        time order (not one with ``"latest": False``, as the months of the year) draws its
+        latest bar darker and labels it and its highest one, unless every bar
+        is labelled already (``values``): see latest_and_peak_marks().
         """
         is_multi = len(datasets) > 1
+        timeline = chart_type == "bar" and not is_multi and not diverging
+        timeline = timeline and all(ds.get("latest", True) for ds in datasets)
+        if timeline and labels and not (annotations and annotations.get("values")):
+            annotations = latest_and_peak_marks(labels, datasets[0]["data"], annotations)
         if chart_type == "bar" and not max_bar_thickness:
             # a few bars keep a bar's width: one would fill the chart as a slab
             max_bar_thickness = self.MAX_BAR_THICKNESS
@@ -3708,6 +3744,7 @@ class HTMLReportCreator(ReportCreator):
         for i, ds in enumerate(datasets):
             series = i % self.SERIES_COLORS + 1
             entry = dict(ds)
+            entry.pop("latest", None)
             # a line is drawn between points: one or two of them would leave
             # an empty chart, or a bare line, without their dots
             known = [value for value in entry.get("data") or [] if value is not None]
@@ -3738,6 +3775,8 @@ class HTMLReportCreator(ReportCreator):
                 entry["backgroundColor"] = "__CSS_BAR_COLOR__"
                 entry["borderColor"] = "__CSS_BAR_COLOR__"
                 entry["themed"] = True
+                if timeline:
+                    entry["latest"] = True
                 if chart_type == "line":
                     entry.setdefault("borderWidth", 1.5)
                     entry.setdefault("pointRadius", radius)
@@ -3867,14 +3906,20 @@ class HTMLReportCreator(ReportCreator):
         else:
             plugins_js = register_js = grace_js = ""
 
-        y_scale_js = f"{{ beginAtZero: true{grace_js}, ticks: {{ precision: 0 }} }}"
+        # a few dashed guides, labelled at the right, and no axis line
+        y_guides = "position: 'right', border: { display: false, dash: [3, 3] }"
+        y_scale_js = (
+            f"{{ {y_guides}, beginAtZero: true{grace_js}, "
+            "ticks: { precision: 0, maxTicksLimit: 4 } }"
+        )
         if annotations and annotations.get("values"):
             # every bar is labelled with its value, so the y-axis would only repeat them
             y_scale_js = f"{{ display: false, beginAtZero: true{grace_js} }}"
         if diverging:
             x_scale_js = x_scale_js.replace("{ ", "{ stacked: true, ", 1)
             y_scale_js = (
-                f"{{ stacked: true, beginAtZero: true{grace_js}, ticks: {{ precision: 0, "
+                f"{{ {y_guides}, stacked: true, beginAtZero: true{grace_js}, ticks: {{ "
+                "precision: 0, maxTicksLimit: 5, "
                 "callback: function(v) { return Math.abs(v).toLocaleString(); } } }"
             )
 
@@ -4474,7 +4519,7 @@ def gap_annotations(labels: list[Any], values: list[int], min_gap: int) -> dict[
         segment = values[lo:hi]
         if segment and max(segment) > 0:
             i = lo + segment.index(max(segment))
-            peaks.append({"index": i, "text": f"{labels[i]} \u00b7 {values[i]}"})
+            peaks.append({"index": i, "text": f"{labels[i]} \u00b7 {format_int(values[i])}"})
     return {
         "bands": [
             {
@@ -4486,6 +4531,31 @@ def gap_annotations(labels: list[Any], values: list[int], min_gap: int) -> dict[
         ],
         "peaks": peaks,
     }
+
+
+def latest_and_peak_marks(
+    labels: list[Any], values: list[int], annotations: dict[str, Any] | None
+) -> dict[str, Any]:
+    """``annotations`` with the latest bar and the highest one labelled
+    ("2026 \u00b7 116"), in that order before the labels it had, each bar
+    once: the chart draws the first ones when labels would collide. A bar
+    without commits is not labelled."""
+    found = dict(annotations or {})
+    marks: list[dict[str, Any]] = []
+    if any(values):
+        last = len(values) - 1
+        for i, latest in ((last, True), (values.index(max(values)), False)):
+            if values[i] and all(mark["index"] != i for mark in marks):
+                text = f"{labels[i]} \u00b7 {format_int(values[i])}"
+                marks.append({"index": i, "text": text, **({"latest": True} if latest else {})})
+    marks += [
+        mark
+        for mark in found.get("peaks", [])
+        if all(mark["index"] != placed["index"] for placed in marks)
+    ]
+    if marks:
+        found["peaks"] = marks
+    return found
 
 
 # A stretch without commits that takes up at least this share of a time axis
