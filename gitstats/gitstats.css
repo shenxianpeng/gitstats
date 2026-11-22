@@ -68,10 +68,14 @@
 	--link-color: #2f6db5; /* 5.3:1 on --bg-color */
 
 	--bar-color: #2f6db5;
+	/* the latest bar of a chart over time: where the project is now */
+	--bar-latest: #1f4f8a;
 
-	/* Chart.js axes — read by applyChartTheme() on load and on theme switch */
+	/* Chart.js axes — read by applyChartTheme() on load and on theme switch:
+	   the labels, the dashed guides, and the baseline */
 	--chart-text: #57524f;
-	--chart-grid: #eeebe8;
+	--chart-grid: #e6e3e0;
+	--chart-axis: #cfcac6;
 
 	/* Multi-series charts (e.g. the top authors) — at least 3:1 on --bg-color */
 	--series-1: #2f6db5;
@@ -129,9 +133,11 @@
 	--link-color: #7fb0ea; /* 7.7:1 on --bg-color */
 
 	--bar-color: #5f93d6;
+	--bar-latest: #9cc3f0;
 
 	--chart-text: #b4aea9;
-	--chart-grid: #2f2b29;
+	--chart-grid: #3a3634;
+	--chart-axis: #5f5955;
 
 	/* Brighter series colors for the dark background (4.9:1 and up) */
 	--series-1: #6ca4f8;

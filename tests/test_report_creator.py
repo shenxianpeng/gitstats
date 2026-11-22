@@ -317,8 +317,11 @@ def test_render_chartjs_xss_protection():
 def test_render_chartjs_no_y_axis_title():
     """Section headings name what a chart counts, so the y-axis carries no title."""
     creator = HTMLReportCreator()
-    result = creator._render_chartjs("chart-yl", "bar", ["X"], [{"label": "C", "data": [1]}])
-    assert "y: { beginAtZero: true, ticks: { precision: 0 } }" in result
+    result = creator._render_chartjs("chart-yl", "line", ["X"], [{"label": "C", "data": [1]}])
+    assert (
+        "y: { position: 'right', border: { display: false, dash: [3, 3] }, beginAtZero: true, "
+        "ticks: { precision: 0, maxTicksLimit: 4 } }"
+    ) in result
     assert "title: { display: true" not in result
 
 
@@ -365,7 +368,12 @@ def test_render_chartjs_annotations():
     creator = HTMLReportCreator()
     ann = {"bands": [{"from": 1, "to": 1, "text": "gap", "short": ""}], "peaks": []}
     result = creator._render_chartjs(
-        "c-ann", "bar", ["A", "B", "C"], [{"label": "C", "data": [1, 0, 2]}], annotations=ann
+        "c-ann",
+        "bar",
+        ["A", "B", "C"],
+        [{"label": "C", "data": [1, 0, 2]}],
+        annotations=ann,
+        ordered=False,
     )
     assert "plugins: [chartAnnotations]," in result
     assert (
@@ -376,10 +384,17 @@ def test_render_chartjs_annotations():
     assert "grace" not in result
     peaks = {**ann, "peaks": [{"index": 2, "text": "C · 2"}]}
     labelled = creator._render_chartjs(
-        "c-peaks", "bar", ["A", "B", "C"], [{"label": "C", "data": [1, 0, 2]}], annotations=peaks
+        "c-peaks",
+        "bar",
+        ["A", "B", "C"],
+        [{"label": "C", "data": [1, 0, 2]}],
+        annotations=peaks,
+        ordered=False,
     )
     assert "grace: '10%'" in labelled
-    plain = creator._render_chartjs("c-plain", "bar", ["A"], [{"label": "C", "data": [1]}])
+    plain = creator._render_chartjs(
+        "c-plain", "bar", ["A"], [{"label": "C", "data": [1]}], ordered=False
+    )
     assert "chartAnnotations" not in plain
     assert "grace" not in plain
 
@@ -2537,7 +2552,7 @@ def test_render_chartjs_integer_y_ticks():
     """Every chart counts whole things, so the y-axis never shows 0.2 steps."""
     creator = HTMLReportCreator()
     result = creator._render_chartjs("c", "bar", ["a"], [{"label": "C", "data": [1]}])
-    assert "y: { beginAtZero: true, ticks: { precision: 0 } }" in result
+    assert "ticks: { precision: 0, maxTicksLimit: 4 } }" in result
 
 
 def test_bot_badges_wherever_authors_are_named(mock_data_collector, temp_dir):
@@ -3136,7 +3151,7 @@ def test_bar_charts_drop_redundant_lines():
     bars = creator._render_chartjs("b", "bar", ["a", "b"], [{"label": "C", "data": [1, 2]}])
     # no gridline per category bar; the y gridlines stay
     assert "x: { ticks: { maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } }" in bars
-    assert "y: { beginAtZero: true, ticks: { precision: 0 } }" in bars
+    assert "beginAtZero: true, grace: '10%', ticks: { precision: 0, maxTicksLimit: 4 } }" in bars
     line = creator._render_chartjs("l", "line", ["a", "b"], [{"label": "C", "data": [1, 2]}])
     assert "grid: { display: false }" not in line
     # a bar chart labelled with every value hides the y-axis that would repeat them
@@ -3176,7 +3191,10 @@ def test_render_chartjs_diverging_with_theme_colors():
     assert '"series"' not in result
     # stacked around zero, magnitudes on the axis and in the tooltip
     assert "x: { stacked: true, ticks: { autoSkip: false" in result
-    assert "y: { stacked: true, beginAtZero: true, ticks: { precision: 0, callback:" in result
+    assert (
+        "y: { position: 'right', border: { display: false, dash: [3, 3] }, stacked: true, "
+        "beginAtZero: true, ticks: { precision: 0, maxTicksLimit: 5, callback:"
+    ) in result
     assert "Math.abs(item.parsed.y).toLocaleString()" in result
 
 
@@ -5012,3 +5030,64 @@ def test_table_scroll_clips_what_is_placed_absolutely_inside_it():
     rule = rule[: rule.index("}")]
     assert "position: relative;" in rule
     assert "overflow-x: auto;" in rule
+
+
+# ── The chart grammar: guides at the right, the latest and the peak labelled ──
+
+
+def test_latest_and_peak_marks():
+    from gitstats.report_creator import latest_and_peak_marks
+
+    labels = [2011, 2012, 2013, 2014]
+    found = latest_and_peak_marks(labels, [1288, 40, 0, 116], None)
+    # the latest first, then the highest, with thousands separated
+    assert found["peaks"] == [
+        {"index": 3, "text": "2014 \u00b7 116", "latest": True},
+        {"index": 0, "text": "2011 \u00b7 1,288"},
+    ]
+    # the latest the highest: one label; a peak it already had is kept once
+    gap = {"bands": [{"from": 1, "to": 1}], "peaks": [{"index": 0, "text": "2011 \u00b7 5"}]}
+    found = latest_and_peak_marks(labels, [5, 0, 0, 9], gap)
+    assert found["bands"] == gap["bands"]
+    assert [mark["index"] for mark in found["peaks"]] == [3, 0]
+    # a latest bar without commits is not labelled; no commits, no labels
+    assert latest_and_peak_marks(labels, [3, 1, 2, 0], {})["peaks"] == [
+        {"index": 0, "text": "2011 \u00b7 3"}
+    ]
+    assert latest_and_peak_marks(labels, [0, 0, 0, 0], None) == {}
+
+
+def test_bars_over_time_label_the_latest_and_the_peak():
+    creator = HTMLReportCreator()
+    chart = creator._render_chartjs(
+        "t", "bar", [2024, 2025, 2026], [{"label": "C", "data": [9, 2, 5]}]
+    )
+    assert '"latest": true' in chart
+    # json.dumps writes the middle dot as an escape
+    assert '"text": "2026 \\u00b7 5", "latest": true' in chart
+    assert '"text": "2024 \\u00b7 9"' in chart
+    # every bar labelled already: only the latest is darker
+    valued = creator._render_chartjs(
+        "v", "bar", [2024, 2025], [{"label": "C", "data": [1, 2]}], annotations={"values": True}
+    )
+    assert '"latest": true' in valued
+    assert '"peaks"' not in valued
+    # the months of the year are not in time order: nothing is the latest
+    months = creator._render_chartjs(
+        "m", "bar", ["Jan", "Feb"], [{"label": "C", "data": [1, 2]}], ordered=False
+    )
+    assert '"latest"' not in months
+    assert "chartAnnotations" not in months
+    # several series, or bars around zero: no latest bar either
+    multi = creator._render_chartjs(
+        "s", "bar", [2025, 2026], [{"label": "A", "data": [1, 2]}, {"label": "B", "data": [2, 1]}]
+    )
+    assert '"latest"' not in multi
+
+
+def test_chart_theme_has_a_latest_color_and_a_baseline():
+    css_path = os.path.join(os.path.dirname(__file__), "..", "gitstats", "gitstats.css")
+    with open(css_path, encoding="utf-8") as f:
+        css = f.read()
+    assert css.count("--bar-latest:") == 2  # light and dark
+    assert css.count("--chart-axis:") == 2
