@@ -1636,7 +1636,7 @@ class AggregateReportCreator:
             )
             return share_card_page(
                 f"What stands out in {name}",
-                f'<div class="brand">// what stands out</div><h1>{html.escape(name)}</h1>'
+                f'<div class="brand">What stands out</div><h1>{html.escape(name)}</h1>'
                 f'<div class="facts n{len(found)}">{facts}</div>',
             )
         scope = "group" if group_projects else "all"
@@ -1646,9 +1646,7 @@ class AggregateReportCreator:
             f"<span>{html.escape(rank_text)}</span></div>"
             for label, position, rank_text in compare.card_rows(row, scope)
         )
-        brand = (
-            f"// {html.escape(group_projects)} compared" if group_projects else "// how it compares"
-        )
+        brand = f"{html.escape(group_projects)} compared" if group_projects else "How it compares"
         return share_card_page(
             f"How {name} compares",
             f'<div class="brand">{brand}</div><h1>{html.escape(name)}</h1>'
@@ -1940,7 +1938,7 @@ class AggregateReportCreator:
             sub += f" &middot; {format_int(len(authors))} authors"
         return share_card_page(
             title,
-            f'<div class="brand">// GitStats</div><h1>{html.escape(title)}</h1>'
+            f'<div class="brand">GitStats</div><h1>{html.escape(title)}</h1>'
             f'<p class="sub">{sub}</p><p class="names">{"&nbsp;&middot; ".join(names)}</p>',
         )
 
@@ -1962,7 +1960,7 @@ class AggregateReportCreator:
         )
         return share_card_page(
             "AI-assisted commits: GitStats",
-            '<div class="brand">// AI-assisted commits</div>'
+            '<div class="brand">AI-assisted commits</div>'
             f"<h1>{html.escape(quarters[-1][0])}</h1>"
             f'<p class="sub">The share of each repository&rsquo;s commits that name an AI coding '
             f"assistant, of {format_int(len(rows))} repositories. A lower bound.</p>"

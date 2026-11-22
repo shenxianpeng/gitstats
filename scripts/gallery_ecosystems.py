@@ -490,7 +490,7 @@ def group_card(
     top = [row for row in rows if row["rank"] is not None and share_of(row["quarter"])][:6]
     return _bars_card(
         f"{group.name}: AI-assisted commits",
-        f"// {group.name}",
+        group.name,
         label,
         f"The median project&rsquo;s share of commits that name {ASSISTANT}: "
         f"{html.escape(percent(summary['median_share']))}, of {summary['ranked']} projects. "
@@ -509,7 +509,7 @@ def index_card(groups: list[tuple[Group, dict[str, Any]]], label: str) -> str:
     bars.sort(key=lambda bar: -bar[1])
     return _bars_card(
         "Ecosystems: AI-assisted commits",
-        "// Ecosystems",
+        "Ecosystems",
         label,
         f"The median project&rsquo;s share of commits that name {ASSISTANT}, by ecosystem. "
         "A lower bound.",

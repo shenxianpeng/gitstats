@@ -4711,51 +4711,65 @@ INSIGHTS_END = "<!-- /gitstats:insights -->"
 # an image (share-card.png) when the report is published with share_card on.
 SHARE_CARD_WIDTH = 1200
 SHARE_CARD_HEIGHT = 630
-_CARD_MONO = 'ui-monospace, SFMono-Regular, Menlo, "DejaVu Sans Mono", monospace'
+_CARD_MONO = '"IBM Plex Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace'
+_CARD_SANS = '-apple-system, BlinkMacSystemFont, "Segoe UI", Inter, "Noto Sans", sans-serif'
+# The report's look (gitstats.css): ink on paper, the data in blue, what asks
+# for attention in orange; the sans for words, the monospace for numbers
 SHARE_CARD_CSS = f"""
 *{{box-sizing:border-box}}
 html,body{{margin:0}}
-body{{width:{SHARE_CARD_WIDTH}px;height:{SHARE_CARD_HEIGHT}px;background:#ffffff;color:#211e1e;
-font:24px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI","DejaVu Sans",sans-serif}}
-main{{height:{SHARE_CARD_HEIGHT}px;padding:54px 64px 44px;display:flex;flex-direction:column}}
-.brand{{font:600 22px {_CARD_MONO};color:#716b6b;letter-spacing:.04em}}
-h1{{font:700 72px/1.1 {_CARD_MONO};margin:14px 0 8px;white-space:nowrap;overflow:hidden;
-text-overflow:ellipsis}}
-.sub{{margin:0 0 30px;color:#716b6b}}
-.tiles{{display:grid;grid-template-columns:repeat(4,1fr);margin:0;border:2px solid #cfcecd}}
-.tiles div{{padding:16px 22px;border-left:2px solid #cfcecd}}
-.tiles div:first-child{{border-left:0}}
-.tiles dt{{font:15px {_CARD_MONO};letter-spacing:.08em;text-transform:uppercase;color:#716b6b}}
-.tiles dd{{margin:6px 0 0;font:700 40px {_CARD_MONO};white-space:nowrap}}
-.note{{margin:20px 0 0}}
-.names{{margin:8px 0 0;font:600 30px/1.5 {_CARD_MONO};display:-webkit-box;-webkit-line-clamp:5;
+body{{width:{SHARE_CARD_WIDTH}px;height:{SHARE_CARD_HEIGHT}px;background:#ffffff;color:#1c1a19;
+font:24px/1.4 {_CARD_SANS}}}
+main{{height:{SHARE_CARD_HEIGHT}px;padding:50px 64px 40px;display:flex;flex-direction:column}}
+.brand{{font:600 16px {_CARD_SANS};letter-spacing:.16em;text-transform:uppercase;color:#6f6a67}}
+h1{{font:700 68px/1.1 {_CARD_SANS};letter-spacing:-.02em;margin:12px 0 6px;white-space:nowrap;
+overflow:hidden;text-overflow:ellipsis}}
+.sub{{margin:0 0 26px;color:#57524f}}
+.sub.dates{{font:20px {_CARD_MONO}}}
+.tiles{{display:grid;grid-template-columns:repeat(4,1fr);margin:0;border-top:1px solid #e6e3e0;
+border-bottom:1px solid #e6e3e0}}
+.tiles div{{padding:14px 22px;border-left:1px solid #eeebe8}}
+.tiles div:first-child{{border-left:0;padding-left:0}}
+.tiles dt{{font:500 17px {_CARD_SANS};color:#57524f}}
+.tiles dd{{margin:4px 0 0;font:500 40px {_CARD_MONO};letter-spacing:-.02em;white-space:nowrap}}
+.note{{margin:16px 0 0;font-size:22px;color:#57524f}}
+.note strong{{color:#1c1a19}}
+.names{{margin:8px 0 0;font:600 30px/1.5 {_CARD_SANS};display:-webkit-box;-webkit-line-clamp:5;
 -webkit-box-orient:vertical;overflow:hidden}}
-.history{{margin:26px 0 0}}
-.history .columns{{display:flex;align-items:flex-end;gap:2px;height:88px}}
-.history i{{flex:1;background:#4a7ab5;border-radius:2px 2px 0 0;min-height:1px}}
-.history .axis{{display:flex;justify-content:space-between;margin-top:6px;color:#716b6b;
-font:16px {_CARD_MONO}}}
+.history{{flex:1;min-height:0;display:flex;flex-direction:column;margin:24px 0 0}}
+.history .columns{{flex:1;min-height:56px;max-height:150px;display:flex;align-items:flex-end;gap:3px}}
+.history i{{flex:1;background:#2f6db5;border-radius:2px 2px 0 0;min-height:1px}}
+.history i.last{{background:#1f4f8a}}
+.history .axis{{display:flex;justify-content:space-between;margin-top:8px;padding-top:6px;
+border-top:1px solid #cfcac6;color:#6f6a67;font:15px {_CARD_MONO}}}
+.finding{{display:flex;align-items:center;gap:14px;margin:18px 0 0;min-width:0}}
+.finding .tag{{flex:none;padding:3px 10px;border-radius:5px;font:600 14px {_CARD_SANS};
+letter-spacing:.06em;text-transform:uppercase;color:#9a4316;background:#fbe9dd}}
+.finding .tag.up{{color:#1f4f8a;background:#e6eef9}}
+.finding .tag.risk{{color:#ffffff;background:#b4501a}}
+.finding b{{font-size:26px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
 .bars{{display:grid;gap:12px;margin:4px 0 0}}
 .bars div{{display:grid;grid-template-columns:240px 1fr 120px;align-items:center;gap:18px}}
-.bars b{{font:600 26px {_CARD_MONO};white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
-.bars i{{display:block;height:26px;background:#4a7ab5;border-radius:0 4px 4px 0}}
-.bars span{{font:700 28px {_CARD_MONO};text-align:right}}
+.bars b{{font:600 26px {_CARD_SANS};white-space:nowrap;overflow:hidden;text-overflow:ellipsis}}
+.bars i{{display:block;height:26px;background:#2f6db5;border-radius:0 4px 4px 0}}
+.bars span{{font:500 28px {_CARD_MONO};text-align:right}}
 .sub.clamp{{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
 .bars.ranks{{gap:10px}}
 .bars.ranks div{{grid-template-columns:300px 1fr 160px}}
-.bars.ranks b{{font-size:23px;font-weight:500;color:#716b6b}}
+.bars.ranks b{{font-size:23px;font-weight:500;color:#57524f}}
 .bars.ranks i{{height:20px}}
 .bars.ranks span{{font-size:24px;white-space:nowrap}}
 .facts{{display:grid;gap:34px;margin:14px 0 0}}
 .facts div{{display:grid;grid-template-columns:200px 1fr;align-items:center;gap:28px}}
-.facts b{{font:700 60px/1 {_CARD_MONO};color:#4a7ab5;white-space:nowrap}}
+.facts b{{font:500 60px/1 {_CARD_MONO};letter-spacing:-.02em;color:#2f6db5;white-space:nowrap}}
 .facts span{{font-size:27px;line-height:1.32;display:-webkit-box;-webkit-line-clamp:3;
 -webkit-box-orient:vertical;overflow:hidden}}
 .facts.n3{{gap:24px;margin-top:8px}}
 .facts.n3 b{{font-size:50px}}
 .facts.n3 span{{font-size:23px;-webkit-line-clamp:2}}
-footer{{margin-top:auto;display:flex;justify-content:space-between;color:#716b6b;
-font:20px {_CARD_MONO}}}
+footer{{margin-top:auto;padding-top:18px;display:flex;justify-content:space-between;color:#6f6a67;
+font:18px {_CARD_SANS}}}
+footer span:last-child{{font-family:{_CARD_MONO}}}
 """
 
 
@@ -4861,31 +4875,75 @@ def report_share_card_html(data: Any) -> str:
     name = html.escape(data.project_name)
     return share_card_page(
         f"{data.project_name}: GitStats",
-        f'<div class="brand">// GitStats report</div><h1>{name}</h1>'
-        f'<p class="sub">{span}</p><dl class="tiles">{tiles}</dl>{history}{note}',
+        f'<div class="brand">GitStats report</div><h1>{name}</h1>'
+        f'<p class="sub dates">{span}</p><dl class="tiles">{tiles}</dl>{history}'
+        f"{_share_card_finding(data)}{note}",
+    )
+
+
+def _share_card_finding(data: Any) -> str:
+    """The first of what the overview says is worth a look, with its tag:
+    the reason to open the report. Nothing when there is none."""
+    signals = overview_signals(data)
+    if not signals:
+        return ""
+    first = signals[0]
+    tone = {"up": " up", "risk": " risk"}.get(first["level"], "")
+    return (
+        f'<p class="finding"><span class="tag{tone}">{first["tag"]}</span>'
+        f"<b>{first['title']}</b></p>"
     )
 
 
 def _share_card_history(data: Any) -> str:
-    """Commits per year as a row of columns, or per month for a history of
-    less than three years; nothing without commits to show."""
+    """Commits per year as a row of columns; per month for a history of less
+    than three years, and per week for one of less than six months; nothing
+    without commits to show. The latest column is darker."""
     by_year = getattr(data, "commits_by_year", None)
     by_month = getattr(data, "commits_by_month", None)
+    by_week = getattr(data, "activity_by_year_week", None)
     if isinstance(by_year, dict) and by_year and max(by_year) - min(by_year) >= 2:
         keys: list[Any] = list(range(min(by_year), max(by_year) + 1))
         counts, unit = [int(by_year.get(year, 0)) for year in keys], "year"
     elif isinstance(by_month, dict) and by_month:
         keys = month_range(by_month)
         counts, unit = [int(by_month.get(month, 0)) for month in keys], "month"
+        weeks = _share_card_weeks(data)
+        if len(keys) < 6 and weeks and isinstance(by_week, dict):
+            counts, unit = [int(by_week.get(week, 0)) for week in weeks], "week"
+            # "2023-46" reads like a month: "2023-W46" is the ISO week
+            keys = [f"{week[:4]}-W{week[5:]}" for week in weeks]
     else:
         return ""
     top = max(counts) or 1
-    columns = "".join(f'<i style="height:{100 * count / top:.1f}%"></i>' for count in counts)
+    columns = "".join(
+        f"<i{LAST_COLUMN if i == len(counts) - 1 else ''} "
+        f'style="height:{100 * count / top:.1f}%"></i>'
+        for i, count in enumerate(counts)
+    )
     return (
         f'<div class="history"><div class="columns">{columns}</div><div class="axis">'
         f"<span>{keys[0]}</span><span>commits per {unit}</span><span>{keys[-1]}</span>"
         "</div></div>"
     )
+
+
+# The class of a share card's latest column
+LAST_COLUMN = ' class="last"'
+
+
+def _share_card_weeks(data: Any) -> list[str]:
+    """The ISO weeks (WEEK_KEY) from the first commit to the last, or none
+    without both dates."""
+    first, last = data.get_first_commit_date(), data.get_last_commit_date()
+    if not (isinstance(first, datetime.datetime) and isinstance(last, datetime.datetime)):
+        return []
+    weeks: list[str] = []
+    day = first - datetime.timedelta(days=first.weekday())
+    while day <= last:
+        weeks.append(day.strftime(WEEK_KEY))
+        day += datetime.timedelta(days=7)
+    return weeks
 
 
 def ai_assisted_count(data: Any) -> int:
