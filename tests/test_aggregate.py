@@ -1794,7 +1794,7 @@ class TestComparisonPages:
         assert '<a href="index.html">The full report of repo0' in page
         assert 'content="https://example.org/g/repo0/compare.html"' in page
         card = read("repo0/compare-card.html")
-        assert "// Python open source projects compared" in card
+        assert "Python open source projects compared" in card
         assert "1st / 5" in card
 
     def test_data(self, temp_dir):
@@ -1818,7 +1818,7 @@ class TestComparisonPages:
         page = read("repo1/compare.html")
         assert "Compared with all 7 repositories of" in page
         assert "<b>2nd of 7</b>repositories</div>" in page
-        assert "// how it compares" in read("repo1/compare-card.html")
+        assert "How it compares" in read("repo1/compare-card.html")
 
     def test_a_value_all_of_them_have_is_no_place(self, temp_dir):
         # half the commits by one person, everywhere: not "1st of 7"
@@ -1973,7 +1973,7 @@ class TestWhatStandsOut:
         assert f'content="{html_module.escape(first["sentence"], quote=True)}"' in page
 
         card = self._read(temp_dir, "p11/compare-card.html")
-        assert "// what stands out" in card
+        assert "What stands out" in card
         assert '<div class="facts n3">' in card
         assert first["big"] in card
 

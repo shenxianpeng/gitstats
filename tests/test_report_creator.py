@@ -6,6 +6,7 @@ import os
 import re
 from io import StringIO
 from types import SimpleNamespace
+from unittest import mock
 
 import pytest
 
@@ -50,6 +51,7 @@ from gitstats.report_creator import (
     release_gaps,
     report_share_card_html,
     report_share_description,
+    share_card_page,
     share_meta_html,
     share_text,
     signals_html,
@@ -3902,10 +3904,12 @@ def test_share_card_of_a_report(mock_data_collector):
     assert "<dt>Commits</dt><dd>50</dd>" in card
     assert "<dt>Lines of code</dt><dd>2,000</dd>" in card
     assert "2022-12-01 &rarr; 2023-04-01" in card
-    # commits per year, the busiest the tallest, a year without commits flat
-    assert card.count('<i style="height:') == 5
+    # commits per year, the busiest the tallest, a year without commits flat,
+    # the latest darker
+    assert card.count('<i style="height:') + card.count('<i class="last"') == 5
     assert '<i style="height:100.0%"></i>' in card
     assert '<i style="height:0.0%"></i>' in card
+    assert '<i class="last" style="height:50.0%"></i></div><div class="axis">' in card
     assert "<span>2019</span><span>commits per year</span><span>2023</span>" in card
     # no AI-assisted commits counted: no line about them
     assert "AI coding assistant" not in card
@@ -3916,13 +3920,62 @@ def test_share_card_of_a_short_history(mock_data_collector):
     # a history of less than three years shows its months
     card = report_share_card_html(mock_data_collector)
     assert "<span>2023-01</span><span>commits per month</span><span>2023-06</span>" in card
-    assert card.count('<i style="height:') == 6
+    assert card.count('<i style="height:') + card.count('<i class="last"') == 6
     mock_data_collector.commits_by_year = {}
     mock_data_collector.commits_by_month = {}
     assert "commits per" not in report_share_card_html(mock_data_collector)
     # no dates: no span under the name
     mock_data_collector.get_first_commit_date.return_value = None
     assert "&rarr;" not in report_share_card_html(mock_data_collector)
+
+
+def test_share_card_of_a_history_of_weeks(mock_data_collector):
+    """Less than six months: the weeks, from the first commit's to the last's."""
+    mock_data_collector.commits_by_year = {2023: 10}
+    mock_data_collector.commits_by_month = {"2023-11": 6, "2023-12": 4}
+    mock_data_collector.activity_by_year_week = {"2023-46": 2, "2023-48": 5, "2023-50": 3}
+    mock_data_collector.get_first_commit_date.return_value = datetime.datetime(2023, 11, 15)
+    mock_data_collector.get_last_commit_date.return_value = datetime.datetime(2023, 12, 14)
+    card = report_share_card_html(mock_data_collector)
+    assert "<span>2023-W46</span><span>commits per week</span><span>2023-W50</span>" in card
+    # weeks 46 to 50, the one without commits flat
+    assert card.count('<i style="height:') + card.count('<i class="last"') == 5
+    assert '<i style="height:0.0%"></i>' in card
+    assert '<i class="last" style="height:60.0%"></i>' in card
+    # without the dates there are no weeks to count: the months stay
+    mock_data_collector.get_first_commit_date.return_value = None
+    assert "commits per month" in report_share_card_html(mock_data_collector)
+
+
+def test_share_card_names_the_first_finding(mock_data_collector):
+    """What the overview says first is worth a look, with its tag."""
+    signals = [
+        {"level": "up", "tag": "Trend", "title": "Activity more than doubled in a year"},
+        {"level": "watch", "tag": "Watch", "title": "Bus factor is 2"},
+    ]
+    with mock.patch("gitstats.report_creator.overview_signals", return_value=signals):
+        card = report_share_card_html(mock_data_collector)
+    assert (
+        '<p class="finding"><span class="tag up">Trend</span>'
+        "<b>Activity more than doubled in a year</b></p>"
+    ) in card
+    assert "Bus factor is 2" not in card
+    for level, tone in (("watch", ""), ("risk", " risk")):
+        first = [{"level": level, "tag": "Watch", "title": "Bus factor is 1"}]
+        with mock.patch("gitstats.report_creator.overview_signals", return_value=first):
+            card = report_share_card_html(mock_data_collector)
+        assert f'<span class="tag{tone}">Watch</span><b>Bus factor is 1</b>' in card
+    with mock.patch("gitstats.report_creator.overview_signals", return_value=[]):
+        assert 'class="finding"' not in report_share_card_html(mock_data_collector)
+
+
+def test_share_cards_have_the_reports_look():
+    """No "//" before a card's brand, and the report's colors."""
+    from gitstats.report_creator import SHARE_CARD_CSS
+
+    assert "#2f6db5" in SHARE_CARD_CSS
+    assert "#4a7ab5" not in SHARE_CARD_CSS
+    assert share_card_page("t", '<div class="brand">GitStats report</div>').count("//") == 0
 
 
 def test_share_card_says_how_many_recent_commits_name_an_assistant(mock_data_collector):
