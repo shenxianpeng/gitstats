@@ -892,71 +892,142 @@ HOTSPOTS_SCRIPT = r"""<script>
 		}
 	};
 
-	// What a legend and a hover would say, written on the plot: each
-	// quadrant's name in its corner, the medians along their lines, and a
-	// number on the highest-scoring files (data.numbered of them), the same as
-	// in the list next to the plot. The points come highest score first.
+	// What a legend and a hover would say, written by the plot: each
+	// quadrant's name outside it, above and below the corner it names, so no
+	// name covers a dot; the medians along their lines; and a number beside the
+	// highest-scoring files (data.numbered of them), the same as in the list next
+	// to the plot. The points come highest score first.
+	const family = function() { return getCSSVar('--font-sans'); };
+	// the dots where they are drawn, highest score first, as the points
+	const dotsOf = function(chart) {
+		return points.map(function(p) {
+			return { x: chart.scales.x.getPixelForValue(p.x), y: chart.scales.y.getPixelForValue(p.y), r: dotRadius(p) };
+		});
+	};
+	// How many of the dots (but the one at index skip) and the boxes a box
+	// {left, top, right, bottom} overlaps, with a pixel to spare
+	const overlaps = function(box, dots, skip, boxes) {
+		let count = 0;
+		dots.forEach(function(d, i) {
+			if (i === skip) return;
+			const dx = Math.max(box.left - d.x, 0, d.x - box.right);
+			const dy = Math.max(box.top - d.y, 0, d.y - box.bottom);
+			if (dx * dx + dy * dy < (d.r + 1) * (d.r + 1)) count += 1;
+		});
+		boxes.forEach(function(b) {
+			if (box.left < b.right + 2 && b.left < box.right + 2 && box.top < b.bottom + 2 && b.top < box.bottom + 2) count += 1;
+		});
+		return count;
+	};
+	const inside = function(box, area) {
+		return box.left >= area.left && box.right <= area.right && box.top >= area.top && box.bottom <= area.bottom;
+	};
+	// a box w x h whose anchor (its [0..1] point along each side) is at x, y
+	const boxAt = function(x, y, w, h, ax, ay) {
+		return { left: x - ax * w, top: y - ay * h, right: x - ax * w + w, bottom: y - ay * h + h };
+	};
+	const write = function(ctx, text, box) {
+		ctx.textAlign = 'left';
+		ctx.textBaseline = 'middle';
+		ctx.fillText(text, box.left, (box.top + box.bottom) / 2);
+	};
+	// the boxes of the text written on the plot, for the numbers to keep clear of
+	let written = [];
 	const quadrantNames = {
 		id: 'gsQuadrantNames',
 		beforeDatasetsDraw: function(chart) {
+			written = [];
 			if (!split) return;
 			const ctx = chart.ctx, area = chart.chartArea;
 			const x = chart.scales.x.getPixelForValue(data.medianLines);
 			const y = chart.scales.y.getPixelForValue(data.medianChurn);
 			const hotColor = getCSSVar('--series-hot'), text = getCSSVar('--chart-text');
 			const count = points.filter(hot).length;
+			const dots = dotsOf(chart);
 			ctx.save();
 			// the quadrant the page is about, tinted
 			ctx.fillStyle = hotColor + '0d';
 			ctx.fillRect(x, area.top, area.right - x, y - area.top);
-			const family = Chart.defaults.font.family;
-			// [text, x, y, align, baseline, color, weight, the width it has]
-			const pad = 8;
-			[
-				['LARGE, CHANGED OFTEN \u00b7 ' + count.toLocaleString() + (count === 1 ? ' FILE' : ' FILES'),
-					x + pad, area.top + pad, 'left', 'top', hotColor, '600', area.right - x],
-				['SMALL, CHANGED OFTEN', area.left + pad, area.top + pad, 'left', 'top', text, '400', x - area.left],
-				['SMALL, RARELY CHANGED', area.left + pad, area.bottom - pad, 'left', 'bottom', text, '400', x - area.left],
-				['LARGE, RARELY CHANGED', area.right - pad, area.bottom - pad, 'right', 'bottom', text, '400', area.right - x]
-			].forEach(function(name) {
-				ctx.font = name[6] + ' 11px ' + family;
-				// a quadrant too narrow for its name goes without
-				if (ctx.measureText(name[0]).width > name[7] - 2 * pad) return;
-				ctx.textAlign = name[3];
-				ctx.textBaseline = name[4];
-				ctx.fillStyle = name[5];
-				ctx.fillText(name[0], name[1], name[2]);
-			});
-			// the medians, at the far ends of their lines from the names; without
-			// the room, the tiles above the plot still say them
-			const lines = 'median ' + data.medianLines.toLocaleString() + (data.medianLines === 1 ? ' line' : ' lines');
-			const changes = 'median ' + data.medianChurn.toLocaleString() + (data.medianChurn === 1 ? ' change' : ' changes');
-			ctx.font = '400 11px ' + family;
+			// The names, above the plot and below its axis: the large files' from
+			// the median, if there is the room, else ending at the plot's right
+			const h = 14;
+			const row = function(top, small, large, largeColor, weight) {
+				ctx.font = weight + ' 12px ' + family();
+				const wl = ctx.measureText(large).width;
+				const start = x + wl <= area.right ? x : area.right - wl;
+				const right = { left: start, top: top, right: start + wl, bottom: top + h };
+				ctx.font = '400 12px ' + family();
+				const left = { left: area.left, top: top, right: area.left + ctx.measureText(small).width, bottom: top + h };
+				// a name that would run into the other goes without
+				const both = left.right + 12 <= right.left;
+				if (both || right.left < area.left) {
+					ctx.fillStyle = text;
+					write(ctx, small, left);
+				}
+				if (right.left >= area.left) {
+					ctx.font = weight + ' 12px ' + family();
+					ctx.fillStyle = largeColor;
+					write(ctx, large, right);
+				}
+			};
+			row(area.top - h - 6, 'Small, changed often',
+				'Large, changed often · ' + count.toLocaleString() + (count === 1 ? ' file' : ' files'), hotColor, '600');
+			row(chart.height - h - 2, 'Small, rarely changed', 'Large, rarely changed', text, '400');
+			// the medians along their lines, where no dot is; without the room,
+			// the tiles above the plot still say them
+			ctx.font = '400 11px ' + family();
 			ctx.fillStyle = text;
-			ctx.textAlign = 'right';
-			if (ctx.measureText(lines).width + ctx.measureText('SMALL, CHANGED OFTEN').width + 4 * pad < x - area.left) {
-				ctx.textBaseline = 'top';
-				ctx.fillText(lines, x - pad, area.top + pad);
-			}
-			if (ctx.measureText(changes).width + 2 * pad < area.right - x) {
-				ctx.textBaseline = 'bottom';
-				ctx.fillText(changes, area.right - pad, y - 5);
-			}
+			const label = function(words, places) {
+				const w = ctx.measureText(words).width;
+				const box = places.map(function(p) { return boxAt(p[0], p[1], w, 13, p[2], p[3]); })
+					.find(function(b) { return inside(b, area) && !overlaps(b, dots, -1, written); });
+				if (!box) return;
+				write(ctx, words, box);
+				written.push(box);
+			};
+			label('median ' + data.medianLines.toLocaleString() + (data.medianLines === 1 ? ' line' : ' lines'), [
+				[x + 6, area.top + 4, 0, 0], [x - 6, area.top + 4, 1, 0],
+				[x + 6, area.bottom - 4, 0, 1], [x - 6, area.bottom - 4, 1, 1]
+			]);
+			label('median ' + data.medianChurn.toLocaleString() + (data.medianChurn === 1 ? ' change' : ' changes'), [
+				[area.right - 6, y - 3, 1, 1], [area.right - 6, y + 3, 1, 0],
+				[area.left + 6, y - 3, 0, 1], [area.left + 6, y + 3, 0, 0]
+			]);
 			ctx.restore();
 		},
+		// Each number in its dot, if the dot has the room and nothing else is
+		// there, else beside it: on the side with the fewest other dots and
+		// labels, on a patch of the page's background so it reads over a dot
 		afterDatasetsDraw: function(chart) {
-			const ctx = chart.ctx;
+			const ctx = chart.ctx, area = chart.chartArea;
+			const dots = dotsOf(chart);
+			const background = getCSSVar('--bg-color');
 			ctx.save();
-			ctx.font = '700 11px ' + Chart.defaults.font.family;
-			ctx.textBaseline = 'middle';
+			ctx.font = '700 11px ' + getCSSVar('--font-mono');
 			points.slice(0, data.numbered || 0).forEach(function(p, index) {
-				const x = chart.scales.x.getPixelForValue(p.x);
-				const y = chart.scales.y.getPixelForValue(p.y);
-				const r = dotRadius(p);
+				const d = dots[index], number = String(index + 1);
+				const w = ctx.measureText(number).width + 6, h = 14, gap = d.r + 2;
+				const own = boxAt(d.x, d.y, w, h, 0.5, 0.5);
+				let box = null;
+				if (d.r >= 8 && !overlaps(own, dots, index, written)) {
+					box = own;
+				} else {
+					let fewest = Infinity;
+					[[gap, 0, 0, 0.5], [-gap, 0, 1, 0.5], [0, -gap, 0.5, 1], [0, gap, 0.5, 0],
+						[gap * 0.7, -gap * 0.7, 0, 1], [-gap * 0.7, -gap * 0.7, 1, 1],
+						[gap * 0.7, gap * 0.7, 0, 0], [-gap * 0.7, gap * 0.7, 1, 0]].forEach(function(o) {
+						const b = boxAt(d.x + o[0], d.y + o[1], w, h, o[2], o[3]);
+						const n = overlaps(b, dots, index, written) + (inside(b, area) ? 0 : 100);
+						if (n < fewest) { fewest = n; box = b; }
+					});
+					ctx.fillStyle = background;
+					ctx.fillRect(box.left, box.top, w, h);
+				}
 				ctx.fillStyle = hot(p) ? getCSSVar('--series-hot') : getCSSVar('--chart-text');
-				// inside a dot with room for it, otherwise at its upper right
-				ctx.textAlign = r >= 8 ? 'center' : 'left';
-				ctx.fillText(String(index + 1), r >= 8 ? x : x + r + 2, r >= 8 ? y + 0.5 : y - r - 2);
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.fillText(number, (box.left + box.right) / 2, (box.top + box.bottom) / 2 + 0.5);
+				written.push(box);
 			});
 			ctx.restore();
 		}
@@ -991,6 +1062,8 @@ HOTSPOTS_SCRIPT = r"""<script>
 		options: {
 			responsive: true,
 			maintainAspectRatio: false,
+			// room above and below for the quadrants' names (quadrantNames)
+			layout: { padding: split ? { top: 22, bottom: 20 } : 0 },
 			plugins: {
 				legend: { display: false },
 				tooltip: {
