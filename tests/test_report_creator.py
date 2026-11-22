@@ -1302,6 +1302,14 @@ def test_contributor_timeline_names_every_fifth_year_of_a_long_history(mock_data
     assert "<span>2000</span><span></span>" in html
     assert "<span>2005</span>" in html
     assert "<span>2001</span>" not in html
+    # 16 years: every second one
+    mock_data_collector.author_of_month = {
+        "2000-01": {"Alice Smith": 1},
+        "2015-12": {"Alice Smith": 1},
+    }
+    html = HTMLReportCreator()._contributor_timeline_html(mock_data_collector, ["Alice Smith"])
+    assert '<div class="timeline" style="--periods: 16">' in html
+    assert "<span>2000</span><span></span><span>2002</span>" in html
     # a row without commits in the history keeps its count, and no dates
     html = HTMLReportCreator()._contributor_timeline_html(mock_data_collector, ["Bob Jones"])
     assert 'aria-label="Bob Jones: 2 commits"' in html

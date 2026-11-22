@@ -1860,11 +1860,21 @@ class HTMLReportCreator(ReportCreator):
 
         # under the cells, every year (every second or fifth on a long history),
         # or every third month
-        every = (1 if len(periods) < 12 else 2 if len(periods) < 24 else 5) if by_year else 3
+        if not by_year:
+            every = 3
+        elif len(periods) < 12:
+            every = 1
+        elif len(periods) < 24:
+            every = 2
+        else:
+            every = 5
+
+        def named(i: int, period: str) -> bool:
+            # a year is named by its number (2010, 2015), a month by its place
+            return (int(period) if by_year else i) % every == 0
+
         ticks = "".join(
-            f"<span>{period if (int(period) % every == 0 if by_year else i % every == 0) else ''}"
-            "</span>"
-            for i, period in enumerate(periods)
+            f"<span>{period if named(i, period) else ''}</span>" for i, period in enumerate(periods)
         )
         unit = "year" if by_year else "month"
         legend = (
