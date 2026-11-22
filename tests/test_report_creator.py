@@ -371,9 +371,8 @@ def test_render_chartjs_annotations():
         "c-ann",
         "bar",
         ["A", "B", "C"],
-        [{"label": "C", "data": [1, 0, 2]}],
+        [{"label": "C", "data": [1, 0, 2], "latest": False}],
         annotations=ann,
-        ordered=False,
     )
     assert "plugins: [chartAnnotations]," in result
     assert (
@@ -387,13 +386,12 @@ def test_render_chartjs_annotations():
         "c-peaks",
         "bar",
         ["A", "B", "C"],
-        [{"label": "C", "data": [1, 0, 2]}],
+        [{"label": "C", "data": [1, 0, 2], "latest": False}],
         annotations=peaks,
-        ordered=False,
     )
     assert "grace: '10%'" in labelled
     plain = creator._render_chartjs(
-        "c-plain", "bar", ["A"], [{"label": "C", "data": [1]}], ordered=False
+        "c-plain", "bar", ["A"], [{"label": "C", "data": [1], "latest": False}]
     )
     assert "chartAnnotations" not in plain
     assert "grace" not in plain
@@ -5074,7 +5072,7 @@ def test_bars_over_time_label_the_latest_and_the_peak():
     assert '"peaks"' not in valued
     # the months of the year are not in time order: nothing is the latest
     months = creator._render_chartjs(
-        "m", "bar", ["Jan", "Feb"], [{"label": "C", "data": [1, 2]}], ordered=False
+        "m", "bar", ["Jan", "Feb"], [{"label": "C", "data": [1, 2], "latest": False}]
     )
     assert '"latest"' not in months
     assert "chartAnnotations" not in months

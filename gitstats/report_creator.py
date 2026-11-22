@@ -1568,9 +1568,8 @@ class HTMLReportCreator(ReportCreator):
                 "chart-month-of-year",
                 "bar",
                 list(self.MONTH_NAMES),
-                [{"label": "Commits", "data": values}],
                 # the months of all years together: no month is the latest
-                ordered=False,
+                [{"label": "Commits", "data": values, "latest": False}],
                 max_bar_thickness=40,
                 aspect_ratio=2,
                 annotations={"values": True},
@@ -3686,7 +3685,6 @@ class HTMLReportCreator(ReportCreator):
         tooltip_share=False,
         month_axis=False,
         diverging=False,
-        ordered=True,
     ):
         """Render a Chart.js chart as inline HTML.
 
@@ -3729,12 +3727,13 @@ class HTMLReportCreator(ReportCreator):
 
         Every chart follows one grammar: a few dashed guides, labelled at the
         right, and a baseline. A bar chart of one series whose bars are in
-        time order (``ordered``, so not the months of the year) draws its
+        time order (not one with ``"latest": False``, as the months of the year) draws its
         latest bar darker and labels it and its highest one, unless every bar
         is labelled already (``values``): see latest_and_peak_marks().
         """
         is_multi = len(datasets) > 1
-        timeline = chart_type == "bar" and not is_multi and not diverging and ordered
+        timeline = chart_type == "bar" and not is_multi and not diverging
+        timeline = timeline and all(ds.get("latest", True) for ds in datasets)
         if timeline and labels and not (annotations and annotations.get("values")):
             annotations = latest_and_peak_marks(labels, datasets[0]["data"], annotations)
         if chart_type == "bar" and not max_bar_thickness:
@@ -3745,6 +3744,7 @@ class HTMLReportCreator(ReportCreator):
         for i, ds in enumerate(datasets):
             series = i % self.SERIES_COLORS + 1
             entry = dict(ds)
+            entry.pop("latest", None)
             # a line is drawn between points: one or two of them would leave
             # an empty chart, or a bare line, without their dots
             known = [value for value in entry.get("data") or [] if value is not None]
