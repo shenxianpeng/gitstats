@@ -1224,14 +1224,10 @@ def test_authors_contributor_timeline(mock_data_collector, temp_dir):
     # One row per author, summarised for screen readers
     assert html.count('<div class="timeline-row') == 3
     assert 'aria-label="Alice Smith: 30 commits, 2023-01 to 2023-06"' in html
-    # Mock history spans 2023-01..2023-06: six months, no year boundary,
-    # so the axis shows the first and last month
-    assert '<span class="timeline-mark" style="left: 41.667%; --size: 10.2px" ' in html
+    # Mock history spans 2023-01..2023-06: six months, a cell each
+    assert '<div class="timeline" style="--periods: 6">' in html
     assert 'title="2023-03: 8 commits"' in html
-    assert (
-        '<div class="timeline-axis" aria-hidden="true"><span>2023-01</span><span>2023-06</span>'
-        in html
-    )
+    assert '<span class="timeline-ticks"><span>2023-01</span><span></span><span></span>' in html
 
     # The lines chart keeps five colors and greys the rest
     assert (
@@ -1240,7 +1236,7 @@ def test_authors_contributor_timeline(mock_data_collector, temp_dir):
     ) in html
 
 
-def test_contributor_timeline_years_and_bots(mock_data_collector):
+def test_contributor_timeline_of_a_short_history_has_a_cell_a_month(mock_data_collector):
     mock_data_collector.author_of_month = {
         "2019-11": {"Alice Smith": 1},
         "2021-02": {"dependabot[bot]": 3},
@@ -1249,37 +1245,66 @@ def test_contributor_timeline_years_and_bots(mock_data_collector):
     html = HTMLReportCreator()._contributor_timeline_html(
         mock_data_collector, ["Alice Smith", "dependabot[bot]"]
     )
-    # Year boundaries become gridlines with labels; no month labels needed then
-    assert '<span class="timeline-year" style="left: 12.500%">2020</span>' in html
-    assert '<span class="timeline-year" style="left: 87.500%">2021</span>' in html
-    assert '<div class="timeline-axis" aria-hidden="true"></div>' in html
-    # Bots are marked so CSS can grey them out
+    # 16 months, a cell each, in every row
+    assert '<div class="timeline" style="--periods: 16">' in html
+    assert html.count('class="timeline-cell') == 32
+    # one commit is the palest; the most in one month (3) the darkest
+    assert '<span class="timeline-cell heat1" title="2019-11: 1 commit"></span>' in html
+    assert '<span class="timeline-cell heat4" title="2021-02: 3 commits"></span>' in html
+    assert '<span class="timeline-cell heat0" title="2020-06: 0 commits"></span>' in html
+    # bots are marked so CSS can grey them out
     assert (
-        '<div class="timeline-row bot" role="img" aria-label="dependabot[bot]: 4 commits, 2021-02 to 2021-02">'
-        in html
-    )
-    # A single month still gets a mark; the span has zero width
-    assert "width: 0.000%" in html
+        '<div class="timeline-row bot" role="img" '
+        'aria-label="dependabot[bot]: 4 commits, 2021-02 to 2021-02">'
+    ) in html
+    # every third month named under the cells
+    assert '<span class="timeline-ticks"><span>2019-11</span><span></span><span></span>' in html
+    assert "<span>2020-02</span>" in html
+    assert "a cell for each month" in html
+    assert '1 commit<span class="heat1"></span>' in html
+    assert "3 commits in a month</p>" in html
 
 
-def test_contributor_timeline_places_a_month_inside_the_collapsed_stretch(mock_data_collector):
-    """The stretch is squeezed into its slot, not cut out: a month inside it
-    lands inside the band, in proportion, never past it."""
+def test_contributor_timeline_of_a_long_history_has_a_cell_a_year(mock_data_collector):
     months = {f"2010-{m:02d}": 2 for m in range(1, 13)}
     months.update({f"2013-{m:02d}": 3 for m in range(1, 13)})
-    mock_data_collector.commits_by_month = months
     mock_data_collector.author_of_month = {m: {"Alice Smith": n} for m, n in months.items()}
-    # a commit the monthly totals do not have, in the quiet 2011-01 .. 2012-12
     mock_data_collector.author_of_month["2011-07"] = {"Bob Jones": 1}
+    mock_data_collector.get_author_info.side_effect = lambda a: {"commits": 9}
     html = HTMLReportCreator()._contributor_timeline_html(
-        mock_data_collector, ["Alice Smith", "Bob Jones"]
+        mock_data_collector, ["Alice Smith", "Bob Jones"], "the top 2 of 3 authors"
     )
-    # 48 months, the 24 quiet ones in one slot of 25: the band is at 48%, 4% wide
-    assert '<span class="timeline-gap is-collapsed" style="left: 48.000%; width: 4.000%" ' in html
-    # 2011-07 is 6.5 months into the 24 of the stretch: that far into the slot,
-    # (12 + 6.5 / 24) / 25 of the axis
-    assert 'aria-label="Bob Jones: 15 commits, 2011-07 to 2011-07"' in html
-    assert 'class="timeline-mark" style="left: 49.083%;' in html
+    # 2010 to 2013, a cell a year, with the commits of its months added up
+    assert '<div class="timeline" style="--periods: 4">' in html
+    assert 'title="2010: 24 commits"' in html
+    assert 'title="2013: 36 commits"' in html
+    assert '<span class="timeline-cell heat0" title="2012: 0 commits"></span>' in html
+    # on a logarithmic scale: 24 of at most 36 is nearly as dark; 1 the palest
+    assert '<span class="timeline-cell heat4" title="2010: 24 commits"></span>' in html
+    assert '<span class="timeline-cell heat1" title="2011: 1 commit"></span>' in html
+    assert 'aria-label="Bob Jones: 9 commits, 2011 to 2011"' in html
+    assert (
+        '<span class="timeline-ticks"><span>2010</span><span>2011</span>'
+        "<span>2012</span><span>2013</span></span>"
+    ) in html
+    assert "One row for each of the top 2 of 3 authors: a cell for each year" in html
+    assert "36 commits in a year</p>" in html
+
+
+def test_contributor_timeline_names_every_fifth_year_of_a_long_history(mock_data_collector):
+    mock_data_collector.author_of_month = {
+        "2000-01": {"Alice Smith": 1},
+        "2025-12": {"Alice Smith": 1},
+    }
+    mock_data_collector.get_author_info.side_effect = lambda a: {"commits": 2}
+    html = HTMLReportCreator()._contributor_timeline_html(mock_data_collector, ["Alice Smith"])
+    assert '<div class="timeline" style="--periods: 26">' in html
+    assert "<span>2000</span><span></span>" in html
+    assert "<span>2005</span>" in html
+    assert "<span>2001</span>" not in html
+    # a row without commits in the history keeps its count, and no dates
+    html = HTMLReportCreator()._contributor_timeline_html(mock_data_collector, ["Bob Jones"])
+    assert 'aria-label="Bob Jones: 2 commits"' in html
 
 
 # ── HTMLReportCreator.create_files_html ──────────────────────────────────
@@ -2866,8 +2891,8 @@ def test_quiet_stretch_is_shaded_on_line_charts_and_timeline(mock_data_collector
     # 2008-01 .. 2013-12 by month: the quiet stretch is indexes 36..47
     assert '"bands": [{"from": 36, "to": 47, "text": "No commits 2011-01' in growth
     assert '"collapsed"' not in growth
-    assert '<span class="timeline-gap" style="left: 50.000%; width: 16.667%" ' in authors
-    assert "is-collapsed" not in authors
+    # the timeline shows the quiet year as an empty cell in every row
+    assert '<span class="timeline-cell heat0" title="2011: 0 commits"></span>' in authors
 
 
 def test_long_quiet_stretch_is_cut_out_of_the_time_axes(mock_data_collector, temp_dir):
@@ -2905,17 +2930,10 @@ def test_long_quiet_stretch_is_cut_out_of_the_time_axes(mock_data_collector, tem
     data = json.loads(growth.split('"data": ', 1)[1].split("]", 1)[0] + "]")
     assert data[11:14] == [1, 1, 1]
 
-    # the timeline cuts the same stretch to the same slot: 12 + 1 + 12 months
-    assert (
-        '<span class="timeline-gap is-collapsed" style="left: 48.000%; width: 4.000%" '
-        'title="No commits 2011-01 \u2013 2012-12"><span>2011\u201312</span></span>'
-    ) in authors
-    # 2011 and 2012 have no gridline of their own; 2013 starts right after the break
-    assert re.findall(
-        r'<span class="timeline-year" style="left: ([\d.]+)%">(\d*)</span>', authors
-    ) == [("52.000", "2013")]
-    # a mark in 2013-01 sits half a month past the break
-    assert 'class="timeline-mark" style="left: 54.000%;' in authors
+    # the timeline has a cell a year; the two quiet years stay as empty cells
+    assert '<div class="timeline" style="--periods: 4">' in authors
+    assert '<span class="timeline-cell heat0" title="2011: 0 commits"></span>' in authors
+    assert '<span class="timeline-cell heat0" title="2012: 0 commits"></span>' in authors
 
     # the time-axis chart is handed the gap, and its band is the break
     files = page("files.html")
@@ -3128,7 +3146,10 @@ def test_authors_page_states_the_top_n_once_per_section(mock_data_collector, tem
     with open(os.path.join(temp_dir, "authors.html"), encoding="utf-8") as f:
         html = f.read()
     assert '<p class="section-note">The top 2 of 3 authors, by commits.</p>' in html
-    assert '<p class="moreauthors">The other 1: Charlie Brown.</p>' in html
+    assert (
+        '<details class="table-details"><summary>1 other author</summary>'
+        '<p class="moreauthors">Charlie Brown.</p></details>'
+    ) in html
     assert "Lines added over time by the top 2 of 3 authors;" in html
     assert "One row for each of the top 2 of 3 authors:" in html
     assert "Only top" not in html

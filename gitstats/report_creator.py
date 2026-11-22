@@ -1796,124 +1796,92 @@ class HTMLReportCreator(ReportCreator):
         loc_datasets = [{"label": a, "data": per_author_lines[a]} for a in authors_to_plot]
         return time_labels, loc_datasets
 
-    def _contributor_timeline_html(self, data: Any, authors: list[str], top_of: str = "") -> str:
-        """One row per author on a shared, real time axis.
+    # A history longer than this many months is drawn a cell per year on the
+    # contributor timeline, a shorter one a cell per month
+    TIMELINE_MONTHS = 36
 
-        A square marks each month with commits (bigger = more commits) and a thin
-        line runs from the author's first to last active month, so who was
-        active when, and for how long, reads at a glance. Plain HTML/CSS: it
-        follows the theme without any script. ``top_of`` ("the top 20 of 40
-        authors") goes in the note when not every author has a row.
+    def _contributor_timeline_html(self, data: Any, authors: list[str], top_of: str = "") -> str:
+        """One row per author, one cell per year of the history (per month for
+        one of three years or less), shaded by the author's commits in it.
+
+        Who carried which years reads at a glance, a busy year from a quiet
+        one: the squares sized by commits this replaces overlapped into a
+        smear. The shading is the punch card's heat scale on a logarithmic
+        scale, from one commit to the most any of them made in one cell, so a
+        year of 50 commits is not lost next to one of 1,000; every cell names
+        its count. Plain HTML and CSS: it follows the theme without a script.
+        ``top_of`` ("the top 20 of 40 authors") goes in the note when not
+        every author has a row.
         """
         months = month_range(data.author_of_month.keys())
         if not months or not authors:
             return ""
-        index = {month: i for i, month in enumerate(months)}
-        n = len(months)
+        by_year = len(months) > self.TIMELINE_MONTHS
+        if by_year:
+            periods = [str(year) for year in range(int(months[0][:4]), int(months[-1][:4]) + 1)]
+        else:
+            periods = months
 
-        # The longest stretch without commits: months[a:b]. When it is long
-        # enough to be collapsed on the charts it is here too, to `slots`
-        # months wide, so the page's time axes agree.
-        quiet = quiet_months(data)
-        a = b = 0
-        slots = None
-        if quiet and quiet[0] in index and quiet[1] in index:
-            a, b = index[quiet[0]], index[quiet[1]] + 1
-            slots = collapsed_slots(n, b - a)
-        width = n if slots is None else n - (b - a) + slots
+        counts: dict[str, dict[str, int]] = {author: {} for author in authors}
+        for month, commits_by_author in data.author_of_month.items():
+            period = month[:4] if by_year else month
+            for author, commits in commits_by_author.items():
+                if author in counts:
+                    counts[author][period] = counts[author].get(period, 0) + commits
+        top = max((c for row in counts.values() for c in row.values()), default=0)
 
-        def place(i: float) -> float:
-            """Where month index ``i`` falls on the axis, in months from its start."""
-            if slots is None or i <= a:
-                return i
-            if i >= b:
-                return i - (b - a) + slots
-            return a + (i - a) / (b - a) * slots
-
-        def left(i: float) -> str:
-            return f"{100.0 * place(i) / width:.3f}%"
-
-        def span(i: float, j: float) -> str:
-            return f"{100.0 * (place(j) - place(i)) / width:.3f}%"
-
-        per_author: dict[str, dict[str, int]] = {a: {} for a in authors}
-        for month, counts in data.author_of_month.items():
-            for author, commits in counts.items():
-                if author in per_author:
-                    per_author[author][month] = commits
-
-        # Year boundaries as gridlines; label every year, or every 2nd/5th on long
-        # histories. The years inside a collapsed stretch have no line of their own.
-        first_year, last_year = int(months[0][:4]), int(months[-1][:4])
-        years = [
-            year
-            for year in range(first_year + 1, last_year + 1)
-            if slots is None or not a <= index[f"{year}-01"] < b
-        ]
-        every = 1 if len(years) < 12 else 2 if len(years) < 24 else 5
-        grid = []
-        for year in years:
-            pos = left(index[f"{year}-01"])
-            label = str(year) if year % every == 0 else ""
-            grid.append(f'<span class="timeline-year" style="left: {pos}">{label}</span>')
-
-        # The quiet stretch, shaded like the charts' gap bands; collapsed, it is
-        # hatched and names its years where the year labels are
-        if quiet and b > a:
-            collapsed = slots is not None
-            grid.insert(
-                0,
-                f'<span class="timeline-gap{" is-collapsed" if collapsed else ""}" '
-                f'style="left: {left(a)}; width: {span(a, b)}" '
-                f'title="No commits {quiet[0]} \u2013 {quiet[1]}">'
-                + (f"<span>{year_span(quiet[0], quiet[1])}</span>" if collapsed else "")
-                + "</span>",
-            )
+        def level(commits: int) -> int:
+            if not commits:
+                return 0
+            ratio = math.log(commits) / math.log(top) if top > 1 else 1.0
+            return 1 + min(3, int(ratio * 4))
 
         rows = []
         for author in authors:
-            active = sorted(per_author[author])
+            row = counts[author]
             name = html.escape(author)
             commits = data.get_author_info(author)["commits"]
+            cells = "".join(
+                f'<span class="timeline-cell heat{level(row.get(period, 0))}" '
+                f'title="{period}: {plural(row.get(period, 0), "commit")}"></span>'
+                for period in periods
+            )
+            active = [period for period in periods if row.get(period)]
+            label = f"{name}: {plural(commits, 'commit')}"
             if active:
-                start, end = index[active[0]], index[active[-1]]
-                marks = [
-                    f'<span class="timeline-span" style="left: {left(start + 0.5)}; '
-                    f'width: {span(start, end)}"></span>'
-                ]
-                for month in active:
-                    count = per_author[author][month]
-                    size = min(18.0, 4 + 2.2 * math.sqrt(count))
-                    marks.append(
-                        f'<span class="timeline-mark" style="left: {left(index[month] + 0.5)}; '
-                        f'--size: {size:.1f}px" title="{month}: {plural(count, "commit")}"></span>'
-                    )
-                label = f"{name}: {plural(commits, 'commit')}, {active[0]} to {active[-1]}"
-            else:
-                marks = []
-                label = f"{name}: {plural(commits, 'commit')}"
+                label += f", {active[0]} to {active[-1]}"
             bot = " bot" if is_bot(author) else ""
             rows.append(
                 f'<div class="timeline-row{bot}" role="img" aria-label="{label}">'
                 f'<span class="timeline-name">{author_html(author)}</span>'
                 f'<span class="timeline-count">{format_int(commits)}</span>'
-                f'<span class="timeline-track">{"".join(marks)}</span></div>'
+                f'<span class="timeline-track">{cells}</span></div>'
             )
 
-        # The axis row shows the year labels from the grid; a history within one
-        # year has no year boundary, so label its first and last month instead
-        ends = "" if grid else f"<span>{months[0]}</span><span>{months[-1]}</span>"
+        # under the cells, every year (every second or fifth on a long history),
+        # or every third month
+        every = (1 if len(periods) < 12 else 2 if len(periods) < 24 else 5) if by_year else 3
+        ticks = "".join(
+            f"<span>{period if (int(period) % every == 0 if by_year else i % every == 0) else ''}"
+            "</span>"
+            for i, period in enumerate(periods)
+        )
+        unit = "year" if by_year else "month"
+        legend = (
+            '<p class="heat-legend">1 commit'
+            + "".join(f'<span class="heat{n}"></span>' for n in range(1, 5))
+            + f"{plural(top, 'commit')} in a {unit}</p>"
+        )
         return (
             '<p class="section-note">'
             + (f"One row for each of {top_of}" if top_of else "One row per author")
-            + ": a square marks each month with commits (bigger means "
-            "more), and the line runs from their first to their last active month. "
-            "Bot accounts are grey.</p>"
-            '<div class="timeline-scroll"><div class="timeline">'
-            f'<div class="timeline-grid" aria-hidden="true">{"".join(grid)}</div>'
+            + f": a cell for each {unit}, darker for more commits, on a logarithmic scale; "
+            "each cell names its count when the pointer is on it. Bot accounts are grey.</p>"
+            f'<div class="timeline-scroll"><div class="timeline" style="--periods: {len(periods)}">'
             + "".join(rows)
-            + f'<div class="timeline-axis" aria-hidden="true">{ends}</div>'
-            "</div></div>"
+            + f'<div class="timeline-axis" aria-hidden="true"><span></span><span></span>'
+            f'<span class="timeline-ticks">{ticks}</span></div>'
+            "</div></div>" + legend
         )
 
     def _authors_summary_html(self, data: Any) -> str:
@@ -2185,10 +2153,12 @@ class HTMLReportCreator(ReportCreator):
             max_list = load_config()["max_authors_list"]
             shown = ", ".join(author_html(a) for a in rest[:max_list])
             more = len(rest) - max_list
+            # folded away: a paragraph of 50 names pushed the timeline down
             f.write(
-                f'<p class="moreauthors">The other {format_int(len(rest))}: {shown}'
+                f'<details class="table-details"><summary>{plural(len(rest), "other author")}'
+                f'</summary><p class="moreauthors">{shown}'
                 + (f", and {format_int(more)} more" if more > 0 else "")
-                + ".</p>"
+                + ".</p></details>"
             )
 
         # The people first: who is around and when, how the group grew; then
