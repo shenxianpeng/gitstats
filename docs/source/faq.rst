@@ -11,9 +11,15 @@ FAQ
 
 3. How do I merge author information when the same author has made commits using different names or emails?
 
-    GitStats automatically merges authors who share the same email address, so commits made under different display names (e.g. ``Xianpeng Shen`` vs ``Xianpeng``) are unified under the most recently used name with no extra configuration needed.
+    Usually there is nothing to do. GitStats treats two identities as one person when they share a name or an email address, and follows the chain: if ``shenxianpeng`` and ``Xianpeng Shen`` committed with the same email, and ``Xianpeng Shen`` also committed with another one, all three are one author. The author goes by the name of their most recent commit.
 
-    For cases where the same person has used *different* email addresses, use Git's ``.mailmap`` feature to map them to a single canonical identity, as described in the `gitmailmap <https://git-scm.com/docs/gitmailmap>`_ documentation.
+    A ``.mailmap`` is needed only where nothing links the identities, or to choose the name shown:
+
+    - The same person used a different name *and* a different email, and never used either with the other.
+    - An account should show a person's name: ``himacro`` as ``Pinhong Ma``.
+    - Two different people have the same name. GitStats would count them as one author; a ``.mailmap`` that gives them distinct names keeps them apart.
+
+    The format is described in `gitmailmap <https://git-scm.com/docs/gitmailmap>`_. The file does not have to be in the repository: Git also reads one from ``git config mailmap.file <path>`` (for example ``git config --global mailmap.file ~/.mailmap``, for every repository you analyze) or from a branch with ``git config mailmap.blob <branch>:.mailmap``. GitStats shows the names after the mapping, wherever it comes from.
 
 4. How does GitStats know that a commit is AI-assisted?
 
