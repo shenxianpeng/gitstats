@@ -55,7 +55,7 @@
    :target: https://shenxianpeng.dev/gitstats/
    :alt: GitStats health
 
-|pypi-version| |python-versions| |test-badge| |docs-badge| |marketplace| |gitstats-report|
+|pypi-version| |python-versions| |test-badge| |marketplace| |gitstats-report|
 
 ``$ gitstats``
 ===============
