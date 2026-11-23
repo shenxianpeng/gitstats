@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:25:28+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:25:10+00:00",
   "name": "Helm",
   "report_path": "index.html",
   "first_commit": "2015-11-02 23:52:56",
-  "last_commit": "2026-11-15 13:07:59",
-  "age_days": 4031,
-  "active_days": 2452,
-  "total_commits": 10043,
-  "total_authors": 951,
-  "active_authors_12mo": 86,
-  "commits_last_12mo": 875,
+  "last_commit": "2026-11-22 23:31:41",
+  "age_days": 4038,
+  "active_days": 2457,
+  "total_commits": 10049,
+  "total_authors": 953,
+  "active_authors_12mo": 87,
+  "commits_last_12mo": 881,
   "total_files": 2048,
-  "total_lines": 134125,
-  "lines_added": 345411,
-  "lines_removed": 211201,
+  "total_lines": 115354,
+  "lines_added": 345445,
+  "lines_removed": 211215,
   "total_tags": 43,
   "era": "steady",
   "top_authors": [
@@ -41,7 +41,9 @@
     }
   ],
   "author_commits": {
-    "Terry Howe": 256,
+    "ViktorBystrov72": 1,
+    "jxj": 1,
+    "Terry Howe": 257,
     "berce": 1,
     "ump45nose": 2,
     "Sean Schneeweiss": 2,
@@ -1005,7 +1007,7 @@
     "2023": 439,
     "2024": 618,
     "2025": 1342,
-    "2026": 783
+    "2026": 789
   },
   "ai_assisted": {
     "commits": 30,
@@ -1066,19 +1068,19 @@
       "2026-08": 36,
       "2026-09": 37,
       "2026-10": 26,
-      "2026-11": 16
+      "2026-11": 22
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 10043,
+    "commits": 10049,
     "by_kind": {
-      "organization": 3709,
+      "organization": 3710,
       "one_person": 2186,
-      "personal": 2787,
+      "personal": 2789,
       "hidden": 861,
       "unknown": 10,
-      "bot": 490
+      "bot": 493
     },
     "organization_count": 32,
     "last_12mo_from": "2025-12",
@@ -1165,11 +1167,11 @@
       },
       {
         "organization": "daocloud.io",
-        "commits": 28,
-        "commits_last_12mo": 0,
-        "addresses": 9,
+        "commits": 29,
+        "commits_last_12mo": 1,
+        "addresses": 10,
         "first_commit": "2017-08-04",
-        "last_commit": "2023-02-19"
+        "last_commit": "2026-11-18"
       },
       {
         "organization": "huawei.com",
@@ -1398,25 +1400,25 @@
         "bot": 61
       },
       "2026-Q4": {
-        "organization": 0,
+        "organization": 1,
         "one_person": 3,
-        "personal": 11,
+        "personal": 13,
         "hidden": 5,
         "unknown": 0,
-        "bot": 23
+        "bot": 26
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 708,
-    "authors": 83,
-    "new_authors": 61,
+    "commits": 711,
+    "authors": 85,
+    "new_authors": 63,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 9553,
+    "commits": 9556,
     "commits_by_year": {
       "2015": 237,
       "2016": 2248,
@@ -1429,9 +1431,9 @@
       "2023": 383,
       "2024": 529,
       "2025": 1218,
-      "2026": 630
+      "2026": 633
     },
-    "active_days": 2374
+    "active_days": 2377
   },
   "timezones": {
     "+0000": 795,
@@ -1441,11 +1443,11 @@
     "+0330": 4,
     "+0400": 3,
     "+0430": 2,
-    "+0500": 17,
+    "+0500": 18,
     "+0530": 154,
     "+0600": 1,
     "+0700": 27,
-    "+0800": 383,
+    "+0800": 384,
     "+0900": 67,
     "+1000": 5,
     "+1100": 7,
@@ -1456,12 +1458,12 @@
     "-0400": 1133,
     "-0500": 768,
     "-0600": 1673,
-    "-0700": 2361,
+    "-0700": 2365,
     "-0800": 1176,
     "-1000": 1
   },
   "source_lines": {
-    "added": 319322,
-    "current": 115334
+    "added": 319352,
+    "current": 115354
   }
 }

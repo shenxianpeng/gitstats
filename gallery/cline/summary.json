@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:23:22+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:22:56+00:00",
   "name": "Cline",
   "report_path": "index.html",
   "first_commit": "2024-07-06 00:51:41",
-  "last_commit": "2026-11-12 22:03:14",
-  "age_days": 860,
-  "active_days": 758,
-  "total_commits": 7767,
-  "total_authors": 351,
-  "active_authors_12mo": 143,
-  "commits_last_12mo": 3642,
-  "total_files": 4470,
-  "total_lines": 1236307,
-  "lines_added": 2780249,
-  "lines_removed": 1543937,
-  "total_tags": 777,
+  "last_commit": "2026-11-21 05:37:41",
+  "age_days": 869,
+  "active_days": 763,
+  "total_commits": 7786,
+  "total_authors": 353,
+  "active_authors_12mo": 144,
+  "commits_last_12mo": 3661,
+  "total_files": 4536,
+  "total_lines": 1253654,
+  "lines_added": 2926696,
+  "lines_removed": 1631553,
+  "total_tags": 786,
   "era": "peak",
   "top_authors": [
     {
       "name": "Saoud Rizwan",
-      "commits": 3630
+      "commits": 3639
     },
     {
       "name": "celestial-vault",
@@ -29,7 +29,7 @@
     },
     {
       "name": "Ara",
-      "commits": 328
+      "commits": 329
     },
     {
       "name": "abeatrix",
@@ -41,9 +41,12 @@
     }
   ],
   "author_commits": {
-    "Dominic Cooney": 232,
-    "Saoud Rizwan": 3630,
-    "Tom\u00e1s Barreiro": 254,
+    "Saoud Rizwan": 3639,
+    "Tom\u00e1s Barreiro": 258,
+    "Ara": 329,
+    "Miko\u0142aj Kondratek": 234,
+    "Junpei Zhang": 2,
+    "Eapp1e": 1,
     "John Choi": 97,
     "Steven Huang": 1,
     "Nagizaaz Shaik": 1,
@@ -84,7 +87,6 @@
     "Harrison": 1,
     "\ud835\udcdc\ud835\udcf2\ud835\udcfc\ud835\udcfc\ud835\udcea\ud835\udcfb\ud835\udcf2 \ud835\udcd0\ud835\udcf1\ud835\udcf2\ud835\udcf5 \ud83c\udf3f": 1,
     "yzxcj797": 1,
-    "Ara": 328,
     "JasmineLCY": 1,
     "Fnine59": 1,
     "Sufiyan Khan": 9,
@@ -396,13 +398,13 @@
   "commits_by_year": {
     "2024": 1067,
     "2025": 3336,
-    "2026": 3364
+    "2026": 3383
   },
   "ai_assisted": {
-    "commits": 168,
+    "commits": 169,
     "authored": 0,
     "assistants": {
-      "Claude": 72,
+      "Claude": 73,
       "Cursor": 50,
       "GitHub Copilot": 47
     },
@@ -430,7 +432,7 @@
       "2026-08": 14,
       "2026-09": 26,
       "2026-10": 9,
-      "2026-11": 0
+      "2026-11": 1
     },
     "commits_by_month": {
       "2024-12": 134,
@@ -456,17 +458,17 @@
       "2026-08": 392,
       "2026-09": 323,
       "2026-10": 227,
-      "2026-11": 40
+      "2026-11": 59
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7767,
+    "commits": 7786,
     "by_kind": {
       "organization": 918,
       "one_person": 257,
-      "personal": 1225,
-      "hidden": 5179,
+      "personal": 1229,
+      "hidden": 5194,
       "unknown": 0,
       "bot": 188
     },
@@ -582,8 +584,8 @@
       "2026-Q4": {
         "organization": 20,
         "one_person": 4,
-        "personal": 24,
-        "hidden": 218,
+        "personal": 28,
+        "hidden": 233,
         "unknown": 0,
         "bot": 1
       }
@@ -592,30 +594,30 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 3587,
-    "authors": 136,
-    "new_authors": 109,
+    "commits": 3606,
+    "authors": 138,
+    "new_authors": 111,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 7579,
+    "commits": 7598,
     "commits_by_year": {
       "2024": 1067,
       "2025": 3188,
-      "2026": 3324
+      "2026": 3343
     },
-    "active_days": 757
+    "active_days": 762
   },
   "timezones": {
     "+0000": 81,
-    "+0100": 114,
+    "+0100": 121,
     "+0200": 231,
     "+0300": 35,
     "+0400": 37,
     "+0500": 4,
     "+0530": 61,
     "+0700": 18,
-    "+0800": 214,
+    "+0800": 217,
     "+0900": 166,
     "+1000": 5,
     "+1100": 1,
@@ -625,11 +627,11 @@
     "-0500": 112,
     "-0600": 66,
     "-0700": 3840,
-    "-0800": 1517,
+    "-0800": 1526,
     "-1000": 60
   },
   "source_lines": {
-    "added": 2666679,
-    "current": 1195033
+    "added": 2812684,
+    "current": 1253654
   }
 }

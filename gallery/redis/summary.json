@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:32:14+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:32:18+00:00",
   "name": "Redis",
   "report_path": "index.html",
   "first_commit": "2009-03-22 09:30:00",
-  "last_commit": "2026-11-15 15:15:18",
-  "age_days": 6448,
-  "active_days": 3861,
-  "total_commits": 13447,
-  "total_authors": 917,
+  "last_commit": "2026-11-23 06:03:23",
+  "age_days": 6455,
+  "active_days": 3866,
+  "total_commits": 13463,
+  "total_authors": 918,
   "active_authors_12mo": 127,
-  "commits_last_12mo": 621,
+  "commits_last_12mo": 637,
   "total_files": 1961,
-  "total_lines": 682718,
-  "lines_added": 1074091,
-  "lines_removed": 391239,
+  "total_lines": 683942,
+  "lines_added": 1075520,
+  "lines_removed": 391443,
   "total_tags": 28,
   "era": "steady",
   "top_authors": [
@@ -41,11 +41,18 @@
     }
   ],
   "author_commits": {
+    "Ozan Tezcan": 104,
+    "gildaf": 3,
+    "Omer Shadmi": 11,
+    "Alon Rolnik": 3,
+    "debing.sun": 164,
+    "Tom Gabsow": 29,
+    "Filipe Oliveira (Redis)": 60,
+    "Paulo Sousa": 5,
+    "Vitah Lin": 92,
     "Moti Cohen": 106,
-    "Vitah Lin": 91,
     "Sergei Georgiev": 34,
     "Slavomir Kaslev": 34,
-    "Filipe Oliveira (Redis)": 59,
     "Lazizbek Ergashev": 6,
     "hristostaykov-del": 16,
     "PavlNekrasov": 1,
@@ -56,11 +63,8 @@
     "Yuan Wang": 67,
     "Ronen Kalish": 8,
     "The number one sword cultivator in the south of the sky": 1,
-    "Tom Gabsow": 28,
-    "debing.sun": 162,
     "Marcello Costagliola": 3,
     "Mincho Paskalev": 46,
-    "Ozan Tezcan": 103,
     "poisongodv": 1,
     "Gimin Kim": 3,
     "Stav-Levi": 23,
@@ -72,13 +76,11 @@
     "pirate329": 2,
     "Perfloop Agent": 1,
     "Antonio Viggiano": 5,
-    "gildaf": 1,
     "Marcin Po\u017aniak": 2,
     "Salvatore Sanfilippo": 7214,
     "Shubham S Taple": 7,
     "Oran Agra": 579,
     "GuyAv46": 8,
-    "Paulo Sousa": 4,
     "chenshi": 1,
     "Syh-Xiong": 2,
     "kei-nan": 24,
@@ -110,7 +112,6 @@
     "YaacovHazan": 48,
     "kush2439p": 1,
     "Aidan Nguyen": 1,
-    "Omer Shadmi": 10,
     "himanshu-2l": 1,
     "Vismay": 2,
     "sacad": 1,
@@ -977,13 +978,13 @@
     "2023": 453,
     "2024": 321,
     "2025": 549,
-    "2026": 591
+    "2026": 607
   },
   "ai_assisted": {
-    "commits": 62,
+    "commits": 68,
     "authored": 0,
     "assistants": {
-      "Claude": 53,
+      "Claude": 59,
       "GitHub Copilot": 10,
       "Cursor": 1
     },
@@ -1011,7 +1012,7 @@
       "2026-08": 1,
       "2026-09": 5,
       "2026-10": 21,
-      "2026-11": 13
+      "2026-11": 19
     },
     "commits_by_month": {
       "2024-12": 16,
@@ -1037,30 +1038,30 @@
       "2026-08": 53,
       "2026-09": 45,
       "2026-10": 74,
-      "2026-11": 54
+      "2026-11": 70
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 13447,
+    "commits": 13463,
     "by_kind": {
-      "organization": 1941,
+      "organization": 1947,
       "one_person": 633,
-      "personal": 10297,
-      "hidden": 553,
+      "personal": 10301,
+      "hidden": 556,
       "unknown": 5,
-      "bot": 18
+      "bot": 21
     },
     "organization_count": 14,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "redis.com",
-        "commits": 1380,
-        "commits_last_12mo": 158,
-        "addresses": 47,
+        "commits": 1386,
+        "commits_last_12mo": 164,
+        "addresses": 48,
         "first_commit": "2015-03-31",
-        "last_commit": "2026-11-13"
+        "last_commit": "2026-11-19"
       },
       {
         "organization": "alibaba-inc.com",
@@ -1225,25 +1226,25 @@
         "bot": 1
       },
       "2026-Q4": {
-        "organization": 43,
+        "organization": 49,
         "one_person": 2,
-        "personal": 62,
-        "hidden": 18,
+        "personal": 66,
+        "hidden": 21,
         "unknown": 0,
-        "bot": 3
+        "bot": 6
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 615,
-    "authors": 126,
-    "new_authors": 90,
+    "commits": 628,
+    "authors": 127,
+    "new_authors": 91,
     "half_of_commits": 9
   },
   "humans": {
-    "commits": 13429,
+    "commits": 13442,
     "commits_by_year": {
       "2009": 435,
       "2010": 1057,
@@ -1262,15 +1263,15 @@
       "2023": 450,
       "2024": 319,
       "2025": 549,
-      "2026": 585
+      "2026": 598
     },
-    "active_days": 3857
+    "active_days": 3862
   },
   "timezones": {
-    "+0000": 151,
+    "+0000": 152,
     "+0100": 3793,
-    "+0200": 5056,
-    "+0300": 1164,
+    "+0200": 5067,
+    "+0300": 1165,
     "+0330": 3,
     "+0400": 9,
     "+0430": 1,
@@ -1278,7 +1279,7 @@
     "+0530": 78,
     "+0600": 1,
     "+0700": 17,
-    "+0800": 1887,
+    "+0800": 1890,
     "+0900": 91,
     "+1000": 6,
     "+1100": 13,
@@ -1293,7 +1294,7 @@
     "-0800": 192
   },
   "source_lines": {
-    "added": 1193151,
-    "current": 682718
+    "added": 1194579,
+    "current": 683942
   }
 }

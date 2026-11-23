@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:21:58+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:21:46+00:00",
   "name": "scikit-learn",
   "report_path": "index.html",
   "first_commit": "2010-01-05 13:26:32",
-  "last_commit": "2026-11-16 00:51:39",
-  "age_days": 6159,
-  "active_days": 5145,
-  "total_commits": 34151,
-  "total_authors": 3377,
-  "active_authors_12mo": 192,
-  "commits_last_12mo": 955,
-  "total_files": 1872,
-  "total_lines": 577321,
-  "lines_added": 2938117,
-  "lines_removed": 2361046,
+  "last_commit": "2026-11-21 14:45:12",
+  "age_days": 6165,
+  "active_days": 5150,
+  "total_commits": 34185,
+  "total_authors": 3378,
+  "active_authors_12mo": 191,
+  "commits_last_12mo": 989,
+  "total_files": 1886,
+  "total_lines": 575075,
+  "lines_added": 2940895,
+  "lines_removed": 2362217,
   "total_tags": 25,
   "era": "steady",
   "top_authors": [
@@ -41,18 +41,24 @@
     }
   ],
   "author_commits": {
-    "Christian Lorentzen": 293,
-    "Arthur Lacote": 69,
+    "Fran\u00e7ois Paugam": 48,
+    "Arthur Lacote": 75,
+    "J\u00e9r\u00e9mie du Boisberranger": 528,
+    "Loic Esteve": 659,
+    "Christian Lorentzen": 302,
+    "Anne Beyer": 66,
+    "Tim Head": 126,
+    "Virgil Chan": 28,
+    "Itamar Turner-Trauring": 15,
+    "Dongjin Choi": 1,
+    "Dea Mar\u00eda L\u00e9on": 72,
+    "Josef Affourtit": 4,
+    "scikit-learn-bot": 540,
     "Lucy Liu": 258,
-    "Virgil Chan": 27,
     "Eric Hare": 1,
     "yi111": 1,
-    "Anne Beyer": 63,
-    "scikit-learn-bot": 539,
-    "Loic Esteve": 657,
     "Hayden Barolette": 2,
     "antoinebaker": 21,
-    "Fran\u00e7ois Paugam": 47,
     "Rugved Bane": 2,
     "Soledad Galli": 2,
     "blank-0007": 1,
@@ -74,16 +80,12 @@
     "Punyak": 2,
     "Arya Topale": 1,
     "Tony Bagnall": 1,
-    "Tim Head": 123,
     "Olivier Grisel": 2584,
     "Pranav Negi": 1,
-    "Dea Mar\u00eda L\u00e9on": 71,
-    "Itamar Turner-Trauring": 14,
     "Mohammad Hamza": 1,
     "Adrin Jalali": 305,
     "Aditya Chaudhary": 1,
     "Eric Larson": 9,
-    "J\u00e9r\u00e9mie du Boisberranger": 525,
     "Abhimanyu Singh Shekhawat": 1,
     "Shruti Nath": 12,
     "Christopher Boseak": 1,
@@ -229,7 +231,6 @@
     "Gaetan": 1,
     "Nithurshen": 4,
     "Sota Goto": 14,
-    "Josef Affourtit": 3,
     "Acciaro Gennaro Daniele": 3,
     "Manikandan Gobalakrishnan": 1,
     "Faizan-Ul Huda": 1,
@@ -3436,15 +3437,15 @@
     "2023": 1349,
     "2024": 1268,
     "2025": 1237,
-    "2026": 886
+    "2026": 920
   },
   "ai_assisted": {
-    "commits": 17,
+    "commits": 25,
     "authored": 3,
     "assistants": {
-      "Claude": 8,
-      "GitHub Copilot": 6,
-      "Cursor": 4
+      "Claude": 14,
+      "Cursor": 6,
+      "GitHub Copilot": 6
     },
     "by_month": {
       "2024-12": 0,
@@ -3470,7 +3471,7 @@
       "2026-08": 1,
       "2026-09": 1,
       "2026-10": 5,
-      "2026-11": 6
+      "2026-11": 14
     },
     "commits_by_month": {
       "2024-12": 72,
@@ -3496,19 +3497,19 @@
       "2026-08": 77,
       "2026-09": 62,
       "2026-10": 70,
-      "2026-11": 49
+      "2026-11": 83
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 34151,
+    "commits": 34185,
     "by_kind": {
-      "organization": 8785,
-      "one_person": 8375,
-      "personal": 13532,
-      "hidden": 3401,
+      "organization": 8788,
+      "one_person": 8376,
+      "personal": 13559,
+      "hidden": 3403,
       "unknown": 38,
-      "bot": 20
+      "bot": 21
     },
     "organization_count": 55,
     "last_12mo_from": "2025-12",
@@ -3539,11 +3540,11 @@
       },
       {
         "organization": "probabl.ai",
-        "commits": 285,
-        "commits_last_12mo": 57,
+        "commits": 288,
+        "commits_last_12mo": 60,
         "addresses": 8,
         "first_commit": "2024-02-10",
-        "last_commit": "2026-09-21"
+        "last_commit": "2026-11-20"
       },
       {
         "organization": "uni-bremen.de",
@@ -4012,25 +4013,25 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 0,
-        "one_person": 6,
-        "personal": 91,
-        "hidden": 21,
+        "organization": 3,
+        "one_person": 7,
+        "personal": 118,
+        "hidden": 23,
         "unknown": 0,
-        "bot": 1
+        "bot": 2
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 950,
-    "authors": 183,
-    "new_authors": 130,
+    "commits": 983,
+    "authors": 185,
+    "new_authors": 131,
     "half_of_commits": 7
   },
   "humans": {
-    "commits": 34131,
+    "commits": 34164,
     "commits_by_year": {
       "2010": 2604,
       "2011": 4913,
@@ -4048,13 +4049,13 @@
       "2023": 1349,
       "2024": 1262,
       "2025": 1230,
-      "2026": 881
+      "2026": 914
     },
-    "active_days": 5145
+    "active_days": 5150
   },
   "timezones": {
     "+0000": 1119,
-    "+0100": 8445,
+    "+0100": 8475,
     "+0200": 11673,
     "+0300": 940,
     "+0330": 24,
@@ -4066,7 +4067,7 @@
     "+0600": 35,
     "+0700": 16,
     "+0800": 803,
-    "+0900": 944,
+    "+0900": 945,
     "+1000": 756,
     "+1030": 1,
     "+1100": 528,
@@ -4075,14 +4076,14 @@
     "-0200": 20,
     "-0300": 250,
     "-0400": 2797,
-    "-0500": 1747,
+    "-0500": 1749,
     "-0600": 189,
     "-0700": 1630,
-    "-0800": 821,
+    "-0800": 822,
     "-1000": 21
   },
   "source_lines": {
-    "added": 3718699,
-    "current": 574862
+    "added": 3707356,
+    "current": 575075
   }
 }

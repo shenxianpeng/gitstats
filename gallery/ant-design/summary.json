@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:30:58+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:30:43+00:00",
   "name": "Ant Design",
   "report_path": "index.html",
   "first_commit": "2015-05-07 10:50:36",
-  "last_commit": "2026-11-16 03:12:48",
-  "age_days": 4211,
-  "active_days": 3856,
-  "total_commits": 33346,
-  "total_authors": 2619,
-  "active_authors_12mo": 192,
-  "commits_last_12mo": 2329,
-  "total_files": 5071,
-  "total_lines": 1863697,
-  "lines_added": 6416450,
-  "lines_removed": 4552752,
-  "total_tags": 759,
+  "last_commit": "2026-11-23 02:43:15",
+  "age_days": 4218,
+  "active_days": 3863,
+  "total_commits": 33408,
+  "total_authors": 2628,
+  "active_authors_12mo": 196,
+  "commits_last_12mo": 2391,
+  "total_files": 5076,
+  "total_lines": 369027,
+  "lines_added": 6418235,
+  "lines_removed": 4553319,
+  "total_tags": 760,
   "era": "steady",
   "top_authors": [
     {
       "name": "afc163",
-      "commits": 10854
+      "commits": 10855
     },
     {
       "name": "\u4e8c\u8d27\u7231\u5403\u767d\u841d\u535c",
@@ -29,7 +29,7 @@
     },
     {
       "name": "lijianan",
-      "commits": 1579
+      "commits": 1592
     },
     {
       "name": "Benjy Cui",
@@ -41,25 +41,36 @@
     }
   ],
   "author_commits": {
-    "lijianan": 1579,
-    "Amumu": 235,
+    "afc163": 10855,
+    "lijianan": 1592,
+    "AMin": 11,
+    "Kayokoi": 2,
+    "Chaoqi": 10,
+    "Breaker": 1,
+    "Wei-Lun Li": 1,
+    "Nicol\u00f2 Zandarin": 17,
+    "T Mohan Aditya": 1,
+    "Vrutik Halani": 1,
+    "\u591a\u683c": 63,
+    "DianDian": 1,
+    "\u9ad8\u8273\u5175": 390,
+    "ngocanhnckh": 1,
+    "Faris Basha TM": 1,
+    "Gowtham Padala": 3,
+    "Nosirbek Xakimov": 1,
+    "Amumu": 236,
+    "xrkffgg": 578,
     "Bin": 5,
-    "\u9ad8\u8273\u5175": 372,
     "Karim Masmoudi": 1,
-    "AMin": 4,
     "Insan Rizky": 1,
-    "Kayokoi": 1,
     "Wan Xiankai": 1,
-    "Nicol\u00f2 Zandarin": 15,
     "Daliik": 1,
     "\u4e8c\u8d27\u7231\u5403\u767d\u841d\u535c": 2820,
     "Raphael Fakhri": 1,
     "\ud835\udc7e\ud835\udc96\ud835\udc99\ud835\udc89": 204,
-    "\u591a\u683c": 60,
     "Dominique Roduit": 3,
     "JANSON": 3,
     "WH-bin": 1,
-    "afc163": 10854,
     "zoomdong": 54,
     "Enes Uygur": 1,
     "Otto": 1,
@@ -67,13 +78,11 @@
     "EmilyyyLiu": 91,
     "SaltyC": 998,
     "Fatih \u00c7ak\u0131r": 2,
-    "Chaoqi": 9,
     "Ting-An Chen": 27,
     "Euan Zhu": 4,
     "xushanpei": 1,
     "Tr\u1ea7n \u0110\u00ecnh Huy": 1,
     "woahwhattheheck": 1,
-    "xrkffgg": 576,
     "\u9648\u5e05": 314,
     "Victor": 2,
     "Beka Latsabidze": 1,
@@ -2673,14 +2682,14 @@
     "2023": 2676,
     "2024": 2021,
     "2025": 2248,
-    "2026": 2143
+    "2026": 2205
   },
   "ai_assisted": {
-    "commits": 342,
+    "commits": 343,
     "authored": 21,
     "assistants": {
       "Gemini": 152,
-      "Claude": 144,
+      "Claude": 145,
       "GitHub Copilot": 64,
       "Cursor": 9,
       "CodeRabbit": 5
@@ -2709,7 +2718,7 @@
       "2026-08": 16,
       "2026-09": 2,
       "2026-10": 5,
-      "2026-11": 4
+      "2026-11": 5
     },
     "commits_by_month": {
       "2024-12": 149,
@@ -2735,19 +2744,19 @@
       "2026-08": 200,
       "2026-09": 186,
       "2026-10": 159,
-      "2026-11": 69
+      "2026-11": 131
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 33346,
+    "commits": 33408,
     "by_kind": {
       "organization": 903,
       "one_person": 678,
-      "personal": 27211,
-      "hidden": 2557,
+      "personal": 27257,
+      "hidden": 2571,
       "unknown": 5,
-      "bot": 1992
+      "bot": 1994
     },
     "organization_count": 13,
     "last_12mo_from": "2025-12",
@@ -2917,23 +2926,23 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 5,
-        "personal": 135,
-        "hidden": 50,
+        "personal": 181,
+        "hidden": 64,
         "unknown": 0,
-        "bot": 38
+        "bot": 40
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1753,
-    "authors": 183,
-    "new_authors": 138,
+    "commits": 1813,
+    "authors": 192,
+    "new_authors": 147,
     "half_of_commits": 4
   },
   "humans": {
-    "commits": 31354,
+    "commits": 31414,
     "commits_by_year": {
       "2015": 3342,
       "2016": 3938,
@@ -2946,25 +2955,25 @@
       "2023": 2426,
       "2024": 1693,
       "2025": 1828,
-      "2026": 1615
+      "2026": 1675
     },
-    "active_days": 3818
+    "active_days": 3825
   },
   "timezones": {
     "+0000": 1026,
-    "+0100": 310,
+    "+0100": 312,
     "+0200": 396,
     "+0300": 227,
     "+0330": 39,
     "+0400": 25,
     "+0430": 7,
-    "+0500": 26,
-    "+0530": 136,
+    "+0500": 27,
+    "+0530": 139,
     "+0545": 12,
     "+0600": 9,
-    "+0700": 144,
-    "+0800": 30158,
-    "+0900": 116,
+    "+0700": 145,
+    "+0800": 30208,
+    "+0900": 117,
     "+0930": 7,
     "+1000": 40,
     "+1100": 18,
@@ -2973,7 +2982,7 @@
     "-0200": 3,
     "-0300": 35,
     "-0400": 150,
-    "-0500": 203,
+    "-0500": 207,
     "-0600": 82,
     "-0700": 86,
     "-0800": 75,
@@ -2981,7 +2990,7 @@
     "-1000": 1
   },
   "source_lines": {
-    "added": 1200208,
-    "current": 368227
+    "added": 1201451,
+    "current": 369027
   }
 }

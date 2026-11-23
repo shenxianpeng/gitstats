@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:26:06+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:25:38+00:00",
   "name": "Linkerd",
   "report_path": "index.html",
   "first_commit": "2017-12-05 00:17:02",
-  "last_commit": "2026-11-13 17:34:45",
-  "age_days": 3266,
-  "active_days": 2006,
-  "total_commits": 9212,
-  "total_authors": 403,
-  "active_authors_12mo": 32,
-  "commits_last_12mo": 728,
+  "last_commit": "2026-11-20 16:11:34",
+  "age_days": 3273,
+  "active_days": 2009,
+  "total_commits": 9218,
+  "total_authors": 404,
+  "active_authors_12mo": 33,
+  "commits_last_12mo": 734,
   "total_files": 1469,
-  "total_lines": 442277,
-  "lines_added": 1209433,
-  "lines_removed": 767004,
+  "total_lines": 266487,
+  "lines_added": 1209634,
+  "lines_removed": 767083,
   "total_tags": 425,
   "era": "steady",
   "top_authors": [
@@ -41,6 +41,7 @@
     }
   ],
   "author_commits": {
+    "Ehsan Shirazi": 1,
     "l5d-bot": 144,
     "Raymond Kroeker": 11,
     "toidiu": 5,
@@ -455,13 +456,13 @@
     "2023": 1054,
     "2024": 1235,
     "2025": 1042,
-    "2026": 679
+    "2026": 685
   },
   "ai_assisted": {
-    "commits": 2,
+    "commits": 3,
     "authored": 0,
     "assistants": {
-      "Claude": 2
+      "Claude": 3
     },
     "by_month": {
       "2024-12": 0,
@@ -487,7 +488,7 @@
       "2026-08": 0,
       "2026-09": 1,
       "2026-10": 1,
-      "2026-11": 0
+      "2026-11": 1
     },
     "commits_by_month": {
       "2024-12": 94,
@@ -513,19 +514,19 @@
       "2026-08": 42,
       "2026-09": 59,
       "2026-10": 22,
-      "2026-11": 10
+      "2026-11": 16
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9212,
+    "commits": 9218,
     "by_kind": {
       "organization": 2928,
       "one_person": 705,
-      "personal": 817,
+      "personal": 818,
       "hidden": 350,
       "unknown": 0,
-      "bot": 4412
+      "bot": 4417
     },
     "organization_count": 4,
     "last_12mo_from": "2025-12",
@@ -623,23 +624,23 @@
       "2026-Q4": {
         "organization": 11,
         "one_person": 2,
-        "personal": 1,
+        "personal": 2,
         "hidden": 5,
         "unknown": 0,
-        "bot": 13
+        "bot": 18
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 161,
-    "authors": 31,
-    "new_authors": 23,
+    "commits": 162,
+    "authors": 32,
+    "new_authors": 24,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 4800,
+    "commits": 4801,
     "commits_by_year": {
       "2017": 65,
       "2018": 948,
@@ -650,9 +651,9 @@
       "2023": 387,
       "2024": 322,
       "2025": 231,
-      "2026": 112
+      "2026": 113
     },
-    "active_days": 1700
+    "active_days": 1701
   },
   "timezones": {
     "+0000": 339,
@@ -669,14 +670,14 @@
     "+1100": 7,
     "-0300": 12,
     "-0400": 372,
-    "-0500": 2136,
+    "-0500": 2137,
     "-0600": 274,
-    "-0700": 3329,
+    "-0700": 3334,
     "-0800": 1459,
     "-1000": 114
   },
   "source_lines": {
-    "added": 574299,
-    "current": 266331
+    "added": 567394,
+    "current": 266487
   }
 }

@@ -1,57 +1,67 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:31:57+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:32:22+00:00",
   "name": "Neovim",
   "report_path": "index.html",
   "first_commit": "2014-01-31 13:39:15",
-  "last_commit": "2026-11-15 21:09:58",
-  "age_days": 4672,
-  "active_days": 4521,
-  "total_commits": 38770,
-  "total_authors": 1517,
-  "active_authors_12mo": 297,
-  "commits_last_12mo": 4196,
+  "last_commit": "2026-11-23 02:44:47",
+  "age_days": 4679,
+  "active_days": 4529,
+  "total_commits": 38852,
+  "total_authors": 1522,
+  "active_authors_12mo": 291,
+  "commits_last_12mo": 4278,
   "total_files": 3953,
-  "total_lines": 1752945,
-  "lines_added": 3732304,
-  "lines_removed": 1979221,
+  "total_lines": 1720348,
+  "lines_added": 3735613,
+  "lines_removed": 1980653,
   "total_tags": 26,
   "era": "steady",
   "top_authors": [
     {
       "name": "zeertzjq",
-      "commits": 7199
+      "commits": 7215
     },
     {
       "name": "Justin M. Keyes",
-      "commits": 5143
+      "commits": 5180
     },
     {
       "name": "Jan Edmund Lazo",
-      "commits": 2771
+      "commits": 2772
     },
     {
       "name": "bfredl",
-      "commits": 2473
+      "commits": 2480
     },
     {
       "name": "Christian Clason",
-      "commits": 1641
+      "commits": 1648
     }
   ],
   "author_commits": {
+    "zeertzjq": 7215,
+    "Justin M. Keyes": 5180,
+    "Ishian": 1,
+    "glepnir": 353,
+    "Jan Edmund Lazo": 2772,
+    "bfredl": 2480,
+    "tupos": 2,
+    "Ata Altyyev": 1,
+    "Oleg Skoromnik": 1,
+    "Dan Drennan": 2,
+    "Ellison Le\u00e3o": 4,
+    "Christian Clason": 1648,
+    "Chinmay Dalal": 24,
+    "Jonas \u00d6rnfelt": 2,
+    "akioweh": 1,
     "Andrea Cappuccio": 3,
     "akiyosi": 2,
     "James McCoy": 1414,
-    "Justin M. Keyes": 5143,
-    "glepnir": 349,
-    "zeertzjq": 7199,
     "Wei Shx": 1,
     "Barrett Ruth": 132,
     "Evgeni Chasnovski": 192,
-    "Jan Edmund Lazo": 2771,
-    "Christian Clason": 1641,
     "Rodrigo Batista de Moraes": 2,
     "Marek Langiewicz": 1,
     "Hasini Bade": 1,
@@ -59,7 +69,6 @@
     "Lewis Russell": 776,
     "Lazizbek Ergashev": 2,
     "Volodymyr Chernetskyi": 77,
-    "bfredl": 2473,
     "Wei-Lun Li": 4,
     "coot": 2,
     "Manoj Panda": 3,
@@ -88,12 +97,10 @@
     "ump45nose": 1,
     "Max Coplan": 3,
     "Aradhya Jain": 1,
-    "Jonas \u00d6rnfelt": 1,
     "IOCRYPOSTO": 1,
     "Sanzhar Kuandyk": 9,
     "Zoe Roux": 1,
     "IcyJerry": 1,
-    "Chinmay Dalal": 23,
     "Jamal Ali": 1,
     "S\u00e9bastien Hoffmann": 24,
     "Langning Zhang": 1,
@@ -225,7 +232,6 @@
     "Alexej Kowalew": 2,
     "Quentin": 1,
     "Eisuke Kawashima": 23,
-    "Ellison": 3,
     "Daigo Yamashita": 2,
     "David Balatero": 4,
     "Matthew Hughes": 2,
@@ -247,7 +253,6 @@
     "skewb1k": 25,
     "Jordan": 2,
     "ngicks": 1,
-    "Dan Drennan": 1,
     "Josh Triplett": 7,
     "nameearly": 1,
     "Elijah Koulaxis": 2,
@@ -1572,7 +1577,7 @@
     "2023": 3985,
     "2024": 3283,
     "2025": 3384,
-    "2026": 3891
+    "2026": 3973
   },
   "ai_assisted": {
     "commits": 57,
@@ -1625,23 +1630,23 @@
       "2026-02": 362,
       "2026-03": 406,
       "2026-04": 423,
-      "2026-05": 324,
+      "2026-05": 325,
       "2026-06": 343,
       "2026-07": 420,
       "2026-08": 428,
-      "2026-09": 408,
+      "2026-09": 409,
       "2026-10": 274,
-      "2026-11": 154
+      "2026-11": 234
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38770,
+    "commits": 38852,
     "by_kind": {
       "organization": 31,
-      "one_person": 6594,
-      "personal": 30093,
-      "hidden": 1872,
+      "one_person": 6602,
+      "personal": 30163,
+      "hidden": 1876,
       "unknown": 17,
       "bot": 163
     },
@@ -1749,7 +1754,7 @@
       "2026-Q2": {
         "organization": 0,
         "one_person": 89,
-        "personal": 871,
+        "personal": 872,
         "hidden": 94,
         "unknown": 0,
         "bot": 36
@@ -1757,16 +1762,16 @@
       "2026-Q3": {
         "organization": 1,
         "one_person": 160,
-        "personal": 930,
+        "personal": 931,
         "hidden": 126,
         "unknown": 0,
         "bot": 39
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 47,
-        "personal": 344,
-        "hidden": 26,
+        "one_person": 55,
+        "personal": 412,
+        "hidden": 30,
         "unknown": 0,
         "bot": 11
       }
@@ -1775,13 +1780,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 4084,
-    "authors": 280,
-    "new_authors": 196,
+    "commits": 4166,
+    "authors": 285,
+    "new_authors": 201,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 38607,
+    "commits": 38689,
     "commits_by_year": {
       "2014": 2640,
       "2015": 2124,
@@ -1795,24 +1800,24 @@
       "2023": 3971,
       "2024": 3279,
       "2025": 3354,
-      "2026": 3788
+      "2026": 3870
     },
-    "active_days": 4521
+    "active_days": 4529
   },
   "timezones": {
-    "+0000": 1131,
-    "+0100": 6207,
-    "+0200": 7787,
+    "+0000": 1132,
+    "+0100": 6261,
+    "+0200": 7788,
     "+0300": 1875,
     "+0330": 2,
     "+0400": 50,
     "+0430": 2,
-    "+0500": 22,
+    "+0500": 23,
     "+0530": 175,
     "+0545": 2,
     "+0600": 231,
     "+0700": 109,
-    "+0800": 8354,
+    "+0800": 8373,
     "+0900": 976,
     "+1000": 82,
     "+1100": 23,
@@ -1820,15 +1825,15 @@
     "+1300": 6,
     "-0200": 58,
     "-0230": 1,
-    "-0300": 1185,
+    "-0300": 1186,
     "-0400": 4945,
-    "-0500": 3168,
-    "-0600": 473,
+    "-0500": 3172,
+    "-0600": 474,
     "-0700": 1286,
     "-0800": 616
   },
   "source_lines": {
-    "added": 3703058,
-    "current": 1718618
+    "added": 3705119,
+    "current": 1720348
   }
 }

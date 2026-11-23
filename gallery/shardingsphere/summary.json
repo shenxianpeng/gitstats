@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:29:32+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:29:23+00:00",
   "name": "Apache ShardingSphere",
   "report_path": "index.html",
   "first_commit": "2016-01-18 12:49:26",
-  "last_commit": "2026-11-15 15:39:53",
-  "age_days": 3955,
-  "active_days": 3443,
-  "total_commits": 50154,
+  "last_commit": "2026-11-23 05:48:20",
+  "age_days": 3962,
+  "active_days": 3451,
+  "total_commits": 50177,
   "total_authors": 740,
   "active_authors_12mo": 66,
-  "commits_last_12mo": 2748,
-  "total_files": 17448,
-  "total_lines": 1492353,
-  "lines_added": 4837232,
-  "lines_removed": 3344618,
+  "commits_last_12mo": 2771,
+  "total_files": 17470,
+  "total_lines": 1500510,
+  "lines_added": 4846991,
+  "lines_removed": 3345739,
   "total_tags": 37,
   "era": "steady",
   "top_authors": [
     {
       "name": "Liang Zhang",
-      "commits": 18925
+      "commits": 18931
     },
     {
       "name": "Juan Pan(Trista)",
@@ -37,25 +37,25 @@
     },
     {
       "name": "Zhengqiang Duan",
-      "commits": 1575
+      "commits": 1577
     }
   ],
   "author_commits": {
-    "Liang Zhang": 18925,
-    "Hongsheng Zhong": 738,
-    "Zhengqiang Duan": 1575,
-    "ZIHAN DAI": 13,
+    "Zhengqiang Duan": 1577,
+    "Liang Zhang": 18931,
+    "Hongsheng Zhong": 740,
+    "ZhangCheng": 548,
+    "Maxim Igoshin": 49,
+    "Eunbin Son": 59,
+    "Reassoonn": 2,
+    "ZIHAN DAI": 14,
     "Raigor": 505,
     "Mohd Irshad": 1,
-    "Reassoonn": 1,
-    "Eunbin Son": 58,
     "jingouzhui": 1,
-    "ZhangCheng": 542,
     "Claire": 73,
     "Divyansh Yadav": 3,
     "LiuYC3213687107": 1,
     "rishi-rana": 4,
-    "Maxim Igoshin": 45,
     "Rain.": 1,
     "Zhang Muyuan": 1,
     "Cong Hu": 294,
@@ -793,7 +793,7 @@
     "2023": 4028,
     "2024": 3620,
     "2025": 2956,
-    "2026": 2442
+    "2026": 2465
   },
   "ai_assisted": {
     "commits": 63,
@@ -854,17 +854,17 @@
       "2026-08": 339,
       "2026-09": 298,
       "2026-10": 295,
-      "2026-11": 51
+      "2026-11": 74
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 50154,
+    "commits": 50177,
     "by_kind": {
-      "organization": 15886,
+      "organization": 15902,
       "one_person": 526,
-      "personal": 30566,
-      "hidden": 3084,
+      "personal": 30567,
+      "hidden": 3090,
       "unknown": 71,
       "bot": 21
     },
@@ -873,11 +873,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 15421,
-        "commits_last_12mo": 2094,
+        "commits": 15437,
+        "commits_last_12mo": 2110,
         "addresses": 21,
         "first_commit": "2018-03-02",
-        "last_commit": "2026-11-15"
+        "last_commit": "2026-11-23"
       },
       {
         "organization": "huobi.com",
@@ -978,10 +978,10 @@
         "bot": 4
       },
       "2026-Q4": {
-        "organization": 279,
+        "organization": 295,
         "one_person": 0,
-        "personal": 17,
-        "hidden": 50,
+        "personal": 18,
+        "hidden": 56,
         "unknown": 0,
         "bot": 0
       }
@@ -990,13 +990,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2742,
+    "commits": 2765,
     "authors": 64,
     "new_authors": 45,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 50133,
+    "commits": 50156,
     "commits_by_year": {
       "2016": 399,
       "2017": 2025,
@@ -1008,23 +1008,23 @@
       "2023": 4025,
       "2024": 3617,
       "2025": 2953,
-      "2026": 2436
+      "2026": 2459
     },
-    "active_days": 3443
+    "active_days": 3451
   },
   "timezones": {
     "+0000": 14,
     "+0100": 31,
     "+0200": 65,
-    "+0300": 72,
+    "+0300": 76,
     "+0400": 2,
     "+0530": 482,
     "+0600": 1,
     "+0700": 49,
-    "+0800": 48826,
-    "+0900": 106,
+    "+0800": 48843,
+    "+0900": 107,
     "+1000": 8,
-    "+1100": 6,
+    "+1100": 7,
     "+1200": 32,
     "+1300": 190,
     "-0300": 7,
@@ -1035,7 +1035,7 @@
     "-0800": 10
   },
   "source_lines": {
-    "added": 6615063,
-    "current": 1491958
+    "added": 6512749,
+    "current": 1500510
   }
 }

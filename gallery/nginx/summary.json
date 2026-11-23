@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:31:46+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:31:48+00:00",
   "name": "nginx",
   "report_path": "index.html",
   "first_commit": "2002-08-06 16:39:45",
-  "last_commit": "2026-11-09 13:10:27",
-  "age_days": 8861,
-  "active_days": 3164,
-  "total_commits": 8788,
+  "last_commit": "2026-11-18 16:37:50",
+  "age_days": 8870,
+  "active_days": 3172,
+  "total_commits": 8807,
   "total_authors": 146,
   "active_authors_12mo": 48,
-  "commits_last_12mo": 288,
+  "commits_last_12mo": 306,
   "total_files": 544,
-  "total_lines": 306536,
-  "lines_added": 508604,
-  "lines_removed": 201575,
-  "total_tags": 502,
+  "total_lines": 307069,
+  "lines_added": 509164,
+  "lines_removed": 201602,
+  "total_tags": 503,
   "era": "steady",
   "top_authors": [
     {
@@ -25,15 +25,15 @@
     },
     {
       "name": "Maxim Dounin",
-      "commits": 1708
+      "commits": 1710
     },
     {
       "name": "Sergey Kandaurov",
-      "commits": 761
+      "commits": 763
     },
     {
       "name": "Roman Arutyunyan",
-      "commits": 662
+      "commits": 670
     },
     {
       "name": "Ruslan Ermilov",
@@ -41,16 +41,16 @@
     }
   ],
   "author_commits": {
-    "Sergey Kandaurov": 761,
-    "Roman Arutyunyan": 662,
-    "Maxim Dounin": 1708,
-    "Aleksei Bavshin": 19,
+    "Sergey Kandaurov": 763,
+    "Roman Arutyunyan": 670,
+    "Vadim Zhestikov": 31,
+    "Maxim Dounin": 1710,
+    "Aleksei Bavshin": 21,
     "Y.Horie": 2,
     "Piotr Przybylski": 1,
     "Sourav Bhowmik": 4,
     "Marek Ludha": 1,
     "\ucd5c\ub300\uc6b0 (Daewoo Choi)": 2,
-    "Vadim Zhestikov": 26,
     "Nexory": 1,
     "Andrew Clayton": 33,
     "Konstantin Pavlov": 4,
@@ -211,9 +211,9 @@
     "2021": 484,
     "2022": 217,
     "2023": 186,
-    "2024": 135,
+    "2024": 136,
     "2025": 164,
-    "2026": 274
+    "2026": 292
   },
   "ai_assisted": {
     "commits": 6,
@@ -266,20 +266,20 @@
       "2026-03": 31,
       "2026-04": 34,
       "2026-05": 22,
-      "2026-06": 33,
+      "2026-06": 34,
       "2026-07": 30,
       "2026-08": 28,
-      "2026-09": 41,
-      "2026-10": 20,
-      "2026-11": 3
+      "2026-09": 44,
+      "2026-10": 25,
+      "2026-11": 12
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8788,
+    "commits": 8807,
     "by_kind": {
-      "organization": 3216,
-      "one_person": 5476,
+      "organization": 3233,
+      "one_person": 5478,
       "personal": 88,
       "hidden": 7,
       "unknown": 1,
@@ -290,19 +290,19 @@
     "top": [
       {
         "organization": "nginx.com",
-        "commits": 3025,
-        "commits_last_12mo": 175,
+        "commits": 3037,
+        "commits_last_12mo": 187,
         "addresses": 13,
         "first_commit": "2011-08-09",
-        "last_commit": "2026-11-09"
+        "last_commit": "2026-11-18"
       },
       {
         "organization": "f5.com",
-        "commits": 92,
-        "commits_last_12mo": 67,
+        "commits": 97,
+        "commits_last_12mo": 72,
         "addresses": 24,
         "first_commit": "2020-08-28",
-        "last_commit": "2026-10-28"
+        "last_commit": "2026-11-04"
       },
       {
         "organization": "cloudflare.com",
@@ -388,14 +388,14 @@
       },
       "2026-Q2": {
         "organization": 72,
-        "one_person": 7,
+        "one_person": 8,
         "personal": 9,
         "hidden": 1,
         "unknown": 0,
         "bot": 0
       },
       "2026-Q3": {
-        "organization": 89,
+        "organization": 92,
         "one_person": 7,
         "personal": 1,
         "hidden": 2,
@@ -403,7 +403,7 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 16,
+        "organization": 30,
         "one_person": 4,
         "personal": 3,
         "hidden": 0,
@@ -415,13 +415,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 288,
+    "commits": 306,
     "authors": 47,
     "new_authors": 34,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 8788,
+    "commits": 8807,
     "commits_by_year": {
       "2002": 44,
       "2003": 174,
@@ -445,19 +445,19 @@
       "2021": 484,
       "2022": 217,
       "2023": 186,
-      "2024": 135,
+      "2024": 136,
       "2025": 164,
-      "2026": 274
+      "2026": 292
     },
-    "active_days": 3164
+    "active_days": 3172
   },
   "timezones": {
     "+0000": 4582,
     "+0100": 67,
     "+0200": 33,
-    "+0300": 2785,
+    "+0300": 2787,
     "+0330": 1,
-    "+0400": 1068,
+    "+0400": 1078,
     "+0530": 4,
     "+0700": 1,
     "+0800": 32,
@@ -467,11 +467,11 @@
     "-0400": 5,
     "-0500": 3,
     "-0600": 2,
-    "-0700": 145,
-    "-0800": 39
+    "-0700": 148,
+    "-0800": 43
   },
   "source_lines": {
-    "added": 545510,
-    "current": 306536
+    "added": 546070,
+    "current": 307069
   }
 }

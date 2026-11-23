@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:21:55+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:21:39+00:00",
   "name": "Pydantic",
   "report_path": "index.html",
   "first_commit": "2017-05-03 21:23:41",
-  "last_commit": "2026-11-15 11:59:25",
-  "age_days": 3483,
-  "active_days": 1433,
-  "total_commits": 5939,
-  "total_authors": 812,
-  "active_authors_12mo": 130,
-  "commits_last_12mo": 627,
-  "total_files": 3579,
-  "total_lines": 323603,
-  "lines_added": 545476,
-  "lines_removed": 220519,
+  "last_commit": "2026-11-21 11:47:40",
+  "age_days": 3489,
+  "active_days": 1439,
+  "total_commits": 5963,
+  "total_authors": 818,
+  "active_authors_12mo": 135,
+  "commits_last_12mo": 651,
+  "total_files": 3585,
+  "total_lines": 318337,
+  "lines_added": 546055,
+  "lines_removed": 220617,
   "total_tags": 143,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Victorien",
-      "commits": 795
+      "commits": 803
     },
     {
       "name": "Sydney Runkle",
@@ -41,14 +41,20 @@
     }
   ],
   "author_commits": {
-    "Victorien": 795,
+    "Chareonwit Kunna": 1,
+    "Alex Hall": 37,
+    "Phat": 1,
+    "Victorien": 803,
+    "Jake Elbirt": 1,
+    "fredheir": 1,
+    "ArthDubey1011": 9,
+    "Manan Chavda": 1,
+    "aidxhxr": 3,
     "Chirag Agarwalla": 1,
-    "aidxhxr": 2,
     "Lior Mashiach": 3,
     "Alvi Rahman": 2,
     "Wei-Lun Li": 1,
     "NingLin Liu": 1,
-    "Alex Hall": 36,
     "Dylan Pulver": 3,
     "Viranshul-P": 1,
     "Michael \u0160im\u00e1\u010dek": 4,
@@ -864,7 +870,7 @@
     "2023": 1775,
     "2024": 1029,
     "2025": 644,
-    "2026": 612
+    "2026": 636
   },
   "ai_assisted": {
     "commits": 4,
@@ -923,17 +929,17 @@
       "2026-08": 82,
       "2026-09": 64,
       "2026-10": 114,
-      "2026-11": 52
+      "2026-11": 76
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5939,
+    "commits": 5963,
     "by_kind": {
       "organization": 263,
       "one_person": 1401,
-      "personal": 1188,
-      "hidden": 2474,
+      "personal": 1192,
+      "hidden": 2494,
       "unknown": 0,
       "bot": 613
     },
@@ -1017,8 +1023,8 @@
       "2026-Q4": {
         "organization": 4,
         "one_person": 5,
-        "personal": 27,
-        "hidden": 112,
+        "personal": 31,
+        "hidden": 132,
         "unknown": 0,
         "bot": 18
       }
@@ -1027,13 +1033,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 523,
-    "authors": 128,
-    "new_authors": 115,
+    "commits": 547,
+    "authors": 134,
+    "new_authors": 121,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 5326,
+    "commits": 5350,
     "commits_by_year": {
       "2017": 116,
       "2018": 131,
@@ -1044,23 +1050,23 @@
       "2023": 1663,
       "2024": 927,
       "2025": 577,
-      "2026": 511
+      "2026": 535
     },
-    "active_days": 1377
+    "active_days": 1383
   },
   "timezones": {
     "+0000": 731,
-    "+0100": 1768,
-    "+0200": 1280,
+    "+0100": 1776,
+    "+0200": 1282,
     "+0300": 162,
     "+0330": 111,
     "+0400": 23,
     "+0430": 1,
     "+0500": 6,
-    "+0530": 44,
+    "+0530": 54,
     "+0545": 3,
     "+0600": 2,
-    "+0700": 16,
+    "+0700": 17,
     "+0800": 93,
     "+0900": 44,
     "+0930": 2,
@@ -1070,13 +1076,13 @@
     "+1300": 3,
     "-0300": 14,
     "-0400": 224,
-    "-0500": 689,
+    "-0500": 690,
     "-0600": 476,
     "-0700": 171,
-    "-0800": 37
+    "-0800": 39
   },
   "source_lines": {
-    "added": 587682,
-    "current": 317861
+    "added": 588239,
+    "current": 318337
   }
 }

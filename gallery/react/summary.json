@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:28:46+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:28:45+00:00",
   "name": "React",
   "report_path": "index.html",
   "first_commit": "2013-05-28 17:04:45",
-  "last_commit": "2026-11-12 15:46:50",
-  "age_days": 4916,
-  "active_days": 3823,
-  "total_commits": 21791,
-  "total_authors": 1938,
-  "active_authors_12mo": 97,
-  "commits_last_12mo": 579,
-  "total_files": 7275,
-  "total_lines": 1168232,
-  "lines_added": 3053194,
-  "lines_removed": 1882039,
+  "last_commit": "2026-11-21 23:07:56",
+  "age_days": 4926,
+  "active_days": 3829,
+  "total_commits": 21805,
+  "total_authors": 1940,
+  "active_authors_12mo": 99,
+  "commits_last_12mo": 593,
+  "total_files": 7283,
+  "total_lines": 799157,
+  "lines_added": 3055494,
+  "lines_removed": 1882198,
   "total_tags": 73,
   "era": "quiet",
   "top_authors": [
@@ -37,18 +37,22 @@
     },
     {
       "name": "Andrew Clark",
-      "commits": 1440
+      "commits": 1448
     }
   ],
   "author_commits": {
+    "Andrew Clark": 1448,
+    "Rick Hanlon": 319,
+    "Trevor I. Lasn": 1,
+    "Sebastian \"Sebbie\" Silbermann": 482,
+    "Tomasz \u017belawski": 1,
+    "Will Binns-Smith": 5,
     "Hendrik Liebau": 72,
     "Ruslan Lesiutin": 317,
     "Sam Zhou": 10,
     "Alex Hunt": 7,
     "Rub\u00e9n Norte": 35,
-    "Andrew Clark": 1440,
     "Jan Kassens": 349,
-    "Sebastian \"Sebbie\" Silbermann": 480,
     "Xinzi Zhou": 2,
     "Jack Pope": 147,
     "magic-akari": 1,
@@ -64,7 +68,6 @@
     "Konstantin Adzer": 1,
     "Batri\u0107 Perovi\u0107": 1,
     "Hmache Abdellah": 1,
-    "Rick Hanlon": 318,
     "Pieter De Baets": 20,
     "lauren": 822,
     "Jimmy Miller": 4,
@@ -80,7 +83,6 @@
     "Sidi Eyel": 1,
     "Matt Carroll": 15,
     "Masaharu Hori": 1,
-    "Will Binns-Smith": 4,
     "Matthew Costabile": 1,
     "Andrew Imm": 6,
     "chirokas": 2,
@@ -1994,13 +1996,13 @@
     "2023": 1955,
     "2024": 2173,
     "2025": 1434,
-    "2026": 540
+    "2026": 554
   },
   "ai_assisted": {
-    "commits": 39,
+    "commits": 47,
     "authored": 0,
     "assistants": {
-      "Claude": 36,
+      "Claude": 44,
       "Cursor": 3,
       "Amp": 1
     },
@@ -2028,7 +2030,7 @@
       "2026-08": 13,
       "2026-09": 5,
       "2026-10": 5,
-      "2026-11": 0
+      "2026-11": 8
     },
     "commits_by_month": {
       "2024-12": 111,
@@ -2054,16 +2056,16 @@
       "2026-08": 45,
       "2026-09": 48,
       "2026-10": 48,
-      "2026-11": 34
+      "2026-11": 48
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 21791,
+    "commits": 21805,
     "by_kind": {
-      "organization": 4456,
-      "one_person": 7629,
-      "personal": 7358,
+      "organization": 4458,
+      "one_person": 7637,
+      "personal": 7362,
       "hidden": 2243,
       "unknown": 7,
       "bot": 98
@@ -2081,11 +2083,11 @@
       },
       {
         "organization": "vercel.com",
-        "commits": 295,
-        "commits_last_12mo": 123,
+        "commits": 297,
+        "commits_last_12mo": 125,
         "addresses": 5,
         "first_commit": "2023-05-03",
-        "last_commit": "2026-10-31"
+        "last_commit": "2026-11-17"
       },
       {
         "organization": "khanacademy.org",
@@ -2234,9 +2236,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 9,
-        "one_person": 44,
-        "personal": 25,
+        "organization": 11,
+        "one_person": 52,
+        "personal": 29,
         "hidden": 4,
         "unknown": 0,
         "bot": 0
@@ -2246,13 +2248,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 575,
-    "authors": 97,
-    "new_authors": 64,
+    "commits": 589,
+    "authors": 99,
+    "new_authors": 66,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 21693,
+    "commits": 21707,
     "commits_by_year": {
       "2013": 1412,
       "2014": 1946,
@@ -2267,14 +2269,14 @@
       "2023": 1938,
       "2024": 2146,
       "2025": 1432,
-      "2026": 536
+      "2026": 550
     },
-    "active_days": 3823
+    "active_days": 3829
   },
   "timezones": {
-    "+0000": 1315,
-    "+0100": 2413,
-    "+0200": 912,
+    "+0000": 1317,
+    "+0100": 2414,
+    "+0200": 913,
     "+0300": 233,
     "+0330": 8,
     "+0400": 39,
@@ -2294,15 +2296,15 @@
     "-0200": 34,
     "-0300": 71,
     "-0400": 3451,
-    "-0500": 1695,
+    "-0500": 1704,
     "-0600": 265,
     "-0700": 6967,
-    "-0800": 3328,
+    "-0800": 3329,
     "-1000": 16,
     "-1100": 1
   },
   "source_lines": {
-    "added": 2294505,
-    "current": 797270
+    "added": 2296429,
+    "current": 799157
   }
 }

@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:27:28+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:27:40+00:00",
   "name": "Vue",
   "report_path": "index.html",
   "first_commit": "2018-09-19 15:35:38",
-  "last_commit": "2026-11-13 05:56:28",
-  "age_days": 2977,
-  "active_days": 1240,
-  "total_commits": 7290,
-  "total_authors": 648,
+  "last_commit": "2026-11-23 02:55:03",
+  "age_days": 2987,
+  "active_days": 1246,
+  "total_commits": 7304,
+  "total_authors": 650,
   "active_authors_12mo": 106,
-  "commits_last_12mo": 442,
+  "commits_last_12mo": 456,
   "total_files": 704,
-  "total_lines": 203731,
-  "lines_added": 482778,
-  "lines_removed": 279047,
-  "total_tags": 268,
+  "total_lines": 186344,
+  "lines_added": 484629,
+  "lines_removed": 279887,
+  "total_tags": 269,
   "era": "steady",
   "top_authors": [
     {
@@ -24,8 +24,8 @@
       "commits": 3576
     },
     {
-      "name": "edison",
-      "commits": 401
+      "name": "daiwei",
+      "commits": 407
     },
     {
       "name": "Kevin Deng \u4e09\u54b2\u667a\u5b50",
@@ -41,9 +41,12 @@
     }
   ],
   "author_commits": {
-    "edison": 401,
-    "Daniel Roe": 17,
-    "The number one sword cultivator in the south of the sky": 3,
+    "\u54c8\u57fa\u7c73": 1,
+    "daiwei": 407,
+    "Randolf J.": 1,
+    "The number one sword cultivator in the south of the sky": 4,
+    "\u6c88\u9752\u5ddd": 2,
+    "Daniel Roe": 18,
     "KevinZhou": 1,
     "Abderrahmane Messaadi": 1,
     "Max": 2,
@@ -151,7 +154,6 @@
     "\u6bb7\u8c0a\u8f89": 1,
     "Jooies": 1,
     "indykoning": 1,
-    "\u6c88\u9752\u5ddd": 1,
     "Alex Snezhko": 7,
     "clay jenson": 1,
     "Dylan Lathrum": 1,
@@ -699,7 +701,7 @@
     "2023": 867,
     "2024": 1027,
     "2025": 372,
-    "2026": 414
+    "2026": 428
   },
   "ai_assisted": {
     "commits": 0,
@@ -755,30 +757,30 @@
       "2026-08": 42,
       "2026-09": 29,
       "2026-10": 39,
-      "2026-11": 53
+      "2026-11": 67
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7290,
+    "commits": 7304,
     "by_kind": {
-      "organization": 254,
-      "one_person": 296,
-      "personal": 5051,
-      "hidden": 572,
+      "organization": 258,
+      "one_person": 298,
+      "personal": 5054,
+      "hidden": 574,
       "unknown": 0,
-      "bot": 1117
+      "bot": 1120
     },
     "organization_count": 2,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "vuejs.org",
-        "commits": 248,
-        "commits_last_12mo": 38,
+        "commits": 252,
+        "commits_last_12mo": 42,
         "addresses": 2,
         "first_commit": "2024-06-22",
-        "last_commit": "2026-11-13"
+        "last_commit": "2026-11-20"
       },
       {
         "organization": "bytedance.com",
@@ -847,25 +849,25 @@
         "bot": 27
       },
       "2026-Q4": {
-        "organization": 31,
-        "one_person": 8,
-        "personal": 27,
-        "hidden": 10,
+        "organization": 35,
+        "one_person": 10,
+        "personal": 30,
+        "hidden": 12,
         "unknown": 0,
-        "bot": 16
+        "bot": 19
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 309,
-    "authors": 103,
-    "new_authors": 78,
+    "commits": 320,
+    "authors": 106,
+    "new_authors": 80,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 6173,
+    "commits": 6184,
     "commits_by_year": {
       "2018": 223,
       "2019": 961,
@@ -875,12 +877,12 @@
       "2023": 786,
       "2024": 831,
       "2025": 243,
-      "2026": 290
+      "2026": 301
     },
-    "active_days": 1108
+    "active_days": 1114
   },
   "timezones": {
-    "+0000": 499,
+    "+0000": 500,
     "+0100": 262,
     "+0200": 190,
     "+0300": 92,
@@ -891,7 +893,7 @@
     "+0600": 4,
     "+0630": 1,
     "+0700": 11,
-    "+0800": 3479,
+    "+0800": 3491,
     "+0900": 60,
     "+1000": 5,
     "+1100": 8,
@@ -901,10 +903,10 @@
     "-0500": 634,
     "-0600": 14,
     "-0700": 43,
-    "-0800": 6
+    "-0800": 7
   },
   "source_lines": {
-    "added": 348747,
-    "current": 185302
+    "added": 349922,
+    "current": 186344
   }
 }

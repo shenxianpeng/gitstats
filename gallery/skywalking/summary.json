@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:29:17+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:29:27+00:00",
   "name": "Apache SkyWalking",
   "report_path": "index.html",
   "first_commit": "2015-11-07 03:30:37",
-  "last_commit": "2026-11-16 00:27:19",
-  "age_days": 4027,
-  "active_days": 2719,
-  "total_commits": 8681,
-  "total_authors": 517,
-  "active_authors_12mo": 27,
-  "commits_last_12mo": 294,
-  "total_files": 5792,
-  "total_lines": 643918,
-  "lines_added": 2415326,
-  "lines_removed": 1771250,
+  "last_commit": "2026-11-22 12:05:18",
+  "age_days": 4034,
+  "active_days": 2724,
+  "total_commits": 8696,
+  "total_authors": 519,
+  "active_authors_12mo": 28,
+  "commits_last_12mo": 309,
+  "total_files": 6005,
+  "total_lines": 683048,
+  "lines_added": 2475055,
+  "lines_removed": 1779381,
   "total_tags": 18,
   "era": "steady",
   "top_authors": [
     {
       "name": "\u5434\u665f Wu Sheng",
-      "commits": 3205
+      "commits": 3215
     },
     {
       "name": "\u5f6d\u52c7\u5347 pengys",
@@ -37,14 +37,16 @@
     },
     {
       "name": "Wan Kai",
-      "commits": 388
+      "commits": 390
     }
   ],
   "author_commits": {
-    "\u5434\u665f Wu Sheng": 3205,
+    "\u5434\u665f Wu Sheng": 3215,
+    "Wan Kai": 390,
+    "songzhendong": 27,
+    "Faris Basha TM": 1,
+    "2748109647": 1,
     "kezhenxu94": 538,
-    "songzhendong": 26,
-    "Wan Kai": 388,
     "Mohd Irshad": 1,
     "S1Jackson-cmd": 1,
     "dennis zhuang": 1,
@@ -571,13 +573,14 @@
     "2023": 409,
     "2024": 312,
     "2025": 232,
-    "2026": 283
+    "2026": 298
   },
   "ai_assisted": {
-    "commits": 3,
+    "commits": 5,
     "authored": 0,
     "assistants": {
-      "Claude": 3
+      "Claude": 5,
+      "Kiro": 2
     },
     "by_month": {
       "2024-12": 0,
@@ -603,7 +606,7 @@
       "2026-08": 0,
       "2026-09": 0,
       "2026-10": 0,
-      "2026-11": 2
+      "2026-11": 4
     },
     "commits_by_month": {
       "2024-12": 31,
@@ -629,17 +632,17 @@
       "2026-08": 18,
       "2026-09": 25,
       "2026-10": 36,
-      "2026-11": 23
+      "2026-11": 38
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8681,
+    "commits": 8696,
     "by_kind": {
       "organization": 779,
       "one_person": 262,
-      "personal": 7317,
-      "hidden": 315,
+      "personal": 7331,
+      "hidden": 316,
       "unknown": 8,
       "bot": 0
     },
@@ -723,8 +726,8 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 0,
-        "personal": 56,
-        "hidden": 2,
+        "personal": 70,
+        "hidden": 3,
         "unknown": 0,
         "bot": 0
       }
@@ -733,13 +736,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 294,
-    "authors": 26,
-    "new_authors": 16,
+    "commits": 309,
+    "authors": 28,
+    "new_authors": 18,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 8681,
+    "commits": 8696,
     "commits_by_year": {
       "2015": 301,
       "2016": 985,
@@ -752,9 +755,9 @@
       "2023": 409,
       "2024": 312,
       "2025": 232,
-      "2026": 283
+      "2026": 298
     },
-    "active_days": 2719
+    "active_days": 2724
   },
   "timezones": {
     "+0000": 23,
@@ -762,9 +765,9 @@
     "+0200": 21,
     "+0300": 12,
     "+0400": 16,
-    "+0530": 10,
+    "+0530": 11,
     "+0700": 11,
-    "+0800": 8309,
+    "+0800": 8323,
     "+0900": 23,
     "+1000": 1,
     "+1100": 3,
@@ -776,7 +779,7 @@
     "-0800": 10
   },
   "source_lines": {
-    "added": 2140320,
-    "current": 632172
+    "added": 2197419,
+    "current": 683048
   }
 }

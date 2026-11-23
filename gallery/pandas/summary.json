@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:22:28+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:21:55+00:00",
   "name": "pandas",
   "report_path": "index.html",
   "first_commit": "2009-07-31 15:07:16",
-  "last_commit": "2026-11-15 19:46:08",
-  "age_days": 6317,
-  "active_days": 5329,
-  "total_commits": 39876,
-  "total_authors": 4076,
-  "active_authors_12mo": 404,
-  "commits_last_12mo": 3089,
-  "total_files": 2700,
-  "total_lines": 1087804,
-  "lines_added": 3338273,
-  "lines_removed": 2250459,
+  "last_commit": "2026-11-22 18:11:55",
+  "age_days": 6324,
+  "active_days": 5336,
+  "total_commits": 39930,
+  "total_authors": 4080,
+  "active_authors_12mo": 401,
+  "commits_last_12mo": 3143,
+  "total_files": 2701,
+  "total_lines": 961552,
+  "lines_added": 3376056,
+  "lines_removed": 2281872,
   "total_tags": 102,
   "era": "steady",
   "top_authors": [
     {
       "name": "jbrockmendel",
-      "commits": 6630
+      "commits": 6667
     },
     {
       "name": "Jeff Reback",
@@ -33,7 +33,7 @@
     },
     {
       "name": "Joris Van den Bossche",
-      "commits": 1702
+      "commits": 1704
     },
     {
       "name": "Matthew Roeschke",
@@ -41,13 +41,18 @@
     }
   ],
   "author_commits": {
-    "jbrockmendel": 6630,
-    "Richard Shadrach": 573,
+    "jbrockmendel": 6667,
+    "Fangchen Li": 192,
+    "Joris Van den Bossche": 1704,
+    "Zeyad Rabie": 2,
+    "Prem gosavi": 1,
+    "Fabio Vincenzi": 1,
+    "dilksh-sharma": 1,
+    "Richard Shadrach": 574,
+    "Krish Koria": 1,
     "hatemadi15": 2,
     "Mutasim ur Rehman": 2,
-    "Fangchen Li": 186,
     "Youeeeee": 1,
-    "Zeyad Rabie": 1,
     "Antsiferov Bogdan": 1,
     "G Karthik Koundinya": 4,
     "layeh": 1,
@@ -65,7 +70,6 @@
     "Pablo Galindo Salgado": 1,
     "sundeep8967": 1,
     "Abhishek Kumar": 11,
-    "Joris Van den Bossche": 1702,
     "tanveer-arch": 1,
     "Monika Dvorackova": 1,
     "Ishan Kumar": 2,
@@ -4136,13 +4140,13 @@
     "2023": 3017,
     "2024": 1769,
     "2025": 1097,
-    "2026": 2954
+    "2026": 3008
   },
   "ai_assisted": {
-    "commits": 1627,
+    "commits": 1671,
     "authored": 1,
     "assistants": {
-      "Claude": 1623,
+      "Claude": 1667,
       "Cursor": 2,
       "Devin": 1,
       "GitHub Copilot": 1
@@ -4171,7 +4175,7 @@
       "2026-08": 167,
       "2026-09": 289,
       "2026-10": 349,
-      "2026-11": 134
+      "2026-11": 178
     },
     "commits_by_month": {
       "2024-12": 62,
@@ -4197,19 +4201,19 @@
       "2026-08": 275,
       "2026-09": 422,
       "2026-10": 477,
-      "2026-11": 199
+      "2026-11": 253
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39876,
+    "commits": 39930,
     "by_kind": {
       "organization": 968,
       "one_person": 6646,
-      "personal": 23850,
-      "hidden": 8153,
+      "personal": 23897,
+      "hidden": 8157,
       "unknown": 25,
-      "bot": 234
+      "bot": 237
     },
     "organization_count": 56,
     "last_12mo_from": "2025-12",
@@ -4723,23 +4727,23 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 4,
-        "personal": 568,
-        "hidden": 76,
+        "personal": 615,
+        "hidden": 80,
         "unknown": 0,
-        "bot": 27
+        "bot": 30
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2959,
-    "authors": 392,
-    "new_authors": 327,
+    "commits": 3010,
+    "authors": 396,
+    "new_authors": 331,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 39642,
+    "commits": 39693,
     "commits_by_year": {
       "2009": 100,
       "2010": 147,
@@ -4758,20 +4762,20 @@
       "2023": 2991,
       "2024": 1747,
       "2025": 1064,
-      "2026": 2827
+      "2026": 2878
     },
-    "active_days": 5321
+    "active_days": 5328
   },
   "timezones": {
     "+0000": 1633,
-    "+0100": 4041,
+    "+0100": 4044,
     "+0200": 3784,
     "+0300": 701,
     "+0330": 10,
     "+0400": 61,
     "+0430": 3,
     "+0500": 16,
-    "+0530": 1273,
+    "+0530": 1276,
     "+0545": 7,
     "+0600": 11,
     "+0700": 209,
@@ -4786,15 +4790,15 @@
     "-0200": 11,
     "-0300": 222,
     "-0400": 8232,
-    "-0500": 5882,
-    "-0600": 711,
+    "-0500": 5883,
+    "-0600": 712,
     "-0700": 7315,
-    "-0800": 4082,
+    "-0800": 4128,
     "-0900": 1,
     "-1000": 361
   },
   "source_lines": {
-    "added": 3134458,
-    "current": 1011597
+    "added": 3079594,
+    "current": 961552
   }
 }

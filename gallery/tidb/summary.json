@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:30:44+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:30:45+00:00",
   "name": "TiDB",
   "report_path": "index.html",
   "first_commit": "2015-09-06 04:04:42",
-  "last_commit": "2026-11-16 05:08:45",
-  "age_days": 4090,
-  "active_days": 3429,
-  "total_commits": 28956,
-  "total_authors": 996,
-  "active_authors_12mo": 140,
-  "commits_last_12mo": 1764,
-  "total_files": 7917,
-  "total_lines": 2623021,
-  "lines_added": 10053932,
-  "lines_removed": 7430143,
+  "last_commit": "2026-11-23 06:20:15",
+  "age_days": 4097,
+  "active_days": 3436,
+  "total_commits": 29017,
+  "total_authors": 998,
+  "active_authors_12mo": 142,
+  "commits_last_12mo": 1825,
+  "total_files": 7942,
+  "total_lines": 2494603,
+  "lines_added": 10093136,
+  "lines_removed": 7450545,
   "total_tags": 54,
   "era": "steady",
   "top_authors": [
@@ -37,25 +37,32 @@
     },
     {
       "name": "Yuanjia Zhang",
-      "commits": 968
+      "commits": 969
     }
   ],
   "author_commits": {
-    "tpp": 134,
-    "xufei": 195,
-    "Yuanjia Zhang": 968,
+    "Jianjun Liao": 218,
+    "Yiding Cui": 498,
+    "expxiaoli": 30,
+    "wjHuang": 511,
+    "Ruihao Chen": 134,
+    "xufei": 204,
+    "linzch3": 2,
+    "D3Hunter": 741,
+    "poisongodv": 1,
+    "YangKeao": 306,
+    "Nikita Massalitin": 3,
+    "Zhigao TONG": 39,
+    "Ziqian Qin": 127,
+    "Dongpo Liu": 376,
+    "tpp": 135,
+    "Yuanjia Zhang": 969,
+    "Elsa": 49,
+    "cfzjywxk": 145,
     "goroutine": 231,
-    "Yiding Cui": 489,
     "YiBo Chen": 4,
     "flaky-claw": 105,
-    "D3Hunter": 729,
-    "Dongpo Liu": 374,
-    "wjHuang": 504,
-    "YangKeao": 304,
-    "Nikita Massalitin": 2,
-    "Ruihao Chen": 132,
     "Aryan Deshmukh": 1,
-    "expxiaoli": 27,
     "Somesh Mehta": 2,
     "JmPotato": 95,
     "ChangRui-Ryan": 28,
@@ -79,11 +86,9 @@
     "GMHDBJD": 105,
     "Sanket Kedia": 2,
     "Vlad Dmitriev": 4,
-    "Elsa": 48,
     "tongjian": 20,
     "Ray Yan": 5,
     "lucasliang": 2,
-    "Jianjun Liao": 214,
     "Jinlong Liu": 39,
     "zeminzhou": 20,
     "bb7133": 130,
@@ -93,7 +98,6 @@
     "Arenatlx": 535,
     "Connor": 19,
     "Wenxuan": 92,
-    "Zhigao TONG": 37,
     "Debra-He": 5,
     "ystaticy": 26,
     "JaySon": 23,
@@ -127,7 +131,6 @@
     "Zhou Kunqin": 185,
     "\u8c22\u667a": 1,
     "Yang Zhang": 5,
-    "Ziqian Qin": 126,
     "Shenghui Wu": 235,
     "MyonKeminta": 134,
     "ConanKudo": 1,
@@ -144,7 +147,6 @@
     "Shirley": 6,
     "zyguan": 65,
     "Henry Baba-Weiss": 28,
-    "cfzjywxk": 144,
     "devtrace404": 1,
     "Airton Lastori": 1,
     "shi yuhang": 2,
@@ -1050,7 +1052,7 @@
     "2023": 3184,
     "2024": 2840,
     "2025": 1979,
-    "2026": 1595
+    "2026": 1656
   },
   "ai_assisted": {
     "commits": 6,
@@ -1108,17 +1110,17 @@
       "2026-08": 118,
       "2026-09": 157,
       "2026-10": 137,
-      "2026-11": 128
+      "2026-11": 189
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 28956,
+    "commits": 29017,
     "by_kind": {
-      "organization": 4115,
-      "one_person": 1562,
-      "personal": 19773,
-      "hidden": 3234,
+      "organization": 4118,
+      "one_person": 1573,
+      "personal": 19810,
+      "hidden": 3244,
       "unknown": 2,
       "bot": 270
     },
@@ -1127,11 +1129,11 @@
     "top": [
       {
         "organization": "pingcap.com",
-        "commits": 3900,
-        "commits_last_12mo": 377,
+        "commits": 3903,
+        "commits_last_12mo": 380,
         "addresses": 55,
         "first_commit": "2016-10-11",
-        "last_commit": "2026-11-16"
+        "last_commit": "2026-11-18"
       },
       {
         "organization": "breeswish.org",
@@ -1280,10 +1282,10 @@
         "bot": 2
       },
       "2026-Q4": {
-        "organization": 37,
-        "one_person": 47,
-        "personal": 135,
-        "hidden": 42,
+        "organization": 40,
+        "one_person": 58,
+        "personal": 172,
+        "hidden": 52,
         "unknown": 0,
         "bot": 4
       }
@@ -1292,13 +1294,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1743,
-    "authors": 138,
-    "new_authors": 57,
+    "commits": 1804,
+    "authors": 140,
+    "new_authors": 59,
     "half_of_commits": 9
   },
   "humans": {
-    "commits": 28686,
+    "commits": 28747,
     "commits_by_year": {
       "2015": 2528,
       "2016": 1541,
@@ -1311,20 +1313,20 @@
       "2023": 3099,
       "2024": 2767,
       "2025": 1904,
-      "2026": 1568
+      "2026": 1629
     },
-    "active_days": 3408
+    "active_days": 3415
   },
   "timezones": {
     "+0000": 209,
-    "+0100": 244,
-    "+0200": 392,
+    "+0100": 246,
+    "+0200": 393,
     "+0300": 39,
     "+0330": 1,
     "+0500": 1,
     "+0530": 42,
     "+0700": 11,
-    "+0800": 26345,
+    "+0800": 26401,
     "+0900": 168,
     "+1000": 9,
     "+1100": 8,
@@ -1332,14 +1334,14 @@
     "+1300": 20,
     "-0300": 1,
     "-0400": 117,
-    "-0500": 384,
+    "-0500": 385,
     "-0600": 384,
     "-0700": 436,
-    "-0800": 138,
+    "-0800": 139,
     "-0900": 1
   },
   "source_lines": {
-    "added": 8591114,
-    "current": 2477755
+    "added": 8628034,
+    "current": 2494603
   }
 }

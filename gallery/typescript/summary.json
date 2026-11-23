@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:32:18+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:33:20+00:00",
   "name": "TypeScript",
   "report_path": "index.html",
   "first_commit": "2014-07-08 00:08:16",
-  "last_commit": "2026-11-14 00:28:09",
-  "age_days": 4513,
-  "active_days": 3941,
-  "total_commits": 39727,
-  "total_authors": 1004,
-  "active_authors_12mo": 149,
-  "commits_last_12mo": 1831,
-  "total_files": 68607,
-  "total_lines": 6528345,
-  "lines_added": 26098239,
-  "lines_removed": 19544174,
+  "last_commit": "2026-11-21 00:08:25",
+  "age_days": 4520,
+  "active_days": 3947,
+  "total_commits": 39786,
+  "total_authors": 1008,
+  "active_authors_12mo": 152,
+  "commits_last_12mo": 1890,
+  "total_files": 69634,
+  "total_lines": 1450034,
+  "lines_added": 26204461,
+  "lines_removed": 19547207,
   "total_tags": 17,
   "era": "steady",
   "top_authors": [
     {
       "name": "Anders Hejlsberg",
-      "commits": 4131
+      "commits": 4132
     },
     {
       "name": "Sheetal Nandi",
@@ -29,7 +29,7 @@
     },
     {
       "name": "Daniel Rosenwasser",
-      "commits": 2418
+      "commits": 2420
     },
     {
       "name": "Nathan Shively-Sanders",
@@ -41,30 +41,35 @@
     }
   ],
   "author_commits": {
-    "Jake Bailey": 1497,
-    "Andrew Branch": 877,
-    "Copilot": 353,
+    "Daniel Rosenwasser": 2420,
+    "Andrew Branch": 886,
+    "Jake Bailey": 1524,
+    "Sumit G": 1,
+    "Oleksandr Tarasiuk": 595,
+    "Ryan Cavanaugh": 1019,
+    "Gabriela Araujo Britto": 295,
+    "Copilot": 359,
+    "Mateusz Burzy\u0144ski": 594,
+    "Mohit Nayak": 2,
+    "Lior-Altarescu": 1,
+    "Anders Hejlsberg": 4132,
+    "Jemmy": 1,
+    "Harsh Vardhan Chauhan": 4,
+    "Arnav Dugar": 1,
     "NullVoxPopuli": 2,
-    "Gabriela Araujo Britto": 294,
     "Andrea Cappuccio": 1,
-    "Oleksandr Tarasiuk": 594,
     "Yusuf YILDIZ": 1,
     "Isabel Duan": 83,
     "OKAN TIKTAS": 1,
     "rafa\u0142 przypek": 1,
     "erantianantha": 2,
-    "Mateusz Burzy\u0144ski": 593,
-    "Harsh Vardhan Chauhan": 3,
     "Dmety": 1,
     "magic-akari": 11,
     "Max Barinov": 1,
-    "Anders Hejlsberg": 4131,
     "Gadzhi Gadzhiev": 2,
-    "Daniel Rosenwasser": 2418,
     "Christopher Plieger": 6,
     "Timur Vural": 1,
     "Mitch Fultz": 1,
-    "Ryan Cavanaugh": 1016,
     "Tom S": 1,
     "GOVARDHAN CHINTA": 1,
     "Timon G\u00e4rtner": 1,
@@ -104,7 +109,6 @@
     "Spencer Young": 2,
     "graphemecluster": 13,
     "Rafli Surya Wijaya": 1,
-    "Mohit Nayak": 1,
     "Shooks": 1,
     "Daniel Lockyer": 1,
     "Dayong Lee": 1,
@@ -1059,14 +1063,14 @@
     "2023": 1305,
     "2024": 1085,
     "2025": 1465,
-    "2026": 1703
+    "2026": 1762
   },
   "ai_assisted": {
-    "commits": 467,
-    "authored": 353,
+    "commits": 485,
+    "authored": 359,
     "assistants": {
-      "GitHub Copilot": 457,
-      "Claude": 8,
+      "GitHub Copilot": 475,
+      "Claude": 9,
       "Codex": 1,
       "Cursor": 1
     },
@@ -1094,7 +1098,7 @@
       "2026-08": 27,
       "2026-09": 22,
       "2026-10": 17,
-      "2026-11": 20
+      "2026-11": 38
     },
     "commits_by_month": {
       "2024-12": 93,
@@ -1120,30 +1124,30 @@
       "2026-08": 137,
       "2026-09": 153,
       "2026-10": 153,
-      "2026-11": 92
+      "2026-11": 151
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 39727,
+    "commits": 39786,
     "by_kind": {
-      "organization": 25472,
+      "organization": 25474,
       "one_person": 1169,
-      "personal": 5896,
-      "hidden": 7037,
+      "personal": 5901,
+      "hidden": 7087,
       "unknown": 10,
-      "bot": 143
+      "bot": 145
     },
     "organization_count": 8,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "microsoft.com",
-        "commits": 25156,
-        "commits_last_12mo": 183,
+        "commits": 25158,
+        "commits_last_12mo": 185,
         "addresses": 70,
         "first_commit": "2014-07-08",
-        "last_commit": "2026-11-10"
+        "last_commit": "2026-11-19"
       },
       {
         "organization": "umich.edu",
@@ -1260,25 +1264,25 @@
         "bot": 11
       },
       "2026-Q4": {
-        "organization": 25,
+        "organization": 27,
         "one_person": 3,
-        "personal": 46,
-        "hidden": 160,
+        "personal": 51,
+        "hidden": 210,
         "unknown": 0,
-        "bot": 11
+        "bot": 13
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1776,
-    "authors": 148,
-    "new_authors": 111,
+    "commits": 1833,
+    "authors": 152,
+    "new_authors": 115,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 39584,
+    "commits": 39641,
     "commits_by_year": {
       "2014": 3328,
       "2015": 6550,
@@ -1292,12 +1296,12 @@
       "2023": 1301,
       "2024": 1053,
       "2025": 1409,
-      "2026": 1654
+      "2026": 1711
     },
-    "active_days": 3939
+    "active_days": 3945
   },
   "timezones": {
-    "+0000": 2155,
+    "+0000": 2214,
     "+0100": 848,
     "+0200": 1171,
     "+0300": 803,
@@ -1324,7 +1328,7 @@
     "-1000": 238
   },
   "source_lines": {
-    "added": 27404171,
-    "current": 1440792
+    "added": 27264215,
+    "current": 1450034
   }
 }

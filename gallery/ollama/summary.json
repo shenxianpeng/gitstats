@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:24:29+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:24:03+00:00",
   "name": "Ollama",
   "report_path": "index.html",
   "first_commit": "2023-06-22 16:45:31",
-  "last_commit": "2026-11-15 18:46:15",
-  "age_days": 1243,
-  "active_days": 1045,
-  "total_commits": 6000,
-  "total_authors": 623,
-  "active_authors_12mo": 91,
-  "commits_last_12mo": 1166,
-  "total_files": 1657,
-  "total_lines": 1073762,
-  "lines_added": 2325354,
-  "lines_removed": 1251565,
-  "total_tags": 670,
+  "last_commit": "2026-11-22 10:09:59",
+  "age_days": 1249,
+  "active_days": 1052,
+  "total_commits": 6016,
+  "total_authors": 624,
+  "active_authors_12mo": 90,
+  "commits_last_12mo": 1182,
+  "total_files": 1727,
+  "total_lines": 534695,
+  "lines_added": 2340381,
+  "lines_removed": 1253171,
+  "total_tags": 673,
   "era": "steady",
   "top_authors": [
     {
@@ -25,7 +25,7 @@
     },
     {
       "name": "Daniel Hiltgen",
-      "commits": 1069
+      "commits": 1079
     },
     {
       "name": "Jeffrey Morgan",
@@ -41,13 +41,14 @@
     }
   ],
   "author_commits": {
+    "Gaurav Jain": 4,
+    "Daniel Hiltgen": 1079,
+    "Patrick Devine": 226,
+    "Eva H": 122,
     "saman-amd": 3,
     "J Berg": 22,
     "Parth Sareen": 253,
     "Anna Rahn": 24,
-    "Eva H": 121,
-    "Daniel Hiltgen": 1069,
-    "Patrick Devine": 225,
     "anra8571": 1,
     "Matteo Celani": 4,
     "liangliang205": 1,
@@ -669,13 +670,13 @@
     "2023": 1681,
     "2024": 2083,
     "2025": 1146,
-    "2026": 1090
+    "2026": 1106
   },
   "ai_assisted": {
-    "commits": 3,
+    "commits": 4,
     "authored": 0,
     "assistants": {
-      "Claude": 2,
+      "Claude": 3,
       "GitHub Copilot": 1
     },
     "by_month": {
@@ -702,7 +703,7 @@
       "2026-08": 0,
       "2026-09": 0,
       "2026-10": 0,
-      "2026-11": 0
+      "2026-11": 1
     },
     "commits_by_month": {
       "2024-12": 68,
@@ -728,17 +729,17 @@
       "2026-08": 105,
       "2026-09": 109,
       "2026-10": 154,
-      "2026-11": 36
+      "2026-11": 52
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 6000,
+    "commits": 6016,
     "by_kind": {
-      "organization": 985,
+      "organization": 990,
       "one_person": 646,
       "personal": 3019,
-      "hidden": 1332,
+      "hidden": 1343,
       "unknown": 18,
       "bot": 0
     },
@@ -747,11 +748,11 @@
     "top": [
       {
         "organization": "ollama.com",
-        "commits": 785,
-        "commits_last_12mo": 266,
-        "addresses": 6,
+        "commits": 790,
+        "commits_last_12mo": 271,
+        "addresses": 7,
         "first_commit": "2023-11-08",
-        "last_commit": "2026-11-14"
+        "last_commit": "2026-11-22"
       },
       {
         "organization": "infrahq.com",
@@ -844,10 +845,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 45,
+        "organization": 50,
         "one_person": 5,
         "personal": 20,
-        "hidden": 107,
+        "hidden": 118,
         "unknown": 13,
         "bot": 0
       }
@@ -856,20 +857,20 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1166,
-    "authors": 87,
-    "new_authors": 68,
+    "commits": 1182,
+    "authors": 88,
+    "new_authors": 69,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 6000,
+    "commits": 6016,
     "commits_by_year": {
       "2023": 1681,
       "2024": 2083,
       "2025": 1146,
-      "2026": 1090
+      "2026": 1106
     },
-    "active_days": 1045
+    "active_days": 1052
   },
   "timezones": {
     "+0000": 47,
@@ -896,11 +897,11 @@
     "-0500": 317,
     "-0600": 35,
     "-0700": 3153,
-    "-0800": 1163,
+    "-0800": 1179,
     "-1000": 1
   },
   "source_lines": {
-    "added": 1570530,
-    "current": 522383
+    "added": 1584413,
+    "current": 534695
   }
 }

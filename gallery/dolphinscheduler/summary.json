@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:29:27+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:29:16+00:00",
   "name": "Apache DolphinScheduler",
   "report_path": "index.html",
   "first_commit": "2019-03-01 16:39:25",
-  "last_commit": "2026-11-14 02:27:48",
-  "age_days": 2815,
-  "active_days": 1913,
-  "total_commits": 9127,
+  "last_commit": "2026-11-22 14:25:51",
+  "age_days": 2823,
+  "active_days": 1918,
+  "total_commits": 9132,
   "total_authors": 675,
-  "active_authors_12mo": 72,
-  "commits_last_12mo": 338,
-  "total_files": 4897,
-  "total_lines": 455648,
-  "lines_added": 1686505,
-  "lines_removed": 1230641,
+  "active_authors_12mo": 70,
+  "commits_last_12mo": 343,
+  "total_files": 4901,
+  "total_lines": 452617,
+  "lines_added": 1687990,
+  "lines_removed": 1231048,
   "total_tags": 8,
   "era": "quiet",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Wenjun",
-      "commits": 533
+      "commits": 535
     },
     {
       "name": "qiaozhanwei",
@@ -41,8 +41,9 @@
     }
   ],
   "author_commits": {
-    "yueqingshu": 2,
-    "Wenjun": 533,
+    "Wenjun": 535,
+    "yueqingshu": 4,
+    "luxiaolong": 17,
     "michaellx1057": 2,
     "LHY_CODE": 3,
     "QHU": 2,
@@ -65,7 +66,6 @@
     "csurong": 2,
     "Adarsh Mishra": 1,
     "Jakub Kondrat": 1,
-    "luxiaolong": 16,
     "huangrunxing": 5,
     "\u9648\u5bb6\u540d": 24,
     "Goutam Adwant": 1,
@@ -725,7 +725,7 @@
     "2023": 571,
     "2024": 429,
     "2025": 224,
-    "2026": 318
+    "2026": 323
   },
   "ai_assisted": {
     "commits": 1,
@@ -783,16 +783,16 @@
       "2026-08": 23,
       "2026-09": 26,
       "2026-10": 31,
-      "2026-11": 12
+      "2026-11": 17
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9127,
+    "commits": 9132,
     "by_kind": {
-      "organization": 1584,
+      "organization": 1586,
       "one_person": 412,
-      "personal": 5345,
+      "personal": 5348,
       "hidden": 1783,
       "unknown": 1,
       "bot": 2
@@ -802,11 +802,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 801,
-        "commits_last_12mo": 92,
+        "commits": 803,
+        "commits_last_12mo": 94,
         "addresses": 18,
         "first_commit": "2020-03-08",
-        "last_commit": "2026-11-13"
+        "last_commit": "2026-11-22"
       },
       {
         "organization": "analysys.com.cn",
@@ -891,9 +891,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 2,
+        "organization": 4,
         "one_person": 2,
-        "personal": 27,
+        "personal": 30,
         "hidden": 12,
         "unknown": 0,
         "bot": 0
@@ -903,13 +903,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 338,
+    "commits": 343,
     "authors": 68,
     "new_authors": 53,
-    "half_of_commits": 2
+    "half_of_commits": 3
   },
   "humans": {
-    "commits": 9125,
+    "commits": 9130,
     "commits_by_year": {
       "2019": 1889,
       "2020": 2359,
@@ -918,9 +918,9 @@
       "2023": 571,
       "2024": 429,
       "2025": 224,
-      "2026": 318
+      "2026": 323
     },
-    "active_days": 1913
+    "active_days": 1918
   },
   "timezones": {
     "+0000": 2,
@@ -931,7 +931,7 @@
     "+0530": 33,
     "+0545": 1,
     "+0700": 3,
-    "+0800": 8995,
+    "+0800": 9000,
     "+0900": 3,
     "+1000": 10,
     "+1100": 1,
@@ -943,7 +943,7 @@
     "-0800": 2
   },
   "source_lines": {
-    "added": 1835815,
-    "current": 451755
+    "added": 1827848,
+    "current": 452617
   }
 }

@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:33:51+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:34:27+00:00",
   "name": "PostgreSQL",
   "report_path": "index.html",
   "first_commit": "1996-07-09 06:22:35",
-  "last_commit": "2026-11-16 02:06:00",
-  "age_days": 11087,
-  "active_days": 10277,
-  "total_commits": 66031,
+  "last_commit": "2026-11-21 19:07:51",
+  "age_days": 11093,
+  "active_days": 10282,
+  "total_commits": 66101,
   "total_authors": 58,
   "active_authors_12mo": 30,
-  "commits_last_12mo": 3312,
-  "total_files": 7755,
-  "total_lines": 4413636,
-  "lines_added": 13961619,
-  "lines_removed": 9547182,
+  "commits_last_12mo": 3382,
+  "total_files": 7759,
+  "total_lines": 4267326,
+  "lines_added": 13965632,
+  "lines_removed": 9548048,
   "total_tags": 103,
-  "era": "steady",
+  "era": "peak",
   "top_authors": [
     {
       "name": "Tom Lane",
-      "commits": 16960
+      "commits": 16967
     },
     {
       "name": "Bruce Momjian",
@@ -29,11 +29,11 @@
     },
     {
       "name": "Peter Eisentraut",
-      "commits": 6625
+      "commits": 6628
     },
     {
       "name": "Michael Paquier",
-      "commits": 2691
+      "commits": 2692
     },
     {
       "name": "Robert Haas",
@@ -41,34 +41,34 @@
     }
   ],
   "author_commits": {
-    "Fujii Masao": 890,
+    "Tom Lane": 16967,
+    "Fujii Masao": 902,
+    "Dean Rasheed": 180,
+    "Daniel Gustafsson": 558,
+    "Melanie Plageman": 154,
+    "Masahiko Sawada": 218,
+    "Heikki Linnakangas": 1983,
+    "Peter Eisentraut": 6628,
+    "Michael Paquier": 2692,
+    "Peter Geoghegan": 547,
+    "Tomas Vondra": 376,
+    "Nathan Bossart": 519,
+    "Jeff Davis": 444,
+    "Amit Kapila": 735,
+    "David Rowley": 642,
+    "Alexander Korotkov": 537,
+    "Etsuro Fujita": 151,
     "Andres Freund": 1573,
-    "Tom Lane": 16960,
-    "Melanie Plageman": 146,
-    "Daniel Gustafsson": 552,
-    "Amit Kapila": 732,
-    "Michael Paquier": 2691,
     "Richard Guo": 186,
-    "Dean Rasheed": 177,
     "\u00c1lvaro Herrera": 2239,
-    "Peter Eisentraut": 6625,
-    "Etsuro Fujita": 150,
-    "David Rowley": 638,
-    "Masahiko Sawada": 215,
-    "Tomas Vondra": 374,
     "Amit Langote": 165,
-    "Heikki Linnakangas": 1972,
-    "Nathan Bossart": 518,
     "Robert Haas": 2643,
     "Noah Misch": 563,
-    "Jeff Davis": 442,
-    "Peter Geoghegan": 545,
     "Jacob Champion": 75,
     "Andrew Dunstan": 1016,
     "Tatsuo Ishii": 456,
     "John Naylor": 206,
     "Bruce Momjian": 14115,
-    "Alexander Korotkov": 536,
     "Thomas Munro": 642,
     "Joe Conway": 127,
     "Magnus Hagander": 928,
@@ -131,7 +131,7 @@
     "2023": 2209,
     "2024": 2722,
     "2025": 2816,
-    "2026": 3052
+    "2026": 3122
   },
   "ai_assisted": {
     "commits": 0,
@@ -187,16 +187,16 @@
       "2026-08": 317,
       "2026-09": 282,
       "2026-10": 293,
-      "2026-11": 228
+      "2026-11": 298
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 66031,
+    "commits": 66101,
     "by_kind": {
-      "organization": 10418,
-      "one_person": 48376,
-      "personal": 7237,
+      "organization": 10453,
+      "one_person": 48389,
+      "personal": 7259,
       "hidden": 0,
       "unknown": 0,
       "bot": 0
@@ -206,11 +206,11 @@
     "top": [
       {
         "organization": "postgresql.org",
-        "commits": 10418,
-        "commits_last_12mo": 1431,
+        "commits": 10453,
+        "commits_last_12mo": 1466,
         "addresses": 21,
         "first_commit": "1998-01-15",
-        "last_commit": "2026-11-16"
+        "last_commit": "2026-11-21"
       }
     ],
     "quarters": {
@@ -271,9 +271,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 255,
-        "one_person": 221,
-        "personal": 45,
+        "organization": 290,
+        "one_person": 234,
+        "personal": 67,
         "hidden": 0,
         "unknown": 0,
         "bot": 0
@@ -283,13 +283,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 3312,
+    "commits": 3382,
     "authors": 30,
     "new_authors": 0,
     "half_of_commits": 6
   },
   "humans": {
-    "commits": 66031,
+    "commits": 66101,
     "commits_by_year": {
       "1996": 876,
       "1997": 1698,
@@ -321,35 +321,35 @@
       "2023": 2209,
       "2024": 2722,
       "2025": 2816,
-      "2026": 3052
+      "2026": 3122
     },
-    "active_days": 10277
+    "active_days": 10282
   },
   "timezones": {
-    "+0000": 30860,
-    "+0100": 2439,
-    "+0200": 3861,
+    "+0000": 30863,
+    "+0100": 2450,
+    "+0200": 3873,
     "+0300": 1797,
     "+0400": 3,
-    "+0530": 713,
+    "+0530": 716,
     "+0700": 178,
     "+0800": 6,
-    "+0900": 4228,
+    "+0900": 4242,
     "+0930": 2,
     "+1030": 10,
     "+1100": 8,
     "+1200": 625,
-    "+1300": 652,
+    "+1300": 656,
     "-0200": 2,
     "-0300": 937,
     "-0400": 10926,
-    "-0500": 5859,
-    "-0600": 161,
+    "-0500": 5876,
+    "-0600": 162,
     "-0700": 1886,
-    "-0800": 878
+    "-0800": 883
   },
   "source_lines": {
-    "added": 13112304,
-    "current": 4266369
+    "added": 13089357,
+    "current": 4267326
   }
 }

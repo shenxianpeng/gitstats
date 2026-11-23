@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:22:06+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:21:45+00:00",
   "name": "Django",
   "report_path": "index.html",
   "first_commit": "2005-07-13 01:25:57",
-  "last_commit": "2026-11-13 09:01:24",
-  "age_days": 7794,
-  "active_days": 6685,
-  "total_commits": 35123,
-  "total_authors": 3190,
-  "active_authors_12mo": 226,
-  "commits_last_12mo": 967,
-  "total_files": 7102,
-  "total_lines": 1122159,
-  "lines_added": 3423052,
-  "lines_removed": 2298732,
+  "last_commit": "2026-11-21 15:48:37",
+  "age_days": 7802,
+  "active_days": 6689,
+  "total_commits": 35131,
+  "total_authors": 3194,
+  "active_authors_12mo": 223,
+  "commits_last_12mo": 975,
+  "total_files": 7104,
+  "total_lines": 1094985,
+  "lines_added": 3425312,
+  "lines_removed": 2299821,
   "total_tags": 8,
   "era": "steady",
   "top_authors": [
@@ -41,8 +41,13 @@
     }
   ],
   "author_commits": {
-    "David Smith": 208,
-    "Jacob Walls": 444,
+    "David Smith": 209,
+    "Gabriel Lobo": 1,
+    "Sarah Boyce": 220,
+    "Alin Morosanu": 1,
+    "Bhuvnesh Nama": 1,
+    "Ahmed Lemine": 1,
+    "Jacob Walls": 445,
     "Namraa Patel": 2,
     "Mariusz Felisiak": 1697,
     "Matthew Newton": 1,
@@ -51,7 +56,6 @@
     "krystof": 1,
     "Akshat": 1,
     "Varun Kasyap": 22,
-    "Sarah Boyce": 218,
     "Zishan Kadri": 1,
     "Awath Javar Abdat": 1,
     "Alisson Silveira": 1,
@@ -3254,7 +3258,7 @@
     "2023": 952,
     "2024": 939,
     "2025": 955,
-    "2026": 899
+    "2026": 907
   },
   "ai_assisted": {
     "commits": 0,
@@ -3309,18 +3313,18 @@
       "2026-07": 81,
       "2026-08": 61,
       "2026-09": 62,
-      "2026-10": 97,
-      "2026-11": 27
+      "2026-10": 99,
+      "2026-11": 33
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 35123,
+    "commits": 35131,
     "by_kind": {
       "organization": 926,
       "one_person": 13560,
-      "personal": 19419,
-      "hidden": 1179,
+      "personal": 19423,
+      "hidden": 1183,
       "unknown": 39,
       "bot": 0
     },
@@ -3916,8 +3920,8 @@
       "2026-Q4": {
         "organization": 0,
         "one_person": 8,
-        "personal": 85,
-        "hidden": 31,
+        "personal": 89,
+        "hidden": 35,
         "unknown": 0,
         "bot": 0
       }
@@ -3926,13 +3930,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 967,
-    "authors": 217,
-    "new_authors": 150,
+    "commits": 975,
+    "authors": 221,
+    "new_authors": 154,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 35123,
+    "commits": 35131,
     "commits_by_year": {
       "2005": 1277,
       "2006": 1320,
@@ -3955,20 +3959,20 @@
       "2023": 952,
       "2024": 939,
       "2025": 955,
-      "2026": 899
+      "2026": 907
     },
-    "active_days": 6685
+    "active_days": 6689
   },
   "timezones": {
-    "+0000": 12860,
-    "+0100": 5135,
-    "+0200": 5239,
+    "+0000": 12862,
+    "+0100": 5136,
+    "+0200": 5240,
     "+0300": 722,
     "+0330": 28,
-    "+0400": 31,
+    "+0400": 32,
     "+0430": 29,
     "+0500": 419,
-    "+0530": 603,
+    "+0530": 604,
     "+0545": 4,
     "+0600": 56,
     "+0700": 246,
@@ -3982,17 +3986,17 @@
     "+1300": 17,
     "-0100": 1,
     "-0200": 11,
-    "-0300": 700,
+    "-0300": 701,
     "-0400": 3573,
     "-0430": 4,
-    "-0500": 2280,
+    "-0500": 2281,
     "-0600": 275,
     "-0700": 1536,
     "-0800": 523,
     "-1000": 3
   },
   "source_lines": {
-    "added": 3389285,
-    "current": 1094309
+    "added": 3389573,
+    "current": 1094985
   }
 }

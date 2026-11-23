@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:22:09+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:21:46+00:00",
   "name": "SciPy",
   "report_path": "index.html",
   "first_commit": "2001-02-01 08:32:30",
-  "last_commit": "2026-11-15 20:37:39",
-  "age_days": 9419,
-  "active_days": 6852,
-  "total_commits": 38614,
-  "total_authors": 1958,
-  "active_authors_12mo": 234,
-  "commits_last_12mo": 2127,
-  "total_files": 2929,
-  "total_lines": 1241961,
-  "lines_added": 5279195,
-  "lines_removed": 4136032,
+  "last_commit": "2026-11-22 14:49:06",
+  "age_days": 9426,
+  "active_days": 6859,
+  "total_commits": 38644,
+  "total_authors": 1963,
+  "active_authors_12mo": 236,
+  "commits_last_12mo": 2157,
+  "total_files": 2955,
+  "total_lines": 1194699,
+  "lines_added": 5301589,
+  "lines_removed": 4149112,
   "total_tags": 5,
   "era": "steady",
   "top_authors": [
     {
       "name": "Ralf Gommers",
-      "commits": 4281
+      "commits": 4282
     },
     {
       "name": "Pauli Virtanen",
@@ -29,50 +29,56 @@
     },
     {
       "name": "Matt Haberland",
-      "commits": 2367
+      "commits": 2368
     },
     {
       "name": "Evgeni Burovski",
-      "commits": 2184
+      "commits": 2186
     },
     {
       "name": "Tyler Reddy",
-      "commits": 1424
+      "commits": 1426
     }
   ],
   "author_commits": {
-    "Evgeni Burovski": 2184,
-    "Basil Liekens": 28,
+    "Evgeni Burovski": 2186,
+    "Aadya Chinubhai": 20,
+    "Atishay Kasliwal": 1,
+    "William Flores": 2,
+    "Christoph Baumgarten": 116,
+    "Albert Steppi": 390,
+    "Basil Liekens": 29,
+    "Tyler Reddy": 1426,
+    "Martin Schuck": 74,
+    "Ilhan Polat": 714,
+    "layeh": 2,
+    "Faris Basha TM": 1,
+    "Matt Haberland": 2368,
+    "Ralf Gommers": 4282,
+    "CJ Carey": 209,
+    "Jaesung Park": 1,
+    "Lucas Colley": 632,
     "Veerendra Kumar Sunkavalli": 9,
-    "Albert Steppi": 386,
-    "Matt Haberland": 2367,
     "Joren Hammudoglu": 72,
     "Jake Bowhay": 466,
     "Sagar Kurada": 2,
-    "Tyler Reddy": 1424,
-    "Lucas Colley": 629,
     "Nikolas Valsamidis": 7,
     "sleshaaineni": 1,
     "Wasim Akram": 5,
-    "Aadya Chinubhai": 18,
     "Likhitha J": 1,
-    "Martin Schuck": 70,
     "Florian Bourgey": 177,
     "gr-0x076": 2,
     "Enrico Lockner": 9,
     "Ayush Yadav": 5,
     "Daniel Schmitz": 198,
-    "Christoph Baumgarten": 115,
     "Andrew Nelson": 1033,
     "Yash Raghubanshi": 2,
-    "Ilhan Polat": 713,
     "VeeraBabu Jakkula": 2,
     "pratik9751": 3,
     "Samuel Hills": 1,
     "Kaushik Gunasekaren": 2,
     "Eugenio \"Jay\" Zuccarelli": 1,
     "Yichao Yu": 1,
-    "Ralf Gommers": 4281,
     "Albert Yau": 3,
     "krishneetRAJ": 2,
     "Christian Lorentzen": 41,
@@ -97,7 +103,6 @@
     "Jesse Livezey": 19,
     "Abhirav Gholba": 2,
     "Sangeetha Grama Srinivasan": 1,
-    "CJ Carey": 208,
     "RYAN AKMAL PASYA": 1,
     "Daniel S\u00e1nchez Pag\u00e1n": 1,
     "Alex Mitre": 1,
@@ -2026,7 +2031,7 @@
     "2023": 2061,
     "2024": 2957,
     "2025": 2335,
-    "2026": 1928
+    "2026": 1958
   },
   "ai_assisted": {
     "commits": 63,
@@ -2086,18 +2091,18 @@
       "2026-07": 171,
       "2026-08": 228,
       "2026-09": 173,
-      "2026-10": 135,
-      "2026-11": 80
+      "2026-10": 136,
+      "2026-11": 109
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 38614,
+    "commits": 38644,
     "by_kind": {
-      "organization": 3823,
+      "organization": 3825,
       "one_person": 3091,
-      "personal": 27146,
-      "hidden": 2734,
+      "personal": 27166,
+      "hidden": 2742,
       "unknown": 1820,
       "bot": 0
     },
@@ -2202,11 +2207,11 @@
       },
       {
         "organization": "tum.de",
-        "commits": 30,
-        "commits_last_12mo": 17,
+        "commits": 32,
+        "commits_last_12mo": 19,
         "addresses": 4,
         "first_commit": "2016-08-22",
-        "last_commit": "2026-11-07"
+        "last_commit": "2026-11-19"
       },
       {
         "organization": "amazon.com",
@@ -2627,10 +2632,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 16,
+        "organization": 18,
         "one_person": 14,
-        "personal": 93,
-        "hidden": 92,
+        "personal": 113,
+        "hidden": 100,
         "unknown": 0,
         "bot": 0
       }
@@ -2639,13 +2644,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2127,
-    "authors": 228,
-    "new_authors": 166,
+    "commits": 2157,
+    "authors": 233,
+    "new_authors": 171,
     "half_of_commits": 7
   },
   "humans": {
-    "commits": 38614,
+    "commits": 38644,
     "commits_by_year": {
       "2001": 286,
       "2002": 357,
@@ -2672,24 +2677,24 @@
       "2023": 2061,
       "2024": 2957,
       "2025": 2335,
-      "2026": 1928
+      "2026": 1958
     },
-    "active_days": 6852
+    "active_days": 6859
   },
   "timezones": {
-    "+0000": 7843,
-    "+0100": 5473,
+    "+0000": 7846,
+    "+0100": 5482,
     "+0200": 6564,
-    "+0300": 2007,
+    "+0300": 2010,
     "+0330": 6,
     "+0400": 20,
     "+0430": 4,
     "+0500": 261,
-    "+0530": 739,
+    "+0530": 740,
     "+0600": 28,
     "+0700": 16,
     "+0800": 477,
-    "+0900": 458,
+    "+0900": 459,
     "+0930": 1,
     "+1000": 463,
     "+1030": 7,
@@ -2700,15 +2705,15 @@
     "-0200": 14,
     "-0300": 175,
     "-0400": 3389,
-    "-0500": 2458,
-    "-0600": 1339,
-    "-0700": 3724,
-    "-0800": 1898,
+    "-0500": 2460,
+    "-0600": 1343,
+    "-0700": 3726,
+    "-0800": 1903,
     "-0900": 1,
     "-1000": 24
   },
   "source_lines": {
-    "added": 5672633,
-    "current": 1186053
+    "added": 5678459,
+    "current": 1194699
   }
 }

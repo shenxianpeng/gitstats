@@ -1,12 +1,15 @@
 /**
- * GitStats — Terminal / OpenCode-inspired stylesheet
- * Design: angular (0 border-radius), monospace accents, line-heavy borders
- * Palette: OpenCode warm grayscale (#211E1E / #F1ECEC)
+ * GitStats stylesheet
+ * Ink on paper with two hues: blue for the data, orange for what asks for
+ * attention (risk, removed lines, hot files); greys for everything else.
+ * The system sans for words; monospace only where characters must line up:
+ * counts, dates, paths and versions.
  */
 
 /* ===== CSS Custom Properties ===== */
 :root {
-	/* Typography — OpenCode uses IBM Plex Mono / Inter */
+	/* Typography: the platform's own sans (no web font, so a report works
+	   offline and under a strict Content-Security-Policy) */
 	--font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
 	--font-mono: "IBM Plex Mono", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 	--font-size-xs: 11px;
@@ -15,6 +18,7 @@
 	--font-size-md: 16px;
 	--font-size-lg: 20px;
 	--font-size-xl: 24px;
+	--font-size-title: 30px;
 
 	/* Spacing */
 	--space-1: 4px;
@@ -23,96 +27,117 @@
 	--space-4: 16px;
 	--space-5: 24px;
 	--space-6: 32px;
+	--space-7: 48px;
 
-	/* Border radius — ZERO everywhere: terminal/angular aesthetic */
-	--radius-sm: 0;
-	--radius-md: 0;
-	--radius-lg: 0;
+	/* Border radius: small for tags, medium for controls, large for cards */
+	--radius-sm: 4px;
+	--radius-md: 6px;
+	--radius-lg: 10px;
 
-	/* ── Light mode — OpenCode warm palette ── */
+	/* ── Light mode ── */
 	--bg-color: #ffffff;
-	--surface-color: #f5f5f4;
-	--text-color: #211e1e;
-	--text-secondary: #656363;
-	--text-muted: #716b6b; /* >= 4.5:1 on --bg-color and --surface-color */
-	--border-color: #cfcecd;
-	--border-strong: #9e9a9a;
-	--accent-color: #211e1e;
-	--success-color: #2d6a3f;
-	--warn-color: #9a6700;
-	--danger-color: #8b2323;
+	--surface-color: #f6f5f3;
+	--text-color: #1c1a19;
+	--text-secondary: #57524f;
+	--text-muted: #6f6a67; /* >= 4.5:1 on --bg-color and --surface-color */
+	--border-color: #e6e3e0;
+	--border-strong: #b5aea9;
+	--accent-color: #1c1a19;
+	/* the two hues: blue (the data, and what went up) and orange (attention) */
+	--blue: #2f6db5; /* 5.3:1 on --bg-color */
+	--blue-strong: #1f4f8a;
+	--blue-tint: #e6eef9;
+	--orange: #b4501a; /* 5.1:1 on --bg-color */
+	--orange-strong: #9a4316; /* 5.6:1 on --orange-tint */
+	--orange-tint: #fbe9dd;
+	--success-color: var(--blue-strong);
+	--warn-color: var(--orange);
+	--danger-color: var(--orange);
 
-	--table-header-color: #211e1e;
-	--table-hover-bg: #f0efef;
-	--table-border: #e6e5e4;
+	--table-header-color: #57524f;
+	--table-hover-bg: #f6f5f3;
+	--table-border: #eeebe8;
 
 	--nav-bg: #ffffff;
-	--nav-text: #4b4646;
-	--nav-hover-color: #211e1e;
+	--nav-text: #57524f;
+	--nav-hover-color: #1c1a19;
 
-	--img-bg: #f5f5f4;
-	--img-border: #cfcecd;
+	--img-bg: #f6f5f3;
+	--img-border: #e6e3e0;
 
-	--link-color: #3b6aa3; /* 5.6:1 on --bg-color */
+	--link-color: #2f6db5; /* 5.3:1 on --bg-color */
 
-	--bar-color: #4a7ab5;
+	--bar-color: #2f6db5;
+	/* the latest bar of a chart over time: where the project is now */
+	--bar-latest: #1f4f8a;
 
-	/* Chart.js axes — read by applyChartTheme() on load and on theme switch */
-	--chart-text: #656363;
-	--chart-grid: #e6e5e4;
+	/* Chart.js axes — read by applyChartTheme() on load and on theme switch:
+	   the labels, the dashed guides, and the baseline */
+	--chart-text: #57524f;
+	--chart-grid: #e6e3e0;
+	--chart-axis: #cfcac6;
 
 	/* Multi-series charts (e.g. the top authors) — at least 3:1 on --bg-color */
-	--series-1: #5b8dee;
+	--series-1: #2f6db5;
 	--series-2: #1a7f37;
 	--series-3: #cf222e;
 	--series-4: #8250df;
 	--series-5: #e16f24;
 	--series-6: #0550ae;
+	/* The Hotspots plot: the large files that change often, and the rest */
+	--series-hot: #b4501a;
+	--series-rest: #a9a39f;
 
-	/* Heatmap — GitHub green scale (user preference) */
-	--heat0-bg: #ebedf0;
-	--heat0-color: #1f2328;
-	--heat1-bg: #9be9a8;
-	--heat1-color: #1f2328;
-	--heat2-bg: #40c463;
-	--heat2-color: #1f2328;
-	--heat3-bg: #30a14e;
-	--heat3-color: #1f2328; /* 4.8:1; white was 3.3:1 */
-	--heat4-bg: #216e39;
+	/* Heat scale (punch card, calendar): shades of the data blue. The light
+	   cells' numbers are quieter, so the busy cells stand out. */
+	--heat0-bg: #f3f2f0;
+	--heat0-color: #6f6a67;
+	--heat1-bg: #dbe7f6;
+	--heat1-color: #57524f;
+	--heat2-bg: #a9c6ea;
+	--heat2-color: #1c1a19;
+	--heat3-bg: #3f74b8;
+	--heat3-color: #ffffff; /* 4.8:1 */
+	--heat4-bg: #1f4f8a;
 	--heat4-color: #ffffff;
 }
 
-/* ── Dark mode — OpenCode near-black ── */
+/* ── Dark mode ── */
 [data-theme="dark"] {
-	--bg-color: #211e1e;
-	--surface-color: #2d2929;
-	--text-color: #f1ecec;
-	--text-secondary: #b7b1b1;
-	--text-muted: #9a9393; /* >= 4.5:1 on --bg-color and --surface-color */
-	--border-color: #3d3838;
-	--border-strong: #656363;
-	--accent-color: #f1ecec;
-	--success-color: #4ade80;
-	--warn-color: #e3a33b;
-	--danger-color: #f87171;
+	--bg-color: #1c1a19;
+	--surface-color: #262322;
+	--text-color: #eeeae6;
+	--text-secondary: #b4aea9;
+	--text-muted: #9a938e; /* >= 4.5:1 on --bg-color and --surface-color */
+	--border-color: #3a3634;
+	--border-strong: #5f5955;
+	--accent-color: #eeeae6;
+	--blue: #7fb0ea;
+	--blue-strong: #9cc3f0;
+	--blue-tint: #1e2a3a;
+	--orange: #e8915a;
+	--orange-strong: #e8915a; /* 5.6:1 on --orange-tint */
+	--orange-tint: #3a2a20;
 
-	--table-header-color: #cfcecd;
-	--table-hover-bg: #352f2f;
-	--table-border: #3d3838;
+	--table-header-color: #b4aea9;
+	--table-hover-bg: #262322;
+	--table-border: #2f2b29;
 
-	--nav-bg: #211e1e;
-	--nav-text: #b7b1b1;
-	--nav-hover-color: #f1ecec;
+	--nav-bg: #1c1a19;
+	--nav-text: #b4aea9;
+	--nav-hover-color: #eeeae6;
 
-	--img-bg: #2d2929;
-	--img-border: #3d3838;
+	--img-bg: #262322;
+	--img-border: #3a3634;
 
-	--link-color: #8db0dc; /* 7.4:1 on --bg-color */
+	--link-color: #7fb0ea; /* 7.7:1 on --bg-color */
 
-	--bar-color: #6b95c8;
+	--bar-color: #5f93d6;
+	--bar-latest: #9cc3f0;
 
-	--chart-text: #b7b1b1;
-	--chart-grid: #3d3838;
+	--chart-text: #b4aea9;
+	--chart-grid: #3a3634;
+	--chart-axis: #5f5955;
 
 	/* Brighter series colors for the dark background (4.9:1 and up) */
 	--series-1: #6ca4f8;
@@ -121,18 +146,20 @@
 	--series-4: #a371f7;
 	--series-5: #f0883e;
 	--series-6: #79c0ff;
+	--series-hot: #e8915a;
+	--series-rest: #7a7470;
 
-	/* Heatmap dark — GitHub dark green, empty cells in the page's warm grey */
-	--heat0-bg: #2d2929;
-	--heat0-color: #e6edf3;
-	--heat1-bg: #0e4429;
-	--heat1-color: #e6edf3;
-	--heat2-bg: #006d32;
-	--heat2-color: #e6edf3;
-	--heat3-bg: #26a641;
-	--heat3-color: #0d1117;
-	--heat4-bg: #39d353;
-	--heat4-color: #0d1117;
+	/* Heat scale dark: empty cells in the surface grey, then deeper blues */
+	--heat0-bg: #262322;
+	--heat0-color: #9a938e;
+	--heat1-bg: #1e3350;
+	--heat1-color: #b4aea9;
+	--heat2-bg: #2c4f7c;
+	--heat2-color: #eeeae6;
+	--heat3-bg: #3e6aa5;
+	--heat3-color: #ffffff; /* 5.5:1 */
+	--heat4-bg: #7fb0ea;
+	--heat4-color: #0e1a2a;
 }
 
 /* ===== Base ===== */
@@ -180,10 +207,181 @@ dd {
 /* ===== Overview page ===== */
 /* Report period, generation time and tool versions under the repo name */
 .page-meta {
-	margin: calc(-1 * var(--space-2)) 0 var(--space-5);
+	margin: 0 0 var(--space-6);
 	font-family: var(--font-mono);
 	font-size: var(--font-size-sm);
 	color: var(--text-secondary);
+}
+
+/* The overview's heading: the repository's name, and a link at the far end */
+.page-head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: var(--space-1) var(--space-5);
+	margin: var(--space-6) 0 var(--space-2);
+}
+
+.page-head h1 {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.page-head > a {
+	font-size: 13px;
+}
+
+/* "Worth a look": what the overview points at, each finding a cell with its
+   tag, a sentence, and the page that shows it. The cells share a row and
+   grow to fill it, so a row of three leaves no gap. */
+.signals-section {
+	margin-bottom: var(--space-6);
+}
+
+/* A page's lead section (the overview's findings, the Activity page's
+   months): its heading a size up from the others */
+.signals-section h2,
+.lead-section > h2 {
+	font-size: var(--font-size-lg);
+}
+
+.signals-section h2 {
+	margin-top: 0;
+}
+
+.signals {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--space-4);
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.signal {
+	flex: 1 1 240px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 10px;
+	min-width: 0;
+	padding: 20px 22px;
+	background-color: var(--surface-color);
+	border-radius: var(--radius-lg);
+	overflow-wrap: break-word;
+}
+
+/* The tag says the kind in words; its color only repeats it: orange for
+   what to watch, solid orange for a risk, blue for activity going up */
+.signal-tag {
+	padding: 2px var(--space-2);
+	border-radius: var(--radius-sm);
+	font-size: var(--font-size-xs);
+	font-weight: 600;
+	line-height: 1.5;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--orange-strong);
+	background-color: var(--orange-tint);
+}
+
+.signal-risk .signal-tag {
+	color: var(--bg-color);
+	background-color: var(--orange);
+}
+
+.signal-up .signal-tag {
+	color: var(--blue-strong);
+	background-color: var(--blue-tint);
+}
+
+.signal-title {
+	font-size: 17px;
+	line-height: 1.35;
+	font-weight: 650;
+}
+
+.signal-detail {
+	font-size: var(--font-size-base);
+	color: var(--text-secondary);
+}
+
+.signal-detail .path {
+	font-family: var(--font-mono);
+	overflow-wrap: anywhere;
+}
+
+.signal-link {
+	margin-top: auto;
+	padding-top: var(--space-1);
+	font-size: 13px;
+	font-weight: 500;
+}
+
+/* A tile's number with the last months as small bars at the far end */
+.stat-spark {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: var(--space-2);
+}
+
+.sparkline {
+	flex: none;
+	margin-bottom: 4px;
+	fill: var(--bar-color);
+}
+
+/* The overview's two charts: the years, and the last 12 months at a third of
+   the width. Their boxes have the same height at these proportions. */
+.overview-charts {
+	display: grid;
+	grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+	/* no row gap: side by side, the rows are the sections' heading, sentence,
+	   chart and footnote (see the subgrid below) */
+	column-gap: var(--space-7);
+	margin-top: var(--space-7);
+}
+
+/* The space above a row of sections is the row's, not its headings' */
+.overview-charts h2,
+.two-columns h2 {
+	margin-top: 0;
+}
+
+/* Side by side, heading, sentence, chart and what follows it are rows the two
+   sections share, so the charts start level whichever sentence is longer */
+@supports (grid-template-rows: subgrid) {
+	@media (min-width: 901px) {
+		.overview-charts > section {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr);
+			grid-template-rows: subgrid;
+			grid-row: span 4;
+			align-content: start;
+		}
+	}
+}
+
+.chart-footnote {
+	margin: var(--space-2) 0 0;
+	font-size: var(--font-size-sm);
+	color: var(--text-secondary);
+}
+
+@media (max-width: 900px) {
+	/* stacked, the rows are the two sections */
+	.overview-charts {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: var(--space-7);
+	}
+
+	/* a chart that was a third of the width is now all of it */
+	.overview-charts .chart-box {
+		aspect-ratio: 3;
+	}
 }
 
 /* "On this page" links to a long page's sections */
@@ -192,8 +390,7 @@ dd {
 	flex-wrap: wrap;
 	align-items: center;
 	gap: var(--space-2);
-	margin: calc(-1 * var(--space-3)) 0 var(--space-5);
-	font-family: var(--font-mono);
+	margin: calc(-1 * var(--space-2)) 0 var(--space-5);
 	font-size: var(--font-size-sm);
 }
 
@@ -205,6 +402,7 @@ dd {
 .page-toc a {
 	padding: 2px var(--space-2);
 	border: 1px solid var(--border-color);
+	border-radius: var(--radius-md);
 	color: var(--text-color);
 }
 
@@ -229,15 +427,14 @@ dd {
 /* The sentence or two under a section heading saying what the section shows */
 .section-note {
 	max-width: 75ch;
-	margin: 0 0 var(--space-4);
+	margin: 0 0 var(--space-5);
 	color: var(--text-secondary);
 }
 
 /* "All 40 authors →" style links closing a section */
 .more-link {
-	margin: var(--space-2) 0 0;
-	font-family: var(--font-mono);
-	font-size: var(--font-size-sm);
+	margin: var(--space-3) 0 0;
+	font-size: 13px;
 }
 
 /* Two sections side by side (e.g. top contributors and latest releases);
@@ -245,7 +442,8 @@ dd {
 .two-columns {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
-	column-gap: var(--space-6);
+	gap: var(--space-7);
+	margin-top: var(--space-7);
 }
 
 @media (max-width: 900px) {
@@ -265,13 +463,118 @@ dd {
 .share-bar {
 	display: block;
 	height: 6px;
-	background-color: var(--surface-color);
+	border-radius: 3px;
+	overflow: hidden;
+	background-color: var(--table-border);
 }
 
 .share-bar > span {
 	display: block;
 	height: 100%;
 	background-color: var(--bar-color);
+}
+
+/* A bar that is not a person's work, or stands for several: bots, "others" */
+.share-bar-muted > span {
+	background-color: var(--series-rest);
+}
+
+/* The scale over a column of bars drawn from 0 to 100% */
+.share-ticks {
+	display: flex;
+	justify-content: space-between;
+	font-weight: 400;
+	letter-spacing: 0;
+	text-transform: none;
+	color: var(--text-secondary);
+}
+
+.share-table .rank,
+table.authors .rank {
+	width: 1%;
+	padding-right: 0;
+	color: var(--text-secondary);
+}
+
+.share-table .share-rest td {
+	color: var(--text-secondary);
+}
+
+/* The Code Ownership page's single owners: each one's most-changed files,
+   one path to a line */
+.owners-table .share-cell {
+	width: 20%;
+}
+
+.owner-files {
+	font-size: var(--font-size-sm);
+}
+
+.owner-files .path {
+	display: block;
+	font-family: var(--font-mono);
+	overflow-wrap: anywhere;
+}
+
+.owner-files-more {
+	display: block;
+	color: var(--text-secondary);
+}
+
+/* On a phone each owner is two lines: the name and the counts, then the
+   files, the full width; the bars give way to the paths */
+@media (max-width: 560px) {
+	table.owners-table,
+	table.owners-table tbody {
+		display: block;
+	}
+
+	table.owners-table tr {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 2px 12px;
+		padding: var(--space-2) 0;
+		border-bottom: 1px solid var(--table-border);
+	}
+
+	table.owners-table tr:first-child {
+		display: none;
+	}
+
+	.table-scroll table.owners-table tr > td,
+	.table-scroll table.owners-table tr:hover > td {
+		position: static;
+		padding: 0;
+		border: 0;
+		box-shadow: none;
+		background-color: transparent;
+	}
+
+	table.owners-table .owner-name {
+		flex: 1 1 auto;
+		font-weight: 500;
+	}
+
+	table.owners-table td[data-label]::before {
+		content: attr(data-label);
+		margin-right: 4px;
+		font-family: var(--font-sans);
+		color: var(--text-secondary);
+	}
+
+	table.owners-table .share-cell {
+		display: none;
+	}
+
+	table.owners-table .owner-files {
+		flex: 0 0 100%;
+		padding-top: var(--space-1);
+	}
+
+	table.owners-table .owner-files:empty {
+		display: none;
+	}
 }
 
 /* The same bar, thinner, under a number inside a table cell */
@@ -290,16 +593,17 @@ dd {
 	display: grid;
 	grid-template-columns: repeat(var(--cols, 6), minmax(0, 1fr));
 	gap: 1px;
-	margin: 0 0 var(--space-6);
-	background-color: var(--border-color);
-	border: 1px solid var(--border-strong);
+	margin: 0 0 var(--space-7);
+	background-color: var(--table-border);
+	border-top: 1px solid var(--border-color);
+	border-bottom: 1px solid var(--border-color);
 }
 
 .stat-tile {
 	display: flex;
 	flex-direction: column;
-	gap: var(--space-1);
-	padding: var(--space-4);
+	gap: 6px;
+	padding: 18px 20px;
 	background-color: var(--bg-color);
 	/* a value as long as a domain wraps inside its tile, at a <wbr> where it has one */
 	min-width: 0;
@@ -309,10 +613,9 @@ dd {
 .stat-tiles dt {
 	float: none;
 	margin: 0;
-	font-size: var(--font-size-xs);
+	font-family: var(--font-sans);
+	font-size: var(--font-size-sm);
 	font-weight: 500;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
 }
 
 .stat-tiles dt::after {
@@ -325,9 +628,10 @@ dd {
 
 .stat-value {
 	font-family: var(--font-mono);
-	font-size: 28px;
-	font-weight: 600;
+	font-size: 26px;
+	font-weight: 500;
 	line-height: 1.15;
+	letter-spacing: -0.02em;
 	font-variant-numeric: tabular-nums;
 	color: var(--text-color);
 }
@@ -381,13 +685,17 @@ dd {
 /* ===== Tables ===== */
 table {
 	border-collapse: collapse;
-	font-size: var(--font-size-sm);
+	font-size: 13px;
 	margin-bottom: var(--space-4);
 	font-variant-numeric: tabular-nums;
 }
 
 /* Wide tables scroll inside their own box instead of widening the page */
 .table-scroll {
+	/* positioned, so that what is placed absolutely inside it (the column
+	   headers' text for screen readers) is clipped with the table instead of
+	   widening the page */
+	position: relative;
 	max-width: 100%;
 	overflow-x: auto;
 	margin-bottom: var(--space-4);
@@ -416,8 +724,9 @@ table {
 }
 
 /* ===== Contributor timeline (Authors page) ===== */
-/* Rows share one grid: name | commits | track. The year gridlines sit in an
-   overlay that starts where the track column does. */
+/* Rows share one grid: name | commits | track. Each track is a row of
+   cells, one per year (or month), shaded on the heat scale; the axis row
+   under them has the same cells, some with their year. */
 .timeline-scroll {
 	overflow-x: auto;
 	margin-bottom: var(--space-2);
@@ -427,13 +736,7 @@ table {
 	--name-w: 180px;
 	--count-w: 56px;
 	--col-gap: var(--space-3);
-	/* room for half of the largest mark at the track's right end */
-	--edge: 10px;
-	position: relative;
-	/* its own stacking context, so the grid (z-index -1) sits behind the rows */
-	z-index: 0;
 	min-width: 640px;
-	padding-right: var(--edge);
 	font-size: var(--font-size-sm);
 }
 
@@ -446,7 +749,7 @@ table {
 }
 
 .timeline-row {
-	min-height: 30px;
+	min-height: 32px;
 	border-bottom: 1px solid var(--table-border);
 }
 
@@ -463,90 +766,26 @@ table {
 	color: var(--text-secondary);
 }
 
+.timeline-track,
+.timeline-ticks {
+	display: grid;
+	grid-template-columns: repeat(var(--periods, 1), minmax(0, 1fr));
+	gap: 2px;
+}
+
 .timeline-track {
-	position: relative;
-	height: 30px;
+	height: 18px;
 }
 
-.timeline-span {
-	position: absolute;
-	top: 50%;
-	height: 1px;
-	background-color: var(--bar-color);
+.timeline-cell {
+	border-radius: 2px;
 }
 
-.timeline-mark {
-	position: absolute;
-	top: 50%;
-	width: var(--size);
-	height: var(--size);
-	transform: translate(-50%, -50%);
-	background-color: var(--bar-color);
-	opacity: 0.6;
+/* a bot's commits are not a person's work: its cells are grey */
+.timeline-row.bot .timeline-cell {
+	filter: grayscale(1);
 }
 
-.timeline-row.bot .timeline-span,
-.timeline-row.bot .timeline-mark {
-	background-color: var(--text-muted);
-}
-
-.timeline-grid {
-	position: absolute;
-	/* behind the rows (see .timeline's z-index), so row lines stay visible */
-	z-index: -1;
-	top: 0;
-	bottom: 0;
-	left: calc(var(--name-w) + var(--count-w) + 2 * var(--col-gap));
-	right: var(--edge);
-	pointer-events: none;
-}
-
-/* The longest stretch without commits, shaded like the charts' gap bands */
-.timeline-gap {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	background-color: var(--surface-color);
-	border-left: 1px dashed var(--border-strong);
-	border-right: 1px dashed var(--border-strong);
-}
-
-/* Cut down to a short break when it would take a quarter of the axis or more
-   (see collapsed_width()): hatched, and naming its years on the label row */
-.timeline-gap.is-collapsed {
-	display: flex;
-	align-items: flex-end;
-	justify-content: center;
-	background-image: repeating-linear-gradient(
-		135deg,
-		transparent 0 7px,
-		var(--border-color) 7px 8px
-	);
-	font-family: var(--font-mono);
-	font-size: var(--font-size-xs);
-	color: var(--text-secondary);
-	white-space: nowrap;
-}
-
-.timeline-gap.is-collapsed > span {
-	background-color: var(--surface-color);
-}
-
-.timeline-year {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	border-left: 1px solid var(--chart-grid);
-	padding-left: 3px;
-	display: flex;
-	align-items: flex-end;
-	font-family: var(--font-mono);
-	font-size: var(--font-size-xs);
-	color: var(--text-secondary);
-}
-
-/* The axis row holds the first/last month at the track's ends; year labels
-   from the overlay land in the same row */
 .timeline-axis {
 	min-height: 24px;
 	font-family: var(--font-mono);
@@ -554,15 +793,10 @@ table {
 	color: var(--text-secondary);
 }
 
-.timeline-axis > span:first-child {
-	grid-column: 3;
-	grid-row: 1;
-}
-
-.timeline-axis > span:last-child {
-	grid-column: 3;
-	grid-row: 1;
-	justify-self: end;
+.timeline-ticks > span {
+	overflow: visible;
+	white-space: nowrap;
+	text-align: center;
 }
 
 @media (max-width: 768px) {
@@ -583,6 +817,118 @@ table {
 	aspect-ratio: var(--chart-ratio, 3);
 	min-height: 240px;
 	margin-bottom: var(--space-2);
+}
+
+/* The note a box holds until its chart is drawn (CHART_NOTE). Where the
+   page's scripts do not run it stays, and the box is as tall as the note
+   instead of leaving a chart's height empty. */
+.chart-note {
+	max-width: 75ch;
+	margin: 0;
+	padding: var(--space-3) var(--space-4);
+	border: 1px dashed var(--border-strong);
+	border-radius: var(--radius-md);
+	color: var(--text-secondary);
+}
+
+.chart-box:has(> .chart-note) {
+	aspect-ratio: auto;
+	min-height: 0;
+}
+
+.chart-box:has(> .chart-note) > canvas {
+	display: none;
+}
+
+/* The Hotspots plot with its highest scores listed next to it */
+.hotspot-plot {
+	display: grid;
+	grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+	column-gap: var(--space-6);
+	align-items: start;
+	margin-bottom: var(--space-5);
+}
+
+.hotspot-top h3 {
+	margin: 0;
+	padding-bottom: var(--space-2);
+	border-bottom: 1px solid var(--border-strong);
+	font-family: var(--font-sans);
+	font-size: var(--font-size-xs);
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+
+.hotspot-top ol {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.hotspot-top li {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	padding: var(--space-2) 0;
+	border-bottom: 1px solid var(--table-border);
+}
+
+/* The rank; a file that is numbered on the plot has it in a circle, as there */
+.hotspot-rank {
+	flex: none;
+	box-sizing: border-box;
+	width: 24px;
+	height: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: var(--font-mono);
+	font-size: var(--font-size-xs);
+	color: var(--text-secondary);
+}
+
+.hotspot-rank.numbered {
+	border: 1.5px solid var(--series-rest);
+	border-radius: 50%;
+	font-weight: 700;
+	color: var(--text-color);
+}
+
+.hotspot-rank.numbered.hot {
+	border-color: var(--series-hot);
+	background-color: color-mix(in srgb, var(--series-hot) 14%, transparent);
+	color: var(--series-hot);
+}
+
+.hotspot-file {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	font-size: var(--font-size-sm);
+}
+
+.hotspot-file .path {
+	font-family: var(--font-mono);
+	overflow-wrap: anywhere;
+}
+
+.hotspot-numbers {
+	color: var(--text-secondary);
+}
+
+@media (max-width: 900px) {
+	.hotspot-plot {
+		grid-template-columns: minmax(0, 1fr);
+		row-gap: var(--space-4);
+	}
+}
+
+/* on a phone the plot is as tall as it is wide: a wide strip would crowd its dots */
+@media (max-width: 560px) {
+	.hotspot-plot .chart-box {
+		aspect-ratio: 1;
+	}
 }
 
 /* AI-assisted commits across repositories: one hue behind the share, darker
@@ -634,7 +980,6 @@ details.tag-authors {
 details.tag-authors > summary {
 	display: inline;
 	cursor: pointer;
-	font-family: var(--font-mono);
 	font-size: var(--font-size-sm);
 	color: var(--link-color);
 	white-space: nowrap;
@@ -654,8 +999,8 @@ details.tag-authors[open] > summary {
 	display: inline-block;
 	margin-left: var(--space-1);
 	padding: 0 5px;
-	border: 1px solid var(--border-strong);
-	font-family: var(--font-mono);
+	border-radius: var(--radius-sm);
+	background-color: var(--surface-color);
 	font-size: 10px;
 	font-weight: 600;
 	line-height: 1.5;
@@ -682,13 +1027,15 @@ td.path[data-tag]::after {
 	display: inline-block;
 	margin-left: var(--space-2);
 	padding: 0 5px;
-	border: 1px solid var(--warn-color);
+	border-radius: var(--radius-sm);
+	background-color: var(--orange-tint);
+	font-family: var(--font-sans);
 	font-size: 10px;
 	font-weight: 600;
-	line-height: 1.5;
+	line-height: 1.6;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	color: var(--warn-color);
+	color: var(--orange-strong);
 	vertical-align: 1px;
 	white-space: nowrap;
 }
@@ -700,14 +1047,11 @@ td {
 }
 
 th {
-	font-family: var(--font-mono);
-	font-weight: 600;
+	font-weight: 500;
 	color: var(--table-header-color);
 	padding: var(--space-2) var(--space-3);
 	text-align: left;
-	font-size: var(--font-size-xs);
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
+	font-size: var(--font-size-sm);
 	border-bottom: 1px solid var(--table-border);
 	white-space: nowrap;
 }
@@ -717,10 +1061,16 @@ tr:first-child > th {
 	border-bottom-color: var(--border-strong);
 }
 
-/* Numeric columns (counts, percentages, spans) line up on the right */
+/* Numeric columns (counts, percentages, spans) line up on the right, in
+   the monospace: the digits of a column then line up whatever the font */
 th.num,
 td.num {
 	text-align: right;
+}
+
+td.num {
+	font-family: var(--font-mono);
+	font-size: var(--font-size-sm);
 }
 
 th a {
@@ -729,7 +1079,7 @@ th a {
 }
 
 th a:hover {
-	color: var(--text-secondary);
+	color: var(--text-color);
 }
 
 tr:hover td {
@@ -744,12 +1094,13 @@ tr:hover td {
 	gap: var(--space-2);
 	margin: 0 0 var(--space-5);
 	padding: var(--space-4);
-	border: 1px solid var(--border-strong);
+	border: 1px solid var(--border-color);
+	border-radius: var(--radius-lg);
 }
 
 .badge-url label,
 .badge-options-label {
-	font-family: var(--font-mono);
+	font-family: var(--font-sans);
 	font-size: var(--font-size-xs);
 	font-weight: 500;
 	letter-spacing: 0.08em;
@@ -774,7 +1125,7 @@ tr:hover td {
 	color: var(--text-color);
 	background-color: var(--bg-color);
 	border: 1px solid var(--border-strong);
-	border-radius: 0;
+	border-radius: var(--radius-md);
 }
 
 .badge-url-status {
@@ -785,6 +1136,7 @@ tr:hover td {
 	letter-spacing: 0.04em;
 	color: var(--text-secondary);
 	border: 1px solid var(--border-strong);
+	border-radius: var(--radius-sm);
 }
 
 .badge-url-status.is-ok {
@@ -840,7 +1192,7 @@ tr:hover td {
 	color: var(--text-color);
 	background-color: var(--bg-color);
 	border: 1px solid var(--border-color);
-	border-radius: 0;
+	border-radius: var(--radius-md);
 	cursor: pointer;
 }
 
@@ -1001,6 +1353,7 @@ tr[hidden] {
 	color: var(--text-color);
 	background-color: var(--surface-color);
 	border: 1px solid var(--table-border);
+	border-radius: var(--radius-md);
 }
 
 .badge-copy {
@@ -1044,13 +1397,15 @@ tr[hidden] {
 }
 
 /* ===== Navigation ===== */
+/* The links stand on the bar's bottom rule, where the current page's
+   underline meets it */
 .nav {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: var(--space-4) 0;
+	padding: var(--space-2) 0 0;
 	margin-bottom: var(--space-5);
-	border-bottom: 1px solid var(--border-strong);
+	border-bottom: 1px solid var(--border-color);
 	position: sticky;
 	top: 0;
 	background-color: var(--nav-bg);
@@ -1079,23 +1434,46 @@ tr[hidden] {
 	border-left: 1px solid var(--border-color);
 }
 
+/* A report's pages come group by group (overview, people, code, timeline).
+   The groups are told apart by spacing: no divider between the pages of a
+   group, and a darker one, with room on either side, before each group
+   after the first */
+.nav .nav-pages li + li {
+	border-left: none;
+}
+
+.nav .nav-pages li.nav-group-start {
+	align-items: center;
+	margin-left: var(--space-2);
+	padding-left: var(--space-2);
+	border-left: none;
+}
+
+/* the divider before a group: a short line, centred on the links' text */
+.nav .nav-pages li.nav-group-start::before {
+	content: '';
+	width: 1px;
+	height: 16px;
+	margin-right: var(--space-2);
+	background-color: var(--border-strong);
+}
+
 .nav li a {
 	display: inline-flex;
 	align-items: center;
-	padding: var(--space-2) var(--space-3);
+	min-height: 44px;
+	padding: 0 10px;
 	text-decoration: none;
 	color: var(--nav-text);
-	font-family: var(--font-mono);
-	font-size: var(--font-size-sm);
+	font-size: 13px;
 	font-weight: 500;
-	letter-spacing: 0.02em;
-	transition: color 0.12s ease, background-color 0.12s ease;
+	transition: color 0.12s ease, box-shadow 0.12s ease;
 	white-space: nowrap;
 }
 
 .nav li a:hover {
 	color: var(--nav-hover-color);
-	background-color: var(--surface-color);
+	box-shadow: inset 0 -2px 0 var(--border-color);
 	text-decoration: none;
 }
 
@@ -1108,23 +1486,24 @@ tr[hidden] {
 	outline-offset: -2px;
 }
 
-/* Current page — inverted block */
+/* Current page: in the text color, underlined */
 .nav li a.active,
 .nav li a.active:hover {
-	color: var(--bg-color);
-	background-color: var(--text-color);
+	color: var(--text-color);
+	font-weight: 600;
+	box-shadow: inset 0 -2px 0 var(--text-color);
 }
 
-/* on the inverted block, the ring takes the block's text color */
-.nav li a.active:focus-visible {
-	outline-color: var(--bg-color);
+/* The pages as a menu, in place of the row of links on a phone (see below) */
+.nav-menu {
+	display: none;
 }
 
 /* ===== Nav Brand ===== */
 .nav-brand {
 	font-family: var(--font-mono);
-	font-size: var(--font-size-md);
-	font-weight: 700;
+	font-size: 15px;
+	font-weight: 600;
 	color: var(--text-color);
 	text-decoration: none;
 	letter-spacing: -0.01em;
@@ -1144,8 +1523,6 @@ tr[hidden] {
 	gap: var(--space-2);
 	flex-shrink: 0;
 	margin-left: var(--space-4);
-	border-left: 1px solid var(--border-color);
-	padding-left: var(--space-3);
 }
 
 .nav-github {
@@ -1176,6 +1553,7 @@ tr[hidden] {
 	padding: 0;
 	background: transparent;
 	border: 1px solid var(--border-color);
+	border-radius: var(--radius-md);
 	cursor: pointer;
 	color: var(--text-secondary);
 	transition: border-color 0.12s ease, color 0.12s ease;
@@ -1201,10 +1579,11 @@ tr[hidden] {
 	display: block;
 }
 
-/* ===== Below 1024px: brand + icons on top, page links in their own row =====
-   One row needs about 860px (970px with the AI Insights link); switching
-   earlier keeps the links from scrolling inside a squeezed row. */
-@media (max-width: 1024px) {
+/* ===== Below 1100px: brand + icons on top, page links in their own row =====
+   The links need about 900px (1010px with the AI Insights link), and the
+   brand and icons about 200px more; switching earlier keeps the links from
+   scrolling inside a squeezed row. */
+@media (max-width: 1100px) {
 	.nav {
 		flex-wrap: wrap;
 		padding: 0;
@@ -1217,8 +1596,19 @@ tr[hidden] {
 		border-top: 1px solid var(--border-color);
 	}
 
+	/* a little narrower, for the row of ten pages to fit a tablet's width */
 	.nav li a {
-		min-height: 44px;
+		padding-left: var(--space-2);
+		padding-right: var(--space-2);
+	}
+
+	.nav .nav-pages li.nav-group-start {
+		margin-left: var(--space-1);
+		padding-left: 0;
+	}
+
+	.nav .nav-pages li.nav-group-start::before {
+		margin-right: var(--space-1);
 	}
 
 	.nav-right {
@@ -1244,6 +1634,119 @@ tr[hidden] {
 @media (max-width: 768px) {
 	body {
 		padding: 0 var(--space-4);
+	}
+
+	/* The row of page links becomes a menu named after the current page: the
+	   row showed a few of the pages, and the rest only by scrolling sideways */
+	.nav > ul {
+		display: none;
+	}
+
+	.nav-menu {
+		display: block;
+		margin-left: auto;
+	}
+
+	.nav-menu summary {
+		display: flex;
+		align-items: center;
+		gap: var(--space-2);
+		min-height: 44px;
+		padding: 0 var(--space-3);
+		border: 1px solid var(--border-strong);
+		border-radius: var(--radius-md);
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--text-color);
+		list-style: none;
+		cursor: pointer;
+		user-select: none;
+	}
+
+	.nav-menu summary::-webkit-details-marker {
+		display: none;
+	}
+
+	/* a chevron, drawn with borders, that turns over while the menu is open */
+	.nav-menu summary::after {
+		content: '';
+		width: 6px;
+		height: 6px;
+		margin: -3px 2px 0 var(--space-1);
+		border-right: 1.5px solid currentColor;
+		border-bottom: 1.5px solid currentColor;
+		transform: rotate(45deg);
+	}
+
+	.nav-menu[open] summary::after {
+		margin-top: 3px;
+		transform: rotate(-135deg);
+	}
+
+	.nav-menu-label {
+		font-weight: 400;
+		color: var(--text-secondary);
+	}
+
+	/* the open menu hangs under the whole nav bar, over the page */
+	.nav-menu ul {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		z-index: 101;
+		flex-direction: column;
+		overflow-x: visible;
+		background-color: var(--nav-bg);
+		border: 1px solid var(--border-strong);
+		border-radius: var(--radius-md);
+		box-shadow: 0 8px 24px rgb(0 0 0 / 12%);
+	}
+
+	.nav-menu li {
+		display: flex;
+	}
+
+	.nav-menu li + li {
+		border-left: none;
+		border-top: 1px solid var(--table-border);
+	}
+
+	.nav-menu li a {
+		flex: 1;
+		min-height: 44px;
+		padding: 0 var(--space-4);
+		font-size: 13px;
+	}
+
+	.nav-menu li a:hover {
+		box-shadow: none;
+		background-color: var(--surface-color);
+	}
+
+	/* in the list, the current page is marked down its left edge */
+	.nav-menu li a.active,
+	.nav-menu li a.active:hover {
+		box-shadow: inset 3px 0 0 var(--text-color);
+	}
+
+	/* each group's name over its pages */
+	.nav-menu li.nav-menu-heading {
+		padding: var(--space-3) var(--space-4) var(--space-1);
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		color: var(--text-secondary);
+		background-color: var(--surface-color);
+	}
+
+	.nav-menu li.nav-menu-heading + li {
+		border-top: none;
+	}
+
+	.nav .nav-right {
+		margin-left: var(--space-2);
 	}
 
 	/* "On this page" stays one row that scrolls sideways, like the nav, instead
@@ -1281,6 +1784,36 @@ tr[hidden] {
 	}
 
 	.table-scroll tr:hover > td:first-child {
+		background-color: var(--table-hover-bg);
+	}
+
+	/* The authors table leads with the rank: the name, next to it, stays
+	   pinned too. The rank column is as wide as three digits, and the name
+	   is pinned that far from the edge. */
+	.table-scroll table.authors tr > .rank {
+		box-sizing: border-box;
+		width: 2.5rem;
+		min-width: 2.5rem;
+		max-width: 2.5rem;
+		padding-left: var(--space-1);
+	}
+
+	.table-scroll table.authors tr > :nth-child(2) {
+		position: sticky;
+		left: 2.5rem;
+		z-index: 1;
+		background-color: var(--bg-color);
+	}
+
+	.table-scroll.is-scrollable table.authors tr > :first-child {
+		box-shadow: none;
+	}
+
+	.table-scroll.is-scrollable table.authors tr > :nth-child(2) {
+		box-shadow: inset -1px 0 0 var(--table-border);
+	}
+
+	.table-scroll table.authors tr:hover > td:nth-child(2) {
 		background-color: var(--table-hover-bg);
 	}
 
@@ -1332,7 +1865,6 @@ tr[hidden] {
 	table.file-table td[data-label]::before {
 		content: attr(data-label);
 		margin-right: 6px;
-		font-family: var(--font-mono);
 		font-size: var(--font-size-xs);
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
@@ -1360,7 +1892,6 @@ tr[hidden] {
 
 	table.file-table tr:first-child::before {
 		content: "Sort by";
-		font-family: var(--font-mono);
 		font-size: var(--font-size-xs);
 		font-weight: 600;
 		letter-spacing: 0.08em;
@@ -1378,19 +1909,17 @@ tr[hidden] {
 		min-height: 32px;
 		padding: 0 6px;
 		border: 1px solid var(--border-color);
+		border-radius: var(--radius-md);
 	}
 }
 
 /* ===== Headings ===== */
 h1 {
-	font-family: var(--font-mono);
-	font-size: var(--font-size-xl);
+	font-size: var(--font-size-title);
 	font-weight: 700;
 	color: var(--text-color);
-	margin: var(--space-5) 0 var(--space-4);
-	padding-bottom: var(--space-3);
-	border-bottom: 1px solid var(--border-strong);
-	line-height: 1.3;
+	margin: var(--space-6) 0 var(--space-4);
+	line-height: 1.15;
 	letter-spacing: -0.02em;
 }
 
@@ -1399,34 +1928,15 @@ h1 a {
 	text-decoration: none;
 }
 
-/* Section heading: "// Title" followed by a hairline to the right edge */
+/* Section heading: the title alone; the space above it sets the sections apart */
 h2 {
-	display: flex;
-	/* baseline keeps "//" on the first line when a long title wraps */
-	align-items: baseline;
-	gap: var(--space-3);
-	font-family: var(--font-mono);
 	font-size: var(--font-size-md);
 	font-weight: 600;
+	line-height: 1.35;
 	color: var(--text-color);
-	margin: var(--space-6) 0 var(--space-3);
+	margin: var(--space-7) 0 var(--space-2);
 	clear: both;
 	letter-spacing: -0.01em;
-}
-
-h2::before {
-	content: '//';
-	color: var(--text-muted);
-	font-weight: 400;
-	letter-spacing: 0;
-}
-
-h2::after {
-	content: '';
-	flex: 1;
-	align-self: center;
-	height: 1px;
-	background-color: var(--border-color);
 }
 
 h2 a {
@@ -1443,7 +1953,8 @@ h2:hover a::after {
 
 /* ===== Images ===== */
 img {
-	border: 1px solid var(--border-strong);
+	border: 1px solid var(--img-border);
+	border-radius: var(--radius-md);
 	padding: var(--space-3);
 	background-color: var(--img-bg);
 	max-width: 100%;
@@ -1513,7 +2024,7 @@ summary:focus-visible {
 	padding: var(--space-2) var(--space-3);
 	background-color: var(--bg-color);
 	border: 1px solid var(--border-strong);
-	font-family: var(--font-mono);
+	border-radius: var(--radius-md);
 	font-size: var(--font-size-sm);
 }
 
@@ -1524,7 +2035,7 @@ summary:focus-visible {
 /* ===== Bar Charts ===== */
 .bar {
 	background-color: var(--bar-color);
-	opacity: 0.85;
+	opacity: 0.9;
 	transition: opacity 0.12s ease;
 }
 
@@ -1551,6 +2062,7 @@ table.noborders td:hover .bar {
 /* Gaps in the page color keep neighbouring heat cells apart */
 td.heat {
 	border: 2px solid var(--bg-color);
+	border-radius: var(--radius-sm);
 }
 
 .heat0 { background-color: var(--heat0-bg) !important; color: var(--heat0-color); }
@@ -1602,8 +2114,9 @@ td.heat {
 }
 
 .heat-legend span {
-	width: 12px;
+	width: 16px;
 	height: 12px;
+	border-radius: 2px;
 }
 
 .heat-legend span:first-child {
@@ -1619,11 +2132,43 @@ details.table-details {
 	margin: var(--space-2) 0 var(--space-4);
 }
 
+/* the summary is a quiet button: "Show all 159 tags" */
 details.table-details > summary {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-2);
+	min-height: 32px;
+	padding: 0 var(--space-3);
+	border: 1px solid var(--border-color);
+	border-radius: var(--radius-md);
 	cursor: pointer;
-	font-family: var(--font-mono);
-	font-size: var(--font-size-sm);
+	font-size: 13px;
 	color: var(--link-color);
+	list-style: none;
+}
+
+details.table-details > summary::-webkit-details-marker {
+	display: none;
+}
+
+details.table-details > summary:hover {
+	border-color: var(--border-strong);
+}
+
+/* a chevron that turns over while the table is open */
+details.table-details > summary::after {
+	content: '';
+	width: 6px;
+	height: 6px;
+	margin-top: -3px;
+	border-right: 1.5px solid currentColor;
+	border-bottom: 1.5px solid currentColor;
+	transform: rotate(45deg);
+}
+
+details.table-details[open] > summary::after {
+	margin-top: 3px;
+	transform: rotate(-135deg);
 }
 
 details.table-details[open] > summary {
@@ -1635,8 +2180,8 @@ details.table-details[open] > summary {
 	margin: var(--space-4) 0;
 	padding: var(--space-4);
 	background-color: var(--surface-color);
-	border: 1px solid var(--border-strong);
-	border-left: 3px solid var(--text-color);
+	border-left: 3px solid var(--blue);
+	border-radius: var(--radius-md);
 }
 
 .ai-summary h3 {
@@ -1663,8 +2208,8 @@ details.table-details[open] > summary {
 .ai-summary-error {
 	padding: var(--space-3);
 	background-color: var(--surface-color);
-	border: 1px solid var(--border-strong);
 	border-left: 3px solid var(--danger-color);
+	border-radius: var(--radius-md);
 }
 
 /* ===== AI Insights Page ===== */
@@ -1672,7 +2217,7 @@ details.table-details[open] > summary {
 	padding: var(--space-4);
 	margin: var(--space-4) 0;
 	background-color: var(--surface-color);
-	border: 1px solid var(--border-strong);
+	border-radius: var(--radius-lg);
 }
 
 .ai-insights-intro p {
@@ -1701,7 +2246,7 @@ details.table-details[open] > summary {
 	margin: var(--space-6) 0;
 	padding: var(--space-4);
 	background-color: var(--surface-color);
-	border: 1px solid var(--border-strong);
+	border-radius: var(--radius-lg);
 }
 
 .ai-disclaimer h3 {
@@ -1778,6 +2323,7 @@ details.table-details[open] > summary {
 	letter-spacing: 0.08em;
 	padding: 1px var(--space-2);
 	border: 1px solid var(--border-strong);
+	border-radius: var(--radius-sm);
 	color: var(--text-secondary);
 }
 
@@ -1807,7 +2353,9 @@ details.table-details[open] > summary {
 .history-bar-track {
 	height: 6px;
 	margin: var(--space-1) 0 var(--space-2);
-	background-color: var(--surface-color);
+	border-radius: 3px;
+	overflow: hidden;
+	background-color: var(--table-border);
 }
 
 .history-bar {
@@ -1820,6 +2368,7 @@ details.table-details[open] > summary {
 	padding: var(--space-4);
 	margin: var(--space-4) 0;
 	background-color: var(--surface-color);
+	border-radius: var(--radius-lg);
 }
 
 .history-prologue p {
@@ -1864,14 +2413,13 @@ details.table-details[open] > summary {
 
 /* ===== Footer ===== */
 .footer {
-	margin-top: var(--space-6);
-	padding: var(--space-4) 0;
-	border-top: 1px solid var(--border-strong);
+	margin-top: var(--space-7);
+	padding: var(--space-5) 0 var(--space-6);
+	border-top: 1px solid var(--border-color);
 	text-align: center;
 }
 
 .footer-generated {
-	font-family: var(--font-mono);
 	font-size: var(--font-size-sm);
 	color: var(--text-muted);
 }
@@ -1910,7 +2458,7 @@ details.table-details[open] > summary {
 }
 
 .compare-name {
-	font-family: var(--font-mono);
+	font-family: var(--font-sans);
 	font-size: var(--font-size-xs);
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
@@ -2062,7 +2610,7 @@ details.table-details[open] > summary {
 }
 
 .insight-label {
-	font-family: var(--font-mono);
+	font-family: var(--font-sans);
 	font-size: var(--font-size-xs);
 	letter-spacing: 0.08em;
 	text-transform: uppercase;

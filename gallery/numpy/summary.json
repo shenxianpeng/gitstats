@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:22:12+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:21:44+00:00",
   "name": "NumPy",
   "report_path": "index.html",
   "first_commit": "2001-12-18 15:45:10",
-  "last_commit": "2026-11-16 02:33:44",
-  "age_days": 9099,
-  "active_days": 6850,
-  "total_commits": 42540,
-  "total_authors": 2125,
-  "active_authors_12mo": 247,
-  "commits_last_12mo": 2382,
-  "total_files": 2446,
-  "total_lines": 1009787,
-  "lines_added": 2796920,
-  "lines_removed": 1786830,
+  "last_commit": "2026-11-23 00:20:36",
+  "age_days": 9106,
+  "active_days": 6857,
+  "total_commits": 42592,
+  "total_authors": 2135,
+  "active_authors_12mo": 253,
+  "commits_last_12mo": 2434,
+  "total_files": 2452,
+  "total_lines": 954074,
+  "lines_added": 2798871,
+  "lines_removed": 1787005,
   "total_tags": 16,
   "era": "steady",
   "top_authors": [
     {
       "name": "Charles Harris",
-      "commits": 7293
+      "commits": 7301
     },
     {
       "name": "Matti Picus",
@@ -41,7 +41,23 @@
     }
   ],
   "author_commits": {
-    "Nathan Goldbaum": 894,
+    "Joren Hammudoglu": 1459,
+    "Shiv": 1,
+    "David King": 4,
+    "Russell Keith-Magee": 5,
+    "layeh": 3,
+    "Lance Li": 1,
+    "Mohd Maaz Khan": 15,
+    "Nathan Goldbaum": 899,
+    "Iason Krommydas": 41,
+    "ndthr": 1,
+    "farisbasha": 2,
+    "mika": 1,
+    "Charles Harris": 7301,
+    "Markus Gro\u00dfer": 1,
+    "Faris Basha TM": 1,
+    "Eugenio \"Jay\" Zuccarelli": 2,
+    "zenubnaqvi2007-spec": 1,
     "Andy": 1,
     "Kevin Sheppard": 256,
     "Inessa Pawson": 53,
@@ -49,17 +65,12 @@
     "Arthur Lacote": 3,
     "Antareep Sarkar": 13,
     "Pragyaan Gaur": 1,
-    "David King": 3,
-    "Iason Krommydas": 40,
     "Anirudh": 1,
     "Matti Picus": 3039,
     "Riku Sakamoto": 18,
     "Malcolm Smith": 3,
     "Andrew Nelson": 97,
-    "Charles Harris": 7293,
     "Bharath Pranav": 1,
-    "layeh": 1,
-    "Joren Hammudoglu": 1440,
     "Sharat Krishnan": 1,
     "Rudransh Shekhar": 1,
     "ageorgou": 2,
@@ -80,32 +91,33 @@
     "Rohit Goswami": 333,
     "Riaz1729": 1,
     "Matthew Digman": 2,
+    "Albert T. Wong": 1,
     "bymasha": 2,
     "Pratham Hole": 61,
     "Ganesh Kathiresan": 162,
     "Dante": 1,
+    "mmporong": 1,
     "dhrub chatterjee": 1,
     "Travis Fortney": 1,
     "Adnan Sami": 1,
     "LeeMEow23": 1,
     "Dragos-Georgian Ion": 4,
-    "Anush Vishwakarma": 1,
+    "Anush Vishwakarma": 4,
     "Gopu Yeshwanth Reddy": 2,
     "gregwb": 3,
     "Sebastian Berg": 2984,
     "Abhinay Reddy Keesara": 3,
+    "Adri\u00e1n Mu\u00f1oz Perera": 1,
     "pereradrian": 1,
     "HughStanway": 4,
     "aryangorde6": 1,
     "Michael Zhan": 4,
     "sukeyzhou": 2,
     "ssmore": 1,
-    "Mohd Maaz Khan": 14,
     "Yuka Sadaoka": 1,
     "Likhitha J": 1,
     "Raghuveer Devulapalli": 330,
     "Lakshay Garg": 5,
-    "Eugenio \"Jay\" Zuccarelli": 1,
     "Rayson Yeap": 1,
     "Gustav Lantz": 1,
     "stanley": 1,
@@ -125,7 +137,6 @@
     "Saad": 2,
     "Bhuvansh Kataria": 1,
     "42-Slices-of-Cheese": 1,
-    "Rvish-glitch": 3,
     "Muhammad Hafiz Azhari": 1,
     "Yuta Nakamura": 4,
     "dukotheduckie": 1,
@@ -151,7 +162,6 @@
     "!DWesl": 56,
     "rahulkotargasthi": 1,
     "Wanja Schulze": 1,
-    "Russell Keith-Magee": 4,
     "Chris Ninham": 1,
     "Warren Weckesser": 282,
     "Vineet Kumar": 6,
@@ -2193,7 +2203,7 @@
     "2023": 3422,
     "2024": 3054,
     "2025": 2543,
-    "2026": 2176
+    "2026": 2228
   },
   "ai_assisted": {
     "commits": 40,
@@ -2252,22 +2262,22 @@
       "2026-07": 242,
       "2026-08": 229,
       "2026-09": 333,
-      "2026-10": 233,
-      "2026-11": 70
+      "2026-10": 236,
+      "2026-11": 119
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 42540,
+    "commits": 42592,
     "by_kind": {
-      "organization": 2796,
-      "one_person": 6053,
-      "personal": 31305,
-      "hidden": 1283,
+      "organization": 2867,
+      "one_person": 5984,
+      "personal": 31350,
+      "hidden": 1287,
       "unknown": 486,
-      "bot": 617
+      "bot": 618
     },
-    "organization_count": 68,
+    "organization_count": 69,
     "last_12mo_from": "2025-12",
     "top": [
       {
@@ -2317,6 +2327,14 @@
         "addresses": 15,
         "first_commit": "2016-02-22",
         "last_commit": "2026-11-10"
+      },
+      {
+        "organization": "uci.edu",
+        "commits": 71,
+        "commits_last_12mo": 1,
+        "addresses": 2,
+        "first_commit": "2011-01-23",
+        "last_commit": "2026-10-30"
       },
       {
         "organization": "intel.com",
@@ -2873,25 +2891,25 @@
         "bot": 49
       },
       "2026-Q4": {
-        "organization": 8,
-        "one_person": 9,
-        "personal": 239,
-        "hidden": 34,
+        "organization": 9,
+        "one_person": 10,
+        "personal": 284,
+        "hidden": 38,
         "unknown": 0,
-        "bot": 13
+        "bot": 14
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2209,
-    "authors": 239,
-    "new_authors": 173,
+    "commits": 2260,
+    "authors": 249,
+    "new_authors": 183,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 41923,
+    "commits": 41974,
     "commits_by_year": {
       "2001": 8,
       "2002": 408,
@@ -2918,25 +2936,25 @@
       "2023": 3343,
       "2024": 2947,
       "2025": 2423,
-      "2026": 2017
+      "2026": 2068
     },
-    "active_days": 6847
+    "active_days": 6854
   },
   "timezones": {
-    "+0000": 9564,
-    "+0100": 4325,
-    "+0200": 6949,
+    "+0000": 9566,
+    "+0100": 4348,
+    "+0200": 6950,
     "+0300": 1943,
     "+0330": 7,
     "+0400": 45,
     "+0430": 2,
     "+0500": 51,
-    "+0530": 1115,
+    "+0530": 1120,
     "+0545": 1,
     "+0600": 15,
     "+0700": 15,
-    "+0800": 539,
-    "+0900": 290,
+    "+0800": 540,
+    "+0900": 291,
     "+1000": 104,
     "+1030": 2,
     "+1100": 147,
@@ -2947,14 +2965,14 @@
     "-0300": 284,
     "-0400": 1901,
     "-0430": 1,
-    "-0500": 2757,
-    "-0600": 4911,
-    "-0700": 5687,
-    "-0800": 1764,
+    "-0500": 2759,
+    "-0600": 4913,
+    "-0700": 5699,
+    "-0800": 1767,
     "-1000": 14
   },
   "source_lines": {
-    "added": 3224558,
-    "current": 1009787
+    "added": 3037920,
+    "current": 954074
   }
 }

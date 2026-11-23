@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:22:50+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:22:32+00:00",
   "name": "Gemini CLI",
   "report_path": "index.html",
   "first_commit": "2025-04-16 04:41:08",
-  "last_commit": "2026-11-13 19:49:40",
-  "age_days": 577,
-  "active_days": 496,
-  "total_commits": 6621,
+  "last_commit": "2026-11-20 19:19:05",
+  "age_days": 584,
+  "active_days": 501,
+  "total_commits": 6640,
   "total_authors": 688,
-  "active_authors_12mo": 395,
-  "commits_last_12mo": 3151,
-  "total_files": 3057,
-  "total_lines": 1695056,
-  "lines_added": 2171295,
-  "lines_removed": 476218,
+  "active_authors_12mo": 385,
+  "commits_last_12mo": 3170,
+  "total_files": 3066,
+  "total_lines": 1653077,
+  "lines_added": 2194689,
+  "lines_removed": 491582,
   "total_tags": 13,
   "era": "steady",
   "top_authors": [
@@ -41,22 +41,22 @@
     }
   ],
   "author_commits": {
-    "tadipavan": 14,
-    "urielefrenvirtusa": 25,
+    "urielefrenvirtusa": 28,
+    "gemini-cli-robot": 193,
+    "David Pierce": 46,
+    "tadipavan": 16,
+    "luisfelipe-alt": 30,
+    "Diego Godinez": 27,
+    "villahernandez-coder": 23,
+    "jvargassanchez-dot": 25,
+    "elberthc-byte": 12,
     "duvanka-prasad": 11,
-    "luisfelipe-alt": 28,
-    "gemini-cli-robot": 189,
-    "jvargassanchez-dot": 24,
-    "Diego Godinez": 25,
     "jesussamuel-byte": 31,
     "ugorla-dev": 10,
-    "villahernandez-coder": 22,
     "Dmitry Lyalin": 17,
-    "elberthc-byte": 11,
     "amelidev": 21,
     "gurusai-voleti": 1,
     "Srinath Padmanabhan": 17,
-    "David Pierce": 43,
     "Sandy Tao": 230,
     "Jose Garcia-Balius": 2,
     "joneba-google": 18,
@@ -732,7 +732,7 @@
   },
   "commits_by_year": {
     "2025": 3744,
-    "2026": 2877
+    "2026": 2896
   },
   "ai_assisted": {
     "commits": 275,
@@ -792,17 +792,17 @@
       "2026-08": 60,
       "2026-09": 62,
       "2026-10": 116,
-      "2026-11": 52
+      "2026-11": 71
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 6621,
+    "commits": 6640,
     "by_kind": {
-      "organization": 2547,
+      "organization": 2564,
       "one_person": 300,
       "personal": 2237,
-      "hidden": 1519,
+      "hidden": 1521,
       "unknown": 0,
       "bot": 18
     },
@@ -811,11 +811,11 @@
     "top": [
       {
         "organization": "google.com",
-        "commits": 2538,
-        "commits_last_12mo": 1353,
+        "commits": 2555,
+        "commits_last_12mo": 1370,
         "addresses": 114,
         "first_commit": "2025-04-16",
-        "last_commit": "2026-11-13"
+        "last_commit": "2026-11-20"
       },
       {
         "organization": "github.com",
@@ -876,10 +876,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 148,
+        "organization": 165,
         "one_person": 1,
         "personal": 0,
-        "hidden": 19,
+        "hidden": 21,
         "unknown": 0,
         "bot": 0
       }
@@ -888,21 +888,21 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 3146,
+    "commits": 3165,
     "authors": 377,
     "new_authors": 312,
     "half_of_commits": 15
   },
   "humans": {
-    "commits": 6603,
+    "commits": 6622,
     "commits_by_year": {
       "2025": 3730,
-      "2026": 2873
+      "2026": 2892
     },
-    "active_days": 496
+    "active_days": 501
   },
   "timezones": {
-    "+0000": 722,
+    "+0000": 741,
     "+0100": 105,
     "+0200": 134,
     "+0300": 17,
@@ -925,7 +925,7 @@
     "-1000": 4
   },
   "source_lines": {
-    "added": 2079749,
-    "current": 1644346
+    "added": 2089897,
+    "current": 1653077
   }
 }

@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Zed: Badges</title>
-	<meta name="description" content="Zed: 40,857 commits by 2,324 authors, 2021 to 2026. A report made with gitstats.">
+	<meta name="description" content="Zed: 40,957 commits by 2,344 authors, 2021 to 2026. A report made with gitstats.">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="GitStats">
 	<meta property="og:title" content="Zed: Badges">
-	<meta property="og:description" content="Zed: 40,857 commits by 2,324 authors, 2021 to 2026. A report made with gitstats.">
+	<meta property="og:description" content="Zed: 40,957 commits by 2,344 authors, 2021 to 2026. A report made with gitstats.">
 	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/zed/badges.html">
 	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/zed/share-card.png">
 	<meta property="og:image:width" content="1200">
@@ -16,12 +16,12 @@
 	<meta property="og:image:alt" content="Zed: Badges">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="Zed: Badges">
-	<meta name="twitter:description" content="Zed: 40,857 commits by 2,324 authors, 2021 to 2026. A report made with gitstats.">
+	<meta name="twitter:description" content="Zed: 40,957 commits by 2,344 authors, 2021 to 2026. A report made with gitstats.">
 	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/zed/share-card.png">
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.12.2.post1.dev5">
+	<meta name="generator" content="GitStats 2.12.4.post1.dev11">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -93,6 +93,7 @@
 	function applyChartTheme(chart) {
 		const text = getCSSVar('--chart-text');
 		const grid = getCSSVar('--chart-grid');
+		const axis = getCSSVar('--chart-axis');
 		Chart.defaults.color = text;
 		Chart.defaults.borderColor = grid;
 		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
@@ -105,12 +106,20 @@
 			scale.title.color = text;
 			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
 			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
-			scale.border.color = grid;
+			// the x-axis is the baseline the bars stand on; the y-axis has no line
+			scale.border.color = scale.axis === 'x' ? axis : grid;
 		});
 		chart.options.plugins.legend.labels.color = text;
 		const bar = getCSSVar('--bar-color');
+		const latest = getCSSVar('--bar-latest');
 		chart.data.datasets.forEach(function(ds) {
 			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			// the latest bar, darker: where the project is now
+			if (ds.themed && ds.latest) {
+				ds.backgroundColor = ds.data.map(function(v, i) {
+					return i === ds.data.length - 1 ? latest : bar;
+				});
+			}
 			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
 			if (ds.series) {
 				const color = getCSSVar('--series-' + ds.series);
@@ -130,7 +139,8 @@
 
 	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
 	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
-	//   peaks  a label above chosen bars
+	//   peaks  a label above chosen bars (the latest in its own color); one
+	//          that would run into a label already placed is left out
 	//   values a value label above every non-zero bar
 	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
 	// hatched, its caption runs up the band, and `axis` names it under the plot.
@@ -235,7 +245,9 @@
 					ctx.fillStyle = getCSSVar('--surface-color');
 					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
 				}
-				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillStyle = getCSSVar(
+					mark.latest ? '--bar-latest' : mark.plain ? '--chart-text' : '--text-color'
+				);
 				ctx.fillText(mark.text, mark.x, mark.y);
 				ctx.restore();
 			});
@@ -273,8 +285,21 @@
 			const onBand = bands.some(function(edges) {
 				return x + half > edges[0] && x - half < edges[1];
 			});
-			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
-				half: half, onBand: onBand });
+			// above every bar the label spans, so a small value among taller
+			// neighbours (one month of many) is not drawn over them
+			let top = bar.y;
+			meta.data.forEach(function(other) {
+				if (Math.abs(other.x - x) <= half + 2) top = Math.min(top, other.y);
+			});
+			const y = top - 6;
+			// the marks come in order of importance: one that would overlap an
+			// earlier one is left out rather than drawn over it
+			const clash = placed.some(function(other) {
+				return Math.abs(other.x - x) < other.half + half + 6 && Math.abs(other.y - y) < 14;
+			});
+			if (clash && !mark.plain) return;
+			placed.push({ text: mark.text, plain: mark.plain, latest: mark.latest, font: font,
+				x: x, y: y, half: half, onBand: onBand });
 		});
 		return placed;
 	}
@@ -383,6 +408,18 @@
 			}
 		};
 	}
+
+	// A chart's box starts with a note that the chart is not shown (CHART_NOTE),
+	// which is all a page whose scripts do not run has of it. A chart that is
+	// built takes the note away first, so that it is laid out in the whole box.
+	const chartNote = {
+		id: 'chartNote',
+		beforeInit: function(chart) {
+			const note = chart.canvas.parentNode.querySelector('.chart-note');
+			if (note) note.remove();
+		}
+	};
+	if (window.Chart) Chart.register(chartNote);
 </script>
 </head>
 <body>
@@ -390,19 +427,8 @@
 
             <nav class="nav" aria-label="Pages">
             <a href="../index.html" class="nav-brand nav-up">&larr; GitStats Gallery</a>
-            <ul>
-            <li><a href="index.html">General</a></li>
-            <li><a href="activity.html">Activity</a></li>
-            <li><a href="authors.html">Authors</a></li>
-            <li><a href="ownership.html">Code Ownership</a></li>
-            <li><a href="hotspots.html">Hotspots</a></li>
-            <li><a href="files.html">Files</a></li>
-            <li><a href="history.html">History</a></li>
-            <li><a href="lines.html">Lines</a></li>
-            <li><a href="tags.html">Tags</a></li>
-            <li><a href="badges.html" class="active" aria-current="page">Badges</a></li>
-            
-            </ul>
+            <ul class="nav-pages"><li><a href="index.html">General</a></li><li><a href="badges.html" class="active" aria-current="page">Badges</a></li><li class="nav-group-start"><a href="authors.html">Authors</a></li><li><a href="ownership.html">Code Ownership</a></li><li class="nav-group-start"><a href="hotspots.html">Hotspots</a></li><li><a href="files.html">Files</a></li><li><a href="lines.html">Lines</a></li><li class="nav-group-start"><a href="activity.html">Activity</a></li><li><a href="history.html">History</a></li><li><a href="tags.html">Tags</a></li></ul>
+            <details class="nav-menu"><summary><span class="nav-menu-label">Page</span> Badges</summary><ul><li class="nav-menu-heading" aria-hidden="true">Overview</li><li><a href="index.html">General</a></li><li><a href="badges.html" class="active" aria-current="page">Badges</a></li><li class="nav-menu-heading" aria-hidden="true">People</li><li><a href="authors.html">Authors</a></li><li><a href="ownership.html">Code Ownership</a></li><li class="nav-menu-heading" aria-hidden="true">Code</li><li><a href="hotspots.html">Hotspots</a></li><li><a href="files.html">Files</a></li><li><a href="lines.html">Lines</a></li><li class="nav-menu-heading" aria-hidden="true">Timeline</li><li><a href="activity.html">Activity</a></li><li><a href="history.html">History</a></li><li><a href="tags.html">Tags</a></li></ul></details>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
@@ -617,5 +643,5 @@ jobs:
         with:
           deploy-to-pages: true
 </pre></details></section></main>
-<footer class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></footer>
+<footer class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a> 2.12.4.post1.dev11 &middot; 2026-11-23 06:32:35 in 33 s &middot; git version 2.56.1</span></footer>
 </body></html>

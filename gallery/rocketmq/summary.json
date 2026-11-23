@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:29:18+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:29:31+00:00",
   "name": "Apache RocketMQ",
   "report_path": "index.html",
   "first_commit": "2013-05-15 05:45:27",
-  "last_commit": "2026-11-10 08:16:28",
-  "age_days": 4928,
-  "active_days": 2252,
-  "total_commits": 9253,
-  "total_authors": 688,
-  "active_authors_12mo": 65,
-  "commits_last_12mo": 295,
-  "total_files": 2780,
-  "total_lines": 430642,
-  "lines_added": 579368,
-  "lines_removed": 148625,
+  "last_commit": "2026-11-23 06:25:41",
+  "age_days": 4941,
+  "active_days": 2255,
+  "total_commits": 9265,
+  "total_authors": 696,
+  "active_authors_12mo": 73,
+  "commits_last_12mo": 307,
+  "total_files": 2790,
+  "total_lines": 431479,
+  "lines_added": 580567,
+  "lines_removed": 148723,
   "total_tags": 32,
   "era": "steady",
   "top_authors": [
@@ -41,10 +41,19 @@
     }
   ],
   "author_commits": {
+    "Hilarious12138": 1,
+    "Zephyruszzzz": 1,
+    "xugaopeng0": 1,
+    "fangm0137": 1,
+    "qianye": 67,
+    "Weidong Qi": 1,
+    "leaveWhite9088": 2,
+    "FinberA0A": 1,
+    "Sharang Gupta": 1,
+    "liu weiwen": 1,
     "bxfjb": 8,
     "rongtong": 356,
     "Lei Zhiyuan": 16,
-    "qianye": 64,
     "Quan": 27,
     "\u70e4\u5316\u306e\u521d\u96ea": 2,
     "Xiao Yang": 106,
@@ -53,7 +62,6 @@
     "zhang hongyuan": 2,
     "Adrian Wang": 3,
     "Untergang1": 1,
-    "leaveWhite9088": 1,
     "majialong": 20,
     "imzs": 20,
     "\u5065\u5eb7\u5b9d": 1,
@@ -744,7 +752,7 @@
     "2023": 635,
     "2024": 380,
     "2025": 270,
-    "2026": 264
+    "2026": 276
   },
   "ai_assisted": {
     "commits": 8,
@@ -803,17 +811,17 @@
       "2026-08": 21,
       "2026-09": 36,
       "2026-10": 25,
-      "2026-11": 3
+      "2026-11": 15
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 9253,
+    "commits": 9265,
     "by_kind": {
-      "organization": 5657,
-      "one_person": 612,
-      "personal": 2449,
-      "hidden": 520,
+      "organization": 5660,
+      "one_person": 613,
+      "personal": 2451,
+      "hidden": 526,
       "unknown": 8,
       "bot": 7
     },
@@ -830,11 +838,11 @@
       },
       {
         "organization": "alibaba-inc.com",
-        "commits": 1237,
-        "commits_last_12mo": 25,
+        "commits": 1240,
+        "commits_last_12mo": 28,
         "addresses": 41,
         "first_commit": "2013-07-01",
-        "last_commit": "2026-10-27"
+        "last_commit": "2026-11-23"
       },
       {
         "organization": "apache.org",
@@ -951,10 +959,10 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 1,
-        "one_person": 2,
-        "personal": 17,
-        "hidden": 8,
+        "organization": 4,
+        "one_person": 3,
+        "personal": 19,
+        "hidden": 14,
         "unknown": 0,
         "bot": 0
       }
@@ -963,13 +971,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 295,
-    "authors": 65,
-    "new_authors": 35,
+    "commits": 307,
+    "authors": 73,
+    "new_authors": 43,
     "half_of_commits": 7
   },
   "humans": {
-    "commits": 9246,
+    "commits": 9258,
     "commits_by_year": {
       "2013": 2273,
       "2014": 1341,
@@ -984,16 +992,16 @@
       "2023": 632,
       "2024": 379,
       "2025": 270,
-      "2026": 264
+      "2026": 276
     },
-    "active_days": 2252
+    "active_days": 2255
   },
   "timezones": {
-    "+0000": 6,
+    "+0000": 7,
     "+0100": 8,
     "+0200": 4,
     "+0530": 20,
-    "+0800": 9147,
+    "+0800": 9158,
     "+0900": 23,
     "+1100": 6,
     "-0400": 10,
@@ -1003,7 +1011,7 @@
     "-0800": 2
   },
   "source_lines": {
-    "added": 1362942,
-    "current": 430642
+    "added": 1357517,
+    "current": 431479
   }
 }

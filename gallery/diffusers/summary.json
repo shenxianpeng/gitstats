@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:24:14+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:24:14+00:00",
   "name": "Diffusers",
   "report_path": "index.html",
   "first_commit": "2022-05-30 16:07:33",
-  "last_commit": "2026-11-13 22:33:33",
-  "age_days": 1629,
-  "active_days": 1329,
-  "total_commits": 7068,
-  "total_authors": 1163,
-  "active_authors_12mo": 224,
-  "commits_last_12mo": 1041,
-  "total_files": 3062,
-  "total_lines": 1203582,
-  "lines_added": 1666035,
-  "lines_removed": 462406,
+  "last_commit": "2026-11-22 10:31:43",
+  "age_days": 1637,
+  "active_days": 1336,
+  "total_commits": 7088,
+  "total_authors": 1165,
+  "active_authors_12mo": 225,
+  "commits_last_12mo": 1061,
+  "total_files": 3061,
+  "total_lines": 1202880,
+  "lines_added": 1673854,
+  "lines_removed": 470726,
   "total_tags": 26,
   "era": "steady",
   "top_authors": [
     {
       "name": "Sayak Paul",
-      "commits": 1091
+      "commits": 1099
     },
     {
       "name": "Patrick von Platen",
@@ -29,7 +29,7 @@
     },
     {
       "name": "Dhruv Nair",
-      "commits": 364
+      "commits": 365
     },
     {
       "name": "Suraj Patil",
@@ -37,25 +37,31 @@
     },
     {
       "name": "YiYi Xu",
-      "commits": 296
+      "commits": 297
     }
   ],
   "author_commits": {
-    "YiYi Xu": 296,
+    "Sayak Paul": 1099,
+    "Jingya HUANG": 13,
+    "yzhautouskay": 12,
+    "menglcai": 3,
+    "Hsu, Chan Fu": 3,
+    "Dhruv Nair": 365,
+    "Kieran Didi": 2,
+    "YiYi Xu": 297,
+    "klin": 1,
+    "Sylvan Liu": 2,
+    "udayraj1238": 1,
     "Steven Liu": 221,
-    "Sayak Paul": 1091,
     "Auden Venn": 1,
     "Akhil Gupta": 1,
-    "Dhruv Nair": 364,
     "Yiming Zhao": 2,
     "Mishig": 20,
     "Nabid Nur": 1,
     "drbh": 1,
     "Yi Gu": 1,
     "sarankumar": 1,
-    "Jingya HUANG": 12,
     "G\u00f6rkem G\u00fcl": 1,
-    "yzhautouskay": 10,
     "Gorka Dab\u00f3": 2,
     "mlzerotoheroyoutube": 1,
     "Parth Vadera": 1,
@@ -64,7 +70,6 @@
     "nvsm": 1,
     "kahlun": 1,
     "Aloys Jehwin": 2,
-    "Sylvan Liu": 1,
     "Wang, Yi": 23,
     "Ziyu Lin": 1,
     "A-Raphie": 1,
@@ -73,7 +78,6 @@
     "Eliott C.": 1,
     "Christopher": 5,
     "Muhammad Usman Mateen": 1,
-    "Kieran Didi": 1,
     "muhammadali-afridi": 1,
     "Alexander Ivanov": 2,
     "Akshan Krithick": 63,
@@ -125,9 +129,7 @@
     "Joseph Loftin": 1,
     "Charchit Sharma": 13,
     "Cedric Perauer": 1,
-    "menglcai": 2,
     "Chenyang Zhu": 3,
-    "chsu": 1,
     "Preetham Noel P": 1,
     "Yaroslav Romanenko": 1,
     "pzarzycki": 1,
@@ -1210,13 +1212,13 @@
     "2023": 1890,
     "2024": 1466,
     "2025": 1151,
-    "2026": 980
+    "2026": 1000
   },
   "ai_assisted": {
-    "commits": 122,
+    "commits": 124,
     "authored": 0,
     "assistants": {
-      "Claude": 116,
+      "Claude": 118,
       "GitHub Copilot": 6
     },
     "by_month": {
@@ -1243,7 +1245,7 @@
       "2026-08": 25,
       "2026-09": 15,
       "2026-10": 19,
-      "2026-11": 14
+      "2026-11": 16
     },
     "commits_by_month": {
       "2024-12": 184,
@@ -1269,17 +1271,17 @@
       "2026-08": 132,
       "2026-09": 64,
       "2026-10": 78,
-      "2026-11": 43
+      "2026-11": 63
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 7068,
+    "commits": 7088,
     "by_kind": {
-      "organization": 817,
+      "organization": 823,
       "one_person": 335,
-      "personal": 4299,
-      "hidden": 1596,
+      "personal": 4310,
+      "hidden": 1599,
       "unknown": 1,
       "bot": 20
     },
@@ -1304,11 +1306,11 @@
       },
       {
         "organization": "nvidia.com",
-        "commits": 23,
-        "commits_last_12mo": 23,
+        "commits": 25,
+        "commits_last_12mo": 25,
         "addresses": 6,
         "first_commit": "2025-12-22",
-        "last_commit": "2026-11-04"
+        "last_commit": "2026-11-20"
       },
       {
         "organization": "berkeley.edu",
@@ -1317,6 +1319,14 @@
         "addresses": 3,
         "first_commit": "2022-06-17",
         "last_commit": "2023-11-11"
+      },
+      {
+        "organization": "amd.com",
+        "commits": 9,
+        "commits_last_12mo": 7,
+        "addresses": 6,
+        "first_commit": "2025-04-05",
+        "last_commit": "2026-11-19"
       },
       {
         "organization": "usc.edu",
@@ -1333,14 +1343,6 @@
         "addresses": 5,
         "first_commit": "2022-12-27",
         "last_commit": "2025-04-03"
-      },
-      {
-        "organization": "amd.com",
-        "commits": 5,
-        "commits_last_12mo": 3,
-        "addresses": 4,
-        "first_commit": "2025-04-05",
-        "last_commit": "2026-10-29"
       },
       {
         "organization": "canva.com",
@@ -1465,10 +1467,10 @@
         "bot": 6
       },
       "2026-Q4": {
-        "organization": 11,
+        "organization": 17,
         "one_person": 1,
-        "personal": 75,
-        "hidden": 34,
+        "personal": 86,
+        "hidden": 37,
         "unknown": 0,
         "bot": 0
       }
@@ -1477,35 +1479,35 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1031,
-    "authors": 218,
-    "new_authors": 165,
+    "commits": 1051,
+    "authors": 220,
+    "new_authors": 167,
     "half_of_commits": 5
   },
   "humans": {
-    "commits": 7048,
+    "commits": 7068,
     "commits_by_year": {
       "2022": 1581,
       "2023": 1889,
       "2024": 1462,
       "2025": 1146,
-      "2026": 970
+      "2026": 990
     },
-    "active_days": 1329
+    "active_days": 1336
   },
   "timezones": {
-    "+0000": 395,
-    "+0100": 740,
+    "+0000": 396,
+    "+0100": 743,
     "+0200": 1551,
     "+0300": 264,
     "+0330": 1,
     "+0400": 24,
     "+0500": 6,
-    "+0530": 1735,
+    "+0530": 1745,
     "+0545": 2,
     "+0600": 1,
     "+0700": 74,
-    "+0800": 628,
+    "+0800": 633,
     "+0900": 181,
     "+1000": 12,
     "+1100": 6,
@@ -1517,10 +1519,10 @@
     "-0600": 65,
     "-0700": 544,
     "-0800": 247,
-    "-1000": 296
+    "-1000": 297
   },
   "source_lines": {
-    "added": 1670830,
-    "current": 1203381
+    "added": 1678649,
+    "current": 1202880
   }
 }

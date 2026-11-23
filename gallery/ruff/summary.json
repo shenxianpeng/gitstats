@@ -1,39 +1,39 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:23:08+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:22:39+00:00",
   "name": "Ruff",
   "report_path": "index.html",
   "first_commit": "2022-08-09 17:19:19",
-  "last_commit": "2026-11-15 12:54:14",
-  "age_days": 1559,
-  "active_days": 1492,
-  "total_commits": 18163,
-  "total_authors": 957,
-  "active_authors_12mo": 317,
-  "commits_last_12mo": 5170,
-  "total_files": 11323,
-  "total_lines": 2300775,
-  "lines_added": 4513501,
-  "lines_removed": 2243832,
-  "total_tags": 435,
+  "last_commit": "2026-11-23 05:00:17",
+  "age_days": 1567,
+  "active_days": 1500,
+  "total_commits": 18365,
+  "total_authors": 964,
+  "active_authors_12mo": 321,
+  "commits_last_12mo": 5372,
+  "total_files": 11339,
+  "total_lines": 1481332,
+  "lines_added": 4533679,
+  "lines_removed": 2254652,
+  "total_tags": 436,
   "era": "peak",
   "top_authors": [
     {
-      "name": "Charlie Marsh",
-      "commits": 7126
+      "name": "Carl Meyer",
+      "commits": 7247
     },
     {
       "name": "Micha Reiser",
-      "commits": 1619
+      "commits": 1649
     },
     {
       "name": "David Peter",
-      "commits": 739
+      "commits": 747
     },
     {
       "name": "Brent Westbrook",
-      "commits": 518
+      "commits": 530
     },
     {
       "name": "Andrew Gallant",
@@ -41,18 +41,32 @@
     }
   ],
   "author_commits": {
-    "Charlie Marsh": 7126,
-    "Ibraheem Ahmed": 154,
-    "L\u00e9r\u00e8": 111,
-    "Brent Westbrook": 518,
-    "David Peter": 739,
+    "Carl Meyer": 7247,
+    "Tamir Duberstein": 3,
+    "Micha Reiser": 1649,
+    "Manognya D": 1,
+    "baltasarblanco": 6,
+    "Zanie Blue": 306,
+    "Brent Westbrook": 530,
+    "Ibraheem Ahmed": 155,
+    "A5rocks": 1,
+    "Shivansh Shukla": 2,
+    "Chammika Mannakkara": 11,
+    "Anuj Das": 1,
+    "David Salvisberg": 24,
+    "Douglas Creager": 210,
+    "Usama (PSEUDO)": 1,
+    "apathydevil": 1,
+    "David Peter": 747,
+    "Ee Durbin": 9,
+    "William Woodruff": 33,
+    "G Karthik Koundinya": 2,
+    "L\u00e9r\u00e8": 114,
+    "Ryan The Dev": 1,
     "Andrii Balakhtar": 1,
-    "Zanie Blue": 305,
-    "Micha Reiser": 1619,
     "Elric": 2,
     "zaniebot": 39,
     "Matias Caliz": 3,
-    "G Karthik Koundinya": 1,
     "layeh": 1,
     "yash": 2,
     "Rajveer Singh": 2,
@@ -61,10 +75,7 @@
     "Ansh Rohilla": 1,
     "Shunsuke Shibayama": 81,
     "GeorgiaPreda": 1,
-    "Douglas Creager": 209,
-    "Ee Durbin": 8,
     "Shantanu Pradhan": 2,
-    "William Woodruff": 31,
     "hirehamir": 3,
     "Avasam": 14,
     "Saber Oueslati": 3,
@@ -92,12 +103,10 @@
     "Yuu": 2,
     "Amirshokh": 1,
     "Aarush Kandukoori": 4,
-    "David Salvisberg": 23,
     "Gore Williams": 5,
     "DeviousCardi": 1,
     "debaditya": 1,
     "Victorien": 6,
-    "Baltasar Blanco": 5,
     "lognd": 1,
     "dOR": 1,
     "Max Azatian": 1,
@@ -238,7 +247,6 @@
     "brian-c11": 1,
     "Ey\u00fcp Can Akman": 1,
     "Tobias Hernstig": 1,
-    "Tamir Duberstein": 1,
     "Amethyst Reese": 65,
     "Xing": 1,
     "Abhay J Nayak": 1,
@@ -724,7 +732,6 @@
     "Bartosz S\u0142awecki": 1,
     "Robert Craigie": 1,
     "Mark Byrne": 1,
-    "Chammika Mannakkara": 10,
     "port19": 1,
     "pabepadu": 1,
     "Randy Syring": 1,
@@ -1004,13 +1011,13 @@
     "2023": 4573,
     "2024": 2969,
     "2025": 4478,
-    "2026": 4738
+    "2026": 4940
   },
   "ai_assisted": {
-    "commits": 71,
+    "commits": 72,
     "authored": 0,
     "assistants": {
-      "Claude": 70,
+      "Claude": 71,
       "Codex": 1,
       "GitHub Copilot": 1
     },
@@ -1038,7 +1045,7 @@
       "2026-08": 4,
       "2026-09": 1,
       "2026-10": 1,
-      "2026-11": 1
+      "2026-11": 2
     },
     "commits_by_month": {
       "2024-12": 301,
@@ -1064,30 +1071,30 @@
       "2026-08": 488,
       "2026-09": 464,
       "2026-10": 409,
-      "2026-11": 291
+      "2026-11": 493
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 18163,
+    "commits": 18365,
     "by_kind": {
-      "organization": 1022,
-      "one_person": 3390,
-      "personal": 9070,
-      "hidden": 2777,
+      "organization": 1039,
+      "one_person": 3431,
+      "personal": 9185,
+      "hidden": 2798,
       "unknown": 0,
-      "bot": 1904
+      "bot": 1912
     },
     "organization_count": 3,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "astral.sh",
-        "commits": 1010,
-        "commits_last_12mo": 480,
+        "commits": 1027,
+        "commits_last_12mo": 497,
         "addresses": 7,
         "first_commit": "2023-06-12",
-        "last_commit": "2026-11-13"
+        "last_commit": "2026-11-23"
       },
       {
         "organization": "openai.com",
@@ -1164,64 +1171,64 @@
         "bot": 205
       },
       "2026-Q4": {
-        "organization": 87,
-        "one_person": 158,
-        "personal": 284,
-        "hidden": 79,
+        "organization": 104,
+        "one_person": 199,
+        "personal": 399,
+        "hidden": 100,
         "unknown": 0,
-        "bot": 92
+        "bot": 100
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 4429,
-    "authors": 311,
-    "new_authors": 235,
+    "commits": 4623,
+    "authors": 319,
+    "new_authors": 242,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 16259,
+    "commits": 16453,
     "commits_by_year": {
       "2022": 1405,
       "2023": 4456,
       "2024": 2464,
       "2025": 3890,
-      "2026": 4044
+      "2026": 4238
     },
-    "active_days": 1488
+    "active_days": 1496
   },
   "timezones": {
-    "+0000": 1269,
-    "+0100": 2910,
+    "+0000": 1286,
+    "+0100": 2956,
     "+0200": 2630,
     "+0300": 196,
     "+0330": 15,
     "+0400": 11,
-    "+0500": 22,
-    "+0530": 845,
+    "+0500": 23,
+    "+0530": 849,
     "+0545": 1,
     "+0600": 24,
     "+0700": 188,
-    "+0800": 194,
-    "+0900": 533,
+    "+0800": 195,
+    "+0900": 534,
     "+0930": 1,
     "+1000": 19,
     "+1030": 1,
     "+1100": 4,
     "+1200": 2,
     "+1300": 3,
-    "-0300": 106,
+    "-0300": 107,
     "-0400": 4176,
-    "-0500": 3043,
-    "-0600": 321,
+    "-0500": 3155,
+    "-0600": 322,
     "-0700": 1179,
-    "-0800": 469,
+    "-0800": 487,
     "-0900": 1
   },
   "source_lines": {
-    "added": 2812909,
-    "current": 1476489
+    "added": 2826541,
+    "current": 1481332
   }
 }

@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:27:41+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:27:48+00:00",
   "name": "Apache Cassandra",
   "report_path": "index.html",
   "first_commit": "2009-03-02 07:57:22",
-  "last_commit": "2026-11-15 12:20:36",
-  "age_days": 6468,
-  "active_days": 4890,
-  "total_commits": 32616,
+  "last_commit": "2026-11-21 17:27:24",
+  "age_days": 6474,
+  "active_days": 4896,
+  "total_commits": 32646,
   "total_authors": 592,
   "active_authors_12mo": 89,
-  "commits_last_12mo": 1079,
-  "total_files": 8848,
-  "total_lines": 2040795,
-  "lines_added": 3718918,
-  "lines_removed": 1677925,
+  "commits_last_12mo": 1109,
+  "total_files": 8862,
+  "total_lines": 2025483,
+  "lines_added": 3726686,
+  "lines_removed": 1678778,
   "total_tags": 246,
   "era": "steady",
   "top_authors": [
@@ -41,24 +41,26 @@
     }
   ],
   "author_commits": {
+    "Stefan Miklosovic": 1166,
+    "Arvind Kandpal": 26,
+    "Francisco Guerrero": 104,
+    "Alan Wang": 13,
+    "Jon Meredith": 121,
+    "Caleb Rackliffe": 298,
+    "Benedict Elliott Smith": 810,
+    "Rishabh Saraswat": 3,
     "Brandon Williams": 3038,
     "tommy stendahl": 9,
-    "Stefan Miklosovic": 1159,
     "Bernardo Botella": 27,
     "Sam Tunnicliffe": 633,
     "nivy": 13,
-    "Benedict Elliott Smith": 808,
     "David Capwell": 359,
     "Hugo de Sousa Pereira": 1,
     "Dmitry Konstantinov": 224,
     "Marcus Eriksson": 1252,
     "mck": 1034,
     "Patrick McFadin": 17,
-    "Alan Wang": 11,
-    "Francisco Guerrero": 100,
     "Dipankar Achinta": 1,
-    "Caleb Rackliffe": 292,
-    "Arvind Kandpal": 25,
     "Yuqi Yan": 6,
     "Galarcel": 2,
     "Pranav Chaurasia": 2,
@@ -75,7 +77,6 @@
     "bharathbikkavolu": 1,
     "Johnny Miller": 3,
     "Jon Haddad": 35,
-    "Rishabh Saraswat": 2,
     "Bohdan Siryk": 1,
     "Piotr Ko\u0142aczkowski": 5,
     "nvharikrishna": 20,
@@ -96,7 +97,6 @@
     "Edward": 9,
     "dhingarkan": 1,
     "Shubhang Singh": 1,
-    "Jon Meredith": 114,
     "Patrick Lee": 1,
     "maoling": 16,
     "Kokoori, Shylaja": 2,
@@ -652,13 +652,13 @@
     "2023": 1367,
     "2024": 945,
     "2025": 1008,
-    "2026": 1023
+    "2026": 1053
   },
   "ai_assisted": {
-    "commits": 24,
+    "commits": 26,
     "authored": 0,
     "assistants": {
-      "Claude": 21,
+      "Claude": 23,
       "Codex": 1,
       "GitHub Copilot": 1,
       "Unnamed assistant": 1
@@ -687,7 +687,7 @@
       "2026-08": 9,
       "2026-09": 9,
       "2026-10": 2,
-      "2026-11": 0
+      "2026-11": 2
     },
     "commits_by_month": {
       "2024-12": 36,
@@ -712,17 +712,17 @@
       "2026-07": 111,
       "2026-08": 140,
       "2026-09": 125,
-      "2026-10": 150,
-      "2026-11": 59
+      "2026-10": 152,
+      "2026-11": 87
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 32616,
+    "commits": 32646,
     "by_kind": {
-      "organization": 25513,
+      "organization": 25534,
       "one_person": 2503,
-      "personal": 4495,
+      "personal": 4504,
       "hidden": 84,
       "unknown": 21,
       "bot": 0
@@ -732,11 +732,11 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 20363,
-        "commits_last_12mo": 665,
+        "commits": 20383,
+        "commits_last_12mo": 685,
         "addresses": 58,
         "first_commit": "2009-03-02",
-        "last_commit": "2026-11-15"
+        "last_commit": "2026-11-21"
       },
       {
         "organization": "datastax.com",
@@ -780,11 +780,11 @@
       },
       {
         "organization": "ksolves.com",
-        "commits": 33,
-        "commits_last_12mo": 28,
+        "commits": 34,
+        "commits_last_12mo": 29,
         "addresses": 4,
         "first_commit": "2024-08-30",
-        "last_commit": "2026-10-30"
+        "last_commit": "2026-11-13"
       },
       {
         "organization": "laerad.com",
@@ -1021,9 +1021,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 119,
+        "organization": 140,
         "one_person": 11,
-        "personal": 79,
+        "personal": 88,
         "hidden": 0,
         "unknown": 0,
         "bot": 0
@@ -1033,13 +1033,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1079,
+    "commits": 1109,
     "authors": 89,
     "new_authors": 32,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 32616,
+    "commits": 32646,
     "commits_by_year": {
       "2009": 1025,
       "2010": 1862,
@@ -1058,17 +1058,17 @@
       "2023": 1367,
       "2024": 945,
       "2025": 1008,
-      "2026": 1023
+      "2026": 1053
     },
-    "active_days": 4890
+    "active_days": 4896
   },
   "timezones": {
-    "+0000": 6812,
-    "+0100": 5034,
+    "+0000": 6813,
+    "+0100": 5042,
     "+0200": 4839,
     "+0300": 1404,
     "+0400": 24,
-    "+0530": 81,
+    "+0530": 83,
     "+0600": 16,
     "+0700": 39,
     "+0800": 441,
@@ -1082,12 +1082,12 @@
     "-0300": 86,
     "-0400": 2113,
     "-0500": 6313,
-    "-0600": 2427,
-    "-0700": 1789,
-    "-0800": 891
+    "-0600": 2433,
+    "-0700": 1796,
+    "-0800": 897
   },
   "source_lines": {
-    "added": 3858112,
-    "current": 2040795
+    "added": 3842515,
+    "current": 2025483
   }
 }

@@ -21,7 +21,7 @@
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.12.2.post1.dev5">
+	<meta name="generator" content="GitStats 2.12.4.post1.dev11">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -93,6 +93,7 @@
 	function applyChartTheme(chart) {
 		const text = getCSSVar('--chart-text');
 		const grid = getCSSVar('--chart-grid');
+		const axis = getCSSVar('--chart-axis');
 		Chart.defaults.color = text;
 		Chart.defaults.borderColor = grid;
 		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
@@ -105,12 +106,20 @@
 			scale.title.color = text;
 			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
 			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
-			scale.border.color = grid;
+			// the x-axis is the baseline the bars stand on; the y-axis has no line
+			scale.border.color = scale.axis === 'x' ? axis : grid;
 		});
 		chart.options.plugins.legend.labels.color = text;
 		const bar = getCSSVar('--bar-color');
+		const latest = getCSSVar('--bar-latest');
 		chart.data.datasets.forEach(function(ds) {
 			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			// the latest bar, darker: where the project is now
+			if (ds.themed && ds.latest) {
+				ds.backgroundColor = ds.data.map(function(v, i) {
+					return i === ds.data.length - 1 ? latest : bar;
+				});
+			}
 			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
 			if (ds.series) {
 				const color = getCSSVar('--series-' + ds.series);
@@ -130,7 +139,8 @@
 
 	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
 	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
-	//   peaks  a label above chosen bars
+	//   peaks  a label above chosen bars (the latest in its own color); one
+	//          that would run into a label already placed is left out
 	//   values a value label above every non-zero bar
 	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
 	// hatched, its caption runs up the band, and `axis` names it under the plot.
@@ -235,7 +245,9 @@
 					ctx.fillStyle = getCSSVar('--surface-color');
 					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
 				}
-				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillStyle = getCSSVar(
+					mark.latest ? '--bar-latest' : mark.plain ? '--chart-text' : '--text-color'
+				);
 				ctx.fillText(mark.text, mark.x, mark.y);
 				ctx.restore();
 			});
@@ -273,8 +285,21 @@
 			const onBand = bands.some(function(edges) {
 				return x + half > edges[0] && x - half < edges[1];
 			});
-			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
-				half: half, onBand: onBand });
+			// above every bar the label spans, so a small value among taller
+			// neighbours (one month of many) is not drawn over them
+			let top = bar.y;
+			meta.data.forEach(function(other) {
+				if (Math.abs(other.x - x) <= half + 2) top = Math.min(top, other.y);
+			});
+			const y = top - 6;
+			// the marks come in order of importance: one that would overlap an
+			// earlier one is left out rather than drawn over it
+			const clash = placed.some(function(other) {
+				return Math.abs(other.x - x) < other.half + half + 6 && Math.abs(other.y - y) < 14;
+			});
+			if (clash && !mark.plain) return;
+			placed.push({ text: mark.text, plain: mark.plain, latest: mark.latest, font: font,
+				x: x, y: y, half: half, onBand: onBand });
 		});
 		return placed;
 	}
@@ -383,6 +408,18 @@
 			}
 		};
 	}
+
+	// A chart's box starts with a note that the chart is not shown (CHART_NOTE),
+	// which is all a page whose scripts do not run has of it. A chart that is
+	// built takes the note away first, so that it is laid out in the whole box.
+	const chartNote = {
+		id: 'chartNote',
+		beforeInit: function(chart) {
+			const note = chart.canvas.parentNode.querySelector('.chart-note');
+			if (note) note.remove();
+		}
+	};
+	if (window.Chart) Chart.register(chartNote);
 </script>
 </head>
 <body>
@@ -390,29 +427,50 @@
 
             <nav class="nav" aria-label="Pages">
             <a href="../index.html" class="nav-brand nav-up">&larr; GitStats Gallery</a>
-            <ul>
-            <li><a href="index.html">General</a></li>
-            <li><a href="activity.html">Activity</a></li>
-            <li><a href="authors.html">Authors</a></li>
-            <li><a href="ownership.html">Code Ownership</a></li>
-            <li><a href="hotspots.html">Hotspots</a></li>
-            <li><a href="files.html">Files</a></li>
-            <li><a href="history.html">History</a></li>
-            <li><a href="lines.html">Lines</a></li>
-            <li><a href="tags.html" class="active" aria-current="page">Tags</a></li>
-            <li><a href="badges.html">Badges</a></li>
-            
-            </ul>
+            <ul class="nav-pages"><li><a href="index.html">General</a></li><li><a href="badges.html">Badges</a></li><li class="nav-group-start"><a href="authors.html">Authors</a></li><li><a href="ownership.html">Code Ownership</a></li><li class="nav-group-start"><a href="hotspots.html">Hotspots</a></li><li><a href="files.html">Files</a></li><li><a href="lines.html">Lines</a></li><li class="nav-group-start"><a href="activity.html">Activity</a></li><li><a href="history.html">History</a></li><li><a href="tags.html" class="active" aria-current="page">Tags</a></li></ul>
+            <details class="nav-menu"><summary><span class="nav-menu-label">Page</span> Tags</summary><ul><li class="nav-menu-heading" aria-hidden="true">Overview</li><li><a href="index.html">General</a></li><li><a href="badges.html">Badges</a></li><li class="nav-menu-heading" aria-hidden="true">People</li><li><a href="authors.html">Authors</a></li><li><a href="ownership.html">Code Ownership</a></li><li class="nav-menu-heading" aria-hidden="true">Code</li><li><a href="hotspots.html">Hotspots</a></li><li><a href="files.html">Files</a></li><li><a href="lines.html">Lines</a></li><li class="nav-menu-heading" aria-hidden="true">Timeline</li><li><a href="activity.html">Activity</a></li><li><a href="history.html">History</a></li><li><a href="tags.html" class="active" aria-current="page">Tags</a></li></ul></details>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </nav>
 <main id="main">
-            <h1>Tags</h1><dl class="stat-tiles" style="--cols: 2; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">4</dd><dd class="stat-note"><span class="nowrap">latest weekly_20240115-v</span>&nbsp;&middot; <span class="nowrap">2024-01-14</span></dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">27798.2</dd><dd class="stat-note">111,193 commits in total</dd></div></dl>
+            <h1>Tags</h1><dl class="stat-tiles" style="--cols: 4; --cols-md: 2; --cols-sm: 2"><div class="stat-tile"><dt>Tags</dt><dd class="stat-value">4</dd><dd class="stat-note">since 2021</dd></div><div class="stat-tile"><dt>Latest</dt><dd class="stat-value">weekly_20240115-v</dd><dd class="stat-note">2024-01-14</dd></div><div class="stat-tile"><dt>Days between Releases</dt><dd class="stat-value">77</dd><dd class="stat-note">median</dd></div><div class="stat-tile"><dt>Commits per Tag</dt><dd class="stat-value">27798.2</dd><dd class="stat-note">111,193 commits in total</dd></div></dl><section class="lead-section">
+<h2 id="releases_per_year"><a href="#releases_per_year">Releases per year</a></h2>
+
+<p class="section-note">4 tags from 2021 to 2024. The most were in 2021, with 2; 2 in 2024.</p><div class="chart-box" style="--chart-ratio: 4"><p class="chart-note">Chart not shown: it is drawn with JavaScript, which is turned off or blocked on this page, as it is on Jenkins by default. <a href="https://gitstats.readthedocs.io/en/latest/integration.html#blank-charts">How to show the charts</a></p><canvas id="chart-tags-per-year" role="img" aria-label="Bar chart, 2021 to 2024"></canvas></div>
+<script>
+(function() {
+  var ctx = document.getElementById('chart-tags-per-year').getContext('2d');
+  var labels = [2021, 2022, 2023, 2024];
+  var gap = null;
+  applyChartTheme();
+  new Chart(ctx, {
+    type: 'bar',
+    plugins: [chartAnnotations],
+    data: {
+      labels: labels,
+      datasets: [{"label": "Tags", "data": [2, 0, 0, 2], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true, "latest": true}]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        gsAnnotations: {"values": true}
+      },
+      scales: {
+        x: { ticks: { maxRotation: 0, autoSkip: false }, grid: { display: false } },
+        y: { display: false, beginAtZero: true, grace: '10%' }
+      }, datasets: { bar: { maxBarThickness: 64 } }
+    }
+  });
+})();
+</script>
+</section>
 <h2 id="all_tags"><a href="#all_tags">All tags</a></h2>
 
-<p class="section-note">Newest first. Commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th data-sort-as="text">Name</th><th>Date</th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">weekly_20240115-v</td><td class="nowrap">2024-01-14</td><td class="num">1,431</td><td>openharmony_ci (636), zhangquanchao (64), houdisheng (21) <details class="tag-authors"><summary>+199 more</summary>huangdong (20), zhuxiantao99 (19), lijuan124 (15), Tianer Zhou (15), tzcurtain (12), zhou-chaobo (10), hw_wyx (10), c00613227 (10), Xing Guang (10), xuqinfeng1 (9), xi-heqiong (9), wangchensu (9), tomkl123 (9), zhourenfeng (8), zhang1596479078 (8), g00649947 (8), chenyuchi (8), 春华秋实 (7), 易宝软件 (7), 常耀中 (7), zhouyan (7), zhanghangkai@huawei.com (7), wangxiuxiu (7), wanglichao (7), littlewhite-tf (7), chenchen (7), yujiang (6), wangsh88 (6), sunbees (6), lzr (6), lyq (6), luoying_ace_admin (6), javafreemanbao (6), jao_liu (6), guanzengkun (6), fengjituo111 (6), fan_pan (6), carnivore233 (6), Adriandyln (6), zhoulianhai (5), zengshenglan (5), wangtao (5), w00584494 (5), shi-hongjie (5), s30052571 (5), lvzikai (5), chenwenchang (5), <em>and 152 more authors</em></details></td></tr><tr><td class="nowrap">master-v</td><td class="nowrap">2024-01-02</td><td class="num">31,997</td><td>openharmony_ci (14,472), Tianer Zhou (547), xiexiyun (428) <details class="tag-authors"><summary>+703 more</summary>limeng (396), sunjiakun (395), huangdong (355), yylong (317), lijuan124 (308), zhou-chaobo (276), zhaoxinyu (261), zhangxiao150 (259), zcdqs (251), xuzhidan (250), wangxiuxiu (247), yaoyuchi (244), caocan (244), Xing Guang (231), bixuefeng (221), zhangrongjie (194), aryawang (193), CCFFWW (191), sunfei (190), jiangdayuan (183), zhengqiyi (175), guozejun (173), hehongyang3 (168), yan-shuifeng (166), chensi10 (163), Hu_ZeQi (154), yujiadong (151), zhangyu (149), yangfan229 (148), huangzejia1 (143), sunbees (140), liyujie43@huawei.com (138), quguiren (135), wangzezhen (134), kangchongtao (133), hct95 (130), wangchensu (128), jyj-0306 (128), lushi (118), zhangbingce (117), zhuzijia (112), qpzeng (111), luoying_ace_admin (106), wanglichao (105), shanshurong (105), zhourenfeng (102), likunhui (101), <em>and 656 more authors</em></details></td></tr><tr><td class="nowrap">OpenHarmony-v3.0-Beta1</td><td class="nowrap">2021-08-17</td><td class="num">63</td><td>openharmony_ci (28), songcongyi (8), tusi_fly (5) <details class="tag-authors"><summary>+11 more</summary>theretherehuh (4), dutie123 (4), zhanghaibo (2), sunfei (2), sharpshooter (2), Nesbeer P N (2), Kishore Kumar M V (2), yan-shuifeng (1), kukixi (1), hwzjq (1), chenqiuyao (1)</details></td></tr><tr><td class="nowrap">OpenHarmony-2.0-Canary</td><td class="nowrap">2021-06-01</td><td class="num">2</td><td>mamingshuai (2)</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How OpenHarmony ArkUI compares with other open source projects from China &rarr;</a></p><p class="more-link"><a href="../ecosystems/china.html">How OpenHarmony ArkUI ranks among open source projects from China by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+<p class="section-note">Newest first. Days are those since the release before; commits are those since the previous tag, and the authors who made them.</p><div class="table-scroll"><table class="tags sortable" id="tags"><tr><th data-sort-as="text">Name</th><th>Date</th><th class="num"><abbr title="Days since the release before it">Days</abbr></th><th class="num">Commits</th><th class="unsortable">Authors</th></tr><tr><td class="nowrap">weekly_20240115-v</td><td class="nowrap">2024-01-14</td><td class="num">12</td><td class="num">1,431</td><td>openharmony_ci (636), zhangquanchao (64), houdisheng (21) <details class="tag-authors"><summary>+199 more</summary>huangdong (20), zhuxiantao99 (19), lijuan124 (15), Tianer Zhou (15), tzcurtain (12), zhou-chaobo (10), hw_wyx (10), c00613227 (10), Xing Guang (10), xuqinfeng1 (9), xi-heqiong (9), wangchensu (9), tomkl123 (9), zhourenfeng (8), zhang1596479078 (8), g00649947 (8), chenyuchi (8), 春华秋实 (7), 易宝软件 (7), 常耀中 (7), zhouyan (7), zhanghangkai@huawei.com (7), wangxiuxiu (7), wanglichao (7), littlewhite-tf (7), chenchen (7), yujiang (6), wangsh88 (6), sunbees (6), lzr (6), lyq (6), luoying_ace_admin (6), javafreemanbao (6), jao_liu (6), guanzengkun (6), fengjituo111 (6), fan_pan (6), carnivore233 (6), Adriandyln (6), zhoulianhai (5), zengshenglan (5), wangtao (5), w00584494 (5), shi-hongjie (5), s30052571 (5), lvzikai (5), chenwenchang (5), <em>and 152 more authors</em></details></td></tr><tr><td class="nowrap">master-v</td><td class="nowrap">2024-01-02</td><td class="num">868</td><td class="num">31,997</td><td>openharmony_ci (14,472), Tianer Zhou (547), xiexiyun (428) <details class="tag-authors"><summary>+703 more</summary>limeng (396), sunjiakun (395), huangdong (355), yylong (317), lijuan124 (308), zhou-chaobo (276), zhaoxinyu (261), zhangxiao150 (259), zcdqs (251), xuzhidan (250), wangxiuxiu (247), yaoyuchi (244), caocan (244), Xing Guang (231), bixuefeng (221), zhangrongjie (194), aryawang (193), CCFFWW (191), sunfei (190), jiangdayuan (183), zhengqiyi (175), guozejun (173), hehongyang3 (168), yan-shuifeng (166), chensi10 (163), Hu_ZeQi (154), yujiadong (151), zhangyu (149), yangfan229 (148), huangzejia1 (143), sunbees (140), liyujie43@huawei.com (138), quguiren (135), wangzezhen (134), kangchongtao (133), hct95 (130), wangchensu (128), jyj-0306 (128), lushi (118), zhangbingce (117), zhuzijia (112), qpzeng (111), luoying_ace_admin (106), wanglichao (105), shanshurong (105), zhourenfeng (102), likunhui (101), <em>and 656 more authors</em></details></td></tr><tr><td class="nowrap">OpenHarmony-v3.0-Beta1</td><td class="nowrap">2021-08-17</td><td class="num">77</td><td class="num">63</td><td>openharmony_ci (28), songcongyi (8), tusi_fly (5) <details class="tag-authors"><summary>+11 more</summary>theretherehuh (4), dutie123 (4), zhanghaibo (2), sunfei (2), sharpshooter (2), Nesbeer P N (2), Kishore Kumar M V (2), yan-shuifeng (1), kukixi (1), hwzjq (1), chenqiuyao (1)</details></td></tr><tr><td class="nowrap">OpenHarmony-2.0-Canary</td><td class="nowrap">2021-06-01</td><td class="num">&mdash;</td><td class="num">2</td><td>mamingshuai (2)</td></tr></table></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How OpenHarmony ArkUI compares with other open source projects from China &rarr;</a></p><p class="more-link"><a href="../ecosystems/china.html">How OpenHarmony ArkUI ranks among open source projects from China by AI-assisted commits &rarr;</a></p><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
 name: GitStats Report
 on:
   push:
@@ -430,5 +488,5 @@ jobs:
         with:
           deploy-to-pages: true
 </pre></details></section></main>
-<footer class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></footer>
+<footer class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a> 2.12.4.post1.dev11 &middot; 2026-11-23 06:33:56 in 141 s &middot; git version 2.56.1</span></footer>
 </body></html>

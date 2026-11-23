@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:28:40+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:29:02+00:00",
   "name": "Tailwind CSS",
   "report_path": "index.html",
   "first_commit": "2017-07-20 12:38:55",
-  "last_commit": "2026-11-11 00:02:07",
-  "age_days": 3401,
-  "active_days": 1569,
-  "total_commits": 6924,
-  "total_authors": 383,
-  "active_authors_12mo": 69,
-  "commits_last_12mo": 395,
+  "last_commit": "2026-11-20 16:04:57",
+  "age_days": 3411,
+  "active_days": 1573,
+  "total_commits": 6959,
+  "total_authors": 393,
+  "active_authors_12mo": 79,
+  "commits_last_12mo": 430,
   "total_files": 565,
-  "total_lines": 204474,
-  "lines_added": 5236618,
-  "lines_removed": 5032144,
+  "total_lines": 181845,
+  "lines_added": 5238774,
+  "lines_removed": 5032355,
   "total_tags": 265,
   "era": "steady",
   "top_authors": [
@@ -25,7 +25,7 @@
     },
     {
       "name": "Robin Malfait",
-      "commits": 1030
+      "commits": 1036
     },
     {
       "name": "Jordan Pittman",
@@ -41,16 +41,27 @@
     }
   ],
   "author_commits": {
-    "Robin Malfait": 1030,
+    "Alexandre Kohler": 3,
+    "Rudransh Shekhar": 1,
+    "mwerneck": 1,
+    "Robin Malfait": 1036,
+    "Huzaifa Iftikhar": 1,
+    "Beno\u00eet Rouleau": 20,
+    "Sudhakar J": 1,
+    "Tanmay Nilesh Shinde": 1,
+    "Sudeep Gowda": 1,
+    "Aaron Queen": 1,
+    "Lazizbek Ergashev": 7,
+    "Andrew K. Fader": 1,
+    "Ragib MRB": 1,
+    "Gautam Kumar": 1,
     "huuya": 1,
     "Adam Wathan": 2901,
     "Rohan Dedhia": 1,
     "\uae40\ubbfc\uc6b1": 1,
     "Kevin Krausse": 1,
     "Wei-Lun Li": 3,
-    "Lazizbek Ergashev": 6,
     "Victor Hugo Macedo Paes Leme": 1,
-    "Beno\u00eet Rouleau": 19,
     "\uc591\uc9c0\uc6b0": 1,
     "i098": 1,
     "OllieinCanada": 1,
@@ -58,7 +69,6 @@
     "Otavio Rampinelli": 2,
     "911RS": 1,
     "Cestercian": 1,
-    "Alexandre Kohler": 2,
     "Younes Beriane": 1,
     "Tamir Duberstein": 1,
     "Dex": 1,
@@ -435,13 +445,13 @@
     "2023": 258,
     "2024": 643,
     "2025": 712,
-    "2026": 350
+    "2026": 385
   },
   "ai_assisted": {
-    "commits": 17,
+    "commits": 19,
     "authored": 0,
     "assistants": {
-      "Claude": 16,
+      "Claude": 18,
       "CodeRabbit": 2,
       "Codex": 1
     },
@@ -469,7 +479,7 @@
       "2026-08": 0,
       "2026-09": 1,
       "2026-10": 0,
-      "2026-11": 4
+      "2026-11": 6
     },
     "commits_by_month": {
       "2024-12": 36,
@@ -495,19 +505,19 @@
       "2026-08": 24,
       "2026-09": 5,
       "2026-10": 25,
-      "2026-11": 47
+      "2026-11": 82
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 6924,
+    "commits": 6959,
     "by_kind": {
       "organization": 13,
-      "one_person": 1372,
-      "personal": 4329,
-      "hidden": 167,
+      "one_person": 1373,
+      "personal": 4340,
+      "hidden": 174,
       "unknown": 5,
-      "bot": 1038
+      "bot": 1054
     },
     "organization_count": 2,
     "last_12mo_from": "2025-12",
@@ -588,24 +598,24 @@
       },
       "2026-Q4": {
         "organization": 2,
-        "one_person": 1,
-        "personal": 45,
-        "hidden": 4,
+        "one_person": 2,
+        "personal": 56,
+        "hidden": 11,
         "unknown": 0,
-        "bot": 20
+        "bot": 36
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 330,
-    "authors": 69,
-    "new_authors": 62,
+    "commits": 349,
+    "authors": 79,
+    "new_authors": 72,
     "half_of_commits": 1
   },
   "humans": {
-    "commits": 5886,
+    "commits": 5905,
     "commits_by_year": {
       "2017": 1392,
       "2018": 263,
@@ -616,17 +626,17 @@
       "2023": 213,
       "2024": 609,
       "2025": 504,
-      "2026": 307
+      "2026": 326
     },
-    "active_days": 1331
+    "active_days": 1335
   },
   "timezones": {
-    "+0000": 843,
-    "+0100": 908,
+    "+0000": 859,
+    "+0100": 914,
     "+0200": 889,
     "+0300": 30,
-    "+0500": 8,
-    "+0530": 25,
+    "+0500": 10,
+    "+0530": 31,
     "+0600": 2,
     "+0700": 6,
     "+0800": 38,
@@ -637,15 +647,15 @@
     "+1100": 8,
     "+1200": 2,
     "-0200": 4,
-    "-0300": 16,
+    "-0300": 18,
     "-0400": 2576,
-    "-0500": 1407,
+    "-0500": 1409,
     "-0600": 37,
-    "-0700": 48,
+    "-0700": 49,
     "-0800": 9
   },
   "source_lines": {
-    "added": 594594,
-    "current": 179915
+    "added": 596674,
+    "current": 181845
   }
 }

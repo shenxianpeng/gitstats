@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:26:36+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:26:20+00:00",
   "name": "TiKV",
   "report_path": "index.html",
   "first_commit": "2016-01-07 05:02:04",
-  "last_commit": "2026-11-12 06:49:53",
-  "age_days": 3963,
-  "active_days": 2610,
-  "total_commits": 8553,
-  "total_authors": 476,
-  "active_authors_12mo": 68,
-  "commits_last_12mo": 222,
-  "total_files": 1553,
-  "total_lines": 853434,
-  "lines_added": 1604677,
-  "lines_removed": 751237,
+  "last_commit": "2026-11-18 12:49:21",
+  "age_days": 3969,
+  "active_days": 2613,
+  "total_commits": 8558,
+  "total_authors": 477,
+  "active_authors_12mo": 69,
+  "commits_last_12mo": 227,
+  "total_files": 1557,
+  "total_lines": 847374,
+  "lines_added": 1611141,
+  "lines_removed": 753530,
   "total_tags": 47,
   "era": "quiet",
   "top_authors": [
@@ -41,10 +41,13 @@
     }
   ],
   "author_commits": {
+    "hujiatao": 8,
+    "Ti Chi Robot": 22,
+    "mittalrishabh": 15,
+    "Asish": 1,
     "lucasliang": 124,
     "Juncen Yu": 5,
     "lhy1024": 45,
-    "mittalrishabh": 14,
     "Madhav Ramesh": 3,
     "Bisheng Huang": 35,
     "Pujitha Paladugu": 1,
@@ -64,7 +67,6 @@
     "timzxz": 1,
     "Zhang Haoyuan": 9,
     "Otto Westerlund": 2,
-    "Ti Chi Robot": 21,
     "Jiong": 1,
     "Paulo Cabral Sanz": 4,
     "disksing": 286,
@@ -80,7 +82,6 @@
     "jebter": 3,
     "Nick Lopez": 1,
     "lance6716": 8,
-    "hujiatao": 6,
     "xufei": 3,
     "JmPotato": 57,
     "Yishuai Li": 1,
@@ -529,7 +530,7 @@
     "2023": 642,
     "2024": 509,
     "2025": 253,
-    "2026": 202
+    "2026": 207
   },
   "ai_assisted": {
     "commits": 4,
@@ -588,19 +589,19 @@
       "2026-08": 35,
       "2026-09": 12,
       "2026-10": 19,
-      "2026-11": 8
+      "2026-11": 13
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8553,
+    "commits": 8558,
     "by_kind": {
       "organization": 1004,
       "one_person": 743,
-      "personal": 5346,
-      "hidden": 1408,
+      "personal": 5349,
+      "hidden": 1409,
       "unknown": 4,
-      "bot": 48
+      "bot": 49
     },
     "organization_count": 4,
     "last_12mo_from": "2025-12",
@@ -698,23 +699,23 @@
       "2026-Q4": {
         "organization": 1,
         "one_person": 1,
-        "personal": 24,
-        "hidden": 1,
+        "personal": 27,
+        "hidden": 2,
         "unknown": 0,
-        "bot": 0
+        "bot": 1
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 222,
-    "authors": 67,
-    "new_authors": 30,
+    "commits": 227,
+    "authors": 68,
+    "new_authors": 31,
     "half_of_commits": 11
   },
   "humans": {
-    "commits": 8505,
+    "commits": 8509,
     "commits_by_year": {
       "2016": 1887,
       "2017": 703,
@@ -726,18 +727,18 @@
       "2023": 642,
       "2024": 501,
       "2025": 247,
-      "2026": 195
+      "2026": 199
     },
-    "active_days": 2601
+    "active_days": 2604
   },
   "timezones": {
     "+0000": 9,
     "+0100": 32,
     "+0200": 39,
     "+0300": 5,
-    "+0530": 26,
+    "+0530": 27,
     "+0700": 4,
-    "+0800": 7688,
+    "+0800": 7691,
     "+0900": 26,
     "+1000": 1,
     "+1200": 27,
@@ -747,10 +748,10 @@
     "-0500": 173,
     "-0600": 58,
     "-0700": 295,
-    "-0800": 104
+    "-0800": 105
   },
   "source_lines": {
-    "added": 1588782,
-    "current": 843212
+    "added": 1594633,
+    "current": 847374
   }
 }

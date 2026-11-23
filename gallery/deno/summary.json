@@ -1,27 +1,27 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:31:26+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:32:20+00:00",
   "name": "Deno",
   "report_path": "index.html",
   "first_commit": "2018-05-14 03:32:01",
-  "last_commit": "2026-10-26 11:27:08",
-  "age_days": 3088,
-  "active_days": 2800,
-  "total_commits": 17398,
-  "total_authors": 1219,
-  "active_authors_12mo": 191,
-  "commits_last_12mo": 2818,
-  "total_files": 14954,
-  "total_lines": 1770959,
-  "lines_added": 4430296,
-  "lines_removed": 2659005,
+  "last_commit": "2026-11-17 15:44:23",
+  "age_days": 3110,
+  "active_days": 2801,
+  "total_commits": 17403,
+  "total_authors": 1220,
+  "active_authors_12mo": 186,
+  "commits_last_12mo": 2823,
+  "total_files": 14949,
+  "total_lines": 1699974,
+  "lines_added": 4430554,
+  "lines_removed": 2664306,
   "total_tags": 284,
   "era": "peak",
   "top_authors": [
     {
       "name": "Bartek Iwa\u0144czuk",
-      "commits": 3274
+      "commits": 3277
     },
     {
       "name": "David Sherret",
@@ -41,7 +41,9 @@
     }
   ],
   "author_commits": {
-    "Bartek Iwa\u0144czuk": 3274,
+    "Bartek Iwa\u0144czuk": 3277,
+    "ismail ramzi": 1,
+    "Ian Hickson": 8,
     "Divy": 853,
     "denobot": 178,
     "David Sherret": 1808,
@@ -53,7 +55,6 @@
     "user77": 1,
     "Bert Belder": 428,
     "hax0r31337": 1,
-    "Ian Hickson": 7,
     "Ryan Zimmerman": 1,
     "Zhaoqi Xu": 3,
     "Nathan Whitaker": 525,
@@ -1270,7 +1271,7 @@
     "2023": 2066,
     "2024": 2462,
     "2025": 1758,
-    "2026": 2698
+    "2026": 2703
   },
   "ai_assisted": {
     "commits": 431,
@@ -1331,22 +1332,22 @@
       "2026-08": 150,
       "2026-09": 35,
       "2026-10": 24,
-      "2026-11": 0
+      "2026-11": 5
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 17398,
+    "commits": 17403,
     "by_kind": {
       "organization": 898,
-      "one_person": 3836,
-      "personal": 9161,
+      "one_person": 3838,
+      "personal": 9164,
       "hidden": 3473,
       "unknown": 0,
       "bot": 30
     },
     "organization_count": 4,
-    "last_12mo_from": "2025-11",
+    "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "littledivy.com",
@@ -1359,7 +1360,7 @@
       {
         "organization": "deno.com",
         "commits": 395,
-        "commits_last_12mo": 142,
+        "commits_last_12mo": 135,
         "addresses": 8,
         "first_commit": "2023-04-28",
         "last_commit": "2026-08-03"
@@ -1440,8 +1441,8 @@
       },
       "2026-Q4": {
         "organization": 1,
-        "one_person": 3,
-        "personal": 15,
+        "one_person": 5,
+        "personal": 18,
         "hidden": 4,
         "unknown": 0,
         "bot": 1
@@ -1449,15 +1450,15 @@
     }
   },
   "people_last_12mo": {
-    "from": "2025-11",
-    "to": "2026-10",
-    "commits": 2922,
-    "authors": 195,
-    "new_authors": 154,
+    "from": "2025-12",
+    "to": "2026-11",
+    "commits": 2809,
+    "authors": 186,
+    "new_authors": 144,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 17368,
+    "commits": 17373,
     "commits_by_year": {
       "2018": 1128,
       "2019": 1463,
@@ -1467,20 +1468,20 @@
       "2023": 2061,
       "2024": 2458,
       "2025": 1751,
-      "2026": 2684
+      "2026": 2689
     },
-    "active_days": 2800
+    "active_days": 2801
   },
   "timezones": {
     "+0000": 533,
-    "+0100": 2911,
+    "+0100": 2914,
     "+0200": 3741,
     "+0300": 238,
     "+0330": 9,
     "+0400": 4,
     "+0430": 45,
     "+0500": 4,
-    "+0530": 1007,
+    "+0530": 1008,
     "+0545": 2,
     "+0600": 3,
     "+0700": 147,
@@ -1496,11 +1497,11 @@
     "-0500": 1265,
     "-0600": 233,
     "-0700": 1363,
-    "-0800": 375,
+    "-0800": 376,
     "-1000": 1
   },
   "source_lines": {
-    "added": 4228396,
-    "current": 1705750
+    "added": 4226849,
+    "current": 1699974
   }
 }

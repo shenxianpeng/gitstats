@@ -4,11 +4,11 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>GitStats - Zed</title>
-	<meta name="description" content="Zed: 40,857 commits by 2,324 authors, 2021 to 2026. A report made with gitstats.">
+	<meta name="description" content="Zed: 40,957 commits by 2,344 authors, 2021 to 2026. A report made with gitstats.">
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="GitStats">
 	<meta property="og:title" content="Zed">
-	<meta property="og:description" content="Zed: 40,857 commits by 2,324 authors, 2021 to 2026. A report made with gitstats.">
+	<meta property="og:description" content="Zed: 40,957 commits by 2,344 authors, 2021 to 2026. A report made with gitstats.">
 	<meta property="og:url" content="https://shenxianpeng.dev/gitstats/gallery/zed/">
 	<meta property="og:image" content="https://shenxianpeng.dev/gitstats/gallery/zed/share-card.png">
 	<meta property="og:image:width" content="1200">
@@ -16,12 +16,12 @@
 	<meta property="og:image:alt" content="Zed">
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="Zed">
-	<meta name="twitter:description" content="Zed: 40,857 commits by 2,324 authors, 2021 to 2026. A report made with gitstats.">
+	<meta name="twitter:description" content="Zed: 40,957 commits by 2,344 authors, 2021 to 2026. A report made with gitstats.">
 	<meta name="twitter:image" content="https://shenxianpeng.dev/gitstats/gallery/zed/share-card.png">
 	<!-- Apply theme before CSS loads to prevent flash of unstyled content -->
 	<script>(function(){var t;try{t=localStorage.getItem('theme');}catch(e){}if(t!=='light'&&t!=='dark'){t=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}document.documentElement.setAttribute('data-theme',t);})();</script>
 	<link rel="stylesheet" href="gitstats.css" type="text/css">
-	<meta name="generator" content="GitStats 2.12.2.post1.dev5">
+	<meta name="generator" content="GitStats 2.12.4.post1.dev11">
 	<script type="text/javascript" src="sortable.js"></script>
 	<script type="text/javascript" src="chart.umd.min.js"></script>
 	<script>
@@ -93,6 +93,7 @@
 	function applyChartTheme(chart) {
 		const text = getCSSVar('--chart-text');
 		const grid = getCSSVar('--chart-grid');
+		const axis = getCSSVar('--chart-axis');
 		Chart.defaults.color = text;
 		Chart.defaults.borderColor = grid;
 		// axis ticks, legends and tooltips in the report's monospace, like its other numbers
@@ -105,12 +106,20 @@
 			scale.title.color = text;
 			// month axes draw gridlines only at their labelled years (see monthAxisGrid)
 			scale.grid.color = scale.ticks.callback === monthAxisTick ? monthAxisGrid : grid;
-			scale.border.color = grid;
+			// the x-axis is the baseline the bars stand on; the y-axis has no line
+			scale.border.color = scale.axis === 'x' ? axis : grid;
 		});
 		chart.options.plugins.legend.labels.color = text;
 		const bar = getCSSVar('--bar-color');
+		const latest = getCSSVar('--bar-latest');
 		chart.data.datasets.forEach(function(ds) {
 			if (ds.themed) { ds.backgroundColor = bar; ds.borderColor = bar; }
+			// the latest bar, darker: where the project is now
+			if (ds.themed && ds.latest) {
+				ds.backgroundColor = ds.data.map(function(v, i) {
+					return i === ds.data.length - 1 ? latest : bar;
+				});
+			}
 			if (ds.colorVar) { ds.backgroundColor = ds.borderColor = getCSSVar(ds.colorVar); }
 			if (ds.series) {
 				const color = getCSSVar('--series-' + ds.series);
@@ -130,7 +139,8 @@
 
 	// Marks drawn onto a chart (see _render_chartjs(annotations=...)):
 	//   bands  shaded x-ranges with a caption, e.g. a stretch of years without commits
-	//   peaks  a label above chosen bars
+	//   peaks  a label above chosen bars (the latest in its own color); one
+	//          that would run into a label already placed is left out
 	//   values a value label above every non-zero bar
 	// A band flagged `collapsed` stands for a stretch cut out of the axis: it is
 	// hatched, its caption runs up the band, and `axis` names it under the plot.
@@ -235,7 +245,9 @@
 					ctx.fillStyle = getCSSVar('--surface-color');
 					ctx.fillRect(mark.x - mark.half - 2, mark.y - 10, 2 * mark.half + 4, 13);
 				}
-				ctx.fillStyle = getCSSVar(mark.plain ? '--chart-text' : '--text-color');
+				ctx.fillStyle = getCSSVar(
+					mark.latest ? '--bar-latest' : mark.plain ? '--chart-text' : '--text-color'
+				);
 				ctx.fillText(mark.text, mark.x, mark.y);
 				ctx.restore();
 			});
@@ -273,8 +285,21 @@
 			const onBand = bands.some(function(edges) {
 				return x + half > edges[0] && x - half < edges[1];
 			});
-			placed.push({ text: mark.text, plain: mark.plain, font: font, x: x, y: bar.y - 6,
-				half: half, onBand: onBand });
+			// above every bar the label spans, so a small value among taller
+			// neighbours (one month of many) is not drawn over them
+			let top = bar.y;
+			meta.data.forEach(function(other) {
+				if (Math.abs(other.x - x) <= half + 2) top = Math.min(top, other.y);
+			});
+			const y = top - 6;
+			// the marks come in order of importance: one that would overlap an
+			// earlier one is left out rather than drawn over it
+			const clash = placed.some(function(other) {
+				return Math.abs(other.x - x) < other.half + half + 6 && Math.abs(other.y - y) < 14;
+			});
+			if (clash && !mark.plain) return;
+			placed.push({ text: mark.text, plain: mark.plain, latest: mark.latest, font: font,
+				x: x, y: y, half: half, onBand: onBand });
 		});
 		return placed;
 	}
@@ -383,6 +408,18 @@
 			}
 		};
 	}
+
+	// A chart's box starts with a note that the chart is not shown (CHART_NOTE),
+	// which is all a page whose scripts do not run has of it. A chart that is
+	// built takes the note away first, so that it is laid out in the whole box.
+	const chartNote = {
+		id: 'chartNote',
+		beforeInit: function(chart) {
+			const note = chart.canvas.parentNode.querySelector('.chart-note');
+			if (note) note.remove();
+		}
+	};
+	if (window.Chart) Chart.register(chartNote);
 </script>
 </head>
 <body>
@@ -390,32 +427,21 @@
 
             <nav class="nav" aria-label="Pages">
             <a href="../index.html" class="nav-brand nav-up">&larr; GitStats Gallery</a>
-            <ul>
-            <li><a href="index.html" class="active" aria-current="page">General</a></li>
-            <li><a href="activity.html">Activity</a></li>
-            <li><a href="authors.html">Authors</a></li>
-            <li><a href="ownership.html">Code Ownership</a></li>
-            <li><a href="hotspots.html">Hotspots</a></li>
-            <li><a href="files.html">Files</a></li>
-            <li><a href="history.html">History</a></li>
-            <li><a href="lines.html">Lines</a></li>
-            <li><a href="tags.html">Tags</a></li>
-            <li><a href="badges.html">Badges</a></li>
-            
-            </ul>
+            <ul class="nav-pages"><li><a href="index.html" class="active" aria-current="page">General</a></li><li><a href="badges.html">Badges</a></li><li class="nav-group-start"><a href="authors.html">Authors</a></li><li><a href="ownership.html">Code Ownership</a></li><li class="nav-group-start"><a href="hotspots.html">Hotspots</a></li><li><a href="files.html">Files</a></li><li><a href="lines.html">Lines</a></li><li class="nav-group-start"><a href="activity.html">Activity</a></li><li><a href="history.html">History</a></li><li><a href="tags.html">Tags</a></li></ul>
+            <details class="nav-menu"><summary><span class="nav-menu-label">Page</span> General</summary><ul><li class="nav-menu-heading" aria-hidden="true">Overview</li><li><a href="index.html" class="active" aria-current="page">General</a></li><li><a href="badges.html">Badges</a></li><li class="nav-menu-heading" aria-hidden="true">People</li><li><a href="authors.html">Authors</a></li><li><a href="ownership.html">Code Ownership</a></li><li class="nav-menu-heading" aria-hidden="true">Code</li><li><a href="hotspots.html">Hotspots</a></li><li><a href="files.html">Files</a></li><li><a href="lines.html">Lines</a></li><li class="nav-menu-heading" aria-hidden="true">Timeline</li><li><a href="activity.html">Activity</a></li><li><a href="history.html">History</a></li><li><a href="tags.html">Tags</a></li></ul></details>
             <div class="nav-right">
             <a href="https://github.com/shenxianpeng/gitstats" class="nav-github" target="_blank" rel="noopener" aria-label="GitHub"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg></a>
             <button id="theme-toggle" class="theme-toggle" onclick="toggleTheme()" aria-label="Switch to dark mode"><svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg><svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
             </div>
             </nav>
 <main id="main">
-            <h1>Zed</h1><p class="page-meta">2021-02-20 &rarr; 2026-11-16 &middot; generated 2026-11-16 05:32:08 in 23 s &middot; gitstats 2.12.2.post1.dev5, git version 2.56.1 &middot; <a href="badges.html">Badge for your README</a></p><!-- gitstats:insights --><section class="insights-section" id="what-stands-out">
+            <div class="page-head"><h1>Zed</h1><a href="badges.html">Badge for your README</a></div><p class="page-meta">2021-02-20 &rarr; 2026-11-23 &middot; 5 years</p><!-- gitstats:insights --><section class="insights-section" id="what-stands-out">
 <h2 id="what_stands_out"><a href="#what_stands_out">What stands out</a></h2>
 
-<p class="section-note">Next to the 106 other projects of <a href="../index.html">GitStats Gallery</a>: where Zed is in the top or bottom 15%.</p><ul class="insights"><li class="insight"><span class="insight-big">92%</span><div><span class="insight-label">Days with a commit</span><p class="insight-sentence">Zed has had a commit by a person on 92% of the days since its first one: 1,937 days in 6 years.</p><p class="insight-compared">15th highest of 97; the median project: 80% of days.</p></div></li></ul><p class="more-link"><a href="compare.html">How Zed compares, measure by measure &rarr;</a></p></section><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value">40,857</dd><dd class="stat-note"><span class="nowrap">21.1 per active day</span>&nbsp;&middot; <span class="nowrap">19.5 per day</span></dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">2,324</dd><dd class="stat-note">17.6 commits per author</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">2,128,213</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+5,229,022</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−3,100,865</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">4,407</dd><dd class="stat-note">46 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">1,937</dd><dd class="stat-note"><span class="nowrap">of 2,095 days</span>&nbsp;&middot; <span class="nowrap">92.4%</span></dd></div><div class="stat-tile"><dt>Longest Streak</dt><dd class="stat-value">415 days</dd><dd class="stat-note">consecutive active days</dd></div></dl>
+<p class="section-note">Next to the 106 other projects of <a href="../index.html">GitStats Gallery</a>: where Zed is in the top or bottom 15%.</p><ul class="insights"><li class="insight"><span class="insight-big">92%</span><div><span class="insight-label">Days with a commit</span><p class="insight-sentence">Zed has had a commit by a person on 92% of the days since its first one: 1,944 days in 6 years.</p><p class="insight-compared">15th highest of 97; the median project: 80% of days.</p></div></li></ul><p class="more-link"><a href="compare.html">How Zed compares, measure by measure &rarr;</a></p></section><!-- /gitstats:insights --><dl class="stat-tiles" style="--cols: 6; --cols-md: 3; --cols-sm: 2"><div class="stat-tile"><dt>Commits</dt><dd class="stat-value"><span class="stat-spark">40,957<svg class="sparkline" viewBox="0 0 82 28" width="82" height="28" aria-hidden="true" focusable="false"><rect x="0" y="6" width="5" height="22"/><rect x="7" y="4" width="5" height="24"/><rect x="14" y="0" width="5" height="28"/><rect x="21" y="0" width="5" height="28"/><rect x="28" y="2" width="5" height="26"/><rect x="35" y="9" width="5" height="19"/><rect x="42" y="9" width="5" height="19"/><rect x="49" y="9" width="5" height="19"/><rect x="56" y="16" width="5" height="12"/><rect x="63" y="15" width="5" height="13"/><rect x="70" y="14" width="5" height="14"/><rect x="77" y="20" width="5" height="8"/></svg></span></dd><dd class="stat-note">7,813 in the last 12 months</dd></div><div class="stat-tile"><dt>Authors</dt><dd class="stat-value">2,344</dd><dd class="stat-note">1,196 active in the last 12 months</dd></div><div class="stat-tile"><dt>Lines of Code</dt><dd class="stat-value">2,102,909</dd><dd class="stat-note"><span class="nowrap"><span class="stat-added">+5,269,519</span> added</span>&nbsp;&middot; <span class="nowrap"><span class="stat-removed">−3,110,719</span> removed</span></dd></div><div class="stat-tile"><dt>Files</dt><dd class="stat-value">4,431</dd><dd class="stat-note">46 extensions</dd></div><div class="stat-tile"><dt>Active Days</dt><dd class="stat-value">1,944</dd><dd class="stat-note"><span class="nowrap">of 2,102 days</span>&nbsp;&middot; <span class="nowrap">92.5%</span></dd></div><div class="stat-tile"><dt>Latest Release</dt><dd class="stat-value">nightly</dd><dd class="stat-note"><span class="nowrap">2026-11-22</span>&nbsp;&middot; <span class="nowrap">194 tags</span></dd></div></dl><div class="overview-charts"><section>
 <h2 id="commits_per_year"><a href="#commits_per_year">Commits per year</a></h2>
 
-<div class="chart-box" style="--chart-ratio: 5"><canvas id="chart-overview-yearly" role="img" aria-label="Bar chart of commits per year, 2021 to 2026"></canvas></div>
+<p class="section-note">40,957 commits in 6 years with commits.</p><div class="chart-box" style="--chart-ratio: 3.3"><p class="chart-note">Chart not shown: it is drawn with JavaScript, which is turned off or blocked on this page, as it is on Jenkins by default. <a href="https://gitstats.readthedocs.io/en/latest/integration.html#blank-charts">How to show the charts</a></p><canvas id="chart-overview-yearly" role="img" aria-label="Bar chart of commits per year, 2021 to 2026"></canvas></div>
 <script>
 (function() {
   var ctx = document.getElementById('chart-overview-yearly').getContext('2d');
@@ -424,31 +450,65 @@
   applyChartTheme();
   new Chart(ctx, {
     type: 'bar',
+    plugins: [chartAnnotations],
     data: {
       labels: labels,
-      datasets: [{"label": "Commits", "data": [2298, 4979, 9010, 7829, 9769, 6972], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true}]
+      datasets: [{"label": "Commits", "data": [2298, 4979, 9010, 7829, 9769, 7072], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true, "latest": true}]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: false }
+        legend: { display: false },
+        gsAnnotations: {"peaks": [{"index": 5, "text": "2026 \u00b7 7,072", "latest": true}, {"index": 4, "text": "2025 \u00b7 9,769"}]}
       },
       scales: {
         x: { ticks: { maxRotation: 0, autoSkipPadding: 12 }, grid: { display: false } },
-        y: { beginAtZero: true, ticks: { precision: 0 } }
+        y: { position: 'right', border: { display: false, dash: [3, 3] }, beginAtZero: true, grace: '10%', ticks: { precision: 0, maxTicksLimit: 4 } }
       }, datasets: { bar: { maxBarThickness: 64 } }
     }
   });
 })();
 </script>
-<p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p><div class="two-columns"><section>
+<p class="more-link"><a href="activity.html">Activity in detail &rarr;</a></p></section><section>
+<h2 id="last_12_months"><a href="#last_12_months">Last 12 months</a></h2>
+
+<p class="section-note">7,813 commits from Dec 2025 to Nov 2026, down from 9,502 in the 12 months before.</p><div class="chart-box" style="--chart-ratio: 1.65"><p class="chart-note">Chart not shown: it is drawn with JavaScript, which is turned off or blocked on this page, as it is on Jenkins by default. <a href="https://gitstats.readthedocs.io/en/latest/integration.html#blank-charts">How to show the charts</a></p><canvas id="chart-last-12-months" role="img" aria-label="Bar chart of commits per month over the last 12 months, Dec to Nov"></canvas></div>
+<script>
+(function() {
+  var ctx = document.getElementById('chart-last-12-months').getContext('2d');
+  var labels = ["Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"];
+  var gap = null;
+  applyChartTheme();
+  new Chart(ctx, {
+    type: 'bar',
+    plugins: [chartAnnotations],
+    data: {
+      labels: labels,
+      datasets: [{"label": "Commits", "data": [741, 813, 943, 941, 872, 654, 636, 640, 397, 430, 460, 286], "backgroundColor": getCSSVar('--bar-color'), "borderColor": getCSSVar('--bar-color'), "themed": true, "latest": true}]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        gsAnnotations: {"values": true}
+      },
+      scales: {
+        x: { ticks: { maxRotation: 0, autoSkip: false }, grid: { display: false } },
+        y: { display: false, beginAtZero: true, grace: '10%' }
+      }, datasets: { bar: { maxBarThickness: 64 } }
+    }
+  });
+})();
+</script>
+<p class="chart-footnote">Nov 2026 was not over when this report was made.</p></section></div><div class="two-columns"><section>
 <h2 id="top_contributors"><a href="#top_contributors">Top contributors</a></h2>
 
-<div class="table-scroll"><table class="share-table"><tr><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th class="unsortable"><span class="visually-hidden">Bar</span></th></tr><tr><td>Antonio Scandurra</td><td class="num">4,443</td><td class="num">10.9%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 100.0%"></span></span></td></tr><tr><td>Max Brunsfeld</td><td class="num">3,595</td><td class="num">8.8%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 80.9%"></span></span></td></tr><tr><td>Marshall Bowers</td><td class="num">2,897</td><td class="num">7.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 65.2%"></span></span></td></tr><tr><td>Mikayla Maki</td><td class="num">2,156</td><td class="num">5.3%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 48.5%"></span></span></td></tr><tr><td>Conrad Irwin</td><td class="num">2,071</td><td class="num">5.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 46.6%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 2,324 authors &rarr;</a></p></section><section>
+<div class="table-scroll"><table class="share-table"><tr><th class="num rank"><abbr title="Rank by commits">#</abbr></th><th>Author</th><th class="num">Commits</th><th class="num">Share</th><th class="unsortable share-scale"><span class="visually-hidden">Share of all commits as a bar, from 0 to 100%</span><span class="share-ticks" aria-hidden="true"><span>0</span><span>50%</span><span>100%</span></span></th></tr><tr><td class="num rank">1</td><td>Antonio Scandurra</td><td class="num">4,443</td><td class="num">10.8%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 10.8%"></span></span></td></tr><tr><td class="num rank">2</td><td>Max Brunsfeld</td><td class="num">3,595</td><td class="num">8.8%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 8.8%"></span></span></td></tr><tr><td class="num rank">3</td><td>Marshall Bowers</td><td class="num">2,897</td><td class="num">7.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 7.1%"></span></span></td></tr><tr><td class="num rank">4</td><td>Mikayla Maki</td><td class="num">2,156</td><td class="num">5.3%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 5.3%"></span></span></td></tr><tr><td class="num rank">5</td><td>Conrad Irwin</td><td class="num">2,071</td><td class="num">5.1%</td><td class="share-cell"><span class="share-bar" aria-hidden="true"><span style="width: 5.1%"></span></span></td></tr><tr class="share-rest"><td></td><td>2,339 other authors</td><td class="num">25,795</td><td class="num">63.0%</td><td class="share-cell"><span class="share-bar share-bar-muted" aria-hidden="true"><span style="width: 63.0%"></span></span></td></tr></table></div><p class="more-link"><a href="authors.html">All 2,344 authors &rarr;</a></p></section><section>
 <h2 id="latest_releases"><a href="#latest_releases">Latest releases</a></h2>
 
-<div class="table-scroll"><table class="share-table"><tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr><tr><td class="nowrap">nightly</td><td class="nowrap">2026-11-16</td><td class="num">6</td><td>Parker Loflin, Remco Smits</td></tr><tr><td class="nowrap">collab-staging</td><td class="nowrap">2026-11-15</td><td class="num">828</td><td>Ben Brandt, Kirill Bulatov +270</td></tr><tr><td class="nowrap">html-v0.3.2</td><td class="nowrap">2026-09-17</td><td class="num">1</td><td>zed-zippy <span class="badge" title="zed-zippy[bot]">bot</span></td></tr><tr><td class="nowrap">glsl-v0.2.5</td><td class="nowrap">2026-09-17</td><td class="num">1</td><td>zed-zippy <span class="badge" title="zed-zippy[bot]">bot</span></td></tr><tr><td class="nowrap">proto-v0.3.4</td><td class="nowrap">2026-09-17</td><td class="num">539</td><td>Kirill Bulatov, Finn Evers +198</td></tr></table></div><p class="more-link"><a href="tags.html">All 194 tags &rarr;</a></p></section></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How Zed compares with other open source languages and developer tools &rarr;</a></p><p class="more-link"><a href="../ecosystems/devtools.html">How Zed ranks among open source languages and developer tools by AI-assisted commits &rarr;</a></p><h2>Badge for your README</h2><p class="section-note">The share of the last 12 months&rsquo; commits that name an AI coding assistant, a lower bound, updated every week with this report.</p><div class="badge-list"><div class="badge-row"><div class="badge-info"><img src="badges/ai-assisted.svg" alt="AI-assisted commits"></div><pre class="badge-code">[![AI-assisted commits: Zed](https://shenxianpeng.dev/gitstats/gallery/zed/badges/ai-assisted.svg)](https://shenxianpeng.dev/gitstats/gallery/zed/)</pre><button type="button" class="badge-copy" aria-label="Copy the Markdown of the badge"><span>Copy</span></button></div></div><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
+<div class="table-scroll"><table class="share-table"><tr><th>Tag</th><th>Date</th><th class="num">Commits</th><th>Authors</th></tr><tr><td class="nowrap">nightly</td><td class="nowrap">2026-11-22</td><td class="num">1</td><td>Kirill Bulatov</td></tr><tr><td class="nowrap">collab-staging</td><td class="nowrap">2026-11-22</td><td class="num">932</td><td>Ben Brandt, Kirill Bulatov +296</td></tr><tr><td class="nowrap">html-v0.3.2</td><td class="nowrap">2026-09-17</td><td class="num">1</td><td>zed-zippy <span class="badge" title="zed-zippy[bot]">bot</span></td></tr><tr><td class="nowrap">glsl-v0.2.5</td><td class="nowrap">2026-09-17</td><td class="num">1</td><td>zed-zippy <span class="badge" title="zed-zippy[bot]">bot</span></td></tr><tr><td class="nowrap">proto-v0.3.4</td><td class="nowrap">2026-09-17</td><td class="num">539</td><td>Kirill Bulatov, Finn Evers +198</td></tr></table></div><p class="more-link"><a href="tags.html">All 194 tags &rarr;</a></p></section></div><!-- gitstats-gallery-note --><section class="gallery-note" id="gallery-note"><p class="more-link"><a href="compare.html">How Zed compares with other open source languages and developer tools &rarr;</a></p><p class="more-link"><a href="../ecosystems/devtools.html">How Zed ranks among open source languages and developer tools by AI-assisted commits &rarr;</a></p><h2>Badge for your README</h2><p class="section-note">The share of the last 12 months&rsquo; commits that name an AI coding assistant, a lower bound, updated every week with this report.</p><div class="badge-list"><div class="badge-row"><div class="badge-info"><img src="badges/ai-assisted.svg" alt="AI-assisted commits"></div><pre class="badge-code">[![AI-assisted commits: Zed](https://shenxianpeng.dev/gitstats/gallery/zed/badges/ai-assisted.svg)](https://shenxianpeng.dev/gitstats/gallery/zed/)</pre><button type="button" class="badge-copy" aria-label="Copy the Markdown of the badge"><span>Copy</span></button></div></div><p class="more-link">Generate this report for your own repository with <a href="https://github.com/shenxianpeng/gitstats-action" target="_blank" rel="noopener">gitstats-action</a> &middot; <a href="../index.html">All Gallery reports</a></p><details class="table-details"><summary>The smallest workflow</summary><p class="section-note">Publishes the report to GitHub Pages on every push to <code>main</code>: turn on Pages for the <code>gh-pages</code> branch.</p><pre class="badge-code"># .github/workflows/gitstats.yml
 name: GitStats Report
 on:
   push:
@@ -480,6 +540,6 @@ document.querySelectorAll('.gallery-note .badge-copy').forEach(function (button)
 	});
 });
 </script></main>
-<footer class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a></span></footer>
+<footer class="footer"><span class="footer-generated">Generated by <a href="https://github.com/shenxianpeng/gitstats" target="_blank" rel="noopener">gitstats</a> 2.12.4.post1.dev11 &middot; 2026-11-23 06:32:35 in 33 s &middot; git version 2.56.1</span></footer>
 </body>
 </html>

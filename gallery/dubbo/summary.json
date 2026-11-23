@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:28:41+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:28:47+00:00",
   "name": "Apache Dubbo",
   "report_path": "index.html",
   "first_commit": "2011-10-20 15:04:29",
-  "last_commit": "2026-11-09 12:37:23",
-  "age_days": 5499,
-  "active_days": 2080,
-  "total_commits": 8930,
-  "total_authors": 688,
+  "last_commit": "2026-11-20 02:30:52",
+  "age_days": 5510,
+  "active_days": 2083,
+  "total_commits": 8937,
+  "total_authors": 689,
   "active_authors_12mo": 52,
-  "commits_last_12mo": 319,
-  "total_files": 4852,
-  "total_lines": 522372,
-  "lines_added": 1334515,
-  "lines_removed": 812112,
+  "commits_last_12mo": 326,
+  "total_files": 4863,
+  "total_lines": 523914,
+  "lines_added": 1336429,
+  "lines_removed": 812146,
   "total_tags": 74,
   "era": "steady",
   "top_authors": [
@@ -41,11 +41,14 @@
     }
   ],
   "author_commits": {
+    "Kayokoi": 2,
+    "zrlw": 99,
+    "ChaoYoung": 6,
+    "Utkarsh Patil": 1,
     "Yukina": 21,
     "Junpei Zhang": 2,
     "CCCLL": 3,
     "xiaobaicai66695": 2,
-    "Kayokoi": 1,
     "binbin.zhang": 1,
     "SiriusTL666": 1,
     "\u7535\u5927\u8001baby": 1,
@@ -72,7 +75,6 @@
     "conellimo": 3,
     "Vinod Kumar M ( codingkiddo )": 1,
     "Ran": 1,
-    "zrlw": 98,
     "SavitarC": 1,
     "DocJlm": 1,
     "codez": 1,
@@ -204,7 +206,6 @@
     "Nortyr": 2,
     "Linchen Xu": 4,
     "\u963f\u9b41": 1,
-    "ChaoChao": 2,
     "chaicho": 2,
     "JYZ": 3,
     "zhengkaifor": 1,
@@ -746,7 +747,7 @@
     "2023": 1468,
     "2024": 720,
     "2025": 456,
-    "2026": 238
+    "2026": 245
   },
   "ai_assisted": {
     "commits": 9,
@@ -805,17 +806,17 @@
       "2026-08": 6,
       "2026-09": 10,
       "2026-10": 17,
-      "2026-11": 4
+      "2026-11": 11
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 8930,
+    "commits": 8937,
     "by_kind": {
       "organization": 238,
       "one_person": 160,
-      "personal": 5263,
-      "hidden": 741,
+      "personal": 5264,
+      "hidden": 747,
       "unknown": 1424,
       "bot": 1104
     },
@@ -915,8 +916,8 @@
       "2026-Q4": {
         "organization": 3,
         "one_person": 1,
-        "personal": 14,
-        "hidden": 3,
+        "personal": 15,
+        "hidden": 9,
         "unknown": 0,
         "bot": 0
       }
@@ -925,13 +926,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 103,
-    "authors": 49,
-    "new_authors": 41,
+    "commits": 110,
+    "authors": 51,
+    "new_authors": 42,
     "half_of_commits": 8
   },
   "humans": {
-    "commits": 7826,
+    "commits": 7833,
     "commits_by_year": {
       "2011": 565,
       "2012": 1200,
@@ -948,9 +949,9 @@
       "2023": 1047,
       "2024": 415,
       "2025": 233,
-      "2026": 90
+      "2026": 97
     },
-    "active_days": 2016
+    "active_days": 2019
   },
   "timezones": {
     "+0000": 1423,
@@ -958,9 +959,9 @@
     "+0200": 12,
     "+0300": 9,
     "+0400": 1,
-    "+0530": 22,
+    "+0530": 23,
     "+0600": 1,
-    "+0800": 7290,
+    "+0800": 7296,
     "+0900": 5,
     "-0300": 11,
     "-0400": 6,
@@ -970,7 +971,7 @@
     "-0800": 8
   },
   "source_lines": {
-    "added": 1526974,
-    "current": 522372
+    "added": 1528478,
+    "current": 523914
   }
 }

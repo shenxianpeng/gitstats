@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:27:40+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:27:43+00:00",
   "name": "Apache Pulsar",
   "report_path": "index.html",
   "first_commit": "2016-09-07 04:17:28",
-  "last_commit": "2026-11-15 22:44:47",
-  "age_days": 3722,
-  "active_days": 2967,
-  "total_commits": 15665,
-  "total_authors": 780,
-  "active_authors_12mo": 140,
-  "commits_last_12mo": 1819,
-  "total_files": 6499,
-  "total_lines": 1390077,
-  "lines_added": 6394233,
-  "lines_removed": 5004047,
+  "last_commit": "2026-11-22 16:07:43",
+  "age_days": 3729,
+  "active_days": 2974,
+  "total_commits": 15710,
+  "total_authors": 783,
+  "active_authors_12mo": 143,
+  "commits_last_12mo": 1864,
+  "total_files": 6534,
+  "total_lines": 1396280,
+  "lines_added": 6411024,
+  "lines_removed": 5005943,
   "total_tags": 6,
   "era": "steady",
   "top_authors": [
     {
       "name": "Matteo Merli",
-      "commits": 1691
+      "commits": 1693
     },
     {
       "name": "Lari Hotari",
-      "commits": 1482
+      "commits": 1487
     },
     {
       "name": "Rajan Dhabalia",
@@ -37,47 +37,52 @@
     },
     {
       "name": "Penghui Li",
-      "commits": 478
+      "commits": 484
     }
   ],
   "author_commits": {
-    "Aurora Twinkle": 17,
-    "void-ptr974": 81,
-    "Oneby Wang": 57,
+    "\u9053\u541b- Tao Jiuming": 61,
+    "Lari Hotari": 1487,
+    "\u4f55\u6668": 2,
+    "Oneby Wang": 58,
+    "Jaswanth Malasani": 1,
+    "Aurora Twinkle": 19,
+    "void-ptr974": 85,
+    "Faris Basha TM": 1,
+    "jiangpengcheng": 43,
+    "Zixuan Liu": 244,
+    "Penghui Li": 484,
+    "fengyubiao": 399,
+    "Matteo Merli": 1693,
+    "SeungTaek Lim": 28,
+    "ken": 31,
+    "kaminski-dev": 3,
+    "Nabid Nur": 1,
     "Gustavo de Camargo": 1,
     "subodhwandile": 2,
-    "SeungTaek Lim": 20,
     "havefunatcode": 1,
     "Chris Robison": 1,
     "Himanshu Jha": 1,
-    "fengyubiao": 397,
     "xh123637": 1,
-    "Penghui Li": 478,
     "David Kjerrumgaard": 40,
-    "Matteo Merli": 1691,
     "RiemannChow": 1,
-    "Lari Hotari": 1482,
-    "\u4f55\u6668": 1,
     "Yike Xiao": 35,
     "sinan liu": 80,
     "Takahiro Hozumi": 1,
     "Sharang Gupta": 11,
     "Rahul": 5,
     "Radiance' \u6ce2\u6ce2": 6,
-    "Zixuan Liu": 242,
     "kannar": 21,
     "sakshichitnis27": 4,
     "gibkim": 3,
     "Qiang Zhao": 199,
     "Prakarsh": 1,
     "Abhirama": 1,
-    "\u9053\u541b- Tao Jiuming": 58,
     "Ali Ahmed": 111,
     "LiuYC3213687107": 1,
     "Michael Marshall": 237,
     "lordcheng10": 61,
     "Dream95": 25,
-    "jiangpengcheng": 42,
     "hrzzzz": 12,
     "WangJialing": 35,
     "Lan": 5,
@@ -88,7 +93,6 @@
     "Rajan Dhabalia": 672,
     "congbo": 178,
     "Yan Zhao": 33,
-    "ken": 30,
     "HuangZeGui": 16,
     "Alexander Preu\u00df": 10,
     "Cong Zhao": 163,
@@ -101,7 +105,6 @@
     "summer": 10,
     "Thomas Bousquet": 1,
     "shetty": 1,
-    "kaminski-dev": 2,
     "dev_Hakaze": 1,
     "QIAOZHENYU": 1,
     "water": 1,
@@ -833,13 +836,13 @@
     "2023": 1165,
     "2024": 931,
     "2025": 719,
-    "2026": 1776
+    "2026": 1821
   },
   "ai_assisted": {
-    "commits": 38,
+    "commits": 42,
     "authored": 0,
     "assistants": {
-      "Claude": 29,
+      "Claude": 33,
       "GitHub Copilot": 8,
       "Cursor": 1
     },
@@ -867,7 +870,7 @@
       "2026-08": 3,
       "2026-09": 3,
       "2026-10": 5,
-      "2026-11": 4
+      "2026-11": 8
     },
     "commits_by_month": {
       "2024-12": 50,
@@ -893,38 +896,38 @@
       "2026-08": 82,
       "2026-09": 256,
       "2026-10": 413,
-      "2026-11": 311
+      "2026-11": 356
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 15665,
+    "commits": 15710,
     "by_kind": {
-      "organization": 5926,
-      "one_person": 252,
-      "personal": 5687,
-      "hidden": 3754,
+      "organization": 5939,
+      "one_person": 253,
+      "personal": 5707,
+      "hidden": 3762,
       "unknown": 0,
-      "bot": 46
+      "bot": 49
     },
     "organization_count": 9,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "apache.org",
-        "commits": 4639,
-        "commits_last_12mo": 664,
+        "commits": 4650,
+        "commits_last_12mo": 675,
         "addresses": 33,
         "first_commit": "2016-09-22",
-        "last_commit": "2026-11-14"
+        "last_commit": "2026-11-22"
       },
       {
         "organization": "streamnative.io",
-        "commits": 686,
-        "commits_last_12mo": 52,
+        "commits": 688,
+        "commits_last_12mo": 54,
         "addresses": 24,
         "first_commit": "2020-02-10",
-        "last_commit": "2026-11-15"
+        "last_commit": "2026-11-19"
       },
       {
         "organization": "yahoo-corp.jp",
@@ -1041,25 +1044,25 @@
         "bot": 4
       },
       "2026-Q4": {
-        "organization": 340,
-        "one_person": 16,
-        "personal": 185,
-        "hidden": 165,
+        "organization": 353,
+        "one_person": 17,
+        "personal": 205,
+        "hidden": 173,
         "unknown": 0,
-        "bot": 18
+        "bot": 21
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1789,
-    "authors": 140,
-    "new_authors": 64,
+    "commits": 1831,
+    "authors": 143,
+    "new_authors": 67,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 15619,
+    "commits": 15661,
     "commits_by_year": {
       "2016": 118,
       "2017": 636,
@@ -1071,31 +1074,32 @@
       "2023": 1163,
       "2024": 924,
       "2025": 712,
-      "2026": 1747
+      "2026": 1789
     },
-    "active_days": 2965
+    "active_days": 2972
   },
   "timezones": {
     "+0000": 74,
-    "+0100": 429,
-    "+0200": 1138,
+    "+0100": 430,
+    "+0200": 1143,
     "+0300": 1001,
     "+0400": 2,
     "+0430": 1,
-    "+0530": 117,
+    "+0530": 119,
+    "+0600": 1,
     "+0700": 2,
-    "+0800": 7150,
-    "+0900": 451,
+    "+0800": 7167,
+    "+0900": 459,
     "+1000": 6,
     "-0300": 45,
     "-0400": 109,
     "-0500": 268,
     "-0600": 215,
     "-0700": 3091,
-    "-0800": 1566
+    "-0800": 1577
   },
   "source_lines": {
-    "added": 6378769,
-    "current": 1385489
+    "added": 6382119,
+    "current": 1396280
   }
 }

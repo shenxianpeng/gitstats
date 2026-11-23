@@ -1,21 +1,21 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:29:28+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:29:37+00:00",
   "name": "Apache APISIX",
   "report_path": "index.html",
   "first_commit": "2019-04-10 02:02:06",
-  "last_commit": "2026-11-13 03:35:40",
-  "age_days": 2775,
-  "active_days": 1724,
-  "total_commits": 5305,
+  "last_commit": "2026-11-23 03:45:14",
+  "age_days": 2785,
+  "active_days": 1728,
+  "total_commits": 5316,
   "total_authors": 524,
   "active_authors_12mo": 63,
-  "commits_last_12mo": 681,
-  "total_files": 2343,
-  "total_lines": 671727,
-  "lines_added": 875822,
-  "lines_removed": 204032,
+  "commits_last_12mo": 692,
+  "total_files": 2347,
+  "total_lines": 667592,
+  "lines_added": 879615,
+  "lines_removed": 204261,
   "total_tags": 15,
   "era": "steady",
   "top_authors": [
@@ -33,28 +33,28 @@
     },
     {
       "name": "Ming Wen",
-      "commits": 239
+      "commits": 245
     },
     {
       "name": "Nic",
-      "commits": 173
+      "commits": 176
     }
   ],
   "author_commits": {
+    "Ming Wen": 245,
+    "Nic": 176,
+    "Traky Deng": 119,
+    "AlinsRan": 134,
     "Abhinav": 1,
     "Bhuvan Somisetty": 6,
-    "AlinsRan": 133,
-    "Nic": 173,
     "ruanweihong-aaa": 6,
     "Shreemaan Abhishek": 289,
     "bucketbase26": 1,
     "Nishan Kashyap": 1,
-    "Traky Deng": 118,
     "Mikhail Alabugin": 1,
     "Satvik Mishra": 1,
     "Vlad": 1,
     "okaybase": 41,
-    "Ming Wen": 239,
     "lordcheng10": 2,
     "Nikolai": 1,
     "jlongWang": 1,
@@ -574,7 +574,7 @@
     "2023": 495,
     "2024": 231,
     "2025": 288,
-    "2026": 663
+    "2026": 674
   },
   "ai_assisted": {
     "commits": 1,
@@ -632,16 +632,16 @@
       "2026-08": 69,
       "2026-09": 44,
       "2026-10": 45,
-      "2026-11": 52
+      "2026-11": 63
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 5305,
+    "commits": 5316,
     "by_kind": {
-      "organization": 502,
+      "organization": 506,
       "one_person": 78,
-      "personal": 3858,
+      "personal": 3865,
       "hidden": 752,
       "unknown": 0,
       "bot": 115
@@ -651,19 +651,19 @@
     "top": [
       {
         "organization": "apache.org",
-        "commits": 325,
-        "commits_last_12mo": 117,
+        "commits": 326,
+        "commits_last_12mo": 118,
         "addresses": 13,
         "first_commit": "2019-10-31",
-        "last_commit": "2026-11-12"
+        "last_commit": "2026-11-18"
       },
       {
         "organization": "api7.ai",
-        "commits": 173,
-        "commits_last_12mo": 149,
+        "commits": 176,
+        "commits_last_12mo": 152,
         "addresses": 3,
         "first_commit": "2021-05-06",
-        "last_commit": "2026-11-12"
+        "last_commit": "2026-11-20"
       },
       {
         "organization": "tencent.com",
@@ -732,9 +732,9 @@
         "bot": 0
       },
       "2026-Q4": {
-        "organization": 34,
+        "organization": 38,
         "one_person": 0,
-        "personal": 50,
+        "personal": 57,
         "hidden": 6,
         "unknown": 0,
         "bot": 7
@@ -744,13 +744,13 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 659,
+    "commits": 670,
     "authors": 62,
     "new_authors": 43,
     "half_of_commits": 2
   },
   "humans": {
-    "commits": 5190,
+    "commits": 5201,
     "commits_by_year": {
       "2019": 753,
       "2020": 858,
@@ -759,9 +759,9 @@
       "2023": 466,
       "2024": 223,
       "2025": 279,
-      "2026": 643
+      "2026": 654
     },
-    "active_days": 1704
+    "active_days": 1708
   },
   "timezones": {
     "+0000": 3,
@@ -772,7 +772,7 @@
     "+0530": 302,
     "+0545": 142,
     "+0700": 1,
-    "+0800": 4488,
+    "+0800": 4499,
     "+0900": 26,
     "+1000": 62,
     "+1100": 1,
@@ -783,7 +783,7 @@
     "-0800": 14
   },
   "source_lines": {
-    "added": 852105,
-    "current": 665672
+    "added": 853935,
+    "current": 667592
   }
 }

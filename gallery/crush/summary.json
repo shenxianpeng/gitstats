@@ -1,22 +1,22 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:23:24+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:23:07+00:00",
   "name": "Crush",
   "report_path": "index.html",
   "first_commit": "2025-03-21 17:20:28",
-  "last_commit": "2026-11-15 18:42:46",
-  "age_days": 605,
-  "active_days": 528,
-  "total_commits": 4532,
-  "total_authors": 171,
-  "active_authors_12mo": 108,
-  "commits_last_12mo": 2484,
-  "total_files": 1424,
-  "total_lines": 229492,
-  "lines_added": 1659660,
-  "lines_removed": 1434043,
-  "total_tags": 211,
+  "last_commit": "2026-11-22 22:08:35",
+  "age_days": 612,
+  "active_days": 534,
+  "total_commits": 4625,
+  "total_authors": 175,
+  "active_authors_12mo": 110,
+  "commits_last_12mo": 2577,
+  "total_files": 1497,
+  "total_lines": 230311,
+  "lines_added": 1678625,
+  "lines_removed": 1441565,
+  "total_tags": 212,
   "era": "steady",
   "top_authors": [
     {
@@ -25,15 +25,15 @@
     },
     {
       "name": "Andrey Nering",
-      "commits": 760
+      "commits": 761
     },
     {
       "name": "Christian Rocha",
-      "commits": 615
+      "commits": 617
     },
     {
       "name": "Charm",
-      "commits": 476
+      "commits": 487
     },
     {
       "name": "Ayman Bagabas",
@@ -41,16 +41,21 @@
     }
   ],
   "author_commits": {
-    "Kieran Klukas": 385,
-    "Charm": 476,
+    "Charm": 487,
+    "Kieran Klukas": 391,
+    "Drew Smirnoff": 143,
+    "jane michelle arc": 2,
+    "Christian Rocha": 617,
+    "Andrey Nering": 761,
+    "Joe (Agent) Stump": 9,
+    "Christopher Dancy": 1,
+    "Bruno Krugel": 19,
+    "namore": 1,
+    "Samouly\ud83e\uddcb": 2,
+    "Steven Huang": 3,
     "Ricardo-M-L": 3,
-    "Christian Rocha": 615,
-    "Andrey Nering": 760,
     "gulagala001": 1,
-    "Drew Smirnoff": 79,
     "Amolith": 40,
-    "Bruno Krugel": 18,
-    "Steven Huang": 2,
     "Samarth Bhatia": 1,
     "joestump": 16,
     "moul": 1,
@@ -66,7 +71,6 @@
     "afsuyadi": 3,
     "Dan Xin": 3,
     "Gustave": 8,
-    "Joe (Agent) Stump": 8,
     "Yash Raj Pandey": 4,
     "yanyukang2003-ux": 1,
     "Vadim Inshakov": 5,
@@ -215,13 +219,13 @@
   },
   "commits_by_year": {
     "2025": 2294,
-    "2026": 2238
+    "2026": 2331
   },
   "ai_assisted": {
-    "commits": 63,
+    "commits": 65,
     "authored": 3,
     "assistants": {
-      "Claude": 50,
+      "Claude": 52,
       "GitHub Copilot": 10,
       "ChatGPT": 2,
       "OpenCode": 1
@@ -250,7 +254,7 @@
       "2026-08": 10,
       "2026-09": 2,
       "2026-10": 12,
-      "2026-11": 3
+      "2026-11": 5
     },
     "commits_by_month": {
       "2024-12": 0,
@@ -275,18 +279,18 @@
       "2026-07": 299,
       "2026-08": 121,
       "2026-09": 207,
-      "2026-10": 163,
-      "2026-11": 76
+      "2026-10": 215,
+      "2026-11": 117
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 4532,
+    "commits": 4625,
     "by_kind": {
       "organization": 0,
-      "one_person": 1320,
-      "personal": 1482,
-      "hidden": 1622,
+      "one_person": 1395,
+      "personal": 1485,
+      "hidden": 1637,
       "unknown": 0,
       "bot": 108
     },
@@ -352,9 +356,9 @@
       },
       "2026-Q4": {
         "organization": 0,
-        "one_person": 170,
-        "personal": 10,
-        "hidden": 58,
+        "one_person": 245,
+        "personal": 13,
+        "hidden": 73,
         "unknown": 0,
         "bot": 1
       }
@@ -363,45 +367,45 @@
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 2419,
-    "authors": 104,
-    "new_authors": 90,
+    "commits": 2512,
+    "authors": 108,
+    "new_authors": 94,
     "half_of_commits": 3
   },
   "humans": {
-    "commits": 4424,
+    "commits": 4517,
     "commits_by_year": {
       "2025": 2244,
-      "2026": 2180
+      "2026": 2273
     },
-    "active_days": 527
+    "active_days": 533
   },
   "timezones": {
-    "+0000": 165,
-    "+0100": 211,
-    "+0200": 798,
+    "+0000": 166,
+    "+0100": 214,
+    "+0200": 800,
     "+0300": 72,
-    "+0400": 80,
+    "+0400": 144,
     "+0500": 5,
     "+0530": 10,
     "+0600": 1,
     "+0700": 10,
-    "+0800": 74,
+    "+0800": 75,
     "+0900": 9,
     "+0930": 1,
     "+1000": 3,
     "+1100": 1,
     "+1200": 1,
-    "-0300": 1468,
+    "-0300": 1470,
     "-0400": 1142,
-    "-0500": 337,
+    "-0500": 356,
     "-0600": 29,
     "-0700": 105,
-    "-0800": 9,
+    "-0800": 10,
     "-1000": 1
   },
   "source_lines": {
-    "added": 425655,
-    "current": 220503
+    "added": 442978,
+    "current": 230311
   }
 }

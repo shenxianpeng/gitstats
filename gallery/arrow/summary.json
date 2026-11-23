@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "generated_by": "gitstats 2.12.2.post1.dev5",
-  "generated_at": "2026-11-16T05:26:51+00:00",
+  "generated_by": "gitstats 2.12.4.post1.dev11",
+  "generated_at": "2026-11-23T06:27:01+00:00",
   "name": "Apache Arrow",
   "report_path": "index.html",
   "first_commit": "2014-06-03 18:55:41",
-  "last_commit": "2026-11-16 01:46:53",
-  "age_days": 4549,
-  "active_days": 3399,
-  "total_commits": 19545,
-  "total_authors": 1486,
-  "active_authors_12mo": 229,
-  "commits_last_12mo": 1371,
-  "total_files": 5313,
-  "total_lines": 1465779,
-  "lines_added": 4616622,
-  "lines_removed": 3150700,
+  "last_commit": "2026-11-22 15:38:34",
+  "age_days": 4555,
+  "active_days": 3405,
+  "total_commits": 19570,
+  "total_authors": 1491,
+  "active_authors_12mo": 230,
+  "commits_last_12mo": 1396,
+  "total_files": 5309,
+  "total_lines": 1456738,
+  "lines_added": 4618716,
+  "lines_removed": 3151672,
   "total_tags": 49,
   "era": "steady",
   "top_authors": [
     {
       "name": "Sutou Kouhei",
-      "commits": 1979
+      "commits": 1980
     },
     {
       "name": "Antoine Pitrou",
-      "commits": 1406
+      "commits": 1409
     },
     {
       "name": "Wes McKinney",
@@ -33,25 +33,36 @@
     },
     {
       "name": "Kriszti\u00e1n Sz\u0171cs",
-      "commits": 617
+      "commits": 618
     },
     {
       "name": "Ra\u00fal Cumplido",
-      "commits": 564
+      "commits": 567
     }
   ],
   "author_commits": {
+    "Sabyasachi Panda": 1,
+    "Sumedh Pimplikar": 3,
+    "Sutou Kouhei": 1980,
+    "Aaditya Srinivasan": 40,
+    "Atul": 1,
+    "Ra\u00fal Cumplido": 567,
+    "Atharva Potdar": 1,
+    "Jonathan Keane": 204,
+    "Mrigank Bhatnagar": 2,
+    "Dewey Dunnington": 148,
+    "Nic Crane": 406,
+    "Antoine Pitrou": 1409,
+    "tadeja": 57,
+    "Kriszti\u00e1n Sz\u0171cs": 618,
+    "Alenka Frim": 271,
+    "ump45nose": 1,
+    "Stefan Wang": 8,
+    "Jun Yao": 1,
     "Gang Wu": 83,
-    "tadeja": 56,
-    "Sumedh Pimplikar": 1,
-    "Stefan Wang": 6,
     "Agriya Khetarpal": 2,
-    "Nic Crane": 405,
-    "Sutou Kouhei": 1979,
-    "Ra\u00fal Cumplido": 564,
     "Dmitry Chirkov": 7,
     "Bryce Mecum": 139,
-    "Jonathan Keane": 203,
     "Rossi Sun": 94,
     "metsw24-max": 11,
     "Adam Reeve": 57,
@@ -66,20 +77,16 @@
     "Rok Mihevc": 121,
     "Abhishek Pathania": 1,
     "mwish": 182,
-    "Mrigank Bhatnagar": 1,
     "Gnananjali": 1,
     "Omkar Kabde": 2,
     "Marcin Krystianc": 3,
     "Mashrafee Aryan": 1,
-    "Antoine Pitrou": 1406,
     "Jonas Dedden": 5,
     "Juan Miguel Carceller": 1,
     "Robert DeRienzo": 1,
-    "Kriszti\u00e1n Sz\u0171cs": 617,
     "Curt Hagenlocher": 45,
     "autoCAT": 1,
     "Antoine Prouvost": 31,
-    "Alenka Frim": 270,
     "Zhou Hongfeng": 1,
     "Alexander Taepper": 22,
     "Advit Arora": 4,
@@ -88,7 +95,6 @@
     "Alexis Placet": 2,
     "Vikrant Puppala": 4,
     "Dricmoy Bhattacharjee": 1,
-    "Aaditya Srinivasan": 39,
     "paultiq": 7,
     "Evan Brown": 1,
     "Abdul Rawoof Khan": 7,
@@ -202,7 +208,6 @@
     "Kyle Edwards": 1,
     "Tom \"spot\" Callaway": 1,
     "Arpit Jain": 1,
-    "Dewey Dunnington": 147,
     "Kristofer Gaudel": 1,
     "Hyukjin Kwon": 71,
     "Vlad Borovtsov": 1,
@@ -1541,13 +1546,13 @@
     "2023": 2227,
     "2024": 1938,
     "2025": 1285,
-    "2026": 1202
+    "2026": 1227
   },
   "ai_assisted": {
-    "commits": 41,
+    "commits": 43,
     "authored": 0,
     "assistants": {
-      "GitHub Copilot": 28,
+      "GitHub Copilot": 30,
       "Claude": 12,
       "Jules": 1
     },
@@ -1575,7 +1580,7 @@
       "2026-08": 1,
       "2026-09": 10,
       "2026-10": 6,
-      "2026-11": 2
+      "2026-11": 4
     },
     "commits_by_month": {
       "2024-12": 91,
@@ -1601,30 +1606,30 @@
       "2026-08": 92,
       "2026-09": 150,
       "2026-10": 109,
-      "2026-11": 66
+      "2026-11": 91
     }
   },
   "organizations": {
     "description": "Commits by the domain of the author's email address. Mail providers anyone can sign up for count as personal, code hosts' private noreply addresses as hidden, CI accounts and accounts named [bot] as bots, and a domain only one person commits from as one_person. A domain says where an address is, not who paid for the work.",
-    "commits": 19545,
+    "commits": 19570,
     "by_kind": {
-      "organization": 5209,
-      "one_person": 3183,
-      "personal": 9070,
-      "hidden": 1500,
+      "organization": 5210,
+      "one_person": 3187,
+      "personal": 9084,
+      "hidden": 1505,
       "unknown": 15,
-      "bot": 568
+      "bot": 569
     },
     "organization_count": 51,
     "last_12mo_from": "2025-12",
     "top": [
       {
         "organization": "clear-code.com",
-        "commits": 1979,
-        "commits_last_12mo": 153,
+        "commits": 1980,
+        "commits_last_12mo": 154,
         "addresses": 5,
         "first_commit": "2016-12-21",
-        "last_commit": "2026-11-12"
+        "last_commit": "2026-11-22"
       },
       {
         "organization": "apache.org",
@@ -2085,25 +2090,25 @@
         "bot": 14
       },
       "2026-Q4": {
-        "organization": 25,
-        "one_person": 20,
-        "personal": 85,
-        "hidden": 39,
+        "organization": 26,
+        "one_person": 24,
+        "personal": 99,
+        "hidden": 44,
         "unknown": 0,
-        "bot": 6
+        "bot": 7
       }
     }
   },
   "people_last_12mo": {
     "from": "2025-12",
     "to": "2026-11",
-    "commits": 1331,
-    "authors": 220,
-    "new_authors": 155,
+    "commits": 1355,
+    "authors": 225,
+    "new_authors": 160,
     "half_of_commits": 7
   },
   "humans": {
-    "commits": 18977,
+    "commits": 19001,
     "commits_by_year": {
       "2014": 1,
       "2015": 1,
@@ -2117,37 +2122,37 @@
       "2023": 2094,
       "2024": 1604,
       "2025": 1222,
-      "2026": 1167
+      "2026": 1191
     },
-    "active_days": 3391
+    "active_days": 3397
   },
   "timezones": {
     "+0000": 314,
-    "+0100": 2469,
+    "+0100": 2478,
     "+0200": 3262,
     "+0300": 138,
     "+0330": 23,
     "+0400": 2,
     "+0500": 4,
-    "+0530": 590,
+    "+0530": 597,
     "+0700": 10,
-    "+0800": 724,
-    "+0900": 2854,
+    "+0800": 726,
+    "+0900": 2856,
     "+1000": 9,
     "+1100": 17,
     "+1200": 35,
     "+1300": 25,
     "-0300": 176,
     "-0400": 3115,
-    "-0500": 2552,
-    "-0600": 820,
+    "-0500": 2556,
+    "-0600": 821,
     "-0700": 1562,
     "-0800": 731,
     "-0900": 14,
     "-1000": 99
   },
   "source_lines": {
-    "added": 4378124,
-    "current": 1456501
+    "added": 4378925,
+    "current": 1456738
   }
 }
